@@ -3,6 +3,8 @@ import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration } from './runner.js';
+import type { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
+import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 
 export const audioCommand = defineCommand({
   meta: {
@@ -271,7 +273,36 @@ export const studioCommand = defineCommand({
   },
   async run() {
     const { startStudioTui } = await import('../tui/app.js');
-    await startStudioTui();
+    const { loadConfigFile } = await import('../config/config-loader.js');
+    const { GoogleGenAI } = await import('@google/genai');
+    const { GeminiTTSProvider } = await import('../tts/gemini-tts-provider.js');
+    const { GeminiNarrationAdapter } = await import('../narration/gemini-narration-adapter.js');
+    const { StudioStore } = await import('../studio/studio-store.js');
+    const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
+
+    const fileConfig = await loadConfigFile(process.cwd());
+    const apiKey = getGeminiApiKey();
+    let provider: GeminiTTSProvider | undefined;
+    let narrationAdapter: GeminiNarrationAdapter | undefined;
+
+    if (apiKey) {
+      const client = new GoogleGenAI({ apiKey });
+      provider = new GeminiTTSProvider(client);
+      if (fileConfig?.narration?.enabled) {
+        narrationAdapter = new GeminiNarrationAdapter(client, {
+          model: fileConfig.narration.model,
+        });
+      }
+    }
+
+    const store = new StudioStore({
+      ttsProvider: provider,
+      narrationAdapter,
+      enableLiveAudio: true,
+      defaultVoice: fileConfig?.audio?.voice,
+    });
+
+    await startStudioTui(store);
   },
 });
 

@@ -86,6 +86,176 @@ function extractTextFromTokens(tokens: Token[]): string {
   return parts.join(' ');
 }
 
+/**
+ * Detects if a text block represents an ASCII directory/file tree.
+ */
+export function isDirectoryTree(text: string): boolean {
+  const lines = text.trim().split('\n').filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return false;
+
+  const treeChars = /[├──└──│┌┐└┘├┤┬┴┼─]/;
+  const asciiBranch = /^\s*(?:\|--|\+--|`--|\\--|\||\+-)/;
+
+  let branchCount = 0;
+  for (const line of lines) {
+    if (treeChars.test(line) || asciiBranch.test(line)) {
+      branchCount++;
+    }
+  }
+
+  return (
+    branchCount >= 2 ||
+    (lines.length >= 2 && branchCount >= 1 && (lines[0].endsWith('/') || lines[0].startsWith('.')))
+  );
+}
+
+function cleanSpokenPathSegment(name: string): string {
+  let s = name.replace(/[/\\]+$/, '').trim();
+  if (s === '.') return 'current directory';
+  s = s.replace(/^\.\//, '');
+  s = s.replace(/<([^>]+)>/g, '$1');
+  s = s.replace(/^\./, 'dot-');
+  s = s.replace(/\/\./g, ' slash dot-');
+  s = s.replace(/\//g, ' slash ');
+  s = s.replace(/\.([a-zA-Z0-9]+)$/, ' dot $1');
+  return s;
+}
+
+function formatSpokenList(items: string[]): string {
+  if (items.length === 0) return '';
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+}
+
+const isDirectoryEntry = (name: string): boolean =>
+  name.endsWith('/') || !/\.[a-zA-Z0-9]+$/.test(name);
+
+/**
+ * Verbalizes an ASCII directory/file tree into natural spoken paragraphs
+ * describing the number of levels, the root directory, and major subdirectories.
+ */
+export function verbalizeDirectoryTree(text: string): string[] {
+  const lines = text.trim().split('\n').filter((l) => l.trim().length > 0);
+  if (lines.length === 0) return [];
+
+  const rootLine = lines[0].replace(/^[#\s*`]+|[#\s*`]+$/g, '').trim();
+  const rootName = rootLine.replace(/[/\\]+$/, '');
+
+  interface TreeItem {
+    name: string;
+    comment: string;
+    depth: number;
+  }
+
+  const items: TreeItem[] = [];
+  let maxDepth = 1;
+
+  for (let i = 1; i < lines.length; i++) {
+    const rawLine = lines[i];
+    let namePart = rawLine;
+    let comment = '';
+    const hashIdx = rawLine.indexOf('#');
+    const slashSlashIdx = rawLine.indexOf('//');
+    const commentIdx = hashIdx !== -1 ? hashIdx : slashSlashIdx;
+    if (commentIdx !== -1) {
+      namePart = rawLine.slice(0, commentIdx);
+      comment = rawLine.slice(commentIdx + 1).replace(/^[/ ]+/, '').trim();
+    }
+
+    const branchMatch = namePart.match(/^([│\s|`+\\-]*(?:├──|└──|\|--|`--|\+--|\\--))\s*(.*)$/);
+    let cleanName = '';
+    let depth = 2;
+
+    if (branchMatch) {
+      const prefix = branchMatch[1];
+      cleanName = branchMatch[2].trim();
+      const segmentCount = (
+        prefix.match(/├──|└──|\|--|`--|\+--|\\--|│\s{3}|\|\s{3}|\s{4}/g) || []
+      ).length;
+      depth = Math.max(2, 1 + segmentCount);
+    } else {
+      cleanName = namePart.replace(/^[│\s|`+\\-]+/, '').trim();
+      const leadingSpaces = namePart.search(/\S|$/);
+      depth = Math.max(2, 2 + Math.floor(leadingSpaces / 4));
+    }
+
+    if (cleanName) {
+      if (depth > maxDepth) maxDepth = depth;
+      items.push({ name: cleanName, comment, depth });
+    }
+  }
+
+  const spokenRoot = cleanSpokenPathSegment(rootName);
+  if (items.length === 0) {
+    return [`The directory structure has 1 level, with root directory ${spokenRoot}.`];
+  }
+
+  interface Section {
+    parent: TreeItem;
+    children: TreeItem[];
+  }
+  const sections: Section[] = [];
+  let currentSec: Section | null = null;
+
+  for (const item of items) {
+    if (item.depth === 2 || !currentSec) {
+      currentSec = { parent: item, children: [] };
+      sections.push(currentSec);
+    } else {
+      currentSec.children.push(item);
+    }
+  }
+
+  const dirNames = sections
+    .filter((s) => isDirectoryEntry(s.parent.name))
+    .map((s) => cleanSpokenPathSegment(s.parent.name));
+  const fileNames = sections
+    .filter((s) => !isDirectoryEntry(s.parent.name))
+    .map((s) => cleanSpokenPathSegment(s.parent.name));
+
+  let overview = `The directory structure has ${maxDepth} levels, the top directory name being ${spokenRoot}`;
+  if (dirNames.length > 0 && fileNames.length > 0) {
+    overview += `, with subdirectories for ${formatSpokenList(dirNames)}, alongside ${formatSpokenList(fileNames)}.`;
+  } else if (dirNames.length > 0) {
+    overview += `, with subdirectories for ${formatSpokenList(dirNames)}.`;
+  } else if (fileNames.length > 0) {
+    overview += `, with files for ${formatSpokenList(fileNames)}.`;
+  } else {
+    overview += '.';
+  }
+
+  const paragraphs: string[] = [overview];
+
+  for (const sec of sections) {
+    const parentSpoken = cleanSpokenPathSegment(sec.parent.name);
+    let desc = `Under ${parentSpoken}`;
+    if (sec.parent.comment) {
+      desc += ` for ${sec.parent.comment}`;
+    }
+    if (sec.children.length > 0) {
+      const childList = sec.children.map((c) => {
+        let n = cleanSpokenPathSegment(c.name);
+        if (c.comment) {
+          n += ` for ${c.comment}`;
+        }
+        return n;
+      });
+      if (childList.length <= 4) {
+        desc += `, contents include ${childList.join(', ')}.`;
+      } else {
+        const first = childList.slice(0, 3).join(', ');
+        desc += `, contents include ${first}, and ${childList.length - 3} other files and folders.`;
+      }
+      paragraphs.push(desc);
+    } else if (sec.parent.comment) {
+      paragraphs.push(`${desc}.`);
+    }
+  }
+
+  return paragraphs;
+}
+
 export function parseMarkdownToSpeakableParagraphs(markdownText: string): string[] {
   const tokens = lexer(markdownText);
   const paragraphs: string[] = [];
@@ -94,6 +264,17 @@ export function parseMarkdownToSpeakableParagraphs(markdownText: string): string
     switch (token.type) {
       case 'paragraph': {
         const pToken = token as Tokens.Paragraph;
+        if (isDirectoryTree(pToken.text)) {
+          const treeParagraphs = verbalizeDirectoryTree(pToken.text);
+          for (const p of treeParagraphs) {
+            const rawText = sanitizeTextForSpeech(p);
+            const text = ensureSentenceEnding(rawText);
+            if (text.length > 0) {
+              paragraphs.push(text);
+            }
+          }
+          break;
+        }
         const rawText = sanitizeTextForSpeech(extractTextFromTokens(pToken.tokens));
         const text = ensureSentenceEnding(rawText);
         if (text.length > 0) {
@@ -132,9 +313,20 @@ export function parseMarkdownToSpeakableParagraphs(markdownText: string): string
       }
       case 'code': {
         const codeToken = token as Tokens.Code;
-        const codeText = sanitizeTextForSpeech(codeToken.text);
-        if (codeText.length > 0) {
-          paragraphs.push(`Code snippet: ${codeText}.`);
+        if (isDirectoryTree(codeToken.text)) {
+          const treeParagraphs = verbalizeDirectoryTree(codeToken.text);
+          for (const p of treeParagraphs) {
+            const rawText = sanitizeTextForSpeech(p);
+            const text = ensureSentenceEnding(rawText);
+            if (text.length > 0) {
+              paragraphs.push(text);
+            }
+          }
+        } else {
+          const codeText = sanitizeTextForSpeech(codeToken.text);
+          if (codeText.length > 0) {
+            paragraphs.push(`Code snippet: ${codeText}.`);
+          }
         }
         break;
       }

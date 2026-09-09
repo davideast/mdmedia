@@ -4,6 +4,8 @@ import { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
 import { AudioLibrary } from '../storage/audio-library.js';
 import { PlaybackEngine } from '../audio/player/playback-engine.js';
 import { StudioStore } from '../studio/studio-store.js';
+import { loadConfigFile } from '../config/config-loader.js';
+import { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 import {
   getGeminiApiKey,
   getAllTranscriptSteps,
@@ -26,12 +28,22 @@ async function main() {
   const provider = new GeminiTTSProvider(client);
   const library = new AudioLibrary();
   const player = new PlaybackEngine();
+
+  const fileConfig = await loadConfigFile(process.cwd());
+  let narrationAdapter: GeminiNarrationAdapter | undefined;
+  if (fileConfig?.narration?.enabled) {
+    narrationAdapter = new GeminiNarrationAdapter(client, {
+      model: fileConfig.narration.model,
+    });
+  }
+
   const studioStore = new StudioStore({
     library,
     player,
     ttsProvider: provider,
+    narrationAdapter,
     enableLiveAudio: true,
-    defaultVoice,
+    defaultVoice: fileConfig?.audio?.voice ?? defaultVoice,
     defaultStyle,
   });
 

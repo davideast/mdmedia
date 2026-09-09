@@ -206,4 +206,34 @@ describe('StudioStore Session & Turn Integration (R2)', () => {
     store.toggleViewMode();
     expect(store.getState().viewMode).toBe('markdown');
   });
+
+  it('activateTurn invokes narrationAdapter when configured on StudioStore', async () => {
+    const convId = 'f1111111-2222-3333-4444-555555555555';
+    setupSessionTranscript(convId);
+
+    let adapterCalled = false;
+    const mockAdapter = {
+      async adaptForNarration(markdown: string) {
+        adapterCalled = true;
+        return `# Adapted Narration\n\nThis is the narration-adapted version of ${markdown.slice(0, 15)}.`;
+      },
+    };
+
+    const store = new StudioStore({
+      library,
+      player,
+      brainDir,
+      ttsProvider: mockTtsProvider,
+      narrationAdapter: mockAdapter,
+      enableLiveAudio: false,
+    });
+
+    const ungenTurn = store.getState().turns.find((t) => t.stepIndex === 2)!;
+    await store.activateTurn(ungenTurn.id);
+
+    expect(adapterCalled).toBe(true);
+    const updatedTurn = store.getState().turns.find((t) => t.id === ungenTurn.id)!;
+    expect(updatedTurn.status).toBe('cached');
+    expect(updatedTurn.track?.transcript).toContain('This is the narration-adapted version');
+  });
 });
