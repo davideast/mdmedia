@@ -347,6 +347,25 @@ Support both in-flight narration during audio synthesis and standalone script ge
 
 ---
 
+### Step 5: Workspace `*.narration.md` Document Discovery in `SessionCatalogService`
+
+1. In `src/studio/session-catalog.ts`:
+   - Update `SessionCatalogOptions` to accept an optional `workspaceDir?: string` (defaults to `process.cwd()`).
+   - Add `source?: 'turn' | 'document'` and `filePath?: string` to `TurnItem`.
+   - Scan `workspaceDir` recursively (ignoring `node_modules`, `.git`, `dist`, `.gemini`) for `*.narration.md` files.
+   - For each file:
+     - Read the file content and compute word count.
+     - Generate slug / id: `doc_${slugify(path.relative(workspaceDir, filePath))}`.
+     - Extract title (first `# Heading` or file basename).
+     - Check if audio has already been synthesized in `AudioLibrary` for this document ID.
+     - Prepend document items with badge prefix `[DOC]` in the catalog.
+   - In `src/studio/studio-store.ts`:
+     - Update `activateTurn` so that if `source === 'document'`, it synthesizes the document's markdown directly and plays the generated WAV track.
+
+2. **Verify**: Run `bun test test/studio/session-catalog.test.ts` to verify `*.narration.md` files appear as first-class items in `listSessionTurns`.
+
+---
+
 ## STOP Conditions
 
 1. If `gemini-3.5-flash-lite` returns 404/Not Found in any environment, stop and check Gemini API model availability.

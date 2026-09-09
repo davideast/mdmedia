@@ -1,10 +1,14 @@
+import fs from 'node:fs';
 import { GoogleGenAI } from '@google/genai';
 import { ChunkQueueAudioPlayer, LiveAudioPlayerSink, WavFileStreamSink } from '../audio/index.js';
 import {
   NodeFileReader,
+  chunkSpeakableParagraphs,
+  parseMarkdownToSpeakableParagraphs,
   prepareDocumentChunks,
   prepareStoryboardScenes,
 } from '../chunker/index.js';
+import { GeminiNarrationAdapter } from '../narration/index.js';
 import {
   DocumentAudioPipeline,
   DocumentVideoPipeline,
@@ -34,6 +38,16 @@ export interface RunAudioSynthesisArgs {
   maxRetries?: number;
   play?: boolean;
   verbose?: boolean;
+  narration?: boolean;
+  narrationModel?: string;
+}
+
+export interface RunNarrationAdaptationArgs {
+  input: string;
+  output?: string;
+  model?: string;
+  apiKey?: string;
+  verbose?: boolean;
 }
 
 export interface RunVideoGenerationArgs {
@@ -51,9 +65,55 @@ export interface RunVideoGenerationArgs {
   verbose?: boolean;
 }
 
+export async function runNarrationAdaptation(args: RunNarrationAdaptationArgs): Promise<string> {
+  const fileReader = new NodeFileReader();
+  const rawMarkdown = await fileReader.readText(args.input);
+
+  const apiKey = args.apiKey ?? new NodeEnvProvider().getApiKey();
+  const genaiClient = apiKey
+    ? new GoogleGenAI({ apiKey })
+    : createGeminiClient(new NodeEnvProvider());
+
+  const adapter = new GeminiNarrationAdapter(genaiClient, {
+    model: args.model,
+  });
+
+  if (args.verbose) {
+    console.log(`[Narration] Adapting ${args.input} using ${args.model ?? 'gemini-3.5-flash-lite'}...`);
+  }
+
+  const adapted = await adapter.adaptForNarration(rawMarkdown);
+
+  if (args.output) {
+    await fs.promises.writeFile(args.output, adapted, 'utf8');
+    console.log(`[Success] Narration-optimized script created at: ${args.output}`);
+  } else {
+    console.log(adapted);
+  }
+
+  return adapted;
+}
+
 export async function runAudioSynthesis(args: RunAudioSynthesisArgs): Promise<void> {
   const fileReader = new NodeFileReader();
-  const chunks = await prepareDocumentChunks(fileReader, args.input, args.maxChars);
+  let rawMarkdown = await fileReader.readText(args.input);
+
+  if (args.narration) {
+    const apiKey = args.apiKey ?? new NodeEnvProvider().getApiKey();
+    const genaiClient = apiKey
+      ? new GoogleGenAI({ apiKey })
+      : createGeminiClient(new NodeEnvProvider());
+    const adapter = new GeminiNarrationAdapter(genaiClient, {
+      model: args.narrationModel,
+    });
+    if (args.verbose) {
+      console.log(`[Narration] Adapting markdown using ${args.narrationModel ?? 'gemini-3.5-flash-lite'}...`);
+    }
+    rawMarkdown = await adapter.adaptForNarration(rawMarkdown);
+  }
+
+  const speakableParagraphs = parseMarkdownToSpeakableParagraphs(rawMarkdown);
+  const chunks = chunkSpeakableParagraphs(speakableParagraphs, args.maxChars);
 
   if (chunks.length === 0) {
     console.warn(`[Warning] No speakable markdown content found in ${args.input}`);

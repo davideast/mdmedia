@@ -78,7 +78,7 @@ export class AudioLibrary extends EventEmitter {
     const durationMs = Math.round(pcmBytes / 48);
 
     const track: TrackMetadata = {
-      id: `${input.sessionId.slice(0, 8)}_s${input.stepIndex}`,
+      id: input.id ?? `${input.sessionId.slice(0, 8)}_s${input.stepIndex}`,
       sessionId: input.sessionId,
       stepIndex: input.stepIndex,
       title,

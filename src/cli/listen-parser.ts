@@ -2,9 +2,10 @@ import { parseArgs } from 'node:util';
 import type { VoiceName } from '../types/voice.js';
 
 export interface ListenCommand {
-  mode: 'once' | 'auto' | 'off';
+  mode: 'once' | 'auto' | 'off' | 'generate';
   voice?: VoiceName;
   style?: string;
+  targetPath?: string;
 }
 
 /**
@@ -75,11 +76,20 @@ export function parseListenCommand(rawContent: string): ListenCommand | null {
 
   const sub = positionals[0]?.toLowerCase();
   const mode =
-    sub === 'auto' ? 'auto' : sub === 'off' || sub === 'stop' ? 'off' : 'once';
+    sub === 'auto'
+      ? 'auto'
+      : sub === 'off' || sub === 'stop'
+        ? 'off'
+        : sub === 'generate'
+          ? 'generate'
+          : 'once';
+
+  const targetPath = sub === 'generate' ? positionals[1] : undefined;
 
   return {
     mode,
     voice: typeof values.voice === 'string' ? (values.voice as VoiceName) : undefined,
     style: typeof values.style === 'string' ? values.style : undefined,
+    targetPath,
   };
 }

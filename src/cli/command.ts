@@ -2,7 +2,7 @@ import { defineCommand } from 'citty';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { runAudioSynthesis, runVideoGeneration } from './runner.js';
+import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration } from './runner.js';
 
 export const audioCommand = defineCommand({
   meta: {
@@ -57,6 +57,16 @@ export const audioCommand = defineCommand({
       description: 'Play audio in real-time through speakers as chunks stream',
       default: false,
     },
+    narration: {
+      type: 'boolean',
+      alias: 'n',
+      description: 'Rewrite document into audio-narration-optimized script before TTS',
+      default: false,
+    },
+    narrationModel: {
+      type: 'string',
+      description: 'Gemini model for narration rewriting (defaults to gemini-3.5-flash-lite)',
+    },
     verbose: {
       type: 'boolean',
       description: 'Enable verbose audio streaming delta logs',
@@ -75,6 +85,8 @@ export const audioCommand = defineCommand({
         apiKey: args.apiKey,
         maxRetries: args.maxRetries ? Number(args.maxRetries) : undefined,
         play: args.play,
+        narration: args.narration,
+        narrationModel: args.narrationModel,
       },
       fileConfig
     );
@@ -90,6 +102,8 @@ export const audioCommand = defineCommand({
       maxRetries: resolved.maxRetries,
       play: resolved.audio.play,
       verbose: args.verbose,
+      narration: resolved.narration.enabled,
+      narrationModel: resolved.narration.model,
     });
   },
 });
@@ -261,6 +275,59 @@ export const studioCommand = defineCommand({
   },
 });
 
+export const adaptCommand = defineCommand({
+  meta: {
+    name: 'adapt',
+    description: 'Transform markdown documents into audio-narration-optimized scripts via Gemini Flash Lite',
+  },
+  args: {
+    input: {
+      type: 'string',
+      alias: 'i',
+      description: 'Path to input markdown (.md) file',
+      required: true,
+    },
+    output: {
+      type: 'string',
+      alias: 'o',
+      description: 'Optional path for output narration script (.md) file (defaults to stdout)',
+    },
+    model: {
+      type: 'string',
+      alias: 'm',
+      description: 'Gemini model name (defaults to gemini-3.5-flash-lite or config)',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'Gemini API Key',
+    },
+    verbose: {
+      type: 'boolean',
+      description: 'Enable verbose logs',
+      default: false,
+    },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const resolved = resolveConfig(
+      {
+        narrationModel: args.model,
+        apiKey: args.apiKey,
+      },
+      fileConfig
+    );
+
+    await runNarrationAdaptation({
+      input: args.input,
+      output: args.output,
+      model: resolved.narration.model,
+      apiKey: resolved.apiKey,
+      verbose: args.verbose,
+    });
+  },
+});
+
 export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
@@ -270,6 +337,7 @@ export const mainCommand = defineCommand({
   subCommands: {
     audio: audioCommand,
     video: videoCommand,
+    adapt: adaptCommand,
     watch: watchCommand,
     studio: studioCommand,
     plugin: pluginCommand,

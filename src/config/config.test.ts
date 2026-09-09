@@ -106,4 +106,41 @@ describe('Configuration Loader & Resolver (.mdmedia.json)', () => {
     expect(resolved.video.delivery).toBe('uri'); // Default
     expect(resolved.video.referenceImages).toEqual(['ref1.png']);
   });
+
+  it('resolves narration configuration with correct precedence (CLI > File > Defaults)', () => {
+    // 1. Defaults when unspecified
+    const defaultResolved = resolveConfig({}, {});
+    expect(defaultResolved.narration.enabled).toBe(false);
+    expect(defaultResolved.narration.model).toBe('gemini-3.5-flash-lite');
+
+    // 2. File config overrides defaults
+    const fileResolved = resolveConfig(
+      {},
+      {
+        narration: {
+          enabled: true,
+          model: 'gemini-file-model',
+        },
+      }
+    );
+    expect(fileResolved.narration.enabled).toBe(true);
+    expect(fileResolved.narration.model).toBe('gemini-file-model');
+
+    // 3. CLI overrides file config
+    const cliResolved = resolveConfig(
+      {
+        narration: false,
+        narrationModel: 'gemini-cli-model',
+      },
+      {
+        narration: {
+          enabled: true,
+          model: 'gemini-file-model',
+        },
+      }
+    );
+    expect(cliResolved.narration.enabled).toBe(false);
+    expect(cliResolved.narration.model).toBe('gemini-cli-model');
+  });
 });
+
