@@ -43,6 +43,7 @@ export interface CatalogIndex {
 }
 
 export interface SaveTrackInput {
+  id?: string;
   sessionId: string;
   stepIndex: number;
   markdown: string;

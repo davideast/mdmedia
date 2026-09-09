@@ -173,6 +173,12 @@ export class AntigravityWatcher {
             this.autoListenConversations.delete(step.convId);
             this.store.abortLiveTurn();
             this.onLog(`🔕 [Session ${step.convId.slice(0, 8)}] Disabled auto-narration.`);
+          } else if (cmd.mode === 'generate') {
+            this.onLog(
+              `📝 [Session ${step.convId.slice(0, 8)}] Narration generation requested (/listen generate${
+                cmd.targetPath ? ` ${cmd.targetPath}` : ''
+              }) - handled by Agent via subscription`
+            );
           } else if (cmd.mode === 'once') {
             this.onLog(`🎯 [Session ${step.convId.slice(0, 8)}] One-shot /listen requested`);
             const latestResp = getLatestPlannerResponseForConv(allSteps, step.convId);

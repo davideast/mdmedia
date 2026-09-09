@@ -36,6 +36,7 @@ export interface StudioState {
 }
 
 export interface LiveTurnInput {
+  turnId?: string;
   sessionId: string;
   stepIndex: number;
   content: string;

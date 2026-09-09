@@ -230,6 +230,7 @@ export class StudioStore implements StudioAction {
       this.emitChange();
 
       const savedTrack = await this.handleLiveTurn({
+        turnId: turn.id,
         sessionId: turn.sessionId,
         stepIndex: turn.stepIndex,
         content: turn.markdown,
@@ -447,6 +448,7 @@ export class StudioStore implements StudioAction {
       const result = await recorder.record(chunks, voice, style);
 
       const savedTrack = await this.library.saveTrack({
+        id: input.turnId,
         sessionId: input.sessionId,
         stepIndex: input.stepIndex,
         markdown: input.content,

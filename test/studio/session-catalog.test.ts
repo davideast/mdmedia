@@ -139,4 +139,30 @@ describe('SessionCatalogService (Seam 1)', () => {
     expect(queryTurns.length).toBe(1);
     expect(queryTurns[0].title).toBe('Beta Release');
   });
+
+  it('discovers workspace *.narration.md files alongside transcript turns', async () => {
+    const workspaceDir = path.join(tempDir, 'workspace');
+    fs.mkdirSync(path.join(workspaceDir, 'docs'), { recursive: true });
+
+    const docContent =
+      '# Audio Pipeline Overview\n\nThis script explains the live streaming audio architecture.';
+    fs.writeFileSync(
+      path.join(workspaceDir, 'docs', 'pipeline.narration.md'),
+      docContent,
+      'utf8'
+    );
+
+    const service = new SessionCatalogService({
+      brainDir,
+      workspaceDir,
+      library,
+    });
+
+    const items = service.listSessionTurns();
+    expect(items.length).toBe(1);
+    expect(items[0].source).toBe('document');
+    expect(items[0].title).toBe('[DOC] Audio Pipeline Overview');
+    expect(items[0].status).toBe('ungenerated');
+    expect(items[0].filePath).toContain('pipeline.narration.md');
+  });
 });

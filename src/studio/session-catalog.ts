@@ -15,10 +15,13 @@ export interface TurnItem {
   wordCount: number;
   status: 'cached' | 'ungenerated' | 'synthesizing';
   track?: TrackMetadata;
+  source?: 'turn' | 'document';
+  filePath?: string;
 }
 
 export interface SessionCatalogOptions {
   brainDir?: string;
+  workspaceDir?: string;
   library: AudioLibrary;
 }
 
@@ -26,6 +29,32 @@ export interface SessionTurnFilter {
   query?: string;
   audioOnly?: boolean;
   limit?: number;
+}
+
+function findWorkspaceNarrationFiles(dir: string, maxDepth: number = 3): string[] {
+  if (!fs.existsSync(dir)) return [];
+  const results: string[] = [];
+
+  function walk(currentDir: string, depth: number) {
+    if (depth > maxDepth) return;
+    try {
+      const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name.startsWith('.') || entry.name === 'node_modules' || entry.name === 'dist') {
+          continue;
+        }
+        const fullPath = path.join(currentDir, entry.name);
+        if (entry.isDirectory()) {
+          walk(fullPath, depth + 1);
+        } else if (entry.isFile() && entry.name.endsWith('.narration.md')) {
+          results.push(fullPath);
+        }
+      }
+    } catch {}
+  }
+
+  walk(dir, 0);
+  return results;
 }
 
 function countWords(text: string): number {
@@ -47,16 +76,50 @@ interface CachedSessionEntry {
 
 export class SessionCatalogService {
   private readonly brainDir: string;
+  private readonly workspaceDir?: string;
   private readonly library: AudioLibrary;
   private readonly sessionCache = new Map<string, CachedSessionEntry>();
 
   constructor(options: SessionCatalogOptions) {
     this.brainDir = options.brainDir ?? getBrainDir();
+    this.workspaceDir = options.workspaceDir ?? process.cwd();
     this.library = options.library;
   }
 
   public listSessionTurns(filter?: SessionTurnFilter): TurnItem[] {
-    if (!fs.existsSync(this.brainDir)) return [];
+    const items: TurnItem[] = [];
+
+    // Scan workspace for *.narration.md files if workspaceDir exists
+    if (this.workspaceDir && fs.existsSync(this.workspaceDir)) {
+      const narrationFiles = findWorkspaceNarrationFiles(this.workspaceDir);
+      for (const filePath of narrationFiles) {
+        try {
+          const rel = path.relative(this.workspaceDir, filePath);
+          const id = `doc_${rel.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+          const markdown = fs.readFileSync(filePath, 'utf8');
+          const baseName = path.basename(filePath, '.narration.md');
+          const { title } = generateTrackSlug(markdown, baseName);
+          const cachedTrack = this.library.getTrack(id) ?? undefined;
+
+          items.push({
+            id,
+            sessionId: 'workspace',
+            stepIndex: 0,
+            title: `[DOC] ${title}`,
+            markdown,
+            wordCount: countWords(markdown),
+            status: cachedTrack ? 'cached' : 'ungenerated',
+            track: cachedTrack,
+            source: 'document',
+            filePath,
+          });
+        } catch {}
+      }
+    }
+
+    if (!fs.existsSync(this.brainDir)) {
+      return items;
+    }
 
     const entries = fs.readdirSync(this.brainDir, { withFileTypes: true });
     const convFiles: { convId: string; transcriptPath: string; mtimeMs: number }[] = [];
@@ -80,7 +143,6 @@ export class SessionCatalogService {
 
     // Scan top 40 most recent conversations by default (or all if searching)
     const maxConvs = filter?.query ? convFiles.length : Math.min(convFiles.length, 40);
-    const items: TurnItem[] = [];
 
     for (let i = 0; i < maxConvs; i++) {
       const { convId, transcriptPath, mtimeMs } = convFiles[i];

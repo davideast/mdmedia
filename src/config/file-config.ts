@@ -18,10 +18,16 @@ export interface VideoConfig {
   readonly previousInteractionId?: string;
 }
 
+export interface NarrationConfig {
+  readonly enabled?: boolean;
+  readonly model?: string;
+}
+
 export interface MdMediaConfig {
   readonly mode?: MediaType;
   readonly audio?: AudioConfig;
   readonly video?: VideoConfig;
+  readonly narration?: NarrationConfig;
   readonly maxChars?: number;
   readonly maxRetries?: number;
   readonly apiKey?: string;
