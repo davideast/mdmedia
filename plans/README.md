@@ -13,6 +13,7 @@ Execute in the order below. Each executor: read the plan fully before starting, 
 | [002](002-stateful-playback-engine.md) | Build stateful `PlaybackEngine` with sample-accurate scrubbing, rate scaling, and timeupdate ticker | P1 | M | 001 | DONE |
 | [003](003-antigravity-studio-store.md) | Create headless `StudioStore` and connect `/listen` watcher to persistent track library | P1 | M | 001, 002 | DONE |
 | [004](004-opentui-studio-interface.md) | Implement fullscreen OpenTUI terminal dashboard with library, transcript viewer, and scrubber | P2 | L | 003 | DONE |
+| [005](005-narration-document-adapter.md) | Implement AI narration-optimized document adapter with Gemini 3.5 Flash Lite | P2 | M | — | READY |
 
 ## Dependency Notes
 
