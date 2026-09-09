@@ -82,7 +82,12 @@ export class SessionCatalogService {
 
   constructor(options: SessionCatalogOptions) {
     this.brainDir = options.brainDir ?? getBrainDir();
-    this.workspaceDir = options.workspaceDir ?? process.cwd();
+    this.workspaceDir =
+      options.workspaceDir !== undefined
+        ? options.workspaceDir
+        : options.brainDir
+          ? undefined
+          : process.cwd();
     this.library = options.library;
   }
 

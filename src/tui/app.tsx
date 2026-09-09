@@ -10,6 +10,7 @@ import { HeaderBar } from './components/header-bar.js';
 import { LibraryPane } from './components/library-pane.js';
 import { TranscriptPane } from './components/transcript-pane.js';
 import { TransportDeck } from './components/transport-deck.js';
+import { copyToSystemClipboard } from '../studio/clipboard.js';
 
 export interface StudioAppProps {
   store: StudioStore;
@@ -22,10 +23,25 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
   const [filterActive, setFilterActive] = useState(false);
   const [filterBuffer, setFilterBuffer] = useState('');
   const [transcriptScrollOffset, setTranscriptScrollOffset] = useState(0);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
 
   useKeyboard((key) => {
     if ((key.ctrl && key.name === 'c') || (!filterActive && key.name === 'q')) {
       onExit();
+      return;
+    }
+
+    if (key.name === 'y' || key.sequence === 'y' || (key.meta && key.name === 'c')) {
+      const textToCopy =
+        state.selectedTurn?.markdown ?? state.selectedTrack?.transcript ?? '';
+      if (textToCopy) {
+        copyToSystemClipboard(textToCopy).then((ok) => {
+          if (ok) {
+            setCopyToast('Copied transcript to clipboard');
+            setTimeout(() => setCopyToast(null), 2500);
+          }
+        });
+      }
       return;
     }
 
@@ -189,6 +205,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
         live={state.live}
         playback={state.playback}
         trackCount={state.turns.length || state.tracks.length}
+        copyNotification={copyToast}
       />
       <box flexDirection="row" flexGrow={1} width="100%">
         <LibraryPane
@@ -243,7 +260,7 @@ export async function startStudioTui(store?: StudioStore): Promise<void> {
   const watcher = new AntigravityWatcher(activeStore);
   watcher.start();
 
-  const renderer = await createCliRenderer();
+  const renderer = await createCliRenderer({ useMouse: false });
 
   function cleanup() {
     try {
