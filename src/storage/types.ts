@@ -47,6 +47,7 @@ export interface SaveTrackInput {
   sessionId: string;
   stepIndex: number;
   markdown: string;
+  transcript?: string;
   audioBuffer: Uint8Array;
   voice: VoiceName;
   style?: string;

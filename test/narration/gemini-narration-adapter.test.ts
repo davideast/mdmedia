@@ -68,4 +68,24 @@ describe('GeminiNarrationAdapter', () => {
     expect(capturedTemp).toBe(0.4);
     expect(result).toBe('Custom adapted narration text.');
   });
+
+  it('passes system instruction with directory tree and file structure verbalization rules', async () => {
+    let capturedInstruction = '';
+    const mockGenerateContent = mock(async ({ config }: any) => {
+      capturedInstruction = config.systemInstruction;
+      return { text: 'Adapted output' };
+    });
+    const mockClient = {
+      models: {
+        generateContent: mockGenerateContent,
+      },
+    } as unknown as GoogleGenAI;
+
+    const adapter = new GeminiNarrationAdapter(mockClient);
+    await adapter.adaptForNarration('Some content');
+
+    expect(capturedInstruction).toContain('Directory Trees & File Structures');
+    expect(capturedInstruction).toContain('Never read raw ASCII tree characters');
+    expect(capturedInstruction).toContain('Verbalize');
+  });
 });

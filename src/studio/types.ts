@@ -4,6 +4,7 @@ import type { VoiceName } from '../types/voice.js';
 import type { AudioLibrary } from '../storage/audio-library.js';
 import type { PlaybackEngine } from '../audio/player/playback-engine.js';
 import type { ITTSProvider } from '../tts/tts-provider.interface.js';
+import type { INarrationAdapter } from '../narration/types.js';
 import type { SessionCatalogService, TurnItem } from './session-catalog.js';
 
 export interface StudioPlaybackState {
@@ -72,6 +73,7 @@ export interface StudioStoreOptions {
   library?: AudioLibrary;
   player?: PlaybackEngine;
   ttsProvider?: ITTSProvider;
+  narrationAdapter?: INarrationAdapter;
   enableLiveAudio?: boolean;
   defaultVoice?: VoiceName;
   defaultStyle?: string;

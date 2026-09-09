@@ -11,6 +11,7 @@ import { SessionCatalogService } from './session-catalog.js';
 import type { ChunkTiming, TrackMetadata } from '../storage/types.js';
 import type { VoiceName } from '../types/voice.js';
 import type { ITTSProvider } from '../tts/tts-provider.interface.js';
+import type { INarrationAdapter } from '../narration/types.js';
 import type {
   LiveTurnInput,
   StudioAction,
@@ -43,6 +44,7 @@ export class StudioStore implements StudioAction {
   private readonly player: PlaybackEngine;
   private readonly catalog: SessionCatalogService;
   private readonly ttsProvider?: ITTSProvider;
+  private readonly narrationAdapter?: INarrationAdapter;
   private readonly enableLiveAudio: boolean;
   private readonly defaultVoice: VoiceName;
   private readonly defaultStyle?: string;
@@ -63,6 +65,7 @@ export class StudioStore implements StudioAction {
         library: this.library,
       });
     this.ttsProvider = options.ttsProvider;
+    this.narrationAdapter = options.narrationAdapter;
     this.enableLiveAudio = options.enableLiveAudio ?? true;
     this.defaultVoice = options.defaultVoice ?? 'Puck';
     this.defaultStyle = options.defaultStyle;
@@ -343,7 +346,16 @@ export class StudioStore implements StudioAction {
       throw new Error('[StudioStore] No TTS provider configured for live turn synthesis.');
     }
 
-    const paragraphs = parseMarkdownToSpeakableParagraphs(input.content);
+    let markdownToSpeak = input.content;
+    if (this.narrationAdapter) {
+      try {
+        markdownToSpeak = await this.narrationAdapter.adaptForNarration(input.content);
+      } catch {
+        // Fall back gracefully to raw content if adaptation encounters an error
+      }
+    }
+
+    const paragraphs = parseMarkdownToSpeakableParagraphs(markdownToSpeak);
     const chunks = chunkSpeakableParagraphs(paragraphs, 130);
     if (chunks.length === 0) return null;
 
@@ -452,6 +464,7 @@ export class StudioStore implements StudioAction {
         sessionId: input.sessionId,
         stepIndex: input.stepIndex,
         markdown: input.content,
+        transcript: markdownToSpeak,
         audioBuffer: result.wavBuffer,
         voice,
         style,

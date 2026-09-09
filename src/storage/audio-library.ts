@@ -77,6 +77,8 @@ export class AudioLibrary extends EventEmitter {
     const pcmBytes = Math.max(0, input.audioBuffer.byteLength - 44);
     const durationMs = Math.round(pcmBytes / 48);
 
+    const transcriptText = input.transcript ?? input.markdown;
+
     const track: TrackMetadata = {
       id: input.id ?? `${input.sessionId.slice(0, 8)}_s${input.stepIndex}`,
       sessionId: input.sessionId,
@@ -86,19 +88,19 @@ export class AudioLibrary extends EventEmitter {
       voice: input.voice,
       style: input.style,
       durationMs,
-      charCount: input.markdown.length,
+      charCount: transcriptText.length,
       chunkCount: input.chunkTimings?.length ?? 1,
       createdAt: now.toISOString(),
       audioPath,
       transcriptPath,
       metadataPath,
       chunkTimings: input.chunkTimings,
-      transcript: input.markdown,
+      transcript: transcriptText,
     };
 
     // Write all artifacts
     fs.writeFileSync(audioPath, input.audioBuffer);
-    fs.writeFileSync(transcriptPath, input.markdown, 'utf8');
+    fs.writeFileSync(transcriptPath, transcriptText, 'utf8');
     fs.writeFileSync(metadataPath, JSON.stringify(track, null, 2), 'utf8');
 
     // Update in-memory catalog (replace existing if same ID, or prepend)
