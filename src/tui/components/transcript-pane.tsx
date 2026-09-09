@@ -260,7 +260,7 @@ export function TranscriptPane({
               <b>{displayTitle}</b>
             </text>
             <text fg="#64748b">
-              [v] View: {viewMode === 'markdown' ? 'Markdown' : 'Script'} •{' '}
+              [y] Copy • [v] View: {viewMode === 'markdown' ? 'Markdown' : 'Script'} •{' '}
               {turn ? `${turn.wordCount} words` : `${track?.charCount ?? 0} chars`}
               {totalScrollItems > 0
                 ? ` • Block ${currentBlockDisplayIdx}/${totalScrollItems}`

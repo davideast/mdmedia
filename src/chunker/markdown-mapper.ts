@@ -13,6 +13,7 @@ interface DocWordToken {
   docStart: number;
   docEnd: number;
   paragraphIndex: number;
+  isAtomicSpan?: boolean;
 }
 
 function expandPathSpanInText(
@@ -54,6 +55,20 @@ function walkInlineAstTokens(
         const codeToken = token as Tokens.Codespan;
         const fullSpanStart = tokenOffset;
         const fullSpanEnd = tokenOffset + codeToken.raw.length;
+
+        // 1. Push full compound codespan text
+        const fullClean = codeToken.text.trim().toLowerCase();
+        if (fullClean.length > 0) {
+          out.push({
+            wordLower: fullClean,
+            docStart: fullSpanStart,
+            docEnd: fullSpanEnd,
+            paragraphIndex,
+            isAtomicSpan: true,
+          });
+        }
+
+        // 2. Sub-words with isAtomicSpan: true
         const wordRegex = /[a-zA-Z0-9]+/g;
         let match: RegExpExecArray | null;
         while ((match = wordRegex.exec(codeToken.text)) !== null) {
@@ -62,6 +77,7 @@ function walkInlineAstTokens(
             docStart: fullSpanStart,
             docEnd: fullSpanEnd,
             paragraphIndex,
+            isAtomicSpan: true,
           });
         }
         break;
@@ -73,6 +89,16 @@ function walkInlineAstTokens(
         const fullSpanStart = tokenOffset;
         const fullSpanEnd = tokenOffset + linkToken.raw.length;
         const labelText = linkToken.text || '';
+        const fullClean = labelText.trim().toLowerCase();
+        if (fullClean.length > 0) {
+          out.push({
+            wordLower: fullClean,
+            docStart: fullSpanStart,
+            docEnd: fullSpanEnd,
+            paragraphIndex,
+            isAtomicSpan: true,
+          });
+        }
         const wordRegex = /[a-zA-Z0-9]+/g;
         let match: RegExpExecArray | null;
         while ((match = wordRegex.exec(labelText)) !== null) {
@@ -81,6 +107,7 @@ function walkInlineAstTokens(
             docStart: fullSpanStart,
             docEnd: fullSpanEnd,
             paragraphIndex,
+            isAtomicSpan: true,
           });
         }
         break;
@@ -121,11 +148,13 @@ function walkInlineAstTokens(
               match.index,
               match.index + match[0].length
             );
+            const isPath = expanded.end - expanded.start > match[0].length;
             out.push({
               wordLower: match[0].toLowerCase(),
               docStart: tokenOffset + expanded.start,
               docEnd: tokenOffset + expanded.end,
               paragraphIndex,
+              isAtomicSpan: isPath,
             });
           }
         }
@@ -160,6 +189,19 @@ function tokenizeMarkdownAst(fullMarkdown: string): DocWordToken[] {
     cursor = tokenOffset + token.raw.length;
 
     if (token.type === 'code' || token.type === 'space' || token.type === 'hr') {
+      continue;
+    }
+
+    if (token.type === 'table') {
+      const tableToken = token as Tokens.Table;
+      for (const row of tableToken.rows) {
+        for (const cell of row) {
+          if (cell.tokens) {
+            walkInlineAstTokens(cell.tokens, tokenOffset, tableToken.raw, paragraphIndex, out);
+          }
+        }
+        paragraphIndex++;
+      }
       continue;
     }
 
@@ -199,14 +241,27 @@ function tokenizeChunkText(text: string): Array<{
   charEnd: number;
 }> {
   const tokens: Array<{ wordLower: string; charStart: number; charEnd: number }> = [];
-  const regex = /[a-zA-Z0-9]+/g;
+  const regex = /[a-zA-Z0-9_./-]+|[a-zA-Z0-9]+/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(text)) !== null) {
-    tokens.push({
-      wordLower: match[0].toLowerCase(),
-      charStart: match.index,
-      charEnd: match.index + match[0].length,
-    });
+    const rawWord = match[0];
+    const cleanWord = rawWord.replace(/^[.,;:!?'"`]+|[.,;:!?'"`]+$/g, '');
+    if (cleanWord.includes('/') || cleanWord.includes('.')) {
+      tokens.push({
+        wordLower: cleanWord.toLowerCase(),
+        charStart: match.index,
+        charEnd: match.index + rawWord.length,
+      });
+    }
+    const subRegex = /[a-zA-Z0-9]+/g;
+    let subMatch: RegExpExecArray | null;
+    while ((subMatch = subRegex.exec(rawWord)) !== null) {
+      tokens.push({
+        wordLower: subMatch[0].toLowerCase(),
+        charStart: match.index + subMatch.index,
+        charEnd: match.index + subMatch.index + subMatch[0].length,
+      });
+    }
   }
   return tokens;
 }
@@ -241,7 +296,7 @@ export function mapChunkToMarkdown(
   const expectedRatio = targetChunkIdx / Math.max(1, chunkTokens.length);
 
   let bestDocToken: DocWordToken | null = null;
-  let bestScore = -1;
+  let bestScore = -Infinity;
   let bestRatioDist = Infinity;
 
   for (let m = 0; m < docTokens.length; m++) {
@@ -259,14 +314,22 @@ export function mapChunkToMarkdown(
       }
     }
 
+    // Prefer plain text words over sub-words inside an atomic codespan or link
+    if (docTokens[m].isAtomicSpan) {
+      score -= 4;
+    }
+
+    // Distance penalty to prevent distant tokens from stealing matches
     const docRatio = m / Math.max(1, docTokens.length);
     const ratioDist = Math.abs(docRatio - expectedRatio);
+    const distancePenalty = ratioDist * 12;
+    const effectiveScore = score - distancePenalty;
 
     if (
-      score > bestScore ||
-      (score === bestScore && ratioDist < bestRatioDist)
+      effectiveScore > bestScore ||
+      (effectiveScore === bestScore && ratioDist < bestRatioDist)
     ) {
-      bestScore = score;
+      bestScore = effectiveScore;
       bestRatioDist = ratioDist;
       bestDocToken = docTokens[m];
     }

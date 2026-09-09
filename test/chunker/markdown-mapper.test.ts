@@ -78,4 +78,62 @@ describe('MarkdownChunkMapper (Seam 3)', () => {
     );
     expect(extractedSpan).toBe('`origin/main`');
   });
+
+  it('does not jump forward prematurely into a long codespan path when plain text words match path sub-words', () => {
+    const markdown =
+      'At the core of the system, all playback state flows directly through the playback engine module, located at `src/audio/player/playback-engine.ts`.';
+    const chunk: ChunkTiming = {
+      chunkIndex: 0,
+      startMs: 0,
+      endMs: 7000,
+      text: 'At the core of the system, all playback state flows directly through the playback engine module, located at src/audio/player/playback-engine.ts.',
+    };
+
+    // 1. Plain text "playback" at index 31
+    const wPlayback1: WordHighlight = {
+      wordIndex: 7,
+      word: 'playback',
+      charStart: chunk.text.indexOf('all playback state') + 'all '.length,
+      charEnd: chunk.text.indexOf('all playback state') + 'all playback'.length,
+    };
+    const docH1 = mapChunkToMarkdown(markdown, chunk, wPlayback1);
+    expect(docH1).not.toBeNull();
+    expect(markdown.slice(docH1!.docCharStart, docH1!.docCharEnd)).toBe('playback');
+    expect(docH1!.docCharStart).toBe(markdown.indexOf('all playback state') + 'all '.length);
+
+    // 2. Plain text "playback" at index 73
+    const wPlayback2: WordHighlight = {
+      wordIndex: 13,
+      word: 'playback',
+      charStart: chunk.text.indexOf('the playback engine') + 'the '.length,
+      charEnd: chunk.text.indexOf('the playback engine') + 'the playback'.length,
+    };
+    const docH2 = mapChunkToMarkdown(markdown, chunk, wPlayback2);
+    expect(docH2).not.toBeNull();
+    expect(markdown.slice(docH2!.docCharStart, docH2!.docCharEnd)).toBe('playback');
+    expect(docH2!.docCharStart).toBe(markdown.indexOf('the playback engine') + 'the '.length);
+
+    // 3. Plain text "engine" at index 82
+    const wEngine: WordHighlight = {
+      wordIndex: 14,
+      word: 'engine',
+      charStart: chunk.text.indexOf('playback engine module') + 'playback '.length,
+      charEnd: chunk.text.indexOf('playback engine module') + 'playback engine'.length,
+    };
+    const docH3 = mapChunkToMarkdown(markdown, chunk, wEngine);
+    expect(docH3).not.toBeNull();
+    expect(markdown.slice(docH3!.docCharStart, docH3!.docCharEnd)).toBe('engine');
+    expect(docH3!.docCharStart).toBe(markdown.indexOf('playback engine module') + 'playback '.length);
+
+    // 4. File path "src/audio/player/playback-engine.ts." aligns to the codespan
+    const wPath: WordHighlight = {
+      wordIndex: 18,
+      word: 'src/audio/player/playback-engine.ts.',
+      charStart: chunk.text.indexOf('src/audio/player/playback-engine.ts.'),
+      charEnd: chunk.text.indexOf('src/audio/player/playback-engine.ts.') + 'src/audio/player/playback-engine.ts.'.length,
+    };
+    const docH4 = mapChunkToMarkdown(markdown, chunk, wPath);
+    expect(docH4).not.toBeNull();
+    expect(markdown.slice(docH4!.docCharStart, docH4!.docCharEnd)).toBe('`src/audio/player/playback-engine.ts`');
+  });
 });

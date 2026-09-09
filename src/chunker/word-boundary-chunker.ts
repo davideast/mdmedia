@@ -94,53 +94,36 @@ export function chunkSpeakableParagraphs(
   paragraphs: string[],
   maxChunkChars = DEFAULT_MAX_CHUNK_CHARS
 ): DocumentChunk[] {
-  const rawSegments: string[] = [];
-
-  for (const paragraph of paragraphs) {
-    if (paragraph.length <= maxChunkChars) {
-      rawSegments.push(paragraph);
-    } else {
-      const subSegments = splitLongText(paragraph, maxChunkChars);
-      for (const seg of subSegments) {
-        rawSegments.push(seg);
-      }
-    }
-  }
-
   const chunks: DocumentChunk[] = [];
-  let currentText = '';
   let chunkIndex = 0;
 
-  for (const segment of rawSegments) {
-    const candidateLength = currentText.length > 0
-      ? currentText.length + 1 + segment.length
-      : segment.length;
+  for (const paragraph of paragraphs) {
+    const trimmed = paragraph.trim();
+    if (!trimmed) continue;
 
-    if (candidateLength <= maxChunkChars) {
-      currentText = currentText.length > 0 ? `${currentText} ${segment}` : segment;
+    if (trimmed.length <= maxChunkChars) {
+      chunks.push({
+        id: `chunk-${chunkIndex}`,
+        index: chunkIndex,
+        text: trimmed,
+        charCount: trimmed.length,
+        wordCount: countWords(trimmed),
+      });
+      chunkIndex++;
     } else {
-      if (currentText.length > 0) {
+      const subSegments = splitLongText(trimmed, maxChunkChars);
+      for (const seg of subSegments) {
+        if (!seg) continue;
         chunks.push({
           id: `chunk-${chunkIndex}`,
           index: chunkIndex,
-          text: currentText,
-          charCount: currentText.length,
-          wordCount: countWords(currentText),
+          text: seg,
+          charCount: seg.length,
+          wordCount: countWords(seg),
         });
         chunkIndex++;
       }
-      currentText = segment;
     }
-  }
-
-  if (currentText.length > 0) {
-    chunks.push({
-      id: `chunk-${chunkIndex}`,
-      index: chunkIndex,
-      text: currentText,
-      charCount: currentText.length,
-      wordCount: countWords(currentText),
-    });
   }
 
   return chunks;

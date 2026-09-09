@@ -4,13 +4,17 @@ export interface HeaderBarProps {
   live: StudioLiveState;
   playback: StudioPlaybackState;
   trackCount: number;
+  copyNotification?: string | null;
 }
 
-export function HeaderBar({ live, playback, trackCount }: HeaderBarProps) {
+export function HeaderBar({ live, playback, trackCount, copyNotification }: HeaderBarProps) {
   let statusBadge = '■ IDLE';
   let statusColor = '#9ca3af'; // gray
 
-  if (live.isStreaming) {
+  if (copyNotification) {
+    statusBadge = `✓ ${copyNotification.toUpperCase()}`;
+    statusColor = '#10b981'; // green
+  } else if (live.isStreaming) {
     statusBadge = '● STREAMING LIVE';
     statusColor = '#10b981'; // green
   } else if (playback.status === 'playing') {
