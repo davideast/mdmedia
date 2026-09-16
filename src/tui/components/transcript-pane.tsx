@@ -1,9 +1,12 @@
-import type { TrackMetadata } from '../../storage/types.js';
-import type { TurnItem } from '../../studio/session-catalog.js';
+import type { TrackMetadata, ChunkTiming } from '../../storage/types.js';
+import type { SessionItem, TurnItem } from '../../studio/session-catalog.js';
+import type { NavigationDepth } from '../../studio/types.js';
 import { buildHighlightedMarkdownBlocks } from '../../studio/highlight-renderer.js';
 import { parseMarkdownToSpeakableParagraphs } from '../../chunker/index.js';
 
 export interface TranscriptPaneProps {
+  navDepth?: NavigationDepth;
+  selectedSession?: SessionItem | null;
   track: TrackMetadata | null;
   turn?: TurnItem | null;
   viewMode?: 'markdown' | 'script';
@@ -148,6 +151,8 @@ function renderSyntaxHighlightedCodeLine(line: string, lineIdx: number) {
 }
 
 export function TranscriptPane({
+  navDepth = 'turns',
+  selectedSession = null,
   track,
   turn = null,
   viewMode = 'markdown',
@@ -205,6 +210,127 @@ export function TranscriptPane({
               : scrollOffset) + 1
         )
       : 0;
+
+  if (navDepth === 'sessions') {
+    return (
+      <box
+        flexDirection="column"
+        width="64%"
+        flexShrink={0}
+        flexGrow={0}
+        overflow="hidden"
+        height="100%"
+        borderStyle="single"
+        borderColor={borderColor}
+        title={selectedSession ? `Conversation: ${selectedSession.shortId} [2]` : 'Conversation [2]'}
+        titleColor={focused ? '#38bdf8' : '#94a3b8'}
+        paddingLeft={1}
+        paddingRight={1}
+        paddingTop={0}
+      >
+        {!selectedSession ? (
+          <box flexGrow={1} justifyContent="center" alignItems="center">
+            <text fg="#64748b">No conversation selected.</text>
+            <text fg="#475569">Use [j/k] to browse conversations.</text>
+          </box>
+        ) : (
+          <box flexDirection="column" flexGrow={1} width="100%">
+            {/* Header: Status and Title */}
+            <box flexDirection="column" marginBottom={1}>
+              <box flexDirection="row" gap={1}>
+                <text fg={selectedSession.isActive ? '#10b981' : '#64748b'}>
+                  <b>{selectedSession.isActive ? '● ACTIVE (Open Antigravity CLI session)' : '○ INACTIVE (Closed session)'}</b>
+                </text>
+              </box>
+              <text fg="#38bdf8" wrapMode="none">
+                <b>{selectedSession.title}</b>
+              </text>
+              <text fg="#64748b" wrapMode="none">
+                Session ID: {selectedSession.id}
+              </text>
+            </box>
+
+            {/* Quick Metrics Bar */}
+            <box
+              flexDirection="row"
+              justifyContent="space-between"
+              paddingLeft={1}
+              paddingRight={1}
+              backgroundColor="#1e293b"
+              height={1}
+              marginBottom={1}
+            >
+              <text fg="#94a3b8">
+                Responses: <span fg="#38bdf8"><b>{selectedSession.turnCount}</b></span>
+              </text>
+              <text fg="#94a3b8">
+                Folded steps: <span fg="#e2e8f0">{selectedSession.foldedStepCount}</span>
+              </text>
+              <text fg="#94a3b8">
+                Audio: <span fg={selectedSession.hasAudio ? '#10b981' : '#64748b'}>
+                  {selectedSession.hasAudio ? '🔊 Cached' : 'None yet'}
+                </span>
+              </text>
+            </box>
+
+            {/* Initial Prompt Preview */}
+            {selectedSession.previewPrompt ? (
+              <box flexDirection="column" marginBottom={1}>
+                <text fg="#94a3b8"><b>Initial User Prompt:</b></text>
+                <box
+                  paddingLeft={1}
+                  paddingRight={1}
+                  borderStyle="single"
+                  borderColor="#334155"
+                >
+                  <text fg="#cbd5e1" wrapMode="word">
+                    {selectedSession.previewPrompt}
+                  </text>
+                </box>
+              </box>
+            ) : null}
+
+            {/* Latest Response Preview */}
+            {selectedSession.previewResponse ? (
+              <box flexDirection="column" flexGrow={1} overflow="hidden" marginBottom={1}>
+                <text fg="#94a3b8"><b>Latest Substantive Response:</b></text>
+                <box
+                  flexGrow={1}
+                  paddingLeft={1}
+                  paddingRight={1}
+                  borderStyle="single"
+                  borderColor="#334155"
+                  overflow="hidden"
+                >
+                  <text fg="#94a3b8" wrapMode="word">
+                    {selectedSession.previewResponse}
+                  </text>
+                </box>
+              </box>
+            ) : null}
+
+            {/* Action Prompt */}
+            <box
+              paddingLeft={1}
+              paddingRight={1}
+              backgroundColor="#0f172a"
+              borderStyle="single"
+              borderColor="#38bdf8"
+              height={3}
+              justifyContent="center"
+            >
+              <text fg="#38bdf8">
+                <b>▸ Press [Enter] or [l] to drill into this conversation's responses.</b>
+              </text>
+              <text fg="#64748b">
+                Browse substantive turns, generate audio narration, and inspect transcripts.
+              </text>
+            </box>
+          </box>
+        )}
+      </box>
+    );
+  }
 
   return (
     <box
@@ -377,7 +503,7 @@ export function TranscriptPane({
                   overflow="hidden"
                   gap={1}
                 >
-                  {visibleChunks.map((chunk) => {
+                  {visibleChunks.map((chunk: ChunkTiming) => {
                     const isActive = chunk.chunkIndex === activeChunkIndex;
                     const startStr = formatTime(chunk.startMs);
                     const endStr = formatTime(chunk.endMs);
