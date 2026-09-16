@@ -81,23 +81,13 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
       return;
     }
 
-    if (key.name === 'left') {
-      actions.scrub(-5000);
+    if (key.sequence === '[' || key.name === '[') {
+      actions.scrub(-10000);
       return;
     }
 
-    if (key.name === 'right') {
-      actions.scrub(5000);
-      return;
-    }
-
-    if (key.name === 'h' || key.sequence === 'h' || key.sequence === 'H') {
-      actions.scrub(-30000);
-      return;
-    }
-
-    if (key.name === 'l' || key.sequence === 'l' || key.sequence === 'L') {
-      actions.scrub(30000);
+    if (key.sequence === ']' || key.name === ']') {
+      actions.scrub(10000);
       return;
     }
 
@@ -138,59 +128,110 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
         setTranscriptScrollOffset((prev) => prev + 5);
         return;
       }
+      if (key.name === 'left') {
+        actions.scrub(-5000);
+        return;
+      }
+      if (key.name === 'right') {
+        actions.scrub(5000);
+        return;
+      }
+      if (key.name === 'h' || key.sequence === 'h' || key.sequence === 'H') {
+        actions.scrub(-30000);
+        return;
+      }
+      if (key.name === 'l' || key.sequence === 'l' || key.sequence === 'L') {
+        actions.scrub(30000);
+        return;
+      }
     }
 
-    if (key.name === 'up' || key.name === 'k' || key.sequence === 'k') {
-      if (state.turns.length > 0) {
-        const currentIdx = state.turns.findIndex((t) => t.id === state.selectedTurn?.id);
-        const prevIdx = currentIdx > 0 ? currentIdx - 1 : 0;
-        if (state.turns[prevIdx]) {
-          actions.selectTurn(state.turns[prevIdx].id);
-          setTranscriptScrollOffset(0);
+    // Focused on Library Pane
+    if (state.navDepth === 'sessions') {
+      if (key.name === 'up' || key.name === 'k' || key.sequence === 'k') {
+        if (state.sessions.length > 0) {
+          const currentIdx = state.sessions.findIndex((s) => s.id === state.selectedSession?.id);
+          const prevIdx = currentIdx > 0 ? currentIdx - 1 : 0;
+          if (state.sessions[prevIdx]) {
+            actions.selectSession(state.sessions[prevIdx].id);
+          }
         }
-      } else {
-        const currentIdx = state.tracks.findIndex((t) => t.id === state.selectedTrack?.id);
-        const prevIdx = currentIdx > 0 ? currentIdx - 1 : 0;
-        if (state.tracks[prevIdx]) {
-          actions.selectTrack(state.tracks[prevIdx].id);
-          setTranscriptScrollOffset(0);
-        }
+        return;
       }
-      return;
+
+      if (key.name === 'down' || key.name === 'j' || key.sequence === 'j') {
+        if (state.sessions.length > 0) {
+          const currentIdx = state.sessions.findIndex((s) => s.id === state.selectedSession?.id);
+          const nextIdx =
+            currentIdx >= 0 && currentIdx < state.sessions.length - 1
+              ? currentIdx + 1
+              : state.sessions.length - 1;
+          if (state.sessions[nextIdx]) {
+            actions.selectSession(state.sessions[nextIdx].id);
+          }
+        }
+        return;
+      }
+
+      if (
+        key.name === 'return' ||
+        key.name === 'right' ||
+        key.name === 'l' ||
+        key.sequence === 'l'
+      ) {
+        actions.drillIntoSession();
+        setTranscriptScrollOffset(0);
+        return;
+      }
     }
 
-    if (key.name === 'down' || key.name === 'j' || key.sequence === 'j') {
-      if (state.turns.length > 0) {
-        const currentIdx = state.turns.findIndex((t) => t.id === state.selectedTurn?.id);
-        const nextIdx =
-          currentIdx >= 0 && currentIdx < state.turns.length - 1
-            ? currentIdx + 1
-            : state.turns.length - 1;
-        if (state.turns[nextIdx]) {
-          actions.selectTurn(state.turns[nextIdx].id);
-          setTranscriptScrollOffset(0);
-        }
-      } else {
-        const currentIdx = state.tracks.findIndex((t) => t.id === state.selectedTrack?.id);
-        const nextIdx =
-          currentIdx >= 0 && currentIdx < state.tracks.length - 1
-            ? currentIdx + 1
-            : state.tracks.length - 1;
-        if (state.tracks[nextIdx]) {
-          actions.selectTrack(state.tracks[nextIdx].id);
-          setTranscriptScrollOffset(0);
-        }
+    if (state.navDepth === 'turns') {
+      if (
+        key.name === 'escape' ||
+        key.name === 'backspace' ||
+        key.name === 'left' ||
+        key.name === 'h' ||
+        key.sequence === 'h'
+      ) {
+        actions.zoomOutToSessions();
+        return;
       }
-      return;
-    }
 
-    if (key.name === 'return') {
-      if (state.selectedTurn) {
-        actions.activateTurn(state.selectedTurn.id);
-      } else if (state.selectedTrack) {
-        actions.play(state.selectedTrack.id);
+      if (key.name === 'up' || key.name === 'k' || key.sequence === 'k') {
+        if (state.turns.length > 0) {
+          const currentIdx = state.turns.findIndex((t) => t.id === state.selectedTurn?.id);
+          const prevIdx = currentIdx > 0 ? currentIdx - 1 : 0;
+          if (state.turns[prevIdx]) {
+            actions.selectTurn(state.turns[prevIdx].id);
+            setTranscriptScrollOffset(0);
+          }
+        }
+        return;
       }
-      return;
+
+      if (key.name === 'down' || key.name === 'j' || key.sequence === 'j') {
+        if (state.turns.length > 0) {
+          const currentIdx = state.turns.findIndex((t) => t.id === state.selectedTurn?.id);
+          const nextIdx =
+            currentIdx >= 0 && currentIdx < state.turns.length - 1
+              ? currentIdx + 1
+              : state.turns.length - 1;
+          if (state.turns[nextIdx]) {
+            actions.selectTurn(state.turns[nextIdx].id);
+            setTranscriptScrollOffset(0);
+          }
+        }
+        return;
+      }
+
+      if (key.name === 'return') {
+        if (state.selectedTurn) {
+          actions.activateTurn(state.selectedTurn.id);
+        } else if (state.selectedTrack) {
+          actions.play(state.selectedTrack.id);
+        }
+        return;
+      }
     }
   });
 
@@ -204,11 +245,14 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
       <HeaderBar
         live={state.live}
         playback={state.playback}
-        trackCount={state.turns.length || state.tracks.length}
+        trackCount={state.navDepth === 'sessions' ? state.sessions.length : state.turns.length}
         copyNotification={copyToast}
       />
       <box flexDirection="row" flexGrow={1} width="100%">
         <LibraryPane
+          navDepth={state.navDepth}
+          sessions={state.sessions}
+          selectedSession={state.selectedSession}
           tracks={state.tracks}
           selectedTrack={state.selectedTrack}
           turns={state.turns}
