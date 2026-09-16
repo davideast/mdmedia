@@ -7,7 +7,7 @@ import { UniversalEventBus } from '../pipeline/pipeline-event-bus.js';
 import { LiveAudioPlayerSink } from '../audio/live-audio-player-sink.js';
 import { ChunkQueueAudioPlayer } from '../audio/player/chunk-queue-audio-player.js';
 import { NarrationRecorder } from './narration-recorder.js';
-import { SessionCatalogService } from './session-catalog.js';
+import { SessionCatalogService, type TurnItem, type SessionItem } from './session-catalog.js';
 import type { ChunkTiming, TrackMetadata } from '../storage/types.js';
 import type { VoiceName } from '../types/voice.js';
 import type { ITTSProvider } from '../tts/tts-provider.interface.js';
@@ -72,13 +72,23 @@ export class StudioStore implements StudioAction {
 
     const initialTracks = this.library.listTracks();
     const initialSelected = initialTracks[0] ?? null;
-    const initialTurns = this.catalog.listSessionTurns({
-      query: '',
-      audioOnly: false,
-    });
+    const initialSessions = this.catalog.listSessions({ query: '' });
+    const initialSelectedSession = initialSessions[0] ?? null;
+    const initialTurns = initialSelectedSession
+      ? this.catalog.getSessionTurns(initialSelectedSession.id, {
+          query: '',
+          audioOnly: false,
+        })
+      : this.catalog.listSessionTurns({
+          query: '',
+          audioOnly: false,
+        });
     const initialSelectedTurn = initialTurns[0] ?? null;
 
     this.state = {
+      navDepth: 'sessions',
+      sessions: initialSessions,
+      selectedSession: initialSelectedSession,
       tracks: initialTracks,
       selectedTrack: initialSelected,
       turns: initialTurns,
@@ -129,6 +139,8 @@ export class StudioStore implements StudioAction {
       ...this.state,
       playback: { ...this.state.playback },
       live: { ...this.state.live },
+      sessions: [...this.state.sessions],
+      selectedSession: this.state.selectedSession ? { ...this.state.selectedSession } : null,
       tracks: [...this.state.tracks],
       turns: [...this.state.turns],
       selectedTurn: this.state.selectedTurn ? { ...this.state.selectedTurn } : null,
@@ -239,10 +251,7 @@ export class StudioStore implements StudioAction {
         content: turn.markdown,
       });
 
-      this.state.turns = this.catalog.listSessionTurns({
-        query: this.state.filterQuery,
-        audioOnly: this.state.audioOnlyFilter,
-      });
+      this.state.turns = this.reloadTurns();
       const updatedTurn = this.state.turns.find((t) => t.id === turn.id) ?? null;
       this.state.selectedTurn = updatedTurn;
       if (savedTrack) {
@@ -252,12 +261,58 @@ export class StudioStore implements StudioAction {
     }
   }
 
-  public toggleAudioOnlyFilter(): void {
-    this.state.audioOnlyFilter = !this.state.audioOnlyFilter;
-    this.state.turns = this.catalog.listSessionTurns({
+  private reloadTurns(): TurnItem[] {
+    if (this.state.selectedSession) {
+      return this.catalog.getSessionTurns(this.state.selectedSession.id, {
+        query: this.state.filterQuery,
+        audioOnly: this.state.audioOnlyFilter,
+      });
+    }
+    return this.catalog.listSessionTurns({
       query: this.state.filterQuery,
       audioOnly: this.state.audioOnlyFilter,
     });
+  }
+
+  public selectSession(sessionId: string): void {
+    const session = this.state.sessions.find((s) => s.id === sessionId) ?? null;
+    if (session) {
+      this.state.selectedSession = session;
+      this.state.turns = this.catalog.getSessionTurns(session.id, {
+        query: this.state.filterQuery,
+        audioOnly: this.state.audioOnlyFilter,
+      });
+      this.state.selectedTurn = this.state.turns[0] ?? null;
+      this.emitChange();
+    }
+  }
+
+  public drillIntoSession(sessionId?: string): void {
+    const targetId = sessionId ?? this.state.selectedSession?.id;
+    if (targetId) {
+      this.selectSession(targetId);
+    }
+    this.state.navDepth = 'turns';
+    this.emitChange();
+  }
+
+  public zoomOutToSessions(): void {
+    this.state.navDepth = 'sessions';
+    this.state.sessions = this.catalog.listSessions({
+      query: this.state.filterQuery,
+    });
+    if (this.state.selectedSession) {
+      const refreshed = this.state.sessions.find((s) => s.id === this.state.selectedSession?.id);
+      if (refreshed) {
+        this.state.selectedSession = refreshed;
+      }
+    }
+    this.emitChange();
+  }
+
+  public toggleAudioOnlyFilter(): void {
+    this.state.audioOnlyFilter = !this.state.audioOnlyFilter;
+    this.state.turns = this.reloadTurns();
     if (
       !this.state.selectedTurn ||
       !this.state.turns.some((t) => t.id === this.state.selectedTurn?.id)
@@ -275,15 +330,19 @@ export class StudioStore implements StudioAction {
   public setFilter(query: string): void {
     this.state.filterQuery = query;
     this.state.tracks = this.library.listTracks({ query });
-    this.state.turns = this.catalog.listSessionTurns({
-      query,
-      audioOnly: this.state.audioOnlyFilter,
-    });
+    this.state.sessions = this.catalog.listSessions({ query });
+    this.state.turns = this.reloadTurns();
     if (
       !this.state.selectedTurn ||
       !this.state.turns.some((t) => t.id === this.state.selectedTurn?.id)
     ) {
       this.state.selectedTurn = this.state.turns[0] ?? null;
+    }
+    if (
+      !this.state.selectedSession ||
+      !this.state.sessions.some((s) => s.id === this.state.selectedSession?.id)
+    ) {
+      this.state.selectedSession = this.state.sessions[0] ?? null;
     }
     this.emitChange();
   }
@@ -295,10 +354,8 @@ export class StudioStore implements StudioAction {
 
     await this.library.deleteTrack(trackId);
     this.state.tracks = this.library.listTracks({ query: this.state.filterQuery });
-    this.state.turns = this.catalog.listSessionTurns({
-      query: this.state.filterQuery,
-      audioOnly: this.state.audioOnlyFilter,
-    });
+    this.state.sessions = this.catalog.listSessions({ query: this.state.filterQuery });
+    this.state.turns = this.reloadTurns();
 
     if (this.state.selectedTrack?.id === trackId) {
       this.state.selectedTrack = this.state.tracks[0] ?? null;

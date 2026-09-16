@@ -5,7 +5,9 @@ import type { AudioLibrary } from '../storage/audio-library.js';
 import type { PlaybackEngine } from '../audio/player/playback-engine.js';
 import type { ITTSProvider } from '../tts/tts-provider.interface.js';
 import type { INarrationAdapter } from '../narration/types.js';
-import type { SessionCatalogService, TurnItem } from './session-catalog.js';
+import type { SessionCatalogService, TurnItem, SessionItem } from './session-catalog.js';
+
+export type NavigationDepth = 'sessions' | 'turns';
 
 export interface StudioPlaybackState {
   status: PlaybackStatus;
@@ -24,6 +26,9 @@ export interface StudioLiveState {
 }
 
 export interface StudioState {
+  navDepth: NavigationDepth;
+  sessions: SessionItem[];
+  selectedSession: SessionItem | null;
   tracks: TrackMetadata[];
   selectedTrack: TrackMetadata | null;
   turns: TurnItem[];
@@ -58,6 +63,9 @@ export interface StudioAction {
   seek(positionMs: number): Promise<void>;
   scrub(deltaMs: number): Promise<void>;
   setRate(rate: number): Promise<void>;
+  selectSession(sessionId: string): void;
+  drillIntoSession(sessionId?: string): void;
+  zoomOutToSessions(): void;
   selectTrack(trackId: string): Promise<void> | void;
   selectTurn(id: string): Promise<void> | void;
   activateTurn(id: string): Promise<void>;
