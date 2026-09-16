@@ -359,19 +359,130 @@ export const adaptCommand = defineCommand({
   },
 });
 
+export const imageCommand = defineCommand({
+  meta: {
+    name: 'image',
+    description: 'Generate high-fidelity art & UI images from prompts via Gemini 3.1 Flash Image',
+  },
+  args: {
+    prompt: {
+      type: 'string',
+      alias: 'p',
+      description: 'Text prompt for image generation',
+    },
+    input: {
+      type: 'string',
+      alias: 'i',
+      description: 'Optional path to input prompt/markdown file',
+    },
+    ref: {
+      type: 'string',
+      alias: 'r',
+      description: 'Optional reference image path for exact artistic style/tone matching',
+    },
+    output: {
+      type: 'string',
+      alias: 'o',
+      description: 'Output image file path (.jpg or .png)',
+      required: true,
+    },
+    model: {
+      type: 'string',
+      alias: 'm',
+      description: 'Gemini image model name (Nano Banana Pro 2)',
+      default: 'gemini-3-pro-image',
+    },
+    aspectRatio: {
+      type: 'string',
+      alias: 'a',
+      description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
+      default: '16:9',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'Gemini API Key',
+    },
+  },
+  async run({ args }) {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { execFileSync } = await import('node:child_process');
+    const { GoogleGenAI } = await import('@google/genai');
+    const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
+
+    let promptText = args.prompt || '';
+    if (!promptText && args.input) {
+      promptText = fs.readFileSync(args.input, 'utf8').trim();
+    }
+    if (!promptText) {
+      throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
+    }
+
+    const apiKey = args.apiKey || getGeminiApiKey();
+    if (!apiKey) {
+      throw new Error('No GEMINI_API_KEY found in environment or ~/.gemini/.env');
+    }
+
+    const contents: any[] = [];
+    if (args.ref && fs.existsSync(args.ref)) {
+      let refPath = args.ref;
+      let ext = path.extname(refPath).toLowerCase();
+      if (ext === '.avif') {
+        const tmpPng = `/tmp/mdmedia_ref_${Date.now()}.png`;
+        execFileSync('sips', ['-s', 'format', 'png', refPath, '--out', tmpPng]);
+        refPath = tmpPng;
+        ext = '.png';
+      }
+      const mimeType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
+      const refBytes = fs.readFileSync(refPath);
+      contents.push({
+        inlineData: {
+          data: refBytes.toString('base64'),
+          mimeType,
+        },
+      });
+    }
+    contents.push({ text: promptText });
+
+    const ai = new GoogleGenAI({ apiKey });
+    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
+    const res = await ai.models.generateContent({
+      model: args.model,
+      contents: contents.length === 1 ? contents[0].text : contents,
+      config: {
+        responseModalities: ['IMAGE'],
+        imageConfig: { aspectRatio: args.aspectRatio },
+      },
+    });
+
+    const part = res.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
+    if (!part?.inlineData?.data) {
+      throw new Error('No image data returned from Gemini model.');
+    }
+
+    const outPath = path.resolve(process.cwd(), args.output);
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, Buffer.from(part.inlineData.data, 'base64'));
+    console.log(`✅ Saved generated image to: ${outPath}`);
+  },
+});
+
 export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: '0.1.0',
-    description: 'Transform markdown documents into rich audio and video media via Gemini Flash 3.1 & Gemini Omni Flash',
+    description: 'Transform markdown documents into rich audio, video, and image media via Gemini Flash 3.1 & Gemini Omni Flash',
   },
   subCommands: {
     audio: audioCommand,
     video: videoCommand,
+    image: imageCommand,
     adapt: adaptCommand,
     watch: watchCommand,
     studio: studioCommand,
     plugin: pluginCommand,
   },
 });
+
 

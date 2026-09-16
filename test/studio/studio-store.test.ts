@@ -27,6 +27,7 @@ class MockTTSProvider implements ITTSProvider {
 
 describe('StudioStore & NarrationRecorder', () => {
   let tempBaseDir: string;
+  let brainDir: string;
   let library: AudioLibrary;
   let player: PlaybackEngine;
   let mockProvider: MockTTSProvider;
@@ -36,7 +37,8 @@ describe('StudioStore & NarrationRecorder', () => {
       os.tmpdir(),
       `mdmedia_studio_test_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
     );
-    fs.mkdirSync(tempBaseDir, { recursive: true });
+    brainDir = path.join(tempBaseDir, 'brain');
+    fs.mkdirSync(brainDir, { recursive: true });
 
     library = new AudioLibrary(tempBaseDir);
     player = new PlaybackEngine('/usr/bin/true');
@@ -118,7 +120,7 @@ describe('StudioStore & NarrationRecorder', () => {
         voice: 'Puck',
       });
 
-      const store = new StudioStore({ library, player, ttsProvider: mockProvider });
+      const store = new StudioStore({ library, player, ttsProvider: mockProvider, brainDir });
 
       let receivedState: any = null;
       const unsubscribe = store.subscribe((state) => {
@@ -155,7 +157,7 @@ describe('StudioStore & NarrationRecorder', () => {
         voice: 'Fenrir',
       });
 
-      const store = new StudioStore({ library, player });
+      const store = new StudioStore({ library, player, brainDir });
       expect(store.getState().tracks.length).toBe(2);
 
       await store.selectTrack(t2.id);
@@ -181,7 +183,7 @@ describe('StudioStore & NarrationRecorder', () => {
         ],
       });
 
-      const store = new StudioStore({ library, player });
+      const store = new StudioStore({ library, player, brainDir });
       await store.selectTrack(track.id);
 
       await store.seek(500);
@@ -215,7 +217,7 @@ describe('StudioStore & NarrationRecorder', () => {
         voice: 'Puck',
       });
 
-      const store = new StudioStore({ library, player });
+      const store = new StudioStore({ library, player, brainDir });
       expect(store.getState().tracks.length).toBe(2);
 
       store.setFilter('apple');
@@ -240,7 +242,7 @@ describe('StudioStore & NarrationRecorder', () => {
         voice: 'Puck',
       });
 
-      const store = new StudioStore({ library, player });
+      const store = new StudioStore({ library, player, brainDir });
       expect(store.getState().tracks.length).toBe(1);
 
       await store.deleteTrack(track.id);
@@ -253,6 +255,7 @@ describe('StudioStore & NarrationRecorder', () => {
         library,
         player,
         ttsProvider: mockProvider,
+        brainDir,
         enableLiveAudio: false, // Don't try to spawn system audio player in unit test
       });
 

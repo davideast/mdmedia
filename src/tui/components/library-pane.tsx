@@ -70,8 +70,8 @@ export function LibraryPane({
 
   const paneTitle =
     navDepth === 'sessions'
-      ? `Sessions (${sessions.length} total • ${activeSessionCount} active) [1]`
-      : `Turns: ${selectedSession?.shortId ?? 'Selected'} [1]`;
+      ? `Conversations (${sessions.length} total • ${activeSessionCount} open in CLI) [1]`
+      : `Responses: ${selectedSession?.shortId ?? 'Selected'} [1]`;
 
   return (
     <box
@@ -112,10 +112,10 @@ export function LibraryPane({
             <span fg="#38bdf8">← [Esc] </span>
             <span fg="#e2e8f0">{selectedSession?.shortId ?? 'Session'}</span>
             <span fg={selectedSession?.isActive ? '#10b981' : '#64748b'}>
-              {' '}({selectedSession?.isActive ? 'ACTIVE' : 'IDLE'})
+              {' '}({selectedSession?.isActive ? 'CLI OPEN' : 'INACTIVE'})
             </span>
           </text>
-          <text fg="#475569">[Enter] play</text>
+          <text fg="#475569">[Enter] narrate</text>
         </box>
       )}
 
@@ -123,8 +123,8 @@ export function LibraryPane({
       {navDepth === 'sessions' ? (
         sessions.length === 0 ? (
           <box marginTop={2} justifyContent="center" alignItems="center">
-            <text fg="#64748b">No sessions found.</text>
-            <text fg="#475569">Start an Antigravity agent session</text>
+            <text fg="#64748b">No conversations found.</text>
+            <text fg="#475569">Start an Antigravity CLI session in your terminal</text>
           </box>
         ) : (
           (() => {
@@ -147,9 +147,9 @@ export function LibraryPane({
               <box flexDirection="column" flexGrow={1} width="100%">
                 <box height={1} marginBottom={1} justifyContent="space-between" flexDirection="row" width="100%">
                   <text fg="#64748b">
-                    Showing {startIdx + 1}–{endIdx} of {sessions.length} sessions
+                    Showing {startIdx + 1}–{endIdx} of {sessions.length} conversations
                   </text>
-                  <text fg="#475569">[Enter/l] drill in</text>
+                  <text fg="#475569">[Enter/l] pick</text>
                 </box>
                 <box flexDirection="column" flexGrow={1} width="100%">
                   {visibleSessions.map((session) => {

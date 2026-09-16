@@ -266,6 +266,8 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
           filterActive={filterActive}
         />
         <TranscriptPane
+          navDepth={state.navDepth}
+          selectedSession={state.selectedSession}
           track={state.selectedTrack}
           turn={state.selectedTurn}
           viewMode={state.viewMode}

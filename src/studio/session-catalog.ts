@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { lexer } from 'marked';
 import { parseMarkdownToSpeakableParagraphs } from '../chunker/markdown-ast-parser.js';
 import type { AudioLibrary } from '../storage/audio-library.js';
@@ -31,17 +32,20 @@ export interface SessionItem {
   id: string;
   shortId: string;
   title: string;
-  isActive: boolean;
+  isActive: boolean; // True if the Antigravity CLI session is open right now
   mtimeMs: number;
   turnCount: number;
   totalSteps: number;
   foldedStepCount: number;
   hasAudio: boolean;
+  previewPrompt?: string;
+  previewResponse?: string;
 }
 
 export interface SessionCatalogOptions {
   brainDir?: string;
   workspaceDir?: string;
+  activeSessionIds?: Set<string>;
   library: AudioLibrary;
 }
 
@@ -102,39 +106,50 @@ export function isSubstantiveResponse(
   return false;
 }
 
-export function isSessionActive(
-  transcriptPath: string,
-  statMtimeMs: number,
-  nowMs: number = Date.now(),
-  activeThresholdMs: number = 90_000
-): boolean {
-  const ageMs = nowMs - statMtimeMs;
-  if (ageMs > activeThresholdMs) {
-    return false;
+let cachedActiveCliSessions: Set<string> | null = null;
+let lastActiveCliCheckMs = 0;
+
+export function getActiveCliSessionIds(ttlMs: number = 2000): Set<string> {
+  const now = Date.now();
+  if (cachedActiveCliSessions && now - lastActiveCliCheckMs < ttlMs) {
+    return cachedActiveCliSessions;
   }
 
+  const activeIds = new Set<string>();
+  const appName = path.basename(path.dirname(getBrainDir()));
   try {
-    const content = fs.readFileSync(transcriptPath, 'utf8').trim();
-    if (!content) return false;
-    const lastNewline = content.lastIndexOf('\n');
-    const lastLine = lastNewline !== -1 ? content.slice(lastNewline + 1) : content;
-    if (!lastLine.trim()) return false;
-
-    const step = JSON.parse(lastLine);
-    if (step.status === 'RUNNING') return true;
-    if (step.type === 'USER_INPUT') return true;
-    if (step.type === 'GENERIC') return true;
-    if (
-      step.type === 'PLANNER_RESPONSE' &&
-      Array.isArray(step.tool_calls) &&
-      step.tool_calls.length > 0
-    ) {
-      return true;
+    const out = execSync(`lsof -c "${appName}" -c antigravity 2>/dev/null`, {
+      encoding: 'utf8',
+      timeout: 1500,
+    });
+    for (const line of out.split('\n')) {
+      if (line.includes('presence') && line.includes('.lock')) {
+        const match = line.match(/([a-f0-9-]{36})\.lock/);
+        if (match) {
+          activeIds.add(match[1]);
+        }
+      }
     }
-    return false;
-  } catch {
-    return false;
+  } catch (e: any) {
+    const stdout = e.stdout ? String(e.stdout) : '';
+    for (const line of stdout.split('\n')) {
+      if (line.includes('presence') && line.includes('.lock')) {
+        const match = line.match(/([a-f0-9-]{36})\.lock/);
+        if (match) {
+          activeIds.add(match[1]);
+        }
+      }
+    }
   }
+
+  cachedActiveCliSessions = activeIds;
+  lastActiveCliCheckMs = now;
+  return activeIds;
+}
+
+export function isSessionActive(convId: string, activeSessionIds?: Set<string>): boolean {
+  const active = activeSessionIds ?? getActiveCliSessionIds();
+  return active.has(convId);
 }
 
 function findWorkspaceNarrationFiles(dir: string, maxDepth: number = 3): string[] {
@@ -166,6 +181,8 @@ function findWorkspaceNarrationFiles(dir: string, maxDepth: number = 3): string[
 interface CachedSessionEntry {
   mtimeMs: number;
   title: string;
+  previewPrompt: string;
+  previewResponse: string;
   totalSteps: number;
   foldedStepCount: number;
   turns: Omit<TurnItem, 'status' | 'track'>[];
@@ -174,6 +191,7 @@ interface CachedSessionEntry {
 export class SessionCatalogService {
   private readonly brainDir: string;
   private readonly workspaceDir?: string;
+  private readonly activeSessionIds?: Set<string>;
   private readonly library: AudioLibrary;
   private readonly sessionCache = new Map<string, CachedSessionEntry>();
 
@@ -185,6 +203,7 @@ export class SessionCatalogService {
         : options.brainDir
           ? undefined
           : process.cwd();
+    this.activeSessionIds = options.activeSessionIds;
     this.library = options.library;
   }
 
@@ -201,6 +220,7 @@ export class SessionCatalogService {
     try {
       const lines = fs.readFileSync(transcriptPath, 'utf8').trim().split('\n');
       let promptTitle = '';
+      let previewPrompt = '';
       let pendingFolded: FoldedStep[] = [];
       const parsedTurns: Omit<TurnItem, 'status' | 'track'>[] = [];
       let totalSteps = 0;
@@ -218,6 +238,7 @@ export class SessionCatalogService {
                 .replace(/^<USER_REQUEST>\s*/, '')
                 .replace(/\s*<\/USER_REQUEST>$/, '');
               promptTitle = clean.slice(0, 60);
+              previewPrompt = clean.slice(0, 180);
             }
           } else if (
             step.type === 'PLANNER_RESPONSE' &&
@@ -274,9 +295,14 @@ export class SessionCatalogService {
         promptTitle ||
         (parsedTurns.length > 0 ? parsedTurns[0].title : `Session ${convId.slice(0, 8)}`);
 
+      const previewResponse =
+        parsedTurns.length > 0 ? parsedTurns[0].markdown.slice(0, 240) : '';
+
       cached = {
         mtimeMs,
         title: sessionTitle,
+        previewPrompt,
+        previewResponse,
         totalSteps,
         foldedStepCount: totalFolded,
         turns: parsedTurns,
@@ -296,7 +322,13 @@ export class SessionCatalogService {
     }
 
     const entries = fs.readdirSync(this.brainDir, { withFileTypes: true });
-    const now = Date.now();
+    const activeCliIds = this.activeSessionIds ?? getActiveCliSessionIds();
+    const candidateFiles: {
+      convId: string;
+      transcriptPath: string;
+      mtimeMs: number;
+      isActive: boolean;
+    }[] = [];
 
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
@@ -309,10 +341,31 @@ export class SessionCatalogService {
 
       try {
         const stat = fs.statSync(transcriptPath);
-        const cached = this.parseSessionTranscript(convId, transcriptPath, stat.mtimeMs);
+        candidateFiles.push({
+          convId,
+          transcriptPath,
+          mtimeMs: stat.mtimeMs,
+          isActive: activeCliIds.has(convId),
+        });
+      } catch {}
+    }
+
+    // Sort: Active CLI sessions first, then Inactive sessions (both newest mtime first)
+    candidateFiles.sort((a, b) => {
+      if (a.isActive !== b.isActive) {
+        return a.isActive ? -1 : 1;
+      }
+      return b.mtimeMs - a.mtimeMs;
+    });
+
+    const maxCandidates = filter?.query ? candidateFiles.length : Math.min(candidateFiles.length, 50);
+
+    for (let i = 0; i < maxCandidates; i++) {
+      const { convId, transcriptPath, mtimeMs, isActive } = candidateFiles[i];
+      try {
+        const cached = this.parseSessionTranscript(convId, transcriptPath, mtimeMs);
         if (!cached) continue;
 
-        const isActive = isSessionActive(transcriptPath, stat.mtimeMs, now);
         let hasAudio = false;
         for (const turn of cached.turns) {
           if (this.library.getTrack(turn.id)) {
@@ -326,22 +379,16 @@ export class SessionCatalogService {
           shortId: convId.slice(0, 8),
           title: cached.title,
           isActive,
-          mtimeMs: stat.mtimeMs,
+          mtimeMs,
           turnCount: cached.turns.length,
           totalSteps: cached.totalSteps,
           foldedStepCount: cached.foldedStepCount,
           hasAudio,
+          previewPrompt: cached.previewPrompt,
+          previewResponse: cached.previewResponse,
         });
       } catch {}
     }
-
-    // Sort: Active first (newest mtime first), then Idle (newest mtime first)
-    sessions.sort((a, b) => {
-      if (a.isActive !== b.isActive) {
-        return a.isActive ? -1 : 1;
-      }
-      return b.mtimeMs - a.mtimeMs;
-    });
 
     let filtered = sessions;
     if (filter?.activeOnly) {
