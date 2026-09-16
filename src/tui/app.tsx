@@ -23,6 +23,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
   const [filterActive, setFilterActive] = useState(false);
   const [filterBuffer, setFilterBuffer] = useState('');
   const [transcriptScrollOffset, setTranscriptScrollOffset] = useState(0);
+  const [selectedTranscriptIndex, setSelectedTranscriptIndex] = useState(0);
   const [copyToast, setCopyToast] = useState<string | null>(null);
 
   useKeyboard((key) => {
@@ -72,7 +73,15 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
     }
 
     if (key.name === 'tab') {
-      setFocusedPane((prev) => (prev === 'library' ? 'transcript' : 'library'));
+      setFocusedPane((prev) => {
+        const next = prev === 'library' ? 'transcript' : 'library';
+        if (next === 'transcript') {
+          setSelectedTranscriptIndex(
+            state.playback.activeChunkIndex >= 0 ? state.playback.activeChunkIndex : 0
+          );
+        }
+        return next;
+      });
       return;
     }
 
@@ -112,36 +121,60 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
     }
 
     if (focusedPane === 'transcript') {
+      if (
+        key.name === 'escape' ||
+        key.name === 'left' ||
+        key.name === 'h' ||
+        key.sequence === 'h'
+      ) {
+        setFocusedPane('library');
+        return;
+      }
+
       if (key.name === 'up' || key.name === 'k' || key.sequence === 'k') {
-        setTranscriptScrollOffset((prev) => Math.max(0, prev - 1));
+        setSelectedTranscriptIndex((prev) => Math.max(0, prev - 1));
         return;
       }
       if (key.name === 'down' || key.name === 'j' || key.sequence === 'j') {
-        setTranscriptScrollOffset((prev) => prev + 1);
+        setSelectedTranscriptIndex((prev) => prev + 1);
         return;
       }
       if (key.name === 'pageup' || key.sequence === 'u') {
-        setTranscriptScrollOffset((prev) => Math.max(0, prev - 5));
+        setSelectedTranscriptIndex((prev) => Math.max(0, prev - 6));
         return;
       }
       if (key.name === 'pagedown' || key.sequence === 'd') {
-        setTranscriptScrollOffset((prev) => prev + 5);
+        setSelectedTranscriptIndex((prev) => prev + 6);
         return;
       }
-      if (key.name === 'left') {
-        actions.scrub(-5000);
+      if (key.sequence === 'g' || key.name === 'home') {
+        setSelectedTranscriptIndex(0);
         return;
       }
-      if (key.name === 'right') {
-        actions.scrub(5000);
+      if (key.sequence === 'G' || key.name === 'end') {
+        setSelectedTranscriptIndex(999999);
         return;
       }
-      if (key.name === 'h' || key.sequence === 'h' || key.sequence === 'H') {
-        actions.scrub(-30000);
-        return;
-      }
-      if (key.name === 'l' || key.sequence === 'l' || key.sequence === 'L') {
-        actions.scrub(30000);
+      if (key.name === 'return') {
+        const currentChunkTimings =
+          state.selectedTrack?.chunkTimings && state.selectedTrack.chunkTimings.length > 0
+            ? state.selectedTrack.chunkTimings
+            : state.selectedTurn?.track?.chunkTimings ?? [];
+        if (currentChunkTimings.length > 0) {
+          const clampedIdx = Math.max(
+            0,
+            Math.min(currentChunkTimings.length - 1, selectedTranscriptIndex)
+          );
+          const targetChunk = currentChunkTimings[clampedIdx];
+          if (targetChunk) {
+            actions.seek(targetChunk.startMs);
+            if (state.playback.status !== 'playing') {
+              actions.play();
+            }
+          }
+        } else if (state.selectedTurn) {
+          actions.activateTurn(state.selectedTurn.id);
+        }
         return;
       }
     }
@@ -181,6 +214,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
       ) {
         actions.drillIntoSession();
         setTranscriptScrollOffset(0);
+        setSelectedTranscriptIndex(0);
         return;
       }
     }
@@ -197,6 +231,18 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
         return;
       }
 
+      if (
+        key.name === 'right' ||
+        key.name === 'l' ||
+        key.sequence === 'l'
+      ) {
+        setFocusedPane('transcript');
+        setSelectedTranscriptIndex(
+          state.playback.activeChunkIndex >= 0 ? state.playback.activeChunkIndex : 0
+        );
+        return;
+      }
+
       if (key.name === 'up' || key.name === 'k' || key.sequence === 'k') {
         if (state.turns.length > 0) {
           const currentIdx = state.turns.findIndex((t) => t.id === state.selectedTurn?.id);
@@ -204,6 +250,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
           if (state.turns[prevIdx]) {
             actions.selectTurn(state.turns[prevIdx].id);
             setTranscriptScrollOffset(0);
+            setSelectedTranscriptIndex(0);
           }
         }
         return;
@@ -219,6 +266,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
           if (state.turns[nextIdx]) {
             actions.selectTurn(state.turns[nextIdx].id);
             setTranscriptScrollOffset(0);
+            setSelectedTranscriptIndex(0);
           }
         }
         return;
@@ -276,6 +324,7 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
           liveStreaming={state.live.isStreaming}
           currentLiveChunkText={state.live.currentChunkText}
           focused={focusedPane === 'transcript'}
+          selectedIndex={selectedTranscriptIndex}
           scrollOffset={transcriptScrollOffset}
         />
       </box>

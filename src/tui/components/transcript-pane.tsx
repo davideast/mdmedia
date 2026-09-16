@@ -15,7 +15,25 @@ export interface TranscriptPaneProps {
   liveStreaming: boolean;
   currentLiveChunkText: string | null;
   focused: boolean;
+  selectedIndex?: number;
   scrollOffset?: number;
+}
+
+export function computeTranscriptWindowStartIdx(
+  targetIdx: number,
+  windowSize: number,
+  total: number,
+  padding: number = 3
+): number {
+  if (total <= 0 || windowSize <= 0) return 0;
+  let start = 0;
+  if (targetIdx >= windowSize - padding) {
+    start = targetIdx - (windowSize - padding - 1);
+  }
+  if (start + windowSize > total) {
+    start = Math.max(0, total - windowSize);
+  }
+  return Math.max(0, start);
 }
 
 function formatTime(ms: number): string {
@@ -161,6 +179,7 @@ export function TranscriptPane({
   liveStreaming,
   currentLiveChunkText,
   focused,
+  selectedIndex = 0,
   scrollOffset = 0,
 }: TranscriptPaneProps) {
   const borderColor = focused ? '#38bdf8' : '#334155';
@@ -197,19 +216,24 @@ export function TranscriptPane({
       : chunkTimings.length > 0
         ? chunkTimings.length
         : scriptParagraphs.length;
-  const activeScrollItemIdx =
-    viewMode === 'markdown' ? activeBlockIdx : activeChunkIndex;
-  const currentBlockDisplayIdx =
+
+  const effectiveSelectedIndex =
     totalScrollItems > 0
-      ? Math.min(
-          totalScrollItems,
-          (focused
-            ? scrollOffset
-            : activeScrollItemIdx >= 0
-              ? activeScrollItemIdx
-              : scrollOffset) + 1
+      ? Math.max(
+          0,
+          Math.min(
+            totalScrollItems - 1,
+            focused
+              ? selectedIndex
+              : (viewMode === 'markdown'
+                  ? (activeBlockIdx >= 0 ? activeBlockIdx : selectedIndex)
+                  : (activeChunkIndex >= 0 ? activeChunkIndex : selectedIndex))
+          )
         )
       : 0;
+
+  const totalTerminalRows = process.stdout.rows || 40;
+  const availableContentRows = Math.max(8, totalTerminalRows - (liveStreaming ? 15 : 10));
 
   if (navDepth === 'sessions') {
     return (
@@ -389,19 +413,19 @@ export function TranscriptPane({
               [y] Copy • [v] View: {viewMode === 'markdown' ? 'Markdown' : 'Script'} •{' '}
               {turn ? `${turn.wordCount} words` : `${track?.charCount ?? 0} chars`}
               {totalScrollItems > 0
-                ? ` • Block ${currentBlockDisplayIdx}/${totalScrollItems}`
+                ? ` • Block ${effectiveSelectedIndex + 1}/${totalScrollItems}`
                 : ''}
-              {focused ? ' • [j/k] scroll' : ' • [Tab] scroll'}
+              {focused ? ' • [j/k] navigate • [Enter] seek' : ' • [Tab] focus'}
             </text>
           </box>
 
           {viewMode === 'markdown' ? (
             (() => {
-              const startIdx = focused
-                ? Math.max(0, Math.min(blocks.length - 1, scrollOffset))
-                : activeBlockIdx >= 0
-                  ? Math.max(0, activeBlockIdx - 1)
-                  : Math.max(0, Math.min(blocks.length - 1, scrollOffset));
+              const startIdx = computeTranscriptWindowStartIdx(
+                effectiveSelectedIndex,
+                availableContentRows,
+                blocks.length
+              );
               const visibleBlocks = blocks.slice(startIdx);
 
               return (
@@ -414,6 +438,10 @@ export function TranscriptPane({
                   gap={1}
                 >
                   {visibleBlocks.map((block, idx) => {
+                    const blockIdx = startIdx + idx;
+                    const isSelected = focused && blockIdx === effectiveSelectedIndex;
+                    const isSpokenBlock = block.isActive;
+
                     if (block.type === 'code') {
                       const rawLines = block.text.split('\n');
                       const codeLines = rawLines.filter(
@@ -426,10 +454,12 @@ export function TranscriptPane({
 
                       return (
                         <box
-                          key={startIdx + idx}
+                          key={blockIdx}
                           flexDirection="column"
                           width="100%"
-                          backgroundColor="#0f172a"
+                          backgroundColor={isSelected ? '#1e293b' : '#0f172a'}
+                          borderStyle={isSelected ? 'single' : undefined}
+                          borderColor={isSelected ? '#38bdf8' : undefined}
                           paddingLeft={1}
                           paddingRight={1}
                           marginBottom={1}
@@ -443,39 +473,50 @@ export function TranscriptPane({
 
                     return (
                       <box
-                        key={startIdx + idx}
+                        key={blockIdx}
                         width="100%"
                         flexDirection="row"
-                        backgroundColor={block.isActive ? '#1e3a8a' : undefined}
+                        backgroundColor={
+                          isSelected
+                            ? isSpokenBlock
+                              ? '#2563eb'
+                              : '#1e3a8a'
+                            : isSpokenBlock
+                              ? '#0f2b5c'
+                              : undefined
+                        }
                         paddingLeft={1}
                         paddingRight={1}
                         marginBottom={1}
                         gap={1}
                       >
+                        <text fg={isSelected ? '#38bdf8' : '#64748b'}>
+                          {isSelected ? '▸ ' : '  '}
+                        </text>
                         {block.timestampBadge && (
-                          <text fg={block.isActive ? '#38bdf8' : '#64748b'}>
+                          <text fg={isSelected || isSpokenBlock ? '#38bdf8' : '#64748b'}>
                             {block.timestampBadge}
                           </text>
                         )}
-                        {block.isActive ? (
+                        {isSpokenBlock ? (
                           <text fg="#ffffff" wrapMode="word">
                             {renderRichMarkdownSegment(
                               block.beforeWord,
-                              `b-${startIdx + idx}`
+                              `b-${blockIdx}`
                             )}
                             <span fg="#facc15">
                               <b>{cleanActiveWordToken(block.activeWord)}</b>
                             </span>
                             {renderRichMarkdownSegment(
                               block.afterWord,
-                              `a-${startIdx + idx}`
+                              `a-${blockIdx}`
                             )}
                           </text>
                         ) : (
-                          <text fg="#cbd5e1" wrapMode="word">
+                          <text fg={isSelected ? '#ffffff' : '#cbd5e1'} wrapMode="word">
                             {renderRichMarkdownSegment(
                               block.text,
-                              `p-${startIdx + idx}`
+                              `p-${blockIdx}`
                             )}
                           </text>
                         )}
@@ -487,11 +528,11 @@ export function TranscriptPane({
             })()
           ) : chunkTimings.length > 0 ? (
             (() => {
-              const startIdx = focused
-                ? Math.max(0, Math.min(chunkTimings.length - 1, scrollOffset))
-                : activeChunkIndex >= 0
-                  ? Math.max(0, activeChunkIndex - 1)
-                  : Math.max(0, Math.min(chunkTimings.length - 1, scrollOffset));
+              const startIdx = computeTranscriptWindowStartIdx(
+                effectiveSelectedIndex,
+                availableContentRows,
+                chunkTimings.length
+              );
               const visibleChunks = chunkTimings.slice(startIdx);
 
               return (
@@ -503,7 +544,9 @@ export function TranscriptPane({
                   overflow="hidden"
                   gap={1}
                 >
-                  {visibleChunks.map((chunk: ChunkTiming) => {
+                  {visibleChunks.map((chunk: ChunkTiming, idx: number) => {
+                    const chunkItemIdx = startIdx + idx;
+                    const isSelected = focused && chunkItemIdx === effectiveSelectedIndex;
                     const isActive = chunk.chunkIndex === activeChunkIndex;
                     const startStr = formatTime(chunk.startMs);
                     const endStr = formatTime(chunk.endMs);
@@ -513,16 +556,27 @@ export function TranscriptPane({
                         key={chunk.chunkIndex}
                         width="100%"
                         flexDirection="row"
-                        backgroundColor={isActive ? '#1e3a8a' : undefined}
+                        backgroundColor={
+                          isSelected
+                            ? isActive
+                              ? '#2563eb'
+                              : '#1e3a8a'
+                            : isActive
+                              ? '#0f2b5c'
+                              : undefined
+                        }
                         paddingLeft={1}
                         paddingRight={1}
                         gap={1}
                       >
-                        <text fg={isActive ? '#38bdf8' : '#64748b'}>
-                          [{startStr} - {endStr}]
+                        <text fg={isSelected ? '#38bdf8' : '#64748b'}>
+                          {isSelected ? '▸ ' : '  '}
+                        </text>
+                        <text fg={isSelected || isActive ? '#38bdf8' : '#64748b'}>
+                          [{startStr} - {endStr}]{isActive ? ' 🔊' : ''}
                         </text>
                         <text
-                          fg={isActive ? '#ffffff' : '#cbd5e1'}
+                          fg={isSelected ? '#ffffff' : isActive ? '#93c5fd' : '#cbd5e1'}
                           wrapMode="word"
                         >
                           {chunk.text}
@@ -535,9 +589,11 @@ export function TranscriptPane({
             })()
           ) : (
             (() => {
-              const startIdx = focused
-                ? Math.max(0, Math.min(scriptParagraphs.length - 1, scrollOffset))
-                : Math.max(0, Math.min(scriptParagraphs.length - 1, scrollOffset));
+              const startIdx = computeTranscriptWindowStartIdx(
+                effectiveSelectedIndex,
+                availableContentRows,
+                scriptParagraphs.length
+              );
               const visibleParagraphs = scriptParagraphs.slice(startIdx);
 
               return (
@@ -549,23 +605,29 @@ export function TranscriptPane({
                   overflow="hidden"
                   gap={1}
                 >
-                  {visibleParagraphs.map((para, idx) => (
-                    <box
-                      key={startIdx + idx}
-                      width="100%"
-                      flexDirection="row"
-                      paddingLeft={1}
-                      paddingRight={1}
-                      gap={1}
-                    >
-                      <text fg="#64748b">
-                        [{String(startIdx + idx + 1).padStart(2, '0')}]
-                      </text>
-                      <text fg="#cbd5e1" wrapMode="word">
-                        {para}
-                      </text>
-                    </box>
-                  ))}
+                  {visibleParagraphs.map((para, idx) => {
+                    const paraIndex = startIdx + idx;
+                    const isSelected = focused && paraIndex === effectiveSelectedIndex;
+
+                    return (
+                      <box
+                        key={paraIndex}
+                        width="100%"
+                        flexDirection="row"
+                        backgroundColor={isSelected ? '#1e3a8a' : undefined}
+                        paddingLeft={1}
+                        paddingRight={1}
+                        gap={1}
+                      >
+                        <text fg={isSelected ? '#38bdf8' : '#64748b'}>
+                          {isSelected ? '▸ ' : '  '}[{String(paraIndex + 1).padStart(2, '0')}]
+                        </text>
+                        <text fg={isSelected ? '#ffffff' : '#cbd5e1'} wrapMode="word">
+                          {para}
+                        </text>
+                      </box>
+                    );
+                  })}
                 </box>
               );
             })()
