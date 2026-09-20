@@ -38,6 +38,10 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js"
     },
+    "./narration": {
+      "types": "./dist/narration/index.d.ts",
+      "import": "./dist/narration/index.js"
+    },
     "./storage": {
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js"

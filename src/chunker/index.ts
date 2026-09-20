@@ -24,6 +24,7 @@ export async function prepareStoryboardScenes(
 
 export * from './file-reader.js';
 export * from './markdown-ast-parser.js';
+export * from './markdown-mapper.js';
 export * from './word-boundary-chunker.js';
 export * from './url-sanitizer.js';
 export * from './storyboard-parser.js';
