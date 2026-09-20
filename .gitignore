@@ -8,4 +8,6 @@ dist/
 .DS_Store
 .agents/
 .jules.json
-
+.mdmedia.json
+package-lock.json
+examples/

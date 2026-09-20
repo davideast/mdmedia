@@ -5,7 +5,7 @@ import path from 'node:path';
 import { AudioLibrary } from '../../src/storage/audio-library.js';
 import { isSessionActive, SessionCatalogService } from '../../src/studio/session-catalog.js';
 
-describe('SessionCatalogService - Active Jetski CLI Session Detection & Sorting', () => {
+describe('SessionCatalogService - Active Antigravity CLI Session Detection & Sorting', () => {
   let tempDir: string;
   let brainDir: string;
   let libraryDir: string;
@@ -29,7 +29,7 @@ describe('SessionCatalogService - Active Jetski CLI Session Detection & Sorting'
     }
   });
 
-  it('detects active sessions based on open Jetski CLI session presence', () => {
+  it('detects active sessions based on open Antigravity CLI session presence', () => {
     const activeId = 'active-cli-session-01';
     const idleId = 'idle-closed-session-02';
     const activeSet = new Set([activeId]);
@@ -38,7 +38,7 @@ describe('SessionCatalogService - Active Jetski CLI Session Detection & Sorting'
     expect(isSessionActive(idleId, activeSet)).toBe(false);
   });
 
-  it('lists conversations with active Jetski CLI sessions pinned to top, followed by inactive sessions', () => {
+  it('lists conversations with active Antigravity CLI sessions pinned to top, followed by inactive sessions', () => {
     const s1 = 'session-active-1';
     const s2 = 'session-idle-old';
     const s3 = 'session-active-2';
@@ -69,7 +69,7 @@ describe('SessionCatalogService - Active Jetski CLI Session Detection & Sorting'
     createSession(s3, 5_000, 'Active CLI Session 2');
     createSession(s4, 20_000, 'New Inactive Task');
 
-    // s1 and s3 are open Jetski CLI sessions
+    // s1 and s3 are open Antigravity CLI sessions
     const activeSessionIds = new Set([s1, s3]);
     const service = new SessionCatalogService({ brainDir, library, activeSessionIds });
     const sessions = service.listSessions();

@@ -59,7 +59,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && bunx tsc -p tsconfig.build.json && chmod +x dist/bin.js",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/bin.js",
     "verify-package": "bun run src/verify-package.ts",
     "dev": "bun run src/bin.ts",
     "start": "bun run src/bin.ts",
@@ -80,6 +80,7 @@
   "devDependencies": {
     "@types/bun": "^1.2.4",
     "@types/node": "^26.1.2",
-    "@types/react": "^19.2.18"
+    "@types/react": "^19.2.18",
+    "typescript": "^5.9.3"
   }
 }
