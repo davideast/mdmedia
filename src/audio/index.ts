@@ -7,4 +7,5 @@ export * from './player/audio-player.interface.js';
 export * from './player/chunk-queue-audio-player.js';
 export * from './player/playback-engine.js';
 export * from './player/types.js';
+export * from './player/word-aligner.js';
 

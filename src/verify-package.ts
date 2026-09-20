@@ -87,15 +87,22 @@ import * as pipeline from 'mdmedia/pipeline';
 import * as config from 'mdmedia/config';
 import * as storage from 'mdmedia/storage';
 import * as studio from 'mdmedia/studio';
+import * as narration from 'mdmedia/narration';
 import * as tui from 'mdmedia/tui';
 
 if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdmedia/audio');
+if (!audio.extractWordTimingsFromPcm) throw new Error('Missing extractWordTimingsFromPcm in mdmedia/audio');
+if (!audio.getActiveWordAtPosition) throw new Error('Missing getActiveWordAtPosition in mdmedia/audio');
 if (!video.GeminiOmniVideoProvider) throw new Error('Missing GeminiOmniVideoProvider in mdmedia/video');
 if (!chunker.prepareDocumentChunks) throw new Error('Missing prepareDocumentChunks in mdmedia/chunker');
+if (!chunker.mapChunkToMarkdown) throw new Error('Missing mapChunkToMarkdown in mdmedia/chunker');
 if (!pipeline.UniversalEventBus) throw new Error('Missing UniversalEventBus in mdmedia/pipeline');
 if (!config.resolveConfig) throw new Error('Missing resolveConfig in mdmedia/config');
 if (!storage.AudioLibrary) throw new Error('Missing AudioLibrary in mdmedia/storage');
 if (!studio.StudioStore) throw new Error('Missing StudioStore in mdmedia/studio');
+if (!studio.NarrationRecorder) throw new Error('Missing NarrationRecorder in mdmedia/studio');
+if (!studio.buildHighlightedMarkdownBlocks) throw new Error('Missing buildHighlightedMarkdownBlocks in mdmedia/studio');
+if (!narration.GeminiNarrationAdapter) throw new Error('Missing GeminiNarrationAdapter in mdmedia/narration');
 if (!tui.StudioApp) throw new Error('Missing StudioApp in mdmedia/tui');
 
 console.log('[ESM Runtime Test] All named exports from all subpaths resolved cleanly!');
@@ -124,9 +131,13 @@ console.log('[ESM Runtime Test] All named exports from all subpaths resolved cle
 
   const tsTestScript = `
 import type { StoryboardScene } from 'mdmedia/chunker';
+import type { DocumentHighlight } from 'mdmedia/chunker';
 import type { VoiceName } from 'mdmedia/types';
 import type { GenerateVideoOptions } from 'mdmedia/video';
 import type { StudioState } from 'mdmedia/studio';
+import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
+import type { WordHighlight } from 'mdmedia/audio';
+import type { INarrationAdapter } from 'mdmedia/narration';
 import { UniversalEventBus } from 'mdmedia/pipeline';
 
 const scene: StoryboardScene = {
@@ -139,8 +150,13 @@ const voice: VoiceName = 'Puck';
 const opts: GenerateVideoOptions = { aspectRatio: '16:9' };
 const bus = new UniversalEventBus();
 let state: StudioState | null = null;
+let word: WordTiming | null = null;
+let chunk: ChunkTiming | null = null;
+let highlight: WordHighlight | null = null;
+let docHighlight: DocumentHighlight | null = null;
+let adapter: INarrationAdapter | null = null;
 
-export { scene, voice, opts, bus, state };
+export { scene, voice, opts, bus, state, word, chunk, highlight, docHighlight, adapter };
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.ts'), tsTestScript);
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
