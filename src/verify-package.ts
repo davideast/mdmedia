@@ -143,7 +143,9 @@ let state: StudioState | null = null;
 export { scene, voice, opts, bus, state };
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.ts'), tsTestScript);
-  execSync('bunx tsc -p tsconfig.json', { cwd: SANDBOX_DIR, stdio: 'inherit' });
+  const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
+  const tscCmd = fs.existsSync(tscBin) ? `"${tscBin}"` : 'tsc';
+  execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit' });
   assert(true, 'TypeScript compilation against mdmedia declarations succeeded with 0 errors');
 
   // Cleanup
