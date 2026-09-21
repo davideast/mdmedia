@@ -403,36 +403,12 @@ export default function PlaylistsPage() {
                             )}
                           >
                             <div className="flex min-w-0 flex-1 items-center gap-2">
-                              <div className="flex items-center gap-0.5 text-ink-faint">
-                                <span
-                                  className="cursor-grab active:cursor-grabbing p-0.5 transition-colors hover:text-foreground"
-                                  title="Drag to reorder"
-                                >
-                                  <GripVertical size={13} strokeWidth={2} />
-                                </span>
-                                <div className="hidden items-center group-hover:flex">
-                                  <button
-                                    type="button"
-                                    disabled={idx === 0 || pending}
-                                    onClick={() => handleMoveTrack(playlist, idx, "up")}
-                                    aria-label="Move track up"
-                                    title="Move track up"
-                                    className="p-0.5 transition-opacity hover:text-foreground disabled:opacity-20"
-                                  >
-                                    <ChevronUp size={12} strokeWidth={2.2} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={idx === tracks.length - 1 || pending}
-                                    onClick={() => handleMoveTrack(playlist, idx, "down")}
-                                    aria-label="Move track down"
-                                    title="Move track down"
-                                    className="p-0.5 transition-opacity hover:text-foreground disabled:opacity-20"
-                                  >
-                                    <ChevronDown size={12} strokeWidth={2.2} />
-                                  </button>
-                                </div>
-                              </div>
+                              <span
+                                className="cursor-grab active:cursor-grabbing p-0.5 text-ink-faint transition-colors hover:text-foreground"
+                                title="Drag to reorder"
+                              >
+                                <GripVertical size={13} strokeWidth={2} />
+                              </span>
 
                               <button
                                 type="button"
@@ -455,6 +431,35 @@ export default function PlaylistsPage() {
                             </div>
 
                             <div className="flex flex-none items-center gap-3">
+                              <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                                <button
+                                  type="button"
+                                  disabled={idx === 0 || pending}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleMoveTrack(playlist, idx, "up");
+                                  }}
+                                  aria-label="Move track up"
+                                  title="Move track up"
+                                  className="rounded p-1 text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none"
+                                >
+                                  <ChevronUp size={12} strokeWidth={2.2} />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={idx === tracks.length - 1 || pending}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleMoveTrack(playlist, idx, "down");
+                                  }}
+                                  aria-label="Move track down"
+                                  title="Move track down"
+                                  className="rounded p-1 text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none"
+                                >
+                                  <ChevronDown size={12} strokeWidth={2.2} />
+                                </button>
+                              </div>
+
                               <span className="t-mono hidden text-ink-muted sm:inline">
                                 {track.voice}
                               </span>
