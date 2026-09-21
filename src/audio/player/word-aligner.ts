@@ -9,23 +9,23 @@ export interface WordHighlight {
 
 interface WeightedWordToken extends WordHighlight {
   weight: number;
-  cumStart: number;
-  cumEnd: number;
+  cumulativeStart: number;
+  cumulativeEnd: number;
 }
 
 function getWordWeight(word: string): number {
-  let weight = Math.max(1, word.length);
-  if (/[,;:]$/.test(word)) {
-    weight += 12; // Clause/comma breath pause (~300ms)
-  } else if (/[.!?—]$/.test(word)) {
-    weight += 20; // Sentence boundary breath pause (~550ms)
+  let weight = 4 + Math.max(1, word.length);
+  if (/[.!?]$/.test(word)) {
+    weight += 5;
+  } else if (/[,;:]$/.test(word)) {
+    weight += 3;
   }
   return weight;
 }
 
 /**
  * Computes exact word start/end millisecond timestamps directly from a 16-bit 24kHz PCM audio waveform
- * by analyzing the RMS vocal energy envelope across 10ms frames and mapping voiced speech bursts.
+ * by analyzing the vocal activity envelope across 10ms frames and mapping words proportionally to phonetic weights.
  */
 export function extractWordTimingsFromPcm(
   pcmBuffer: Uint8Array,
@@ -38,8 +38,8 @@ export function extractWordTimingsFromPcm(
     charStart: number;
     charEnd: number;
     weight: number;
-    cumStart: number;
-    cumEnd: number;
+    cumulativeStart: number;
+    cumulativeEnd: number;
   }> = [];
 
   const regex = /\S+/g;
@@ -53,7 +53,7 @@ export function extractWordTimingsFromPcm(
       continue;
     }
     const weight = getWordWeight(word);
-    const cumStart = totalWeight;
+    const cumulativeStart = totalWeight;
     totalWeight += weight;
     tokens.push({
       wordIndex: index++,
@@ -61,8 +61,8 @@ export function extractWordTimingsFromPcm(
       charStart: match.index,
       charEnd: match.index + word.length,
       weight,
-      cumStart,
-      cumEnd: totalWeight,
+      cumulativeStart,
+      cumulativeEnd: totalWeight,
     });
   }
 
@@ -96,62 +96,98 @@ export function extractWordTimingsFromPcm(
     if (rms > maxRms) maxRms = rms;
   }
 
-  // Silence floor threshold: zero out silent frames so cumulative energy holds during pauses
-  const silenceThreshold = Math.max(80, maxRms * 0.08);
-  const cumEnergy = new Float32Array(numWindows);
-  let runningEnergy = 0;
-
+  // Moving average smoothing (5 windows = 50ms) to bridge micro-dips in speech
+  const smoothed = new Float32Array(numWindows);
   for (let w = 0; w < numWindows; w++) {
-    const voiced = rmsValues[w] >= silenceThreshold ? rmsValues[w] : 0;
-    runningEnergy += voiced;
-    cumEnergy[w] = runningEnergy;
+    let sum = 0;
+    let count = 0;
+    for (let d = -2; d <= 2; d++) {
+      if (w + d >= 0 && w + d < numWindows) {
+        sum += rmsValues[w + d];
+        count++;
+      }
+    }
+    smoothed[w] = sum / count;
   }
 
-  // Fallback to uniform progression if buffer is silent
-  if (runningEnergy <= 0) {
-    for (let w = 0; w < numWindows; w++) {
-      cumEnergy[w] = w + 1;
-    }
-    runningEnergy = numWindows;
+  // Silence floor threshold (at least 80, or 6% of peak RMS)
+  const silenceThreshold = Math.max(80, maxRms * 0.06);
+
+  // Find true vocal onset and vocal offset across the waveform
+  let onsetW = 0;
+  while (onsetW < numWindows && rmsValues[onsetW] < silenceThreshold) {
+    onsetW++;
   }
+  let offsetW = numWindows - 1;
+  while (offsetW > onsetW && rmsValues[offsetW] < silenceThreshold) {
+    offsetW--;
+  }
+
+  // Fallback to uniform progression if buffer is silent or onset reaches offset
+  if (onsetW >= offsetW) {
+    const chunkDurationMs = numWindows * WINDOW_MS;
+    return tokens.map((t) => ({
+      wordIndex: t.wordIndex,
+      word: t.word,
+      startMs: chunkStartMs + Math.round((t.cumulativeStart / totalWeight) * chunkDurationMs),
+      endMs: chunkStartMs + Math.round((t.cumulativeEnd / totalWeight) * chunkDurationMs),
+      charStart: t.charStart,
+      charEnd: t.charEnd,
+    }));
+  }
+
+  // Activity curve:
+  // Voiced windows count as 1.0; silent pause windows count as 0.25 (holds playhead pace during pauses)
+  const cumulativeActivity = new Float32Array(numWindows);
+  let accumulatedActivity = 0;
+  for (let w = onsetW; w <= offsetW; w++) {
+    accumulatedActivity += smoothed[w] >= silenceThreshold ? 1.0 : 0.25;
+    cumulativeActivity[w] = accumulatedActivity;
+  }
+  const totalActivity = accumulatedActivity;
 
   const wordTimings: WordTiming[] = [];
-  let prevEndWindow = 0;
+  let prevEndWindow = onsetW;
 
-  for (const token of tokens) {
-    const startFrac = token.cumStart / totalWeight;
-    const endFrac = token.cumEnd / totalWeight;
-    const targetStartEnergy = startFrac * runningEnergy;
-    const targetEndEnergy = endFrac * runningEnergy;
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    const startFrac = token.cumulativeStart / totalWeight;
+    const endFrac = token.cumulativeEnd / totalWeight;
+    const targetStartAct = startFrac * totalActivity;
+    const targetEndAct = endFrac * totalActivity;
 
     let wStart = prevEndWindow;
     if (token.wordIndex === 0) {
-      while (wStart < numWindows - 1 && cumEnergy[wStart] === 0) {
-        wStart++;
-      }
+      wStart = onsetW;
     } else {
-      while (wStart < numWindows - 1 && cumEnergy[wStart] < targetStartEnergy) {
+      while (wStart < offsetW && cumulativeActivity[wStart] < targetStartAct) {
         wStart++;
       }
-      // Also advance past silent frames if we landed in a silent pause between words
-      while (wStart < numWindows - 1 && rmsValues[wStart] < silenceThreshold) {
+      // Advance past silence if landed in a pause between words
+      while (
+        wStart < offsetW &&
+        smoothed[wStart] < silenceThreshold &&
+        cumulativeActivity[wStart] < targetStartAct + 1.0
+      ) {
         wStart++;
       }
     }
 
     let wEnd = wStart;
-    while (wEnd < numWindows - 1 && cumEnergy[wEnd] < targetEndEnergy) {
+    while (wEnd < offsetW && cumulativeActivity[wEnd] < targetEndAct) {
       wEnd++;
     }
 
-    const endWindow = Math.max(wStart + 1, wEnd + 1);
-    prevEndWindow = endWindow;
+    // Minimum word duration of 100ms (10 windows) unless compressed near chunk end
+    wEnd = Math.max(wStart + 10, wEnd);
+    wEnd = Math.min(offsetW + 1, wEnd);
+    prevEndWindow = wEnd;
 
     wordTimings.push({
       wordIndex: token.wordIndex,
       word: token.word,
       startMs: chunkStartMs + wStart * WINDOW_MS,
-      endMs: chunkStartMs + endWindow * WINDOW_MS,
+      endMs: chunkStartMs + wEnd * WINDOW_MS,
       charStart: token.charStart,
       charEnd: token.charEnd,
     });
@@ -227,9 +263,9 @@ export function getActiveWordAtPosition(
     const charStart = match.index;
     const charEnd = charStart + word.length;
     const weight = getWordWeight(word);
-    const cumStart = totalWeight;
+    const cumulativeStart = totalWeight;
     totalWeight += weight;
-    const cumEnd = totalWeight;
+    const cumulativeEnd = totalWeight;
 
     tokens.push({
       wordIndex: index++,
@@ -237,8 +273,8 @@ export function getActiveWordAtPosition(
       charStart,
       charEnd,
       weight,
-      cumStart,
-      cumEnd,
+      cumulativeStart,
+      cumulativeEnd,
     });
   }
 
@@ -255,7 +291,7 @@ export function getActiveWordAtPosition(
   const targetWeight = elapsedFraction * totalWeight;
 
   for (const token of tokens) {
-    if (targetWeight >= token.cumStart && targetWeight <= token.cumEnd) {
+    if (targetWeight >= token.cumulativeStart && targetWeight <= token.cumulativeEnd) {
       return {
         wordIndex: token.wordIndex,
         word: token.word,
