@@ -85,8 +85,17 @@ function findActiveWord(
 
   if (candidate < 0) return null;
   const word = words[candidate];
-  if (positionMs > word.endMs) return null;
-  return { charStart: word.charStart, charEnd: word.charEnd };
+  if (positionMs <= word.endMs) {
+    return { charStart: word.charStart, charEnd: word.charEnd };
+  }
+
+  // Gracefully hold highlight across normal inter-word micro-pauses (<= 250ms)
+  const nextWord = words[candidate + 1];
+  if (nextWord && positionMs < nextWord.startMs && nextWord.startMs - word.endMs <= 250) {
+    return { charStart: word.charStart, charEnd: word.charEnd };
+  }
+
+  return null;
 }
 
 async function currentIdToken(): Promise<string | null> {
