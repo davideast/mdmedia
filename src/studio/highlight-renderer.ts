@@ -20,6 +20,57 @@ interface RawBlock {
   endOffset: number;
 }
 
+/** Minimal structural shape of a track, to avoid importing the storage barrel here. */
+interface TrackLike {
+  transcript?: string;
+  chunkTimings?: ChunkTiming[];
+}
+
+/** Minimal structural shape of a conversation turn. */
+interface TurnLike {
+  markdown?: string;
+  track?: TrackLike;
+}
+
+export interface TranscriptSource {
+  /** The text to render — always the text the timings were computed against. */
+  text: string;
+  chunkTimings: ChunkTiming[];
+}
+
+/**
+ * Picks the display text and chunk timings as a matched pair.
+ *
+ * `chunkTimings[].text` indexes whatever was actually spoken. When a narration
+ * adapter rewrote the document before synthesis, that is `track.transcript`, not
+ * the original `turn.markdown`. Rendering the original against adapted timings
+ * makes `mapChunkToMarkdown` drift or return null, and highlights silently vanish
+ * for most of playback — so text and timings must come from the same source.
+ *
+ * Falls back to the original markdown only when there are no timings to honour.
+ */
+export function resolveTranscriptSource(
+  turn?: TurnLike | null,
+  track?: TrackLike | null
+): TranscriptSource {
+  const timed = [track, turn?.track].find((t) => t?.chunkTimings && t.chunkTimings.length > 0);
+
+  if (timed) {
+    // Prefer the spoken transcript; fall back to the turn's markdown only if the
+    // track never stored one (pre-transcript tracks).
+    return {
+      text: timed.transcript ?? turn?.markdown ?? '',
+      chunkTimings: timed.chunkTimings ?? [],
+    };
+  }
+
+  // No timings: nothing can be highlighted, so show the most human-readable text.
+  return {
+    text: turn?.markdown ?? track?.transcript ?? '',
+    chunkTimings: [],
+  };
+}
+
 function formatTimestampBadge(ms: number): string {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);

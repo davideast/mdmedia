@@ -51,13 +51,20 @@ export class DocumentAudioPipeline {
         });
       }
 
-      this.eventBus.emit('pipeline:complete', {
+      // Awaited, unlike the per-chunk events above: sinks flush on this event, and
+      // processDocument() must not resolve until that flush has actually landed.
+      await this.eventBus.emitAndWait('pipeline:complete', {
         totalChunksProcessed: chunks.length,
         totalBytesGenerated,
       });
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      this.eventBus.emit('pipeline:error', { error });
+      // Await teardown too, so sinks close their handles before the throw surfaces.
+      try {
+        await this.eventBus.emitAndWait('pipeline:error', { error });
+      } catch {
+        // A failing error-handler must not mask the original failure.
+      }
       throw error;
     }
   }

@@ -1,7 +1,10 @@
 import type { TrackMetadata, ChunkTiming } from '../../storage/types.js';
 import type { SessionItem, TurnItem } from '../../studio/session-catalog.js';
 import type { NavigationDepth } from '../../studio/types.js';
-import { buildHighlightedMarkdownBlocks } from '../../studio/highlight-renderer.js';
+import {
+  buildHighlightedMarkdownBlocks,
+  resolveTranscriptSource,
+} from '../../studio/highlight-renderer.js';
 import { parseMarkdownToSpeakableParagraphs } from '../../chunker/index.js';
 
 export interface TranscriptPaneProps {
@@ -183,11 +186,8 @@ export function TranscriptPane({
   scrollOffset = 0,
 }: TranscriptPaneProps) {
   const borderColor = focused ? '#38bdf8' : '#334155';
-  const markdownText = turn?.markdown ?? track?.transcript ?? '';
-  const chunkTimings =
-    track?.chunkTimings && track.chunkTimings.length > 0
-      ? track.chunkTimings
-      : turn?.track?.chunkTimings ?? [];
+  // Text and timings MUST come from the same source — see resolveTranscriptSource.
+  const { text: markdownText, chunkTimings } = resolveTranscriptSource(turn, track);
   const rawBlocks = buildHighlightedMarkdownBlocks(markdownText, chunkTimings, positionMs);
   const blocks = rawBlocks.flatMap((block) => {
     if (block.type !== 'code') return [block];
