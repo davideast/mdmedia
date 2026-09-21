@@ -49,6 +49,9 @@ export function extractWordTimingsFromPcm(
 
   while ((match = regex.exec(text)) !== null) {
     const word = match[0];
+    if (/^[#>*+-]+$/.test(word)) {
+      continue;
+    }
     const weight = getWordWeight(word);
     const cumStart = totalWeight;
     totalWeight += weight;

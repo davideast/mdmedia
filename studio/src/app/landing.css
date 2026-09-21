@@ -1,0 +1,935 @@
+/* ==========================================================================
+   Marketing landing page.
+
+   Layout and section structure are ported from the Nira Clean SaaS study
+   (.design/02-nira-landing-structure.md): the frosted pill header, the hero +
+   specimen card, the hairline feature triad, the matrix canvas card, the
+   bento showcase, the CTA enclosure and the footer grid.
+
+   Colour and typography come from the installed NexEvent theme
+   (src/app/globals.css). Nira's indigo/pastel palette is replaced by the
+   theme's single-accent monochrome ramp; every colour here resolves through a
+   theme variable.
+
+   Every class is `lp-` prefixed so nothing here can reach the app surfaces.
+   Spacing is padding and gap only — no margins on children.
+   ========================================================================== */
+
+.lp-page {
+  /* Nira layout constants */
+  --lp-shell: 1020px;
+  --lp-gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --lp-rhythm: clamp(4rem, 7vw, 6.5rem);
+
+  /* Nira radii, kept verbatim — geometry, not colour */
+  --lp-radius-cta: 28px;
+  --lp-radius-xl: 20px;
+  --lp-radius-box: 18px;
+  --lp-radius-lg: 14px;
+  --lp-radius-md: 10px;
+  --lp-radius-pill: 9999px;
+
+  --lp-shadow-card: 0 1px 3px color-mix(in srgb, var(--ink-primary) 4%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ink-primary) 5%, transparent);
+  --lp-shadow-nav: 0 4px 24px color-mix(in srgb, var(--ink-primary) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--ink-primary) 4%, transparent);
+  --lp-shadow-pill: 0 1px 2px color-mix(in srgb, var(--ink-primary) 4%, transparent);
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--surface-page);
+  color: var(--ink-primary);
+}
+
+/* --- composition ---------------------------------------------------------- */
+
+.lp-container {
+  inline-size: 100%;
+  max-inline-size: var(--lp-shell);
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter);
+}
+
+.lp-section {
+  padding-block: var(--lp-rhythm);
+}
+
+.lp-section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.lp-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.lp-section-headline {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  color: var(--ink-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lp-headline-muted {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.lp-section-subtext {
+  max-inline-size: 320px;
+  margin: 0;
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.lp-site-header {
+  position: sticky;
+  top: 1.25rem;
+  z-index: 60;
+  pointer-events: none;
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+}
+
+.lp-nav-wrapper {
+  max-inline-size: var(--lp-shell);
+  margin-inline: auto;
+}
+
+.lp-nav-pill {
+  pointer-events: auto;
+  background-color: color-mix(in srgb, var(--surface-card) 64%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--border-hairline) 70%, transparent);
+  border-radius: var(--lp-radius-pill);
+  box-shadow: var(--lp-shadow-nav);
+  padding: 0.45rem 0.55rem 0.45rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  block-size: 3.65rem;
+}
+
+/* --- brand mark ----------------------------------------------------------- */
+
+.lp-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink-primary);
+  font-size: 0.9375rem;
+}
+
+
+/* --- buttons -------------------------------------------------------------- */
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--lp-radius-pill);
+  padding: 0.625rem 1.35rem;
+  transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease,
+    border-color 0.16s ease, color 0.16s ease;
+}
+
+.lp-btn-primary {
+  background-color: var(--accent-primary);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink-primary) 18%, transparent);
+}
+
+.lp-btn-primary:hover {
+  transform: translateY(-1px);
+  background-color: color-mix(in srgb, var(--accent-primary) 88%, var(--surface-page));
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--ink-primary) 22%, transparent);
+}
+
+.lp-btn-quiet {
+  background-color: var(--surface-card);
+  border-color: var(--border-hairline);
+  color: var(--ink-primary);
+  box-shadow: var(--lp-shadow-pill);
+}
+
+.lp-btn-quiet:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.lp-btn-header {
+  padding: 0.55rem 1.35rem;
+  font-size: 0.8125rem;
+}
+
+/* --- hero ----------------------------------------------------------------- */
+
+.lp-hero {
+  padding-block-start: clamp(2.5rem, 4.5vw, 4rem);
+  padding-block-end: clamp(4rem, 7vw, 6rem);
+  text-align: center;
+}
+
+.lp-hero-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+}
+
+.lp-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  max-inline-size: 680px;
+}
+
+.lp-hero-headline {
+  font-size: clamp(2.5rem, 4.8vw, 3.65rem);
+  line-height: 1.12;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lp-hero-subcopy {
+  margin: 0;
+  text-align: center;
+}
+
+.lp-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* --- hero specimen: the reader, drawn in real DOM ------------------------- */
+
+.lp-specimen-card {
+  inline-size: 100%;
+  max-inline-size: 840px;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--lp-radius-xl);
+  box-shadow: var(--lp-shadow-card);
+  text-align: left;
+  overflow: hidden;
+}
+
+.lp-specimen-head {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.125rem 1.75rem;
+  border-block-end: 1px solid var(--border-hairline);
+}
+
+.lp-specimen-head-icon {
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.lp-specimen-title {
+  flex: 1;
+  min-inline-size: 0;
+  font-size: 0.9375rem;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-specimen-body {
+  display: grid;
+  grid-template-columns: 1.28fr 1fr;
+  gap: 2rem;
+  padding: 1.75rem;
+  align-items: start;
+}
+
+.lp-specimen-read {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-inline-end: 1.5rem;
+  border-inline-end: 1px solid var(--border-hairline);
+  block-size: 200px;
+  overflow: hidden;
+}
+
+.lp-reader-copy {
+  font-size: 0.97rem;
+  line-height: 1.68;
+  max-inline-size: 62ch;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.lp-reader-copy-dim {
+  color: var(--ink-faint);
+}
+
+.lp-specimen-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.lp-side-card {
+  background-color: var(--surface-inset);
+  border-radius: var(--lp-radius-lg);
+  padding: 1rem 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lp-side-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-primary);
+}
+
+.lp-equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  block-size: 24px;
+}
+
+.lp-equalizer span {
+  inline-size: 3.5px;
+  border-radius: 2px;
+  background-color: var(--border-strong);
+}
+
+.lp-equalizer span:nth-child(odd) {
+  background-color: var(--accent-primary);
+}
+
+/* compact player bar */
+
+.lp-player {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.75rem;
+  border-block-start: 1px solid var(--border-hairline);
+  block-size: 4.25rem;
+}
+
+.lp-player-btn {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: var(--lp-radius-pill);
+  background-color: var(--accent-primary);
+  color: var(--accent-ink);
+  flex-shrink: 0;
+}
+
+.lp-player-step {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.lp-player-track {
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 4px;
+  border-radius: var(--lp-radius-pill);
+  background-color: var(--accent-soft);
+  overflow: hidden;
+}
+
+.lp-player-fill {
+  display: block;
+  block-size: 100%;
+  inline-size: var(--lp-progress, 0%);
+  border-radius: inherit;
+  background-color: var(--accent-primary);
+}
+
+.lp-player-time {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- feature triad -------------------------------------------------------- */
+
+.lp-triad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+  border-block-start: 1px solid var(--border-hairline);
+}
+
+.lp-triad-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding-block-start: 2.25rem;
+  padding-inline: 1.75rem;
+  border-inline-end: 1px solid var(--border-hairline);
+}
+
+.lp-triad-item:first-child {
+  padding-inline-start: 0;
+}
+
+.lp-triad-item:last-child {
+  padding-inline-end: 0;
+  border-inline-end: none;
+}
+
+.lp-specimen-box {
+  border-radius: var(--lp-radius-box);
+  padding: 1.125rem 1rem 3.25rem 1rem;
+  block-size: 165px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  overflow: hidden;
+  background-color: var(--surface-inset);
+}
+
+.lp-specimen-box-subtle {
+  background-color: var(--surface-subtle);
+}
+
+.lp-specimen-box-accent {
+  background-color: var(--accent-soft);
+}
+
+.lp-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background-color: var(--surface-card);
+  border-radius: var(--lp-radius-md);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--ink-primary);
+  box-shadow: var(--lp-shadow-pill);
+}
+
+.lp-chip-split {
+  justify-content: space-between;
+}
+
+.lp-chip-icon {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.lp-chip-lead {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-inline-size: 0;
+}
+
+.lp-chip-lead span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-feature-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lp-feature-title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--ink-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lp-feature-desc {
+  margin: 0;
+}
+
+/* --- how it works (Nira matrix canvas card, re-cut as three steps) -------- */
+
+.lp-steps-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--lp-radius-xl);
+  box-shadow: var(--lp-shadow-card);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+}
+
+.lp-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 2rem 1.75rem;
+  border-inline-end: 1px solid var(--border-hairline);
+}
+
+.lp-step:last-child {
+  border-inline-end: none;
+}
+
+.lp-step-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lp-step-title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.lp-step-desc {
+  margin: 0;
+}
+
+.lp-step-visual {
+  block-size: 132px;
+  border-radius: var(--lp-radius-lg);
+  background-color: var(--surface-inset);
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.lp-text-line {
+  block-size: 6px;
+  border-radius: var(--lp-radius-pill);
+  background-color: var(--accent-soft);
+}
+
+.lp-text-line-strong {
+  background-color: var(--border-strong);
+}
+
+.lp-voice-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--lp-radius-md);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.lp-voice-row-selected {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--ink-primary);
+  font-weight: 500;
+}
+
+.lp-step-player {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* --- reader preview (Nira stack bento) ------------------------------------ */
+
+.lp-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.lp-showcase-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--lp-radius-xl);
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  justify-content: space-between;
+}
+
+.lp-showcase-title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.014em;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.lp-showcase-text {
+  margin: 0;
+}
+
+.lp-showcase-reader {
+  grid-area: reader;
+  min-block-size: 272px;
+}
+
+.lp-showcase-reader-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  block-size: 176px;
+  overflow: hidden;
+}
+
+.lp-showcase-reader-copy {
+  font-size: 0.9rem;
+  line-height: 1.68;
+  max-inline-size: 62ch;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.lp-inline-player {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--lp-radius-lg);
+  background-color: var(--surface-inset);
+}
+
+.lp-inline-player-btn {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: var(--lp-radius-pill);
+  background-color: var(--accent-primary);
+  color: var(--accent-ink);
+  flex-shrink: 0;
+}
+
+.lp-showcase-library {
+  grid-area: library;
+  background-color: var(--surface-inset);
+  border-color: var(--border-hairline);
+}
+
+.lp-library-panel {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--lp-radius-lg);
+  overflow: hidden;
+}
+
+.lp-library-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-block-end: 1px solid var(--border-hairline);
+  font-size: 0.8125rem;
+  color: var(--ink-primary);
+}
+
+.lp-library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  block-size: 248px;
+  overflow-y: auto;
+}
+
+.lp-library-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--lp-radius-md);
+  background-color: var(--surface-inset);
+  flex-shrink: 0;
+}
+
+.lp-library-row-name {
+  font-size: 0.8125rem;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-inline-size: 0;
+}
+
+.lp-library-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+
+.lp-showcase-marker {
+  grid-area: marker;
+}
+
+.lp-marker-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--lp-radius-lg);
+  background-color: var(--surface-inset);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.lp-showcase-share {
+  grid-area: share;
+}
+
+.lp-share-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-share-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--lp-radius-md);
+  background-color: var(--surface-inset);
+  font-size: 0.8125rem;
+  color: var(--ink-primary);
+}
+
+.lp-share-row svg {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+/* --- closing CTA ---------------------------------------------------------- */
+
+.lp-cta-card {
+  background-color: var(--surface-inset);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--lp-radius-cta);
+  padding: clamp(3.5rem, 6vw, 5.25rem) 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.25rem;
+}
+
+.lp-cta-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.lp-cta-headline {
+  font-size: clamp(2.35rem, 4.5vw, 3.25rem);
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lp-cta-subcopy {
+  margin: 0;
+  text-align: center;
+  max-inline-size: 46ch;
+}
+
+.lp-cta-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+.lp-footer {
+  padding-block: 3.5rem 2.5rem;
+  background-color: var(--surface-page);
+}
+
+.lp-footer-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 3rem;
+}
+
+.lp-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-inline-size: 300px;
+}
+
+.lp-footer-tagline {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.lp-footer-nav {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  justify-items: start;
+}
+
+.lp-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.lp-footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-footer-links a {
+  text-decoration: none;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  transition: color 0.15s ease;
+}
+
+.lp-footer-links a:hover {
+  color: var(--ink-primary);
+}
+
+/* --- breakpoints (Nira's own: 960px, 640px) -------------------------------- */
+
+@media (min-width: 961px) {
+  .lp-showcase-grid {
+    grid-template-columns: 1.35fr 1fr;
+    grid-template-areas:
+      "reader  library"
+      "marker  library"
+      "share   library";
+  }
+}
+
+@media (max-width: 960px) {
+  .lp-specimen-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .lp-specimen-read {
+    border-inline-end: none;
+    padding-inline-end: 0;
+    border-block-end: 1px solid var(--border-hairline);
+    padding-block-end: 1.5rem;
+    block-size: auto;
+  }
+
+  .lp-specimen-side {
+    flex-direction: row;
+  }
+
+  .lp-side-card {
+    flex: 1;
+  }
+
+  .lp-triad-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-triad-item {
+    padding-inline: 0;
+    border-inline-end: none;
+    border-block-end: 1px solid var(--border-hairline);
+    padding-block: 2rem;
+  }
+
+  .lp-triad-item:last-child {
+    border-block-end: none;
+  }
+
+  .lp-steps-card {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-step {
+    border-inline-end: none;
+    border-block-end: 1px solid var(--border-hairline);
+  }
+
+  .lp-step:last-child {
+    border-block-end: none;
+  }
+
+  .lp-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .lp-line-break {
+    display: none;
+  }
+
+  .lp-specimen-side {
+    flex-direction: column;
+  }
+
+  .lp-footer-nav {
+    gap: 2rem;
+  }
+}

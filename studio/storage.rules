@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  function isAuthenticated() {
+    return request.auth != null;
+  }
+  function isOwner(userId) {
+    return isAuthenticated() && request.auth.uid == userId;
+  }
+  match /b/{bucket}/o {
+    match /narrations/{ownerUid}/{fileName} {
+      allow read: if isOwner(ownerUid) || resource.metadata.visibility == 'public';
+      allow write: if false;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+// @pyric-source-map: [{"generatedLine":2,"authoredLine":13,"authoredCol":1,"authoredFile":"firestore.rules"},{"generatedLine":3,"authoredLine":3,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":6,"authoredLine":7,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":9,"authoredLine":14,"authoredCol":3,"authoredFile":"storage.modules.rules"},{"generatedLine":10,"authoredLine":15,"authoredCol":5,"authoredFile":"storage.modules.rules"},{"generatedLine":11,"authoredLine":25,"authoredCol":7,"authoredFile":"storage.modules.rules","expression":"isOwner(ownerUid) || resource.metadata.visibility == 'public'"},{"generatedLine":12,"authoredLine":32,"authoredCol":7,"authoredFile":"storage.modules.rules","expression":"false"},{"generatedLine":14,"authoredLine":36,"authoredCol":5,"authoredFile":"storage.modules.rules"},{"generatedLine":15,"authoredLine":37,"authoredCol":7,"authoredFile":"storage.modules.rules","expression":"false"}]

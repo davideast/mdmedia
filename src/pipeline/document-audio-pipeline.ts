@@ -35,7 +35,8 @@ export class DocumentAudioPipeline {
         if (this.aborted) break;
         this.eventBus.emit('chunk:start', { chunk });
 
-        const audioStream = this.ttsProvider.streamAudio(chunk.text, voice, promptStyle);
+        const speakableText = chunk.text.replace(/^\s*(?:#{1,6}|>|[-*+])\s+/, '');
+        const audioStream = this.ttsProvider.streamAudio(speakableText, voice, promptStyle);
 
         for await (const pcmChunk of audioStream) {
           if (this.aborted) break;

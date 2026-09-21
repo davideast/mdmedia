@@ -256,9 +256,22 @@ export function verbalizeDirectoryTree(text: string): string[] {
   return paragraphs;
 }
 
-export function parseMarkdownToSpeakableParagraphs(markdownText: string): string[] {
+export interface ParseMarkdownOptions {
+  /**
+   * When true, Markdown headings (`#`, `##`, `###`) retain their leading `# `
+   * prefix in the returned paragraph list so downstream reader views can
+   * render structured section headings while still speaking them naturally.
+   */
+  preserveHeadings?: boolean;
+}
+
+export function parseMarkdownToSpeakableParagraphs(
+  markdownText: string,
+  options?: ParseMarkdownOptions
+): string[] {
   const tokens = lexer(markdownText);
   const paragraphs: string[] = [];
+  const preserveHeadings = options?.preserveHeadings === true;
 
   for (const token of tokens) {
     switch (token.type) {
@@ -284,10 +297,19 @@ export function parseMarkdownToSpeakableParagraphs(markdownText: string): string
       }
       case 'heading': {
         const hToken = token as Tokens.Heading;
-        const rawText = sanitizeTextForSpeech(extractTextFromTokens(hToken.tokens));
-        const text = ensureSentenceEnding(rawText);
-        if (text.length > 0) {
-          paragraphs.push(text);
+        const rawText = sanitizeTextForSpeech(extractTextFromTokens(hToken.tokens)).trim();
+        if (rawText.length > 0) {
+          if (preserveHeadings) {
+            const depth = Math.min(3, Math.max(1, hToken.depth));
+            const prefix = `${'#'.repeat(depth)} `;
+            const cleanedHeading = rawText.replace(/[.]+$/, '');
+            paragraphs.push(`${prefix}${cleanedHeading}`);
+          } else {
+            const text = ensureSentenceEnding(rawText);
+            if (text.length > 0) {
+              paragraphs.push(text);
+            }
+          }
         }
         break;
       }
