@@ -64,3 +64,18 @@ if (fs.existsSync(adminStoragePath)) {
     console.log('[patch] Patched pyric-admin MAX_REMOTE_STORAGE_OP_BYTES to 512 MiB');
   }
 }
+
+// 5. Patch bridge/server/socket-message.js backlog limit (up to 768 MiB)
+const socketMessagePath = path.join(cliDist, 'bridge', 'server', 'socket-message.js');
+if (fs.existsSync(socketMessagePath)) {
+  let content = fs.readFileSync(socketMessagePath, 'utf8');
+  const targetBacklog = "socket.bufferedAmount + Buffer.byteLength(payload) > 24 * 1024 * 1024;";
+  const replacementBacklog = "socket.bufferedAmount + Buffer.byteLength(payload) > 768 * 1024 * 1024;";
+  if (content.includes(targetBacklog)) {
+    content = content.replace(targetBacklog, replacementBacklog);
+    content = content.replace("Client output backlog exceeds 24 MiB", "Client output backlog exceeds 768 MiB");
+    fs.writeFileSync(socketMessagePath, content, 'utf8');
+    console.log('[patch] Patched socket-message.js backlog cap to 768 MiB');
+  }
+}
+
