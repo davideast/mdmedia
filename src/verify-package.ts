@@ -133,6 +133,7 @@ console.log('[ESM Runtime Test] All named exports from all subpaths resolved cle
 import type { StoryboardScene } from 'mdmedia/chunker';
 import type { DocumentHighlight } from 'mdmedia/chunker';
 import type { VoiceName } from 'mdmedia/types';
+import type { DocumentChunk, IFileReader, PipelineEventMap, SynthesisOptions } from 'mdmedia/types';
 import type { GenerateVideoOptions } from 'mdmedia/video';
 import type { StudioState } from 'mdmedia/studio';
 import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
@@ -155,8 +156,12 @@ let chunk: ChunkTiming | null = null;
 let highlight: WordHighlight | null = null;
 let docHighlight: DocumentHighlight | null = null;
 let adapter: INarrationAdapter | null = null;
+let docChunk: DocumentChunk | null = null;
+let reader: IFileReader | null = null;
+let evtMap: keyof PipelineEventMap = 'pipeline:complete';
+let synthOpts: SynthesisOptions | null = null;
 
-export { scene, voice, opts, bus, state, word, chunk, highlight, docHighlight, adapter };
+export { scene, voice, opts, bus, state, word, chunk, highlight, docHighlight, adapter, docChunk, reader, evtMap, synthOpts };
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.ts'), tsTestScript);
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
