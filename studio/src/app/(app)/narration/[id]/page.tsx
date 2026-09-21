@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { BookOpen, Loader2 } from "lucide-react";
+import { BookOpen, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Reader } from "@/components/reader/reader";
+import { SourceDocumentView } from "@/components/reader/source-document-view";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { updateNarrationTitle } from "@/lib/narrations";
@@ -12,10 +13,12 @@ import { updateNarrationTitle } from "@/lib/narrations";
 export default function NarrationPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
-  const { stream } = useNarration();
+  const { stream, documentView, setDocumentView } = useNarration();
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const isSubmittingRef = useRef(false);
+  const isCancelledRef = useRef(false);
 
   // Only load from storage when this is not the narration already streaming
   // through the provider — replay must not interrupt a live synthesis.
@@ -62,14 +65,27 @@ export default function NarrationPage() {
   const displayTitle = stream.title.length > 0 ? stream.title : "Narration";
 
   const startEditingTitle = () => {
+    isSubmittingRef.current = false;
+    isCancelledRef.current = false;
     setDraftTitle(displayTitle);
     setEditingTitle(true);
   };
 
-  const commitTitle = async () => {
-    const trimmed = draftTitle.trim();
+  const cancelEditing = () => {
+    isCancelledRef.current = true;
     setEditingTitle(false);
-    if (!trimmed || trimmed === stream.title) return;
+    setDraftTitle(displayTitle);
+  };
+
+  const commitTitle = async () => {
+    if (isSubmittingRef.current || isCancelledRef.current) return;
+    const trimmed = draftTitle.trim();
+    if (!trimmed || trimmed === stream.title) {
+      setEditingTitle(false);
+      return;
+    }
+    isSubmittingRef.current = true;
+    setEditingTitle(false);
     const previousTitle = stream.title;
     stream.setTitle(trimmed);
     try {
@@ -77,6 +93,8 @@ export default function NarrationPage() {
     } catch {
       stream.setTitle(previousTitle);
       toast.error("Could not update title.");
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
@@ -86,7 +104,13 @@ export default function NarrationPage() {
   return (
     <WorkbenchPanel
       title={displayTitle}
-      icon={<BookOpen size={13} strokeWidth={2} className="flex-none" />}
+      icon={
+        documentView === "source" ? (
+          <FileText size={13} strokeWidth={2} className="flex-none" />
+        ) : (
+          <BookOpen size={13} strokeWidth={2} className="flex-none" />
+        )
+      }
       headerClassName="px-8"
       headerInnerClassName="mx-auto w-full max-w-[68ch]"
       titleNode={
@@ -102,7 +126,7 @@ export default function NarrationPage() {
                 void commitTitle();
               } else if (event.key === "Escape") {
                 event.preventDefault();
-                setEditingTitle(false);
+                cancelEditing();
               }
             }}
             aria-label="Edit narration title"
@@ -119,7 +143,7 @@ export default function NarrationPage() {
         )
       }
       actions={busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
-      bodyClassName="px-8 pt-10 pb-40"
+      bodyClassName="px-8 pt-10 pb-40 min-w-0 max-w-full"
     >
       {stream.status === "error" ? (
         <p className="mx-auto w-full max-w-[68ch] text-[0.95rem] text-ink-muted">
@@ -130,6 +154,11 @@ export default function NarrationPage() {
           <Loader2 size={18} className="animate-spin text-ink-faint" />
           <span className="sr-only">Loading narration</span>
         </div>
+      ) : documentView === "source" ? (
+        <SourceDocumentView
+          sourceMarkdown={stream.sourceMarkdown || ""}
+          onSwitchToAdapted={() => setDocumentView("adapted")}
+        />
       ) : (
         <Reader
           transcript={stream.transcript}

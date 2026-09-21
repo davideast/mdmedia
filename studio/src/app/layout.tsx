@@ -30,6 +30,14 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "mdmedia studio",
   description: "Turn writing into narration you can read along with.",
+  icons: {
+    icon: [
+      {
+        url: "/icon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -49,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           <AuthProvider>
             <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
-            <Toaster position="bottom-center" />
+            <Toaster position="bottom-right" />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -87,6 +87,75 @@ function extractTextFromTokens(tokens: Token[]): string {
 }
 
 /**
+ * Known diagram declaration keywords (Mermaid, flowcharts, schemas).
+ */
+const DIAGRAM_KEYWORDS = new Set([
+  'flowchart',
+  'graph',
+  'sequencediagram',
+  'statediagram',
+  'statediagram-v2',
+  'classdiagram',
+  'classdiagram-v2',
+  'erdiagram',
+  'journey',
+  'gantt',
+  'pie',
+  'quadrantchart',
+  'requirementdiagram',
+  'gitgraph',
+  'c4context',
+  'mindmap',
+  'timeline',
+  'sankey-beta',
+  'xychart-beta',
+  'block-beta',
+  'packet-beta',
+  'kanban',
+  'architecture-beta',
+  'subgraph',
+]);
+
+/**
+ * Detects if a code block contains a visual diagram (e.g., Mermaid flowchart or graph)
+ * using language tags or non-regex first-token keyword inspection.
+ */
+export function isDiagramBlock(text: string, lang?: string): boolean {
+  if (lang) {
+    const normalizedLang = lang.trim().toLowerCase();
+    if (normalizedLang === 'mermaid' || normalizedLang === 'diagram') {
+      return true;
+    }
+  }
+
+  const lines = text.trim().split('\n');
+  const delimiters = [' ', '\t', ':', ';', '(', '[', '{'];
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (line.length === 0 || line.startsWith('%%')) {
+      continue;
+    }
+
+    let end = line.length;
+    for (const d of delimiters) {
+      const idx = line.indexOf(d);
+      if (idx !== -1 && idx < end) {
+        end = idx;
+      }
+    }
+
+    const firstWord = line.slice(0, end).toLowerCase();
+    if (DIAGRAM_KEYWORDS.has(firstWord)) {
+      return true;
+    }
+    break;
+  }
+
+  return false;
+}
+
+/**
  * Detects if a text block represents an ASCII directory/file tree.
  */
 export function isDirectoryTree(text: string): boolean {
@@ -344,6 +413,11 @@ export function parseMarkdownToSpeakableParagraphs(
               paragraphs.push(text);
             }
           }
+        } else if (isDiagramBlock(codeToken.text, codeToken.lang)) {
+          // Visual diagrams should be translated by the narration adapter into natural prose.
+          // In the raw AST fallback parser, discard raw diagram markup so text-to-speech
+          // never reads raw diagram syntax (e.g. "Code snippet: flowchart TD...").
+          break;
         } else {
           const codeText = sanitizeTextForSpeech(codeToken.text);
           if (codeText.length > 0) {

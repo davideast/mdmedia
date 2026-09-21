@@ -31,6 +31,8 @@ export interface NarrationStreamState {
   durationMs: number;
   playing: boolean;
   activeWord: { charStart: number; charEnd: number } | null;
+  sourceMarkdown: string | null;
+  adapted: boolean;
   start: (input: {
     markdown: string;
     voice: VoiceName;
@@ -123,6 +125,8 @@ export function useNarrationStream(): NarrationStreamState {
   const [voice, setVoice] = useState<VoiceName | null>(null);
   const [transcript, setTranscript] = useState('');
   const [chunks, setChunks] = useState<AlignedChunk[]>([]);
+  const [sourceMarkdown, setSourceMarkdown] = useState<string | null>(null);
+  const [adapted, setAdapted] = useState<boolean>(false);
   const [status, setStatus] = useState<NarrationStreamState['status']>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [player, setPlayer] = useState<StreamingPcmPlayer | null>(null);
@@ -133,6 +137,7 @@ export function useNarrationStream(): NarrationStreamState {
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const docUnsubRef = useRef<(() => void) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const loadSessionRef = useRef(0);
 
   const ensurePlayer = useCallback((): StreamingPcmPlayer => {
     const existing = playerRef.current;
@@ -152,6 +157,7 @@ export function useNarrationStream(): NarrationStreamState {
   }, []);
 
   const resetPlayer = useCallback(() => {
+    loadSessionRef.current++;
     docUnsubRef.current?.();
     docUnsubRef.current = null;
     unsubscribeRef.current?.();
@@ -164,9 +170,12 @@ export function useNarrationStream(): NarrationStreamState {
 
   useEffect(
     () => () => {
+      loadSessionRef.current++;
       abortRef.current?.abort();
       docUnsubRef.current?.();
+      docUnsubRef.current = null;
       unsubscribeRef.current?.();
+      unsubscribeRef.current = null;
       playerRef.current?.destroy();
     },
     [],
@@ -181,6 +190,8 @@ export function useNarrationStream(): NarrationStreamState {
       setTitle('');
       setVoice(input.voice);
       setTranscript('');
+      setSourceMarkdown(input.markdown);
+      setAdapted(input.rewriteForNarration);
       setChunks([]);
       setErrorMessage(null);
       setStatus('starting');
@@ -328,15 +339,20 @@ export function useNarrationStream(): NarrationStreamState {
       abortRef.current = null;
       resetPlayer();
 
+      const session = ++loadSessionRef.current;
+
       setId(narrationId);
       setTitle('');
       setVoice(null);
       setTranscript('');
+      setSourceMarkdown(null);
+      setAdapted(false);
       setChunks([]);
       setErrorMessage(null);
       setStatus('loading');
 
       const token = await currentIdToken();
+      if (session !== loadSessionRef.current) return;
       if (!token) {
         setStatus('error');
         setErrorMessage(SIGN_IN_REQUIRED);
@@ -349,11 +365,14 @@ export function useNarrationStream(): NarrationStreamState {
       let loadChain = Promise.resolve();
 
       const pullCheckpoint = async (isFinal: boolean): Promise<boolean> => {
+        if (session !== loadSessionRef.current) return false;
         try {
           const [audioResponse, timingsResponse] = await Promise.all([
             fetch(`/api/narrations/${narrationId}/audio?raw=1`, { headers }),
             fetch(`/api/narrations/${narrationId}/timings?raw=1`, { headers }),
           ]);
+
+          if (session !== loadSessionRef.current) return false;
 
           if (!audioResponse.ok || !timingsResponse.ok) {
             if (isFinal) {
@@ -369,7 +388,11 @@ export function useNarrationStream(): NarrationStreamState {
             timingsResponse.json() as Promise<NarrationTimingsFile>,
           ]);
 
-          if (timingsFile.title) setTitle(timingsFile.title);
+          if (session !== loadSessionRef.current) return false;
+
+          if (timingsFile.title) {
+            setTitle((current) => (current.trim().length > 0 ? current : timingsFile.title));
+          }
           if (timingsFile.transcript) setTranscript(timingsFile.transcript);
           setChunks([...timingsFile.chunks].sort((a, b) => a.index - b.index));
 
@@ -387,6 +410,7 @@ export function useNarrationStream(): NarrationStreamState {
           }
           return true;
         } catch {
+          if (session !== loadSessionRef.current) return false;
           if (isFinal) {
             setStatus('error');
             setErrorMessage(LOAD_FAILURE);
@@ -400,7 +424,15 @@ export function useNarrationStream(): NarrationStreamState {
         docUnsubRef.current = null;
       };
 
+      stopDocWatch();
+      if (session !== loadSessionRef.current) return;
+
       docUnsubRef.current = watchNarration(narrationId, (narration) => {
+        if (session !== loadSessionRef.current) {
+          stopDocWatch();
+          return;
+        }
+
         if (!narration) {
           setStatus('error');
           setErrorMessage(LOAD_FAILURE);
@@ -411,6 +443,8 @@ export function useNarrationStream(): NarrationStreamState {
         if (narration.title) setTitle(narration.title);
         if (narration.voice) setVoice(narration.voice);
         if (narration.transcript) setTranscript(narration.transcript);
+        if (narration.sourceMarkdown !== undefined) setSourceMarkdown(narration.sourceMarkdown);
+        if (narration.adapted !== undefined) setAdapted(narration.adapted);
 
         if (narration.status === 'error') {
           setStatus('error');
@@ -438,7 +472,7 @@ export function useNarrationStream(): NarrationStreamState {
           loadChain = loadChain
             .then(() => pullCheckpoint(true))
             .then((ok) => {
-              if (ok) setStatus('ready');
+              if (ok && session === loadSessionRef.current) setStatus('ready');
             });
         }
       });
@@ -447,6 +481,9 @@ export function useNarrationStream(): NarrationStreamState {
   );
 
   const cancel = useCallback(() => {
+    loadSessionRef.current++;
+    docUnsubRef.current?.();
+    docUnsubRef.current = null;
     abortRef.current?.abort();
     abortRef.current = null;
     playerRef.current?.pause();
@@ -470,6 +507,8 @@ export function useNarrationStream(): NarrationStreamState {
     durationMs: transport.durationMs,
     playing: transport.playing,
     activeWord,
+    sourceMarkdown,
+    adapted,
     start,
     loadExisting,
     cancel,

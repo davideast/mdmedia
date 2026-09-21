@@ -8,6 +8,7 @@ import {
   AudioLines,
   Library,
   ListMusic,
+  ListOrdered,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
@@ -18,6 +19,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
+import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
 
 interface NavItem {
@@ -30,6 +32,7 @@ interface NavItem {
 
 const NAV: readonly NavItem[] = [
   { href: "/studio", label: "Studio", icon: AudioLines },
+  { href: "/queue", label: "Queue", icon: ListOrdered },
   { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
   { href: "/playlists", label: "Playlists", icon: ListMusic },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -58,8 +61,10 @@ export function NavRail({
 }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { generationQueue } = useNarration();
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const activeCount = generationQueue.activeCount;
 
   return (
     <nav
@@ -101,6 +106,9 @@ export function NavRail({
         {NAV.map((item) => {
           const active = isActive(pathname, item);
           const Icon = item.icon;
+          const isQueue = item.href === "/queue";
+          const showBadge = isQueue && activeCount > 0;
+
           const link = (
             <Link
               href={item.href}
@@ -113,17 +121,37 @@ export function NavRail({
                   : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
               )}
             >
-              <Icon size={16} strokeWidth={2} className="flex-none" />
-              {docked ? null : <span className="truncate">{item.label}</span>}
+              <div className="relative flex flex-none items-center justify-center">
+                <Icon size={16} strokeWidth={2} className="flex-none" />
+                {docked && showBadge ? (
+                  <span className="absolute -top-1 -right-1 flex size-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                  </span>
+                ) : null}
+              </div>
+              {docked ? null : (
+                <>
+                  <span className="truncate">{item.label}</span>
+                  {showBadge ? (
+                    <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-semibold text-primary-foreground">
+                      {activeCount}
+                    </span>
+                  ) : null}
+                </>
+              )}
             </Link>
           );
+
+          const tooltipLabel =
+            isQueue && activeCount > 0 ? `${item.label} (${activeCount} active)` : item.label;
 
           return (
             <li key={item.href}>
               {docked ? (
                 <Tooltip>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  <TooltipContent side="right">{item.label}</TooltipContent>
+                  <TooltipContent side="right">{tooltipLabel}</TooltipContent>
                 </Tooltip>
               ) : (
                 link

@@ -39,47 +39,40 @@ function HistoryRow({ narration }: { narration: Narration }) {
 export default function StudioPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { stream, draft, setDraft } = useNarration();
+  const { draft, setDraft, generationQueue } = useNarration();
   const [history, setHistory] = useState<Narration[]>([]);
-  const submittedRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (user === null) return;
     return watchMyNarrations(user.uid, setHistory);
   }, [user]);
 
-  // The id arrives on the stream's first event. Hand the reader over as soon as
-  // it does, clear the composer draft so clicking Back shows a clean slate, and
-  // reset submittedRef so navigating back to /studio while audio plays stays on /studio.
-  useEffect(() => {
-    if (
-      submittedRef.current &&
-      stream.id !== null &&
-      (stream.status === "streaming" || stream.status === "ready")
-    ) {
-      submittedRef.current = false;
-      setDraft({ markdown: "" });
-      router.push(`/narration/${stream.id}`);
-    }
-  }, [stream.id, stream.status, router, setDraft]);
-
   const tooShort = draft.markdown.trim().length < MIN_CHARS;
-  const starting = stream.status === "starting";
 
   const create = async () => {
-    const markdownToSynthesize = draft.markdown;
-    submittedRef.current = true;
+    const markdownToSynthesize = draft.markdown.trim();
+    if (markdownToSynthesize.length < MIN_CHARS) return;
+    setSubmitting(true);
     try {
-      await stream.start({
+      await generationQueue.queueNarration({
         markdown: markdownToSynthesize,
         voice: draft.voice,
         promptStyle: draft.promptStyle,
         rewriteForNarration: draft.rewriteForNarration,
         visibility: draft.visibility,
       });
+      setDraft({ markdown: "" });
+      toast.success("Narration queued for processing", {
+        action: {
+          label: "View Queue",
+          onClick: () => router.push("/queue"),
+        },
+      });
     } catch {
-      submittedRef.current = false;
-      toast.error("That did not start. Try again.");
+      toast.error("Could not queue narration. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -109,11 +102,11 @@ export default function StudioPage() {
             type="button"
             size="lg"
             onClick={create}
-            disabled={tooShort || starting}
+            disabled={tooShort || submitting}
             className="h-10 gap-2 rounded-full px-6"
           >
-            {starting ? <Loader2 size={16} className="animate-spin" /> : null}
-            Start narrating
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+            Start Narration
           </Button>
         </div>
       </div>

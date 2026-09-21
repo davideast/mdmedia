@@ -24,7 +24,8 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 
-import { db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
   DEFAULT_VOICE,
   MAX_SHARED_WITH,
@@ -129,21 +130,33 @@ function narrationRef(id: string) {
  * be part of the query.
  */
 export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => void): Unsubscribe {
-  const q = query(
-    narrationsCollection(),
-    where('ownerUid', '==', uid),
-    orderBy('createdAt', 'desc'),
-    limit(NARRATION_PAGE_SIZE),
+  return multicastSubscribe<Narration[]>(
+    `my-narrations:${uid}`,
+    (onData) => {
+      const q = query(
+        narrationsCollection(),
+        where('ownerUid', '==', uid),
+        orderBy('createdAt', 'desc'),
+        limit(NARRATION_PAGE_SIZE),
+      );
+      return onSnapshot(q, (snapshot) => {
+        onData(snapshot.docs.map(toNarration).filter((item) => item.status !== 'error'));
+      });
+    },
+    cb,
   );
-  return onSnapshot(q, (snapshot) => {
-    cb(snapshot.docs.map(toNarration).filter((item) => item.status !== 'error'));
-  });
 }
 
 export function watchNarration(id: string, cb: (narration: Narration | null) => void): Unsubscribe {
-  return onSnapshot(narrationRef(id), (snapshot) => {
-    cb(snapshot.exists() ? toNarration(snapshot) : null);
-  });
+  return multicastSubscribe<Narration | null>(
+    `narration:${id}`,
+    (onData) => {
+      return onSnapshot(narrationRef(id), (snapshot) => {
+        onData(snapshot.exists() ? toNarration(snapshot) : null);
+      });
+    },
+    cb,
+  );
 }
 
 export async function getNarrationOnce(id: string): Promise<Narration | null> {
@@ -181,14 +194,21 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
 export async function deleteNarration(id: string): Promise<void> {
   await deleteDoc(doc(db(), 'narrations', id));
   try {
-    const q = query(collection(db(), 'playlists'), where('narrationIds', 'array-contains', id));
-    const snap = await getDocs(q);
-    await Promise.all(
-      snap.docs.map((pDoc) => {
-        const nextIds = ((pDoc.data().narrationIds as string[]) ?? []).filter((item) => item !== id);
-        return updateDoc(pDoc.ref, { narrationIds: nextIds, updatedAt: Date.now() });
-      }),
-    );
+    const currentUid = auth().currentUser?.uid;
+    if (currentUid) {
+      const q = query(
+        collection(db(), 'playlists'),
+        where('ownerUid', '==', currentUid),
+        where('narrationIds', 'array-contains', id),
+      );
+      const snap = await getDocs(q);
+      await Promise.all(
+        snap.docs.map((pDoc) => {
+          const nextIds = ((pDoc.data().narrationIds as string[]) ?? []).filter((item) => item !== id);
+          return updateDoc(pDoc.ref, { narrationIds: nextIds, updatedAt: Date.now() });
+        }),
+      );
+    }
   } catch {
     // Non-fatal if playlist cleanup encounters an issue
   }

@@ -64,11 +64,6 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.ownerUid);
     }
 
-    // Everything not matched above is denied, including future collections
-    // added before their rules are written.
-    match /{document=**} {
-      allow read, write: if false;
-    }
 
     function canReadNarration() {
       return isOwner(resource.data.ownerUid)

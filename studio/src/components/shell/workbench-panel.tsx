@@ -32,7 +32,7 @@ export function WorkbenchPanel({
   className?: string;
 }) {
   return (
-    <section className={cn("flex h-full min-h-0 flex-col bg-background", className)}>
+    <section className={cn("flex h-full min-h-0 min-w-0 flex-col bg-background", className)}>
       {title === undefined && titleNode === undefined ? null : (
         <header
           className={cn(
@@ -58,7 +58,7 @@ export function WorkbenchPanel({
       )}
       <div
         className={cn(
-          "flex min-h-0 flex-1 flex-col overflow-y-auto",
+          "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden",
           bodyClassName ?? "gap-2 p-3",
         )}
       >
