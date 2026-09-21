@@ -13,6 +13,7 @@ export class WavFileStreamSink {
   private unsubscribeError?: () => void;
   private openPromise?: Promise<void>;
   private writeQueue: Promise<void> = Promise.resolve();
+  private finalizePromise?: Promise<void>;
 
   constructor(destination: string) {
     this.destination = resolve(destination);
@@ -55,15 +56,14 @@ export class WavFileStreamSink {
       });
     });
 
-    this.unsubscribeComplete = eventBus.on('pipeline:complete', () => {
-      this.finalize(sampleRate, channels, bitDepth).catch((err) => {
-        console.error('[WavFileStreamSink] Error finalizing WAV header:', err);
-      });
-    });
+    // These listeners RETURN their promises so `emitAndWait` can await them.
+    // Returning rather than floating is what guarantees the file is complete
+    // by the time processDocument() resolves.
+    this.unsubscribeComplete = eventBus.on('pipeline:complete', () =>
+      this.finalize(sampleRate, channels, bitDepth)
+    );
 
-    this.unsubscribeError = eventBus.on('pipeline:error', () => {
-      this.closeStream();
-    });
+    this.unsubscribeError = eventBus.on('pipeline:error', () => this.closeStream());
   }
 
   detach(): void {
@@ -82,6 +82,16 @@ export class WavFileStreamSink {
   }
 
   writePCMChunk(chunk: Uint8Array): Promise<void> {
+    if (this.finalizePromise) {
+      // open() would early-return on the stale openPromise, leaving writeStream
+      // undefined and throwing an opaque TypeError below. Fail clearly instead.
+      return Promise.reject(
+        new Error(
+          `WavFileStreamSink: cannot write after finalize() (${this.destination}). ` +
+            `Create a new sink for a new file.`
+        )
+      );
+    }
     this.writeQueue = this.writeQueue.then(async () => {
       if (!this.writeStream) {
         await this.open();
@@ -117,18 +127,37 @@ export class WavFileStreamSink {
     });
   }
 
-  async finalize(sampleRate = 24000, channels = 1, bitDepth = 16): Promise<void> {
-    // Wait for all pending delta writes in the queue to finish writing to disk
-    await this.writeQueue;
-    await this.closeStream();
+  /**
+   * Drains pending writes, closes the stream, and rewrites the 44-byte header
+   * with the real sizes.
+   *
+   * Idempotent: repeated calls return the same promise and perform no extra I/O,
+   * so calling it explicitly after `processDocument()` (which now awaits it via
+   * `pipeline:complete`) is safe and cheap.
+   */
+  finalize(sampleRate = 24000, channels = 1, bitDepth = 16): Promise<void> {
+    if (this.finalizePromise) return this.finalizePromise;
 
-    const header = createWavHeader(this.bytesWritten, sampleRate, channels, bitDepth);
-    const fd = await openFile(this.destination, 'r+');
-    try {
-      await fd.write(header, 0, header.length, 0);
-    } finally {
-      await fd.close();
-    }
+    this.finalizePromise = (async () => {
+      // Wait for all pending delta writes in the queue to finish writing to disk
+      await this.writeQueue;
+      await this.closeStream();
+
+      const header = createWavHeader(this.bytesWritten, sampleRate, channels, bitDepth);
+      const fd = await openFile(this.destination, 'r+');
+      try {
+        await fd.write(header, 0, header.length, 0);
+      } finally {
+        await fd.close();
+      }
+    })();
+
+    return this.finalizePromise;
+  }
+
+  /** True once `finalize()` has been invoked (whether or not it has settled). */
+  isFinalized(): boolean {
+    return this.finalizePromise !== undefined;
   }
 
   getBytesWritten(): number {
