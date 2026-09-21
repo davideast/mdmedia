@@ -16,6 +16,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from './firebase';
+import { multicastSubscribe } from './subscription-pool';
 import { MAX_PLAYLIST_ITEMS, type Playlist } from './types';
 
 const PLAYLIST_PAGE_SIZE = 100;
@@ -63,15 +64,21 @@ export function watchMyPlaylists(
   uid: string,
   cb: (playlists: Playlist[]) => void,
 ): Unsubscribe {
-  const q = query(
-    playlistsCollection(),
-    where('ownerUid', '==', uid),
-    orderBy('updatedAt', 'desc'),
-    limit(PLAYLIST_PAGE_SIZE),
+  return multicastSubscribe<Playlist[]>(
+    `my-playlists:${uid}`,
+    (onData) => {
+      const q = query(
+        playlistsCollection(),
+        where('ownerUid', '==', uid),
+        orderBy('updatedAt', 'desc'),
+        limit(PLAYLIST_PAGE_SIZE),
+      );
+      return onSnapshot(q, (snapshot) => {
+        onData(snapshot.docs.map(toPlaylist));
+      });
+    },
+    cb,
   );
-  return onSnapshot(q, (snapshot) => {
-    cb(snapshot.docs.map(toPlaylist));
-  });
 }
 
 export async function createPlaylist(

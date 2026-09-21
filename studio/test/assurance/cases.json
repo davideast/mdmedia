@@ -1,0 +1,139 @@
+[
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-read-alice-profile",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A user must not access another user profile or settings document.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "users/alice"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-read-alice-private-narr",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A non-owner must not read a private narration.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "narrations/narr-private"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-read-alice-shared-narr",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "An uninvited user (not in sharedWith) must not read a shared narration.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "narrations/narr-shared"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-read-alice-playlist",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A non-owner must not read or update another user playlist.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "playlists/playlist-alice"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-alice-reassign-playlist-owner",
+    "actorId": "actor-alice",
+    "dimension": "payload",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "An update must not alter the ownerUid of a playlist or narration.",
+    "operation": {
+      "service": "firestore",
+      "method": "update",
+      "path": "playlists/playlist-alice",
+      "data": {
+        "title": "Alice Updated Morning Queue",
+        "description": "Updated description",
+        "narrationIds": [
+          "narr-private"
+        ],
+        "updatedAt": 1000500,
+        "ownerUid": "eve"
+      }
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-delete-shared-narr",
+    "actorId": "actor-bob",
+    "dimension": "operation",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A shared reader must not delete a narration owned by another user.",
+    "operation": {
+      "service": "firestore",
+      "method": "delete",
+      "path": "narrations/narr-shared"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-alice-direct-storage-delete",
+    "actorId": "actor-alice",
+    "dimension": "operation",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Clients must not directly upload or write audio files into storage.",
+    "operation": {
+      "service": "storage",
+      "method": "delete",
+      "path": "narrations/alice/narr-private.wav"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-anon-read-private-storage",
+    "actorId": "actor-anon",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "An unauthenticated visitor must not read private audio objects in storage.",
+    "operation": {
+      "service": "storage",
+      "method": "get",
+      "path": "narrations/alice/narr-private.wav"
+    }
+  }
+]

@@ -88,4 +88,25 @@ describe('GeminiNarrationAdapter', () => {
     expect(capturedInstruction).toContain('Never read raw ASCII tree characters');
     expect(capturedInstruction).toContain('Verbalize');
   });
+
+  it('passes system instruction with code block and diagram verbalization rules', async () => {
+    let capturedInstruction = '';
+    const mockGenerateContent = mock(async ({ config }: any) => {
+      capturedInstruction = config.systemInstruction;
+      return { text: 'Adapted output' };
+    });
+    const mockClient = {
+      models: {
+        generateContent: mockGenerateContent,
+      },
+    } as unknown as GoogleGenAI;
+
+    const adapter = new GeminiNarrationAdapter(mockClient);
+    await adapter.adaptForNarration('Some content with ```mermaid flowchart TD');
+
+    expect(capturedInstruction).toContain('Code Blocks & Snippets');
+    expect(capturedInstruction).toContain('Mermaid & Architecture Diagrams');
+    expect(capturedInstruction).toContain('Never read or emit raw diagram syntax');
+    expect(capturedInstruction).toContain('Never include triple backticks');
+  });
 });

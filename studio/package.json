@@ -11,6 +11,7 @@
     "rules:build": "npm run rules:build:firestore && npm run rules:build:storage",
     "rules:build:firestore": "pyric firestore rules resolve firestore.modules.rules --out firestore.rules",
     "rules:build:storage": "pyric storage rules resolve storage.modules.rules --out storage.rules",
+    "test:assurance": "node scripts/run-authorization-campaign.mjs",
     "postinstall": "node scripts/patch-pyric-bridge-port.js"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "mdmedia": "file:../mdmedia-0.1.0.tgz",
     "next": "16.3.5",
     "next-themes": "^0.4.6",
+    "prismjs": "^1.30.0",
     "radix-ui": "^1.6.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -34,6 +36,7 @@
     "@pyric/cli": "file:.pyric-local/pyric-cli-0.1.0-alpha.23.tgz",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/prismjs": "^1.26.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "create-pyric": "file:.pyric-local/create-pyric-0.1.0-alpha.23.tgz",

@@ -26,6 +26,11 @@ import { useAuth } from "@/lib/auth-context";
 
 const HIGHLIGHT_STORAGE_KEY = "mdmedia.highlightColor";
 
+import { useGenerationQueue } from "@/lib/use-generation-queue";
+import type { GenerationJob, GenerationQueueState } from "@/lib/use-generation-queue";
+
+export type { GenerationJob, GenerationQueueState };
+
 export interface Draft {
   markdown: string;
   voice: VoiceName;
@@ -41,6 +46,8 @@ export interface PlaylistQueueState {
   index: number;
 }
 
+export type DocumentView = "adapted" | "source";
+
 interface NarrationContextValue {
   stream: NarrationStreamState;
   draft: Draft;
@@ -53,6 +60,9 @@ interface NarrationContextValue {
   playTrack: (narration: Narration) => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  documentView: DocumentView;
+  setDocumentView: (view: DocumentView) => void;
+  generationQueue: GenerationQueueState;
 }
 
 const NarrationContext = createContext<NarrationContextValue | null>(null);
@@ -63,6 +73,7 @@ const NarrationContext = createContext<NarrationContextValue | null>(null);
  */
 export function NarrationProvider({ children }: { children: ReactNode }) {
   const stream = useNarrationStream();
+  const generationQueue = useGenerationQueue();
   const { user, profile, updateSettings } = useAuth();
 
   const settings = profile?.settings ?? DEFAULT_SETTINGS;
@@ -72,7 +83,16 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [queue, setQueue] = useState<PlaylistQueueState | null>(null);
+  const [documentView, setDocumentView] = useState<DocumentView>("adapted");
   const wasPlayingRef = useRef(false);
+  const lastStreamIdRef = useRef(stream.id);
+
+  useEffect(() => {
+    if (stream.id !== lastStreamIdRef.current) {
+      lastStreamIdRef.current = stream.id;
+      setDocumentView("adapted");
+    }
+  }, [stream.id]);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(HIGHLIGHT_STORAGE_KEY);
@@ -196,6 +216,9 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       playTrack,
       nextTrack,
       previousTrack,
+      documentView,
+      setDocumentView,
+      generationQueue,
     }),
     [
       stream,
@@ -209,6 +232,9 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       playTrack,
       nextTrack,
       previousTrack,
+      documentView,
+      setDocumentView,
+      generationQueue,
     ],
   );
 

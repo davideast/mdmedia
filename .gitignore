@@ -14,4 +14,7 @@ package-lock.json
 examples/
 *.tgz
 .design/
+.loop/
+*.tsbuildinfo
+.env*.local
 

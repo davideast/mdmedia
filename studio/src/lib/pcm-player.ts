@@ -157,6 +157,10 @@ export class StreamingPcmPlayer {
     this.seek(this.positionMs + deltaMs);
   }
 
+  get rate(): number {
+    return this.rateValue;
+  }
+
   setRate(rate: number): void {
     const next = clamp(rate, MIN_RATE, MAX_RATE);
     if (next === this.rateValue) return;

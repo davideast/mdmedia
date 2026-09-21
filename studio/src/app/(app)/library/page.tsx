@@ -2,11 +2,33 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Library, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  CheckCircle2,
+  Library,
+  Loader2,
+  Play,
+  Search,
+  Sparkles,
+  Trash2,
+  Volume2,
+} from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "cn";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { useNarration } from "@/components/shell/narration-provider";
 import { useAuth } from "@/lib/auth-context";
-import { watchMyNarrations } from "@/lib/narrations";
+import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
 import type { Narration } from "@/lib/types";
 
 const READABLE_VISIBILITY: Record<Narration["visibility"], string> = {
@@ -22,10 +44,141 @@ function duration(ms: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function relativeTime(ms: number): string {
+  if (!ms || !Number.isFinite(ms)) return "recently";
+  const seconds = Math.max(0, Math.round((Date.now() - ms) / 1000));
+  if (seconds < 45) return "just now";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return new Date(ms).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function LibraryNarrationCard({
+  narration,
+  isCurrentTrack,
+  isPlaying,
+  onDelete,
+}: {
+  narration: Narration;
+  isCurrentTrack: boolean;
+  isPlaying: boolean;
+  onDelete: (narration: Narration) => void;
+}) {
+  const router = useRouter();
+
+  const cleanExcerpt = useMemo(() => {
+    return narration.transcript
+      .replace(/^#+\s*/gm, "")
+      .replace(/[*_`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 140);
+  }, [narration.transcript]);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push(`/narration/${narration.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          router.push(`/narration/${narration.id}`);
+        }
+      }}
+      className={cn(
+        "group flex items-center justify-between gap-4 rounded-lg border p-3.5 transition-all cursor-pointer",
+        isCurrentTrack
+          ? "border-primary/40 bg-card shadow-2xs"
+          : "border-border/80 bg-card/60 hover:border-border hover:bg-card",
+      )}
+    >
+      <div className="grid min-w-0 flex-1 gap-1">
+        {/* Title row with status icon */}
+        <div className="flex items-center gap-2">
+          {isCurrentTrack && isPlaying ? (
+            <Volume2 size={14} className="flex-none text-primary animate-pulse" />
+          ) : narration.status === "streaming" ? (
+            <Loader2 size={14} className="flex-none animate-spin text-primary" />
+          ) : (
+            <CheckCircle2 size={14} className="flex-none text-primary" />
+          )}
+          <span className="truncate text-[0.92rem] font-medium text-foreground group-hover:text-primary transition-colors">
+            {narration.title}
+          </span>
+        </div>
+
+        {/* Clean text excerpt */}
+        {cleanExcerpt ? (
+          <p className="line-clamp-1 pl-5.5 text-[0.8rem] text-ink-muted/80">
+            {cleanExcerpt}
+          </p>
+        ) : null}
+
+        {/* Metadata row */}
+        <div className="flex flex-wrap items-center gap-2 pl-5.5 text-[0.75rem] text-ink-muted">
+          <span className="font-medium text-foreground">{narration.voice}</span>
+          <span>&middot;</span>
+          <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
+          <span>&middot;</span>
+          <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
+          <span>&middot;</span>
+          <span>{READABLE_VISIBILITY[narration.visibility]}</span>
+          {narration.adapted ? (
+            <>
+              <span>&middot;</span>
+              <span className="inline-flex items-center gap-1 text-primary">
+                <Sparkles size={11} /> Adapted for ear
+              </span>
+            </>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Right-side actions */}
+      <div className="flex items-center gap-1.5 flex-none">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/narration/${narration.id}`);
+          }}
+          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
+        >
+          <Play size={11} strokeWidth={2.5} className="fill-current" />
+          <span>Open</span>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(narration);
+          }}
+          className="h-7 px-2 text-xs text-ink-muted hover:bg-destructive/10 hover:text-destructive"
+          title={`Delete ${narration.title}`}
+          aria-label={`Delete ${narration.title}`}
+        >
+          <Trash2 size={13} strokeWidth={2} />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function LibraryPage() {
   const { user } = useAuth();
+  const { stream } = useNarration();
   const [items, setItems] = useState<Narration[]>([]);
   const [query, setQuery] = useState("");
+  const [itemToDelete, setItemToDelete] = useState<Narration | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (user === null) return;
@@ -42,13 +195,30 @@ export default function LibraryPage() {
     );
   }, [items, query]);
 
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    setIsDeleting(true);
+    try {
+      if (stream.id === itemToDelete.id) {
+        stream.cancel();
+      }
+      await deleteNarration(itemToDelete.id);
+      toast.success("Narration deleted.");
+      setItemToDelete(null);
+    } catch {
+      toast.error("Could not delete narration.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <WorkbenchPanel
       title="Library"
       icon={<Library size={13} strokeWidth={2} />}
-      bodyClassName="gap-0 p-0"
+      bodyClassName="px-8 py-8"
     >
-      <div className="grid gap-5 p-6">
+      <div className="mx-auto grid w-full max-w-[68ch] gap-6">
         <div className="relative">
           <Search
             size={15}
@@ -58,45 +228,92 @@ export default function LibraryPage() {
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search your narrations"
+            placeholder="Search your narrations…"
             className="h-10 rounded-full pl-9"
           />
         </div>
 
-        {/* Height is locked so typing in the field above never moves anything. */}
-        <div className="grid h-[calc(100dvh-14rem)] content-start gap-3 overflow-y-auto pr-1">
-          {filtered.length === 0 ? (
-            <p className="t-lead pt-8">
-              {items.length === 0
-                ? "Nothing here yet. Anything you narrate will be waiting for you."
-                : "No narration matches that."}
-            </p>
+        {filtered.length === 0 ? (
+          items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+              <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
+                <Library size={24} strokeWidth={1.5} />
+              </div>
+              <div className="grid gap-1">
+                <h2 className="text-[1.05rem] font-semibold text-foreground">
+                  Library is empty
+                </h2>
+                <p className="max-w-sm text-[0.85rem] text-ink-muted">
+                  Anything you narrate in the Studio will appear here with instant audio replay, transcripts, and sharing.
+                </p>
+              </div>
+              <Button asChild variant="outline" size="sm" className="mt-2">
+                <Link href="/studio">Go to Studio</Link>
+              </Button>
+            </div>
           ) : (
-            /* Three explicit rows on the list, and each card spans all three as a
-               subgrid — so titles, excerpts and footers lock to the same
-               horizontal planes across a row no matter how long the excerpt is. */
-            <ul className="grid auto-rows-[auto_1fr_auto] gap-3 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
+            <p className="t-lead pt-8 text-center">
+              No narration matches &ldquo;{query}&rdquo;.
+            </p>
+          )
+        ) : (
+          <section className="grid gap-3">
+            <h2 className="t-label">
+              Narrations ({filtered.length})
+            </h2>
+            <div className="grid gap-2">
               {filtered.map((item) => (
-                <li key={item.id} className="grid grid-rows-subgrid row-span-3">
-                  <Link
-                    href={`/narration/${item.id}`}
-                    className="grid grid-rows-subgrid row-span-3 gap-2 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted"
-                  >
-                    <span className="t-card-title truncate">{item.title}</span>
-                    <span className="t-card-desc line-clamp-2">
-                      {item.transcript.slice(0, 160)}
-                    </span>
-                    <span className="t-mono flex items-center justify-between tabular-nums">
-                      <span>{READABLE_VISIBILITY[item.visibility]}</span>
-                      <span>{duration(item.durationMs)}</span>
-                    </span>
-                  </Link>
-                </li>
+                <LibraryNarrationCard
+                  key={item.id}
+                  narration={item}
+                  isCurrentTrack={stream.id === item.id}
+                  isPlaying={stream.playing}
+                  onDelete={setItemToDelete}
+                />
               ))}
-            </ul>
-          )}
-        </div>
+            </div>
+          </section>
+        )}
       </div>
+
+      <Dialog
+        open={itemToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) {
+            setItemToDelete(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete narration?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete &ldquo;{itemToDelete?.title}&rdquo;? This will permanently remove its audio and transcript, and remove it from any playlists. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2.5">
+            <Button
+              variant="outline"
+              onClick={() => setItemToDelete(null)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <Trash2 size={13} strokeWidth={2} />
+              )}
+              <span>Delete</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </WorkbenchPanel>
   );
 }

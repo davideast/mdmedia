@@ -44,7 +44,7 @@
   --muted-foreground: #707270;
   --accent: #e0e1e0;
   --accent-foreground: #222722;
-  --destructive: #ef4444;
+  --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
   --border: #d7d8d7;
   --input: #d7d8d7;
@@ -99,8 +99,8 @@
   --muted-foreground: #9da19e;
   --accent: rgba(255, 255, 255, 0.08);
   --accent-foreground: #f3f5f3;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --destructive: #f26969;
+  --destructive-foreground: #141615;
   --border: rgba(255, 255, 255, 0.11);
   --input: rgba(255, 255, 255, 0.14);
   --ring: rgba(255, 255, 255, 0.42);
@@ -145,8 +145,8 @@
     --muted-foreground: #9da19e;
     --accent: rgba(255, 255, 255, 0.08);
     --accent-foreground: #f3f5f3;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
+    --destructive: #f26969;
+    --destructive-foreground: #141615;
     --border: rgba(255, 255, 255, 0.11);
     --input: rgba(255, 255, 255, 0.14);
     --ring: rgba(255, 255, 255, 0.42);
@@ -386,5 +386,252 @@
   .reader-block[data-spoken="false"] {
     color: var(--ink-faint);
     transition: color 400ms ease;
+  }
+
+  /* ==========================================================================
+     Source Document View — unadapted markdown reader styling.
+     ========================================================================== */
+  .source-markdown-body {
+    color: var(--foreground);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .source-markdown-body p,
+  .source-markdown-body h1,
+  .source-markdown-body h2,
+  .source-markdown-body h3,
+  .source-markdown-body blockquote,
+  .source-markdown-body li {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .source-markdown-body h1 {
+    font-family: var(--font-display);
+    font-size: 2.15rem;
+    font-weight: 700;
+    line-height: 1.18;
+    margin-top: 1.75rem;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.022em;
+    color: var(--foreground);
+  }
+
+  .source-markdown-body h1:first-child {
+    margin-top: 0;
+  }
+
+  .source-markdown-body h2 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: 1.6rem;
+    margin-bottom: 0.65rem;
+    letter-spacing: -0.014em;
+    color: var(--foreground);
+  }
+
+  .source-markdown-body h3 {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-top: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+  }
+
+  .source-markdown-body p {
+    margin-bottom: 1.25rem;
+  }
+
+  .source-markdown-body ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .source-markdown-body ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .source-markdown-body li {
+    margin-bottom: 0.35rem;
+  }
+
+  .source-markdown-body blockquote {
+    border-left: 3px solid var(--border-strong);
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 1.25rem;
+    color: var(--ink-muted);
+    font-style: italic;
+  }
+
+  .source-markdown-body pre {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .source-markdown-body code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border);
+    padding: 0.15em 0.35em;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .source-markdown-body pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    white-space: inherit;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .source-markdown-body hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .source-markdown-body a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .source-markdown-body table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin-bottom: 1.25rem;
+  }
+
+  .source-markdown-body img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* ==========================================================================
+     Syntax Highlighting Tokens — minimal, quiet, anti-slop palette.
+     ========================================================================== */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  .token.punctuation {
+    color: var(--ink-muted);
+  }
+
+  .token.keyword,
+  .token.tag,
+  .token.selector {
+    color: #c084fc;
+    font-weight: 500;
+  }
+
+  .token.function,
+  .token.class-name {
+    color: #93c5fd;
+  }
+
+  .token.string,
+  .token.char,
+  .token.attr-value {
+    color: #86efac;
+  }
+
+  .token.number,
+  .token.boolean,
+  .token.constant {
+    color: #fdba74;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url {
+    color: var(--ink-muted);
+  }
+
+  .token.variable,
+  .token.property,
+  .token.attr-name {
+    color: #e2e8f0;
+  }
+
+  .token.parameter {
+    color: #f3f5f3;
+  }
+
+  /* Light mode token adjustments */
+  :root:not(.dark) .token.keyword,
+  :root:not(.dark) .token.tag,
+  :root:not(.dark) .token.selector {
+    color: #7c3aed;
+  }
+
+  :root:not(.dark) .token.function,
+  :root:not(.dark) .token.class-name {
+    color: #0284c7;
+  }
+
+  :root:not(.dark) .token.string,
+  :root:not(.dark) .token.char,
+  :root:not(.dark) .token.attr-value {
+    color: #16a34a;
+  }
+
+  :root:not(.dark) .token.number,
+  :root:not(.dark) .token.boolean,
+  :root:not(.dark) .token.constant {
+    color: #c2410c;
+  }
+
+  :root:not(.dark) .token.variable,
+  :root:not(.dark) .token.property,
+  :root:not(.dark) .token.attr-name {
+    color: #1e293b;
+  }
+
+  :root:not(.dark) .token.parameter {
+    color: #0f172a;
   }
 }

@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, Info, ListMusic, Loader2, Plus, X } from "lucide-react";
+import { Check, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,7 +26,7 @@ import {
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
-import { updateVisibility, watchMyNarrations } from "@/lib/narrations";
+import { deleteNarration, updateVisibility } from "@/lib/narrations";
 import {
   createPlaylist,
   toggleNarrationInPlaylist,
@@ -51,29 +60,27 @@ export function NarrationSettings({
   canEdit: boolean;
   actions?: React.ReactNode;
 }) {
+  const router = useRouter();
   const { user } = useAuth();
-  const { stream, highlightColor, setHighlightColor } = useNarration();
+  const { stream, highlightColor, setHighlightColor, documentView, setDocumentView } =
+    useNarration();
   const [pending, startTransition] = useTransition();
   const [invitee, setInvitee] = useState("");
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [narrations, setNarrations] = useState<Narration[]>([]);
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setPlaylists([]);
-      setNarrations([]);
       return;
     }
     const unsubP = watchMyPlaylists(user.uid, setPlaylists);
-    const unsubN = watchMyNarrations(user.uid, setNarrations);
     return () => {
       unsubP();
-      unsubN();
     };
   }, [user]);
-
-  const validNarrationIds = useMemo(() => new Set(narrations.map((n) => n.id)), [narrations]);
 
   const effectiveId = narration?.id ?? narrationId ?? stream.id;
   const effectiveVoice = narration?.voice ?? stream.voice;
@@ -132,6 +139,26 @@ export function NarrationSettings({
     });
   };
 
+  const handleDeleteNarration = async () => {
+    const idToDelete = narration?.id ?? narrationId ?? stream.id;
+    if (!idToDelete) return;
+    setIsDeleting(true);
+    try {
+      if (stream.id === idToDelete) {
+        stream.cancel();
+      }
+      await deleteNarration(idToDelete);
+      toast.success("Narration deleted.");
+      setDeleteDialogOpen(false);
+      router.push("/library");
+    } catch {
+      toast.error("Could not delete narration.");
+      setIsDeleting(false);
+    }
+  };
+
+  const isAdapted = (narration?.adapted ?? stream.adapted) === true;
+
   return (
     <WorkbenchPanel
       title="Details"
@@ -144,6 +171,56 @@ export function NarrationSettings({
       }
       bodyClassName="gap-6 p-4"
     >
+      {isAdapted ? (
+        <div className="grid gap-2">
+          <Label className="t-label">Document view</Label>
+          <div className="grid grid-cols-2 gap-1.5 rounded-lg border border-border bg-muted/40 p-1">
+            <button
+              type="button"
+              aria-pressed={documentView === "adapted"}
+              onClick={() => setDocumentView("adapted")}
+              className={cn(
+                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                documentView === "adapted"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-ink-muted hover:text-foreground",
+              )}
+            >
+              <Sparkles
+                size={13}
+                strokeWidth={2}
+                className={cn(
+                  "flex-none",
+                  documentView === "adapted" ? "text-primary" : "text-ink-faint",
+                )}
+              />
+              <span>Audio adapted</span>
+            </button>
+            <button
+              type="button"
+              aria-pressed={documentView === "source"}
+              onClick={() => setDocumentView("source")}
+              className={cn(
+                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                documentView === "source"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-ink-muted hover:text-foreground",
+              )}
+            >
+              <FileText
+                size={13}
+                strokeWidth={2}
+                className={cn(
+                  "flex-none",
+                  documentView === "source" ? "text-primary" : "text-ink-faint",
+                )}
+              />
+              <span>Source</span>
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid gap-2">
         <Label className="t-label">Highlight color</Label>
         <div className="grid grid-cols-3 gap-1.5">
@@ -216,7 +293,7 @@ export function NarrationSettings({
                         <span className="truncate">{playlist.title}</span>
                       </span>
                       <span className="flex-none font-mono text-[11px] tabular-nums text-ink-faint">
-                        {playlist.narrationIds.filter((id) => validNarrationIds.has(id)).length}
+                        {playlist.narrationIds.length}
                       </span>
                     </button>
                   </li>
@@ -367,6 +444,60 @@ export function NarrationSettings({
           <p className="t-meta">Sharing options appear once the narration finishes saving.</p>
         </>
       )}
+
+      {canEdit && effectiveId ? (
+        <div className="pt-2 border-t border-border">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteDialogOpen(true)}
+            className="w-full justify-center text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+          >
+            <Trash2 size={13} strokeWidth={2} />
+            <span>Delete narration</span>
+          </Button>
+        </div>
+      ) : null}
+
+      <Dialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) {
+            setDeleteDialogOpen(false);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete narration?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete &ldquo;{narration?.title || stream.title || "this narration"}&rdquo;? This will permanently remove its audio and transcript, and remove it from any playlists. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2.5">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteNarration}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <Trash2 size={13} strokeWidth={2} />
+              )}
+              <span>Delete</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </WorkbenchPanel>
   );
 }

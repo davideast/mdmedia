@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-09-21T15:36:18.656Z",
+  "campaignId": "studio-authorization-audit-v1",
+  "summary": {
+    "probes": 8,
+    "controlsPassed": 8,
+    "localCounterexamples": 0,
+    "candidateSignals": 0,
+    "noCounterexamples": 8,
+    "engineGaps": 0,
+    "invalidProbes": 0
+  },
+  "target": {
+    "network": "forbid",
+    "services": [
+      "firestore",
+      "storage"
+    ]
+  },
+  "results": [
+    {
+      "probeId": "probe-eve-read-alice-profile",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "A user must not access another user profile or settings document.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-eve-read-alice-private-narr",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "A non-owner must not read a private narration.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-eve-read-alice-shared-narr",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "An uninvited user (not in sharedWith) must not read a shared narration.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-eve-read-alice-playlist",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "A non-owner must not read or update another user playlist.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-alice-reassign-playlist-owner",
+      "dimension": "payload",
+      "classification": "no-counterexample",
+      "invariant": "An update must not alter the ownerUid of a playlist or narration.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-delete-shared-narr",
+      "dimension": "operation",
+      "classification": "no-counterexample",
+      "invariant": "A shared reader must not delete a narration owned by another user.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-alice-direct-storage-delete",
+      "dimension": "operation",
+      "classification": "no-counterexample",
+      "invariant": "Clients must not directly upload or write audio files into storage.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-anon-read-private-storage",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "An unauthenticated visitor must not read private audio objects in storage.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    }
+  ]
+}
