@@ -306,6 +306,34 @@ Two behaviors in `pyric-admin/storage` differ from `@google-cloud/storage`:
    whether `url` starts with `http(s)://` and falls back to `file.download()`
    encoded as a `data:` URI when running against the sandbox.
 
+### 3.7 Hardcoded 8 MiB Cloud Storage cap and 12/24 MiB WebSocket bridge limits sever long transfers
+
+Firebase Cloud Storage is intended for multimedia and large assets (audio, video, documents). In `@pyric/cli` and `pyric-admin`, Cloud Storage operations over the bridge are wrapped in single base64-encoded JSON WebSocket frames governed by three tiered constants:
+
+1. **Storage Op Limit (8 MiB)**: `MAX_STORAGE_OP_BYTES = 8 * 1024 * 1024` in `serve/worker/protocol/storage.ts` and `pyric-admin/src/storage/index.ts`. Any read or upload over 8 MiB throws `storagePayloadTooLarge`.
+2. **Bridge Frame Limit (12 MiB)**: `MAX_BRIDGE_FRAME_BYTES = 12 * 1024 * 1024` in `bridge/protocol.ts`. Because an 8 MiB binary expands to ~10.67 MiB of base64 text, 12 MiB was chosen as the frame ceiling.
+3. **Socket Backlog Limit (24 MiB)**: In `bridge/server/socket-message.ts`, Pyric checked:
+   ```ts
+   const exceedsBacklog = socket.bufferedAmount + Buffer.byteLength(payload) > 24 * 1024 * 1024;
+   if (exceedsBacklog) {
+       socket.close(1013, 'Client output backlog exceeds 24 MiB; reconnect to resume.');
+       return;
+   }
+   ```
+   Note that this check hardcoded `24 * 1024 * 1024` instead of referencing `MAX_QUEUED_OPERATION_BYTES`.
+
+**The Failure Mode:**
+When audio files exceed ~4–5 minutes (~14–20+ MiB raw WAV audio), base64 encoding expands them beyond 24 MiB (e.g. a 6m47s audio track is 19.55 MiB raw audio, expanding to 26.07 MiB base64).
+When pushed to the WebSocket, `socket-message.ts` trips the 24 MiB check and executes `socket.close(1013)`.
+Instead of gracefully refusing the single operation, closing the WebSocket aborts the entire bridge connection. This causes all in-flight and future operations across the process to fail with:
+`Error [SandboxError]: remote sandbox connection closed (serve stopped or connection lost)`
+and leaves Firestore documents stuck in `status: 'streaming'`, disappearing from the UI on reload with "That narration isn't available."
+
+**Suggested Upstream Fix:**
+- Replace the magic number in `socket-message.ts` with `MAX_QUEUED_OPERATION_BYTES` (and make the budget configurable via `pyric.json`).
+- Gracefully refuse oversized operations via `refuseBridgeRequest(frame)` rather than destroying the underlying transport socket.
+- Support HTTP chunked streaming for Cloud Storage transfers rather than wrapping whole binaries in single JSON WebSocket messages.
+
 ---
 
 ## 4. Workarounds in this repo
@@ -369,6 +397,15 @@ empty module) so the specifier stays resolvable and production ships no Pyric co
   in SharedWorker mode.
 - Next may warn that a webpack config is present while using Turbopack;
   `withPyric` always sets both. The Turbopack aliases are the ones in effect.
+
+### 4.4 Uncapping Pyric Storage & Bridge limits (`scripts/patch-pyric-bridge-port.js`)
+
+To allow narrations of any length to save and play in the studio, [`scripts/patch-pyric-bridge-port.js`](file:///Users/deast/repos/davideast/tts-flash/studio/scripts/patch-pyric-bridge-port.js) (hooked to `postinstall` in `package.json`) automatically patches:
+1. `bridge-url.js` to preserve the bridge port `3473` under Next.js port `3000`.
+2. `serve/worker/protocol/storage.js` to raise `MAX_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
+3. `bridge/protocol.js` to raise `MAX_BRIDGE_FRAME_BYTES` and `MAX_QUEUED_OPERATION_BYTES` from 12/24 MiB to **768 MiB**.
+4. `pyric-admin/dist/storage/index.js` to raise `MAX_REMOTE_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
+5. `bridge/server/socket-message.js` to raise the socket output backlog cap from 24 MiB to **768 MiB**.
 
 ---
 
