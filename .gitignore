@@ -11,3 +11,4 @@ dist/
 .mdmedia.json
 package-lock.json
 examples/
+*.tgz
