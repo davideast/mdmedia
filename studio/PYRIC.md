@@ -334,6 +334,8 @@ and leaves Firestore documents stuck in `status: 'streaming'`, disappearing from
 - Gracefully refuse oversized operations via `refuseBridgeRequest(frame)` rather than destroying the underlying transport socket.
 - Support HTTP chunked streaming for Cloud Storage transfers rather than wrapping whole binaries in single JSON WebSocket messages.
 
+**Upstream tracking issue:** [davideast/pyric#668](https://github.com/davideast/pyric/issues/668)
+
 ---
 
 ## 4. Workarounds in this repo
