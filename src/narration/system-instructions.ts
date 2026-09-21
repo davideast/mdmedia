@@ -10,3 +10,32 @@ Core Guidelines:
 7. Links: Omit URLs and link markdown syntax. Seamlessly refer to what the link points to in conversational speech.
 8. Tone: Clear, professional, fluent spoken delivery.
 9. Output: Return pure narration markdown text without meta-introductions (such as "Sure, here is your script"), conversational filler, or enclosing code fences.`;
+
+/**
+ * Reusable customizable prompt extension that instructs the narration adapter
+ * to generate descriptive Markdown headings (`#`, `##`, `###`) for narrated documents.
+ */
+export const HEADING_GENERATION_NARRATION_PROMPT = `Document Headings & Section Structure:
+- Organize the narrated script using clear, concise Markdown headings (\`#\` for the main document title, and \`##\` or \`###\` for major thematic sections and transitions).
+- If the source document lacks headings or only has raw prose/notes, synthesize descriptive \`#\` and \`##\` section headings at natural topic boundaries so the reader view is well-structured and scannable.
+- Place each heading on its own line separated by blank lines (\`\\n\\n\`), without trailing periods on the heading line.`;
+
+/**
+ * Combines the base narration system instruction with one or more customizable
+ * prompt extensions.
+ */
+export function buildNarrationSystemInstruction(
+  customPrompt?: string | ReadonlyArray<string | undefined>,
+  baseInstruction: string = DEFAULT_NARRATION_SYSTEM_INSTRUCTION
+): string {
+  const parts = Array.isArray(customPrompt) ? customPrompt : [customPrompt];
+  const normalized = parts
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part && part.length > 0));
+
+  if (normalized.length === 0) {
+    return baseInstruction;
+  }
+
+  return `${baseInstruction}\n\nCustom Narration Instructions:\n${normalized.join('\n\n')}`;
+}

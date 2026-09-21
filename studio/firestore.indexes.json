@@ -1,0 +1,44 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "narrations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ownerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "playlists",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ownerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "updatedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "narrations",
+      "fieldPath": "sourceMarkdown",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "narrations",
+      "fieldPath": "transcript",
+      "indexes": []
+    }
+  ]
+}

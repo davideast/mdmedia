@@ -1,0 +1,8 @@
+{
+  "port": 3473,
+  "project": "mdmedia-studio",
+  "rules": {
+    "firestore": "firestore.modules.rules",
+    "storage": "storage.modules.rules"
+  }
+}

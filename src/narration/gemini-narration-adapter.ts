@@ -1,10 +1,18 @@
 import type { GoogleGenAI } from '@google/genai';
-import { DEFAULT_NARRATION_SYSTEM_INSTRUCTION } from './system-instructions.js';
-import type { INarrationAdapter, NarrationAdapterOptions } from './types.js';
+import {
+  buildNarrationSystemInstruction,
+  DEFAULT_NARRATION_SYSTEM_INSTRUCTION,
+} from './system-instructions.js';
+import type {
+  AdaptForNarrationOptions,
+  INarrationAdapter,
+  NarrationAdapterOptions,
+} from './types.js';
 
 export class GeminiNarrationAdapter implements INarrationAdapter {
   private readonly model: string;
-  private readonly systemInstruction: string;
+  private readonly baseSystemInstruction: string;
+  private readonly customPrompt?: string;
   private readonly temperature: number;
 
   constructor(
@@ -12,15 +20,25 @@ export class GeminiNarrationAdapter implements INarrationAdapter {
     options: NarrationAdapterOptions = {}
   ) {
     this.model = options.model ?? 'gemini-3.5-flash-lite';
-    this.systemInstruction = options.systemInstruction ?? DEFAULT_NARRATION_SYSTEM_INSTRUCTION;
+    this.baseSystemInstruction =
+      options.systemInstruction ?? DEFAULT_NARRATION_SYSTEM_INSTRUCTION;
+    this.customPrompt = options.customPrompt;
     this.temperature = options.temperature ?? 0.2;
   }
 
-  public async adaptForNarration(markdown: string): Promise<string> {
+  public async adaptForNarration(
+    markdown: string,
+    options?: AdaptForNarrationOptions
+  ): Promise<string> {
     const trimmed = markdown.trim();
     if (!trimmed) {
       return '';
     }
+
+    const effectiveSystemInstruction = buildNarrationSystemInstruction(
+      [this.customPrompt, options?.customPrompt],
+      this.baseSystemInstruction
+    );
 
     const response = await this.client.models.generateContent({
       model: this.model,
@@ -35,7 +53,7 @@ export class GeminiNarrationAdapter implements INarrationAdapter {
         },
       ],
       config: {
-        systemInstruction: this.systemInstruction,
+        systemInstruction: effectiveSystemInstruction,
         temperature: this.temperature,
       },
     });

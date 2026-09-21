@@ -1,0 +1,40 @@
+rules_version = '2+modules';
+
+// mdmedia studio — Cloud Storage authorization.
+//
+// AUTHORED SOURCE. `storage.rules` is the generated deployment artifact:
+//   pyric storage rules resolve storage.modules.rules --out storage.rules
+//
+// Objects live at `narrations/{ownerUid}/{fileName}` — the audio track and the
+// word timings for one narration, both named after the Firestore document id.
+
+import { isOwner } from 'auth';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /narrations/{ownerUid}/{fileName} {
+
+      // Owners read their own audio. A narration published to everyone is
+      // readable by anyone, which the writer declares as object metadata.
+      //
+      // DELIBERATE: there is no `shared` branch here. Custom metadata is a
+      // flat string map, so a recipient list cannot be represented or bounded
+      // in it, and Storage Rules cannot read the Firestore document that owns
+      // the list. Shared-group playback is served by a short-lived signed URL
+      // issued by the server after it checks `sharedWith` in Firestore.
+      allow read: if isOwner(ownerUid)
+        || resource.metadata.visibility == 'public';
+
+      // DELIBERATE: no client writes at all. Audio and timings are produced by
+      // the synthesis route and written with the Admin SDK, which bypasses
+      // Rules. A browser therefore has no reason to upload here, and denying
+      // outright removes the whole class of unvalidated-upload risk.
+      allow write: if false;
+    }
+
+    // Any other object path is denied outright.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

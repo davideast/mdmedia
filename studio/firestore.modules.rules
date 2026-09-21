@@ -1,0 +1,129 @@
+rules_version = '2+modules';
+
+// mdmedia studio — Firestore authorization.
+//
+// AUTHORED SOURCE. `firestore.rules` is the generated deployment artifact;
+// edit this file and regenerate, never the other way round:
+//   pyric firestore rules resolve firestore.modules.rules --out firestore.rules
+//
+// Standard Library modules are imported, never copied:
+//   auth       — isAuthenticated(), isOwner(userId)
+//   validation — hasRequired(), validString(), isOneOf()
+//   lifecycle  — immutableFields()
+
+import { isAuthenticated, isOwner } from 'auth';
+import { hasRequired, validString, isOneOf } from 'validation';
+import { immutableFields } from 'lifecycle';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The profile document, which also holds the embedded `settings` map.
+    // Owner-only in both directions: no other signed-in person, and no
+    // signed-out reader, may see an email address, a bio, or a preference.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    match /narrations/{narrationId} {
+
+      // Reads are authorized per document. For a query (`list`), Firestore
+      // evaluates this expression against the query's constraints, so every
+      // supported listing must carry the matching filter:
+      //   mine    -> where('ownerUid', '==', uid)
+      //   public  -> where('visibility', '==', 'public')
+      //   shared  -> where('visibility', '==', 'shared')
+      //              + where('sharedWith', 'array-contains', uid)
+      // An unconstrained list satisfies no branch and is rejected.
+      allow get, list: if canReadNarration();
+
+      allow create: if isOwner(request.resource.data.ownerUid)
+        && hasRequiredNarrationFields()
+        && validNarrationFields();
+
+      // Only the owner may edit, and the two fields that establish provenance
+      // can never be rewritten after creation.
+      allow update: if isOwner(resource.data.ownerUid)
+        && immutableFields(['ownerUid', 'createdAt'])
+        && validNarrationFields();
+
+      allow delete: if isOwner(resource.data.ownerUid);
+    }
+
+    match /playlists/{playlistId} {
+      allow get, list: if isOwner(resource.data.ownerUid);
+
+      allow create: if isOwner(request.resource.data.ownerUid)
+        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])
+        && validPlaylistFields();
+
+      allow update: if isOwner(resource.data.ownerUid)
+        && immutableFields(['ownerUid', 'createdAt'])
+        && validPlaylistFields();
+
+      allow delete: if isOwner(resource.data.ownerUid);
+    }
+
+    // Everything not matched above is denied, including future collections
+    // added before their rules are written.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function canReadNarration() {
+      return isOwner(resource.data.ownerUid)
+        || resource.data.visibility == 'public'
+        || (resource.data.visibility == 'shared'
+            && isAuthenticated()
+            && request.auth.uid in resource.data.sharedWith);
+    }
+
+    function hasRequiredNarrationFields() {
+      return hasRequired([
+        'ownerUid',
+        'title',
+        'sourceMarkdown',
+        'transcript',
+        'voice',
+        'promptStyle',
+        'adapted',
+        'status',
+        'durationMs',
+        'audioPath',
+        'timingsPath',
+        'visibility',
+        'sharedWith',
+        'authorName',
+        'authorPhoto',
+        'createdAt',
+        'updatedAt'
+      ]);
+    }
+
+    // Shape checks on the incoming document. Applied to create and update
+    // alike, so an owner cannot degrade their own document into an unreadable
+    // shape or grow `sharedWith` past the bound the product promises.
+    function validNarrationFields() {
+      return validString('title', 1, 200)
+        && isOneOf('visibility', ['private', 'shared', 'public'])
+        && isOneOf('status', ['streaming', 'ready', 'error'])
+        && request.resource.data.ownerUid is string
+        && request.resource.data.sharedWith is list
+        // 50 mirrors MAX_SHARED_WITH in src/lib/types.ts.
+        && request.resource.data.sharedWith.size() <= 50
+        && request.resource.data.createdAt is number
+        && request.resource.data.updatedAt is number;
+    }
+
+    function validPlaylistFields() {
+      return validString('title', 1, 200)
+        && request.resource.data.ownerUid is string
+        && request.resource.data.description is string
+        && request.resource.data.narrationIds is list
+        && request.resource.data.narrationIds.size() <= 100
+        && request.resource.data.createdAt is number
+        && request.resource.data.updatedAt is number;
+    }
+  }
+}
+

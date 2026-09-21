@@ -1,0 +1,108 @@
+"use client";
+
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { useNarration } from "@/components/shell/narration-provider";
+import { VOICES, type VoiceName, type Visibility } from "@/lib/types";
+import { SlidersHorizontal } from "lucide-react";
+
+const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string; hint: string }> = [
+  { value: "private", label: "Only me", hint: "Nobody else can open it." },
+  { value: "shared", label: "People I choose", hint: "You pick who, after it is made." },
+  { value: "public", label: "Anyone with the link", hint: "No sign-in required to listen." },
+];
+
+import type { ReactNode } from "react";
+
+/** Voice and delivery controls for the composer. */
+export function ComposerSettings({ actions }: { actions?: ReactNode }) {
+  const { draft, setDraft } = useNarration();
+
+  return (
+    <WorkbenchPanel
+      title="Voice"
+      icon={<SlidersHorizontal size={13} strokeWidth={2} />}
+      actions={actions}
+      bodyClassName="gap-6 p-4"
+    >
+      <div className="grid gap-2">
+        <Label htmlFor="voice" className="t-label">
+          Reader
+        </Label>
+        <Select
+          value={draft.voice}
+          onValueChange={(value) => setDraft({ voice: value as VoiceName })}
+        >
+          <SelectTrigger id="voice" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            {VOICES.map((voice) => (
+              <SelectItem key={voice} value={voice}>
+                {voice}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="style" className="t-label">
+          Delivery
+        </Label>
+        <Textarea
+          id="style"
+          value={draft.promptStyle}
+          onChange={(event) => setDraft({ promptStyle: event.target.value })}
+          rows={3}
+          className="resize-none"
+          placeholder="Warm, unhurried narration."
+        />
+      </div>
+
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+        <Label htmlFor="rewrite" className="t-card-title cursor-pointer font-normal">
+          Rewrite for the ear
+        </Label>
+        <Switch
+          id="rewrite"
+          checked={draft.rewriteForNarration}
+          onCheckedChange={(checked) => setDraft({ rewriteForNarration: checked })}
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="visibility" className="t-label">
+          Who can listen
+        </Label>
+        <Select
+          value={draft.visibility}
+          onValueChange={(value) => setDraft({ visibility: value as Visibility })}
+        >
+          <SelectTrigger id="visibility" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {VISIBILITY.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="t-meta">
+          {VISIBILITY.find((option) => option.value === draft.visibility)?.hint}
+        </p>
+      </div>
+    </WorkbenchPanel>
+  );
+}

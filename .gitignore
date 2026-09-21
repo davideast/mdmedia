@@ -8,7 +8,10 @@ dist/
 .DS_Store
 .agents/
 .jules.json
+.stitch.json
 .mdmedia.json
 package-lock.json
 examples/
 *.tgz
+.design/
+
