@@ -1,9 +1,17 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { currentIdToken } from './firebase';
 import { getMediaStore } from './media-store';
 import type { NarrationTimingsFile } from './wav';
+
+async function currentIdToken(): Promise<string | null> {
+  try {
+    const { currentIdToken: fetchToken } = await import('./firebase');
+    return await fetchToken();
+  } catch {
+    return null;
+  }
+}
 
 export interface OfflineNarrationMetadata {
   title?: string;
