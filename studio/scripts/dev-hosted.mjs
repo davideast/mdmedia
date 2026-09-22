@@ -9,7 +9,7 @@
  * Supports commands: start, stop, restart, status, logs
  */
 
-import { spawn } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +21,19 @@ const STUDIO_DIR = path.resolve(__dirname, '..');
 const PID_FILE = path.join(STUDIO_DIR, '.dev.pid');
 const LOG_FILE = path.join(STUDIO_DIR, '.dev.log');
 const PORT = process.env.PORT || '3000';
+
+function killPortListeners(port) {
+  try {
+    const raw = execSync(`lsof -ti :${port}`, { encoding: 'utf8' }).trim();
+    if (!raw) return;
+    const pids = raw.split('\n').map((p) => parseInt(p.trim(), 10)).filter(Boolean);
+    for (const p of pids) {
+      if (p !== process.pid && isPidAlive(p)) {
+        try { process.kill(p, 'SIGKILL'); } catch {}
+      }
+    }
+  } catch {}
+}
 
 function isPidAlive(pid) {
   try {
@@ -64,6 +77,10 @@ async function start() {
 
   // Ensure log file parent directory exists
   fs.mkdirSync(path.dirname(LOG_FILE), { recursive: true });
+
+  // Clean any orphaned processes listening on ports
+  killPortListeners(PORT);
+  killPortListeners(3473);
 
   const logFd = fs.openSync(LOG_FILE, 'a');
   const timestamp = new Date().toISOString();
@@ -163,6 +180,9 @@ async function stop() {
   try {
     fs.unlinkSync(PID_FILE);
   } catch {}
+
+  killPortListeners(PORT);
+  killPortListeners(3473);
 
   console.log(`[studio-dev] Server stopped successfully.`);
 }

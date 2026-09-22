@@ -79,3 +79,15 @@ if (fs.existsSync(socketMessagePath)) {
   }
 }
 
+// 6. Patch server.js to redirect root '/' to '/__pyric/ui/studio' when no static index.html exists
+const serverPath = path.join(cliDist, 'serve', 'server.js');
+if (fs.existsSync(serverPath)) {
+  let content = fs.readFileSync(serverPath, 'utf8');
+  const target404 = "if (!file) {\n        logger.note(`  ✖ 404 ${req.method} ${url.pathname}`);\n        res.writeHead(404, { 'content-type': 'text/plain' }).end('not found');\n        return;\n    }";
+  const replacementRedirect = "if (!file && url.pathname === '/') {\n        res.writeHead(302, { location: '/__pyric/ui/studio' }).end();\n        return;\n    }\n    " + target404;
+  if (content.includes(target404)) {
+    content = content.replace(target404, replacementRedirect);
+    fs.writeFileSync(serverPath, content, 'utf8');
+    console.log('[patch] Patched server.js to redirect / to /__pyric/ui/studio');
+  }
+}
