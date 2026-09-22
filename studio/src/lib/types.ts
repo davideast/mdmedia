@@ -184,7 +184,7 @@ export const DEFAULT_HIGHLIGHT_COLOR: HighlightColorId = "amber";
 
 /**
  * Default prompt extension for generating structured Markdown headings during audio adaptation.
- * Used as the placeholder text in the composer's custom instructions textarea.
+ * Used as the default text in the composer's custom instructions textarea.
  */
 export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structure:
 - Organize the narrated script using clear, concise Markdown headings (# for the main document title, and ## or ### for major thematic sections and transitions).

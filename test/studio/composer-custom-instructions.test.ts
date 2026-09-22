@@ -14,12 +14,17 @@ describe("Composer Custom Instructions for Audio Adaptation", () => {
     import.meta.dir,
     "../../studio/src/lib/narration-server.ts",
   );
+  const narrationProviderPath = resolve(
+    import.meta.dir,
+    "../../studio/src/components/shell/narration-provider.tsx",
+  );
   const studioPagePath = resolve(
     import.meta.dir,
     "../../studio/src/app/(app)/studio/page.tsx",
   );
 
   const composerSettings = readFileSync(composerSettingsPath, "utf8");
+  const narrationProvider = readFileSync(narrationProviderPath, "utf8");
   const narrationServer = readFileSync(narrationServerPath, "utf8");
   const studioPage = readFileSync(studioPagePath, "utf8");
 
@@ -33,12 +38,15 @@ describe("Composer Custom Instructions for Audio Adaptation", () => {
   });
 
   describe("Composer Settings Panel (Right Panel UI)", () => {
-    it("renders Custom instructions textarea with DEFAULT_HEADING_INSTRUCTIONS placeholder when rewriteForNarration is true", () => {
+    it("initializes draft rewriteInstructions with DEFAULT_HEADING_INSTRUCTIONS as default text in NarrationProvider", () => {
+      expect(narrationProvider).toContain("rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS");
+    });
+
+    it("renders Custom instructions textarea with pre-filled default text when rewriteForNarration is true", () => {
       expect(composerSettings).toContain("draft.rewriteForNarration ?");
       expect(composerSettings).toContain("Custom instructions");
       expect(composerSettings).toContain('id="rewrite-instructions"');
-      expect(composerSettings).toContain("placeholder={DEFAULT_HEADING_INSTRUCTIONS}");
-      expect(composerSettings).toContain("draft.rewriteInstructions");
+      expect(composerSettings).toContain("value={draft.rewriteInstructions ?? DEFAULT_HEADING_INSTRUCTIONS}");
       expect(composerSettings).toContain("setDraft({ rewriteInstructions: event.target.value })");
     });
 

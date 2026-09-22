@@ -3,8 +3,7 @@
 import { useMemo, useState } from "react";
 import { marked } from "marked";
 import { cn } from "cn";
-import { Check, Code2, Copy, FileText, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { Code2, FileText, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/reader/code-block";
 
@@ -28,7 +27,6 @@ export function SourceDocumentView({
   className,
 }: SourceDocumentViewProps) {
   const [viewMode, setViewMode] = useState<"rendered" | "raw">("rendered");
-  const [copied, setCopied] = useState(false);
 
   const segments = useMemo<RenderSegment[]>(() => {
     if (!sourceMarkdown || sourceMarkdown.trim().length === 0) {
@@ -81,17 +79,6 @@ export function SourceDocumentView({
     }
   }, [sourceMarkdown]);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(sourceMarkdown);
-      setCopied(true);
-      toast.success("Source markdown copied to clipboard");
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error("Failed to copy source markdown");
-    }
-  };
-
   const isEmpty = !sourceMarkdown || sourceMarkdown.trim().length === 0;
 
   return (
@@ -132,7 +119,7 @@ export function SourceDocumentView({
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between border-t border-border/60 pt-3">
+        <div className="flex items-center justify-start border-t border-border/60 pt-3">
           {/* Rendered vs Raw toggle */}
           <div className="flex items-center gap-1 rounded-md border border-border bg-muted/30 p-0.5">
             <button
@@ -164,22 +151,6 @@ export function SourceDocumentView({
               <span>Raw</span>
             </button>
           </div>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleCopy}
-            disabled={isEmpty}
-            className="h-7 gap-1.5 px-2 text-xs text-ink-muted hover:text-foreground"
-          >
-            {copied ? (
-              <Check size={12} strokeWidth={2.5} className="text-primary" />
-            ) : (
-              <Copy size={12} strokeWidth={2} />
-            )}
-            <span>{copied ? "Copied" : "Copy"}</span>
-          </Button>
         </div>
       </div>
 

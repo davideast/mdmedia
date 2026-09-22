@@ -12,8 +12,14 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
     "../../studio/src/components/narration/narration-settings.tsx",
   );
 
+  const sourceDocumentViewPath = resolve(
+    import.meta.dir,
+    "../../studio/src/components/reader/source-document-view.tsx",
+  );
+
   const narrationPage = readFileSync(narrationPagePath, "utf8");
   const narrationSettings = readFileSync(narrationSettingsPath, "utf8");
+  const sourceDocumentView = readFileSync(sourceDocumentViewPath, "utf8");
 
   describe("Narration Reader Page (Workbench Header Action)", () => {
     it("imports Check and Copy icons along with Button component", () => {
@@ -39,25 +45,17 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
     });
   });
 
-  describe("Narration Settings Panel (Document View Action)", () => {
-    it("derives effectiveTranscript from narration or stream transcript", () => {
-      expect(narrationSettings).toContain("const effectiveTranscript =");
-      expect(narrationSettings).toContain("narration?.transcript");
-      expect(narrationSettings).toContain("stream.transcript");
+  describe("De-noised Secondary Panels (No Redundant Copy Buttons)", () => {
+    it("removes redundant copy button from Narration Settings panel", () => {
+      expect(narrationSettings).not.toContain("handleCopyAdapted");
+      expect(narrationSettings).not.toContain("Copy adapted markdown");
+      expect(narrationSettings).not.toContain("Copy markdown");
     });
 
-    it("implements handleCopyAdapted copying effectiveTranscript to clipboard with feedback", () => {
-      expect(narrationSettings).toContain("const handleCopyAdapted = async () =>");
-      expect(narrationSettings).toContain("if (!effectiveTranscript || effectiveTranscript.trim().length === 0) return;");
-      expect(narrationSettings).toContain("navigator.clipboard.writeText(effectiveTranscript)");
-      expect(narrationSettings).toContain('toast.success("Audio adapted document copied as markdown")');
-      expect(narrationSettings).toContain("setTimeout(() => setCopiedAdapted(false), 2000)");
-    });
-
-    it("renders Copy adapted markdown button in Document view section", () => {
-      expect(narrationSettings).toContain("onClick={handleCopyAdapted}");
-      expect(narrationSettings).toContain("disabled={!effectiveTranscript || effectiveTranscript.trim().length === 0}");
-      expect(narrationSettings).toContain('copiedAdapted ? "Copied adapted markdown" : "Copy adapted markdown"');
+    it("removes redundant copy button from Source Document View card header", () => {
+      expect(sourceDocumentView).not.toContain("handleCopy");
+      expect(sourceDocumentView).not.toContain("<span>{copied ? \"Copied\" : \"Copy\"}</span>");
+      expect(sourceDocumentView).not.toContain("Source markdown copied to clipboard");
     });
   });
 

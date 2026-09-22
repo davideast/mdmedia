@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, Copy, Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Check, Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -179,24 +179,6 @@ export function NarrationSettings({
   };
 
   const isAdapted = (narration?.adapted ?? stream.adapted) === true;
-  const [copiedAdapted, setCopiedAdapted] = useState(false);
-
-  const effectiveTranscript =
-    narration?.transcript ||
-    (stream.id === effectiveId ? stream.transcript : "") ||
-    stream.transcript;
-
-  const handleCopyAdapted = async () => {
-    if (!effectiveTranscript || effectiveTranscript.trim().length === 0) return;
-    try {
-      await navigator.clipboard.writeText(effectiveTranscript);
-      setCopiedAdapted(true);
-      toast.success("Audio adapted document copied as markdown");
-      setTimeout(() => setCopiedAdapted(false), 2000);
-    } catch {
-      toast.error("Could not copy markdown to clipboard.");
-    }
-  };
 
   return (
     <WorkbenchPanel
@@ -257,42 +239,8 @@ export function NarrationSettings({
               <span className="truncate">Source</span>
             </button>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopyAdapted}
-            disabled={!effectiveTranscript || effectiveTranscript.trim().length === 0}
-            className="w-full justify-center gap-1.5 text-xs text-ink-muted hover:bg-muted hover:text-foreground"
-          >
-            {copiedAdapted ? (
-              <Check size={13} strokeWidth={2.5} className="text-primary" />
-            ) : (
-              <Copy size={13} strokeWidth={2} />
-            )}
-            <span>{copiedAdapted ? "Copied adapted markdown" : "Copy adapted markdown"}</span>
-          </Button>
         </div>
-      ) : (
-        <div className="grid gap-2">
-          <Label className="t-label">Document</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopyAdapted}
-            disabled={!effectiveTranscript || effectiveTranscript.trim().length === 0}
-            className="w-full justify-center gap-1.5 text-xs text-ink-muted hover:bg-muted hover:text-foreground"
-          >
-            {copiedAdapted ? (
-              <Check size={13} strokeWidth={2.5} className="text-primary" />
-            ) : (
-              <Copy size={13} strokeWidth={2} />
-            )}
-            <span>{copiedAdapted ? "Copied markdown" : "Copy markdown"}</span>
-          </Button>
-        </div>
-      )}
+      ) : null}
 
       <div className="grid gap-2">
         <Label className="t-label">Highlight color</Label>

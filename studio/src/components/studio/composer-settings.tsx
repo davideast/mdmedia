@@ -87,11 +87,11 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
           </Label>
           <Textarea
             id="rewrite-instructions"
-            value={draft.rewriteInstructions ?? ""}
+            value={draft.rewriteInstructions ?? DEFAULT_HEADING_INSTRUCTIONS}
             onChange={(event) => setDraft({ rewriteInstructions: event.target.value })}
             rows={5}
             className="resize-none font-mono text-[0.75rem] leading-relaxed"
-            placeholder={DEFAULT_HEADING_INSTRUCTIONS}
+            placeholder="Custom instructions for adapting markdown..."
           />
         </div>
       ) : null}
