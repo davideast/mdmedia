@@ -104,7 +104,7 @@ export function useGenerationQueue(): GenerationQueueState {
 
       if (narrationId) {
         try {
-          await deleteNarration(narrationId);
+          void deleteNarration(narrationId);
         } catch (err) {
           console.error('Failed to purge cancelled narration data:', err);
         }

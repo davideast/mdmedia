@@ -184,38 +184,44 @@ export async function getNarrationOnce(id: string): Promise<Narration | null> {
  * the visibility so the two can never disagree, and it is trimmed to the same
  * bound the Rules enforce.
  */
-export async function updateVisibility(
+export function updateVisibility(
   id: string,
   visibility: Visibility,
   sharedWith: string[],
-): Promise<void> {
+): void {
   const recipients = visibility === 'shared' ? sharedWith.slice(0, MAX_SHARED_WITH) : [];
-  await updateDoc(doc(db(), 'narrations', id), {
+  void updateDoc(doc(db(), 'narrations', id), {
     visibility,
     sharedWith: recipients,
     updatedAt: Date.now(),
+  }).catch((err) => {
+    console.error(`[narrations] failed to update visibility for ${id}:`, err);
   });
 }
 
-export async function updateNarrationTitle(id: string, title: string): Promise<void> {
+export function updateNarrationTitle(id: string, title: string): void {
   const trimmed = title.trim().slice(0, 200);
   if (trimmed.length === 0) return;
-  await updateDoc(doc(db(), 'narrations', id), {
+  void updateDoc(doc(db(), 'narrations', id), {
     title: trimmed,
     updatedAt: Date.now(),
+  }).catch((err) => {
+    console.error(`[narrations] failed to update narration title for ${id}:`, err);
   });
-  try {
-    const mediaStore = getMediaStore();
-    const timings = await mediaStore.getTimings(id);
-    if (timings && timings.title !== trimmed) {
-      await mediaStore.saveTimings(id, {
-        ...timings,
-        title: trimmed,
-      });
+  void (async () => {
+    try {
+      const mediaStore = getMediaStore();
+      const timings = await mediaStore.getTimings(id);
+      if (timings && timings.title !== trimmed) {
+        await mediaStore.saveTimings(id, {
+          ...timings,
+          title: trimmed,
+        });
+      }
+    } catch {
+      // Non-fatal if offline media store cannot be patched
     }
-  } catch {
-    // Non-fatal if offline media store cannot be patched
-  }
+  })();
 }
 
 export async function deleteNarration(id: string): Promise<void> {

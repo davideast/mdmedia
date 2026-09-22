@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import { LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
@@ -69,18 +68,15 @@ export default function SettingsPage() {
   const { profile, updateSettings, signOutUser } = useAuth();
   const { highlightColor, setHighlightColor } = useNarration();
   const { theme, setTheme } = useTheme();
-  const [pending, startTransition] = useTransition();
 
   const settings: UserSettings = profile?.settings ?? DEFAULT_SETTINGS;
 
   const save = (patch: Partial<UserSettings>) => {
-    startTransition(async () => {
-      try {
-        await updateSettings(patch);
-      } catch {
-        toast.error("That setting did not save. Try again.");
-      }
-    });
+    try {
+      void updateSettings(patch);
+    } catch {
+      toast.error("That setting did not save. Try again.");
+    }
   };
 
   return (
@@ -148,7 +144,6 @@ export default function SettingsPage() {
           <Row label="Reader" htmlFor="default-voice">
             <Select
               value={settings.defaultVoice}
-              disabled={pending}
               onValueChange={(value) => save({ defaultVoice: value as VoiceName })}
             >
               <SelectTrigger id="default-voice" className="w-full">
@@ -191,7 +186,6 @@ export default function SettingsPage() {
               <Switch
                 id="default-rewrite"
                 checked={settings.rewriteForNarration}
-                disabled={pending}
                 onCheckedChange={(checked) => save({ rewriteForNarration: checked })}
               />
             </div>
@@ -204,7 +198,6 @@ export default function SettingsPage() {
               <Switch
                 id="default-autoplay"
                 checked={settings.autoPlay}
-                disabled={pending}
                 onCheckedChange={(checked) => save({ autoPlay: checked })}
               />
             </div>
@@ -215,7 +208,6 @@ export default function SettingsPage() {
           <Row label="Who can listen" hint="The default for anything new." htmlFor="default-visibility">
             <Select
               value={settings.defaultVisibility}
-              disabled={pending}
               onValueChange={(value) => save({ defaultVisibility: value as Visibility })}
             >
               <SelectTrigger id="default-visibility" className="w-full">

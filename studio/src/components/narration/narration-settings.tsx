@@ -107,13 +107,11 @@ export function NarrationSettings({
 
   const commit = (visibility: Visibility, sharedWith: string[]) => {
     if (!narration) return;
-    startTransition(async () => {
-      try {
-        await updateVisibility(narration.id, visibility, sharedWith);
-      } catch {
-        toast.error("That change did not save. Try again.");
-      }
-    });
+    try {
+      updateVisibility(narration.id, visibility, sharedWith);
+    } catch {
+      toast.error("That change did not save. Try again.");
+    }
   };
 
   const addInvitee = () => {
@@ -148,15 +146,13 @@ export function NarrationSettings({
     if (!user || !effectiveId) return;
     const title = newPlaylistTitle.trim();
     if (title.length === 0) return;
-    startTransition(async () => {
-      try {
-        await createPlaylist(user.uid, title, "", [effectiveId]);
-        setNewPlaylistTitle("");
-        toast.success(`Created "${title}" and added narration`);
-      } catch {
-        toast.error("Could not create playlist.");
-      }
-    });
+    try {
+      createPlaylist(user.uid, title, "", [effectiveId]);
+      setNewPlaylistTitle("");
+      toast.success(`Created "${title}" and added narration`);
+    } catch {
+      toast.error("Could not create playlist.");
+    }
   };
 
   const handleDeleteNarration = () => {
