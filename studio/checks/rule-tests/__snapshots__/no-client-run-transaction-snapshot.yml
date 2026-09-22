@@ -1,0 +1,14 @@
+id: no-client-run-transaction
+snapshots:
+  await runTransaction(db, async (tx) => {}):
+    labels:
+    - source: runTransaction(db, async (tx) => {})
+      style: primary
+      start: 6
+      end: 42
+  runTransaction(db, async (tx) => {}):
+    labels:
+    - source: runTransaction(db, async (tx) => {})
+      style: primary
+      start: 0
+      end: 36

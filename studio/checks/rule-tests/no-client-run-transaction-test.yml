@@ -1,0 +1,9 @@
+id: no-client-run-transaction
+valid:
+  - "adminDb().runTransaction(async (tx) => {})"
+  - "db.runTransaction(async (tx) => {})"
+  - "deleteDoc(ref)"
+  - "updateDoc(ref, patch)"
+invalid:
+  - "runTransaction(db, async (tx) => {})"
+  - "await runTransaction(db, async (tx) => {})"

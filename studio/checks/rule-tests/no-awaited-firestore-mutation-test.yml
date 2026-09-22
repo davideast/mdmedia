@@ -1,0 +1,19 @@
+id: no-awaited-firestore-mutation
+valid:
+  - "deleteDoc(ref)"
+  - "void deleteDoc(ref).catch(console.error)"
+  - "updateDoc(ref, { title })"
+  - "void updateDoc(ref, { title })"
+  - "setDoc(ref, data)"
+  - "void setDoc(ref, data)"
+  - "addDoc(collectionRef, data)"
+  - "void addDoc(collectionRef, data)"
+  - "batch.commit()"
+  - "await fetch('/api/narrations')"
+  - "await loadData()"
+invalid:
+  - "await deleteDoc(ref)"
+  - "await updateDoc(ref, { title })"
+  - "await setDoc(ref, data)"
+  - "await addDoc(collectionRef, data)"
+  - "await batch.commit()"
