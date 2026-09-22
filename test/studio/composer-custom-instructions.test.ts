@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DEFAULT_HEADING_INSTRUCTIONS } from "../../studio/src/lib/types";
 import { HEADING_GENERATION_NARRATION_PROMPT } from "../../src/narration/system-instructions";
-import { parseNarrationRequest } from "../../studio/src/lib/narration-server";
+import { parseNarrationRequest } from "../../studio/src/lib/narration-request";
 
 describe("Composer Custom Instructions for Audio Adaptation", () => {
   const composerSettingsPath = resolve(

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { generateNarrationId } from '../../studio/src/lib/narrations.js';
-import { parseNarrationRequest } from '../../studio/src/lib/narration-server.js';
+import { generateNarrationId, parseNarrationRequest } from '../../studio/src/lib/narration-request.js';
 import { GeminiTTSProvider } from '../../src/tts/gemini-tts-provider.js';
 import type { GoogleGenAI } from '@google/genai';
 

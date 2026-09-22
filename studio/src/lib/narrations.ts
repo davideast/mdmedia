@@ -286,13 +286,4 @@ export async function deleteNarration(id: string): Promise<void> {
   })();
 }
 
-/**
- * Generates a cryptographically random 20-character alphanumeric ID compatible with
- * Firestore document IDs. Avoids depending on SDK auto-id stubs in simulated environments.
- */
-export function generateNarrationId(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const bytes = new Uint8Array(20);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => chars[b % chars.length]).join('');
-}
+export { generateNarrationId } from './narration-request';
