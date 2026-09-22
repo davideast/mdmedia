@@ -140,7 +140,7 @@ export default function NarrationPage() {
         ) : null
       }
       icon={
-        documentView === "source" ? (
+        documentView === "source" || documentView === "raw" ? (
           <FileText size={13} strokeWidth={2} className="flex-none" />
         ) : (
           <BookOpen size={13} strokeWidth={2} className="flex-none" />
@@ -209,10 +209,10 @@ export default function NarrationPage() {
           <Loader2 size={18} className="animate-spin text-ink-faint" />
           <span className="sr-only">Loading narration</span>
         </div>
-      ) : documentView === "source" ? (
+      ) : documentView === "source" || documentView === "raw" ? (
         <SourceDocumentView
           sourceMarkdown={stream.sourceMarkdown || ""}
-          onSwitchToAdapted={() => setDocumentView("adapted")}
+          viewMode={documentView === "raw" ? "raw" : "source"}
         />
       ) : (
         <Reader

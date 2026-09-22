@@ -48,7 +48,7 @@ export interface PlaylistQueueState {
   index: number;
 }
 
-export type DocumentView = "adapted" | "source";
+export type DocumentView = "adapted" | "source" | "raw";
 
 interface NarrationContextValue {
   stream: NarrationStreamState;

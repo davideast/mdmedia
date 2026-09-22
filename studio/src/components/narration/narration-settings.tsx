@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { cn } from "cn";
-import { Check, Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Check, Code2, Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -195,7 +194,7 @@ export function NarrationSettings({
       {isAdapted ? (
         <div className="grid gap-2">
           <Label className="t-label">Document view</Label>
-          <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-muted/50 p-1">
+          <div className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-muted/50 p-1">
             <button
               type="button"
               aria-pressed={documentView === "adapted"}
@@ -215,7 +214,7 @@ export function NarrationSettings({
                   documentView === "adapted" ? "text-primary" : "text-ink-faint",
                 )}
               />
-              <span className="truncate">Audio adapted</span>
+              <span className="truncate">Adapted</span>
             </button>
             <button
               type="button"
@@ -237,6 +236,27 @@ export function NarrationSettings({
                 )}
               />
               <span className="truncate">Source</span>
+            </button>
+            <button
+              type="button"
+              aria-pressed={documentView === "raw"}
+              onClick={() => setDocumentView("raw")}
+              className={cn(
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[0.78rem] font-medium transition-all",
+                documentView === "raw"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-ink-muted hover:text-foreground",
+              )}
+            >
+              <Code2
+                size={13}
+                strokeWidth={2}
+                className={cn(
+                  "flex-none",
+                  documentView === "raw" ? "text-primary" : "text-ink-faint",
+                )}
+              />
+              <span className="truncate">Raw</span>
             </button>
           </div>
         </div>
