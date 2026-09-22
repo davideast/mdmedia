@@ -197,6 +197,7 @@ export function AppShell({
       closeContext,
       toggleContext,
       showContextToggle: hasContext && (breakpoints.isMobile || breakpoints.isTablet),
+      hasPlayerBar: showPlayerBar,
       isMobile: breakpoints.isMobile,
       isTablet: breakpoints.isTablet,
       isMedium: breakpoints.isMedium,
@@ -213,6 +214,7 @@ export function AppShell({
       openContext,
       closeContext,
       toggleContext,
+      showPlayerBar,
     ],
   );
 
@@ -235,7 +237,16 @@ export function AppShell({
     ) : undefined;
 
   const mainContent = (
-    <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+    <div
+      className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+      style={
+        {
+          "--shell-player-offset": showPlayerBar
+            ? "var(--player-dock-height, 6.5rem)"
+            : "0rem",
+        } as React.CSSProperties
+      }
+    >
       {children}
       {showPlayerBar ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-3 sm:px-6 sm:pb-5">

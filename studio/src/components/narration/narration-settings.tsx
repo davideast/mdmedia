@@ -518,18 +518,24 @@ export function NarrationSettings({
             </div>
           ) : null}
 
-          <dl className="grid gap-3">
-            <div className="grid gap-0.5">
-              <dt className="t-label">Voice</dt>
-              <dd className="text-[0.85rem]">{narration.voice}</dd>
-            </div>
-            {narration.authorName ? (
-              <div className="grid gap-0.5">
-                <dt className="t-label">Made by</dt>
-                <dd className="text-[0.85rem]">{narration.authorName}</dd>
+          <div className="details-meta-container">
+            <dl className={narration.authorName ? "details-meta-grid" : "grid gap-3"}>
+              <div className="grid min-w-0 gap-0.5">
+                <dt className="t-label">Voice</dt>
+                <dd className="truncate text-[0.85rem]" title={narration.voice}>
+                  {narration.voice}
+                </dd>
               </div>
-            ) : null}
-          </dl>
+              {narration.authorName ? (
+                <div className="grid min-w-0 gap-0.5">
+                  <dt className="t-label">Made by</dt>
+                  <dd className="truncate text-[0.85rem]" title={narration.authorName}>
+                    {narration.authorName}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
 
           {narration.visibility === "public" ? (
             <p className="item-label-lockup t-meta">

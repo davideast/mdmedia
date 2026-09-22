@@ -27,6 +27,9 @@ export interface ShellContextValue {
   /** Whether context drawer toggle button should be displayed (e.g. tablet/mobile) */
   showContextToggle: boolean;
 
+  /** Whether the persistent audio player bar is currently visible */
+  hasPlayerBar: boolean;
+
   /** Screen breakpoint flags */
   isMobile: boolean;
   isTablet: boolean;

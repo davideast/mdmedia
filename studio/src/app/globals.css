@@ -27,6 +27,7 @@
   --radius-inner: 6px;
   --radius-control: 4px;
   --shell: 1312px;
+  --player-dock-height: 6.5rem;
 
   /* ---- shadcn contract ---- */
   --radius: 0.625rem;
@@ -677,7 +678,7 @@
     grid-template-rows:
       [gutter-top] 2rem
       [view-content] max-content
-      [gutter-bottom] 2rem;
+      [gutter-bottom] calc(2rem + var(--shell-player-offset, 0rem));
     column-gap: 0;
     row-gap: 0;
     padding: 0;
@@ -688,6 +689,9 @@
   }
 
   @media (max-width: 640px) {
+    :root {
+      --player-dock-height: 8rem;
+    }
     .view-grid {
       --view-gutter: 1rem;
     }
@@ -703,7 +707,7 @@
     grid-template-rows:
       [gutter-top] 2.5rem
       [view-content] max-content
-      [gutter-bottom] 10rem;
+      [gutter-bottom] calc(3.5rem + var(--shell-player-offset, 6.5rem));
   }
 
   /* Subgrid body: inherits named column tracks directly from .view-grid */
@@ -801,6 +805,27 @@
     }
     .player-compact-row {
       display: flex !important;
+    }
+  }
+
+  /* Narration Details Metadata Lockup (Container Query Architecture) */
+  .details-meta-container {
+    container-type: inline-size;
+    container-name: details-meta;
+    width: 100%;
+  }
+
+  .details-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @container details-meta (max-width: 240px) {
+    .details-meta-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
     }
   }
 }
