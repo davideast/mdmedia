@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 
 import { auth } from './firebase';
 import { watchNarration } from './narrations';
+import { getMediaStore } from './media-store';
 import { StreamingPcmPlayer } from './pcm-player';
 import type { AlignedChunk, AlignedWord, StreamEvent, Visibility, VoiceName } from './types';
 import type { NarrationTimingsFile } from './wav';
@@ -351,6 +352,32 @@ export function useNarrationStream(): NarrationStreamState {
       setErrorMessage(null);
       setStatus('loading');
 
+      const mediaStore = getMediaStore();
+      const offlineTrack = await mediaStore.getTrack(narrationId);
+      if (session !== loadSessionRef.current) return;
+
+      if (offlineTrack) {
+        setTitle(offlineTrack.timings.title || '');
+        if (offlineTrack.timings.transcript) setTranscript(offlineTrack.timings.transcript);
+        setChunks([...offlineTrack.timings.chunks].sort((a, b) => a.index - b.index));
+
+        const objectUrl = URL.createObjectURL(offlineTrack.audioBlob);
+        const activePlayer = ensurePlayer();
+        try {
+          await activePlayer.loadWavUrl(objectUrl, { final: true });
+        } finally {
+          URL.revokeObjectURL(objectUrl);
+        }
+
+        if (session !== loadSessionRef.current) return;
+
+        if (options?.autoPlay) {
+          void activePlayer.play();
+        }
+        setStatus('ready');
+        return;
+      }
+
       const token = await currentIdToken();
       if (session !== loadSessionRef.current) return;
       if (!token) {
@@ -402,6 +429,10 @@ export function useNarrationStream(): NarrationStreamState {
             await activePlayer.loadWavUrl(objectUrl, { final: isFinal });
           } finally {
             URL.revokeObjectURL(objectUrl);
+          }
+
+          if (isFinal) {
+            void mediaStore.saveTrack(narrationId, audioBlob, timingsFile).catch(() => {});
           }
 
           if (options?.autoPlay && !autoPlayed) {
