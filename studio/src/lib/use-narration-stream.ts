@@ -139,6 +139,7 @@ export function useNarrationStream(): NarrationStreamState {
   const docUnsubRef = useRef<(() => void) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const loadSessionRef = useRef(0);
+  const latestDocRef = useRef<{ sourceMarkdown?: string; adapted?: boolean }>({});
 
   const ensurePlayer = useCallback((): StreamingPcmPlayer => {
     const existing = playerRef.current;
@@ -159,6 +160,7 @@ export function useNarrationStream(): NarrationStreamState {
 
   const resetPlayer = useCallback(() => {
     loadSessionRef.current++;
+    latestDocRef.current = {};
     docUnsubRef.current?.();
     docUnsubRef.current = null;
     unsubscribeRef.current?.();
@@ -172,6 +174,7 @@ export function useNarrationStream(): NarrationStreamState {
   useEffect(
     () => () => {
       loadSessionRef.current++;
+      latestDocRef.current = {};
       abortRef.current?.abort();
       docUnsubRef.current?.();
       docUnsubRef.current = null;
@@ -359,6 +362,12 @@ export function useNarrationStream(): NarrationStreamState {
       if (offlineTrack) {
         setTitle(offlineTrack.timings.title || '');
         if (offlineTrack.timings.transcript) setTranscript(offlineTrack.timings.transcript);
+        if (offlineTrack.timings.sourceMarkdown !== undefined) {
+          setSourceMarkdown(offlineTrack.timings.sourceMarkdown);
+        }
+        if (offlineTrack.timings.adapted !== undefined) {
+          setAdapted(offlineTrack.timings.adapted);
+        }
         setChunks([...offlineTrack.timings.chunks].sort((a, b) => a.index - b.index));
 
         const objectUrl = URL.createObjectURL(offlineTrack.audioBlob);
@@ -375,6 +384,41 @@ export function useNarrationStream(): NarrationStreamState {
           void activePlayer.play();
         }
         setStatus('ready');
+
+        const stopDocWatch = () => {
+          docUnsubRef.current?.();
+          docUnsubRef.current = null;
+        };
+        stopDocWatch();
+
+        docUnsubRef.current = watchNarration(narrationId, (narration) => {
+          if (session !== loadSessionRef.current) {
+            stopDocWatch();
+            return;
+          }
+          if (!narration) return;
+          if (narration.title) setTitle((current) => (current.trim().length > 0 ? current : narration.title));
+          if (narration.voice) setVoice(narration.voice);
+          if (narration.transcript) setTranscript((current) => (current.trim().length > 0 ? current : narration.transcript));
+          if (narration.sourceMarkdown !== undefined) setSourceMarkdown(narration.sourceMarkdown);
+          if (narration.adapted !== undefined) setAdapted(narration.adapted);
+
+          if (
+            narration.sourceMarkdown &&
+            (!offlineTrack.timings.sourceMarkdown || offlineTrack.timings.adapted === undefined)
+          ) {
+            const upgradedTimings: NarrationTimingsFile = {
+              ...offlineTrack.timings,
+              sourceMarkdown: narration.sourceMarkdown,
+              adapted: narration.adapted,
+            };
+            void mediaStore.saveTrack(narrationId, offlineTrack.audioBlob, upgradedTimings).catch(() => {});
+          }
+
+          if (narration.status === 'ready' || narration.status === 'error') {
+            stopDocWatch();
+          }
+        });
         return;
       }
 
@@ -421,6 +465,16 @@ export function useNarrationStream(): NarrationStreamState {
             setTitle((current) => (current.trim().length > 0 ? current : timingsFile.title));
           }
           if (timingsFile.transcript) setTranscript(timingsFile.transcript);
+          if (timingsFile.sourceMarkdown !== undefined) {
+            setSourceMarkdown(timingsFile.sourceMarkdown);
+          } else if (latestDocRef.current.sourceMarkdown !== undefined) {
+            setSourceMarkdown(latestDocRef.current.sourceMarkdown);
+          }
+          if (timingsFile.adapted !== undefined) {
+            setAdapted(timingsFile.adapted);
+          } else if (latestDocRef.current.adapted !== undefined) {
+            setAdapted(latestDocRef.current.adapted);
+          }
           setChunks([...timingsFile.chunks].sort((a, b) => a.index - b.index));
 
           const objectUrl = URL.createObjectURL(audioBlob);
@@ -432,7 +486,12 @@ export function useNarrationStream(): NarrationStreamState {
           }
 
           if (isFinal) {
-            void mediaStore.saveTrack(narrationId, audioBlob, timingsFile).catch(() => {});
+            const saveTimings: NarrationTimingsFile = {
+              ...timingsFile,
+              sourceMarkdown: timingsFile.sourceMarkdown ?? latestDocRef.current.sourceMarkdown,
+              adapted: timingsFile.adapted ?? latestDocRef.current.adapted,
+            };
+            void mediaStore.saveTrack(narrationId, audioBlob, saveTimings).catch(() => {});
           }
 
           if (options?.autoPlay && !autoPlayed) {
@@ -476,6 +535,10 @@ export function useNarrationStream(): NarrationStreamState {
         if (narration.transcript) setTranscript(narration.transcript);
         if (narration.sourceMarkdown !== undefined) setSourceMarkdown(narration.sourceMarkdown);
         if (narration.adapted !== undefined) setAdapted(narration.adapted);
+        latestDocRef.current = {
+          sourceMarkdown: narration.sourceMarkdown,
+          adapted: narration.adapted,
+        };
 
         if (narration.status === 'error') {
           setStatus('error');
@@ -513,6 +576,7 @@ export function useNarrationStream(): NarrationStreamState {
 
   const cancel = useCallback(() => {
     loadSessionRef.current++;
+    latestDocRef.current = {};
     docUnsubRef.current?.();
     docUnsubRef.current = null;
     abortRef.current?.abort();

@@ -78,4 +78,47 @@ describe('Slice 4: Offline Audio Integration & Storage Lifecycle', () => {
     expect(await mediaStore.has('deleted-narr-300')).toBe(false);
     expect(await mediaStore.getTrack('deleted-narr-300')).toBeNull();
   });
+
+  it('persists and hydrates sourceMarkdown and adapted flags in offline timings', async () => {
+    const adapter = new MemoryStorageAdapter();
+    const mediaStore = new MediaStoreService(adapter);
+
+    const fullTimings: NarrationTimingsFile = {
+      ...sampleTimings,
+      sourceMarkdown: '# Original Document\n\nThis is the unadapted user markdown.',
+      adapted: true,
+    };
+
+    await mediaStore.saveTrack('doc-narr-400', sampleAudioBlob, fullTimings);
+
+    const track = await mediaStore.getTrack('doc-narr-400');
+    expect(track).not.toBeNull();
+    expect(track?.timings.sourceMarkdown).toBe('# Original Document\n\nThis is the unadapted user markdown.');
+    expect(track?.timings.adapted).toBe(true);
+    expect(track?.timings.transcript).toBe('Testing seamless offline playback.');
+  });
+
+  it('upgrades legacy offline tracks lacking sourceMarkdown when new metadata arrives', async () => {
+    const adapter = new MemoryStorageAdapter();
+    const mediaStore = new MediaStoreService(adapter);
+
+    // Initial save with legacy timings (no sourceMarkdown)
+    await mediaStore.saveTrack('legacy-narr-500', sampleAudioBlob, sampleTimings);
+    const initial = await mediaStore.getTrack('legacy-narr-500');
+    expect(initial?.timings.sourceMarkdown).toBeUndefined();
+
+    // Background sync upgrades timings
+    const upgradedTimings: NarrationTimingsFile = {
+      ...initial!.timings,
+      sourceMarkdown: '# Backfilled Markdown\n\nHydrated from remote document.',
+      adapted: false,
+    };
+    await mediaStore.saveTrack('legacy-narr-500', initial!.audioBlob, upgradedTimings);
+
+    const upgraded = await mediaStore.getTrack('legacy-narr-500');
+    expect(upgraded?.timings.sourceMarkdown).toBe('# Backfilled Markdown\n\nHydrated from remote document.');
+    expect(upgraded?.timings.adapted).toBe(false);
+    expect(upgraded?.audioBlob.size).toBe(sampleAudioBlob.size);
+  });
 });
+

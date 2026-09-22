@@ -379,6 +379,8 @@ export function createNarrationStream({
           transcript,
           durationMs,
           chunks: [...alignedChunks],
+          sourceMarkdown: request.markdown,
+          adapted: request.rewriteForNarration,
         };
         const audioBuffer = Buffer.from(wav);
         const timingsBuffer = Buffer.from(JSON.stringify(timingsFile));

@@ -6,6 +6,8 @@ import {
   timingsObjectPath,
 } from "@/lib/narration-server";
 
+import type { NarrationTimingsFile } from "@/lib/wav";
+
 export const runtime = "nodejs";
 
 export async function GET(
@@ -30,7 +32,14 @@ export async function GET(
     if (!bytes) {
       return Response.json({ message: "That narration isn't available." }, { status: 404 });
     }
-    return new Response(new Uint8Array(bytes), {
+    const timings = JSON.parse(new TextDecoder().decode(bytes)) as NarrationTimingsFile;
+    if (timings.sourceMarkdown === undefined && narration.sourceMarkdown) {
+      timings.sourceMarkdown = narration.sourceMarkdown;
+    }
+    if (timings.adapted === undefined && narration.adapted !== undefined) {
+      timings.adapted = narration.adapted;
+    }
+    return Response.json(timings, {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-store",
