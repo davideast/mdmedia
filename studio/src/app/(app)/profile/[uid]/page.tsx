@@ -64,9 +64,9 @@ export default function ProfilePage() {
       title="Profile"
       icon={<UserRound size={13} strokeWidth={2} />}
       viewGrid
-      gridVariant="wide"
     >
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
+      <div className="grid gap-8">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
           <Avatar className="size-16">
             <AvatarImage src={user.photoURL} alt="" />
             <AvatarFallback className="font-display text-[1.1rem]">
@@ -128,6 +128,7 @@ export default function ProfilePage() {
             value={String(items.filter((item) => item.visibility === "public").length)}
           />
         </div>
+      </div>
     </WorkbenchPanel>
   );
 }

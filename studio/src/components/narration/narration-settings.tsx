@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, Download, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -364,7 +364,7 @@ export function NarrationSettings({
                 aria-label="Downloaded to device"
                 className="inline-flex items-center text-mint"
               >
-                <Check size={13} strokeWidth={2.5} />
+                <FileCheck size={14} strokeWidth={2} />
               </span>
             ) : isDownloading ? (
               <span

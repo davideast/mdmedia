@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Check,
   CheckCircle2,
   Download,
+  FileCheck,
   Library,
   Loader2,
   Play,
@@ -169,7 +169,7 @@ function LibraryNarrationCard({
             title="Downloaded to device (click to remove)"
             aria-label="Remove download"
           >
-            <Check size={13} strokeWidth={2.5} />
+            <FileCheck size={13} strokeWidth={2} />
             <span className="sr-only">Downloaded</span>
           </Button>
         ) : isReady ? (
@@ -234,15 +234,6 @@ function LibraryNarrationCard({
           {narration.adapted ? (
             <span className="inline-flex items-center gap-1 text-primary">
               <Sparkles size={11} /> Adapted for ear
-            </span>
-          ) : null}
-          {isDownloaded ? (
-            <span
-              title="Downloaded to device"
-              aria-label="Downloaded to device"
-              className="inline-flex items-center text-mint"
-            >
-              <Check size={12} strokeWidth={2.5} />
             </span>
           ) : null}
         </div>

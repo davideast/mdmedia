@@ -44,14 +44,14 @@ export function WorkbenchPanel({
       {title === undefined && titleNode === undefined ? null : (
         <header
           className={cn(
-            "flex h-11 flex-none items-center border-b border-border bg-surface-inset",
+            "h-11 flex-none items-center border-b border-border bg-surface-inset",
             viewGrid
               ? cn(
                   "grid px-0",
                   gridVariant === "wide" && "view-grid-wide",
                   "grid-cols-[[full-start]_minmax(var(--view-gutter,1.5rem),1fr)_[wide-start_content-start]_minmax(0,var(--view-content-max,68ch))_[content-end_wide-end]_minmax(var(--view-gutter,1.5rem),1fr)_[full-end]]",
                 )
-              : "px-3",
+              : "flex px-3",
             headerClassName,
           )}
         >
