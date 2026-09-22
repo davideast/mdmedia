@@ -29,6 +29,18 @@ function killPortListeners(port) {
     const pids = raw.split('\n').map((p) => parseInt(p.trim(), 10)).filter(Boolean);
     for (const p of pids) {
       if (p !== process.pid && isPidAlive(p)) {
+        try { process.kill(p, 'SIGINT'); } catch {}
+      }
+    }
+    // Give SQLite and servers 800ms to gracefully close
+    const start = Date.now();
+    while (Date.now() - start < 800) {
+      if (pids.every((p) => !isPidAlive(p))) break;
+      const pause = Date.now() + 100;
+      while (Date.now() < pause) {}
+    }
+    for (const p of pids) {
+      if (p !== process.pid && isPidAlive(p)) {
         try { process.kill(p, 'SIGKILL'); } catch {}
       }
     }
