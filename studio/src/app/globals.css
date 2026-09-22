@@ -642,15 +642,16 @@
    ========================================================================== */
 
 @layer components {
-  /* Whole-view layout grid with named alignment tracks and intrinsic gutters */
+  /* Whole-view layout grid with named alignment tracks and intrinsic gutters (Ahmad Shadeed ch content wrapper) */
   .view-grid {
+    --view-gutter: 1.5rem;
+    --view-content-max: 68ch;
+
     display: grid;
     grid-template-columns:
-      [full-start] minmax(1.5rem, 1fr)
-      [wide-start] minmax(0, 8rem)
-      [content-start] minmax(0, 68ch) [content-end]
-      minmax(0, 8rem) [wide-end]
-      minmax(1.5rem, 1fr) [full-end];
+      [full-start] minmax(var(--view-gutter), 1fr)
+      [wide-start content-start] minmax(0, var(--view-content-max)) [content-end wide-end]
+      minmax(var(--view-gutter), 1fr) [full-end];
     grid-template-rows:
       [gutter-top] 2rem
       [view-content] auto
@@ -661,6 +662,17 @@
     margin: 0;
     min-height: 100%;
     width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .view-grid {
+      --view-gutter: 1rem;
+    }
+  }
+
+  /* Wide view grid (Playlists, Settings, Profile) */
+  .view-grid-wide {
+    --view-content-max: 90ch;
   }
 
   /* Reader view grid with extra bottom clearance for the floating transport bar */

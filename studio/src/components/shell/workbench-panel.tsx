@@ -42,7 +42,11 @@ export function WorkbenchPanel({
           className={cn(
             "flex h-11 flex-none items-center border-b border-border bg-surface-inset",
             viewGrid
-              ? "grid grid-cols-[[full-start]_minmax(1.5rem,1fr)_[wide-start]_minmax(0,8rem)_[content-start]_minmax(0,68ch)_[content-end]_minmax(0,8rem)_[wide-end]_minmax(1.5rem,1fr)_[full-end]] px-0"
+              ? cn(
+                  "grid px-0",
+                  gridVariant === "wide" && "view-grid-wide",
+                  "grid-cols-[[full-start]_minmax(var(--view-gutter,1.5rem),1fr)_[wide-start_content-start]_minmax(0,var(--view-content-max,68ch))_[content-end_wide-end]_minmax(var(--view-gutter,1.5rem),1fr)_[full-end]]",
+                )
               : "px-3",
             headerClassName,
           )}
@@ -77,7 +81,7 @@ export function WorkbenchPanel({
         )}
       >
         {viewGrid ? (
-          <div className={cn("view-grid", gridVariant === "reader" && "view-grid-reader")}>
+          <div className={cn("view-grid", gridVariant === "reader" && "view-grid-reader", gridVariant === "wide" && "view-grid-wide")}>
             <div
               className={cn(
                 "view-grid-body",

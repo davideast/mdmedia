@@ -22,10 +22,10 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
   describe("globals.css named tracks & zero padding/margin invariant", () => {
     it("defines .view-grid with named column tracks [full-start], [wide-start], [content-start], [content-end], [wide-end], [full-end]", () => {
       expect(globalsCss).toContain("[full-start]");
-      expect(globalsCss).toContain("[wide-start]");
-      expect(globalsCss).toContain("[content-start]");
-      expect(globalsCss).toContain("[content-end]");
-      expect(globalsCss).toContain("[wide-end]");
+      expect(globalsCss).toContain("wide-start");
+      expect(globalsCss).toContain("content-start");
+      expect(globalsCss).toContain("content-end");
+      expect(globalsCss).toContain("wide-end");
       expect(globalsCss).toContain("[full-end]");
     });
 
