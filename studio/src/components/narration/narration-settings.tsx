@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, updateVisibility } from "@/lib/narrations";
+import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import {
   createPlaylist,
   toggleNarrationInPlaylist,
@@ -84,6 +85,26 @@ export function NarrationSettings({
 
   const effectiveId = narration?.id ?? narrationId ?? stream.id;
   const effectiveVoice = narration?.voice ?? stream.voice;
+  const effectiveTitle = narration?.title ?? stream.title;
+  const effectiveSourceMarkdown = narration?.sourceMarkdown ?? stream.sourceMarkdown ?? undefined;
+  const effectiveAdapted = narration?.adapted ?? stream.adapted;
+  const isReady =
+    narration?.status === "ready" ||
+    (stream.id === effectiveId && stream.status === "ready");
+
+  const offlineMetadata = useMemo<OfflineNarrationMetadata>(
+    () => ({
+      title: effectiveTitle,
+      sourceMarkdown: effectiveSourceMarkdown,
+      adapted: effectiveAdapted,
+    }),
+    [effectiveTitle, effectiveSourceMarkdown, effectiveAdapted],
+  );
+
+  const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
+    effectiveId,
+    offlineMetadata,
+  );
 
   const commit = (visibility: Visibility, sharedWith: string[]) => {
     if (!narration) return;
@@ -174,13 +195,13 @@ export function NarrationSettings({
       {isAdapted ? (
         <div className="grid gap-2">
           <Label className="t-label">Document view</Label>
-          <div className="grid grid-cols-2 gap-1.5 rounded-lg border border-border bg-muted/40 p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-muted/50 p-1">
             <button
               type="button"
               aria-pressed={documentView === "adapted"}
               onClick={() => setDocumentView("adapted")}
               className={cn(
-                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[0.78rem] font-medium transition-all",
                 documentView === "adapted"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-ink-muted hover:text-foreground",
@@ -194,14 +215,14 @@ export function NarrationSettings({
                   documentView === "adapted" ? "text-primary" : "text-ink-faint",
                 )}
               />
-              <span>Audio adapted</span>
+              <span className="truncate">Audio adapted</span>
             </button>
             <button
               type="button"
               aria-pressed={documentView === "source"}
               onClick={() => setDocumentView("source")}
               className={cn(
-                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[0.78rem] font-medium transition-all",
                 documentView === "source"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-ink-muted hover:text-foreground",
@@ -215,7 +236,7 @@ export function NarrationSettings({
                   documentView === "source" ? "text-primary" : "text-ink-faint",
                 )}
               />
-              <span>Source</span>
+              <span className="truncate">Source</span>
             </button>
           </div>
         </div>
@@ -223,7 +244,7 @@ export function NarrationSettings({
 
       <div className="grid gap-2">
         <Label className="t-label">Highlight color</Label>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-2 gap-1.5">
           {HIGHLIGHT_COLORS.map((preset) => {
             const selected = highlightColor === preset.id;
             return (
@@ -233,7 +254,7 @@ export function NarrationSettings({
                 aria-pressed={selected}
                 onClick={() => setHighlightColor(preset.id as HighlightColorId)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md border px-2 py-1 text-left text-[0.75rem] transition-all",
+                  "flex min-w-0 items-center gap-2 rounded-md border px-2 py-1.5 text-left text-[0.75rem] transition-all",
                   selected
                     ? "border-foreground bg-accent font-medium text-foreground"
                     : "border-border bg-card text-ink-muted hover:border-border-strong hover:text-foreground",
@@ -245,7 +266,7 @@ export function NarrationSettings({
                 >
                   Aa
                 </span>
-                <span className="truncate">{preset.label.split(" ")[0]}</span>
+                <span className="truncate font-medium">{preset.label.split(" ")[0]}</span>
               </button>
             );
           })}
@@ -306,10 +327,11 @@ export function NarrationSettings({
             </p>
           )}
 
-          <div className="grid grid-cols-[1fr_auto] gap-2">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
             <Input
               value={newPlaylistTitle}
-              placeholder="New playlist name…"
+              placeholder="New playlist…"
+              className="h-8 min-w-0 text-[0.8rem]"
               onChange={(event) => setNewPlaylistTitle(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
@@ -329,6 +351,91 @@ export function NarrationSettings({
               <Plus size={15} strokeWidth={2} />
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {effectiveId ? (
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="t-label">Offline storage</Label>
+            {isDownloaded ? (
+              <span
+                title="Downloaded to device"
+                aria-label="Downloaded to device"
+                className="inline-flex items-center text-mint"
+              >
+                <FileCheck size={14} strokeWidth={2} />
+              </span>
+            ) : isDownloading ? (
+              <span
+                title="Downloading audio…"
+                aria-label="Downloading audio…"
+                className="inline-flex items-center text-primary"
+              >
+                <Loader2 size={13} className="animate-spin" />
+              </span>
+            ) : null}
+          </div>
+          <p className="text-[0.78rem] text-ink-muted leading-normal">
+            {isDownloaded
+              ? "Audio and timings are saved to this device for offline playback."
+              : isDownloading
+              ? "Fetching audio and word timings to save on this device."
+              : isReady
+              ? "Download this narration to listen without an internet connection."
+              : "Download will become available once narration generation completes."}
+          </p>
+          {isDownloaded ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  await remove();
+                  toast.info("Removed from offline storage");
+                } catch {
+                  toast.error("Could not remove narration from offline storage.");
+                }
+              }}
+              className="h-8 w-full justify-center gap-2 text-[0.8rem] text-destructive hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 size={13} strokeWidth={2} />
+              <span>Remove download</span>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDownloading || !isReady}
+              onClick={async () => {
+                try {
+                  await download();
+                  toast.success(
+                    effectiveTitle
+                      ? `Downloaded "${effectiveTitle}" for offline listening`
+                      : "Downloaded for offline listening",
+                  );
+                } catch {
+                  toast.error("Could not download narration for offline listening.");
+                }
+              }}
+              className="h-8 w-full justify-center gap-2 text-[0.8rem]"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 size={13} className="animate-spin text-primary" />
+                  <span>Downloading audio…</span>
+                </>
+              ) : (
+                <>
+                  <Download size={13} strokeWidth={2} />
+                  <span>Download for offline</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
       ) : null}
 
@@ -411,18 +518,24 @@ export function NarrationSettings({
             </div>
           ) : null}
 
-          <dl className="grid gap-3">
-            <div className="grid gap-0.5">
-              <dt className="t-label">Voice</dt>
-              <dd className="text-[0.85rem]">{narration.voice}</dd>
-            </div>
-            {narration.authorName ? (
-              <div className="grid gap-0.5">
-                <dt className="t-label">Made by</dt>
-                <dd className="text-[0.85rem]">{narration.authorName}</dd>
+          <div className="details-meta-container">
+            <dl className={narration.authorName ? "details-meta-grid" : "grid gap-3"}>
+              <div className="grid min-w-0 gap-0.5">
+                <dt className="t-label">Voice</dt>
+                <dd className="truncate text-[0.85rem]" title={narration.voice}>
+                  {narration.voice}
+                </dd>
               </div>
-            ) : null}
-          </dl>
+              {narration.authorName ? (
+                <div className="grid min-w-0 gap-0.5">
+                  <dt className="t-label">Made by</dt>
+                  <dd className="truncate text-[0.85rem]" title={narration.authorName}>
+                    {narration.authorName}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
 
           {narration.visibility === "public" ? (
             <p className="item-label-lockup t-meta">

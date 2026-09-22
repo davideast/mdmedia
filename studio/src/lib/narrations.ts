@@ -25,7 +25,7 @@ import {
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
-import { getMediaStore } from '@/lib/media-store';
+import { removeOfflineNarration } from '@/lib/offline-manager';
 import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
   DEFAULT_VOICE,
@@ -195,7 +195,7 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
 export async function deleteNarration(id: string): Promise<void> {
   await deleteDoc(doc(db(), 'narrations', id));
   try {
-    await getMediaStore().delete(id).catch(() => {});
+    await removeOfflineNarration(id).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }

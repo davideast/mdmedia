@@ -225,7 +225,7 @@ export function AudioPlayerBar({
   /** Synthesis still running — the track is not yet its final length. */
   busy: boolean;
   title?: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   href?: string;
   onPrevious?: () => void;
   onNext?: () => void;
@@ -265,121 +265,202 @@ export function AudioPlayerBar({
     setMuted(next);
   }, [player, muted]);
 
+  const trackInfo = (compact?: boolean) => (
+    <div className={cn("flex min-w-0 items-center", compact ? "gap-2 flex-1" : "gap-2.5")}>
+      <button
+        type="button"
+        onClick={toggleMute}
+        title={muted ? "Unmute" : "Mute"}
+        aria-label={muted ? "Unmute" : "Mute"}
+        className={cn(
+          "flex flex-none items-center justify-center rounded-lg border border-border bg-surface-inset text-foreground cursor-pointer transition-colors hover:bg-muted",
+          compact ? "size-8" : "size-9",
+          playing && "border-border-strong",
+        )}
+      >
+        {muted ? (
+          <VolumeX size={compact ? 13 : 15} strokeWidth={2} className="text-destructive" />
+        ) : (
+          <AudioLines size={compact ? 14 : 16} strokeWidth={2} className={cn(playing && "animate-pulse")} />
+        )}
+      </button>
+      <div className="grid min-w-0 gap-0.5">
+        {href ? (
+          <Link
+            href={href}
+            className="truncate text-[13px] leading-tight font-semibold text-foreground transition-colors hover:underline"
+            title={displayTitle}
+          >
+            {displayTitle}
+          </Link>
+        ) : (
+          <span className="truncate text-[13px] leading-tight font-semibold text-foreground">
+            {displayTitle}
+          </span>
+        )}
+        <span className="t-meta truncate text-[11px] leading-tight">
+          {subtitle ?? (busy ? "Synthesizing…" : "Narration")}
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className={cn(
-        "pointer-events-auto grid w-[min(48rem,100%)] grid-cols-[minmax(9rem,13.5rem)_minmax(0,1fr)_auto] items-center gap-4 rounded-2xl border border-border bg-popover/95 px-3.5 py-2.5 shadow-[0_10px_32px_rgba(0,0,0,0.16)] backdrop-blur-md",
+        "audio-player-pill pointer-events-auto w-[min(48rem,100%)] rounded-2xl border border-border bg-popover/95 p-2.5 sm:px-3.5 sm:py-2.5 shadow-[0_10px_32px_rgba(0,0,0,0.16)] backdrop-blur-md",
         className,
       )}
     >
-      {/* Track information (clicking title links back to /narration/[id]) */}
-      <div className="flex min-w-0 items-center gap-2.5">
-        <div
-          className={cn(
-            "flex size-9 flex-none items-center justify-center rounded-lg border border-border bg-surface-inset text-foreground",
-            playing && "border-border-strong",
-          )}
-        >
-          <AudioLines size={16} strokeWidth={2} className={cn(playing && "animate-pulse")} />
-        </div>
-        <div className="grid min-w-0 gap-0.5">
-          {href ? (
-            <Link
-              href={href}
-              className="truncate text-[13px] leading-tight font-semibold text-foreground transition-colors hover:underline"
-              title={displayTitle}
-            >
-              {displayTitle}
-            </Link>
-          ) : (
-            <span className="truncate text-[13px] leading-tight font-semibold text-foreground">
-              {displayTitle}
-            </span>
-          )}
-          <span className="t-meta truncate text-[11px] leading-tight">
-            {subtitle && subtitle.length > 0 ? subtitle : busy ? "Synthesizing…" : "Narration"}
-          </span>
-        </div>
-      </div>
+      {/* Desktop Single-Row Layout (Container >= 620px) */}
+      <div className="player-desktop-row">
+        {/* Track information */}
+        {trackInfo(false)}
 
-      {/* Transport + Scrubber */}
-      <div className="flex min-w-0 items-center gap-1.5">
-        {onPrevious ? (
+        {/* Transport + Scrubber */}
+        <div className="flex min-w-0 items-center gap-1.5">
+          {onPrevious ? (
+            <TransportButton
+              label="Previous / Restart"
+              onClick={onPrevious}
+              disabled={!ready}
+            >
+              <SkipBack size={14} strokeWidth={2} />
+            </TransportButton>
+          ) : null}
+
           <TransportButton
-            label="Previous / Restart"
-            onClick={onPrevious}
+            label="Back 10 seconds"
+            onClick={() => player?.scrub(-10_000)}
             disabled={!ready}
           >
-            <SkipBack size={14} strokeWidth={2} />
+            <Rewind size={15} strokeWidth={2} />
           </TransportButton>
-        ) : null}
 
-        <TransportButton
-          label="Back 10 seconds"
-          onClick={() => player?.scrub(-10_000)}
-          disabled={!ready}
-        >
-          <Rewind size={15} strokeWidth={2} />
-        </TransportButton>
-
-        <TransportButton
-          label={playing ? "Pause" : "Play"}
-          onClick={toggle}
-          disabled={!ready}
-          primary
-        >
-          {playing ? (
-            <Pause size={16} strokeWidth={2} />
-          ) : (
-            <Play size={16} strokeWidth={2} className="translate-x-px" />
-          )}
-        </TransportButton>
-
-        <TransportButton
-          label="Forward 10 seconds"
-          onClick={() => player?.scrub(10_000)}
-          disabled={!ready}
-        >
-          <FastForward size={15} strokeWidth={2} />
-        </TransportButton>
-
-        {onNext ? (
           <TransportButton
-            label="Next in playlist"
-            onClick={onNext}
-            disabled={!ready || !hasNext}
+            label={playing ? "Pause" : "Play"}
+            onClick={toggle}
+            disabled={!ready}
+            primary
           >
-            <SkipForward size={14} strokeWidth={2} />
+            {playing ? (
+              <Pause size={16} strokeWidth={2} />
+            ) : (
+              <Play size={16} strokeWidth={2} className="translate-x-px" />
+            )}
           </TransportButton>
-        ) : null}
 
-        <Slider
-          aria-label="Position"
-          value={[Math.min(positionMs, durationMs)]}
-          min={0}
-          max={Math.max(durationMs, 1)}
-          step={100}
-          disabled={!ready}
-          onValueChange={([next]) => player?.seek(next)}
-          className="min-w-20 flex-1 px-1.5"
-        />
+          <TransportButton
+            label="Forward 10 seconds"
+            onClick={() => player?.scrub(10_000)}
+            disabled={!ready}
+          >
+            <FastForward size={15} strokeWidth={2} />
+          </TransportButton>
 
-        <span className="t-mono flex-none text-[11px] tabular-nums whitespace-nowrap">
-          {clock(positionMs)} / {busy ? "\u2013\u2013:\u2013\u2013" : clock(durationMs)}
-        </span>
+          {onNext ? (
+            <TransportButton
+              label="Next in playlist"
+              onClick={onNext}
+              disabled={!ready || !hasNext}
+            >
+              <SkipForward size={14} strokeWidth={2} />
+            </TransportButton>
+          ) : null}
+
+          <Slider
+            aria-label="Position"
+            value={[Math.min(positionMs, durationMs)]}
+            min={0}
+            max={Math.max(durationMs, 1)}
+            step={100}
+            disabled={!ready}
+            onValueChange={([next]) => player?.seek(next)}
+            className="min-w-20 flex-1 px-1.5"
+          />
+
+          <span className="t-mono flex-none text-[11px] tabular-nums whitespace-nowrap">
+            {clock(positionMs)} / {busy ? "––:––" : clock(durationMs)}
+          </span>
+        </div>
+
+        {/* Volume + Speed */}
+        <div className="flex flex-none items-center gap-1">
+          <TransportButton label={muted ? "Unmute" : "Mute"} onClick={toggleMute} disabled={!ready}>
+            {muted ? <VolumeX size={15} strokeWidth={2} /> : <Volume2 size={15} strokeWidth={2} />}
+          </TransportButton>
+
+          <PlaybackSpeedPopover
+            rate={rate}
+            onRateChange={handleRateChange}
+            disabled={!ready}
+          />
+        </div>
       </div>
 
-      {/* Volume + Speed */}
-      <div className="flex flex-none items-center gap-1">
-        <TransportButton label={muted ? "Unmute" : "Mute"} onClick={toggleMute} disabled={!ready}>
-          {muted ? <VolumeX size={15} strokeWidth={2} /> : <Volume2 size={15} strokeWidth={2} />}
-        </TransportButton>
+      {/* Compact Two-Tier Layout (Container < 620px) */}
+      <div className="player-compact-row">
+        {/* Tier 1: Track Metadata + Core Playback Controls */}
+        <div className="flex w-full min-w-0 items-center justify-between gap-2">
+          {trackInfo(true)}
 
-        <PlaybackSpeedPopover
-          rate={rate}
-          onRateChange={handleRateChange}
-          disabled={!ready}
-        />
+          <div className="flex flex-none items-center gap-1">
+            <TransportButton
+              label="Back 10 seconds"
+              onClick={() => player?.scrub(-10_000)}
+              disabled={!ready}
+            >
+              <Rewind size={14} strokeWidth={2} />
+            </TransportButton>
+
+            <TransportButton
+              label={playing ? "Pause" : "Play"}
+              onClick={toggle}
+              disabled={!ready}
+              primary
+            >
+              {playing ? (
+                <Pause size={15} strokeWidth={2} />
+              ) : (
+                <Play size={15} strokeWidth={2} className="translate-x-px" />
+              )}
+            </TransportButton>
+
+            <TransportButton
+              label="Forward 10 seconds"
+              onClick={() => player?.scrub(10_000)}
+              disabled={!ready}
+            >
+              <FastForward size={14} strokeWidth={2} />
+            </TransportButton>
+
+            <PlaybackSpeedPopover
+              rate={rate}
+              onRateChange={handleRateChange}
+              disabled={!ready}
+            />
+          </div>
+        </div>
+
+        {/* Tier 2: Edge-to-Edge Full-Width Scrubber Track */}
+        <div className="flex w-full items-center gap-2 pt-0.5">
+          <span className="t-mono flex-none text-[11px] tabular-nums text-ink-muted">
+            {clock(positionMs)}
+          </span>
+          <Slider
+            aria-label="Position"
+            value={[Math.min(positionMs, durationMs)]}
+            min={0}
+            max={Math.max(durationMs, 1)}
+            step={100}
+            disabled={!ready}
+            onValueChange={([next]) => player?.seek(next)}
+            className="flex-1 min-w-0 px-1"
+          />
+          <span className="t-mono flex-none text-[11px] tabular-nums text-ink-muted">
+            {busy ? "––:––" : clock(durationMs)}
+          </span>
+        </div>
       </div>
     </div>
   );
