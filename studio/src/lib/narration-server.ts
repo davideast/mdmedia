@@ -29,6 +29,10 @@ import {
   type VoiceName,
 } from "./types";
 import { wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
+import {
+  classifyNarrationError,
+  type ClassifiedNarrationError,
+} from "./narration-errors";
 
 const MAX_CHUNK_CHARS = 400;
 const NARRATION_MODEL = "gemini-3.5-flash-lite";
@@ -309,14 +313,23 @@ export function createNarrationStream({
 
   signal.addEventListener("abort", detachStream);
 
-  const failDocument = async (message: string) => {
+  const failDocument = async (error: ClassifiedNarrationError | string) => {
     if (!docWritten) return;
     try {
-      await docRef.update({
+      const updateData: Record<string, any> = {
         status: "error",
-        errorMessage: message,
         updatedAt: Date.now(),
-      });
+      };
+      if (typeof error === "string") {
+        updateData.errorMessage = error;
+      } else {
+        updateData.errorMessage = error.message;
+        updateData.errorCode = error.code;
+        updateData.errorCategory = error.category;
+        if (error.chunkIndex !== undefined) updateData.errorChunkIndex = error.chunkIndex;
+        if (error.actionableHint) updateData.errorActionableHint = error.actionableHint;
+      }
+      await docRef.update(updateData);
     } catch {
       // The stream is already terminating; a failed status write must not mask it.
     }
@@ -355,6 +368,9 @@ export function createNarrationStream({
   };
 
   const run = async () => {
+    let pipelineError: Error | null = null;
+    let currentProcessingChunkIndex: number | undefined = undefined;
+
     try {
       const client = createGeminiClient();
 
@@ -465,7 +481,10 @@ export function createNarrationStream({
        * synthesis is indistinguishable from a successful one that produced no
        * audio, and the only symptom is a zero-byte result.
        */
-      let pipelineError: Error | null = null;
+      bus.on("chunk:start", ({ chunk }) => {
+        currentProcessingChunkIndex = chunk.index;
+      });
+
       bus.on("pipeline:error", ({ error }) => {
         pipelineError ??= error;
       });
@@ -581,8 +600,23 @@ export function createNarrationStream({
       }
       if (pipelineError !== null) throw pipelineError;
       if (totalBytes === 0) {
-        await failDocument(GENERIC_FAILURE);
-        queue.push({ type: "error", message: GENERIC_FAILURE });
+        const classified = classifyNarrationError(
+          pipelineError ?? new Error("No audio was generated for this document."),
+          {
+            currentChunkIndex: currentProcessingChunkIndex,
+            promptStyle: request.promptStyle,
+          }
+        );
+        await failDocument(classified);
+        queue.push({
+          type: "error",
+          message: classified.message,
+          code: classified.code,
+          category: classified.category,
+          chunkIndex: classified.chunkIndex,
+          actionableHint: classified.actionableHint,
+          retryable: classified.retryable,
+        });
         return;
       }
 
@@ -593,19 +627,24 @@ export function createNarrationStream({
         await purgeDocumentAndStorage();
         return;
       }
-      // The user-facing copy is intentionally vague, so this is the only place
-      // the real cause is visible. Development only — a deployed server should
-      // not spill provider internals into its logs on every failed synthesis.
       if (process.env.NODE_ENV !== "production") {
         console.error("[narration] synthesis failed:", error);
       }
-      const message =
-        error instanceof Error && error.message.includes("GEMINI_API_KEY")
-          ? MISSING_KEY_FAILURE
-          : GENERIC_FAILURE;
-      await failDocument(message);
+      const classified = classifyNarrationError(pipelineError ?? error, {
+        currentChunkIndex: currentProcessingChunkIndex,
+        promptStyle: request.promptStyle,
+      });
+      await failDocument(classified);
       await discardObjects();
-      queue.push({ type: "error", message });
+      queue.push({
+        type: "error",
+        message: classified.message,
+        code: classified.code,
+        category: classified.category,
+        chunkIndex: classified.chunkIndex,
+        actionableHint: classified.actionableHint,
+        retryable: classified.retryable,
+      });
     } finally {
       activeStreams.delete(id);
       signal.removeEventListener("abort", detachStream);

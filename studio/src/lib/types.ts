@@ -78,6 +78,14 @@ export interface AlignedChunk {
   words: AlignedWord[];
 }
 
+export type NarrationErrorCategory =
+  | "policy"
+  | "quota"
+  | "config"
+  | "invalid_input"
+  | "transient"
+  | "system";
+
 /** The Firestore document at `narrations/{id}`. */
 export interface Narration {
   id: string;
@@ -107,6 +115,10 @@ export interface Narration {
   updatedAt: number;
   /** Present only when `status === "error"`. */
   errorMessage?: string;
+  errorCode?: string;
+  errorCategory?: NarrationErrorCategory;
+  errorChunkIndex?: number;
+  errorActionableHint?: string;
 }
 
 export type NarrationStatus = "streaming" | "ready" | "error";
@@ -274,6 +286,11 @@ export interface StreamDoneEvent {
 export interface StreamErrorEvent {
   type: "error";
   message: string;
+  code?: string;
+  category?: "policy" | "quota" | "config" | "invalid_input" | "transient" | "system";
+  chunkIndex?: number;
+  actionableHint?: string;
+  retryable?: boolean;
 }
 
 /* ==========================================================================
