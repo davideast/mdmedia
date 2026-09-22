@@ -2,10 +2,9 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
-import { auth, db } from './firebase';
-import { deleteNarration } from './narrations';
+import { auth } from './firebase';
+import { deleteNarration, generateNarrationId } from './narrations';
 import type { StreamEvent, Visibility, VoiceName } from './types';
 
 export type JobStatus = 'queued' | 'starting' | 'streaming' | 'ready' | 'error';
@@ -128,7 +127,7 @@ export function useGenerationQueue(): GenerationQueueState {
       visibility: Visibility;
     }): Promise<string> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
-      const narrationId = doc(collection(db(), 'narrations')).id;
+      const narrationId = generateNarrationId();
       const controller = new AbortController();
       controllersRef.current.set(jobId, controller);
 

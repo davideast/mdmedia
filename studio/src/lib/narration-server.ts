@@ -73,8 +73,11 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   if (!isVoice(raw.voice)) return null;
   if (!isVisibility(raw.visibility)) return null;
 
+  const RESERVED_IDS = new Set(["narrations", "new", "settings", "playlists", "queue", "library"]);
   const customId =
-    typeof raw.id === "string" && /^[A-Za-z0-9_-]{10,128}$/.test(raw.id)
+    typeof raw.id === "string" &&
+    /^[A-Za-z0-9_-]{10,128}$/.test(raw.id) &&
+    !RESERVED_IDS.has(raw.id.toLowerCase())
       ? raw.id
       : undefined;
 
