@@ -13,6 +13,7 @@ import { AudioPlayerBar } from "@/components/reader/audio-player-bar";
 import { ContextPanel } from "@/components/shell/context-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { NavRail } from "@/components/shell/nav-rail";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const DOCK_KEY = "mdmedia.nav.docked.v1";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
@@ -23,6 +24,33 @@ const CONTEXT = "context";
 /** Pixel thresholds at which resizing a panel smaller automatically snaps it to its docked rail. */
 const LEFT_DOCK_THRESHOLD_PX = 170;
 const RIGHT_DOCK_THRESHOLD_PX = 220;
+
+function useResponsiveBreakpoints() {
+  const [breakpoints, setBreakpoints] = useState({
+    isMobile: false,   // < 768px
+    isTablet: false,   // 768px - 1023px
+    isMedium: false,   // 1024px - 1279px
+    isDesktop: true,   // >= 1280px
+  });
+
+  useEffect(() => {
+    const update = () => {
+      if (typeof window === "undefined") return;
+      const w = window.innerWidth;
+      setBreakpoints({
+        isMobile: w < 768,
+        isTablet: w >= 768 && w < 1024,
+        isMedium: w >= 1024 && w < 1280,
+        isDesktop: w >= 1280,
+      });
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return breakpoints;
+}
 
 /**
  * The workbench shell.
@@ -43,10 +71,12 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const { stream, queue, nextTrack, previousTrack } = useNarration();
+  const breakpoints = useResponsiveBreakpoints();
   const hasContext = pathname.startsWith("/studio") || pathname.startsWith("/narration/");
   const isNarrationRoute = pathname.startsWith("/narration/");
   const [docked, setDocked] = useState(true);
   const [contextDocked, setContextDocked] = useState(false);
+  const [contextSheetOpen, setContextSheetOpen] = useState(false);
   const groupRef = useGroupRef();
   const isResizingRef = useRef(false);
 
@@ -61,6 +91,14 @@ export function AppShell({
     const storedContext = window.localStorage.getItem(CONTEXT_DOCK_KEY);
     if (storedContext !== null) setContextDocked(storedContext === "1");
   }, []);
+
+  // When viewport resizes into medium desktop (< 1280px), enforce mutual exclusivity
+  useEffect(() => {
+    if (breakpoints.isMedium && !docked && !contextDocked) {
+      setDocked(true);
+      window.localStorage.setItem(DOCK_KEY, "1");
+    }
+  }, [breakpoints.isMedium, docked, contextDocked]);
 
   useEffect(() => {
     const stopResizing = () => {
@@ -90,14 +128,30 @@ export function AppShell({
     setDocked((previous) => {
       const next = !previous;
       window.localStorage.setItem(DOCK_KEY, next ? "1" : "0");
+      // On medium screens (< 1280px), enforce mutual exclusivity to preserve reading width
+      if (!next && typeof window !== "undefined" && window.innerWidth < 1280) {
+        setContextDocked(true);
+        window.localStorage.setItem(CONTEXT_DOCK_KEY, "1");
+      }
       return next;
     });
   }, []);
 
   const toggleContextDock = useCallback(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      // On tablet and mobile, open ContextPanel in an overlay Sheet to preserve 100% reading width
+      setContextSheetOpen((prev) => !prev);
+      return;
+    }
+
     setContextDocked((previous) => {
       const next = !previous;
       window.localStorage.setItem(CONTEXT_DOCK_KEY, next ? "1" : "0");
+      // On medium screens (< 1280px), enforce mutual exclusivity
+      if (!next && typeof window !== "undefined" && window.innerWidth < 1280) {
+        setDocked(true);
+        window.localStorage.setItem(DOCK_KEY, "1");
+      }
       return next;
     });
   }, []);
@@ -117,7 +171,7 @@ export function AppShell({
     <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       {children}
       {showPlayerBar ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-6 pb-5">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-3 sm:px-6 sm:pb-5">
           <AudioPlayerBar
             player={stream.player}
             positionMs={stream.positionMs}
@@ -136,12 +190,13 @@ export function AppShell({
     </div>
   );
 
-  const showLeftResizable = !docked;
-  const showRightResizable = hasContext && !contextDocked;
+  const showLeftResizable = !docked && !breakpoints.isMobile;
+  const showRightResizable =
+    hasContext && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
 
   return (
     <div className="flex h-dvh min-h-0 w-full overflow-hidden">
-      {docked ? (
+      {docked && !breakpoints.isMobile ? (
         <div
           data-docked="true"
           className="h-full flex-none border-r border-sidebar-border transition-[width] duration-200 ease-linear"
@@ -229,7 +284,7 @@ export function AppShell({
         mainContent
       )}
 
-      {hasContext && contextDocked ? (
+      {hasContext && (contextDocked || breakpoints.isTablet) && !breakpoints.isMobile ? (
         <div
           data-docked="true"
           className="h-full flex-none border-l border-sidebar-border transition-[width] duration-200 ease-linear"
@@ -237,6 +292,19 @@ export function AppShell({
         >
           <ContextPanel docked={true} onToggleDock={toggleContextDock} />
         </div>
+      ) : null}
+
+      {/* Slide-over overlay sheet for ContextPanel on tablet and mobile */}
+      {hasContext ? (
+        <Sheet open={contextSheetOpen} onOpenChange={setContextSheetOpen}>
+          <SheetContent
+            side="right"
+            className="w-[340px] max-w-[85vw] p-0 border-l border-border bg-background"
+            showCloseButton={false}
+          >
+            <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+          </SheetContent>
+        </Sheet>
       ) : null}
     </div>
   );

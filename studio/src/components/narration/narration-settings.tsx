@@ -174,13 +174,13 @@ export function NarrationSettings({
       {isAdapted ? (
         <div className="grid gap-2">
           <Label className="t-label">Document view</Label>
-          <div className="grid grid-cols-2 gap-1.5 rounded-lg border border-border bg-muted/40 p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-muted/50 p-1">
             <button
               type="button"
               aria-pressed={documentView === "adapted"}
               onClick={() => setDocumentView("adapted")}
               className={cn(
-                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[0.78rem] font-medium transition-all",
                 documentView === "adapted"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-ink-muted hover:text-foreground",
@@ -194,14 +194,14 @@ export function NarrationSettings({
                   documentView === "adapted" ? "text-primary" : "text-ink-faint",
                 )}
               />
-              <span>Audio adapted</span>
+              <span className="truncate">Audio adapted</span>
             </button>
             <button
               type="button"
               aria-pressed={documentView === "source"}
               onClick={() => setDocumentView("source")}
               className={cn(
-                "flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem] font-medium transition-all",
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[0.78rem] font-medium transition-all",
                 documentView === "source"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-ink-muted hover:text-foreground",
@@ -215,7 +215,7 @@ export function NarrationSettings({
                   documentView === "source" ? "text-primary" : "text-ink-faint",
                 )}
               />
-              <span>Source</span>
+              <span className="truncate">Source</span>
             </button>
           </div>
         </div>
@@ -223,7 +223,7 @@ export function NarrationSettings({
 
       <div className="grid gap-2">
         <Label className="t-label">Highlight color</Label>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-2 gap-1.5">
           {HIGHLIGHT_COLORS.map((preset) => {
             const selected = highlightColor === preset.id;
             return (
@@ -233,7 +233,7 @@ export function NarrationSettings({
                 aria-pressed={selected}
                 onClick={() => setHighlightColor(preset.id as HighlightColorId)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md border px-2 py-1 text-left text-[0.75rem] transition-all",
+                  "flex min-w-0 items-center gap-2 rounded-md border px-2 py-1.5 text-left text-[0.75rem] transition-all",
                   selected
                     ? "border-foreground bg-accent font-medium text-foreground"
                     : "border-border bg-card text-ink-muted hover:border-border-strong hover:text-foreground",
@@ -245,7 +245,7 @@ export function NarrationSettings({
                 >
                   Aa
                 </span>
-                <span className="truncate">{preset.label.split(" ")[0]}</span>
+                <span className="truncate font-medium">{preset.label.split(" ")[0]}</span>
               </button>
             );
           })}
@@ -306,10 +306,11 @@ export function NarrationSettings({
             </p>
           )}
 
-          <div className="grid grid-cols-[1fr_auto] gap-2">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
             <Input
               value={newPlaylistTitle}
-              placeholder="New playlist name…"
+              placeholder="New playlist…"
+              className="h-8 min-w-0 text-[0.8rem]"
               onChange={(event) => setNewPlaylistTitle(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
