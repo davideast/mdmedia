@@ -70,7 +70,6 @@ export function NarrationSettings({
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -593,11 +592,7 @@ export function NarrationSettings({
 
       <Dialog
         open={deleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!open && !isDeleting) {
-            setDeleteDialogOpen(false);
-          }
-        }}
+        onOpenChange={setDeleteDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
@@ -610,20 +605,14 @@ export function NarrationSettings({
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteNarration}
-              disabled={isDeleting}
             >
-              {isDeleting ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Trash2 size={13} strokeWidth={2} />
-              )}
+              <Trash2 size={13} strokeWidth={2} />
               <span>Delete</span>
             </Button>
           </DialogFooter>
