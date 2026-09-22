@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useGroupRef } from "react-resizable-panels";
@@ -13,7 +13,8 @@ import { AudioPlayerBar } from "@/components/reader/audio-player-bar";
 import { ContextPanel } from "@/components/shell/context-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { NavRail } from "@/components/shell/nav-rail";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { ShellContext, type ShellContextValue } from "@/components/shell/shell-context";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 
 const DOCK_KEY = "mdmedia.nav.docked.v1";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
@@ -76,9 +77,16 @@ export function AppShell({
   const isNarrationRoute = pathname.startsWith("/narration/");
   const [docked, setDocked] = useState(true);
   const [contextDocked, setContextDocked] = useState(false);
+  const [navSheetOpen, setNavSheetOpen] = useState(false);
   const [contextSheetOpen, setContextSheetOpen] = useState(false);
   const groupRef = useGroupRef();
   const isResizingRef = useRef(false);
+
+  // Close sheets upon route transition
+  useEffect(() => {
+    setNavSheetOpen(false);
+    setContextSheetOpen(false);
+  }, [pathname]);
 
   const busy = stream.status === "starting" || stream.status === "streaming";
   const showPlayerBar =
@@ -156,6 +164,58 @@ export function AppShell({
     });
   }, []);
 
+  const openNav = useCallback(() => setNavSheetOpen(true), []);
+  const closeNav = useCallback(() => setNavSheetOpen(false), []);
+  const toggleNav = useCallback(() => {
+    if (breakpoints.isMobile) {
+      setNavSheetOpen((prev) => !prev);
+    } else {
+      toggleDock();
+    }
+  }, [breakpoints.isMobile, toggleDock]);
+
+  const openContext = useCallback(() => setContextSheetOpen(true), []);
+  const closeContext = useCallback(() => setContextSheetOpen(false), []);
+  const toggleContext = useCallback(() => {
+    if (breakpoints.isMobile || breakpoints.isTablet) {
+      setContextSheetOpen((prev) => !prev);
+    } else {
+      toggleContextDock();
+    }
+  }, [breakpoints.isMobile, breakpoints.isTablet, toggleContextDock]);
+
+  const shellContextValue: ShellContextValue = useMemo(
+    () => ({
+      navSheetOpen,
+      openNav,
+      closeNav,
+      toggleNav,
+      showNavToggle: breakpoints.isMobile,
+      hasContext,
+      contextSheetOpen,
+      openContext,
+      closeContext,
+      toggleContext,
+      showContextToggle: hasContext && (breakpoints.isMobile || breakpoints.isTablet),
+      isMobile: breakpoints.isMobile,
+      isTablet: breakpoints.isTablet,
+      isMedium: breakpoints.isMedium,
+      isDesktop: breakpoints.isDesktop,
+    }),
+    [
+      navSheetOpen,
+      openNav,
+      closeNav,
+      toggleNav,
+      breakpoints,
+      hasContext,
+      contextSheetOpen,
+      openContext,
+      closeContext,
+      toggleContext,
+    ],
+  );
+
   const markResizeStart = useCallback(() => {
     isResizingRef.current = true;
   }, []);
@@ -195,117 +255,138 @@ export function AppShell({
     hasContext && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
 
   return (
-    <div className="flex h-dvh min-h-0 w-full overflow-hidden">
-      {docked && !breakpoints.isMobile ? (
-        <div
-          data-docked="true"
-          className="h-full flex-none border-r border-sidebar-border transition-[width] duration-200 ease-linear"
-          style={{ width: 56 }}
-        >
-          <NavRail docked={true} onToggleDock={toggleDock} />
-        </div>
-      ) : null}
+    <ShellContext.Provider value={shellContextValue}>
+      <div className="flex h-dvh min-h-0 w-full overflow-hidden">
+        {docked && !breakpoints.isMobile ? (
+          <div
+            data-docked="true"
+            className="h-full flex-none border-r border-sidebar-border transition-[width] duration-200 ease-linear"
+            style={{ width: 56 }}
+          >
+            <NavRail docked={true} onToggleDock={toggleDock} />
+          </div>
+        ) : null}
 
-      {showLeftResizable || showRightResizable ? (
-        <ResizablePanelGroup
-          key={`layout-${showLeftResizable ? "L" : "l"}-${showRightResizable ? "R" : "r"}`}
-          groupRef={groupRef}
-          orientation="horizontal"
-          className="min-w-0 flex-1"
-        >
-          {showLeftResizable ? (
-            <>
-              <ResizablePanel
-                id={NAV}
-                defaultSize="248px"
-                minSize="120px"
-                maxSize="340px"
-                groupResizeBehavior="preserve-pixel-size"
-                className="min-w-0"
-                onResize={(panelSize) => {
-                  if (
-                    isResizingRef.current &&
-                    panelSize.inPixels <= LEFT_DOCK_THRESHOLD_PX
-                  ) {
-                    isResizingRef.current = false;
-                    setLeftDocked(true);
-                  }
-                }}
-              >
-                <NavRail docked={false} onToggleDock={toggleDock} />
-              </ResizablePanel>
+        {showLeftResizable || showRightResizable ? (
+          <ResizablePanelGroup
+            key={`layout-${showLeftResizable ? "L" : "l"}-${showRightResizable ? "R" : "r"}`}
+            groupRef={groupRef}
+            orientation="horizontal"
+            className="min-w-0 flex-1"
+          >
+            {showLeftResizable ? (
+              <>
+                <ResizablePanel
+                  id={NAV}
+                  defaultSize="248px"
+                  minSize="120px"
+                  maxSize="340px"
+                  groupResizeBehavior="preserve-pixel-size"
+                  className="min-w-0"
+                  onResize={(panelSize) => {
+                    if (
+                      isResizingRef.current &&
+                      panelSize.inPixels <= LEFT_DOCK_THRESHOLD_PX
+                    ) {
+                      isResizingRef.current = false;
+                      setLeftDocked(true);
+                    }
+                  }}
+                >
+                  <NavRail docked={false} onToggleDock={toggleDock} />
+                </ResizablePanel>
 
-              <ResizableHandle
-                onPointerDown={markResizeStart}
-                onKeyDown={markResizeStart}
-                className="w-[7px] bg-sidebar-border transition-colors duration-150 hover:bg-border-strong data-[state=drag]:bg-border-strong"
-              >
-                <div className="pointer-events-none h-9 w-[3px] rounded-full bg-border-strong" />
-              </ResizableHandle>
-            </>
-          ) : null}
+                <ResizableHandle
+                  onPointerDown={markResizeStart}
+                  onKeyDown={markResizeStart}
+                  className="w-[7px] bg-sidebar-border transition-colors duration-150 hover:bg-border-strong data-[state=drag]:bg-border-strong"
+                >
+                  <div className="pointer-events-none h-9 w-[3px] rounded-full bg-border-strong" />
+                </ResizableHandle>
+              </>
+            ) : null}
 
-          <ResizablePanel id={MAIN} minSize="40%" className="min-w-0">
-            {mainContent}
-          </ResizablePanel>
+            <ResizablePanel id={MAIN} minSize="40%" className="min-w-0">
+              {mainContent}
+            </ResizablePanel>
 
-          {showRightResizable ? (
-            <>
-              <ResizableHandle
-                onPointerDown={markResizeStart}
-                onKeyDown={markResizeStart}
-                className="w-[7px] bg-border transition-colors duration-150 hover:bg-border-strong data-[state=drag]:bg-border-strong"
-              >
-                <div className="pointer-events-none h-9 w-[3px] rounded-full bg-border-strong" />
-              </ResizableHandle>
+            {showRightResizable ? (
+              <>
+                <ResizableHandle
+                  onPointerDown={markResizeStart}
+                  onKeyDown={markResizeStart}
+                  className="w-[7px] bg-border transition-colors duration-150 hover:bg-border-strong data-[state=drag]:bg-border-strong"
+                >
+                  <div className="pointer-events-none h-9 w-[3px] rounded-full bg-border-strong" />
+                </ResizableHandle>
 
-              <ResizablePanel
-                id={CONTEXT}
-                defaultSize="28%"
-                minSize="140px"
-                maxSize="44%"
-                className="min-w-0 border-l border-border"
-                onResize={(panelSize) => {
-                  if (
-                    isResizingRef.current &&
-                    panelSize.inPixels <= RIGHT_DOCK_THRESHOLD_PX
-                  ) {
-                    isResizingRef.current = false;
-                    setRightDocked(true);
-                  }
-                }}
-              >
-                <ContextPanel docked={false} onToggleDock={toggleContextDock} />
-              </ResizablePanel>
-            </>
-          ) : null}
-        </ResizablePanelGroup>
-      ) : (
-        mainContent
-      )}
+                <ResizablePanel
+                  id={CONTEXT}
+                  defaultSize="28%"
+                  minSize="140px"
+                  maxSize="44%"
+                  className="min-w-0 border-l border-border"
+                  onResize={(panelSize) => {
+                    if (
+                      isResizingRef.current &&
+                      panelSize.inPixels <= RIGHT_DOCK_THRESHOLD_PX
+                    ) {
+                      isResizingRef.current = false;
+                      setRightDocked(true);
+                    }
+                  }}
+                >
+                  <ContextPanel docked={false} onToggleDock={toggleContextDock} />
+                </ResizablePanel>
+              </>
+            ) : null}
+          </ResizablePanelGroup>
+        ) : (
+          mainContent
+        )}
 
-      {hasContext && (contextDocked || breakpoints.isTablet) && !breakpoints.isMobile ? (
-        <div
-          data-docked="true"
-          className="h-full flex-none border-l border-sidebar-border transition-[width] duration-200 ease-linear"
-          style={{ width: 56 }}
-        >
-          <ContextPanel docked={true} onToggleDock={toggleContextDock} />
-        </div>
-      ) : null}
+        {hasContext && contextDocked && !breakpoints.isTablet && !breakpoints.isMobile ? (
+          <div
+            data-docked="true"
+            className="h-full flex-none border-l border-sidebar-border transition-[width] duration-200 ease-linear"
+            style={{ width: 56 }}
+          >
+            <ContextPanel docked={true} onToggleDock={toggleContextDock} />
+          </div>
+        ) : null}
 
-      {/* Slide-over overlay sheet for ContextPanel on tablet and mobile */}
-      {hasContext ? (
-        <Sheet open={contextSheetOpen} onOpenChange={setContextSheetOpen}>
+        {/* Slide-over overlay sheet for NavRail on mobile */}
+        <Sheet open={navSheetOpen} onOpenChange={setNavSheetOpen}>
           <SheetContent
-            side="right"
-            className="w-[340px] max-w-[85vw] p-0 border-l border-border bg-background"
+            side="left"
+            className="w-[280px] max-w-[85vw] p-0 border-r border-border bg-sidebar"
             showCloseButton={false}
           >
-            <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <SheetDescription className="sr-only">Main application navigation rail</SheetDescription>
+            <NavRail
+              docked={false}
+              onToggleDock={() => setNavSheetOpen(false)}
+              onNavigate={() => setNavSheetOpen(false)}
+            />
           </SheetContent>
         </Sheet>
-      ) : null}
-    </div>
+
+        {/* Slide-over overlay sheet for ContextPanel on tablet and mobile */}
+        {hasContext ? (
+          <Sheet open={contextSheetOpen} onOpenChange={setContextSheetOpen}>
+            <SheetContent
+              side="right"
+              className="w-[340px] max-w-[85vw] p-0 border-l border-border bg-background"
+              showCloseButton={false}
+            >
+              <SheetTitle className="sr-only">Details</SheetTitle>
+              <SheetDescription className="sr-only">Narration and studio inspector panel</SheetDescription>
+              <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+            </SheetContent>
+          </Sheet>
+        ) : null}
+      </div>
+    </ShellContext.Provider>
   );
 }

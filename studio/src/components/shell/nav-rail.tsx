@@ -55,9 +55,11 @@ function isActive(pathname: string, item: NavItem): boolean {
 export function NavRail({
   docked,
   onToggleDock,
+  onNavigate,
 }: {
   docked: boolean;
   onToggleDock: () => void;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -79,7 +81,7 @@ export function NavRail({
         )}
       >
         {docked ? null : (
-          <Link href="/" className="min-w-0">
+          <Link href="/" onClick={onNavigate} className="min-w-0">
             <BrandMark className="text-[0.95rem]" />
           </Link>
         )}
@@ -112,6 +114,7 @@ export function NavRail({
           const link = (
             <Link
               href={item.href}
+              onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex h-[30px] items-center rounded-md text-[13px] transition-colors",
@@ -188,6 +191,7 @@ export function NavRail({
             <TooltipTrigger asChild>
               <Link
                 href={`/profile/${user.uid}`}
+                onClick={onNavigate}
                 className={cn(
                   "flex h-[30px] items-center rounded-md text-[13px] text-ink-muted transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                   docked ? "w-full justify-center" : "gap-2 px-2",
