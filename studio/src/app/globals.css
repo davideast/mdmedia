@@ -105,8 +105,8 @@
   --muted-foreground: #9da19e;
   --accent: rgba(255, 255, 255, 0.08);
   --accent-foreground: #f3f5f3;
-  --destructive: #f26969;
-  --destructive-foreground: #141615;
+  --destructive: #fca5a5;
+  --destructive-foreground: #2c0b14;
   --mint: #a7f3d0;
   --mint-bg: rgba(167, 243, 208, 0.15);
   --mint-fg: #a7f3d0;
@@ -157,8 +157,8 @@
     --muted-foreground: #9da19e;
     --accent: rgba(255, 255, 255, 0.08);
     --accent-foreground: #f3f5f3;
-    --destructive: #f26969;
-    --destructive-foreground: #141615;
+    --destructive: #fca5a5;
+    --destructive-foreground: #2c0b14;
     --mint: #a7f3d0;
     --mint-bg: rgba(167, 243, 208, 0.15);
     --mint-fg: #a7f3d0;
@@ -676,7 +676,7 @@
       minmax(var(--view-gutter), 1fr) [full-end];
     grid-template-rows:
       [gutter-top] 2rem
-      [view-content] auto
+      [view-content] max-content
       [gutter-bottom] 2rem;
     column-gap: 0;
     row-gap: 0;
@@ -702,7 +702,7 @@
   .view-grid-reader {
     grid-template-rows:
       [gutter-top] 2.5rem
-      [view-content] auto
+      [view-content] max-content
       [gutter-bottom] 10rem;
   }
 
@@ -712,11 +712,13 @@
     grid-row: view-content;
     display: grid;
     grid-template-columns: subgrid;
+    grid-auto-rows: max-content;
     row-gap: 1.5rem;
     min-width: 0;
     padding: 0;
     margin: 0;
     align-content: start;
+    align-items: start;
   }
 
   /* Direct children default to snapping inside the primary reading/content track */

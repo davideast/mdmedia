@@ -298,7 +298,7 @@ export default function QueuePage() {
           </Button>
         </div>
       ) : (
-        <>
+        <div className="grid gap-6">
           {/* Active section */}
           <section className="grid gap-3">
             <h2 className="t-label">
@@ -379,7 +379,7 @@ export default function QueuePage() {
               </div>
             </section>
           ) : null}
-        </>
+        </div>
       )}
     </WorkbenchPanel>
   );
