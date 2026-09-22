@@ -359,7 +359,7 @@ export function NarrationSettings({
           <div className="flex items-center justify-between gap-2">
             <Label className="t-label">Offline storage</Label>
             {isDownloaded ? (
-              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-500">
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-mint">
                 <Check size={11} strokeWidth={2.5} />
                 Downloaded
               </span>
@@ -396,7 +396,7 @@ export function NarrationSettings({
                   toast.error("Could not remove narration from offline storage.");
                 }
               }}
-              className="h-8 justify-start gap-2 text-[0.8rem] text-ink-muted hover:border-destructive/40 hover:text-destructive"
+              className="h-8 justify-start gap-2 text-[0.8rem] text-coral hover:border-coral/40 hover:bg-coral/10 hover:text-coral"
             >
               <Trash2 size={13} strokeWidth={2} />
               <span>Remove download</span>

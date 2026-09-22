@@ -165,7 +165,7 @@ function LibraryNarrationCard({
                 toast.error("Could not remove narration from offline storage.");
               }
             }}
-            className="h-7 px-2 text-xs text-emerald-500 hover:bg-muted hover:text-foreground"
+            className="h-7 px-2 text-xs text-mint hover:bg-muted hover:text-foreground"
             title="Downloaded to device (click to remove)"
             aria-label="Remove download"
           >
@@ -245,7 +245,7 @@ function LibraryNarrationCard({
           {isDownloaded ? (
             <>
               <span>&middot;</span>
-              <span className="inline-flex items-center gap-1 font-medium text-emerald-500">
+              <span className="inline-flex items-center gap-1 font-medium text-mint">
                 <Check size={11} strokeWidth={2.5} /> Offline ready
               </span>
             </>
