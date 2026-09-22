@@ -344,10 +344,14 @@ export class MediaStoreService implements MediaStore {
         await this.adapter.appendFile(audioFile, pcmBytes);
       },
       finalize: async (timings: NarrationTimingsFile) => {
-        // Patch WAV header with final pcm byte length
-        const patchedHeader = buildWavHeader(pcmTotalBytes);
-        await this.adapter.patchFile(audioFile, 0, patchedHeader);
-        // Write timings JSON
+        const placeholder = await this.adapter.readSlice(audioFile, 0, WAV_HEADER_SIZE);
+        if (placeholder) {
+          const patched = patchWavHeader(placeholder, pcmTotalBytes);
+          await this.adapter.patchFile(audioFile, 0, patched);
+        } else {
+          const freshHeader = buildWavHeader(pcmTotalBytes, 24000);
+          await this.adapter.patchFile(audioFile, 0, freshHeader);
+        }
         const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
         await this.adapter.writeFile(timingsFile, timingsBytes);
       },

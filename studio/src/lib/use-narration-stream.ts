@@ -357,9 +357,7 @@ export function useNarrationStream(): NarrationStreamState {
       if (session !== loadSessionRef.current) return;
 
       if (offlineTrack) {
-        if (offlineTrack.timings.title) {
-          setTitle((current) => (current.trim().length > 0 ? current : offlineTrack.timings.title));
-        }
+        setTitle(offlineTrack.timings.title || '');
         if (offlineTrack.timings.transcript) setTranscript(offlineTrack.timings.transcript);
         setChunks([...offlineTrack.timings.chunks].sort((a, b) => a.index - b.index));
 
@@ -370,6 +368,8 @@ export function useNarrationStream(): NarrationStreamState {
         } finally {
           URL.revokeObjectURL(objectUrl);
         }
+
+        if (session !== loadSessionRef.current) return;
 
         if (options?.autoPlay) {
           void activePlayer.play();

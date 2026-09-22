@@ -195,7 +195,7 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
 export async function deleteNarration(id: string): Promise<void> {
   await deleteDoc(doc(db(), 'narrations', id));
   try {
-    void getMediaStore().delete(id).catch(() => {});
+    await getMediaStore().delete(id).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }
