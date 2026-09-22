@@ -94,16 +94,12 @@ function ActiveJobCard({
 
         {/* Track: Metadata */}
         <div className="track-body">
-          <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.75rem] text-ink-muted">
             <span className="font-medium text-foreground">{job.voice}</span>
-            <span>&middot;</span>
             {job.rewriteForNarration ? (
-              <>
-                <span className="inline-flex items-center gap-1 text-primary">
-                  <Sparkles size={11} /> Adapted for ear
-                </span>
-                <span>&middot;</span>
-              </>
+              <span className="inline-flex items-center gap-1 text-primary">
+                <Sparkles size={11} /> Adapted for ear
+              </span>
             ) : null}
             <span>Started {relativeTime(job.createdAt)}</span>
           </div>
@@ -176,9 +172,8 @@ function CompletedJobCard({ job }: { job: GenerationJob }) {
 
       {/* Track: Metadata */}
       <div className="track-body">
-        <div className="flex items-center gap-2 text-[0.75rem] text-ink-muted">
+        <div className="flex items-center gap-x-2.5 text-[0.75rem] text-ink-muted">
           <span>{job.voice}</span>
-          <span>&middot;</span>
           <span>Ready {relativeTime(job.updatedAt)}</span>
         </div>
       </div>
@@ -346,9 +341,10 @@ export default function QueuePage() {
                       </Button>
                     </div>
                     <div className="track-body">
-                      <span className="text-[0.75rem] text-ink-muted">
-                        {n.voice} &middot; Synthesizing on server
-                      </span>
+                      <div className="flex items-center gap-x-2.5 text-[0.75rem] text-ink-muted">
+                        <span>{n.voice}</span>
+                        <span>Synthesizing on server</span>
+                      </div>
                     </div>
                   </div>
                 ))}

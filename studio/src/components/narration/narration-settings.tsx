@@ -359,20 +359,22 @@ export function NarrationSettings({
           <div className="flex items-center justify-between gap-2">
             <Label className="t-label">Offline storage</Label>
             {isDownloaded ? (
-              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-mint">
-                <Check size={11} strokeWidth={2.5} />
-                Downloaded
+              <span
+                title="Downloaded to device"
+                aria-label="Downloaded to device"
+                className="inline-flex items-center text-mint"
+              >
+                <Check size={13} strokeWidth={2.5} />
               </span>
             ) : isDownloading ? (
-              <span className="inline-flex items-center gap-1 font-mono text-[11px] text-primary">
-                <Loader2 size={11} className="animate-spin" />
-                Downloading…
+              <span
+                title="Downloading audio…"
+                aria-label="Downloading audio…"
+                className="inline-flex items-center text-primary"
+              >
+                <Loader2 size={13} className="animate-spin" />
               </span>
-            ) : (
-              <span className="font-mono text-[11px] text-ink-faint">
-                Cloud only
-              </span>
-            )}
+            ) : null}
           </div>
           <p className="text-[0.78rem] text-ink-muted leading-normal">
             {isDownloaded
@@ -396,7 +398,7 @@ export function NarrationSettings({
                   toast.error("Could not remove narration from offline storage.");
                 }
               }}
-              className="h-8 justify-start gap-2 text-[0.8rem] text-coral hover:border-coral/40 hover:bg-coral/10 hover:text-coral"
+              className="h-8 w-full justify-center gap-2 text-[0.8rem] text-destructive hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
             >
               <Trash2 size={13} strokeWidth={2} />
               <span>Remove download</span>
@@ -419,7 +421,7 @@ export function NarrationSettings({
                   toast.error("Could not download narration for offline listening.");
                 }
               }}
-              className="h-8 justify-start gap-2 text-[0.8rem]"
+              className="h-8 w-full justify-center gap-2 text-[0.8rem]"
             >
               {isDownloading ? (
                 <>

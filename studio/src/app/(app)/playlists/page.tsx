@@ -340,8 +340,9 @@ export default function PlaylistsPage() {
                           <>
                             <div className="flex items-center gap-2">
                               <h2 className="t-card-title truncate">{playlist.title}</h2>
-                              <span className="t-mono tabular-nums text-ink-faint">
-                                {tracks.length} {tracks.length === 1 ? "track" : "tracks"} · {formatDuration(totalMs)}
+                              <span className="inline-flex items-center gap-2.5 t-mono tabular-nums text-ink-faint">
+                                <span>{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
+                                <span>{formatDuration(totalMs)}</span>
                               </span>
                             </div>
                             {playlist.description ? (

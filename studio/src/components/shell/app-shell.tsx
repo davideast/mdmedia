@@ -220,12 +220,19 @@ export function AppShell({
     isResizingRef.current = true;
   }, []);
 
-  const subtitle = [
+  const subtitleItems = [
     stream.voice,
     queue ? `${queue.playlistTitle} (${queue.index + 1}/${queue.tracks.length})` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  ].filter(Boolean) as string[];
+
+  const subtitle =
+    subtitleItems.length > 0 ? (
+      <span className="inline-flex items-center gap-2">
+        {subtitleItems.map((item, idx) => (
+          <span key={idx}>{item}</span>
+        ))}
+      </span>
+    ) : undefined;
 
   const mainContent = (
     <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

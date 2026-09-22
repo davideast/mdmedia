@@ -226,29 +226,24 @@ function LibraryNarrationCard({
 
       {/* Track: Metadata tags */}
       <div className="track-body">
-        <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.75rem] text-ink-muted">
           <span className="font-medium text-foreground">{narration.voice}</span>
-          <span>&middot;</span>
           <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
-          <span>&middot;</span>
           <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
-          <span>&middot;</span>
           <span>{READABLE_VISIBILITY[narration.visibility]}</span>
           {narration.adapted ? (
-            <>
-              <span>&middot;</span>
-              <span className="inline-flex items-center gap-1 text-primary">
-                <Sparkles size={11} /> Adapted for ear
-              </span>
-            </>
+            <span className="inline-flex items-center gap-1 text-primary">
+              <Sparkles size={11} /> Adapted for ear
+            </span>
           ) : null}
           {isDownloaded ? (
-            <>
-              <span>&middot;</span>
-              <span className="inline-flex items-center gap-1 font-medium text-mint">
-                <Check size={11} strokeWidth={2.5} /> Offline ready
-              </span>
-            </>
+            <span
+              title="Downloaded to device"
+              aria-label="Downloaded to device"
+              className="inline-flex items-center text-mint"
+            >
+              <Check size={12} strokeWidth={2.5} />
+            </span>
           ) : null}
         </div>
       </div>

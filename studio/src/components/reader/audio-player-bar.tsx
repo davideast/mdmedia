@@ -225,7 +225,7 @@ export function AudioPlayerBar({
   /** Synthesis still running — the track is not yet its final length. */
   busy: boolean;
   title?: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
   href?: string;
   onPrevious?: () => void;
   onNext?: () => void;
@@ -299,7 +299,7 @@ export function AudioPlayerBar({
           </span>
         )}
         <span className="t-meta truncate text-[11px] leading-tight">
-          {subtitle && subtitle.length > 0 ? subtitle : busy ? "Synthesizing…" : "Narration"}
+          {subtitle ?? (busy ? "Synthesizing…" : "Narration")}
         </span>
       </div>
     </div>
