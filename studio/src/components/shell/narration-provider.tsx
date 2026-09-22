@@ -36,6 +36,7 @@ export interface Draft {
   voice: VoiceName;
   promptStyle: string;
   rewriteForNarration: boolean;
+  rewriteInstructions?: string;
   visibility: Visibility;
 }
 
@@ -121,6 +122,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       voice: settings.defaultVoice,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
+      rewriteInstructions: "",
       visibility: settings.defaultVisibility,
       ...overrides,
     }),

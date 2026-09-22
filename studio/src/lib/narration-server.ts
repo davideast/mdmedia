@@ -49,6 +49,7 @@ export interface NarrationRequest {
   voice: VoiceName;
   promptStyle: string;
   rewriteForNarration: boolean;
+  rewriteInstructions?: string;
   visibility: Visibility;
 }
 
@@ -76,6 +77,10 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
     voice: raw.voice,
     promptStyle: typeof raw.promptStyle === "string" ? raw.promptStyle : "",
     rewriteForNarration: raw.rewriteForNarration === true,
+    rewriteInstructions:
+      typeof raw.rewriteInstructions === "string" && raw.rewriteInstructions.trim().length > 0
+        ? raw.rewriteInstructions.trim()
+        : undefined,
     visibility: raw.visibility,
   };
 }
@@ -254,8 +259,10 @@ export function createNarrationStream({
        * replacing it, so all of its markdown-to-speech rules still apply.
        */
       const deliveryNote = request.promptStyle.trim();
+      const adaptationInstructions =
+        request.rewriteInstructions?.trim() || HEADING_GENERATION_NARRATION_PROMPT;
       const customPrompt = [
-        HEADING_GENERATION_NARRATION_PROMPT,
+        adaptationInstructions,
         deliveryNote.length > 0 ? `Delivery: ${deliveryNote}` : undefined,
       ]
         .filter(Boolean)

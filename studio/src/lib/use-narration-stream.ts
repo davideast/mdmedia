@@ -39,6 +39,7 @@ export interface NarrationStreamState {
     voice: VoiceName;
     promptStyle: string;
     rewriteForNarration: boolean;
+    rewriteInstructions?: string;
     visibility: Visibility;
   }) => Promise<void>;
   loadExisting: (id: string, options?: { autoPlay?: boolean }) => Promise<void>;

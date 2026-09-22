@@ -16,6 +16,7 @@ export interface GenerationJob {
   voice: VoiceName;
   promptStyle: string;
   rewriteForNarration: boolean;
+  rewriteInstructions?: string;
   visibility: Visibility;
   status: JobStatus;
   errorMessage: string | null;
@@ -34,6 +35,7 @@ export interface GenerationQueueState {
     voice: VoiceName;
     promptStyle: string;
     rewriteForNarration: boolean;
+    rewriteInstructions?: string;
     visibility: Visibility;
   }) => Promise<string>;
   cancelJob: (jobId: string) => void;
@@ -122,6 +124,7 @@ export function useGenerationQueue(): GenerationQueueState {
         voice: input.voice,
         promptStyle: input.promptStyle,
         rewriteForNarration: input.rewriteForNarration,
+        rewriteInstructions: input.rewriteInstructions,
         visibility: input.visibility,
         status: 'queued',
         errorMessage: null,
