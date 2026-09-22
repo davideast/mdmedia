@@ -19,8 +19,9 @@ import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
-import { watchMyNarrations } from "@/lib/narrations";
+import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
 import type { GenerationJob } from "@/lib/use-generation-queue";
 import type { Narration } from "@/lib/types";
 
@@ -255,6 +256,15 @@ export default function QueuePage() {
   const completedJobs = generationQueue.jobs.filter((j) => j.status === "ready");
   const failedJobs = generationQueue.jobs.filter((j) => j.status === "error");
 
+  const handleCancelOrphan = async (id: string) => {
+    try {
+      await deleteNarration(id);
+      toast.info("Generation cancelled and data deleted");
+    } catch {
+      toast.error("Could not cancel generation.");
+    }
+  };
+
   const totalActive = activeJobs.length + orphanStreamingNarrations.length;
   const hasJobs =
     generationQueue.jobs.length > 0 || orphanStreamingNarrations.length > 0;
@@ -338,6 +348,17 @@ export default function QueuePage() {
                           <span>View</span>
                           <ArrowUpRight size={12} />
                         </Link>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCancelOrphan(n.id)}
+                        className="h-7 px-2 text-xs text-ink-muted hover:text-destructive"
+                        title="Cancel generation"
+                      >
+                        <X size={13} strokeWidth={2} />
+                        <span className="sr-only">Cancel</span>
                       </Button>
                     </div>
                     <div className="track-body">

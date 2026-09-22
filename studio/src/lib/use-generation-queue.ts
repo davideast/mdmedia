@@ -2,8 +2,10 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { collection, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { deleteNarration } from './narrations';
 import type { StreamEvent, Visibility, VoiceName } from './types';
 
 export type JobStatus = 'queued' | 'starting' | 'streaming' | 'ready' | 'error';
@@ -81,16 +83,29 @@ export function useGenerationQueue(): GenerationQueueState {
   }, []);
 
   const cancelJob = useCallback(
-    (jobId: string) => {
+    async (jobId: string) => {
       const controller = controllersRef.current.get(jobId);
       if (controller) {
         controller.abort();
         controllersRef.current.delete(jobId);
       }
-      updateJob(jobId, { status: 'error', errorMessage: 'Cancelled by user' });
+
+      const job = jobsRef.current.find((j) => j.id === jobId);
+      const narrationId = job?.narrationId;
+
+      // Remove job immediately from local state so it does not spin or linger
+      setJobs((previous) => previous.filter((j) => j.id !== jobId));
       toast.info('Generation cancelled');
+
+      if (narrationId) {
+        try {
+          await deleteNarration(narrationId);
+        } catch (err) {
+          console.error('Failed to purge cancelled narration data:', err);
+        }
+      }
     },
-    [updateJob],
+    [],
   );
 
   const dismissJob = useCallback((jobId: string) => {
@@ -109,16 +124,18 @@ export function useGenerationQueue(): GenerationQueueState {
       voice: VoiceName;
       promptStyle: string;
       rewriteForNarration: boolean;
+      rewriteInstructions?: string;
       visibility: Visibility;
     }): Promise<string> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
+      const narrationId = doc(collection(db(), 'narrations')).id;
       const controller = new AbortController();
       controllersRef.current.set(jobId, controller);
 
       const title = deriveInitialTitle(input.markdown);
       const newJob: GenerationJob = {
         id: jobId,
-        narrationId: null,
+        narrationId,
         title,
         markdown: input.markdown,
         voice: input.voice,
@@ -161,16 +178,16 @@ export function useGenerationQueue(): GenerationQueueState {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(input),
+            body: JSON.stringify({ ...input, id: narrationId }),
           });
         } catch {
           if (controller.signal.aborted) {
-            updateJob(jobId, { status: 'error', errorMessage: 'Cancelled' });
-          } else {
-            const errorMsg = 'Failed to connect to narration service.';
-            updateJob(jobId, { status: 'error', errorMessage: errorMsg });
-            toast.error(errorMsg);
+            controllersRef.current.delete(jobId);
+            return;
           }
+          const errorMsg = 'Failed to connect to narration service.';
+          updateJob(jobId, { status: 'error', errorMessage: errorMsg });
+          toast.error(errorMsg);
           controllersRef.current.delete(jobId);
           return;
         }

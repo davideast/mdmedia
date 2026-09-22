@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const id = newNarrationId();
+  const id = parsed.id ?? newNarrationId();
   const stream = createNarrationStream({
     uid,
     id,

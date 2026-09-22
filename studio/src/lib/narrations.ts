@@ -18,6 +18,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  runTransaction,
   updateDoc,
   where,
   type DocumentData,
@@ -206,12 +207,48 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
 }
 
 export async function deleteNarration(id: string): Promise<void> {
-  await deleteDoc(doc(db(), 'narrations', id));
+  const user = auth().currentUser;
+  const token = user ? await user.getIdToken().catch(() => null) : null;
+
+  if (token) {
+    try {
+      const res = await fetch(`/api/narrations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        // Successfully purged on the server (transactional Firestore delete, storage cleanup, and playlist update)
+        try {
+          await removeOfflineNarration(id).catch(() => {});
+        } catch {}
+        return;
+      }
+    } catch {
+      // Fall back to client-side transactional delete if network fails
+    }
+  }
+
+  // Fallback: Client-side deletion within a transaction
+  try {
+    await runTransaction(db(), async (tx) => {
+      const ref = doc(db(), 'narrations', id);
+      const snap = await tx.get(ref);
+      if (snap.exists()) {
+        tx.delete(ref);
+      }
+    });
+  } catch {
+    await deleteDoc(doc(db(), 'narrations', id)).catch(() => {});
+  }
+
   try {
     await removeOfflineNarration(id).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }
+
   try {
     const currentUid = auth().currentUser?.uid;
     if (currentUid) {

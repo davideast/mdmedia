@@ -99,4 +99,57 @@ describe('Narration Deletion Logic', () => {
       expect(cancelled).toBe(false);
     });
   });
+
+  describe('Atomic Purge on Cancellation Policy', () => {
+    const { readFileSync } = require('node:fs');
+    const { resolve } = require('node:path');
+
+    const narrationServerSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/lib/narration-server.ts'),
+      'utf8',
+    );
+    const deleteRouteSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/app/api/narrations/[id]/route.ts'),
+      'utf8',
+    );
+    const useGenQueueSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/lib/use-generation-queue.ts'),
+      'utf8',
+    );
+    const queuePageSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/app/(app)/queue/page.tsx'),
+      'utf8',
+    );
+
+    it('implements purgeNarrationData on the server using a Firestore transaction', () => {
+      expect(narrationServerSource).toContain('export async function purgeNarrationData');
+      expect(narrationServerSource).toContain('adminDb().runTransaction');
+      expect(narrationServerSource).toContain('tx.delete(docRef)');
+      expect(narrationServerSource).toContain('audioObjectPath(uid, id)');
+      expect(narrationServerSource).toContain('timingsObjectPath(uid, id)');
+    });
+
+    it('aborts active synthesis streams when purgeNarrationData is invoked', () => {
+      expect(narrationServerSource).toContain('activeStreams');
+      expect(narrationServerSource).toContain('active.abort()');
+    });
+
+    it('exposes DELETE /api/narrations/[id] route calling purgeNarrationData with auth verification', () => {
+      expect(deleteRouteSource).toContain('verifyIdToken');
+      expect(deleteRouteSource).toContain('purgeNarrationData(id, uid)');
+      expect(deleteRouteSource).toContain('export async function DELETE');
+    });
+
+    it('pre-allocates narrationId so cancelJob can purge immediately without spinning', () => {
+      expect(useGenQueueSource).toContain('const narrationId = doc(collection(db(), \'narrations\')).id');
+      expect(useGenQueueSource).toContain('deleteNarration(narrationId)');
+      expect(useGenQueueSource).toContain('setJobs((previous) => previous.filter((j) => j.id !== jobId))');
+    });
+
+    it('provides cancel button on orphanStreamingNarrations in QueuePage to clean up stuck generations', () => {
+      expect(queuePageSource).toContain('handleCancelOrphan');
+      expect(queuePageSource).toContain('deleteNarration(id)');
+      expect(queuePageSource).toContain('title="Cancel generation"');
+    });
+  });
 });
