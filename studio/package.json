@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "pyric sandbox --hosted -- next dev --port 3000",
+    "dev:bg": "node scripts/dev-hosted.mjs start",
+    "dev:stop": "node scripts/dev-hosted.mjs stop",
+    "dev:restart": "node scripts/dev-hosted.mjs restart",
+    "dev:status": "node scripts/dev-hosted.mjs status",
+    "dev:logs": "node scripts/dev-hosted.mjs logs",
     "dev:direct": "next dev --port 3000",
     "build": "next build",
     "start": "next start",

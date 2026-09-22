@@ -17,4 +17,6 @@ examples/
 .loop/
 *.tsbuildinfo
 .env*.local
+.dev.pid
+.dev.log
 
