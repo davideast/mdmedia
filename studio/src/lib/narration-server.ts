@@ -47,17 +47,8 @@ const EMPTY_SOURCE_FAILURE =
   "There was nothing to narrate in this document. Add some text and try again.";
 const CANCELLED_MESSAGE = "This narration was cancelled before it finished.";
 
-/** The validated body of `POST /api/narrations`. */
-export interface NarrationRequest {
-  id?: string;
-  markdown: string;
-  voice: VoiceName;
-  promptStyle: string;
-  rewriteForNarration: boolean;
-  rewriteInstructions?: string;
-  visibility: Visibility;
-}
-
+import type { NarrationRequest } from './narration-request';
+export type { NarrationRequest };
 export { parseNarrationRequest } from './narration-request';
 
 /** A human title for the narration, taken from the document where possible. */
