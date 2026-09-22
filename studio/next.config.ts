@@ -72,16 +72,21 @@ export default async function buildConfig(): Promise<NextConfig> {
     // Production (or Pyric not installed): keep the `pyric-sdk-init` specifier
     // used by src/pyric-bootstrap/index.ts resolvable by pointing it at a local
     // empty module, so the build succeeds and ships no Pyric code.
-    const noop = path.join(__dirname, "src", "pyric-bootstrap", "init-noop.ts");
+    const noop = "./src/pyric-bootstrap/init-noop.ts";
+    const noopAbsolute = path.join(__dirname, "src", "pyric-bootstrap", "init-noop.ts");
     return {
       ...nextConfig,
-      turbopack: { ...(nextConfig.turbopack ?? {}), resolveAlias: { "pyric-sdk-init": noop } },
+      turbopack: {
+        ...(nextConfig.turbopack ?? {}),
+        root: __dirname,
+        resolveAlias: { "pyric-sdk-init": noop },
+      },
       webpack: (webpackConfig: any, options: any) => {
         if (!options.isServer) {
           webpackConfig.resolve = webpackConfig.resolve ?? {};
           webpackConfig.resolve.alias = {
             ...(webpackConfig.resolve.alias ?? {}),
-            "pyric-sdk-init": noop,
+            "pyric-sdk-init": noopAbsolute,
           };
         }
         return webpackConfig;

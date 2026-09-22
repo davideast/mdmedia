@@ -2,11 +2,10 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, doc } from 'firebase/firestore';
 import { toast } from 'sonner';
-import { auth, db } from './firebase';
-import { deleteNarration } from './narrations';
-import type { StreamEvent, Visibility, VoiceName } from './types';
+import { auth } from './firebase';
+import { deleteNarration, generateNarrationId } from './narrations';
+import type { NarrationErrorCategory, StreamEvent, Visibility, VoiceName } from './types';
 
 export type JobStatus = 'queued' | 'starting' | 'streaming' | 'ready' | 'error';
 
@@ -22,6 +21,11 @@ export interface GenerationJob {
   visibility: Visibility;
   status: JobStatus;
   errorMessage: string | null;
+  errorCode?: string;
+  errorCategory?: NarrationErrorCategory;
+  errorChunkIndex?: number;
+  errorActionableHint?: string;
+  errorRetryable?: boolean;
   totalChunks: number;
   completedChunks: number;
   totalChars: number;
@@ -40,6 +44,7 @@ export interface GenerationQueueState {
     rewriteInstructions?: string;
     visibility: Visibility;
   }) => Promise<string>;
+  retryJob: (jobId: string) => Promise<string | null>;
   cancelJob: (jobId: string) => void;
   dismissJob: (jobId: string) => void;
   clearCompleted: () => void;
@@ -128,7 +133,7 @@ export function useGenerationQueue(): GenerationQueueState {
       visibility: Visibility;
     }): Promise<string> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
-      const narrationId = doc(collection(db(), 'narrations')).id;
+      const narrationId = generateNarrationId();
       const controller = new AbortController();
       controllersRef.current.set(jobId, controller);
 
@@ -256,8 +261,19 @@ export function useGenerationQueue(): GenerationQueueState {
               updateJob(jobId, {
                 status: 'error',
                 errorMessage: event.message,
+                errorCode: event.code,
+                errorCategory: event.category,
+                errorChunkIndex: event.chunkIndex,
+                errorActionableHint: event.actionableHint,
+                errorRetryable: event.retryable,
               });
-              toast.error(`Narration "${currentJobTitle}" failed: ${event.message}`);
+              if (event.category === 'policy') {
+                toast.error(`Narration "${currentJobTitle}" blocked by safety policy`, {
+                  description: event.actionableHint || event.message,
+                });
+              } else {
+                toast.error(`Narration "${currentJobTitle}" failed: ${event.message}`);
+              }
               break;
             }
           }
@@ -317,10 +333,28 @@ export function useGenerationQueue(): GenerationQueueState {
     (job) => job.status === 'queued' || job.status === 'starting' || job.status === 'streaming',
   ).length;
 
+  const retryJob = useCallback(
+    async (jobId: string): Promise<string | null> => {
+      const existingJob = jobsRef.current.find((job) => job.id === jobId);
+      if (!existingJob) return null;
+      dismissJob(jobId);
+      return queueNarration({
+        markdown: existingJob.markdown,
+        voice: existingJob.voice,
+        promptStyle: existingJob.promptStyle,
+        rewriteForNarration: existingJob.rewriteForNarration,
+        rewriteInstructions: existingJob.rewriteInstructions,
+        visibility: existingJob.visibility,
+      });
+    },
+    [dismissJob, queueNarration],
+  );
+
   return {
     jobs,
     activeCount,
     queueNarration,
+    retryJob,
     cancelJob,
     dismissJob,
     clearCompleted,

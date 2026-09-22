@@ -29,6 +29,10 @@ import {
   type VoiceName,
 } from "./types";
 import { wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
+import {
+  classifyNarrationError,
+  type ClassifiedNarrationError,
+} from "./narration-errors";
 
 const MAX_CHUNK_CHARS = 400;
 const NARRATION_MODEL = "gemini-3.5-flash-lite";
@@ -73,8 +77,11 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   if (!isVoice(raw.voice)) return null;
   if (!isVisibility(raw.visibility)) return null;
 
+  const RESERVED_IDS = new Set(["narrations", "new", "settings", "playlists", "queue", "library"]);
   const customId =
-    typeof raw.id === "string" && /^[A-Za-z0-9_-]{10,128}$/.test(raw.id)
+    typeof raw.id === "string" &&
+    /^[A-Za-z0-9_-]{10,128}$/.test(raw.id) &&
+    !RESERVED_IDS.has(raw.id.toLowerCase())
       ? raw.id
       : undefined;
 
@@ -306,14 +313,23 @@ export function createNarrationStream({
 
   signal.addEventListener("abort", detachStream);
 
-  const failDocument = async (message: string) => {
+  const failDocument = async (error: ClassifiedNarrationError | string) => {
     if (!docWritten) return;
     try {
-      await docRef.update({
+      const updateData: Record<string, any> = {
         status: "error",
-        errorMessage: message,
         updatedAt: Date.now(),
-      });
+      };
+      if (typeof error === "string") {
+        updateData.errorMessage = error;
+      } else {
+        updateData.errorMessage = error.message;
+        updateData.errorCode = error.code;
+        updateData.errorCategory = error.category;
+        if (error.chunkIndex !== undefined) updateData.errorChunkIndex = error.chunkIndex;
+        if (error.actionableHint) updateData.errorActionableHint = error.actionableHint;
+      }
+      await docRef.update(updateData);
     } catch {
       // The stream is already terminating; a failed status write must not mask it.
     }
@@ -352,8 +368,46 @@ export function createNarrationStream({
   };
 
   const run = async () => {
+    let pipelineError: Error | null = null;
+    let currentProcessingChunkIndex: number | undefined = undefined;
+
     try {
       const client = createGeminiClient();
+
+      const author = await readAuthorProfile(uid);
+      const now = Date.now();
+      const initialTitle = deriveTitle(request.markdown, "");
+
+      // Seed the Firestore document immediately with status: "streaming" so that
+      // real-time listeners and security rules succeed from the outset, even while
+      // long-running adaptation or synthesis is underway.
+      const initialNarration: Narration = {
+        id,
+        ownerUid: uid,
+        title: initialTitle,
+        sourceMarkdown: request.markdown,
+        transcript: "",
+        voice: request.voice,
+        promptStyle: request.promptStyle,
+        adapted: request.rewriteForNarration,
+        status: "streaming",
+        durationMs: 0,
+        audioPath: "",
+        timingsPath: "",
+        visibility: request.visibility,
+        sharedWith: [],
+        authorName: author.name,
+        authorPhoto: author.photo,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await docRef.set(initialNarration);
+      docWritten = true;
+
+      if (cancelled) {
+        await purgeDocumentAndStorage();
+        return;
+      }
 
       /**
        * Delivery customization shapes both the script and the speech synthesis:
@@ -401,31 +455,12 @@ export function createNarrationStream({
 
       const { transcript, offsets } = buildTranscript(documentChunks);
       const title = deriveTitle(request.markdown, transcript);
-      const author = await readAuthorProfile(uid);
-      const now = Date.now();
 
-      const narration: Narration = {
-        id,
-        ownerUid: uid,
+      await docRef.update({
         title,
-        sourceMarkdown: request.markdown,
         transcript,
-        voice: request.voice,
-        promptStyle: request.promptStyle,
-        adapted: request.rewriteForNarration,
-        status: "streaming",
-        durationMs: 0,
-        audioPath: "",
-        timingsPath: "",
-        visibility: request.visibility,
-        sharedWith: [],
-        authorName: author.name,
-        authorPhoto: author.photo,
-        createdAt: now,
-        updatedAt: now,
-      };
-      await docRef.set(narration);
-      docWritten = true;
+        updatedAt: Date.now(),
+      });
 
       if (cancelled) {
         await purgeDocumentAndStorage();
@@ -462,7 +497,10 @@ export function createNarrationStream({
        * synthesis is indistinguishable from a successful one that produced no
        * audio, and the only symptom is a zero-byte result.
        */
-      let pipelineError: Error | null = null;
+      bus.on("chunk:start", ({ chunk }) => {
+        currentProcessingChunkIndex = chunk.index;
+      });
+
       bus.on("pipeline:error", ({ error }) => {
         pipelineError ??= error;
       });
@@ -578,8 +616,23 @@ export function createNarrationStream({
       }
       if (pipelineError !== null) throw pipelineError;
       if (totalBytes === 0) {
-        await failDocument(GENERIC_FAILURE);
-        queue.push({ type: "error", message: GENERIC_FAILURE });
+        const classified = classifyNarrationError(
+          pipelineError ?? new Error("No audio was generated for this document."),
+          {
+            currentChunkIndex: currentProcessingChunkIndex,
+            promptStyle: request.promptStyle,
+          }
+        );
+        await failDocument(classified);
+        queue.push({
+          type: "error",
+          message: classified.message,
+          code: classified.code,
+          category: classified.category,
+          chunkIndex: classified.chunkIndex,
+          actionableHint: classified.actionableHint,
+          retryable: classified.retryable,
+        });
         return;
       }
 
@@ -590,19 +643,24 @@ export function createNarrationStream({
         await purgeDocumentAndStorage();
         return;
       }
-      // The user-facing copy is intentionally vague, so this is the only place
-      // the real cause is visible. Development only — a deployed server should
-      // not spill provider internals into its logs on every failed synthesis.
       if (process.env.NODE_ENV !== "production") {
         console.error("[narration] synthesis failed:", error);
       }
-      const message =
-        error instanceof Error && error.message.includes("GEMINI_API_KEY")
-          ? MISSING_KEY_FAILURE
-          : GENERIC_FAILURE;
-      await failDocument(message);
+      const classified = classifyNarrationError(pipelineError ?? error, {
+        currentChunkIndex: currentProcessingChunkIndex,
+        promptStyle: request.promptStyle,
+      });
+      await failDocument(classified);
       await discardObjects();
-      queue.push({ type: "error", message });
+      queue.push({
+        type: "error",
+        message: classified.message,
+        code: classified.code,
+        category: classified.category,
+        chunkIndex: classified.chunkIndex,
+        actionableHint: classified.actionableHint,
+        retryable: classified.retryable,
+      });
     } finally {
       activeStreams.delete(id);
       signal.removeEventListener("abort", detachStream);

@@ -10,7 +10,9 @@ import {
   Clock,
   ListOrdered,
   Loader2,
+  PenLine,
   Play,
+  RotateCw,
   Sparkles,
   Trash2,
   X,
@@ -185,26 +187,61 @@ function CompletedJobCard({ job }: { job: GenerationJob }) {
 function FailedJobCard({
   job,
   onDismiss,
+  onEditInStudio,
+  onRetry,
 }: {
   job: GenerationJob;
   onDismiss: (id: string) => void;
+  onEditInStudio: (job: GenerationJob) => void;
+  onRetry: (id: string) => void;
 }) {
+  const isPolicy = job.errorCategory === "policy";
+
   return (
-    <div className="group item-track-grid rounded-lg border border-destructive/30 bg-destructive/5 p-3.5">
+    <div className="group item-track-grid rounded-lg border border-destructive/30 bg-destructive/5 p-4 shadow-2xs">
       {/* Track: Status */}
       <div className="track-status">
         <AlertCircle size={14} className="flex-none text-destructive" />
       </div>
 
       {/* Track: Title */}
-      <div className="track-title">
+      <div className="track-title flex items-center gap-2 flex-wrap">
         <span className="truncate text-[0.9rem] font-medium text-foreground">
           {job.title}
         </span>
+        {isPolicy && (
+          <span className="font-mono text-[0.68rem] uppercase tracking-wider text-destructive/90 font-medium">
+            Policy Block
+          </span>
+        )}
       </div>
 
       {/* Track: Actions */}
-      <div className="track-actions">
+      <div className="track-actions flex items-center gap-1.5">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onEditInStudio(job)}
+          className="h-7 gap-1 px-2.5 text-xs text-foreground hover:bg-background"
+          title="Open draft in Studio to edit prompt or text"
+        >
+          <PenLine size={12} />
+          <span>Edit in Studio</span>
+        </Button>
+        {job.errorRetryable && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onRetry(job.id)}
+            className="h-7 gap-1 px-2.5 text-xs text-foreground hover:bg-background"
+            title="Retry narration"
+          >
+            <RotateCw size={12} />
+            <span>Retry</span>
+          </Button>
+        )}
         <Button
           type="button"
           variant="ghost"
@@ -217,19 +254,41 @@ function FailedJobCard({
       </div>
 
       {/* Track: Error */}
-      <div className="track-body">
-        <p className="text-[0.75rem] text-destructive/80">
+      <div className="track-body space-y-1">
+        <p className="text-[0.8rem] text-destructive/90 leading-relaxed font-normal">
           {job.errorMessage || "Generation failed"}
         </p>
+        {job.errorActionableHint && (
+          <p className="text-[0.75rem] text-ink-muted leading-relaxed">
+            {job.errorActionableHint}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
 export default function QueuePage() {
+  const router = useRouter();
   const { user } = useAuth();
-  const { generationQueue } = useNarration();
+  const { generationQueue, setDraft } = useNarration();
   const [firestoreNarrations, setFirestoreNarrations] = useState<Narration[]>([]);
+
+  const handleEditInStudio = (job: GenerationJob) => {
+    setDraft({
+      markdown: job.markdown,
+      voice: job.voice,
+      promptStyle: job.promptStyle,
+      rewriteForNarration: job.rewriteForNarration,
+      rewriteInstructions: job.rewriteInstructions,
+      visibility: job.visibility,
+    });
+    router.push("/studio");
+  };
+
+  const handleRetry = (jobId: string) => {
+    void generationQueue.retryJob(jobId);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -395,6 +454,8 @@ export default function QueuePage() {
                     key={job.id}
                     job={job}
                     onDismiss={generationQueue.dismissJob}
+                    onEditInStudio={handleEditInStudio}
+                    onRetry={handleRetry}
                   />
                 ))}
               </div>
