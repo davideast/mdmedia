@@ -20,23 +20,30 @@ export class GeminiTTSProvider implements ITTSProvider {
 
     while (true) {
       try {
+        const trimmedStyle = promptStyle?.trim();
+        const formattedInput = trimmedStyle
+          ? `${trimmedStyle.startsWith('[') && trimmedStyle.endsWith(']') ? trimmedStyle : `[${trimmedStyle}]`}\n\n${text}`
+          : text;
+
         const payload: any = {
           model: this.model,
-          input: text,
+          input: formattedInput,
           response_format: { type: 'audio' },
           generation_config: {
             speech_config: [{ voice }],
           },
           stream: true,
         };
-        if (promptStyle) {
-          payload.system_instruction = promptStyle;
-        }
 
         const stream = await this.client.interactions.create(payload);
 
         const chunkBuffer: Uint8Array[] = [];
         for await (const event of stream as unknown as AsyncIterable<any>) {
+          if (event.event_type === 'error') {
+            throw new Error(
+              event.error?.message || 'Gemini TTS generation error from model'
+            );
+          }
           if (
             event.event_type === 'step.delta' &&
             event.delta?.type === 'audio' &&

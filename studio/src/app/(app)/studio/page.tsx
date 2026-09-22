@@ -60,6 +60,7 @@ export default function StudioPage() {
         voice: draft.voice,
         promptStyle: draft.promptStyle,
         rewriteForNarration: draft.rewriteForNarration,
+        rewriteInstructions: draft.rewriteInstructions?.trim() || undefined,
         visibility: draft.visibility,
       });
       setDraft({ markdown: "" });

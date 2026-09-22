@@ -18,6 +18,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  runTransaction,
   updateDoc,
   where,
   type DocumentData,
@@ -25,6 +26,7 @@ import {
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
 import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
@@ -190,15 +192,63 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
     title: trimmed,
     updatedAt: Date.now(),
   });
+  try {
+    const mediaStore = getMediaStore();
+    const timings = await mediaStore.getTimings(id);
+    if (timings && timings.title !== trimmed) {
+      await mediaStore.saveTimings(id, {
+        ...timings,
+        title: trimmed,
+      });
+    }
+  } catch {
+    // Non-fatal if offline media store cannot be patched
+  }
 }
 
 export async function deleteNarration(id: string): Promise<void> {
-  await deleteDoc(doc(db(), 'narrations', id));
+  const user = auth().currentUser;
+  const token = user ? await user.getIdToken().catch(() => null) : null;
+
+  if (token) {
+    try {
+      const res = await fetch(`/api/narrations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        // Successfully purged on the server (transactional Firestore delete, storage cleanup, and playlist update)
+        try {
+          await removeOfflineNarration(id).catch(() => {});
+        } catch {}
+        return;
+      }
+    } catch {
+      // Fall back to client-side transactional delete if network fails
+    }
+  }
+
+  // Fallback: Client-side deletion within a transaction
+  try {
+    await runTransaction(db(), async (tx) => {
+      const ref = doc(db(), 'narrations', id);
+      const snap = await tx.get(ref);
+      if (snap.exists()) {
+        tx.delete(ref);
+      }
+    });
+  } catch {
+    await deleteDoc(doc(db(), 'narrations', id)).catch(() => {});
+  }
+
   try {
     await removeOfflineNarration(id).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }
+
   try {
     const currentUid = auth().currentUser?.uid;
     if (currentUid) {

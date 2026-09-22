@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 import { useNarrationStream } from "@/lib/use-narration-stream";
 import type { NarrationStreamState } from "@/lib/use-narration-stream";
 import {
+  DEFAULT_HEADING_INSTRUCTIONS,
   DEFAULT_HIGHLIGHT_COLOR,
   DEFAULT_SETTINGS,
   HIGHLIGHT_COLORS,
@@ -36,6 +37,7 @@ export interface Draft {
   voice: VoiceName;
   promptStyle: string;
   rewriteForNarration: boolean;
+  rewriteInstructions?: string;
   visibility: Visibility;
 }
 
@@ -46,7 +48,7 @@ export interface PlaylistQueueState {
   index: number;
 }
 
-export type DocumentView = "adapted" | "source";
+export type DocumentView = "adapted" | "source" | "raw";
 
 interface NarrationContextValue {
   stream: NarrationStreamState;
@@ -121,6 +123,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       voice: settings.defaultVoice,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
+      rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,
       visibility: settings.defaultVisibility,
       ...overrides,
     }),
