@@ -33,6 +33,9 @@ export async function GET(
       return Response.json({ message: "That narration isn't available." }, { status: 404 });
     }
     const timings = JSON.parse(new TextDecoder().decode(bytes)) as NarrationTimingsFile;
+    if (narration.title) {
+      timings.title = narration.title;
+    }
     if (timings.sourceMarkdown === undefined && narration.sourceMarkdown) {
       timings.sourceMarkdown = narration.sourceMarkdown;
     }

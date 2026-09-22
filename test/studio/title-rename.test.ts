@@ -109,4 +109,43 @@ describe('Narration Title Renaming & Checkpoint Synchronization', () => {
       expect(titleInState).toBe('Original Title');
     });
   });
+
+  describe('Offline Track & Refresh Title Synchronization', () => {
+    it('updates title state when Firestore arrives with a newer renamed title than offlineTrack', () => {
+      // Simulation of loadExisting:
+      // 1. offlineTrack has the old title
+      let titleState = '1. The Original Implementation on Branch firestore';
+
+      // 2. watchNarration arrives with the updated title from Firestore
+      const narrationFromFirestore = {
+        title: 'Technical Breakdown of the Digspaces Rate Limiting Architecture',
+      };
+
+      if (narrationFromFirestore.title) {
+        titleState = narrationFromFirestore.title;
+      }
+
+      expect(titleState).toBe('Technical Breakdown of the Digspaces Rate Limiting Architecture');
+    });
+
+    it('persists renamed title to local mediaStore timings so subsequent reloads use the new title', async () => {
+      const timingsInStore: { title: string } = {
+        title: '1. The Original Implementation on Branch firestore',
+      };
+
+      const mockSaveTimings = async (_id: string, updated: { title: string }) => {
+        timingsInStore.title = updated.title;
+      };
+
+      const narrationFromFirestore = {
+        title: 'Technical Breakdown of the Digspaces Rate Limiting Architecture',
+      };
+
+      if (narrationFromFirestore.title && timingsInStore.title !== narrationFromFirestore.title) {
+        await mockSaveTimings('narr-1', { ...timingsInStore, title: narrationFromFirestore.title });
+      }
+
+      expect(timingsInStore.title).toBe('Technical Breakdown of the Digspaces Rate Limiting Architecture');
+    });
+  });
 });

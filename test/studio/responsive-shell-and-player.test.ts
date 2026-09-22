@@ -111,8 +111,9 @@ describe("Responsive Shell & Audio Player Architecture (intrinsic-ui-craft)", ()
 
   describe("NarrationSettings micro-layout responsiveness", () => {
     it("uses min-w-0 and truncate on Document View toggle buttons", () => {
-      expect(narrationSettings).toContain('className="truncate">Audio adapted</span>');
+      expect(narrationSettings).toContain('className="truncate">Adapted</span>');
       expect(narrationSettings).toContain('className="truncate">Source</span>');
+      expect(narrationSettings).toContain('className="truncate">Raw</span>');
     });
 
     it("uses a 2-column grid for highlight colors to prevent text truncation", () => {

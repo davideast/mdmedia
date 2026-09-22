@@ -260,6 +260,7 @@ export interface MediaStore {
   getTimings(narrationId: string): Promise<NarrationTimingsFile | null>;
   openWriter(narrationId: string): Promise<MediaWriter>;
   saveTrack(narrationId: string, audioBlob: Blob, timings: NarrationTimingsFile): Promise<void>;
+  saveTimings(narrationId: string, timings: NarrationTimingsFile): Promise<void>;
   delete(narrationId: string): Promise<void>;
   getStorageUsage(): Promise<{ usedBytes: number; quotaBytes: number }>;
 }
@@ -283,12 +284,16 @@ export class MediaStoreService implements MediaStore {
     return hasAudio && hasTimings;
   }
 
+  async saveTimings(narrationId: string, timings: NarrationTimingsFile): Promise<void> {
+    const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
+    await this.adapter.writeFile(this.timingsPath(narrationId), timingsBytes);
+  }
+
   async saveTrack(narrationId: string, audioBlob: Blob, timings: NarrationTimingsFile): Promise<void> {
     const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
-    const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
     await Promise.all([
       this.adapter.writeFile(this.audioPath(narrationId), audioBytes),
-      this.adapter.writeFile(this.timingsPath(narrationId), timingsBytes),
+      this.saveTimings(narrationId, timings),
     ]);
   }
 

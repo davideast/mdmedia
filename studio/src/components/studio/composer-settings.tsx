@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
-import { VOICES, type VoiceName, type Visibility } from "@/lib/types";
+import { DEFAULT_HEADING_INSTRUCTIONS, VOICES, type VoiceName, type Visibility } from "@/lib/types";
 import { SlidersHorizontal } from "lucide-react";
 
 const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string; hint: string }> = [
@@ -79,6 +79,22 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
           onCheckedChange={(checked) => setDraft({ rewriteForNarration: checked })}
         />
       </div>
+
+      {draft.rewriteForNarration ? (
+        <div className="grid gap-2">
+          <Label htmlFor="rewrite-instructions" className="t-label">
+            Custom instructions
+          </Label>
+          <Textarea
+            id="rewrite-instructions"
+            value={draft.rewriteInstructions ?? DEFAULT_HEADING_INSTRUCTIONS}
+            onChange={(event) => setDraft({ rewriteInstructions: event.target.value })}
+            rows={5}
+            className="resize-none font-mono text-[0.75rem] leading-relaxed"
+            placeholder="Custom instructions for adapting markdown..."
+          />
+        </div>
+      ) : null}
 
       <div className="grid gap-2">
         <Label htmlFor="visibility" className="t-label">

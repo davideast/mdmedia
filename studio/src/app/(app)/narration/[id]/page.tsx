@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { BookOpen, FileText, Loader2 } from "lucide-react";
+import { BookOpen, Check, Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/reader/follow-button";
 import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
@@ -93,6 +94,7 @@ export default function NarrationPage() {
     stream.setTitle(trimmed);
     try {
       await updateNarrationTitle(id, trimmed);
+      toast.success("Title updated");
     } catch {
       stream.setTitle(previousTitle);
       toast.error("Could not update title.");
@@ -103,6 +105,20 @@ export default function NarrationPage() {
 
   const busy = stream.status === "starting" || stream.status === "streaming";
   const empty = stream.transcript.length === 0;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAdapted = async () => {
+    if (!stream.transcript || stream.transcript.trim().length === 0) return;
+    try {
+      await navigator.clipboard.writeText(stream.transcript);
+      setCopied(true);
+      toast.success("Audio adapted document copied as markdown");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy markdown to clipboard.");
+    }
+  };
 
   const { showFollowButton, scrollToCurrent } = useReaderFollow({
     containerRef: scrollContainerRef,
@@ -124,7 +140,7 @@ export default function NarrationPage() {
         ) : null
       }
       icon={
-        documentView === "source" ? (
+        documentView === "source" || documentView === "raw" ? (
           <FileText size={13} strokeWidth={2} className="flex-none" />
         ) : (
           <BookOpen size={13} strokeWidth={2} className="flex-none" />
@@ -161,7 +177,28 @@ export default function NarrationPage() {
           </span>
         )
       }
-      actions={busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
+      actions={
+        <div className="flex items-center gap-1">
+          {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
+          {!empty ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyAdapted}
+              title={copied ? "Copied markdown" : "Copy audio adapted document as markdown"}
+              aria-label="Copy audio adapted document as markdown"
+              className="size-7 p-0 text-ink-muted hover:text-foreground"
+            >
+              {copied ? (
+                <Check size={13} strokeWidth={2.5} className="text-primary" />
+              ) : (
+                <Copy size={13} strokeWidth={2} />
+              )}
+            </Button>
+          ) : null}
+        </div>
+      }
     >
       {stream.status === "error" ? (
         <p className="text-[0.95rem] text-ink-muted">
@@ -172,10 +209,10 @@ export default function NarrationPage() {
           <Loader2 size={18} className="animate-spin text-ink-faint" />
           <span className="sr-only">Loading narration</span>
         </div>
-      ) : documentView === "source" ? (
+      ) : documentView === "source" || documentView === "raw" ? (
         <SourceDocumentView
           sourceMarkdown={stream.sourceMarkdown || ""}
-          onSwitchToAdapted={() => setDocumentView("adapted")}
+          viewMode={documentView === "raw" ? "raw" : "source"}
         />
       ) : (
         <Reader

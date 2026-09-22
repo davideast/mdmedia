@@ -45,10 +45,12 @@ const CANCELLED_MESSAGE = "This narration was cancelled before it finished.";
 
 /** The validated body of `POST /api/narrations`. */
 export interface NarrationRequest {
+  id?: string;
   markdown: string;
   voice: VoiceName;
   promptStyle: string;
   rewriteForNarration: boolean;
+  rewriteInstructions?: string;
   visibility: Visibility;
 }
 
@@ -71,11 +73,21 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   if (!isVoice(raw.voice)) return null;
   if (!isVisibility(raw.visibility)) return null;
 
+  const customId =
+    typeof raw.id === "string" && /^[A-Za-z0-9_-]{10,128}$/.test(raw.id)
+      ? raw.id
+      : undefined;
+
   return {
+    id: customId,
     markdown,
     voice: raw.voice,
     promptStyle: typeof raw.promptStyle === "string" ? raw.promptStyle : "",
     rewriteForNarration: raw.rewriteForNarration === true,
+    rewriteInstructions:
+      typeof raw.rewriteInstructions === "string" && raw.rewriteInstructions.trim().length > 0
+        ? raw.rewriteInstructions.trim()
+        : undefined,
     visibility: raw.visibility,
   };
 }
@@ -175,6 +187,80 @@ async function readAuthorProfile(uid: string): Promise<{ name: string; photo: st
   }
 }
 
+interface ActiveStream {
+  uid: string;
+  abort: () => void;
+}
+
+const activeStreams = new Map<string, ActiveStream>();
+
+/**
+ * Cancels and deletes an entire narration and its associated data (Firestore document,
+ * playlist references, and Storage assets) atomically in a transaction.
+ */
+export async function purgeNarrationData(
+  id: string,
+  uid: string,
+): Promise<{ deleted: boolean }> {
+  // 1. Abort any in-flight synthesis pipeline
+  const active = activeStreams.get(id);
+  if (active && active.uid === uid) {
+    active.abort();
+    activeStreams.delete(id);
+  }
+
+  const docRef = adminDb().collection("narrations").doc(id);
+
+  // 2. Atomic deletion in a Firestore transaction
+  await adminDb().runTransaction(async (tx) => {
+    const snap = await tx.get(docRef);
+    if (!snap.exists) return;
+    const data = snap.data();
+    if (data?.ownerUid && data.ownerUid !== uid) {
+      throw new Error("Forbidden: You do not own this narration.");
+    }
+    tx.delete(docRef);
+  });
+
+  // 3. Remove narration ID from any of the user's playlists in a transaction
+  try {
+    const playlistsSnap = await adminDb()
+      .collection("playlists")
+      .where("ownerUid", "==", uid)
+      .where("narrationIds", "array-contains", id)
+      .get();
+
+    if (!playlistsSnap.empty) {
+      await adminDb().runTransaction(async (tx) => {
+        for (const pDoc of playlistsSnap.docs) {
+          const pSnap = await tx.get(pDoc.ref);
+          if (pSnap.exists) {
+            const nextIds = ((pSnap.data()?.narrationIds as string[]) ?? []).filter(
+              (item) => item !== id,
+            );
+            tx.update(pDoc.ref, { narrationIds: nextIds, updatedAt: Date.now() });
+          }
+        }
+      });
+    }
+  } catch (err) {
+    console.error(`[narration] playlist cleanup failed for ${id}:`, err);
+  }
+
+  // 4. Delete Cloud Storage objects
+  try {
+    const bucket = adminBucket();
+    await Promise.allSettled([
+      bucket.file(audioObjectPath(uid, id)).delete({ ignoreNotFound: true }),
+      bucket.file(timingsObjectPath(uid, id)).delete({ ignoreNotFound: true }),
+    ]);
+  } catch (err) {
+    console.error(`[narration] storage cleanup failed for ${id}:`, err);
+  }
+
+  return { deleted: true };
+}
+
 interface StreamParams {
   uid: string;
   id: string;
@@ -200,8 +286,16 @@ export function createNarrationStream({
   const docRef = adminDb().collection("narrations").doc(id);
 
   let pipeline: DocumentAudioPipeline | null = null;
-  const cancelled = false;
+  let cancelled = false;
   let docWritten = false;
+
+  const abortStream = () => {
+    cancelled = true;
+    pipeline?.abort();
+    queue.close();
+  };
+
+  activeStreams.set(id, { uid, abort: abortStream });
 
   // Disconnecting the HTTP stream (e.g. a browser refresh) closes the live
   // NDJSON response queue, while `run()` continues in the background so the
@@ -225,6 +319,23 @@ export function createNarrationStream({
     }
   };
 
+  // Atomic purge helper for cancelled generations
+  const purgeDocumentAndStorage = async () => {
+    if (docWritten) {
+      try {
+        await adminDb().runTransaction(async (tx) => {
+          const snap = await tx.get(docRef);
+          if (snap.exists) {
+            tx.delete(docRef);
+          }
+        });
+      } catch {
+        // Best-effort if already deleted by purgeNarrationData
+      }
+    }
+    await discardObjects();
+  };
+
   // Best-effort cleanup, called only from the failure path. `adminBucket()`
   // itself can throw, and an escaping error here becomes an unhandled
   // rejection that masks whatever actually went wrong.
@@ -245,17 +356,19 @@ export function createNarrationStream({
       const client = createGeminiClient();
 
       /**
-       * The delivery note shapes the *script*, not the voice.
+       * Delivery customization shapes both the script and the speech synthesis:
        *
-       * The TTS model refuses a developer instruction outright — see the
-       * `processDocument` call below — so the only stage that can honour "warm,
-       * unhurried" is the rewrite, where it becomes phrasing, sentence length
-       * and punctuation. Appended to the SDK's default instruction rather than
-       * replacing it, so all of its markdown-to-speech rules still apply.
+       * 1. Script Adaptation: If rewrite is enabled, the delivery note informs
+       *    phrasing, sentence pacing, and vocabulary.
+       * 2. TTS Voice Synthesis: In `pipeline.processDocument`, the delivery note
+       *    is passed to `GeminiTTSProvider`, which supplies it as stage directions
+       *    to steer the voice persona, tone, and cadence without speaking them aloud.
        */
       const deliveryNote = request.promptStyle.trim();
+      const adaptationInstructions =
+        request.rewriteInstructions?.trim() || HEADING_GENERATION_NARRATION_PROMPT;
       const customPrompt = [
-        HEADING_GENERATION_NARRATION_PROMPT,
+        adaptationInstructions,
         deliveryNote.length > 0 ? `Delivery: ${deliveryNote}` : undefined,
       ]
         .filter(Boolean)
@@ -281,7 +394,10 @@ export function createNarrationStream({
         queue.push({ type: "error", message: EMPTY_SOURCE_FAILURE });
         return;
       }
-      if (cancelled) return;
+      if (cancelled) {
+        await purgeDocumentAndStorage();
+        return;
+      }
 
       const { transcript, offsets } = buildTranscript(documentChunks);
       const title = deriveTitle(request.markdown, transcript);
@@ -312,7 +428,7 @@ export function createNarrationStream({
       docWritten = true;
 
       if (cancelled) {
-        await failDocument(CANCELLED_MESSAGE);
+        await purgeDocumentAndStorage();
         return;
       }
 
@@ -453,11 +569,11 @@ export function createNarrationStream({
           .catch(() => undefined);
       });
 
-      await pipeline.processDocument(documentChunks, request.voice);
+      await pipeline.processDocument(documentChunks, request.voice, request.promptStyle);
       await checkpointChain;
 
       if (cancelled) {
-        await failDocument(CANCELLED_MESSAGE);
+        await purgeDocumentAndStorage();
         return;
       }
       if (pipelineError !== null) throw pipelineError;
@@ -470,6 +586,10 @@ export function createNarrationStream({
       const durationMs = (await persistSnapshot("ready")) ?? Math.round(totalBytes / BYTES_PER_MS);
       queue.push({ type: "done", id, durationMs });
     } catch (error) {
+      if (cancelled) {
+        await purgeDocumentAndStorage();
+        return;
+      }
       // The user-facing copy is intentionally vague, so this is the only place
       // the real cause is visible. Development only — a deployed server should
       // not spill provider internals into its logs on every failed synthesis.
@@ -480,10 +600,11 @@ export function createNarrationStream({
         error instanceof Error && error.message.includes("GEMINI_API_KEY")
           ? MISSING_KEY_FAILURE
           : GENERIC_FAILURE;
-      await failDocument(cancelled ? CANCELLED_MESSAGE : message);
+      await failDocument(message);
       await discardObjects();
-      if (!cancelled) queue.push({ type: "error", message });
+      queue.push({ type: "error", message });
     } finally {
+      activeStreams.delete(id);
       signal.removeEventListener("abort", detachStream);
       queue.close();
     }
