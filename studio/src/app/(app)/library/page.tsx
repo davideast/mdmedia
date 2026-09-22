@@ -89,36 +89,42 @@ function LibraryNarrationCard({
         }
       }}
       className={cn(
-        "group flex items-center justify-between gap-4 rounded-lg border p-3.5 transition-all cursor-pointer",
+        "group item-track-grid rounded-lg border p-3.5 transition-all cursor-pointer",
         isCurrentTrack
           ? "border-primary/40 bg-card shadow-2xs"
           : "border-border/80 bg-card/60 hover:border-border hover:bg-card",
       )}
     >
-      <div className="grid min-w-0 flex-1 gap-1">
-        {/* Title row with status icon */}
-        <div className="flex items-center gap-2">
-          {isCurrentTrack && isPlaying ? (
-            <Volume2 size={14} className="flex-none text-primary animate-pulse" />
-          ) : narration.status === "streaming" ? (
-            <Loader2 size={14} className="flex-none animate-spin text-primary" />
-          ) : (
-            <CheckCircle2 size={14} className="flex-none text-primary" />
-          )}
-          <span className="truncate text-[0.92rem] font-medium text-foreground group-hover:text-primary transition-colors">
-            {narration.title}
-          </span>
-        </div>
+      {/* Track: Status indicator */}
+      <div className="track-status">
+        {isCurrentTrack && isPlaying ? (
+          <Volume2 size={14} className="flex-none text-primary animate-pulse" />
+        ) : narration.status === "streaming" ? (
+          <Loader2 size={14} className="flex-none animate-spin text-primary" />
+        ) : (
+          <CheckCircle2 size={14} className="flex-none text-primary" />
+        )}
+      </div>
 
-        {/* Clean text excerpt */}
-        {cleanExcerpt ? (
-          <p className="line-clamp-1 pl-5.5 text-[0.8rem] text-ink-muted/80">
+      {/* Track: Title text */}
+      <div className="track-title">
+        <span className="block truncate text-[0.92rem] font-medium text-foreground group-hover:text-primary transition-colors">
+          {narration.title}
+        </span>
+      </div>
+
+      {/* Track: Excerpt text */}
+      {cleanExcerpt ? (
+        <div className="track-body">
+          <p className="line-clamp-1 text-[0.8rem] text-ink-muted/80">
             {cleanExcerpt}
           </p>
-        ) : null}
+        </div>
+      ) : null}
 
-        {/* Metadata row */}
-        <div className="flex flex-wrap items-center gap-2 pl-5.5 text-[0.75rem] text-ink-muted">
+      {/* Track: Metadata tags */}
+      <div className="track-body">
+        <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
           <span className="font-medium text-foreground">{narration.voice}</span>
           <span>&middot;</span>
           <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
@@ -137,8 +143,8 @@ function LibraryNarrationCard({
         </div>
       </div>
 
-      {/* Right-side actions */}
-      <div className="flex items-center gap-1.5 flex-none">
+      {/* Track: Action controls */}
+      <div className="track-actions">
         <Button
           type="button"
           variant="secondary"
@@ -216,65 +222,69 @@ export default function LibraryPage() {
     <WorkbenchPanel
       title="Library"
       icon={<Library size={13} strokeWidth={2} />}
-      bodyClassName="px-8 py-8"
+      viewGrid
     >
-      <div className="mx-auto grid w-full max-w-[68ch] gap-6">
-        <div className="relative">
-          <Search
-            size={15}
-            strokeWidth={2}
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
-          />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search your narrations…"
-            className="h-10 rounded-full pl-9"
-          />
-        </div>
+      <div className="relative">
+        <Search
+          size={15}
+          strokeWidth={2}
+          className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
+        />
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search your narrations…"
+          className="h-10 rounded-full pl-9"
+        />
+      </div>
 
-        {filtered.length === 0 ? (
-          items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-              <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
-                <Library size={24} strokeWidth={1.5} />
-              </div>
-              <div className="grid gap-1">
-                <h2 className="text-[1.05rem] font-semibold text-foreground">
-                  Library is empty
-                </h2>
-                <p className="max-w-sm text-[0.85rem] text-ink-muted">
-                  Anything you narrate in the Studio will appear here with instant audio replay, transcripts, and sharing.
-                </p>
-              </div>
-              <Button asChild variant="outline" size="sm" className="mt-2">
-                <Link href="/studio">Go to Studio</Link>
-              </Button>
+      {filtered.length === 0 ? (
+        items.length === 0 ? (
+          <div className="col-span-full grid place-items-center gap-3 py-12 text-center">
+            <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
+              <Library size={24} strokeWidth={1.5} />
             </div>
-          ) : (
-            <p className="t-lead pt-8 text-center">
-              No narration matches &ldquo;{query}&rdquo;.
-            </p>
-          )
+            <div className="grid gap-1">
+              <h2 className="text-[1.05rem] font-semibold text-foreground">
+                Library is empty
+              </h2>
+              <p className="max-w-sm text-[0.85rem] text-ink-muted">
+                Anything you narrate in the Studio will appear here with instant audio replay, transcripts, and sharing.
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/studio">Go to Studio</Link>
+            </Button>
+          </div>
         ) : (
-          <section className="grid gap-3">
+          <p className="t-lead text-center">
+            No narration matches &ldquo;{query}&rdquo;.
+          </p>
+        )
+      ) : (
+        <section className="grid gap-3">
+          <div className="flex items-center justify-between">
             <h2 className="t-label">
               Narrations ({filtered.length})
             </h2>
-            <div className="grid gap-2">
-              {filtered.map((item) => (
-                <LibraryNarrationCard
-                  key={item.id}
-                  narration={item}
-                  isCurrentTrack={stream.id === item.id}
-                  isPlaying={stream.playing}
-                  onDelete={setItemToDelete}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+            <span className="t-meta text-ink-faint">
+              {filtered.reduce((sum, item) => sum + item.chunksCount, 0)} paragraphs total
+            </span>
+          </div>
+
+          <div className="grid gap-2">
+            {filtered.map((item) => (
+              <LibraryNarrationCard
+                key={item.id}
+                narration={item}
+                isCurrentTrack={stream.id === item.id}
+                isPlaying={stream.playing}
+                onDelete={setItemToDelete}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <Dialog
         open={itemToDelete !== null}

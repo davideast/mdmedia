@@ -20,6 +20,8 @@ export function WorkbenchPanel({
   headerInnerClassName,
   bodyClassName,
   className,
+  viewGrid = false,
+  gridVariant = "content",
 }: {
   title?: string;
   titleNode?: ReactNode;
@@ -30,19 +32,30 @@ export function WorkbenchPanel({
   headerInnerClassName?: string;
   bodyClassName?: string;
   className?: string;
+  viewGrid?: boolean;
+  gridVariant?: "content" | "wide" | "full" | "reader";
 }) {
   return (
     <section className={cn("flex h-full min-h-0 min-w-0 flex-col bg-background", className)}>
       {title === undefined && titleNode === undefined ? null : (
         <header
           className={cn(
-            "flex h-11 flex-none items-center border-b border-border bg-surface-inset px-3",
+            "flex h-11 flex-none items-center border-b border-border bg-surface-inset",
+            viewGrid
+              ? "grid grid-cols-[[full-start]_minmax(1.5rem,1fr)_[wide-start]_minmax(0,8rem)_[content-start]_minmax(0,68ch)_[content-end]_minmax(0,8rem)_[wide-end]_minmax(1.5rem,1fr)_[full-end]] px-0"
+              : "px-3",
             headerClassName,
           )}
         >
           <div
             className={cn(
               "flex w-full min-w-0 items-center justify-between gap-1.5",
+              viewGrid &&
+                (gridVariant === "wide"
+                  ? "col-start-[wide-start] col-end-[wide-end]"
+                  : gridVariant === "full"
+                    ? "col-start-[full-start] col-end-[full-end] px-3"
+                    : "col-start-[content-start] col-end-[content-end]"),
               headerInnerClassName,
             )}
           >
@@ -58,11 +71,28 @@ export function WorkbenchPanel({
       )}
       <div
         className={cn(
-          "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden",
-          bodyClassName ?? "gap-2 p-3",
+          "min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
+          !viewGrid && "flex flex-col",
+          bodyClassName,
         )}
       >
-        {children}
+        {viewGrid ? (
+          <div className={cn("view-grid", gridVariant === "reader" && "view-grid-reader")}>
+            <div
+              className={cn(
+                "view-grid-body",
+                gridVariant === "wide" &&
+                  "[&>*]:col-start-[wide-start] [&>*]:col-end-[wide-end]",
+                gridVariant === "full" &&
+                  "[&>*]:col-start-[full-start] [&>*]:col-end-[full-end]",
+              )}
+            >
+              {children}
+            </div>
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </section>
   );

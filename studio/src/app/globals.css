@@ -635,3 +635,105 @@
     color: #0f172a;
   }
 }
+
+/* ==========================================================================
+   Modern CSS Grid View & Alignment Track Architecture
+   Eliminates layout padding and margins; defines strict alignment lines across the view.
+   ========================================================================== */
+
+@layer components {
+  /* Whole-view layout grid with named alignment tracks and intrinsic gutters */
+  .view-grid {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(1.5rem, 1fr)
+      [wide-start] minmax(0, 8rem)
+      [content-start] minmax(0, 68ch) [content-end]
+      minmax(0, 8rem) [wide-end]
+      minmax(1.5rem, 1fr) [full-end];
+    grid-template-rows:
+      [gutter-top] 2rem
+      [view-content] auto
+      [gutter-bottom] 2rem;
+    column-gap: 0;
+    row-gap: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 100%;
+    width: 100%;
+  }
+
+  /* Reader view grid with extra bottom clearance for the floating transport bar */
+  .view-grid-reader {
+    grid-template-rows:
+      [gutter-top] 2.5rem
+      [view-content] auto
+      [gutter-bottom] 10rem;
+  }
+
+  /* Subgrid body: inherits named column tracks directly from .view-grid */
+  .view-grid-body {
+    grid-column: full-start / full-end;
+    grid-row: view-content;
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: 1.5rem;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Direct children default to snapping inside the primary reading/content track */
+  .view-grid-body > * {
+    grid-column: content-start / content-end;
+  }
+
+  .view-grid-body > .col-wide {
+    grid-column: wide-start / wide-end;
+  }
+
+  .view-grid-body > .col-full {
+    grid-column: full-start / full-end;
+  }
+
+  /* Micro-track grid inside list items and cards for deterministic optical alignment */
+  .item-track-grid {
+    display: grid;
+    grid-template-columns:
+      [status-start] 1.25rem [status-end]
+      [text-start] minmax(0, 1fr) [text-end]
+      [action-start] auto [action-end];
+    column-gap: 0.75rem;
+    row-gap: 0.35rem;
+    align-items: center;
+  }
+
+  .item-track-grid .track-status {
+    grid-column: status-start / status-end;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .item-track-grid .track-title {
+    grid-column: text-start / text-end;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .item-track-grid .track-body {
+    grid-column: text-start / text-end;
+    min-width: 0;
+  }
+
+  .item-track-grid .track-actions {
+    grid-column: action-start / action-end;
+    grid-row: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    justify-self: end;
+  }
+}
+

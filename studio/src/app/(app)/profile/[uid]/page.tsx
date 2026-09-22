@@ -42,7 +42,7 @@ export default function ProfilePage() {
 
   if (!isSelf) {
     return (
-      <WorkbenchPanel title="Profile" icon={<UserRound size={13} strokeWidth={2} />} bodyClassName="p-8">
+      <WorkbenchPanel title="Profile" icon={<UserRound size={13} strokeWidth={2} />} viewGrid>
         <p className="t-lead">This profile is private.</p>
       </WorkbenchPanel>
     );
@@ -63,10 +63,10 @@ export default function ProfilePage() {
     <WorkbenchPanel
       title="Profile"
       icon={<UserRound size={13} strokeWidth={2} />}
-      bodyClassName="p-0"
+      viewGrid
+      gridVariant="wide"
     >
-      <div className="mx-auto grid w-full max-w-[52rem] gap-8 p-8">
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
           <Avatar className="size-16">
             <AvatarImage src={user.photoURL} alt="" />
             <AvatarFallback className="font-display text-[1.1rem]">
@@ -128,7 +128,6 @@ export default function ProfilePage() {
             value={String(items.filter((item) => item.visibility === "public").length)}
           />
         </div>
-      </div>
     </WorkbenchPanel>
   );
 }
