@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: no-client-run-transaction
+message: "Client-side runTransaction fails immediately when offline. Use direct optimistic mutations for offline-capable flows."
+severity: error
+language: tsx
+note: |
+  Firestore client-side transactions (`runTransaction`) require server network roundtrips for atomic verification.
+  When the client is offline or on an unstable connection, `runTransaction` throws an exception immediately.
+  
+  Remediation:
+  - For user-initiated mutations that must work offline, use direct optimistic mutations (deleteDoc, setDoc, updateDoc, arrayRemove, arrayUnion).
+  - If transactional concurrency guarantees are strictly required, delegate the operation to an authorized server endpoint (/api) using the Admin SDK.
+rule:
+  pattern: runTransaction($$$ARGS)
+ignores:
+  - "**/app/api/**"
+  - "**/api/**"
+  - "**/*server*"
+  - "**/firebase-admin*"
+  - "**/*.test.*"
+  - "**/test/**"
+  - "**/node_modules/**"
+  - "**/.next/**"

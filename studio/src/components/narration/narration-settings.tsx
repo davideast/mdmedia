@@ -70,7 +70,6 @@ export function NarrationSettings({
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -108,13 +107,11 @@ export function NarrationSettings({
 
   const commit = (visibility: Visibility, sharedWith: string[]) => {
     if (!narration) return;
-    startTransition(async () => {
-      try {
-        await updateVisibility(narration.id, visibility, sharedWith);
-      } catch {
-        toast.error("That change did not save. Try again.");
-      }
-    });
+    try {
+      updateVisibility(narration.id, visibility, sharedWith);
+    } catch {
+      toast.error("That change did not save. Try again.");
+    }
   };
 
   const addInvitee = () => {
@@ -149,33 +146,28 @@ export function NarrationSettings({
     if (!user || !effectiveId) return;
     const title = newPlaylistTitle.trim();
     if (title.length === 0) return;
-    startTransition(async () => {
-      try {
-        await createPlaylist(user.uid, title, "", [effectiveId]);
-        setNewPlaylistTitle("");
-        toast.success(`Created "${title}" and added narration`);
-      } catch {
-        toast.error("Could not create playlist.");
-      }
-    });
+    try {
+      createPlaylist(user.uid, title, "", [effectiveId]);
+      setNewPlaylistTitle("");
+      toast.success(`Created "${title}" and added narration`);
+    } catch {
+      toast.error("Could not create playlist.");
+    }
   };
 
-  const handleDeleteNarration = async () => {
+  const handleDeleteNarration = () => {
     const idToDelete = narration?.id ?? narrationId ?? stream.id;
     if (!idToDelete) return;
-    setIsDeleting(true);
-    try {
-      if (stream.id === idToDelete) {
-        stream.cancel();
-      }
-      await deleteNarration(idToDelete);
-      toast.success("Narration deleted.");
-      setDeleteDialogOpen(false);
-      router.push("/library");
-    } catch {
-      toast.error("Could not delete narration.");
-      setIsDeleting(false);
+    if (stream.id === idToDelete) {
+      stream.cancel();
     }
+    setDeleteDialogOpen(false);
+    router.push("/library");
+    toast.success("Narration deleted.");
+    void deleteNarration(idToDelete).catch((err) => {
+      console.error("Failed to delete narration:", err);
+      toast.error("Could not delete narration.");
+    });
   };
 
   const isAdapted = (narration?.adapted ?? stream.adapted) === true;
@@ -596,11 +588,7 @@ export function NarrationSettings({
 
       <Dialog
         open={deleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!open && !isDeleting) {
-            setDeleteDialogOpen(false);
-          }
-        }}
+        onOpenChange={setDeleteDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
@@ -613,20 +601,14 @@ export function NarrationSettings({
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteNarration}
-              disabled={isDeleting}
             >
-              {isDeleting ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Trash2 size={13} strokeWidth={2} />
-              )}
+              <Trash2 size={13} strokeWidth={2} />
               <span>Delete</span>
             </Button>
           </DialogFooter>

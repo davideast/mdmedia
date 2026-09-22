@@ -1,0 +1,32 @@
+id: no-awaited-firestore-mutation
+snapshots:
+  await addDoc(collectionRef, data):
+    labels:
+    - source: await addDoc(collectionRef, data)
+      style: primary
+      start: 0
+      end: 33
+  await batch.commit():
+    labels:
+    - source: await batch.commit()
+      style: primary
+      start: 0
+      end: 20
+  await deleteDoc(ref):
+    labels:
+    - source: await deleteDoc(ref)
+      style: primary
+      start: 0
+      end: 20
+  await setDoc(ref, data):
+    labels:
+    - source: await setDoc(ref, data)
+      style: primary
+      start: 0
+      end: 23
+  await updateDoc(ref, { title }):
+    labels:
+    - source: await updateDoc(ref, { title })
+      style: primary
+      start: 0
+      end: 31

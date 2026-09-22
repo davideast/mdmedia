@@ -248,7 +248,6 @@ export default function LibraryPage() {
   const [items, setItems] = useState<Narration[]>([]);
   const [query, setQuery] = useState("");
   const [itemToDelete, setItemToDelete] = useState<Narration | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (user === null) return;
@@ -273,21 +272,18 @@ export default function LibraryPage() {
     }, 0);
   }, [filtered]);
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!itemToDelete) return;
-    setIsDeleting(true);
-    try {
-      if (stream.id === itemToDelete.id) {
-        stream.cancel();
-      }
-      await deleteNarration(itemToDelete.id);
-      toast.success("Narration deleted.");
-      setItemToDelete(null);
-    } catch {
-      toast.error("Could not delete narration.");
-    } finally {
-      setIsDeleting(false);
+    const narrationId = itemToDelete.id;
+    if (stream.id === narrationId) {
+      stream.cancel();
     }
+    setItemToDelete(null);
+    toast.success("Narration deleted.");
+    void deleteNarration(narrationId).catch((err) => {
+      console.error("Failed to delete narration:", err);
+      toast.error("Could not delete narration.");
+    });
   };
 
   return (
@@ -361,7 +357,7 @@ export default function LibraryPage() {
       <Dialog
         open={itemToDelete !== null}
         onOpenChange={(open) => {
-          if (!open && !isDeleting) {
+          if (!open) {
             setItemToDelete(null);
           }
         }}
@@ -377,20 +373,14 @@ export default function LibraryPage() {
             <Button
               variant="outline"
               onClick={() => setItemToDelete(null)}
-              disabled={isDeleting}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
-              disabled={isDeleting}
             >
-              {isDeleting ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Trash2 size={13} strokeWidth={2} />
-              )}
+              <Trash2 size={13} strokeWidth={2} />
               <span>Delete</span>
             </Button>
           </DialogFooter>

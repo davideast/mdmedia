@@ -315,9 +315,9 @@ export default function QueuePage() {
   const completedJobs = generationQueue.jobs.filter((j) => j.status === "ready");
   const failedJobs = generationQueue.jobs.filter((j) => j.status === "error");
 
-  const handleCancelOrphan = async (id: string) => {
+  const handleCancelOrphan = (id: string) => {
     try {
-      await deleteNarration(id);
+      void deleteNarration(id);
       toast.info("Generation cancelled and data deleted");
     } catch {
       toast.error("Could not cancel generation.");

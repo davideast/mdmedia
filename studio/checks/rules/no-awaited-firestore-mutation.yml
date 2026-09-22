@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: no-awaited-firestore-mutation
+message: "Do not await client-side Firestore document mutations. Client mutations update the local cache immediately and sync in the background; awaiting them stalls the UI and breaks offline mechanics."
+severity: error
+language: tsx
+note: |
+  Under Firestore CQRS and offline-first principles, client mutations (deleteDoc, updateDoc, setDoc, addDoc, batch.commit)
+  dispatch synchronously to the local cache and queue writes for server synchronization in the background.
+  Awaiting them stalls UI transitions and will block indefinitely or fail when offline.
+  
+  Remediation:
+  - Treat mutations like dispatched actions: fire-and-forget or handle errors asynchronously via `void mutation().catch(...)`.
+  - For auto-generated IDs, pre-allocate with `doc(collection)` and use `setDoc` instead of awaiting `addDoc`.
+  - Close modals/dialogs immediately upon confirmation rather than showing deletion loading spinners.
+rule:
+  any:
+    - pattern: await deleteDoc($$$ARGS)
+    - pattern: await updateDoc($$$ARGS)
+    - pattern: await setDoc($$$ARGS)
+    - pattern: await addDoc($$$ARGS)
+    - pattern: await $BATCH.commit($$$ARGS)
+ignores:
+  - "**/app/api/**"
+  - "**/api/**"
+  - "**/*server*"
+  - "**/firebase-admin*"
+  - "**/*.test.*"
+  - "**/test/**"
+  - "**/node_modules/**"
+  - "**/.next/**"

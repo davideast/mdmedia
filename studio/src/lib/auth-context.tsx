@@ -137,13 +137,13 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
   const updateSettings = useCallback(async (patch: Partial<UserSettings>) => {
     const uid = uidRef.current;
     if (!uid) return;
-    await saveSettings(uid, patch);
+    saveSettings(uid, patch);
   }, []);
 
   const updateProfile = useCallback(async (patch: { displayName?: string; bio?: string }) => {
     const uid = uidRef.current;
     if (!uid) return;
-    await saveProfileFields(uid, patch);
+    saveProfileFields(uid, patch);
   }, []);
 
   const value = useMemo<AuthState>(
