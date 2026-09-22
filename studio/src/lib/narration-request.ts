@@ -7,10 +7,20 @@
 
 import {
   VOICES,
-  type NarrationRequest,
   type Visibility,
   type VoiceName,
 } from './types';
+
+/** The validated body of `POST /api/narrations`. */
+export interface NarrationRequest {
+  id?: string;
+  markdown: string;
+  voice: VoiceName;
+  promptStyle: string;
+  rewriteForNarration: boolean;
+  rewriteInstructions?: string;
+  visibility: Visibility;
+}
 
 const VISIBILITIES: readonly Visibility[] = ['private', 'shared', 'public'];
 
