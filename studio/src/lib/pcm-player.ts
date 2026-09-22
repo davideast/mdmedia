@@ -9,12 +9,15 @@
  */
 
 import { SAMPLE_RATE, WAV_HEADER_BYTES } from "./types";
+import { timeStretchWsola } from "./wsola";
 
 const MIN_RATE = 0.5;
 const MAX_RATE = 2.5;
 const INITIAL_CAPACITY = SAMPLE_RATE * 30;
 /** How long to wait for more audio after the buffer drains before calling it the end. */
 const STARVE_GRACE_MS = 600;
+const MAX_QUEUED_SOURCES = 2;
+const BATCH_SAMPLES = SAMPLE_RATE * 8; // 8 seconds per scheduled buffer
 
 export interface PcmPlayerState {
   positionMs: number;
@@ -303,43 +306,58 @@ export class StreamingPcmPlayer {
     this.pump();
   }
 
-  /** Schedules every sample that has arrived but not yet been queued. */
+  /** Schedules samples that have arrived using pitch-preserving WSOLA time stretching. */
   private pump(): void {
     const context = this.context;
     const gain = this.gain;
     if (!context || !gain || !this.isPlaying) return;
 
-    const pending = this.sampleCount - this.scheduledSamples;
-    if (pending <= 0) return;
+    while (this.sources.size < MAX_QUEUED_SOURCES && this.scheduledSamples < this.sampleCount) {
+      const pending = this.sampleCount - this.scheduledSamples;
+      if (pending <= 0) break;
 
-    this.clearStarveTimer();
+      const batchSize = Math.min(pending, BATCH_SAMPLES);
+      const chunkEnd = this.scheduledSamples + batchSize;
+      const rawChunk = this.samples.subarray(this.scheduledSamples, chunkEnd);
 
-    const buffer = context.createBuffer(1, pending, SAMPLE_RATE);
-    buffer.copyToChannel(
-      this.samples.subarray(this.scheduledSamples, this.sampleCount),
-      0,
-    );
+      const processed =
+        this.rateValue === 1.0
+          ? rawChunk
+          : timeStretchWsola(rawChunk, this.rateValue, SAMPLE_RATE);
 
-    const startAt = Math.max(context.currentTime, this.nextStartTime);
-    if (startAt > this.nextStartTime + 0.001) {
-      // The buffer ran dry: re-anchor so position tracks the audio again.
-      this.anchorMs = (this.scheduledSamples / SAMPLE_RATE) * 1000;
-      this.anchorCtxTime = startAt;
+      if (processed.length === 0) {
+        this.scheduledSamples = chunkEnd;
+        continue;
+      }
+
+      this.clearStarveTimer();
+
+      const buffer = context.createBuffer(1, processed.length, SAMPLE_RATE);
+      buffer.copyToChannel(processed, 0);
+
+      const startAt = Math.max(context.currentTime, this.nextStartTime);
+      if (startAt > this.nextStartTime + 0.001) {
+        // The buffer ran dry: re-anchor so position tracks the audio again.
+        this.anchorMs = (this.scheduledSamples / SAMPLE_RATE) * 1000;
+        this.anchorCtxTime = startAt;
+      }
+
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      // Normal 1.0 playback rate on the Web Audio node: WSOLA has already time-stretched
+      // the PCM buffer, preserving natural vocal pitch and preventing the chipmunk effect.
+      source.playbackRate.value = 1.0;
+      source.connect(gain);
+      source.onended = () => {
+        this.sources.delete(source);
+        this.handleSegmentEnd();
+      };
+      source.start(startAt);
+
+      this.sources.add(source);
+      this.scheduledSamples = chunkEnd;
+      this.nextStartTime = startAt + buffer.duration;
     }
-
-    const source = context.createBufferSource();
-    source.buffer = buffer;
-    source.playbackRate.value = this.rateValue;
-    source.connect(gain);
-    source.onended = () => {
-      this.sources.delete(source);
-      this.handleSegmentEnd();
-    };
-    source.start(startAt);
-
-    this.sources.add(source);
-    this.scheduledSamples = this.sampleCount;
-    this.nextStartTime = startAt + buffer.duration / this.rateValue;
   }
 
   private handleSegmentEnd(): void {

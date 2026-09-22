@@ -18,6 +18,8 @@ export function WorkbenchPanel({
   icon,
   actions,
   children,
+  floating,
+  scrollRef,
   headerClassName,
   headerInnerClassName,
   bodyClassName,
@@ -30,6 +32,8 @@ export function WorkbenchPanel({
   icon?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
+  floating?: ReactNode;
+  scrollRef?: React.Ref<HTMLDivElement>;
   headerClassName?: string;
   headerInnerClassName?: string;
   bodyClassName?: string;
@@ -40,7 +44,7 @@ export function WorkbenchPanel({
   const shell = useOptionalShell();
 
   return (
-    <section className={cn("flex h-full min-h-0 min-w-0 flex-col bg-background", className)}>
+    <section className={cn("relative flex h-full min-h-0 min-w-0 flex-col bg-background", className)}>
       {title === undefined && titleNode === undefined ? null : (
         <header
           className={cn(
@@ -102,6 +106,7 @@ export function WorkbenchPanel({
         </header>
       )}
       <div
+        ref={scrollRef}
         className={cn(
           "min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
           !viewGrid && "flex flex-col",
@@ -126,6 +131,7 @@ export function WorkbenchPanel({
           children
         )}
       </div>
+      {floating}
     </section>
   );
 }
