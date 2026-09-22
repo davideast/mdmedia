@@ -58,46 +58,7 @@ export interface NarrationRequest {
   visibility: Visibility;
 }
 
-const VISIBILITIES: readonly Visibility[] = ["private", "shared", "public"];
-
-function isVoice(value: unknown): value is VoiceName {
-  return typeof value === "string" && (VOICES as readonly string[]).includes(value);
-}
-
-function isVisibility(value: unknown): value is Visibility {
-  return typeof value === "string" && (VISIBILITIES as readonly string[]).includes(value);
-}
-
-/** Returns the validated request body, or `null` when it is unusable. */
-export function parseNarrationRequest(body: unknown): NarrationRequest | null {
-  if (typeof body !== "object" || body === null) return null;
-  const raw = body as Record<string, unknown>;
-  const markdown = typeof raw.markdown === "string" ? raw.markdown : "";
-  if (markdown.trim().length === 0) return null;
-  if (!isVoice(raw.voice)) return null;
-  if (!isVisibility(raw.visibility)) return null;
-
-  const RESERVED_IDS = new Set(["narrations", "new", "settings", "playlists", "queue", "library"]);
-  const customId =
-    typeof raw.id === "string" &&
-    /^[A-Za-z0-9_-]{10,128}$/.test(raw.id) &&
-    !RESERVED_IDS.has(raw.id.toLowerCase())
-      ? raw.id
-      : undefined;
-
-  return {
-    id: customId,
-    markdown,
-    voice: raw.voice,
-    promptStyle: typeof raw.promptStyle === "string" ? raw.promptStyle : "",
-    rewriteForNarration: raw.rewriteForNarration === true,
-    rewriteInstructions:
-      typeof raw.rewriteInstructions === "string" && raw.rewriteInstructions.trim().length > 0
-        ? raw.rewriteInstructions.trim()
-        : undefined,
-    visibility: raw.visibility,
-  };
-}
+export { parseNarrationRequest } from './narration-request';
 
 /** A human title for the narration, taken from the document where possible. */
 export function deriveTitle(markdown: string, fallbackText: string): string {
