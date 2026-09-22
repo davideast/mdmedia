@@ -333,7 +333,7 @@ export class StreamingPcmPlayer {
       this.clearStarveTimer();
 
       const buffer = context.createBuffer(1, processed.length, SAMPLE_RATE);
-      buffer.copyToChannel(processed, 0);
+      buffer.copyToChannel(processed as Float32Array<ArrayBuffer>, 0);
 
       const startAt = Math.max(context.currentTime, this.nextStartTime);
       if (startAt > this.nextStartTime + 0.001) {
