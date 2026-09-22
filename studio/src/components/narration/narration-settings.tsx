@@ -160,22 +160,19 @@ export function NarrationSettings({
     });
   };
 
-  const handleDeleteNarration = async () => {
+  const handleDeleteNarration = () => {
     const idToDelete = narration?.id ?? narrationId ?? stream.id;
     if (!idToDelete) return;
-    setIsDeleting(true);
-    try {
-      if (stream.id === idToDelete) {
-        stream.cancel();
-      }
-      await deleteNarration(idToDelete);
-      toast.success("Narration deleted.");
-      setDeleteDialogOpen(false);
-      router.push("/library");
-    } catch {
-      toast.error("Could not delete narration.");
-      setIsDeleting(false);
+    if (stream.id === idToDelete) {
+      stream.cancel();
     }
+    setDeleteDialogOpen(false);
+    router.push("/library");
+    toast.success("Narration deleted.");
+    void deleteNarration(idToDelete).catch((err) => {
+      console.error("Failed to delete narration:", err);
+      toast.error("Could not delete narration.");
+    });
   };
 
   const isAdapted = (narration?.adapted ?? stream.adapted) === true;

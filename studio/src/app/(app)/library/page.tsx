@@ -273,21 +273,18 @@ export default function LibraryPage() {
     }, 0);
   }, [filtered]);
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!itemToDelete) return;
-    setIsDeleting(true);
-    try {
-      if (stream.id === itemToDelete.id) {
-        stream.cancel();
-      }
-      await deleteNarration(itemToDelete.id);
-      toast.success("Narration deleted.");
-      setItemToDelete(null);
-    } catch {
-      toast.error("Could not delete narration.");
-    } finally {
-      setIsDeleting(false);
+    const narrationId = itemToDelete.id;
+    if (stream.id === narrationId) {
+      stream.cancel();
     }
+    setItemToDelete(null);
+    toast.success("Narration deleted.");
+    void deleteNarration(narrationId).catch((err) => {
+      console.error("Failed to delete narration:", err);
+      toast.error("Could not delete narration.");
+    });
   };
 
   return (

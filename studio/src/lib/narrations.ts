@@ -9,6 +9,7 @@
  */
 
 import {
+  arrayRemove,
   collection,
   deleteDoc,
   doc,
@@ -18,7 +19,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  runTransaction,
   updateDoc,
   where,
   type DocumentData,
@@ -219,67 +219,65 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
 }
 
 export async function deleteNarration(id: string): Promise<void> {
-  const user = auth().currentUser;
-  const token = user ? await user.getIdToken().catch(() => null) : null;
+  // 1. Optimistic direct client-side Firestore document deletion.
+  // Firestore mutations update the local cache immediately, notifying active onSnapshot
+  // listeners synchronously, and queue the write for server sync with rollback capabilities.
+  // We explicitly avoid client-side transactions because transactions require
+  // active server connectivity and fail when offline.
+  const narrationRef = doc(db(), 'narrations', id);
+  void deleteDoc(narrationRef).catch((err) => {
+    console.error(`[narrations] failed to delete narration ${id}:`, err);
+  });
 
-  if (token) {
-    try {
-      const res = await fetch(`/api/narrations/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (res.ok) {
-        // Successfully purged on the server (transactional Firestore delete, storage cleanup, and playlist update)
-        try {
-          await removeOfflineNarration(id).catch(() => {});
-        } catch {}
-        return;
-      }
-    } catch {
-      // Fall back to client-side transactional delete if network fails
-    }
-  }
-
-  // Fallback: Client-side deletion within a transaction
-  try {
-    await runTransaction(db(), async (tx) => {
-      const ref = doc(db(), 'narrations', id);
-      const snap = await tx.get(ref);
-      if (snap.exists()) {
-        tx.delete(ref);
-      }
-    });
-  } catch {
-    await deleteDoc(doc(db(), 'narrations', id)).catch(() => {});
-  }
-
+  // 2. Clean up local OPFS offline track immediately (non-fatal if missing)
   try {
     await removeOfflineNarration(id).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }
 
-  try {
-    const currentUid = auth().currentUser?.uid;
-    if (currentUid) {
-      const q = query(
-        collection(db(), 'playlists'),
-        where('ownerUid', '==', currentUid),
-        where('narrationIds', 'array-contains', id),
-      );
-      const snap = await getDocs(q);
-      await Promise.all(
-        snap.docs.map((pDoc) => {
-          const nextIds = ((pDoc.data().narrationIds as string[]) ?? []).filter((item) => item !== id);
-          return updateDoc(pDoc.ref, { narrationIds: nextIds, updatedAt: Date.now() });
-        }),
-      );
-    }
-  } catch {
-    // Non-fatal if playlist cleanup encounters an issue
+  // 3. Optimistically remove the narration from user's playlists
+  const currentUid = auth().currentUser?.uid;
+  if (currentUid) {
+    void (async () => {
+      try {
+        const q = query(
+          collection(db(), 'playlists'),
+          where('ownerUid', '==', currentUid),
+          where('narrationIds', 'array-contains', id),
+        );
+        const snap = await getDocs(q);
+        await Promise.all(
+          snap.docs.map((pDoc) =>
+            updateDoc(pDoc.ref, {
+              narrationIds: arrayRemove(id),
+              updatedAt: Date.now(),
+            }),
+          ),
+        );
+      } catch (err) {
+        console.warn(`[narrations] playlist cleanup failed for ${id}:`, err);
+      }
+    })();
   }
+
+  // 4. Out-of-band server purge for Cloud Storage assets & in-flight stream cancellation.
+  // Dispatched in the background without blocking the caller or breaking offline support.
+  void (async () => {
+    try {
+      const user = auth().currentUser;
+      const token = user ? await user.getIdToken().catch(() => null) : null;
+      if (!token) return;
+      await fetch(`/api/narrations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      console.warn(`[narrations] background storage purge for ${id} failed:`, err);
+    }
+  })();
 }
 
 /**
