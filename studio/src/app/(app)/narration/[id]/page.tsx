@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { BookOpen, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { FollowButton } from "@/components/reader/follow-button";
 import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
+import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { updateNarrationTitle } from "@/lib/narrations";
@@ -17,6 +19,7 @@ export default function NarrationPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const isSubmittingRef = useRef(false);
   const isCancelledRef = useRef(false);
 
@@ -101,9 +104,25 @@ export default function NarrationPage() {
   const busy = stream.status === "starting" || stream.status === "streaming";
   const empty = stream.transcript.length === 0;
 
+  const { showFollowButton, scrollToCurrent } = useReaderFollow({
+    containerRef: scrollContainerRef,
+    activeCharStart: stream.activeWord?.charStart ?? null,
+    activeCharEnd: stream.activeWord?.charEnd ?? null,
+    isPlaying: stream.playing,
+    disabled: documentView !== "adapted" || empty,
+  });
+
   return (
     <WorkbenchPanel
       title={displayTitle}
+      scrollRef={scrollContainerRef}
+      floating={
+        showFollowButton ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--player-dock-height,6.5rem)+0.75rem)] z-30 flex justify-center px-4">
+            <FollowButton onClick={scrollToCurrent} />
+          </div>
+        ) : null
+      }
       icon={
         documentView === "source" ? (
           <FileText size={13} strokeWidth={2} className="flex-none" />
