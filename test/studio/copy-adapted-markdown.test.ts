@@ -30,12 +30,12 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
       expect(narrationPage).toContain("setTimeout(() => setCopied(false), 2000)");
     });
 
-    it("renders copy button in WorkbenchPanel actions when narration is loaded", () => {
+    it("renders clean icon-only copy button in WorkbenchPanel actions when narration is loaded", () => {
       expect(narrationPage).toContain("actions={");
       expect(narrationPage).toContain("onClick={handleCopyAdapted}");
-      expect(narrationPage).toContain('title="Copy audio adapted document as markdown"');
       expect(narrationPage).toContain('aria-label="Copy audio adapted document as markdown"');
-      expect(narrationPage).toContain("documentView === \"source\" ? \"Copy adapted\" : \"Copy markdown\"");
+      expect(narrationPage).toContain('className="size-7 p-0 text-ink-muted hover:text-foreground"');
+      expect(narrationPage).not.toContain('<span>{copied ? "Copied markdown"');
     });
   });
 

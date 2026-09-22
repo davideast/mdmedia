@@ -25,6 +25,7 @@ import {
 } from 'firebase/firestore';
 
 import { auth, db } from '@/lib/firebase';
+import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
 import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
@@ -190,6 +191,18 @@ export async function updateNarrationTitle(id: string, title: string): Promise<v
     title: trimmed,
     updatedAt: Date.now(),
   });
+  try {
+    const mediaStore = getMediaStore();
+    const timings = await mediaStore.getTimings(id);
+    if (timings && timings.title !== trimmed) {
+      await mediaStore.saveTimings(id, {
+        ...timings,
+        title: trimmed,
+      });
+    }
+  } catch {
+    // Non-fatal if offline media store cannot be patched
+  }
 }
 
 export async function deleteNarration(id: string): Promise<void> {

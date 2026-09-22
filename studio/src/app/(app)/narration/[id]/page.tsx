@@ -94,6 +94,7 @@ export default function NarrationPage() {
     stream.setTitle(trimmed);
     try {
       await updateNarrationTitle(id, trimmed);
+      toast.success("Title updated");
     } catch {
       stream.setTitle(previousTitle);
       toast.error("Could not update title.");
@@ -185,18 +186,15 @@ export default function NarrationPage() {
               variant="ghost"
               size="sm"
               onClick={handleCopyAdapted}
-              title="Copy audio adapted document as markdown"
+              title={copied ? "Copied markdown" : "Copy audio adapted document as markdown"}
               aria-label="Copy audio adapted document as markdown"
-              className="h-7 gap-1.5 px-2 text-xs text-ink-muted hover:text-foreground"
+              className="size-7 p-0 text-ink-muted hover:text-foreground"
             >
               {copied ? (
-                <Check size={12} strokeWidth={2.5} className="text-primary" />
+                <Check size={13} strokeWidth={2.5} className="text-primary" />
               ) : (
-                <Copy size={12} strokeWidth={2} />
+                <Copy size={13} strokeWidth={2} />
               )}
-              <span className="hidden sm:inline">
-                {copied ? "Copied markdown" : documentView === "source" ? "Copy adapted" : "Copy markdown"}
-              </span>
             </Button>
           ) : null}
         </div>

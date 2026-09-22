@@ -397,22 +397,28 @@ export function useNarrationStream(): NarrationStreamState {
             return;
           }
           if (!narration) return;
-          if (narration.title) setTitle((current) => (current.trim().length > 0 ? current : narration.title));
+          if (narration.title) {
+            setTitle(narration.title);
+          }
           if (narration.voice) setVoice(narration.voice);
-          if (narration.transcript) setTranscript((current) => (current.trim().length > 0 ? current : narration.transcript));
+          if (narration.transcript) setTranscript(narration.transcript);
           if (narration.sourceMarkdown !== undefined) setSourceMarkdown(narration.sourceMarkdown);
           if (narration.adapted !== undefined) setAdapted(narration.adapted);
 
-          if (
+          const needsTitleUpdate = Boolean(narration.title && offlineTrack.timings.title !== narration.title);
+          const needsSourceUpdate = Boolean(
             narration.sourceMarkdown &&
             (!offlineTrack.timings.sourceMarkdown || offlineTrack.timings.adapted === undefined)
-          ) {
+          );
+
+          if (needsTitleUpdate || needsSourceUpdate) {
             const upgradedTimings: NarrationTimingsFile = {
               ...offlineTrack.timings,
-              sourceMarkdown: narration.sourceMarkdown,
-              adapted: narration.adapted,
+              title: narration.title || offlineTrack.timings.title,
+              sourceMarkdown: narration.sourceMarkdown ?? offlineTrack.timings.sourceMarkdown,
+              adapted: narration.adapted ?? offlineTrack.timings.adapted,
             };
-            void mediaStore.saveTrack(narrationId, offlineTrack.audioBlob, upgradedTimings).catch(() => {});
+            void mediaStore.saveTimings(narrationId, upgradedTimings).catch(() => {});
           }
 
           if (narration.status === 'ready' || narration.status === 'error') {
