@@ -74,4 +74,6 @@ export interface NarrationTimingsFile {
   transcript: string;
   durationMs: number;
   chunks: AlignedChunk[];
+  sourceMarkdown?: string;
+  adapted?: boolean;
 }

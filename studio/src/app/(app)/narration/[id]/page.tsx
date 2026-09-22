@@ -111,8 +111,8 @@ export default function NarrationPage() {
           <BookOpen size={13} strokeWidth={2} className="flex-none" />
         )
       }
-      headerClassName="px-8"
-      headerInnerClassName="mx-auto w-full max-w-[68ch]"
+      viewGrid
+      gridVariant="reader"
       titleNode={
         editingTitle ? (
           <input
@@ -143,10 +143,9 @@ export default function NarrationPage() {
         )
       }
       actions={busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
-      bodyClassName="px-8 pt-10 pb-40 min-w-0 max-w-full"
     >
       {stream.status === "error" ? (
-        <p className="mx-auto w-full max-w-[68ch] text-[0.95rem] text-ink-muted">
+        <p className="text-[0.95rem] text-ink-muted">
           {stream.errorMessage ?? "This narration could not be loaded."}
         </p>
       ) : empty ? (

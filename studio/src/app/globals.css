@@ -27,6 +27,7 @@
   --radius-inner: 6px;
   --radius-control: 4px;
   --shell: 1312px;
+  --player-dock-height: 6.5rem;
 
   /* ---- shadcn contract ---- */
   --radius: 0.625rem;
@@ -46,6 +47,12 @@
   --accent-foreground: #222722;
   --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
+  --mint: #047857;
+  --mint-bg: #a7f3d0;
+  --mint-fg: #062419;
+  --coral: #be123c;
+  --coral-bg: #fecdd3;
+  --coral-fg: #2c0b14;
   --border: #d7d8d7;
   --input: #d7d8d7;
   --ring: #222722;
@@ -99,8 +106,14 @@
   --muted-foreground: #9da19e;
   --accent: rgba(255, 255, 255, 0.08);
   --accent-foreground: #f3f5f3;
-  --destructive: #f26969;
-  --destructive-foreground: #141615;
+  --destructive: #fca5a5;
+  --destructive-foreground: #2c0b14;
+  --mint: #a7f3d0;
+  --mint-bg: rgba(167, 243, 208, 0.15);
+  --mint-fg: #a7f3d0;
+  --coral: #fecdd3;
+  --coral-bg: rgba(254, 205, 211, 0.15);
+  --coral-fg: #fecdd3;
   --border: rgba(255, 255, 255, 0.11);
   --input: rgba(255, 255, 255, 0.14);
   --ring: rgba(255, 255, 255, 0.42);
@@ -145,8 +158,14 @@
     --muted-foreground: #9da19e;
     --accent: rgba(255, 255, 255, 0.08);
     --accent-foreground: #f3f5f3;
-    --destructive: #f26969;
-    --destructive-foreground: #141615;
+    --destructive: #fca5a5;
+    --destructive-foreground: #2c0b14;
+    --mint: #a7f3d0;
+    --mint-bg: rgba(167, 243, 208, 0.15);
+    --mint-fg: #a7f3d0;
+    --coral: #fecdd3;
+    --coral-bg: rgba(254, 205, 211, 0.15);
+    --coral-fg: #fecdd3;
     --border: rgba(255, 255, 255, 0.11);
     --input: rgba(255, 255, 255, 0.14);
     --ring: rgba(255, 255, 255, 0.42);
@@ -179,6 +198,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-mint: var(--mint);
+  --color-mint-bg: var(--mint-bg);
+  --color-coral: var(--coral);
+  --color-coral-bg: var(--coral-bg);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -635,3 +658,175 @@
     color: #0f172a;
   }
 }
+
+/* ==========================================================================
+   Modern CSS Grid View & Alignment Track Architecture
+   Eliminates layout padding and margins; defines strict alignment lines across the view.
+   ========================================================================== */
+
+@layer components {
+  /* Whole-view layout grid with named alignment tracks and intrinsic gutters (Ahmad Shadeed ch content wrapper) */
+  .view-grid {
+    --view-gutter: 1.5rem;
+    --view-content-max: 68ch;
+
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(var(--view-gutter), 1fr)
+      [wide-start content-start] minmax(0, var(--view-content-max)) [content-end wide-end]
+      minmax(var(--view-gutter), 1fr) [full-end];
+    grid-template-rows:
+      [gutter-top] 2rem
+      [view-content] max-content
+      [gutter-bottom] calc(2rem + var(--shell-player-offset, 0rem));
+    column-gap: 0;
+    row-gap: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 100%;
+    width: 100%;
+    align-content: start;
+  }
+
+  @media (max-width: 640px) {
+    :root {
+      --player-dock-height: 8rem;
+    }
+    .view-grid {
+      --view-gutter: 1rem;
+    }
+  }
+
+  /* Wide view grid (Playlists, Settings, Profile) */
+  .view-grid-wide {
+    --view-content-max: 90ch;
+  }
+
+  /* Reader view grid with extra bottom clearance for the floating transport bar */
+  .view-grid-reader {
+    grid-template-rows:
+      [gutter-top] 2.5rem
+      [view-content] max-content
+      [gutter-bottom] calc(3.5rem + var(--shell-player-offset, 6.5rem));
+  }
+
+  /* Subgrid body: inherits named column tracks directly from .view-grid */
+  .view-grid-body {
+    grid-column: full-start / full-end;
+    grid-row: view-content;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-auto-rows: max-content;
+    row-gap: 1.5rem;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    align-content: start;
+    align-items: start;
+  }
+
+  /* Direct children default to snapping inside the primary reading/content track */
+  .view-grid-body > * {
+    grid-column: content-start / content-end;
+  }
+
+  .view-grid-body > .col-wide {
+    grid-column: wide-start / wide-end;
+  }
+
+  .view-grid-body > .col-full {
+    grid-column: full-start / full-end;
+  }
+
+  /* Micro-track grid inside list items and cards for deterministic optical alignment */
+  .item-track-grid {
+    display: grid;
+    grid-template-columns:
+      [status-start] 1.25rem [status-end text-start]
+      minmax(0, 1fr) [text-end action-start]
+      auto [action-end];
+    column-gap: 0.75rem;
+    row-gap: 0.25rem;
+    align-items: center;
+  }
+
+  .item-track-grid .track-status {
+    grid-column: status-start / status-end;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .item-track-grid .track-title {
+    grid-column: text-start / text-end;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .item-track-grid .track-body {
+    grid-column: text-start / text-end;
+    min-width: 0;
+  }
+
+  .item-track-grid .track-actions {
+    grid-column: action-start / action-end;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    justify-self: end;
+  }
+
+  /* Responsive Floating Audio Transport Bar (Container Query Architecture) */
+  .audio-player-pill {
+    container-type: inline-size;
+    container-name: player;
+  }
+
+  .player-desktop-row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 13.5rem) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .player-compact-row {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  @container player (max-width: 619px) {
+    .player-desktop-row {
+      display: none !important;
+    }
+    .player-compact-row {
+      display: flex !important;
+    }
+  }
+
+  /* Narration Details Metadata Lockup (Container Query Architecture) */
+  .details-meta-container {
+    container-type: inline-size;
+    container-name: details-meta;
+    width: 100%;
+  }
+
+  .details-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @container details-meta (max-width: 240px) {
+    .details-meta-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+}
+

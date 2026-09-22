@@ -223,10 +223,10 @@ export default function PlaylistsPage() {
     <WorkbenchPanel
       title="Playlists"
       icon={<ListMusic size={13} strokeWidth={2} />}
-      bodyClassName="gap-0 p-0"
+      viewGrid
+      gridVariant="wide"
     >
-      <div className="grid gap-6 p-6 pb-28">
-        {/* Create new playlist bar */}
+      {/* Create new playlist bar */}
         <div className="grid gap-3 rounded-lg border border-border bg-card p-4">
           <div className="t-label">New playlist</div>
           <div className="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
@@ -340,8 +340,9 @@ export default function PlaylistsPage() {
                           <>
                             <div className="flex items-center gap-2">
                               <h2 className="t-card-title truncate">{playlist.title}</h2>
-                              <span className="t-mono tabular-nums text-ink-faint">
-                                {tracks.length} {tracks.length === 1 ? "track" : "tracks"} · {formatDuration(totalMs)}
+                              <span className="inline-flex items-center gap-2.5 t-mono tabular-nums text-ink-faint">
+                                <span>{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
+                                <span>{formatDuration(totalMs)}</span>
                               </span>
                             </div>
                             {playlist.description ? (
@@ -532,7 +533,6 @@ export default function PlaylistsPage() {
             })
           )}
         </div>
-      </div>
     </WorkbenchPanel>
   );
 }

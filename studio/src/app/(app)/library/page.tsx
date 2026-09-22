@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
+  Download,
+  FileCheck,
   Library,
   Loader2,
   Play,
@@ -29,6 +31,7 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
+import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import type { Narration } from "@/lib/types";
 
 const READABLE_VISIBILITY: Record<Narration["visibility"], string> = {
@@ -67,6 +70,19 @@ function LibraryNarrationCard({
   onDelete: (narration: Narration) => void;
 }) {
   const router = useRouter();
+  const isReady = narration.status === "ready";
+  const offlineMetadata = useMemo<OfflineNarrationMetadata>(
+    () => ({
+      title: narration.title,
+      sourceMarkdown: narration.sourceMarkdown,
+      adapted: narration.adapted,
+    }),
+    [narration.title, narration.sourceMarkdown, narration.adapted],
+  );
+  const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
+    narration.id,
+    offlineMetadata,
+  );
 
   const cleanExcerpt = useMemo(() => {
     return narration.transcript
@@ -89,56 +105,32 @@ function LibraryNarrationCard({
         }
       }}
       className={cn(
-        "group flex items-center justify-between gap-4 rounded-lg border p-3.5 transition-all cursor-pointer",
+        "group item-track-grid rounded-lg border p-3.5 transition-all cursor-pointer",
         isCurrentTrack
           ? "border-primary/40 bg-card shadow-2xs"
           : "border-border/80 bg-card/60 hover:border-border hover:bg-card",
       )}
     >
-      <div className="grid min-w-0 flex-1 gap-1">
-        {/* Title row with status icon */}
-        <div className="flex items-center gap-2">
-          {isCurrentTrack && isPlaying ? (
-            <Volume2 size={14} className="flex-none text-primary animate-pulse" />
-          ) : narration.status === "streaming" ? (
-            <Loader2 size={14} className="flex-none animate-spin text-primary" />
-          ) : (
-            <CheckCircle2 size={14} className="flex-none text-primary" />
-          )}
-          <span className="truncate text-[0.92rem] font-medium text-foreground group-hover:text-primary transition-colors">
-            {narration.title}
-          </span>
-        </div>
-
-        {/* Clean text excerpt */}
-        {cleanExcerpt ? (
-          <p className="line-clamp-1 pl-5.5 text-[0.8rem] text-ink-muted/80">
-            {cleanExcerpt}
-          </p>
-        ) : null}
-
-        {/* Metadata row */}
-        <div className="flex flex-wrap items-center gap-2 pl-5.5 text-[0.75rem] text-ink-muted">
-          <span className="font-medium text-foreground">{narration.voice}</span>
-          <span>&middot;</span>
-          <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
-          <span>&middot;</span>
-          <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
-          <span>&middot;</span>
-          <span>{READABLE_VISIBILITY[narration.visibility]}</span>
-          {narration.adapted ? (
-            <>
-              <span>&middot;</span>
-              <span className="inline-flex items-center gap-1 text-primary">
-                <Sparkles size={11} /> Adapted for ear
-              </span>
-            </>
-          ) : null}
-        </div>
+      {/* Track: Status indicator */}
+      <div className="track-status">
+        {isCurrentTrack && isPlaying ? (
+          <Volume2 size={14} className="flex-none text-primary animate-pulse" />
+        ) : narration.status === "streaming" ? (
+          <Loader2 size={14} className="flex-none animate-spin text-primary" />
+        ) : (
+          <CheckCircle2 size={14} className="flex-none text-primary" />
+        )}
       </div>
 
-      {/* Right-side actions */}
-      <div className="flex items-center gap-1.5 flex-none">
+      {/* Track: Title text */}
+      <div className="track-title">
+        <span className="block truncate text-[0.92rem] font-medium text-foreground group-hover:text-primary transition-colors">
+          {narration.title}
+        </span>
+      </div>
+
+      {/* Track: Action controls */}
+      <div className="track-actions">
         <Button
           type="button"
           variant="secondary"
@@ -152,6 +144,60 @@ function LibraryNarrationCard({
           <Play size={11} strokeWidth={2.5} className="fill-current" />
           <span>Open</span>
         </Button>
+        {isDownloading ? (
+          <span
+            className="inline-flex size-7 items-center justify-center text-primary"
+            title="Downloading for offline listening…"
+          >
+            <Loader2 size={13} className="animate-spin" />
+          </span>
+        ) : isDownloaded ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={async (e) => {
+              e.stopPropagation();
+              try {
+                await remove();
+                toast.info("Removed from offline storage");
+              } catch {
+                toast.error("Could not remove narration from offline storage.");
+              }
+            }}
+            className="h-7 px-2 text-xs text-mint hover:bg-muted hover:text-foreground"
+            title="Downloaded to device (click to remove)"
+            aria-label="Remove download"
+          >
+            <FileCheck size={13} strokeWidth={2} />
+            <span className="sr-only">Downloaded</span>
+          </Button>
+        ) : isReady ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={async (e) => {
+              e.stopPropagation();
+              try {
+                await download();
+                toast.success(
+                  narration.title
+                    ? `Downloaded "${narration.title}" for offline listening`
+                    : "Downloaded for offline listening",
+                );
+              } catch {
+                toast.error("Could not download narration for offline listening.");
+              }
+            }}
+            className="h-7 px-2 text-xs text-ink-muted hover:bg-muted hover:text-foreground"
+            title="Download for offline listening"
+            aria-label="Download for offline"
+          >
+            <Download size={13} strokeWidth={2} />
+            <span className="sr-only">Download for offline</span>
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="ghost"
@@ -167,6 +213,30 @@ function LibraryNarrationCard({
           <Trash2 size={13} strokeWidth={2} />
           <span className="sr-only">Delete</span>
         </Button>
+      </div>
+
+      {/* Track: Excerpt text */}
+      {cleanExcerpt ? (
+        <div className="track-body">
+          <p className="line-clamp-1 text-[0.8rem] text-ink-muted/80">
+            {cleanExcerpt}
+          </p>
+        </div>
+      ) : null}
+
+      {/* Track: Metadata tags */}
+      <div className="track-body">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.75rem] text-ink-muted">
+          <span className="font-medium text-foreground">{narration.voice}</span>
+          <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
+          <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
+          <span>{READABLE_VISIBILITY[narration.visibility]}</span>
+          {narration.adapted ? (
+            <span className="inline-flex items-center gap-1 text-primary">
+              <Sparkles size={11} /> Adapted for ear
+            </span>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -195,6 +265,14 @@ export default function LibraryPage() {
     );
   }, [items, query]);
 
+  const totalParagraphs = useMemo(() => {
+    return filtered.reduce((sum, item) => {
+      const text = item.sourceMarkdown || item.transcript || "";
+      const count = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length;
+      return sum + (count || (text.trim().length > 0 ? 1 : 0));
+    }, 0);
+  }, [filtered]);
+
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
     setIsDeleting(true);
@@ -216,65 +294,69 @@ export default function LibraryPage() {
     <WorkbenchPanel
       title="Library"
       icon={<Library size={13} strokeWidth={2} />}
-      bodyClassName="px-8 py-8"
+      viewGrid
     >
-      <div className="mx-auto grid w-full max-w-[68ch] gap-6">
-        <div className="relative">
-          <Search
-            size={15}
-            strokeWidth={2}
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
-          />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search your narrations…"
-            className="h-10 rounded-full pl-9"
-          />
-        </div>
+      <div className="relative">
+        <Search
+          size={15}
+          strokeWidth={2}
+          className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
+        />
+        <Input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search your narrations…"
+          className="h-10 rounded-full pl-9"
+        />
+      </div>
 
-        {filtered.length === 0 ? (
-          items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-              <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
-                <Library size={24} strokeWidth={1.5} />
-              </div>
-              <div className="grid gap-1">
-                <h2 className="text-[1.05rem] font-semibold text-foreground">
-                  Library is empty
-                </h2>
-                <p className="max-w-sm text-[0.85rem] text-ink-muted">
-                  Anything you narrate in the Studio will appear here with instant audio replay, transcripts, and sharing.
-                </p>
-              </div>
-              <Button asChild variant="outline" size="sm" className="mt-2">
-                <Link href="/studio">Go to Studio</Link>
-              </Button>
+      {filtered.length === 0 ? (
+        items.length === 0 ? (
+          <div className="col-span-full grid place-items-center gap-3 py-12 text-center">
+            <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
+              <Library size={24} strokeWidth={1.5} />
             </div>
-          ) : (
-            <p className="t-lead pt-8 text-center">
-              No narration matches &ldquo;{query}&rdquo;.
-            </p>
-          )
+            <div className="grid gap-1">
+              <h2 className="text-[1.05rem] font-semibold text-foreground">
+                Library is empty
+              </h2>
+              <p className="max-w-sm text-[0.85rem] text-ink-muted">
+                Anything you narrate in the Studio will appear here with instant audio replay, transcripts, and sharing.
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/studio">Go to Studio</Link>
+            </Button>
+          </div>
         ) : (
-          <section className="grid gap-3">
+          <p className="t-lead text-center">
+            No narration matches &ldquo;{query}&rdquo;.
+          </p>
+        )
+      ) : (
+        <section className="grid gap-3">
+          <div className="flex items-center justify-between">
             <h2 className="t-label">
               Narrations ({filtered.length})
             </h2>
-            <div className="grid gap-2">
-              {filtered.map((item) => (
-                <LibraryNarrationCard
-                  key={item.id}
-                  narration={item}
-                  isCurrentTrack={stream.id === item.id}
-                  isPlaying={stream.playing}
-                  onDelete={setItemToDelete}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+            <span className="t-meta text-ink-faint">
+              {totalParagraphs} {totalParagraphs === 1 ? "paragraph" : "paragraphs"} total
+            </span>
+          </div>
+
+          <div className="grid gap-2">
+            {filtered.map((item) => (
+              <LibraryNarrationCard
+                key={item.id}
+                narration={item}
+                isCurrentTrack={stream.id === item.id}
+                isPlaying={stream.playing}
+                onDelete={setItemToDelete}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <Dialog
         open={itemToDelete !== null}

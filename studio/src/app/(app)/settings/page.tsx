@@ -87,10 +87,10 @@ export default function SettingsPage() {
     <WorkbenchPanel
       title="Settings"
       icon={<SettingsIcon size={13} strokeWidth={2} />}
-      bodyClassName="p-0"
+      viewGrid
+      gridVariant="wide"
     >
-      <div className="mx-auto grid w-full max-w-[52rem] gap-8 p-8">
-        <p className="t-lead">These apply to every new narration you start.</p>
+      <p className="t-lead">These apply to every new narration you start.</p>
 
         <div className="grid gap-6">
           <Row label="Appearance" htmlFor="appearance-theme">
@@ -232,7 +232,7 @@ export default function SettingsPage() {
           </Row>
         </div>
 
-        <div className="pt-2">
+        <div>
           <Button
             type="button"
             variant="outline"
@@ -243,7 +243,6 @@ export default function SettingsPage() {
             Sign out
           </Button>
         </div>
-      </div>
     </WorkbenchPanel>
   );
 }

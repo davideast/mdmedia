@@ -48,33 +48,25 @@ function ActiveJobCard({
     : null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-2xs transition-all">
-      <div className="flex items-start justify-between gap-3">
-        <div className="grid min-w-0 gap-1">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex size-5 flex-none items-center justify-center rounded-sm bg-primary/10 text-primary">
-              <Loader2 size={12} className="animate-spin" />
-            </span>
-            <h3 className="truncate text-[0.95rem] font-semibold text-foreground">
-              {job.title}
-            </h3>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
-            <span className="font-medium text-foreground">{job.voice}</span>
-            <span>&middot;</span>
-            {job.rewriteForNarration ? (
-              <>
-                <span className="inline-flex items-center gap-1 text-primary">
-                  <Sparkles size={11} /> Adapted for ear
-                </span>
-                <span>&middot;</span>
-              </>
-            ) : null}
-            <span>Started {relativeTime(job.createdAt)}</span>
-          </div>
+    <div className="group rounded-lg border border-border bg-card p-4 shadow-2xs transition-all grid gap-3">
+      {/* Top track grid: status, title, actions, metadata */}
+      <div className="item-track-grid">
+        {/* Track: Status indicator */}
+        <div className="track-status">
+          <span className="inline-flex size-5 flex-none items-center justify-center rounded-sm bg-primary/10 text-primary">
+            <Loader2 size={12} className="animate-spin" />
+          </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        {/* Track: Title text */}
+        <div className="track-title">
+          <h3 className="truncate text-[0.95rem] font-semibold text-foreground">
+            {job.title}
+          </h3>
+        </div>
+
+        {/* Track: Action controls */}
+        <div className="track-actions">
           {job.narrationId ? (
             <Button
               type="button"
@@ -99,10 +91,23 @@ function ActiveJobCard({
             <span className="sr-only">Cancel</span>
           </Button>
         </div>
+
+        {/* Track: Metadata */}
+        <div className="track-body">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.75rem] text-ink-muted">
+            <span className="font-medium text-foreground">{job.voice}</span>
+            {job.rewriteForNarration ? (
+              <span className="inline-flex items-center gap-1 text-primary">
+                <Sparkles size={11} /> Adapted for ear
+              </span>
+            ) : null}
+            <span>Started {relativeTime(job.createdAt)}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Progress Bar & Status Text */}
-      <div className="grid gap-1.5">
+      {/* Full-width Progress Bar & Status Text */}
+      <div className="grid gap-1.5 pt-1">
         <div className="flex items-center justify-between text-[0.75rem]">
           <span className="font-medium text-ink-muted">
             {job.status === "starting"
@@ -136,33 +141,42 @@ function CompletedJobCard({ job }: { job: GenerationJob }) {
   const router = useRouter();
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border/80 bg-card/60 p-3.5 transition-colors hover:bg-card">
-      <div className="grid min-w-0 gap-0.5">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 size={14} className="flex-none text-primary" />
-          <span className="truncate text-[0.9rem] font-medium text-foreground">
-            {job.title}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 pl-5 text-[0.75rem] text-ink-muted">
+    <div className="group item-track-grid rounded-lg border border-border/80 bg-card/60 p-3.5 transition-colors hover:bg-card">
+      {/* Track: Status */}
+      <div className="track-status">
+        <CheckCircle2 size={14} className="flex-none text-primary" />
+      </div>
+
+      {/* Track: Title */}
+      <div className="track-title">
+        <span className="truncate text-[0.9rem] font-medium text-foreground">
+          {job.title}
+        </span>
+      </div>
+
+      {/* Track: Actions */}
+      <div className="track-actions">
+        {job.narrationId ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => router.push(`/narration/${job.narrationId}`)}
+            className="h-7 gap-1.5 px-2.5 text-xs font-medium"
+          >
+            <Play size={11} strokeWidth={2.5} className="fill-current" />
+            <span>Open</span>
+          </Button>
+        ) : null}
+      </div>
+
+      {/* Track: Metadata */}
+      <div className="track-body">
+        <div className="flex items-center gap-x-2.5 text-[0.75rem] text-ink-muted">
           <span>{job.voice}</span>
-          <span>&middot;</span>
           <span>Ready {relativeTime(job.updatedAt)}</span>
         </div>
       </div>
-
-      {job.narrationId ? (
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => router.push(`/narration/${job.narrationId}`)}
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-        >
-          <Play size={11} strokeWidth={2.5} className="fill-current" />
-          <span>Open</span>
-        </Button>
-      ) : null}
     </div>
   );
 }
@@ -175,28 +189,38 @@ function FailedJobCard({
   onDismiss: (id: string) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3.5">
-      <div className="grid min-w-0 gap-0.5">
-        <div className="flex items-center gap-2">
-          <AlertCircle size={14} className="flex-none text-destructive" />
-          <span className="truncate text-[0.9rem] font-medium text-foreground">
-            {job.title}
-          </span>
-        </div>
-        <p className="pl-5 text-[0.75rem] text-destructive/80">
+    <div className="group item-track-grid rounded-lg border border-destructive/30 bg-destructive/5 p-3.5">
+      {/* Track: Status */}
+      <div className="track-status">
+        <AlertCircle size={14} className="flex-none text-destructive" />
+      </div>
+
+      {/* Track: Title */}
+      <div className="track-title">
+        <span className="truncate text-[0.9rem] font-medium text-foreground">
+          {job.title}
+        </span>
+      </div>
+
+      {/* Track: Actions */}
+      <div className="track-actions">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => onDismiss(job.id)}
+          className="h-7 px-2 text-xs text-ink-muted hover:text-foreground"
+        >
+          Dismiss
+        </Button>
+      </div>
+
+      {/* Track: Error */}
+      <div className="track-body">
+        <p className="text-[0.75rem] text-destructive/80">
           {job.errorMessage || "Generation failed"}
         </p>
       </div>
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => onDismiss(job.id)}
-        className="h-7 px-2 text-xs text-ink-muted hover:text-foreground"
-      >
-        Dismiss
-      </Button>
     </div>
   );
 }
@@ -239,6 +263,7 @@ export default function QueuePage() {
     <WorkbenchPanel
       title="Queue"
       icon={<ListOrdered size={13} strokeWidth={2} />}
+      viewGrid
       actions={
         completedJobs.length > 0 || failedJobs.length > 0 ? (
           <Button
@@ -253,65 +278,61 @@ export default function QueuePage() {
           </Button>
         ) : null
       }
-      bodyClassName="px-8 py-8"
     >
-      <div className="mx-auto grid w-full max-w-[68ch] gap-8">
-        {!hasJobs ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-            <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
-              <ListOrdered size={24} strokeWidth={1.5} />
-            </div>
-            <div className="grid gap-1">
-              <h2 className="text-[1.05rem] font-semibold text-foreground">
-                Queue is empty
-              </h2>
-              <p className="max-w-sm text-[0.85rem] text-ink-muted">
-                When you click &ldquo;Start Narration&rdquo; from the Studio, jobs
-                process here in the background without interrupting your listening.
-              </p>
-            </div>
-            <Button asChild variant="outline" size="sm" className="mt-2">
-              <Link href="/studio">Go to Studio</Link>
-            </Button>
+      {!hasJobs ? (
+        <div className="col-span-full grid place-items-center gap-3 py-12 text-center">
+          <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
+            <ListOrdered size={24} strokeWidth={1.5} />
           </div>
-        ) : (
-          <>
-            {/* Active section */}
-            <section className="grid gap-3">
-              <h2 className="t-label">
-                Processing ({totalActive})
-              </h2>
+          <div className="grid gap-1">
+            <h2 className="text-[1.05rem] font-semibold text-foreground">
+              Queue is empty
+            </h2>
+            <p className="max-w-sm text-[0.85rem] text-ink-muted">
+              When you click &ldquo;Start Narration&rdquo; from the Studio, jobs
+              process here in the background without interrupting your listening.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/studio">Go to Studio</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {/* Active section */}
+          <section className="grid gap-3">
+            <h2 className="t-label">
+              Processing ({totalActive})
+            </h2>
 
-              {totalActive === 0 ? (
-                <p className="rounded-lg border border-dashed border-border/80 p-4 text-center text-[0.85rem] text-ink-muted">
-                  No active generations right now.
-                </p>
-              ) : (
-                <div className="grid gap-3">
-                  {activeJobs.map((job) => (
-                    <ActiveJobCard
-                      key={job.id}
-                      job={job}
-                      onCancel={generationQueue.cancelJob}
-                    />
-                  ))}
+            {totalActive === 0 ? (
+              <p className="rounded-lg border border-dashed border-border/80 p-4 text-center text-[0.85rem] text-ink-muted">
+                No active generations right now.
+              </p>
+            ) : (
+              <div className="grid gap-3">
+                {activeJobs.map((job) => (
+                  <ActiveJobCard
+                    key={job.id}
+                    job={job}
+                    onCancel={generationQueue.cancelJob}
+                  />
+                ))}
 
-                  {orphanStreamingNarrations.map((n) => (
-                    <div
-                      key={n.id}
-                      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 shadow-2xs"
-                    >
-                      <div className="grid min-w-0 gap-1">
-                        <div className="flex items-center gap-2">
-                          <Loader2 size={13} className="animate-spin text-primary" />
-                          <span className="truncate text-[0.95rem] font-semibold text-foreground">
-                            {n.title}
-                          </span>
-                        </div>
-                        <span className="text-[0.75rem] text-ink-muted">
-                          {n.voice} &middot; Synthesizing on server
-                        </span>
-                      </div>
+                {orphanStreamingNarrations.map((n) => (
+                  <div
+                    key={n.id}
+                    className="group item-track-grid rounded-lg border border-border bg-card p-4 shadow-2xs"
+                  >
+                    <div className="track-status">
+                      <Loader2 size={13} className="animate-spin text-primary" />
+                    </div>
+                    <div className="track-title">
+                      <span className="truncate text-[0.95rem] font-semibold text-foreground">
+                        {n.title}
+                      </span>
+                    </div>
+                    <div className="track-actions">
                       <Button asChild variant="outline" size="sm" className="h-7 gap-1 text-xs">
                         <Link href={`/narration/${n.id}`}>
                           <span>View</span>
@@ -319,41 +340,47 @@ export default function QueuePage() {
                         </Link>
                       </Button>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div className="track-body">
+                      <div className="flex items-center gap-x-2.5 text-[0.75rem] text-ink-muted">
+                        <span>{n.voice}</span>
+                        <span>Synthesizing on server</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Completed section */}
+          {completedJobs.length > 0 ? (
+            <section className="grid gap-3 border-t border-border/60 pt-6">
+              <h2 className="t-label">Completed ({completedJobs.length})</h2>
+              <div className="grid gap-2">
+                {completedJobs.map((job) => (
+                  <CompletedJobCard key={job.id} job={job} />
+                ))}
+              </div>
             </section>
+          ) : null}
 
-            {/* Completed section */}
-            {completedJobs.length > 0 ? (
-              <section className="grid gap-3 border-t border-border/60 pt-6">
-                <h2 className="t-label">Completed ({completedJobs.length})</h2>
-                <div className="grid gap-2">
-                  {completedJobs.map((job) => (
-                    <CompletedJobCard key={job.id} job={job} />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            {/* Failed section */}
-            {failedJobs.length > 0 ? (
-              <section className="grid gap-3 border-t border-border/60 pt-6">
-                <h2 className="t-label text-destructive">Failed ({failedJobs.length})</h2>
-                <div className="grid gap-2">
-                  {failedJobs.map((job) => (
-                    <FailedJobCard
-                      key={job.id}
-                      job={job}
-                      onDismiss={generationQueue.dismissJob}
-                    />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-          </>
-        )}
-      </div>
+          {/* Failed section */}
+          {failedJobs.length > 0 ? (
+            <section className="grid gap-3 border-t border-border/60 pt-6">
+              <h2 className="t-label text-destructive">Failed ({failedJobs.length})</h2>
+              <div className="grid gap-2">
+                {failedJobs.map((job) => (
+                  <FailedJobCard
+                    key={job.id}
+                    job={job}
+                    onDismiss={generationQueue.dismissJob}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+      )}
     </WorkbenchPanel>
   );
 }
