@@ -141,7 +141,7 @@ describe('Narration Deletion Logic', () => {
     });
 
     it('pre-allocates narrationId so cancelJob can purge immediately without spinning', () => {
-      expect(useGenQueueSource).toContain('const narrationId = doc(collection(db(), \'narrations\')).id');
+      expect(useGenQueueSource).toContain('const narrationId = generateNarrationId()');
       expect(useGenQueueSource).toContain('deleteNarration(narrationId)');
       expect(useGenQueueSource).toContain('setJobs((previous) => previous.filter((j) => j.id !== jobId))');
     });

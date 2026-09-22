@@ -29,10 +29,15 @@ export async function GET(
   const urlObj = new URL(request.url);
   if (urlObj.searchParams.get("raw") === "1") {
     const bytes = await readStorageObjectBytes(objectPath);
-    if (!bytes) {
+    if (!bytes || bytes.length === 0) {
       return Response.json({ message: "That narration isn't available." }, { status: 404 });
     }
-    const timings = JSON.parse(new TextDecoder().decode(bytes)) as NarrationTimingsFile;
+    let timings: NarrationTimingsFile;
+    try {
+      timings = JSON.parse(new TextDecoder().decode(bytes)) as NarrationTimingsFile;
+    } catch {
+      return Response.json({ message: "Timings data is still generating or invalid." }, { status: 404 });
+    }
     if (narration.title) {
       timings.title = narration.title;
     }
