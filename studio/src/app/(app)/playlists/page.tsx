@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { cn } from "cn";
 import {
@@ -51,7 +51,6 @@ export default function PlaylistsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!user) return;
@@ -75,16 +74,14 @@ export default function PlaylistsPage() {
     if (!user) return;
     const title = newTitle.trim();
     if (!title) return;
-    startTransition(async () => {
-      try {
-        await createPlaylist(user.uid, title, newDescription.trim(), []);
-        setNewTitle("");
-        setNewDescription("");
-        toast.success(`Created "${title}"`);
-      } catch {
-        toast.error("Could not create playlist.");
-      }
-    });
+    try {
+      createPlaylist(user.uid, title, newDescription.trim(), []);
+      setNewTitle("");
+      setNewDescription("");
+      toast.success(`Created "${title}"`);
+    } catch {
+      toast.error("Could not create playlist.");
+    }
   };
 
   const startEdit = (playlist: Playlist) => {
@@ -96,40 +93,34 @@ export default function PlaylistsPage() {
   const handleSaveEdit = (playlistId: string) => {
     const title = editTitle.trim();
     if (!title) return;
-    startTransition(async () => {
-      try {
-        await updatePlaylist(playlistId, {
-          title,
-          description: editDescription.trim(),
-        });
-        setEditingId(null);
-        toast.success("Playlist updated");
-      } catch {
-        toast.error("Could not save changes.");
-      }
-    });
+    try {
+      updatePlaylist(playlistId, {
+        title,
+        description: editDescription.trim(),
+      });
+      setEditingId(null);
+      toast.success("Playlist updated");
+    } catch {
+      toast.error("Could not save changes.");
+    }
   };
 
   const handleDelete = (playlist: Playlist) => {
-    startTransition(async () => {
-      try {
-        await deletePlaylist(playlist.id);
-        if (editingId === playlist.id) setEditingId(null);
-        toast.success(`Deleted "${playlist.title}"`);
-      } catch {
-        toast.error("Could not delete playlist.");
-      }
-    });
+    try {
+      deletePlaylist(playlist.id);
+      if (editingId === playlist.id) setEditingId(null);
+      toast.success(`Deleted "${playlist.title}"`);
+    } catch {
+      toast.error("Could not delete playlist.");
+    }
   };
 
   const handleToggleTrack = (playlist: Playlist, narrationId: string) => {
-    startTransition(async () => {
-      try {
-        await toggleNarrationInPlaylist(playlist, narrationId);
-      } catch {
-        toast.error("Could not update playlist tracks.");
-      }
-    });
+    try {
+      toggleNarrationInPlaylist(playlist, narrationId);
+    } catch {
+      toast.error("Could not update playlist tracks.");
+    }
   };
 
   const [dragState, setDragState] = useState<{
@@ -156,13 +147,11 @@ export default function PlaylistsPage() {
       }
     }
 
-    startTransition(async () => {
-      try {
-        await reorderPlaylistTracks(playlist.id, currentIds);
-      } catch {
-        toast.error("Could not reorder tracks.");
-      }
-    });
+    try {
+      reorderPlaylistTracks(playlist.id, currentIds);
+    } catch {
+      toast.error("Could not reorder tracks.");
+    }
   };
 
   const handleMoveTrack = (playlist: Playlist, index: number, direction: "up" | "down") => {
@@ -254,7 +243,7 @@ export default function PlaylistsPage() {
             />
             <Button
               type="button"
-              disabled={pending || newTitle.trim().length === 0}
+              disabled={newTitle.trim().length === 0}
               onClick={handleCreate}
             >
               <Plus size={14} strokeWidth={2} />
@@ -320,7 +309,7 @@ export default function PlaylistsPage() {
                               <Button
                                 type="button"
                                 size="sm"
-                                disabled={pending || editTitle.trim().length === 0}
+                                disabled={editTitle.trim().length === 0}
                                 onClick={() => handleSaveEdit(playlist.id)}
                               >
                                 <Check size={13} strokeWidth={2} />
@@ -435,7 +424,7 @@ export default function PlaylistsPage() {
                               <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                 <button
                                   type="button"
-                                  disabled={idx === 0 || pending}
+                                  disabled={idx === 0}
                                   onClick={(event) => {
                                     event.stopPropagation();
                                     handleMoveTrack(playlist, idx, "up");
@@ -448,7 +437,7 @@ export default function PlaylistsPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  disabled={idx === tracks.length - 1 || pending}
+                                  disabled={idx === tracks.length - 1}
                                   onClick={(event) => {
                                     event.stopPropagation();
                                     handleMoveTrack(playlist, idx, "down");

@@ -152,4 +152,65 @@ describe('Narration Deletion Logic', () => {
       expect(queuePageSource).toContain('title="Cancel generation"');
     });
   });
+
+  describe('Optimistic CQRS Deletion Architecture', () => {
+    const { readFileSync } = require('node:fs');
+    const { resolve } = require('node:path');
+
+    const narrationsSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/lib/narrations.ts'),
+      'utf8',
+    );
+    const libraryPageSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/app/(app)/library/page.tsx'),
+      'utf8',
+    );
+    const settingsSource = readFileSync(
+      resolve(import.meta.dir, '../../studio/src/components/narration/narration-settings.tsx'),
+      'utf8',
+    );
+
+    it('uses deleteDoc directly and does not call client-side runTransaction in deleteNarration', () => {
+      const deleteNarrationBody = narrationsSource.slice(
+        narrationsSource.indexOf('export async function deleteNarration('),
+        narrationsSource.indexOf('export function generateNarrationId('),
+      );
+
+      expect(deleteNarrationBody).toContain('deleteDoc(');
+      expect(deleteNarrationBody).not.toContain('runTransaction(');
+    });
+
+    it('performs background out-of-band storage purge without blocking client mutation', () => {
+      const deleteNarrationBody = narrationsSource.slice(
+        narrationsSource.indexOf('export async function deleteNarration('),
+        narrationsSource.indexOf('export function generateNarrationId('),
+      );
+
+      expect(deleteNarrationBody).toMatch(/fetch\(`\/api\/narrations\/\$\{id\}`,\s*\{\s*method:\s*['"]DELETE['"]/);
+    });
+
+    it('library/page.tsx closes delete dialog immediately upon confirmation instead of blocking with spinner', () => {
+      const confirmDeleteBody = libraryPageSource.slice(
+        libraryPageSource.indexOf('const handleConfirmDelete ='),
+        libraryPageSource.indexOf('return (', libraryPageSource.indexOf('const handleConfirmDelete =')),
+      );
+
+      expect(confirmDeleteBody).toContain('setItemToDelete(null)');
+      const setItemPos = confirmDeleteBody.indexOf('setItemToDelete(null)');
+      const deleteNarrationPos = confirmDeleteBody.indexOf('deleteNarration(');
+      expect(setItemPos).toBeLessThan(deleteNarrationPos);
+    });
+
+    it('narration-settings.tsx closes delete dialog immediately upon confirmation', () => {
+      const deleteNarrationBody = settingsSource.slice(
+        settingsSource.indexOf('const handleDeleteNarration ='),
+        settingsSource.indexOf('const isAdapted =', settingsSource.indexOf('const handleDeleteNarration =')),
+      );
+
+      expect(deleteNarrationBody).toContain('setDeleteDialogOpen(false)');
+      const setDialogPos = deleteNarrationBody.indexOf('setDeleteDialogOpen(false)');
+      const deleteNarrationPos = deleteNarrationBody.indexOf('deleteNarration(');
+      expect(setDialogPos).toBeLessThan(deleteNarrationPos);
+    });
+  });
 });

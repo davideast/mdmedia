@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -9,6 +8,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  setDoc,
   updateDoc,
   where,
   type DocumentData,
@@ -81,36 +81,39 @@ export function watchMyPlaylists(
   );
 }
 
-export async function createPlaylist(
+export function createPlaylist(
   ownerUid: string,
   title: string,
   description = '',
   initialNarrationIds: string[] = [],
-): Promise<string> {
+): string {
   const cleanTitle = title.trim().slice(0, 200);
   if (!cleanTitle) {
     throw new Error('Playlist title cannot be empty.');
   }
   const now = Date.now();
-  const created = await addDoc(playlistsCollection(), {
+  const newRef = doc(playlistsCollection());
+  void setDoc(newRef, {
     ownerUid,
     title: cleanTitle,
     description: description.trim(),
     narrationIds: initialNarrationIds.slice(0, MAX_PLAYLIST_ITEMS),
     createdAt: now,
     updatedAt: now,
+  }).catch((err) => {
+    console.error(`[playlists] failed to create playlist ${newRef.id}:`, err);
   });
-  return created.id;
+  return newRef.id;
 }
 
-export async function updatePlaylist(
+export function updatePlaylist(
   id: string,
   patch: {
     title?: string;
     description?: string;
     narrationIds?: string[];
   },
-): Promise<void> {
+): void {
   const payload: Record<string, unknown> = {
     updatedAt: Date.now(),
   };
@@ -125,32 +128,37 @@ export async function updatePlaylist(
   if (patch.narrationIds !== undefined) {
     payload.narrationIds = patch.narrationIds.slice(0, MAX_PLAYLIST_ITEMS);
   }
-  await updateDoc(playlistRef(id), payload);
+  void updateDoc(playlistRef(id), payload).catch((err) => {
+    console.error(`[playlists] failed to update playlist ${id}:`, err);
+  });
 }
 
 /**
  * Adds or removes `narrationId` on `playlist`. Returns `true` if added,
  * `false` if removed.
  */
-export async function toggleNarrationInPlaylist(
+export function toggleNarrationInPlaylist(
   playlist: Playlist,
   narrationId: string,
-): Promise<boolean> {
+): boolean {
   const exists = playlist.narrationIds.includes(narrationId);
   const nextIds = exists
     ? playlist.narrationIds.filter((id) => id !== narrationId)
     : [...playlist.narrationIds, narrationId].slice(0, MAX_PLAYLIST_ITEMS);
-  await updatePlaylist(playlist.id, { narrationIds: nextIds });
+  updatePlaylist(playlist.id, { narrationIds: nextIds });
   return !exists;
 }
 
-export async function reorderPlaylistTracks(
+export function reorderPlaylistTracks(
   playlistId: string,
   narrationIds: string[],
-): Promise<void> {
-  await updatePlaylist(playlistId, { narrationIds });
+): void {
+  updatePlaylist(playlistId, { narrationIds });
 }
 
-export async function deletePlaylist(id: string): Promise<void> {
-  await deleteDoc(playlistRef(id));
+export function deletePlaylist(id: string): void {
+  void deleteDoc(playlistRef(id)).catch((err) => {
+    console.error(`[playlists] failed to delete playlist ${id}:`, err);
+  });
 }
+

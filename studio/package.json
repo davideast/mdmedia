@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "check:cqrs": "ast-grep scan -c checks/sgconfig.yml",
+    "test:checks": "ast-grep test -c checks/sgconfig.yml",
     "rules:build": "npm run rules:build:firestore && npm run rules:build:storage",
     "rules:build:firestore": "pyric firestore rules resolve firestore.modules.rules --out firestore.rules",
     "rules:build:storage": "pyric storage rules resolve storage.modules.rules --out storage.rules",

@@ -51,9 +51,9 @@ export default function ProfilePage() {
   const totalMs = items.reduce((sum, item) => sum + item.durationMs, 0);
   const minutes = Math.round(totalMs / 60_000);
 
-  const commit = async (patch: { displayName?: string; bio?: string }) => {
+  const commit = (patch: { displayName?: string; bio?: string }) => {
     try {
-      await updateProfile(patch);
+      void updateProfile(patch);
     } catch {
       toast.error("That did not save. Try again.");
     }

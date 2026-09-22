@@ -104,7 +104,7 @@ export default function NarrationPage() {
     const previousTitle = stream.title;
     stream.setTitle(trimmed);
     try {
-      await updateNarrationTitle(id, trimmed);
+      updateNarrationTitle(id, trimmed);
       toast.success("Title updated");
     } catch {
       stream.setTitle(previousTitle);

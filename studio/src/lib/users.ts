@@ -116,7 +116,9 @@ export async function upsertUserProfile(input: UpsertProfileInput): Promise<User
       updatedAt: now,
       settings: { ...DEFAULT_SETTINGS },
     };
-    await setDoc(ref, profile);
+    void setDoc(ref, profile).catch((err) => {
+      console.error(`[users] failed to set initial profile for ${input.uid}:`, err);
+    });
     return profile;
   }
 
@@ -128,27 +130,33 @@ export async function upsertUserProfile(input: UpsertProfileInput): Promise<User
 
   if (Object.keys(patch).length === 0) return current;
 
-  await updateDoc(doc(db(), 'users', input.uid), { ...patch, updatedAt: now });
+  void updateDoc(doc(db(), 'users', input.uid), { ...patch, updatedAt: now }).catch((err) => {
+    console.error(`[users] failed to update profile for ${input.uid}:`, err);
+  });
   return { ...current, ...patch, updatedAt: now };
 }
 
 /** Merge a settings patch without clobbering the keys it leaves alone. */
-export async function saveSettings(uid: string, patch: Partial<UserSettings>): Promise<void> {
+export function saveSettings(uid: string, patch: Partial<UserSettings>): void {
   const fields: Record<string, unknown> = { updatedAt: Date.now() };
   for (const [key, value] of Object.entries(patch)) {
     if (value === undefined) continue;
     fields[`settings.${key}`] = value;
   }
-  await updateDoc(doc(db(), 'users', uid), fields);
+  void updateDoc(doc(db(), 'users', uid), fields).catch((err) => {
+    console.error(`[users] failed to save settings for ${uid}:`, err);
+  });
 }
 
 /** Update the fields of the profile a person controls directly. */
-export async function saveProfileFields(
+export function saveProfileFields(
   uid: string,
   patch: { displayName?: string; bio?: string },
-): Promise<void> {
+): void {
   const fields: Record<string, unknown> = { updatedAt: Date.now() };
   if (patch.displayName !== undefined) fields.displayName = patch.displayName;
   if (patch.bio !== undefined) fields.bio = patch.bio;
-  await updateDoc(doc(db(), 'users', uid), fields);
+  void updateDoc(doc(db(), 'users', uid), fields).catch((err) => {
+    console.error(`[users] failed to save profile fields for ${uid}:`, err);
+  });
 }
