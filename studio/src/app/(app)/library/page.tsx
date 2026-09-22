@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Check,
   CheckCircle2,
+  Download,
   Library,
   Loader2,
   Play,
@@ -29,6 +31,7 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
+import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import type { Narration } from "@/lib/types";
 
 const READABLE_VISIBILITY: Record<Narration["visibility"], string> = {
@@ -67,6 +70,19 @@ function LibraryNarrationCard({
   onDelete: (narration: Narration) => void;
 }) {
   const router = useRouter();
+  const isReady = narration.status === "ready";
+  const offlineMetadata = useMemo<OfflineNarrationMetadata>(
+    () => ({
+      title: narration.title,
+      sourceMarkdown: narration.sourceMarkdown,
+      adapted: narration.adapted,
+    }),
+    [narration.title, narration.sourceMarkdown, narration.adapted],
+  );
+  const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
+    narration.id,
+    offlineMetadata,
+  );
 
   const cleanExcerpt = useMemo(() => {
     return narration.transcript
@@ -128,6 +144,46 @@ function LibraryNarrationCard({
           <Play size={11} strokeWidth={2.5} className="fill-current" />
           <span>Open</span>
         </Button>
+        {isDownloading ? (
+          <span
+            className="inline-flex size-7 items-center justify-center text-primary"
+            title="Downloading for offline listening…"
+          >
+            <Loader2 size={13} className="animate-spin" />
+          </span>
+        ) : isDownloaded ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              void remove();
+            }}
+            className="h-7 px-2 text-xs text-emerald-500 hover:bg-muted hover:text-foreground"
+            title="Downloaded to device (click to remove)"
+            aria-label="Remove download"
+          >
+            <Check size={13} strokeWidth={2.5} />
+            <span className="sr-only">Downloaded</span>
+          </Button>
+        ) : isReady ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              void download();
+            }}
+            className="h-7 px-2 text-xs text-ink-muted hover:bg-muted hover:text-foreground"
+            title="Download for offline listening"
+            aria-label="Download for offline"
+          >
+            <Download size={13} strokeWidth={2} />
+            <span className="sr-only">Download for offline</span>
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="ghost"
@@ -169,6 +225,14 @@ function LibraryNarrationCard({
               <span>&middot;</span>
               <span className="inline-flex items-center gap-1 text-primary">
                 <Sparkles size={11} /> Adapted for ear
+              </span>
+            </>
+          ) : null}
+          {isDownloaded ? (
+            <>
+              <span>&middot;</span>
+              <span className="inline-flex items-center gap-1 font-medium text-emerald-500">
+                <Check size={11} strokeWidth={2.5} /> Offline ready
               </span>
             </>
           ) : null}

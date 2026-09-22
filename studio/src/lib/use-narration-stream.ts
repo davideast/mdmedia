@@ -485,15 +485,6 @@ export function useNarrationStream(): NarrationStreamState {
             URL.revokeObjectURL(objectUrl);
           }
 
-          if (isFinal) {
-            const saveTimings: NarrationTimingsFile = {
-              ...timingsFile,
-              sourceMarkdown: timingsFile.sourceMarkdown ?? latestDocRef.current.sourceMarkdown,
-              adapted: timingsFile.adapted ?? latestDocRef.current.adapted,
-            };
-            void mediaStore.saveTrack(narrationId, audioBlob, saveTimings).catch(() => {});
-          }
-
           if (options?.autoPlay && !autoPlayed) {
             autoPlayed = true;
             void activePlayer.play();

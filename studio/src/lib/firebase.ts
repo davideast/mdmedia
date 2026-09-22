@@ -33,3 +33,14 @@ export const storage = (): FirebaseStorage => getStorage(firebaseApp());
 /** The small model behind in-studio assistance (titles, style suggestions). */
 export const assistModel = (): GenerativeModel =>
   getGenerativeModel(getAI(firebaseApp()), { model: 'gemini-3.5-flash-lite' });
+
+/** Retrieves current user's ID token if authenticated, or null. */
+export async function currentIdToken(): Promise<string | null> {
+  try {
+    const user = auth().currentUser;
+    if (!user) return null;
+    return await user.getIdToken();
+  } catch {
+    return null;
+  }
+}

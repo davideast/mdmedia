@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Check, Download, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, updateVisibility } from "@/lib/narrations";
+import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import {
   createPlaylist,
   toggleNarrationInPlaylist,
@@ -84,6 +85,26 @@ export function NarrationSettings({
 
   const effectiveId = narration?.id ?? narrationId ?? stream.id;
   const effectiveVoice = narration?.voice ?? stream.voice;
+  const effectiveTitle = narration?.title ?? stream.title;
+  const effectiveSourceMarkdown = narration?.sourceMarkdown ?? stream.sourceMarkdown ?? undefined;
+  const effectiveAdapted = narration?.adapted ?? stream.adapted;
+  const isReady =
+    narration?.status === "ready" ||
+    (stream.id === effectiveId && stream.status === "ready");
+
+  const offlineMetadata = useMemo<OfflineNarrationMetadata>(
+    () => ({
+      title: effectiveTitle,
+      sourceMarkdown: effectiveSourceMarkdown,
+      adapted: effectiveAdapted,
+    }),
+    [effectiveTitle, effectiveSourceMarkdown, effectiveAdapted],
+  );
+
+  const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
+    effectiveId,
+    offlineMetadata,
+  );
 
   const commit = (visibility: Visibility, sharedWith: string[]) => {
     if (!narration) return;
@@ -330,6 +351,71 @@ export function NarrationSettings({
               <Plus size={15} strokeWidth={2} />
             </Button>
           </div>
+        </div>
+      ) : null}
+
+      {effectiveId ? (
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="t-label">Offline storage</Label>
+            {isDownloaded ? (
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-500">
+                <Check size={11} strokeWidth={2.5} />
+                Downloaded
+              </span>
+            ) : isDownloading ? (
+              <span className="inline-flex items-center gap-1 font-mono text-[11px] text-primary">
+                <Loader2 size={11} className="animate-spin" />
+                Downloading…
+              </span>
+            ) : (
+              <span className="font-mono text-[11px] text-ink-faint">
+                Cloud only
+              </span>
+            )}
+          </div>
+          <p className="text-[0.78rem] text-ink-muted leading-normal">
+            {isDownloaded
+              ? "Audio and timings are saved to this device for offline playback."
+              : isDownloading
+              ? "Fetching audio and word timings to save on this device."
+              : isReady
+              ? "Download this narration to listen without an internet connection."
+              : "Download will become available once narration generation completes."}
+          </p>
+          {isDownloaded ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void remove()}
+              className="h-8 justify-start gap-2 text-[0.8rem] text-ink-muted hover:border-destructive/40 hover:text-destructive"
+            >
+              <Trash2 size={13} strokeWidth={2} />
+              <span>Remove download</span>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDownloading || !isReady}
+              onClick={() => void download()}
+              className="h-8 justify-start gap-2 text-[0.8rem]"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 size={13} className="animate-spin text-primary" />
+                  <span>Downloading audio…</span>
+                </>
+              ) : (
+                <>
+                  <Download size={13} strokeWidth={2} />
+                  <span>Download for offline</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
       ) : null}
 
