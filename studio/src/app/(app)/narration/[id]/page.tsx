@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { BookOpen, FileText, Loader2 } from "lucide-react";
+import { BookOpen, Check, Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/reader/follow-button";
 import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
@@ -104,6 +105,20 @@ export default function NarrationPage() {
   const busy = stream.status === "starting" || stream.status === "streaming";
   const empty = stream.transcript.length === 0;
 
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAdapted = async () => {
+    if (!stream.transcript || stream.transcript.trim().length === 0) return;
+    try {
+      await navigator.clipboard.writeText(stream.transcript);
+      setCopied(true);
+      toast.success("Audio adapted document copied as markdown");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy markdown to clipboard.");
+    }
+  };
+
   const { showFollowButton, scrollToCurrent } = useReaderFollow({
     containerRef: scrollContainerRef,
     activeCharStart: stream.activeWord?.charStart ?? null,
@@ -161,7 +176,31 @@ export default function NarrationPage() {
           </span>
         )
       }
-      actions={busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
+      actions={
+        <div className="flex items-center gap-1">
+          {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
+          {!empty ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyAdapted}
+              title="Copy audio adapted document as markdown"
+              aria-label="Copy audio adapted document as markdown"
+              className="h-7 gap-1.5 px-2 text-xs text-ink-muted hover:text-foreground"
+            >
+              {copied ? (
+                <Check size={12} strokeWidth={2.5} className="text-primary" />
+              ) : (
+                <Copy size={12} strokeWidth={2} />
+              )}
+              <span className="hidden sm:inline">
+                {copied ? "Copied markdown" : documentView === "source" ? "Copy adapted" : "Copy markdown"}
+              </span>
+            </Button>
+          ) : null}
+        </div>
+      }
     >
       {stream.status === "error" ? (
         <p className="text-[0.95rem] text-ink-muted">
