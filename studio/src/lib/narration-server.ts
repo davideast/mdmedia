@@ -356,13 +356,13 @@ export function createNarrationStream({
       const client = createGeminiClient();
 
       /**
-       * The delivery note shapes the *script*, not the voice.
+       * Delivery customization shapes both the script and the speech synthesis:
        *
-       * The TTS model refuses a developer instruction outright — see the
-       * `processDocument` call below — so the only stage that can honour "warm,
-       * unhurried" is the rewrite, where it becomes phrasing, sentence length
-       * and punctuation. Appended to the SDK's default instruction rather than
-       * replacing it, so all of its markdown-to-speech rules still apply.
+       * 1. Script Adaptation: If rewrite is enabled, the delivery note informs
+       *    phrasing, sentence pacing, and vocabulary.
+       * 2. TTS Voice Synthesis: In `pipeline.processDocument`, the delivery note
+       *    is passed to `GeminiTTSProvider`, which supplies it as stage directions
+       *    to steer the voice persona, tone, and cadence without speaking them aloud.
        */
       const deliveryNote = request.promptStyle.trim();
       const adaptationInstructions =
