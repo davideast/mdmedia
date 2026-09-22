@@ -374,6 +374,41 @@ export function createNarrationStream({
     try {
       const client = createGeminiClient();
 
+      const author = await readAuthorProfile(uid);
+      const now = Date.now();
+      const initialTitle = deriveTitle(request.markdown, "");
+
+      // Seed the Firestore document immediately with status: "streaming" so that
+      // real-time listeners and security rules succeed from the outset, even while
+      // long-running adaptation or synthesis is underway.
+      const initialNarration: Narration = {
+        id,
+        ownerUid: uid,
+        title: initialTitle,
+        sourceMarkdown: request.markdown,
+        transcript: "",
+        voice: request.voice,
+        promptStyle: request.promptStyle,
+        adapted: request.rewriteForNarration,
+        status: "streaming",
+        durationMs: 0,
+        audioPath: "",
+        timingsPath: "",
+        visibility: request.visibility,
+        sharedWith: [],
+        authorName: author.name,
+        authorPhoto: author.photo,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await docRef.set(initialNarration);
+      docWritten = true;
+
+      if (cancelled) {
+        await purgeDocumentAndStorage();
+        return;
+      }
+
       /**
        * Delivery customization shapes both the script and the speech synthesis:
        *
@@ -420,31 +455,12 @@ export function createNarrationStream({
 
       const { transcript, offsets } = buildTranscript(documentChunks);
       const title = deriveTitle(request.markdown, transcript);
-      const author = await readAuthorProfile(uid);
-      const now = Date.now();
 
-      const narration: Narration = {
-        id,
-        ownerUid: uid,
+      await docRef.update({
         title,
-        sourceMarkdown: request.markdown,
         transcript,
-        voice: request.voice,
-        promptStyle: request.promptStyle,
-        adapted: request.rewriteForNarration,
-        status: "streaming",
-        durationMs: 0,
-        audioPath: "",
-        timingsPath: "",
-        visibility: request.visibility,
-        sharedWith: [],
-        authorName: author.name,
-        authorPhoto: author.photo,
-        createdAt: now,
-        updatedAt: now,
-      };
-      await docRef.set(narration);
-      docWritten = true;
+        updatedAt: Date.now(),
+      });
 
       if (cancelled) {
         await purgeDocumentAndStorage();

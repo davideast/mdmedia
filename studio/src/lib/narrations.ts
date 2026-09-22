@@ -135,16 +135,22 @@ function narrationRef(id: string) {
 export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => void): Unsubscribe {
   return multicastSubscribe<Narration[]>(
     `my-narrations:${uid}`,
-    (onData) => {
+    (onData, onError) => {
       const q = query(
         narrationsCollection(),
         where('ownerUid', '==', uid),
         orderBy('createdAt', 'desc'),
         limit(NARRATION_PAGE_SIZE),
       );
-      return onSnapshot(q, (snapshot) => {
-        onData(snapshot.docs.map(toNarration).filter((item) => item.status !== 'error'));
-      });
+      return onSnapshot(
+        q,
+        (snapshot) => {
+          onData(snapshot.docs.map(toNarration).filter((item) => item.status !== 'error'));
+        },
+        (error) => {
+          onError?.(error);
+        },
+      );
     },
     cb,
   );
@@ -153,10 +159,16 @@ export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => 
 export function watchNarration(id: string, cb: (narration: Narration | null) => void): Unsubscribe {
   return multicastSubscribe<Narration | null>(
     `narration:${id}`,
-    (onData) => {
-      return onSnapshot(narrationRef(id), (snapshot) => {
-        onData(snapshot.exists() ? toNarration(snapshot) : null);
-      });
+    (onData, onError) => {
+      return onSnapshot(
+        narrationRef(id),
+        (snapshot) => {
+          onData(snapshot.exists() ? toNarration(snapshot) : null);
+        },
+        (error) => {
+          onError?.(error);
+        },
+      );
     },
     cb,
   );

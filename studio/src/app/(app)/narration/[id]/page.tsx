@@ -16,7 +16,15 @@ import { updateNarrationTitle } from "@/lib/narrations";
 export default function NarrationPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
-  const { stream, documentView, setDocumentView } = useNarration();
+  const { stream, documentView, setDocumentView, generationQueue } = useNarration();
+  const activeQueueJob = generationQueue.jobs.find(
+    (j) =>
+      j.narrationId === id &&
+      (j.status === "queued" || j.status === "starting" || j.status === "streaming"),
+  );
+  const failedQueueJob = generationQueue.jobs.find(
+    (j) => j.narrationId === id && j.status === "error",
+  );
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -66,7 +74,10 @@ export default function NarrationPage() {
     stream.player.seek(startMs);
   };
 
-  const displayTitle = stream.title.length > 0 ? stream.title : "Narration";
+  const displayTitle =
+    stream.title.length > 0
+      ? stream.title
+      : activeQueueJob?.title || "Narration";
 
   const startEditingTitle = () => {
     isSubmittingRef.current = false;
@@ -103,7 +114,10 @@ export default function NarrationPage() {
     }
   };
 
-  const busy = stream.status === "starting" || stream.status === "streaming";
+  const busy =
+    stream.status === "starting" ||
+    stream.status === "streaming" ||
+    Boolean(activeQueueJob);
   const empty = stream.transcript.length === 0;
 
   const [copied, setCopied] = useState(false);
@@ -200,15 +214,55 @@ export default function NarrationPage() {
         </div>
       }
     >
-      {stream.status === "error" ? (
+      {stream.status === "error" || failedQueueJob ? (
         <p className="text-[0.95rem] text-ink-muted">
-          {stream.errorMessage ?? "This narration could not be loaded."}
+          {failedQueueJob?.errorMessage ??
+            stream.errorMessage ??
+            "This narration could not be loaded."}
         </p>
       ) : empty ? (
-        <div className="grid place-items-center pt-24">
-          <Loader2 size={18} className="animate-spin text-ink-faint" />
-          <span className="sr-only">Loading narration</span>
-        </div>
+        activeQueueJob ? (
+          <div className="mx-auto flex max-w-md flex-col items-center justify-center pt-24 text-center">
+            <div className="mb-4 inline-flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Loader2 size={18} className="animate-spin" />
+            </div>
+            <h3 className="mb-1 text-[0.95rem] font-semibold text-foreground">
+              Synthesizing audio
+            </h3>
+            <p className="mb-4 text-xs text-ink-muted">
+              {activeQueueJob.totalChunks > 0
+                ? `Synthesizing audio (${activeQueueJob.completedChunks} / ${activeQueueJob.totalChunks} chunks)`
+                : activeQueueJob.status === "starting"
+                  ? "Connecting to synthesis engine…"
+                  : "Adapting text and preparing chunks…"}
+            </p>
+            <div className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-muted">
+              {activeQueueJob.totalChunks > 0 ? (
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(
+                        8,
+                        Math.round(
+                          (activeQueueJob.completedChunks / activeQueueJob.totalChunks) * 100,
+                        ),
+                      ),
+                    )}%`,
+                  }}
+                />
+              ) : (
+                <div className="h-full w-2/5 animate-pulse rounded-full bg-primary/70" />
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid place-items-center pt-24">
+            <Loader2 size={18} className="animate-spin text-ink-faint" />
+            <span className="sr-only">Loading narration</span>
+          </div>
+        )
       ) : documentView === "source" || documentView === "raw" ? (
         <SourceDocumentView
           sourceMarkdown={stream.sourceMarkdown || ""}
