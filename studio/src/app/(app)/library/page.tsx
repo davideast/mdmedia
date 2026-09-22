@@ -113,36 +113,6 @@ function LibraryNarrationCard({
         </span>
       </div>
 
-      {/* Track: Excerpt text */}
-      {cleanExcerpt ? (
-        <div className="track-body">
-          <p className="line-clamp-1 text-[0.8rem] text-ink-muted/80">
-            {cleanExcerpt}
-          </p>
-        </div>
-      ) : null}
-
-      {/* Track: Metadata tags */}
-      <div className="track-body">
-        <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
-          <span className="font-medium text-foreground">{narration.voice}</span>
-          <span>&middot;</span>
-          <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
-          <span>&middot;</span>
-          <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
-          <span>&middot;</span>
-          <span>{READABLE_VISIBILITY[narration.visibility]}</span>
-          {narration.adapted ? (
-            <>
-              <span>&middot;</span>
-              <span className="inline-flex items-center gap-1 text-primary">
-                <Sparkles size={11} /> Adapted for ear
-              </span>
-            </>
-          ) : null}
-        </div>
-      </div>
-
       {/* Track: Action controls */}
       <div className="track-actions">
         <Button
@@ -174,6 +144,36 @@ function LibraryNarrationCard({
           <span className="sr-only">Delete</span>
         </Button>
       </div>
+
+      {/* Track: Excerpt text */}
+      {cleanExcerpt ? (
+        <div className="track-body">
+          <p className="line-clamp-1 text-[0.8rem] text-ink-muted/80">
+            {cleanExcerpt}
+          </p>
+        </div>
+      ) : null}
+
+      {/* Track: Metadata tags */}
+      <div className="track-body">
+        <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-ink-muted">
+          <span className="font-medium text-foreground">{narration.voice}</span>
+          <span>&middot;</span>
+          <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
+          <span>&middot;</span>
+          <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
+          <span>&middot;</span>
+          <span>{READABLE_VISIBILITY[narration.visibility]}</span>
+          {narration.adapted ? (
+            <>
+              <span>&middot;</span>
+              <span className="inline-flex items-center gap-1 text-primary">
+                <Sparkles size={11} /> Adapted for ear
+              </span>
+            </>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }
@@ -200,6 +200,14 @@ export default function LibraryPage() {
         item.transcript.toLowerCase().includes(needle),
     );
   }, [items, query]);
+
+  const totalParagraphs = useMemo(() => {
+    return filtered.reduce((sum, item) => {
+      const text = item.sourceMarkdown || item.transcript || "";
+      const count = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length;
+      return sum + (count || (text.trim().length > 0 ? 1 : 0));
+    }, 0);
+  }, [filtered]);
 
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
@@ -268,7 +276,7 @@ export default function LibraryPage() {
               Narrations ({filtered.length})
             </h2>
             <span className="t-meta text-ink-faint">
-              {filtered.reduce((sum, item) => sum + item.chunksCount, 0)} paragraphs total
+              {totalParagraphs} {totalParagraphs === 1 ? "paragraph" : "paragraphs"} total
             </span>
           </div>
 

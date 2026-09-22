@@ -45,10 +45,10 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
 
     it("defines .item-track-grid with named tracks [status-start], [text-start], [action-start]", () => {
       expect(globalsCss).toContain("[status-start]");
-      expect(globalsCss).toContain("[status-end]");
-      expect(globalsCss).toContain("[text-start]");
-      expect(globalsCss).toContain("[text-end]");
-      expect(globalsCss).toContain("[action-start]");
+      expect(globalsCss).toContain("status-end");
+      expect(globalsCss).toContain("text-start");
+      expect(globalsCss).toContain("text-end");
+      expect(globalsCss).toContain("action-start");
       expect(globalsCss).toContain("[action-end]");
     });
   });
@@ -75,6 +75,11 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
       expect(libraryPage).toContain("<WorkbenchPanel\n      title=\"Library\"\n      icon={<Library size={13} strokeWidth={2} />}\n      viewGrid\n    >");
       expect(libraryPage).not.toContain('bodyClassName="px-8 py-8"');
       expect(libraryPage).not.toContain("mx-auto grid w-full max-w-[68ch]");
+    });
+
+    it("LibraryPage computes real totalParagraphs and does not reference undefined chunksCount", () => {
+      expect(libraryPage).toContain("totalParagraphs");
+      expect(libraryPage).not.toContain("chunksCount");
     });
 
     it("LibraryNarrationCard uses item-track-grid and does NOT use pl-5.5 or pl-5 ad-hoc nudging", () => {

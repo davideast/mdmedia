@@ -700,11 +700,11 @@
   .item-track-grid {
     display: grid;
     grid-template-columns:
-      [status-start] 1.25rem [status-end]
-      [text-start] minmax(0, 1fr) [text-end]
-      [action-start] auto [action-end];
+      [status-start] 1.25rem [status-end text-start]
+      minmax(0, 1fr) [text-end action-start]
+      auto [action-end];
     column-gap: 0.75rem;
-    row-gap: 0.35rem;
+    row-gap: 0.25rem;
     align-items: center;
   }
 
@@ -729,7 +729,7 @@
 
   .item-track-grid .track-actions {
     grid-column: action-start / action-end;
-    grid-row: 1 / -1;
+    grid-row: 1;
     display: flex;
     align-items: center;
     gap: 0.375rem;
