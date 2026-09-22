@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { currentIdToken } from './firebase';
 import { getMediaStore } from './media-store';
 import type { NarrationTimingsFile } from './wav';
@@ -171,26 +170,12 @@ export function useOfflineStatus(
 
   const download = useCallback(async () => {
     if (!narrationId || isNarrationDownloading(narrationId)) return;
-    try {
-      await downloadNarration(narrationId, metadataRef.current);
-      toast.success(
-        metadataRef.current?.title
-          ? `Downloaded "${metadataRef.current.title}" for offline listening`
-          : 'Downloaded for offline listening',
-      );
-    } catch {
-      toast.error('Could not download narration for offline listening.');
-    }
+    await downloadNarration(narrationId, metadataRef.current);
   }, [narrationId]);
 
   const remove = useCallback(async () => {
     if (!narrationId) return;
-    try {
-      await removeOfflineNarration(narrationId);
-      toast.info('Removed from offline storage');
-    } catch {
-      toast.error('Could not remove narration from offline storage.');
-    }
+    await removeOfflineNarration(narrationId);
   }, [narrationId]);
 
   return {

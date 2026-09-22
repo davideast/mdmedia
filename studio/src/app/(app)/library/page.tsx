@@ -156,9 +156,14 @@ function LibraryNarrationCard({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              void remove();
+              try {
+                await remove();
+                toast.info("Removed from offline storage");
+              } catch {
+                toast.error("Could not remove narration from offline storage.");
+              }
             }}
             className="h-7 px-2 text-xs text-emerald-500 hover:bg-muted hover:text-foreground"
             title="Downloaded to device (click to remove)"
@@ -172,9 +177,18 @@ function LibraryNarrationCard({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              void download();
+              try {
+                await download();
+                toast.success(
+                  narration.title
+                    ? `Downloaded "${narration.title}" for offline listening`
+                    : "Downloaded for offline listening",
+                );
+              } catch {
+                toast.error("Could not download narration for offline listening.");
+              }
             }}
             className="h-7 px-2 text-xs text-ink-muted hover:bg-muted hover:text-foreground"
             title="Download for offline listening"

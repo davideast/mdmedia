@@ -388,7 +388,14 @@ export function NarrationSettings({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => void remove()}
+              onClick={async () => {
+                try {
+                  await remove();
+                  toast.info("Removed from offline storage");
+                } catch {
+                  toast.error("Could not remove narration from offline storage.");
+                }
+              }}
               className="h-8 justify-start gap-2 text-[0.8rem] text-ink-muted hover:border-destructive/40 hover:text-destructive"
             >
               <Trash2 size={13} strokeWidth={2} />
@@ -400,7 +407,18 @@ export function NarrationSettings({
               variant="outline"
               size="sm"
               disabled={isDownloading || !isReady}
-              onClick={() => void download()}
+              onClick={async () => {
+                try {
+                  await download();
+                  toast.success(
+                    effectiveTitle
+                      ? `Downloaded "${effectiveTitle}" for offline listening`
+                      : "Downloaded for offline listening",
+                  );
+                } catch {
+                  toast.error("Could not download narration for offline listening.");
+                }
+              }}
               className="h-8 justify-start gap-2 text-[0.8rem]"
             >
               {isDownloading ? (
