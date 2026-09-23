@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { auth } from './firebase';
 import { deleteNarration, generateNarrationId } from './narrations';
-import type { NarrationErrorCategory, StreamEvent, Visibility, VoiceName } from './types';
+import {
+  DEFAULT_TTS_MODEL,
+  type NarrationErrorCategory,
+  type StreamEvent,
+  type TTSModelName,
+  type Visibility,
+  type VoiceName,
+} from './types';
 
 export type JobStatus = 'queued' | 'starting' | 'streaming' | 'ready' | 'error';
 
@@ -15,6 +22,7 @@ export interface GenerationJob {
   title: string;
   markdown: string;
   voice: VoiceName;
+  model?: TTSModelName;
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
@@ -40,6 +48,7 @@ export interface GenerationQueueState {
   queueNarration: (input: {
     markdown: string;
     voice: VoiceName;
+    model?: TTSModelName;
     promptStyle: string;
     rewriteForNarration: boolean;
     rewriteInstructions?: string;
@@ -129,6 +138,7 @@ export function useGenerationQueue(): GenerationQueueState {
     async (input: {
       markdown: string;
       voice: VoiceName;
+      model?: TTSModelName;
       promptStyle: string;
       rewriteForNarration: boolean;
       rewriteInstructions?: string;
@@ -147,6 +157,7 @@ export function useGenerationQueue(): GenerationQueueState {
         title,
         markdown: input.markdown,
         voice: input.voice,
+        model: input.model ?? DEFAULT_TTS_MODEL,
         promptStyle: input.promptStyle,
         rewriteForNarration: input.rewriteForNarration,
         rewriteInstructions: input.rewriteInstructions,
@@ -345,6 +356,7 @@ export function useGenerationQueue(): GenerationQueueState {
       return queueNarration({
         markdown: existingJob.markdown,
         voice: existingJob.voice,
+        model: existingJob.model,
         promptStyle: existingJob.promptStyle,
         rewriteForNarration: existingJob.rewriteForNarration,
         rewriteInstructions: existingJob.rewriteInstructions,

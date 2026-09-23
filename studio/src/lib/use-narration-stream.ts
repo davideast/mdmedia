@@ -15,7 +15,7 @@ import { auth } from './firebase';
 import { watchNarration } from './narrations';
 import { getMediaStore } from './media-store';
 import { StreamingPcmPlayer } from './pcm-player';
-import type { AlignedChunk, AlignedWord, StreamEvent, Visibility, VoiceName } from './types';
+import type { AlignedChunk, AlignedWord, StreamEvent, TTSModelName, Visibility, VoiceName } from './types';
 import type { NarrationTimingsFile } from './wav';
 
 export interface NarrationStreamState {
@@ -37,6 +37,7 @@ export interface NarrationStreamState {
   start: (input: {
     markdown: string;
     voice: VoiceName;
+    model?: TTSModelName;
     promptStyle: string;
     rewriteForNarration: boolean;
     rewriteInstructions?: string;

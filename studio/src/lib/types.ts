@@ -44,6 +44,16 @@ export type VoiceName = (typeof VOICES)[number];
 
 export const DEFAULT_VOICE: VoiceName = "Kore";
 
+/** Supported Gemini TTS models for audio generation. */
+export const TTS_MODELS = [
+  "gemini-3.8-flash-tts",
+  "gemini-3.8-flash-lite-tts",
+] as const;
+
+export type TTSModelName = (typeof TTS_MODELS)[number];
+
+export const DEFAULT_TTS_MODEL: TTSModelName = "gemini-3.8-flash-tts";
+
 /** Who can read a narration. */
 export type Visibility = "private" | "shared" | "public";
 
@@ -96,6 +106,7 @@ export interface Narration {
   /** What was actually spoken. The reader renders this. */
   transcript: string;
   voice: VoiceName;
+  model?: TTSModelName;
   promptStyle: string;
   /** Whether the source was rewritten for the ear before synthesis. */
   adapted: boolean;
@@ -205,6 +216,7 @@ export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structu
 
 export interface UserSettings {
   defaultVoice: VoiceName;
+  defaultModel?: TTSModelName;
   defaultPromptStyle: string;
   /** Rewrite markdown for the ear before synthesis. */
   rewriteForNarration: boolean;
@@ -218,6 +230,7 @@ export interface UserSettings {
 
 export const DEFAULT_SETTINGS: UserSettings = {
   defaultVoice: DEFAULT_VOICE,
+  defaultModel: DEFAULT_TTS_MODEL,
   defaultPromptStyle: "Warm, unhurried narration.",
   rewriteForNarration: true,
   autoPlay: true,
@@ -251,6 +264,7 @@ export interface StreamMetaEvent {
   id: string;
   title: string;
   voice: VoiceName;
+  model?: TTSModelName;
   totalChunks: number;
   totalChars: number;
 }

@@ -58,6 +58,7 @@ export default function StudioPage() {
       await generationQueue.queueNarration({
         markdown: markdownToSynthesize,
         voice: draft.voice,
+        model: draft.model,
         promptStyle: draft.promptStyle,
         rewriteForNarration: draft.rewriteForNarration,
         rewriteInstructions: draft.rewriteInstructions?.trim() || undefined,

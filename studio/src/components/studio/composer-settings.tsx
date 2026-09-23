@@ -12,7 +12,15 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
-import { DEFAULT_HEADING_INSTRUCTIONS, VOICES, type VoiceName, type Visibility } from "@/lib/types";
+import {
+  DEFAULT_HEADING_INSTRUCTIONS,
+  DEFAULT_TTS_MODEL,
+  TTS_MODELS,
+  VOICES,
+  type TTSModelName,
+  type Visibility,
+  type VoiceName,
+} from "@/lib/types";
 import { SlidersHorizontal } from "lucide-react";
 
 const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string; hint: string }> = [
@@ -49,6 +57,27 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
             {VOICES.map((voice) => (
               <SelectItem key={voice} value={voice}>
                 {voice}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="model" className="t-label">
+          Model
+        </Label>
+        <Select
+          value={draft.model ?? DEFAULT_TTS_MODEL}
+          onValueChange={(value) => setDraft({ model: value as TTSModelName })}
+        >
+          <SelectTrigger id="model" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TTS_MODELS.map((model) => (
+              <SelectItem key={model} value={model}>
+                {model}
               </SelectItem>
             ))}
           </SelectContent>

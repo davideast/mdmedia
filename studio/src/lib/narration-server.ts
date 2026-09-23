@@ -21,6 +21,7 @@ import type { DocumentChunk } from "mdmedia/types";
 import { adminAuth, adminBucket, adminDb } from "./firebase-admin";
 import {
   BYTES_PER_MS,
+  DEFAULT_TTS_MODEL,
   VOICES,
   type AlignedChunk,
   type AlignedWord,
@@ -341,6 +342,7 @@ export function createNarrationStream({
         sourceMarkdown: request.markdown,
         transcript: "",
         voice: request.voice,
+        model: request.model ?? DEFAULT_TTS_MODEL,
         promptStyle: request.promptStyle,
         adapted: request.rewriteForNarration,
         status: "streaming",
@@ -443,11 +445,14 @@ export function createNarrationStream({
         return;
       }
 
+      const selectedModel = request.model ?? DEFAULT_TTS_MODEL;
+
       queue.push({
         type: "meta",
         id,
         title,
         voice: request.voice,
+        model: selectedModel,
         totalChunks: documentChunks.length,
         totalChars: transcript.length,
       });
@@ -455,7 +460,7 @@ export function createNarrationStream({
 
       const bus = new UniversalEventBus();
       pipeline = new DocumentAudioPipeline(
-        new GeminiTTSProvider(client),
+        new GeminiTTSProvider(client, 3, selectedModel),
         bus,
       );
 

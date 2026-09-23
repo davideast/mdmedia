@@ -16,10 +16,12 @@ import {
   DEFAULT_HEADING_INSTRUCTIONS,
   DEFAULT_HIGHLIGHT_COLOR,
   DEFAULT_SETTINGS,
+  DEFAULT_TTS_MODEL,
   HIGHLIGHT_COLORS,
   type HighlightColorId,
   type Narration,
   type Playlist,
+  type TTSModelName,
   type VoiceName,
   type Visibility,
 } from "@/lib/types";
@@ -35,6 +37,7 @@ export type { GenerationJob, GenerationQueueState };
 export interface Draft {
   markdown: string;
   voice: VoiceName;
+  model: TTSModelName;
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
@@ -171,6 +174,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     () => ({
       markdown: "",
       voice: settings.defaultVoice,
+      model: settings.defaultModel ?? DEFAULT_TTS_MODEL,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
       rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,

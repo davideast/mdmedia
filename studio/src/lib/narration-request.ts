@@ -6,7 +6,10 @@
  */
 
 import {
+  DEFAULT_TTS_MODEL,
+  TTS_MODELS,
   VOICES,
+  type TTSModelName,
   type Visibility,
   type VoiceName,
 } from './types';
@@ -16,6 +19,7 @@ export interface NarrationRequest {
   id?: string;
   markdown: string;
   voice: VoiceName;
+  model?: TTSModelName;
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
@@ -27,6 +31,10 @@ const VISIBILITIES: readonly Visibility[] = ['private', 'shared', 'public'];
 
 function isVoice(value: unknown): value is VoiceName {
   return typeof value === 'string' && (VOICES as readonly string[]).includes(value);
+}
+
+function isTTSModel(value: unknown): value is TTSModelName {
+  return typeof value === 'string' && (TTS_MODELS as readonly string[]).includes(value);
 }
 
 function isVisibility(value: unknown): value is Visibility {
@@ -54,6 +62,7 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
     id: customId,
     markdown,
     voice: raw.voice,
+    model: isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL,
     promptStyle: typeof raw.promptStyle === 'string' ? raw.promptStyle : '',
     rewriteForNarration: raw.rewriteForNarration === true,
     rewriteInstructions:
