@@ -70,6 +70,22 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
       </div>
 
       <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+        <div className="grid gap-0.5">
+          <Label htmlFor="structure" className="t-card-title cursor-pointer font-normal">
+            Clean document structure
+          </Label>
+          <span className="text-[0.78rem] text-ink-muted">
+            Format headings, fences, tables, and Mermaid charts.
+          </span>
+        </div>
+        <Switch
+          id="structure"
+          checked={draft.structureMarkdown ?? false}
+          onCheckedChange={(checked) => setDraft({ structureMarkdown: checked })}
+        />
+      </div>
+
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
         <Label htmlFor="rewrite" className="t-card-title cursor-pointer font-normal">
           Rewrite for the ear
         </Label>

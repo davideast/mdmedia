@@ -624,6 +624,22 @@
     color: #f3f5f3;
   }
 
+  /* Diff highlighting tokens — grounded in the study's mint/coral semantic tokens */
+  .token.inserted {
+    color: var(--mint);
+    background-color: var(--mint-bg);
+  }
+
+  .token.deleted {
+    color: var(--coral);
+    background-color: var(--coral-bg);
+  }
+
+  .token.coord {
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
   /* Light mode token adjustments */
   :root:not(.dark) .token.keyword,
   :root:not(.dark) .token.tag,
@@ -656,6 +672,20 @@
 
   :root:not(.dark) .token.parameter {
     color: #0f172a;
+  }
+
+  :root:not(.dark) .token.inserted {
+    color: var(--mint);
+    background-color: var(--mint-bg);
+  }
+
+  :root:not(.dark) .token.deleted {
+    color: var(--coral);
+    background-color: var(--coral-bg);
+  }
+
+  :root:not(.dark) .token.coord {
+    color: var(--ink-faint);
   }
 }
 

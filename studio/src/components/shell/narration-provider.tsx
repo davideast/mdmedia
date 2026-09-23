@@ -38,6 +38,7 @@ export interface Draft {
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
+  structureMarkdown?: boolean;
   visibility: Visibility;
 }
 

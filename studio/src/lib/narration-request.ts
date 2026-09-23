@@ -19,6 +19,7 @@ export interface NarrationRequest {
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
+  structureMarkdown?: boolean;
   visibility: Visibility;
 }
 
@@ -59,6 +60,7 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
       typeof raw.rewriteInstructions === 'string' && raw.rewriteInstructions.trim().length > 0
         ? raw.rewriteInstructions.trim()
         : undefined,
+    structureMarkdown: raw.structureMarkdown === true,
     visibility: raw.visibility,
   };
 }

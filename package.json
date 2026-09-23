@@ -42,6 +42,10 @@
       "types": "./dist/narration/index.d.ts",
       "import": "./dist/narration/index.js"
     },
+    "./markdown": {
+      "types": "./dist/markdown/index.d.ts",
+      "import": "./dist/markdown/index.js"
+    },
     "./storage": {
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js"

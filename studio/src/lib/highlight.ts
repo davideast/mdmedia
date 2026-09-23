@@ -8,6 +8,7 @@ import "prismjs/components/prism-json";
 import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-css";
+import "prismjs/components/prism-diff";
 
 function escapeHtml(text: string): string {
   return text
@@ -43,6 +44,8 @@ const LANGUAGE_MAP: Record<string, string> = {
   svg: "markup",
   md: "markdown",
   markdown: "markdown",
+  diff: "diff",
+  patch: "diff",
 };
 
 /**

@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { marked } from "marked";
 import { cn } from "cn";
 import { CodeBlock } from "@/components/reader/code-block";
+import { MermaidBlock } from "@/components/reader/mermaid-block";
 
 export interface SourceDocumentViewProps {
   sourceMarkdown: string;
@@ -96,11 +97,18 @@ export function SourceDocumentView({
         <div className="flex w-full min-w-0 max-w-full flex-col">
           {segments.map((segment) =>
             segment.type === "code" ? (
-              <CodeBlock
-                key={segment.key}
-                code={segment.text}
-                lang={segment.lang}
-              />
+              segment.lang?.toLowerCase().trim() === "mermaid" ? (
+                <MermaidBlock
+                  key={segment.key}
+                  code={segment.text}
+                />
+              ) : (
+                <CodeBlock
+                  key={segment.key}
+                  code={segment.text}
+                  lang={segment.lang}
+                />
+              )
             ) : (
               <div
                 key={segment.key}

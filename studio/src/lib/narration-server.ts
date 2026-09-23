@@ -13,6 +13,7 @@ import {
   GeminiNarrationAdapter,
   HEADING_GENERATION_NARRATION_PROMPT,
 } from "mdmedia/narration";
+import { GeminiMarkdownStructureAdapter } from "mdmedia/markdown";
 import { DocumentAudioPipeline, UniversalEventBus } from "mdmedia/pipeline";
 import { GeminiTTSProvider, createGeminiClient } from "mdmedia/tts";
 import type { DocumentChunk } from "mdmedia/types";
@@ -361,6 +362,29 @@ export function createNarrationStream({
         return;
       }
 
+      let sourceMarkdown = request.markdown;
+      if (request.structureMarkdown) {
+        try {
+          const structureAdapter = new GeminiMarkdownStructureAdapter(client);
+          const structured = await structureAdapter.structureMarkdown(sourceMarkdown);
+          if (structured && structured.length > 0) {
+            sourceMarkdown = structured;
+            await docRef.update({
+              sourceMarkdown,
+              title: deriveTitle(sourceMarkdown, ""),
+              updatedAt: Date.now(),
+            });
+          }
+        } catch (structureError) {
+          console.warn("[NarrationServer] Structure markdown fallback to raw:", structureError);
+        }
+      }
+
+      if (cancelled) {
+        await purgeDocumentAndStorage();
+        return;
+      }
+
       /**
        * Delivery customization shapes both the script and the speech synthesis:
        *
@@ -385,12 +409,12 @@ export function createNarrationStream({
             model: NARRATION_MODEL,
             systemInstruction: DEFAULT_NARRATION_SYSTEM_INSTRUCTION,
             customPrompt,
-          }).adaptForNarration(request.markdown)
-        : request.markdown;
+          }).adaptForNarration(sourceMarkdown)
+        : sourceMarkdown;
 
       const documentChunks = chunkSpeakableParagraphs(
         parseMarkdownToSpeakableParagraphs(
-          script.trim().length > 0 ? script : request.markdown,
+          script.trim().length > 0 ? script : sourceMarkdown,
           { preserveHeadings: true },
         ),
         MAX_CHUNK_CHARS,
@@ -406,7 +430,7 @@ export function createNarrationStream({
       }
 
       const { transcript, offsets } = buildTranscript(documentChunks);
-      const title = deriveTitle(request.markdown, transcript);
+      const title = deriveTitle(sourceMarkdown, transcript);
 
       await docRef.update({
         title,
@@ -485,7 +509,7 @@ export function createNarrationStream({
           transcript,
           durationMs,
           chunks: [...alignedChunks],
-          sourceMarkdown: request.markdown,
+          sourceMarkdown,
           adapted: request.rewriteForNarration,
         };
         const audioBuffer = Buffer.from(wav);

@@ -18,6 +18,7 @@ export interface GenerationJob {
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
+  structureMarkdown?: boolean;
   visibility: Visibility;
   status: JobStatus;
   errorMessage: string | null;
@@ -42,6 +43,7 @@ export interface GenerationQueueState {
     promptStyle: string;
     rewriteForNarration: boolean;
     rewriteInstructions?: string;
+    structureMarkdown?: boolean;
     visibility: Visibility;
   }) => Promise<string>;
   retryJob: (jobId: string) => Promise<string | null>;
@@ -130,6 +132,7 @@ export function useGenerationQueue(): GenerationQueueState {
       promptStyle: string;
       rewriteForNarration: boolean;
       rewriteInstructions?: string;
+      structureMarkdown?: boolean;
       visibility: Visibility;
     }): Promise<string> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
@@ -147,6 +150,7 @@ export function useGenerationQueue(): GenerationQueueState {
         promptStyle: input.promptStyle,
         rewriteForNarration: input.rewriteForNarration,
         rewriteInstructions: input.rewriteInstructions,
+        structureMarkdown: input.structureMarkdown,
         visibility: input.visibility,
         status: 'queued',
         errorMessage: null,
