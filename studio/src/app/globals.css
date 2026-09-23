@@ -224,6 +224,8 @@
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
   --color-border-strong: var(--border-strong);
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
   --color-surface-inset: var(--surface-inset);
   --color-surface-subtle: var(--surface-subtle);
 
@@ -494,12 +496,93 @@
 
   .source-markdown-body blockquote {
     border-left: 3px solid var(--border-strong);
-    padding-left: 1rem;
+    background-color: var(--surface-inset);
+    border-radius: 0 var(--radius-inner) var(--radius-inner) 0;
+    padding: 0.85rem 1.15rem;
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 1.25rem;
-    color: var(--ink-muted);
-    font-style: italic;
+    color: var(--foreground);
+    font-style: normal;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .source-markdown-body blockquote > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* ==========================================================================
+     GFM Markdown Alerts (marked-alert AST extension)
+     ========================================================================== */
+  .source-markdown-body .markdown-alert {
+    margin-bottom: 1.25rem;
+    border-radius: var(--radius-inner);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    background-color: var(--surface-card);
+    padding: 0.85rem 1.15rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .source-markdown-body .markdown-alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--foreground);
+  }
+
+  .source-markdown-body .markdown-alert-title svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .source-markdown-body .markdown-alert > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Note & Tip */
+  .source-markdown-body .markdown-alert-note,
+  .source-markdown-body .markdown-alert-tip {
+    border-color: color-mix(in srgb, var(--mint) 35%, transparent);
+    border-left-color: var(--mint);
+    background-color: color-mix(in srgb, var(--mint-bg) 20%, var(--surface-card));
+  }
+  .source-markdown-body .markdown-alert-note .markdown-alert-title,
+  .source-markdown-body .markdown-alert-tip .markdown-alert-title {
+    color: var(--mint);
+  }
+
+  /* Important, Warning & Caution */
+  .source-markdown-body .markdown-alert-important,
+  .source-markdown-body .markdown-alert-warning,
+  .source-markdown-body .markdown-alert-caution {
+    border-color: color-mix(in srgb, var(--coral) 35%, transparent);
+    border-left-color: var(--coral);
+    background-color: color-mix(in srgb, var(--coral-bg) 20%, var(--surface-card));
+  }
+  .source-markdown-body .markdown-alert-important .markdown-alert-title,
+  .source-markdown-body .markdown-alert-warning .markdown-alert-title,
+  .source-markdown-body .markdown-alert-caution .markdown-alert-title {
+    color: var(--coral);
+  }
+
+  /* Modify */
+  .source-markdown-body .markdown-alert-modify {
+    border-color: var(--border-strong);
+    border-left-color: var(--primary);
+    background-color: var(--surface-inset);
+  }
+  .source-markdown-body .markdown-alert-modify .markdown-alert-title {
+    color: var(--foreground);
   }
 
   .source-markdown-body pre {

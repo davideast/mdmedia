@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AudioLines, Clock, Loader2, Sparkles } from "lucide-react";
+import { AudioLines, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useAuth } from "@/lib/auth-context";
-import { currentIdToken } from "@/lib/firebase";
 import { watchMyNarrations } from "@/lib/narrations";
 import type { Narration } from "@/lib/types";
 
@@ -43,7 +42,6 @@ export default function StudioPage() {
   const { draft, setDraft, generationQueue } = useNarration();
   const [history, setHistory] = useState<Narration[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [formatting, setFormatting] = useState(false);
 
   useEffect(() => {
     if (user === null) return;
@@ -51,37 +49,6 @@ export default function StudioPage() {
   }, [user]);
 
   const tooShort = draft.markdown.trim().length < MIN_CHARS;
-
-  const formatStructure = async () => {
-    const markdownToFormat = draft.markdown.trim();
-    if (!markdownToFormat) return;
-    setFormatting(true);
-    try {
-      const token = await currentIdToken();
-      const response = await fetch("/api/format-markdown", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ markdown: draft.markdown }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to format markdown structure");
-      }
-      const data = await response.json();
-      if (data.markdown) {
-        setDraft({ markdown: data.markdown });
-        toast.success("Document structure cleaned and formatted");
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to format document";
-      toast.error(msg);
-    } finally {
-      setFormatting(false);
-    }
-  };
 
   const create = async () => {
     const markdownToSynthesize = draft.markdown.trim();
@@ -119,25 +86,7 @@ export default function StudioPage() {
     >
       <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] gap-5 p-6">
         <div className="grid min-h-0 grid-rows-[auto_1fr] gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <h1 className="t-h2">Paste something worth hearing</h1>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={formatStructure}
-              disabled={formatting || !draft.markdown.trim()}
-              className="h-8 gap-1.5 text-xs font-mono border-border/70 text-ink-muted hover:text-foreground"
-              title="Clean headings, codeblocks, GFM tables, and Mermaid charts"
-            >
-              {formatting ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : (
-                <Sparkles size={13} />
-              )}
-              <span>Format structure</span>
-            </Button>
-          </div>
+          <h1 className="t-h2">Paste something worth hearing</h1>
           <Textarea
             value={draft.markdown}
             onChange={(event) => setDraft({ markdown: event.target.value })}

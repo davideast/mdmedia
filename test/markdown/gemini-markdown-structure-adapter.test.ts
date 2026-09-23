@@ -110,10 +110,14 @@ describe('GeminiMarkdownStructureAdapter', () => {
     expect(capturedInstruction).toContain('CRITICAL NON-REWRITING INVARIANT');
     expect(capturedInstruction).toContain('Do NOT rewrite, summarize, rephrase, condense, or omit any text');
     expect(capturedInstruction).toContain('Heading Hierarchy');
-    expect(capturedInstruction).toContain('Code Blocks & Fences');
+    expect(capturedInstruction).toContain('Code Blocks, Fences & Indentation');
+    expect(capturedInstruction).toContain('DEDENT AND CLEAN INDENTATION');
     expect(capturedInstruction).toContain('diff');
     expect(capturedInstruction).toContain('Mermaid');
     expect(capturedInstruction).toContain('Tables');
+    expect(capturedInstruction).toContain('GitHub-Flavored Callouts & Action Items');
+    expect(capturedInstruction).toContain('DE-NOISE OVER-NESTED LISTS');
+    expect(capturedInstruction).toContain('ELIMINATE ARBITRARY LINE BREAKS');
     expect(capturedInstruction).toContain('OUTPUT FORMAT');
   });
 

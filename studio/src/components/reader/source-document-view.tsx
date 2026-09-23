@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { marked } from "marked";
+import { Marked } from "marked";
+import markedAlert from "marked-alert";
 import { cn } from "cn";
 import { CodeBlock } from "@/components/reader/code-block";
 import { MermaidBlock } from "@/components/reader/mermaid-block";
@@ -15,6 +16,22 @@ export interface SourceDocumentViewProps {
 type RenderSegment =
   | { type: "html"; key: string; html: string }
   | { type: "code"; key: string; text: string; lang?: string };
+
+const MODIFY_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="octicon mr-2 shrink-0"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+
+const docMarked = new Marked({
+  gfm: true,
+  breaks: true,
+}).use(
+  markedAlert({
+    variants: [
+      {
+        type: "modify",
+        icon: MODIFY_ICON,
+      },
+    ],
+  }),
+);
 
 /**
  * Displays the original unadapted source document provided by the user.
@@ -30,9 +47,9 @@ export function SourceDocumentView({
       return [];
     }
     try {
-      const tokens = marked.lexer(sourceMarkdown);
+      const tokens = docMarked.lexer(sourceMarkdown);
       const result: RenderSegment[] = [];
-      let pendingTokens: Parameters<typeof marked.parser>[0] = [];
+      let pendingTokens: Parameters<typeof docMarked.parser>[0] = [];
       let counter = 0;
 
       for (const token of tokens) {
@@ -41,7 +58,7 @@ export function SourceDocumentView({
             result.push({
               type: "html",
               key: `html_${counter++}`,
-              html: marked.parser(pendingTokens),
+              html: docMarked.parser(pendingTokens),
             });
             pendingTokens = [];
           }
@@ -60,7 +77,7 @@ export function SourceDocumentView({
         result.push({
           type: "html",
           key: `html_${counter++}`,
-          html: marked.parser(pendingTokens),
+          html: docMarked.parser(pendingTokens),
         });
       }
 
@@ -70,7 +87,7 @@ export function SourceDocumentView({
         {
           type: "html",
           key: "fallback",
-          html: marked.parse(sourceMarkdown, { gfm: true, breaks: true }) as string,
+          html: docMarked.parse(sourceMarkdown) as string,
         },
       ];
     }

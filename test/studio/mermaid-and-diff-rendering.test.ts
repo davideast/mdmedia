@@ -129,4 +129,20 @@ describe('Mermaid and Diff Syntax Highlighting', () => {
     expect(validWithoutStructure).not.toBeNull();
     expect(validWithoutStructure?.structureMarkdown).toBe(false);
   });
+
+  it('renders GFM alerts into markdown-alert AST containers using markedAlert', async () => {
+    const { Marked } = await import('marked');
+    const markedAlert = (await import('marked-alert')).default;
+
+    const m = new Marked().use(markedAlert());
+    const rendered = m.parse([
+      '> [!IMPORTANT]',
+      '> Critical Harness Trap in `bin/start-session` (Lines 77–80)',
+    ].join('\n')) as string;
+
+    expect(rendered).toContain('markdown-alert markdown-alert-important');
+    expect(rendered).toContain('markdown-alert-title');
+    expect(rendered).toContain('Important');
+    expect(rendered).toContain('Critical Harness Trap');
+  });
 });
