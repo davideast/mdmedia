@@ -20,12 +20,9 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
 import {
   DEFAULT_SETTINGS,
-  DEFAULT_TTS_MODEL,
   HIGHLIGHT_COLORS,
-  TTS_MODELS,
   VOICES,
   type HighlightColorId,
-  type TTSModelName,
   type UserSettings,
   type Visibility,
   type VoiceName,
@@ -156,26 +153,6 @@ export default function SettingsPage() {
                 {VOICES.map((voice) => (
                   <SelectItem key={voice} value={voice}>
                     {voice}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
-
-          <Separator />
-
-          <Row label="Model" hint="Gemini TTS model for speech generation." htmlFor="default-model">
-            <Select
-              value={settings.defaultModel ?? DEFAULT_TTS_MODEL}
-              onValueChange={(value) => save({ defaultModel: value as TTSModelName })}
-            >
-              <SelectTrigger id="default-model" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TTS_MODELS.map((model) => (
-                  <SelectItem key={model} value={model}>
-                    {model}
                   </SelectItem>
                 ))}
               </SelectContent>

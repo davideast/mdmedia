@@ -174,7 +174,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     () => ({
       markdown: "",
       voice: settings.defaultVoice,
-      model: settings.defaultModel ?? DEFAULT_TTS_MODEL,
+      model: DEFAULT_TTS_MODEL,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
       rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,

@@ -216,7 +216,6 @@ export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structu
 
 export interface UserSettings {
   defaultVoice: VoiceName;
-  defaultModel?: TTSModelName;
   defaultPromptStyle: string;
   /** Rewrite markdown for the ear before synthesis. */
   rewriteForNarration: boolean;
@@ -230,7 +229,6 @@ export interface UserSettings {
 
 export const DEFAULT_SETTINGS: UserSettings = {
   defaultVoice: DEFAULT_VOICE,
-  defaultModel: DEFAULT_TTS_MODEL,
   defaultPromptStyle: "Warm, unhurried narration.",
   rewriteForNarration: true,
   autoPlay: true,
