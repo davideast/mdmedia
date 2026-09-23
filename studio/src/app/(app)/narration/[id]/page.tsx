@@ -122,12 +122,46 @@ export default function NarrationPage() {
 
   const [copied, setCopied] = useState(false);
 
-  const handleCopyAdapted = async () => {
-    if (!stream.transcript || stream.transcript.trim().length === 0) return;
+  const documentConfig = useMemo(() => {
+    switch (documentView) {
+      case "source":
+        return {
+          label: "Source",
+          name: "source document",
+          text: stream.sourceMarkdown || stream.transcript || "",
+        };
+      case "raw":
+        return {
+          label: "Raw",
+          name: "raw document",
+          text: stream.sourceMarkdown || stream.transcript || "",
+        };
+      case "adapted":
+      default:
+        return {
+          label: "Adapted",
+          name: "audio adapted document",
+          text: stream.transcript || "",
+        };
+    }
+  }, [documentView, stream.sourceMarkdown, stream.transcript]);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [documentView]);
+
+  const handleCopy = async () => {
+    const text = documentConfig.text;
+    if (!text || text.trim().length === 0) {
+      toast.error(`No ${documentConfig.name} available to copy.`);
+      return;
+    }
     try {
-      await navigator.clipboard.writeText(stream.transcript);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast.success("Audio adapted document copied as markdown");
+      toast.success(
+        `${documentConfig.name.charAt(0).toUpperCase() + documentConfig.name.slice(1)} copied as markdown`,
+      );
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Could not copy markdown to clipboard.");
@@ -199,9 +233,17 @@ export default function NarrationPage() {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={handleCopyAdapted}
-              title={copied ? "Copied markdown" : "Copy audio adapted document as markdown"}
-              aria-label="Copy audio adapted document as markdown"
+              onClick={handleCopy}
+              title={
+                copied
+                  ? `Copied ${documentConfig.name}`
+                  : `Copy ${documentConfig.name} as markdown`
+              }
+              aria-label={
+                copied
+                  ? `Copied ${documentConfig.name}`
+                  : `Copy ${documentConfig.name} as markdown`
+              }
               className="size-7 p-0 text-ink-muted hover:text-foreground"
             >
               {copied ? (

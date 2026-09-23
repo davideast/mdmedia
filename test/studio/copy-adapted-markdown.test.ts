@@ -28,18 +28,19 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
       expect(narrationPage).toContain('from "@/components/ui/button"');
     });
 
-    it("implements handleCopyAdapted copying stream.transcript to clipboard with feedback", () => {
-      expect(narrationPage).toContain("const handleCopyAdapted = async () =>");
-      expect(narrationPage).toContain("if (!stream.transcript || stream.transcript.trim().length === 0) return;");
-      expect(narrationPage).toContain("navigator.clipboard.writeText(stream.transcript)");
-      expect(narrationPage).toContain('toast.success("Audio adapted document copied as markdown")');
+    it("implements context-aware copying of active document view (Adapted, Source, Raw) to clipboard with feedback", () => {
+      expect(narrationPage).toContain("const handleCopy = async () =>");
+      expect(narrationPage).toContain("case \"source\":");
+      expect(narrationPage).toContain("case \"raw\":");
+      expect(narrationPage).toContain("case \"adapted\":");
+      expect(narrationPage).toContain("navigator.clipboard.writeText(text)");
+      expect(narrationPage).toContain("copied as markdown");
       expect(narrationPage).toContain("setTimeout(() => setCopied(false), 2000)");
     });
 
     it("renders clean icon-only copy button in WorkbenchPanel actions when narration is loaded", () => {
       expect(narrationPage).toContain("actions={");
-      expect(narrationPage).toContain("onClick={handleCopyAdapted}");
-      expect(narrationPage).toContain('aria-label="Copy audio adapted document as markdown"');
+      expect(narrationPage).toContain("onClick={handleCopy}");
       expect(narrationPage).toContain('className="size-7 p-0 text-ink-muted hover:text-foreground"');
       expect(narrationPage).not.toContain('<span>{copied ? "Copied markdown"');
     });
