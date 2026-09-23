@@ -1,15 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import type { DocumentView } from "../../studio/src/components/shell/narration-provider";
-
-/** Pure helper matching the routing resolution contract */
-export function resolveDocumentViewFromParam(param: string | null | undefined): DocumentView {
-  if (param === "source" || param === "raw" || param === "adapted") {
-    return param;
-  }
-  return "adapted";
-}
+import { parseDocumentView } from "../../studio/src/components/shell/narration-provider";
 
 describe("Document View Routing State Architecture (?doc=adapted|source|raw)", () => {
   const providerPath = resolve(
@@ -24,36 +16,37 @@ describe("Document View Routing State Architecture (?doc=adapted|source|raw)", (
   const providerSource = readFileSync(providerPath, "utf8");
   const narrationPageSource = readFileSync(narrationPagePath, "utf8");
 
-  describe("resolveDocumentViewFromParam contract", () => {
+  describe("parseDocumentView parser contract", () => {
     it("resolves ?doc=adapted to adapted", () => {
-      expect(resolveDocumentViewFromParam("adapted")).toBe("adapted");
+      expect(parseDocumentView("adapted")).toBe("adapted");
     });
 
     it("resolves ?doc=source to source", () => {
-      expect(resolveDocumentViewFromParam("source")).toBe("source");
+      expect(parseDocumentView("source")).toBe("source");
     });
 
     it("resolves ?doc=raw to raw", () => {
-      expect(resolveDocumentViewFromParam("raw")).toBe("raw");
+      expect(parseDocumentView("raw")).toBe("raw");
     });
 
     it("falls back to adapted when query param is omitted or invalid", () => {
-      expect(resolveDocumentViewFromParam(null)).toBe("adapted");
-      expect(resolveDocumentViewFromParam(undefined)).toBe("adapted");
-      expect(resolveDocumentViewFromParam("")).toBe("adapted");
-      expect(resolveDocumentViewFromParam("unknown")).toBe("adapted");
-      expect(resolveDocumentViewFromParam("rendered")).toBe("adapted");
+      expect(parseDocumentView(null)).toBe("adapted");
+      expect(parseDocumentView(undefined)).toBe("adapted");
+      expect(parseDocumentView("")).toBe("adapted");
+      expect(parseDocumentView("unknown")).toBe("adapted");
+      expect(parseDocumentView("rendered")).toBe("adapted");
     });
   });
 
   describe("NarrationProvider URL State Synchronization", () => {
-    it("initializes documentView state from window.location.search on first load", () => {
+    it("initializes documentView state from window.location.search on first load using parseDocumentView", () => {
       expect(providerSource).toContain("URLSearchParams");
-      expect(providerSource).toContain('.get("doc")');
+      expect(providerSource).toContain("parseDocumentView(urlDoc)");
     });
 
     it("synchronizes setDocumentView to the URL query param via replaceState", () => {
       expect(providerSource).toContain('url.searchParams.set("doc", view)');
+      expect(providerSource).toContain('url.searchParams.delete("doc")');
       expect(providerSource).toContain("window.history.replaceState");
     });
 
@@ -64,7 +57,6 @@ describe("Document View Routing State Architecture (?doc=adapted|source|raw)", (
     });
 
     it("preserves URL query param when stream.id resolves to prevent clobbering active tab on reload", () => {
-      // Must not unconditionally setDocumentView("adapted") without checking doc param
       const streamIdEffectBlock = providerSource.slice(
         providerSource.indexOf("lastStreamIdRef.current = stream.id;"),
         providerSource.indexOf("lastStreamIdRef.current = stream.id;") + 300,
@@ -73,10 +65,20 @@ describe("Document View Routing State Architecture (?doc=adapted|source|raw)", (
     });
   });
 
-  describe("Narration Page Routing Integration", () => {
-    it("subscribes to Next.js searchParams to sync ?doc navigation", () => {
+  describe("Narration Page Routing Integration & Zero Layout Shift", () => {
+    it("synchronously computes activeDocumentView from searchParams to prevent layout shift on reload", () => {
       expect(narrationPageSource).toContain("useSearchParams");
-      expect(narrationPageSource).toContain('.get("doc")');
+      expect(narrationPageSource).toContain('searchParams.get("doc")');
+      expect(narrationPageSource).toContain("const activeDocumentView = docParam ? parseDocumentView(docParam) : documentView;");
+    });
+
+    it("synchronizes context state with updateUrl: false to avoid history clobbering", () => {
+      expect(narrationPageSource).toContain("setDocumentView(parseDocumentView(docParam), { updateUrl: false })");
+      expect(narrationPageSource).toContain('setDocumentView("adapted", { updateUrl: false })');
+    });
+
+    it("renders document body based on activeDocumentView projection", () => {
+      expect(narrationPageSource).toContain('activeDocumentView === "source" || activeDocumentView === "raw"');
     });
   });
 });

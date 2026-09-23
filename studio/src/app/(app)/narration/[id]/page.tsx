@@ -10,7 +10,7 @@ import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
 import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
-import { useNarration } from "@/components/shell/narration-provider";
+import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
 import { updateNarrationTitle } from "@/lib/narrations";
 
 export default function NarrationPage() {
@@ -20,11 +20,15 @@ export default function NarrationPage() {
   const docParam = searchParams.get("doc");
   const { stream, documentView, setDocumentView, generationQueue } = useNarration();
 
+  // Immediate synchronous projection: if docParam is present, use it directly during render
+  // so page reloads load the active tab first with zero layout shift or hydration mismatch.
+  const activeDocumentView = docParam ? parseDocumentView(docParam) : documentView;
+
   useEffect(() => {
-    if (docParam === "source" || docParam === "raw" || docParam === "adapted") {
-      setDocumentView(docParam);
+    if (docParam) {
+      setDocumentView(parseDocumentView(docParam), { updateUrl: false });
     } else {
-      setDocumentView("adapted");
+      setDocumentView("adapted", { updateUrl: false });
     }
   }, [id, docParam, setDocumentView]);
   const activeQueueJob = generationQueue.jobs.find(
@@ -133,7 +137,7 @@ export default function NarrationPage() {
   const [copied, setCopied] = useState(false);
 
   const documentConfig = useMemo(() => {
-    switch (documentView) {
+    switch (activeDocumentView) {
       case "source":
         return {
           label: "Source",
@@ -154,11 +158,11 @@ export default function NarrationPage() {
           text: stream.transcript || "",
         };
     }
-  }, [documentView, stream.sourceMarkdown, stream.transcript]);
+  }, [activeDocumentView, stream.sourceMarkdown, stream.transcript]);
 
   useEffect(() => {
     setCopied(false);
-  }, [documentView]);
+  }, [activeDocumentView]);
 
   const handleCopy = async () => {
     const text = documentConfig.text;
@@ -183,7 +187,7 @@ export default function NarrationPage() {
     activeCharStart: stream.activeWord?.charStart ?? null,
     activeCharEnd: stream.activeWord?.charEnd ?? null,
     isPlaying: stream.playing,
-    disabled: documentView !== "adapted" || empty,
+    disabled: activeDocumentView !== "adapted" || empty,
   });
 
   return (
@@ -198,7 +202,7 @@ export default function NarrationPage() {
         ) : null
       }
       icon={
-        documentView === "source" || documentView === "raw" ? (
+        activeDocumentView === "source" || activeDocumentView === "raw" ? (
           <FileText size={13} strokeWidth={2} className="flex-none" />
         ) : (
           <BookOpen size={13} strokeWidth={2} className="flex-none" />
@@ -315,10 +319,10 @@ export default function NarrationPage() {
             <span className="sr-only">Loading narration</span>
           </div>
         )
-      ) : documentView === "source" || documentView === "raw" ? (
+      ) : activeDocumentView === "source" || activeDocumentView === "raw" ? (
         <SourceDocumentView
           sourceMarkdown={stream.sourceMarkdown || ""}
-          viewMode={documentView === "raw" ? "raw" : "source"}
+          viewMode={activeDocumentView === "raw" ? "raw" : "source"}
         />
       ) : (
         <Reader

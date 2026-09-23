@@ -51,6 +51,13 @@ export interface PlaylistQueueState {
 
 export type DocumentView = "adapted" | "source" | "raw";
 
+export function parseDocumentView(param: string | null | undefined): DocumentView {
+  if (param === "source" || param === "raw" || param === "adapted") {
+    return param;
+  }
+  return "adapted";
+}
+
 interface NarrationContextValue {
   stream: NarrationStreamState;
   draft: Draft;
@@ -64,7 +71,7 @@ interface NarrationContextValue {
   nextTrack: () => void;
   previousTrack: () => void;
   documentView: DocumentView;
-  setDocumentView: (view: DocumentView) => void;
+  setDocumentView: (view: DocumentView, options?: { updateUrl?: boolean }) => void;
   generationQueue: GenerationQueueState;
 }
 
@@ -89,31 +96,40 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   const [documentView, setDocumentViewState] = useState<DocumentView>(() => {
     if (typeof window !== "undefined") {
       const urlDoc = new URLSearchParams(window.location.search).get("doc");
-      if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
-        return urlDoc;
-      }
+      return parseDocumentView(urlDoc);
     }
     return "adapted";
   });
   const wasPlayingRef = useRef(false);
   const lastStreamIdRef = useRef(stream.id);
 
-  const setDocumentView = useCallback((view: DocumentView) => {
-    setDocumentViewState(view);
-    if (typeof window !== "undefined" && window.location.pathname.startsWith("/narration/")) {
-      const url = new URL(window.location.href);
-      url.searchParams.set("doc", view);
-      window.history.replaceState(null, "", url.toString());
-    }
-  }, []);
+  const setDocumentView = useCallback(
+    (view: DocumentView, options?: { updateUrl?: boolean }) => {
+      setDocumentViewState(view);
+      if (
+        options?.updateUrl !== false &&
+        typeof window !== "undefined" &&
+        window.location.pathname.startsWith("/narration/")
+      ) {
+        const url = new URL(window.location.href);
+        if (view === "adapted") {
+          url.searchParams.delete("doc");
+        } else {
+          url.searchParams.set("doc", view);
+        }
+        window.history.replaceState(null, "", url.toString());
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (stream.id !== lastStreamIdRef.current) {
       lastStreamIdRef.current = stream.id;
       if (typeof window !== "undefined") {
         const urlDoc = new URLSearchParams(window.location.search).get("doc");
-        if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
-          setDocumentViewState(urlDoc);
+        if (urlDoc) {
+          setDocumentViewState(parseDocumentView(urlDoc));
           return;
         }
       }
@@ -124,11 +140,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handlePopState = () => {
       const urlDoc = new URLSearchParams(window.location.search).get("doc");
-      if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
-        setDocumentViewState(urlDoc);
-      } else {
-        setDocumentViewState("adapted");
-      }
+      setDocumentViewState(parseDocumentView(urlDoc));
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
