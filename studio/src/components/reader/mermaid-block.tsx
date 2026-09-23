@@ -155,20 +155,47 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
   }, [lightboxOpen, fitToScreen]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !lightboxOpen) return;
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === "+" || e.key === "=") {
+        e.preventDefault();
+        setZoomLevel((z) => Math.min(4, +(z + 0.15).toFixed(2)));
+      } else if (e.key === "-" || e.key === "_") {
+        e.preventDefault();
+        setZoomLevel((z) => Math.max(0.15, +(z - 0.15).toFixed(2)));
+      } else if (e.key === "0") {
+        e.preventDefault();
+        setZoomLevel(1);
+        setPan({ x: 0, y: 0 });
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        fitToScreen();
+      }
+    };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
+      const canvas = canvasRef.current;
+      const rect = canvas ? canvas.getBoundingClientRect() : null;
+      const mouseX = rect ? e.clientX - (rect.left + rect.width / 2) : 0;
+      const mouseY = rect ? e.clientY - (rect.top + rect.height / 2) : 0;
+
       if (e.ctrlKey || e.metaKey) {
         // Pinch-to-zoom on trackpad or Ctrl/Cmd + wheel centered at cursor
         const zoomDelta = -e.deltaY * 0.01;
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - (rect.left + rect.width / 2);
-        const mouseY = e.clientY - (rect.top + rect.height / 2);
-
         const currentZoom = zoomRef.current;
         const currentPan = panRef.current;
         const factor = Math.exp(zoomDelta);
@@ -202,10 +229,11 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
       const ge = e as unknown as { clientX?: number; clientY?: number };
       gestureStartZoom = zoomRef.current;
       gestureStartPan = { ...panRef.current };
-      const rect = canvas.getBoundingClientRect();
+      const canvas = canvasRef.current;
+      const rect = canvas ? canvas.getBoundingClientRect() : null;
       gestureFocalPoint = {
-        x: (ge.clientX ?? (rect.left + rect.width / 2)) - (rect.left + rect.width / 2),
-        y: (ge.clientY ?? (rect.top + rect.height / 2)) - (rect.top + rect.height / 2),
+        x: rect && ge.clientX != null ? ge.clientX - (rect.left + rect.width / 2) : 0,
+        y: rect && ge.clientY != null ? ge.clientY - (rect.top + rect.height / 2) : 0,
       };
     };
 
@@ -231,18 +259,20 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
       e.stopPropagation();
     };
 
-    canvas.addEventListener("wheel", handleWheel, { passive: false });
-    canvas.addEventListener("gesturestart", handleGestureStart, { passive: false });
-    canvas.addEventListener("gesturechange", handleGestureChange, { passive: false });
-    canvas.addEventListener("gestureend", handleGestureEnd, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("gesturestart", handleGestureStart, { passive: false });
+    window.addEventListener("gesturechange", handleGestureChange, { passive: false });
+    window.addEventListener("gestureend", handleGestureEnd, { passive: false });
 
     return () => {
-      canvas.removeEventListener("wheel", handleWheel);
-      canvas.removeEventListener("gesturestart", handleGestureStart);
-      canvas.removeEventListener("gesturechange", handleGestureChange);
-      canvas.removeEventListener("gestureend", handleGestureEnd);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("gesturestart", handleGestureStart);
+      window.removeEventListener("gesturechange", handleGestureChange);
+      window.removeEventListener("gestureend", handleGestureEnd);
     };
-  }, [lightboxOpen]);
+  }, [lightboxOpen, fitToScreen]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
