@@ -644,18 +644,19 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border/70 bg-surface-inset px-2.5 text-xs font-medium text-ink-muted hover:border-border-strong hover:bg-muted hover:text-foreground transition-all cursor-pointer"
+                aria-label={copied ? "Copied" : "Copy diagram source"}
+                title={copied ? "Copied!" : "Copy diagram source"}
+                className={cn(
+                  "inline-flex size-7 items-center justify-center rounded-md border transition-all cursor-pointer",
+                  copied
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/70 bg-surface-inset text-ink-muted hover:border-border-strong hover:bg-muted hover:text-foreground",
+                )}
               >
                 {copied ? (
-                  <>
-                    <Check size={12} strokeWidth={2.5} className="text-primary" />
-                    <span className="text-primary">Copied</span>
-                  </>
+                  <Check size={13} strokeWidth={2.5} className="text-primary" />
                 ) : (
-                  <>
-                    <Copy size={12} strokeWidth={2} />
-                    <span>Copy</span>
-                  </>
+                  <Copy size={13} strokeWidth={2} />
                 )}
               </button>
 
