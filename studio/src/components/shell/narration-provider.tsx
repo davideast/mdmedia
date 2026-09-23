@@ -86,16 +86,53 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [queue, setQueue] = useState<PlaylistQueueState | null>(null);
-  const [documentView, setDocumentView] = useState<DocumentView>("adapted");
+  const [documentView, setDocumentViewState] = useState<DocumentView>(() => {
+    if (typeof window !== "undefined") {
+      const urlDoc = new URLSearchParams(window.location.search).get("doc");
+      if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
+        return urlDoc;
+      }
+    }
+    return "adapted";
+  });
   const wasPlayingRef = useRef(false);
   const lastStreamIdRef = useRef(stream.id);
+
+  const setDocumentView = useCallback((view: DocumentView) => {
+    setDocumentViewState(view);
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/narration/")) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("doc", view);
+      window.history.replaceState(null, "", url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     if (stream.id !== lastStreamIdRef.current) {
       lastStreamIdRef.current = stream.id;
-      setDocumentView("adapted");
+      if (typeof window !== "undefined") {
+        const urlDoc = new URLSearchParams(window.location.search).get("doc");
+        if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
+          setDocumentViewState(urlDoc);
+          return;
+        }
+      }
+      setDocumentViewState("adapted");
     }
   }, [stream.id]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlDoc = new URLSearchParams(window.location.search).get("doc");
+      if (urlDoc === "source" || urlDoc === "raw" || urlDoc === "adapted") {
+        setDocumentViewState(urlDoc);
+      } else {
+        setDocumentViewState("adapted");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(HIGHLIGHT_STORAGE_KEY);

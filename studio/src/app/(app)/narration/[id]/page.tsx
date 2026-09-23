@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { BookOpen, Check, Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,17 @@ import { updateNarrationTitle } from "@/lib/narrations";
 export default function NarrationPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
+  const searchParams = useSearchParams();
+  const docParam = searchParams.get("doc");
   const { stream, documentView, setDocumentView, generationQueue } = useNarration();
+
+  useEffect(() => {
+    if (docParam === "source" || docParam === "raw" || docParam === "adapted") {
+      setDocumentView(docParam);
+    } else {
+      setDocumentView("adapted");
+    }
+  }, [id, docParam, setDocumentView]);
   const activeQueueJob = generationQueue.jobs.find(
     (j) =>
       j.narrationId === id &&
