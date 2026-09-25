@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "timings-route-derived-path",
+  "title": "[002] Timings route derives the object path from ownerUid + id",
+  "screenshot": "n/a",
+  "rule": "SERVER_DERIVED_STORAGE_PATHS",
+  "target": {
+    "file": "studio/src/app/api/narrations/[id]/timings/route.ts",
+    "enclosingSymbol": "GET",
+    "anchor": {
+      "contextBefore": "  }",
+      "targetSnippet": "  const objectPath = narration.timingsPath || timingsObjectPath(narration.ownerUid, id);",
+      "contextAfter": "  const urlObj = new URL(request.url);"
+    }
+  },
+  "violation": {
+    "problem": "The route trusts the owner-writable `narration.timingsPath` for an Admin Storage download, so it can read another user's timings and source transcript.",
+    "expectedSolution": "Use `const objectPath = timingsObjectPath(narration.ownerUid, id);`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "narration.timingsPath ||"
+    ],
+    "requiredPatterns": [
+      "const objectPath = timingsObjectPath(narration.ownerUid, id);"
+    ]
+  }
+}

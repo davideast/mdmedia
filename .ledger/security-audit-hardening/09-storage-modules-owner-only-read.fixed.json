@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "storage-modules-owner-only-read",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:10:27.867Z",
+  "file": "studio/storage.modules.rules",
+  "enclosingSymbol": "match /narrations/{ownerUid}/{fileName}",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "resource.metadata.visibility == 'public'"
+    ],
+    "requiredPatternsPresent": [
+      "allow read: if isOwner(ownerUid);",
+      "DELIBERATE: no metadata-based public branch"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

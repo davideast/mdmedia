@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "rules-verify-scripts",
+  "title": "[006] Add rules:verify and rules:verify:hosted npm scripts",
+  "screenshot": "n/a",
+  "rule": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+  "target": {
+    "file": "studio/package.json",
+    "enclosingSymbol": "scripts",
+    "anchor": {
+      "contextBefore": "    \"rules:build:storage\": \"pyric storage rules resolve storage.modules.rules --out storage.rules\",",
+      "targetSnippet": "(missing scripts)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "There is no one-command journey replay or hosted parity check.",
+    "expectedSolution": "Add `rules:verify` (pyric verify on the committed fixture) and `rules:verify:hosted` (node scripts/verify-rules-hosted.mjs)."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "\"rules:verify\": \"pyric verify test/fixtures/allowlist-journey.session.json",
+      "\"rules:verify:hosted\": \"node scripts/verify-rules-hosted.mjs\""
+    ]
+  }
+}

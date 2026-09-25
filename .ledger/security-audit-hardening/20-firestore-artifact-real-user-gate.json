@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "firestore-artifact-real-user-gate",
+  "title": "[005] Regenerated firestore.rules carries the real-user read gate",
+  "screenshot": "n/a",
+  "rule": "REAL_USER_READ_GATE",
+  "target": {
+    "file": "studio/firestore.rules",
+    "enclosingSymbol": "canReadNarration",
+    "anchor": {
+      "contextBefore": "    function canReadNarration() {",
+      "targetSnippet": "      return isOwner(resource.data.ownerUid) || resource.data.visibility == 'public' || resource.data.visibility == 'shared' && isAuthenticated() && request.auth.uid in resource.data.sharedWith;",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The deployable artifact still lets non-allowlisted accounts read shared narrations.",
+    "expectedSolution": "Regenerate with `npm --prefix studio run rules:build:firestore`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "return isOwner(resource.data.ownerUid) || resource.data.visibility == 'public'",
+      "allow get, list: if isOwner(resource.data.ownerUid);"
+    ],
+    "requiredPatterns": [
+      "isAllowlisted() && (isOwner(resource.data.ownerUid)",
+      "allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "transactional-initial-narration-write",
+  "title": "[001] Seed the narration doc in an ownership-checking transaction",
+  "screenshot": "n/a",
+  "rule": "ADMIN_WRITE_OWNERSHIP_GUARD",
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "createNarrationStream.run",
+    "anchor": {
+      "contextBefore": "        updatedAt: now,\n      };",
+      "targetSnippet": "      await docRef.set(initialNarration);",
+      "contextAfter": "      docWritten = true;"
+    }
+  },
+  "violation": {
+    "problem": "`await docRef.set(initialNarration)` overwrites any existing narration and flips `ownerUid` to the caller. It is the authoritative write, with no ownership check (TOCTOU with any route pre-check).",
+    "expectedSolution": "Replace it with `adminDb().runTransaction` that reads the doc, throws when `owner !== undefined && owner !== uid`, then `tx.set(docRef, initialNarration)`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "await docRef.set(initialNarration);"
+    ],
+    "requiredPatterns": [
+      "tx.set(docRef, initialNarration)",
+      "owner !== uid"
+    ]
+  }
+}

@@ -11,7 +11,6 @@ import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
-import { getAI, getGenerativeModel, type GenerativeModel } from 'firebase/ai';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -29,10 +28,6 @@ export function firebaseApp(): FirebaseApp {
 export const auth = (): Auth => getAuth(firebaseApp());
 export const db = (): Firestore => getFirestore(firebaseApp());
 export const storage = (): FirebaseStorage => getStorage(firebaseApp());
-
-/** The small model behind in-studio assistance (titles, style suggestions). */
-export const assistModel = (): GenerativeModel =>
-  getGenerativeModel(getAI(firebaseApp()), { model: 'gemini-3.5-flash-lite' });
 
 /** Retrieves current user's ID token if authenticated, or null. */
 export async function currentIdToken(): Promise<string | null> {

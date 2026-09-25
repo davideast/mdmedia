@@ -61,12 +61,9 @@ describe('Allowlist Account Creation & Access Gate', () => {
     });
 
     it('gates /narrations/{narrationId} and /playlists/{playlistId} mutations on isAllowlisted()', () => {
-      expect(modulesRules).toContain(
-        'allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()',
-      );
-      expect(modulesRules).toContain(
-        "allow update: if isAllowlisted()\n        && isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
-      );
+      expect(modulesRules).toContain('allow create: if false;');
+      expect(modulesRules).toContain("allow update: if isAllowlisted()");
+      expect(modulesRules).toContain(".hasOnly(['title', 'visibility', 'sharedWith', 'sharedWithLabels', 'updatedAt'])");
       expect(modulesRules).toContain('allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);');
       expect(modulesRules).toContain(
         "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])",

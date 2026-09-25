@@ -118,6 +118,8 @@ export interface Narration {
   timingsPath: string;
   visibility: Visibility;
   sharedWith: string[];
+  /** Optional display map (uid -> email) for recipients in `sharedWith`. */
+  sharedWithLabels?: Record<string, string>;
   /** Denormalized so a shared narration can be attributed without exposing
    *  the owner's profile, which is owner-only by design. */
   authorName: string;

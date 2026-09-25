@@ -14,18 +14,20 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
+  // Public narrations play for anyone (plan 005); `uid` is null for signed-out
+  // or non-allowlisted callers, who can then only reach public narrations.
   const uid = await verifyIdToken(request.headers.get("authorization"));
-  if (!uid) {
-    return Response.json({ message: "Please sign in to open this narration." }, { status: 401 });
-  }
 
   const { id } = await params;
   const narration = await loadReadableNarration(id, uid);
+  if (!narration && !uid) {
+    return Response.json({ message: "Please sign in to open this narration." }, { status: 401 });
+  }
   if (!narration || (narration.status !== "ready" && narration.status !== "streaming")) {
     return Response.json({ message: "That narration isn't available." }, { status: 404 });
   }
 
-  const objectPath = narration.timingsPath || timingsObjectPath(narration.ownerUid, id);
+  const objectPath = timingsObjectPath(narration.ownerUid, id);
   const urlObj = new URL(request.url);
   if (urlObj.searchParams.get("raw") === "1") {
     const bytes = await readStorageObjectBytes(objectPath);

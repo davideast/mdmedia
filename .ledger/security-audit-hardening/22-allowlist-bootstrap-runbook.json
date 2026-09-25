@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "allowlist-bootstrap-runbook",
+  "title": "[006] Document the production allowlist bootstrap",
+  "screenshot": "n/a",
+  "rule": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+  "target": {
+    "file": "studio/README.md",
+    "enclosingSymbol": "## Allowlist bootstrap",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(missing section)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The IAM → `studio:allowlist add` bootstrap exists but is undocumented, so the next operator has to rediscover it.",
+    "expectedSolution": "Add an \"Allowlist bootstrap\" section: IAM is the root of trust; `firebase login`; add/check/remove (with --revoke-tokens); `--local` for the sandbox; clients never write the allowlist."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "## Allowlist bootstrap",
+      "bun run studio:allowlist add",
+      "bun run studio:allowlist check",
+      "--revoke-tokens",
+      "roles/datastore.user"
+    ]
+  }
+}

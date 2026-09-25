@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "pyric-upstream-gap-reports",
+  "title": "[006] Record the four Pyric upstream gaps in PYRIC.md",
+  "screenshot": "n/a",
+  "rule": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+  "target": {
+    "file": "studio/PYRIC.md",
+    "enclosingSymbol": "## 3. Upstream Pyric bugs found",
+    "anchor": {
+      "contextBefore": "## 3. Upstream Pyric bugs found (worth reporting to the maintainers)",
+      "targetSnippet": "(missing entries)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Replay has no initial state, derived hosted cases lack mocks, hosted verify is service-account-only, and there are SEM-4 false positives. None of this is recorded.",
+    "expectedSolution": "Add four §3 entries using these exact headings, each with a reproduction command and output."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "Replay has no initial-state fixture",
+      "Derived Rules Test API cases omit exists()/get() functionMocks",
+      "Hosted verify accepts only service-account credentials",
+      "SEM-4 false positives on resolved Standard Library functions"
+    ]
+  }
+}

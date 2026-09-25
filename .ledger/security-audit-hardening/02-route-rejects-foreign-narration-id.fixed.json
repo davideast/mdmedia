@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "route-rejects-foreign-narration-id",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:08:26.828Z",
+  "file": "studio/src/app/api/narrations/route.ts",
+  "enclosingSymbol": "POST",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "claimNarrationId(id, uid)",
+      "status: 409"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

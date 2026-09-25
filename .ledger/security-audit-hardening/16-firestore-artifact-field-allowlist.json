@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "firestore-artifact-field-allowlist",
+  "title": "[004] Regenerated firestore.rules carries the narration write restrictions",
+  "screenshot": "n/a",
+  "rule": "CLIENT_WRITE_FIELD_ALLOWLIST",
+  "target": {
+    "file": "studio/firestore.rules",
+    "enclosingSymbol": "match /narrations/{narrationId}",
+    "anchor": {
+      "contextBefore": "      allow get, list: if canReadNarration();",
+      "targetSnippet": "      allow create: if isAllowlisted() && isOwner(request.resource.data.ownerUid) && hasRequiredNarrationFields() && validNarrationFields();",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The deployable artifact still permits client narration creates and unrestricted updates.",
+    "expectedSolution": "Regenerate with `npm --prefix studio run rules:build:firestore`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "hasRequiredNarrationFields"
+    ],
+    "requiredPatterns": [
+      ".hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])"
+    ]
+  }
+}

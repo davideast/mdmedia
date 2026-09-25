@@ -52,23 +52,29 @@ service cloud.firestore {
       // An unconstrained list satisfies no branch and is rejected.
       allow get, list: if canReadNarration();
 
-      allow create: if isAllowlisted()
-        && isOwner(request.resource.data.ownerUid)
-        && hasRequiredNarrationFields()
-        && validNarrationFields();
+      // DELIBERATE: narrations are created only by the synthesis route with the
+      // Admin SDK (which bypasses Rules). No client create path exists, so a
+      // client-authored narration — with forged status or Storage paths — is refused.
+      allow create: if false;
 
-      // Only the owner may edit, and the two fields that establish provenance
-      // can never be rewritten after creation.
+      // Owners may edit only what the UI edits: the title and who can reach it.
+      // Everything else (status, transcript, durations, Storage paths, author
+      // snapshot) is server-owned and written with the Admin SDK.
+      // Base allowlist (.hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt']))
+      // extended with 'sharedWithLabels' for UID-resolved display labels.
       allow update: if isAllowlisted()
         && isOwner(resource.data.ownerUid)
-        && immutableFields(['ownerUid', 'createdAt'])
+        && (request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])
+            || request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['title', 'visibility', 'sharedWith', 'sharedWithLabels', 'updatedAt']))
         && validNarrationFields();
 
       allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);
     }
 
     match /playlists/{playlistId} {
-      allow get, list: if isOwner(resource.data.ownerUid);
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
 
       allow create: if isAllowlisted()
         && isOwner(request.resource.data.ownerUid)
@@ -97,34 +103,15 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/allowlist/$(request.auth.token['email'].lower()));
     }
 
+    // Public narrations are readable by anyone. Every other read requires a real
+    // user of the app (an allowlisted account): the owner, or a named recipient.
+    // Mirrors the server gate in src/lib/firebase-admin.ts#verifyIdToken.
     function canReadNarration() {
-      return isOwner(resource.data.ownerUid)
-        || resource.data.visibility == 'public'
-        || (resource.data.visibility == 'shared'
-            && isAuthenticated()
-            && request.auth.uid in resource.data.sharedWith);
-    }
-
-    function hasRequiredNarrationFields() {
-      return hasRequired([
-        'ownerUid',
-        'title',
-        'sourceMarkdown',
-        'transcript',
-        'voice',
-        'promptStyle',
-        'adapted',
-        'status',
-        'durationMs',
-        'audioPath',
-        'timingsPath',
-        'visibility',
-        'sharedWith',
-        'authorName',
-        'authorPhoto',
-        'createdAt',
-        'updatedAt'
-      ]);
+      return resource.data.visibility == 'public'
+        || (isAllowlisted()
+            && (isOwner(resource.data.ownerUid)
+                || (resource.data.visibility == 'shared'
+                    && request.auth.uid in resource.data.sharedWith)));
     }
 
     // Shape checks on the incoming document. Applied to create and update
@@ -138,6 +125,8 @@ service cloud.firestore {
         && request.resource.data.sharedWith is list
         // 50 mirrors MAX_SHARED_WITH in src/lib/types.ts.
         && request.resource.data.sharedWith.size() <= 50
+        && request.resource.data.get('sharedWithLabels', {}) is map
+        && request.resource.data.get('sharedWithLabels', {}).size() <= 50
         && request.resource.data.createdAt is number
         && request.resource.data.updatedAt is number;
     }

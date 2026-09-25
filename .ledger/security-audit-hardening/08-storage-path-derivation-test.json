@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "storage-path-derivation-test",
+  "title": "[002] Add Storage path derivation regression test",
+  "screenshot": "n/a",
+  "rule": "SERVER_DERIVED_STORAGE_PATHS",
+  "target": {
+    "file": "test/studio/storage-path-derivation.test.ts",
+    "enclosingSymbol": "describe",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No test prevents routes from reintroducing document-supplied Storage paths.",
+    "expectedSolution": "Create the test asserting both routes build objectPath only via audioObjectPath(/timingsObjectPath( and never `narration.audioPath ||` / `narration.timingsPath ||`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "audioObjectPath(",
+      "timingsObjectPath(",
+      "narration.audioPath ||"
+    ]
+  }
+}

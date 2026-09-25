@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "narration-read-requires-real-user",
+  "title": "[005] canReadNarration: public for anyone, otherwise allowlisted owner/recipient",
+  "screenshot": "n/a",
+  "rule": "REAL_USER_READ_GATE",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "canReadNarration",
+    "anchor": {
+      "contextBefore": "    function canReadNarration() {",
+      "targetSnippet": "      return isOwner(resource.data.ownerUid)\n        || resource.data.visibility == 'public'",
+      "contextAfter": "        || (resource.data.visibility == 'shared'"
+    }
+  },
+  "violation": {
+    "problem": "Non-allowlisted accounts can read narrations shared with them, and de-allowlisted owners keep reading their own (hosted Rules Test API: ALLOW).",
+    "expectedSolution": "Return `visibility == 'public' || (isAllowlisted() && (isOwner(...) || (visibility == 'shared' && uid in sharedWith)))`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "return isOwner(resource.data.ownerUid)\n        || resource.data.visibility == 'public'"
+    ],
+    "requiredPatterns": [
+      "return resource.data.visibility == 'public'",
+      "|| (isAllowlisted()"
+    ]
+  }
+}

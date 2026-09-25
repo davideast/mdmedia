@@ -12,7 +12,7 @@
     "operation": {
       "service": "firestore",
       "method": "get",
-      "path": "allowlist/bob@example.com"
+      "path": "allowlist/bob@example.test"
     }
   },
   {
@@ -28,7 +28,7 @@
     "operation": {
       "service": "firestore",
       "method": "delete",
-      "path": "allowlist/alice@example.com"
+      "path": "allowlist/alice@example.test"
     }
   },
   {
@@ -170,18 +170,165 @@
   },
   {
     "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-anon-read-public-audio",
+    "actorId": "actor-anon",
+    "dimension": "path",
+    "classification": "invalid-probe",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "DENY",
+    "invariant": "Storage narration audio may only be read directly by the owner.",
+    "operation": {
+      "service": "storage",
+      "method": "get",
+      "path": "narrations/alice/narr-public.wav"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-read-public-audio",
+    "actorId": "actor-bob",
+    "dimension": "path",
+    "classification": "invalid-probe",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "DENY",
+    "invariant": "Storage narration audio may only be read directly by the owner.",
+    "operation": {
+      "service": "storage",
+      "method": "get",
+      "path": "narrations/alice/narr-public.wav"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
     "probeId": "probe-anon-read-private-storage",
     "actorId": "actor-anon",
     "dimension": "path",
-    "classification": "no-counterexample",
+    "classification": "invalid-probe",
     "expect": "DENY",
     "observedDecision": "DENY",
-    "controlDecision": "ALLOW",
+    "controlDecision": "DENY",
     "invariant": "An unauthenticated visitor must not read private audio objects in storage.",
     "operation": {
       "service": "storage",
       "method": "get",
       "path": "narrations/alice/narr-private.wav"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-forge-status",
+    "actorId": "actor-bob",
+    "dimension": "payload",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+    "operation": {
+      "service": "firestore",
+      "method": "update",
+      "path": "narrations/narr-bob",
+      "data": {
+        "title": "Bob Renamed Narration",
+        "status": "streaming",
+        "updatedAt": 1000500
+      }
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-repoint-audio-path",
+    "actorId": "actor-bob",
+    "dimension": "payload",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+    "operation": {
+      "service": "firestore",
+      "method": "update",
+      "path": "narrations/narr-bob",
+      "data": {
+        "title": "Bob Renamed Narration",
+        "audioPath": "narrations/alice/narr-private.wav",
+        "updatedAt": 1000500
+      }
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-unknown-key",
+    "actorId": "actor-bob",
+    "dimension": "payload",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+    "operation": {
+      "service": "firestore",
+      "method": "update",
+      "path": "narrations/narr-bob",
+      "data": {
+        "title": "Bob Renamed Narration",
+        "featured": true,
+        "updatedAt": 1000500
+      }
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-bob-client-create-narration",
+    "actorId": "actor-bob",
+    "dimension": "operation",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+    "operation": {
+      "service": "firestore",
+      "method": "create",
+      "path": "narrations/narr-bob",
+      "data": {
+        "title": "Bob Renamed Narration",
+        "updatedAt": 1000500
+      }
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-nonallowlisted-read-shared",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Non-public narration reads require an allowlisted user.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "narrations/narr-shared"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-removed-owner-read-own",
+    "actorId": "actor-alice-removed",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "Non-public narration reads require an allowlisted user.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "narrations/narr-alice2"
     }
   }
 ]

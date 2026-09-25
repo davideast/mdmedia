@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "claim-narration-id-helper",
+  "title": "[001] Add claimNarrationId ownership pre-check helper",
+  "screenshot": "n/a",
+  "rule": "ADMIN_WRITE_OWNERSHIP_GUARD",
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "claimNarrationId",
+    "anchor": {
+      "contextBefore": "export function newNarrationId(): string {",
+      "targetSnippet": "(missing) export async function claimNarrationId",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No server helper checks whether a client-supplied narration id already belongs to another uid before the Admin SDK writes it.",
+    "expectedSolution": "Export `claimNarrationId(id, uid)`: returns true when the doc does not exist or `ownerUid === uid`, false otherwise."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "export async function claimNarrationId(id: string, uid: string): Promise<boolean>",
+      "snap.data()?.ownerUid === uid"
+    ]
+  }
+}

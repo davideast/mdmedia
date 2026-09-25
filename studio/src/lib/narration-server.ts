@@ -81,6 +81,29 @@ export function newNarrationId(): string {
 }
 
 /**
+ * Thrown when a caller tries to write a narration id owned by another user.
+ * Routes map it to HTTP 409.
+ */
+export class NarrationOwnershipError extends Error {
+  constructor() {
+    super("Forbidden: narration id belongs to another user.");
+    this.name = "NarrationOwnershipError";
+  }
+}
+
+/**
+ * Read-only fast-fail: returns false when `id` already belongs to someone
+ * else. It does not reserve the id. The authoritative guard is the
+ * ownership-checking transaction in `createNarrationStream`, which closes
+ * the check-then-write race this read alone cannot.
+ */
+export async function claimNarrationId(id: string, uid: string): Promise<boolean> {
+  const snap = await adminDb().collection("narrations").doc(id).get();
+  if (!snap.exists) return true;
+  return snap.data()?.ownerUid === uid;
+}
+
+/**
  * A single-consumer async queue. The pipeline's event bus dispatches
  * synchronously, so producers hand events off here and the response stream
  * pulls them at its own pace.
@@ -256,6 +279,10 @@ export function createNarrationStream({
     queue.close();
   };
 
+  const existingStream = activeStreams.get(id);
+  if (existingStream && existingStream.uid !== uid) {
+    throw new NarrationOwnershipError();
+  }
   activeStreams.set(id, { uid, abort: abortStream });
 
   // Disconnecting the HTTP stream (e.g. a browser refresh) closes the live
@@ -356,7 +383,14 @@ export function createNarrationStream({
         createdAt: now,
         updatedAt: now,
       };
-      await docRef.set(initialNarration);
+      await adminDb().runTransaction(async (tx) => {
+        const snap = await tx.get(docRef);
+        const owner = snap.exists ? snap.data()?.ownerUid : undefined;
+        if (owner !== undefined && owner !== uid) {
+          throw new NarrationOwnershipError();
+        }
+        tx.set(docRef, initialNarration);
+      });
       docWritten = true;
 
       if (cancelled) {
@@ -502,7 +536,7 @@ export function createNarrationStream({
 
       const audioPath = audioObjectPath(uid, id);
       const timingsPath = timingsObjectPath(uid, id);
-      const objectMetadata = { metadata: { ownerUid: uid, visibility: request.visibility } };
+      const objectMetadata = { metadata: { ownerUid: uid } };
 
       const persistSnapshot = async (status: "streaming" | "ready") => {
         if (totalBytes === 0) return;
@@ -666,6 +700,43 @@ export function createNarrationStream({
   });
 }
 
+export const STALE_STREAMING_MS = 15 * 60 * 1000;
+
+/**
+ * If a narration has remained `streaming` past `STALE_STREAMING_MS` with no live
+ * in-process stream, mark it as `error` with `errorCode: "interrupted"` so an
+ * interrupted Cloud Run instance does not leave the document stuck forever.
+ */
+export async function markStaleStreaming(
+  id: string,
+  narration: Narration,
+  persist: (id: string, patch: Partial<Narration>) => Promise<void> = async (docId, patch) => {
+    await adminDb().collection("narrations").doc(docId).update(patch);
+  },
+): Promise<Narration> {
+  if (
+    narration.status !== "streaming" ||
+    activeStreams.has(id) ||
+    Date.now() - (narration.updatedAt || narration.createdAt || 0) <= STALE_STREAMING_MS
+  ) {
+    return narration;
+  }
+
+  const patch = {
+    status: "error" as const,
+    errorCode: "interrupted",
+    errorMessage: "Narration generation was interrupted. Please try generating it again.",
+    updatedAt: Date.now(),
+  };
+
+  await persist(id, patch).catch(() => {});
+
+  return {
+    ...narration,
+    ...patch,
+  };
+}
+
 /**
  * Loads a narration the caller is allowed to read: the owner, anything public,
  * or a shared narration the caller was named on. Returns `null` for everything
@@ -673,17 +744,23 @@ export function createNarrationStream({
  */
 export async function loadReadableNarration(
   id: string,
-  uid: string,
+  uid: string | null,
 ): Promise<Narration | null> {
   const snapshot = await adminDb().collection("narrations").doc(id).get();
   if (!snapshot.exists) return null;
 
-  const narration = snapshot.data() as Narration | undefined;
-  if (!narration) return null;
+  const raw = snapshot.data() as Narration | undefined;
+  if (!raw) return null;
+  const narration = await markStaleStreaming(id, raw);
+
+  // Mirrors canReadNarration() in firestore.modules.rules: anyone may read a
+  // public narration; owner and shared reads need an allowlisted caller
+  // (`uid` is non-null only after verifyIdToken's allowlist check).
+  if (narration.visibility === "public") return narration;
+  if (uid === null) return null;
 
   const allowed =
     narration.ownerUid === uid ||
-    narration.visibility === "public" ||
     (narration.visibility === "shared" && (narration.sharedWith ?? []).includes(uid));
 
   return allowed ? narration : null;

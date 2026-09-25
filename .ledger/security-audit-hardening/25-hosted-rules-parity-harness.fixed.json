@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "hosted-rules-parity-harness",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:14:22.094Z",
+  "file": "studio/scripts/verify-rules-hosted.mjs",
+  "enclosingSymbol": "main",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "writeFileSync",
+      "GOOGLE_APPLICATION_CREDENTIALS="
+    ],
+    "requiredPatternsPresent": [
+      "firebaserules.googleapis.com",
+      "functionMocks",
+      "process.exit(1)",
+      ".firebaserc"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

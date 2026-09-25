@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "narration-update-affected-keys",
+  "title": "[004] Narration updates limited to title/visibility/sharedWith/updatedAt",
+  "screenshot": "n/a",
+  "rule": "CLIENT_WRITE_FIELD_ALLOWLIST",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "match /narrations/{narrationId}",
+    "anchor": {
+      "contextBefore": "      allow update: if isAllowlisted()\n        && isOwner(resource.data.ownerUid)",
+      "targetSnippet": "        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Owners can forge status/durationMs/audioPath and add unknown keys (hosted Rules Test API: ALLOW).",
+    "expectedSolution": "Add `request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      ".hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "campaign-narration-field-probes",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:13:48.823Z",
+  "file": "studio/scripts/run-authorization-campaign.mjs",
+  "enclosingSymbol": "runStudioAssurance",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "id: 'obs-bob-update-own-title'",
+      "id: 'probe-bob-forge-status'",
+      "id: 'probe-bob-repoint-audio-path'",
+      "id: 'probe-bob-unknown-key'",
+      "id: 'probe-bob-client-create-narration'"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

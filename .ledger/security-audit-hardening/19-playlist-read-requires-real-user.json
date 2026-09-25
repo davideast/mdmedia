@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "playlist-read-requires-real-user",
+  "title": "[005] Playlist reads require an allowlisted owner",
+  "screenshot": "n/a",
+  "rule": "REAL_USER_READ_GATE",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "match /playlists/{playlistId}",
+    "anchor": {
+      "contextBefore": "    match /playlists/{playlistId} {",
+      "targetSnippet": "      allow get, list: if isOwner(resource.data.ownerUid);",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "De-allowlisted owners keep reading their playlists directly from Firestore.",
+    "expectedSolution": "Use `allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "allow get, list: if isOwner(resource.data.ownerUid);"
+    ],
+    "requiredPatterns": [
+      "allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);"
+    ]
+  }
+}

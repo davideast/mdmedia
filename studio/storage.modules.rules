@@ -14,16 +14,14 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /narrations/{ownerUid}/{fileName} {
 
-      // Owners read their own audio. A narration published to everyone is
-      // readable by anyone, which the writer declares as object metadata.
+      // Owners may read their own objects directly. Every other reader —
+      // shared recipients and the public — goes through the server routes,
+      // which authorize against the Firestore document's CURRENT visibility.
       //
-      // DELIBERATE: there is no `shared` branch here. Custom metadata is a
-      // flat string map, so a recipient list cannot be represented or bounded
-      // in it, and Storage Rules cannot read the Firestore document that owns
-      // the list. Shared-group playback is served by a short-lived signed URL
-      // issued by the server after it checks `sharedWith` in Firestore.
-      allow read: if isOwner(ownerUid)
-        || resource.metadata.visibility == 'public';
+      // DELIBERATE: no metadata-based public branch. Object metadata is set
+      // once at synthesis and is not rewritten when visibility changes, so
+      // trusting it would keep un-published audio public.
+      allow read: if isOwner(ownerUid);
 
       // DELIBERATE: no client writes at all. Audio and timings are produced by
       // the synthesis route and written with the Admin SDK, which bypasses
