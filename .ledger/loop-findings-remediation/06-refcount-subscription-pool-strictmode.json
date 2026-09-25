@@ -1,0 +1,46 @@
+{
+  "$schema": "../rules.json",
+  "id": "refcount-subscription-pool-strictmode",
+  "title": "Tokenize multicast subscriptions to prevent premature StrictMode listener teardown",
+  "screenshot": "n/a",
+  "rule": "GRACE_PERIOD_STRICTMODE_HYGIENE",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/src/lib/subscription-pool.ts",
+    "enclosingSymbol": "multicastSubscribe",
+    "anchor": {
+      "contextBefore": "export function multicastSubscribe<T>(",
+      "targetSnippet": "entry.subscribers.add(callback);",
+      "contextAfter": "return () => {"
+    }
+  },
+  "violation": {
+    "problem": "multicastSubscribe stores subscriber callbacks in a Set<(data: T) => void>. When a React component with a stable callback reference double-mounts in StrictMode, the Set only contains 1 entry. The first cleanup deletes the callback, reducing subscriber count to 0 and triggering grace-period detachment while mount 2 is active.",
+    "expectedSolution": "Assign a unique subscriber ID or subscription handle to each multicastSubscribe call, tracking subscribers by handle so cleanup for one handle does not delete active sibling handles."
+  },
+  "steps": [
+    "In studio/src/lib/subscription-pool.ts, change subscribers from Set<(data: T) => void> to Map<number, (data: T) => void> or a ref-counted subscriber collection.",
+    "In multicastSubscribe(), generate a unique numeric or string handle ID for the subscription and store subscribers.set(handleId, callback).",
+    "In the returned unsubscribe function, delete by handleId (subscribers.delete(handleId)).",
+    "Only schedule detachment when subscribers.size === 0."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/src/lib/subscription-pool.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/subscription-pool-strictmode.test.ts"
+    ],
+    "maxDiffLines": 45
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/subscription-pool-strictmode.test.ts"
+  },
+  "reviewChecklist": [
+    "StrictMode double-mounting with stable callbacks does not detach listener",
+    "Listener is cleanly detached after all active handles unsubscribe",
+    "Cached snapshots are still delivered immediately to new handles"
+  ]
+}

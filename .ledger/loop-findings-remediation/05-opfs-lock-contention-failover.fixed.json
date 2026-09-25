@@ -1,0 +1,33 @@
+{
+  "issueId": "opfs-lock-contention-failover",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:45:21.095Z",
+  "baseCommit": "bcc9b5da6ba2a2272c963cece57afe92f7b5293f",
+  "redProof": {
+    "observedAt": "2026-09-25T19:43:49.912Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/opfs-lock-contention.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/opfs-lock-contention.test.ts:\n29 |       );\n30 |     } catch {\n31 |       failed = true;\n32 |     }\n33 | \n34 |     expect(failed).toBe(false);\n                        ^\nerror: expect(received).toBe(expected)\n\nExpected: false\nReceived: true\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/opfs-lock-contention.test.ts:34:20)\n(fail) Insight ef7bb410: Unhandled lock failure in OPFS audio store > falls back to memory storage when OPFS lock contention occurs [1.14ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [13.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/opfs-lock-contention.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/opfs-lock-contention.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/src/lib/media-store.ts",
+        "lines": 54
+      }
+    ],
+    "diffLines": 54,
+    "diffFingerprint": "ad1c2eb484c30178292775ba9f2ef1cb52f742dc5f74f67f756432ccd5061bcd"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "NoModificationAllowedError does not throw to the caller",
+      "Transparently falls back to in-memory storage when OPFS locks fail",
+      "Existing OPFS write and read flows remain unchanged when no contention occurs"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

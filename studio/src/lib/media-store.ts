@@ -276,6 +276,39 @@ export class MediaStoreService implements MediaStore {
     return `narrations/${id}.timings.json`;
   }
 
+  private async withFailover<T>(op: () => Promise<T>): Promise<T> {
+    const maxRetries = 2;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await op();
+      } catch (err: any) {
+        const errorName = err?.name || '';
+        const errorMessage = String(err?.message || '');
+        const isLockError =
+          errorName === 'NoModificationAllowedError' ||
+          errorName.includes('NoModification') ||
+          errorMessage.includes('locked') ||
+          errorMessage.includes('contention');
+        const isQuotaError = errorName === 'QuotaExceededError';
+
+        if (isLockError && attempt < maxRetries) {
+          // Retry backoff for transient lock contention
+          await new Promise((r) => setTimeout(r, (attempt + 1) * 30));
+          continue;
+        }
+
+        if (isLockError || isQuotaError) {
+          if (!(this.adapter instanceof MemoryStorageAdapter)) {
+            this.adapter = new MemoryStorageAdapter();
+          }
+          return await op();
+        }
+        throw err;
+      }
+    }
+    return await op();
+  }
+
   async has(narrationId: string): Promise<boolean> {
     const [hasAudio, hasTimings] = await Promise.all([
       this.adapter.hasFile(this.audioPath(narrationId)),
@@ -286,15 +319,17 @@ export class MediaStoreService implements MediaStore {
 
   async saveTimings(narrationId: string, timings: NarrationTimingsFile): Promise<void> {
     const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
-    await this.adapter.writeFile(this.timingsPath(narrationId), timingsBytes);
+    await this.withFailover(() => this.adapter.writeFile(this.timingsPath(narrationId), timingsBytes));
   }
 
   async saveTrack(narrationId: string, audioBlob: Blob, timings: NarrationTimingsFile): Promise<void> {
     const audioBytes = new Uint8Array(await audioBlob.arrayBuffer());
-    await Promise.all([
-      this.adapter.writeFile(this.audioPath(narrationId), audioBytes),
-      this.saveTimings(narrationId, timings),
-    ]);
+    await this.withFailover(async () => {
+      await Promise.all([
+        this.adapter.writeFile(this.audioPath(narrationId), audioBytes),
+        this.saveTimings(narrationId, timings),
+      ]);
+    });
   }
 
   async getTrack(narrationId: string): Promise<{ audioBlob: Blob; timings: NarrationTimingsFile } | null> {
@@ -334,33 +369,58 @@ export class MediaStoreService implements MediaStore {
   }
 
   async openWriter(narrationId: string): Promise<MediaWriter> {
-    // Initialized and fully implemented in Slice 3
     const audioFile = this.audioPath(narrationId);
     const timingsFile = this.timingsPath(narrationId);
     let pcmTotalBytes = 0;
 
-    // Write placeholder 44-byte WAV header at offset 0
+    // Maintain in-memory chunks so midstream failover never loses earlier audio or the header
     const placeholder = buildWavHeader(0);
-    await this.adapter.writeFile(audioFile, placeholder);
+    const inMemoryChunks: Uint8Array[] = [placeholder];
+
+    const safeOp = async <T>(op: () => Promise<T>): Promise<T> => {
+      try {
+        return await this.withFailover(op);
+      } catch (err) {
+        if (!(this.adapter instanceof MemoryStorageAdapter)) {
+          this.adapter = new MemoryStorageAdapter();
+          let offset = 0;
+          for (const chunk of inMemoryChunks) {
+            if (offset === 0) {
+              await this.adapter.writeFile(audioFile, chunk);
+            } else {
+              await this.adapter.appendFile(audioFile, chunk);
+            }
+            offset += chunk.byteLength;
+          }
+        }
+        return await op();
+      }
+    };
+
+    await safeOp(() => this.adapter.writeFile(audioFile, placeholder));
 
     return {
       appendChunk: async (pcmBytes: Uint8Array) => {
         pcmTotalBytes += pcmBytes.byteLength;
-        await this.adapter.appendFile(audioFile, pcmBytes);
+        inMemoryChunks.push(pcmBytes);
+        await safeOp(() => this.adapter.appendFile(audioFile, pcmBytes));
       },
       finalize: async (timings: NarrationTimingsFile) => {
-        const placeholder = await this.adapter.readSlice(audioFile, 0, WAV_HEADER_SIZE);
-        if (placeholder) {
-          const patched = patchWavHeader(placeholder, pcmTotalBytes);
-          await this.adapter.patchFile(audioFile, 0, patched);
-        } else {
-          const freshHeader = buildWavHeader(pcmTotalBytes, 24000);
-          await this.adapter.patchFile(audioFile, 0, freshHeader);
-        }
-        const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
-        await this.adapter.writeFile(timingsFile, timingsBytes);
+        await safeOp(async () => {
+          const placeholder = await this.adapter.readSlice(audioFile, 0, WAV_HEADER_SIZE);
+          if (placeholder) {
+            const patched = patchWavHeader(placeholder, pcmTotalBytes);
+            await this.adapter.patchFile(audioFile, 0, patched);
+          } else {
+            const freshHeader = buildWavHeader(pcmTotalBytes, 24000);
+            await this.adapter.patchFile(audioFile, 0, freshHeader);
+          }
+          const timingsBytes = new TextEncoder().encode(JSON.stringify(timings, null, 2));
+          await this.adapter.writeFile(timingsFile, timingsBytes);
+        });
       },
       abort: async () => {
+        inMemoryChunks.length = 0;
         await Promise.all([
           this.adapter.deleteFile(audioFile),
           this.adapter.deleteFile(timingsFile),

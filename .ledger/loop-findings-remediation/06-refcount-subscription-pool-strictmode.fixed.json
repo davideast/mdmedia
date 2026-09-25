@@ -1,0 +1,33 @@
+{
+  "issueId": "refcount-subscription-pool-strictmode",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:47:43.001Z",
+  "baseCommit": "a5fae8b24589389f2f2b840004b1ea2e17991790",
+  "redProof": {
+    "observedAt": "2026-09-25T19:45:43.842Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/subscription-pool-strictmode.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/subscription-pool-strictmode.test.ts:\n18 |     const unsub2 = multicastSubscribe('strict-oracle-key', mockStart, stableCallback, 30);\n19 | \n20 |     unsub1();\n21 |     await new Promise((r) => setTimeout(r, 60));\n22 | \n23 |     expect(firestoreDetached).toBe(false);\n                                   ^\nerror: expect(received).toBe(expected)\n\nExpected: false\nReceived: true\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/subscription-pool-strictmode.test.ts:23:31)\n(fail) Insight c9ad8fd0: Orphaned Firestore listeners during StrictMode navigation > retains active Firestore listener during StrictMode double-mount with stable callback [61.14ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [72.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/subscription-pool-strictmode.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/subscription-pool-strictmode.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/src/lib/subscription-pool.ts",
+        "lines": 12
+      }
+    ],
+    "diffLines": 12,
+    "diffFingerprint": "7948de099398def95e800a47485a68a033cb95f50fb2ef7327dbd374221575e9"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "StrictMode double-mounting with stable callbacks does not detach listener",
+      "Listener is cleanly detached after all active handles unsubscribe",
+      "Cached snapshots are still delivered immediately to new handles"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}
