@@ -1,0 +1,45 @@
+{
+  "$schema": "../rules.json",
+  "id": "opfs-lock-contention-failover",
+  "title": "Add lock contention retry and in-memory failover to MediaStoreService",
+  "screenshot": "n/a",
+  "rule": "OPFS_RESILIENT_STORAGE_FAILOVER",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/src/lib/media-store.ts",
+    "enclosingSymbol": "MediaStoreService",
+    "anchor": {
+      "contextBefore": "export class MediaStoreService implements MediaStore {",
+      "targetSnippet": "async saveTrack(narrationId: string, audioBlob: Blob, timings: NarrationTimingsFile): Promise<void> {",
+      "contextAfter": "async getTrack(narrationId: string): Promise<{"
+    }
+  },
+  "violation": {
+    "problem": "MediaStoreService directly awaits OPFS operations. When concurrent browser tabs access the same file or quota is exceeded, createWritable() throws NoModificationAllowedError or QuotaExceededError, crashing client operations without fallback.",
+    "expectedSolution": "Add lock retry backoff and in-memory fallback in MediaStoreService so that when OPFS locks fail, operations transparently fall back to MemoryStorageAdapter."
+  },
+  "steps": [
+    "In studio/src/lib/media-store.ts, wrap adapter file write and open operations in MediaStoreService with a try/catch.",
+    "If the adapter throws NoModificationAllowedError or QuotaExceededError, initialize an internal MemoryStorageAdapter fallback instance.",
+    "Re-execute the operation on the memory adapter and maintain in-memory tracks for the duration of the session."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/src/lib/media-store.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/opfs-lock-contention.test.ts"
+    ],
+    "maxDiffLines": 60
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/opfs-lock-contention.test.ts"
+  },
+  "reviewChecklist": [
+    "NoModificationAllowedError does not throw to the caller",
+    "Transparently falls back to in-memory storage when OPFS locks fail",
+    "Existing OPFS write and read flows remain unchanged when no contention occurs"
+  ]
+}

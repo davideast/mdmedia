@@ -1,7 +1,7 @@
 import type { Unsubscribe } from "firebase/firestore";
 
 interface PoolEntry<T> {
-  subscribers: Set<(data: T) => void>;
+  subscribers: Map<number, (data: T) => void>;
   latestData: T | undefined;
   hasData: boolean;
   unsubscribeFirestore: Unsubscribe | null;
@@ -9,6 +9,7 @@ interface PoolEntry<T> {
 }
 
 const pool = new Map<string, PoolEntry<any>>();
+let nextSubId = 1;
 
 /**
  * Multicast a single Firestore onSnapshot listener across multiple subscribers
@@ -34,7 +35,7 @@ export function multicastSubscribe<T>(
 
   if (!entry) {
     entry = {
-      subscribers: new Set(),
+      subscribers: new Map(),
       latestData: undefined,
       hasData: false,
       unsubscribeFirestore: null,
@@ -48,7 +49,7 @@ export function multicastSubscribe<T>(
         if (!pool.has(key)) return;
         activeEntry.latestData = data;
         activeEntry.hasData = true;
-        for (const sub of activeEntry.subscribers) {
+        for (const sub of activeEntry.subscribers.values()) {
           try {
             sub(data);
           } catch (err) {
@@ -66,7 +67,8 @@ export function multicastSubscribe<T>(
     entry.cleanupTimer = null;
   }
 
-  entry.subscribers.add(callback);
+  const subId = nextSubId++;
+  entry.subscribers.set(subId, callback);
 
   // Deliver current cached snapshot immediately if available
   if (entry.hasData && entry.latestData !== undefined) {
@@ -81,7 +83,7 @@ export function multicastSubscribe<T>(
     const currentEntry = pool.get(key) as PoolEntry<T> | undefined;
     if (!currentEntry) return;
 
-    currentEntry.subscribers.delete(callback);
+    currentEntry.subscribers.delete(subId);
 
     if (currentEntry.subscribers.size === 0) {
       if (currentEntry.cleanupTimer !== null) {
