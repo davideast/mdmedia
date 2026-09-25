@@ -63,7 +63,10 @@ export class WavFileStreamSink {
       this.finalize(sampleRate, channels, bitDepth)
     );
 
-    this.unsubscribeError = eventBus.on('pipeline:error', () => this.closeStream());
+    this.unsubscribeError = eventBus.on('pipeline:error', async () => {
+      await this.writeQueue.catch(() => {});
+      return this.finalize(sampleRate, channels, bitDepth);
+    });
   }
 
   detach(): void {

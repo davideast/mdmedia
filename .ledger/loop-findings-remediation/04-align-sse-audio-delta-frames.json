@@ -1,0 +1,46 @@
+{
+  "$schema": "../rules.json",
+  "id": "align-sse-audio-delta-frames",
+  "title": "Enforce 2-byte 16-bit PCM sample alignment on dispatched SSE audio chunks",
+  "screenshot": "n/a",
+  "rule": "TTS_WIRE_FRAME_ALIGNMENT",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "createNarrationStream",
+    "anchor": {
+      "contextBefore": "bus.on(\"audio:delta\", ({ chunkIndex, audioData }) => {",
+      "targetSnippet": "queue.push({\n          type: \"audio\",\n          chunkIndex,\n          pcm: Buffer.from(copy).toString(\"base64\"),\n        });",
+      "contextAfter": "const persistSnapshot = async (status: \"streaming\" | \"ready\") => {"
+    }
+  },
+  "violation": {
+    "problem": "The audio:delta event handler in createNarrationStream pushes raw byte arrays directly to the SSE queue. If a delta has an odd byte count, a 16-bit PCM sample is split across network packets, desynchronizing the client player's sample clock.",
+    "expectedSolution": "Buffer trailing odd bytes in createNarrationStream so all dispatched SSE audio event payloads have an even byte length (16-bit sample aligned)."
+  },
+  "steps": [
+    "In studio/src/lib/narration-server.ts, export alignAudioDelta(chunk: Uint8Array, carry: Uint8Array | null): { aligned: Uint8Array; carry: Uint8Array | null } helper.",
+    "In alignAudioDelta, combine chunk with carry, return even-length slice as aligned, and any leftover trailing byte as carry.",
+    "In createNarrationStream(), maintain a carry buffer across audio:delta events and dispatch only aligned bytes to the SSE queue.",
+    "Flush any remaining carry byte on stream completion."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/src/lib/narration-server.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/sse-chunk-boundaries.test.ts"
+    ],
+    "maxDiffLines": 45
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/sse-chunk-boundaries.test.ts"
+  },
+  "reviewChecklist": [
+    "All SSE audio deltas emitted to the client are 2-byte aligned",
+    "No dropped audio samples on stream completion",
+    "Total byte counts and duration calculations match actual emitted samples"
+  ]
+}

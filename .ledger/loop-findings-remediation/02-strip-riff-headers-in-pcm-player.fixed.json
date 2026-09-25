@@ -1,0 +1,33 @@
+{
+  "issueId": "strip-riff-headers-in-pcm-player",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:38:44.696Z",
+  "baseCommit": "fd31ab02c5eb2be61aadca260ad41faeb8e22cd1",
+  "redProof": {
+    "observedAt": "2026-09-25T19:36:32.019Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/sse-wav-header-pollution.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/sse-wav-header-pollution.test.ts:\n 9 | \n10 |     player.append(wavHeader);\n11 | \n12 |     // @ts-ignore\n13 |     const sampleCount = player.sampleCount;\n14 |     expect(sampleCount).toBe(0);\n                             ^\nerror: expect(received).toBe(expected)\n\nExpected: 0\nReceived: 22\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/sse-wav-header-pollution.test.ts:14:25)\n(fail) Insight 89bc4dba: WAV header byte preservation pollutes SSE audio chunks > strips 44-byte RIFF headers in StreamingPcmPlayer to prevent audio popping and sample offset drift [0.56ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [13.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/sse-wav-header-pollution.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/sse-wav-header-pollution.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/src/lib/pcm-player.ts",
+        "lines": 11
+      }
+    ],
+    "diffLines": 11,
+    "diffFingerprint": "a9e3112af9d69ed1ea8c9342a7f6bb3c9d02225c55494b9fc1426c0e418013b5"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "StreamingPcmPlayer.append() strips 44-byte RIFF headers without throwing on short chunks",
+      "Raw PCM chunks without headers continue to append with zero regression",
+      "Carry byte logic for odd PCM frames functions correctly after header stripping"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

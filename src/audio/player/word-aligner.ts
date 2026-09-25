@@ -42,12 +42,15 @@ export function extractWordTimingsFromPcm(
     cumulativeEnd: number;
   }> = [];
 
+  // Sanitize bracketed prompt directives (e.g. [style: ...]) by replacing with whitespace to preserve character offsets
+  const sanitizedText = text.replace(/\[[^\]]*\]/g, (m) => ' '.repeat(m.length));
+
   const regex = /\S+/g;
   let match: RegExpExecArray | null;
   let totalWeight = 0;
   let index = 0;
 
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = regex.exec(sanitizedText)) !== null) {
     const word = match[0];
     if (/^[#>*+-]+$/.test(word)) {
       continue;

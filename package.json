@@ -72,6 +72,8 @@
     "dev": "bun run src/bin.ts",
     "start": "bun run src/bin.ts",
     "test": "bun test",
+    "test:proofs": "bun test test/regression/",
+    "test:oracles": "VERIFY_ORACLE=1 bun test test/regression/",
     "verify": "bun run src/verify-port.ts && bun run verify-package",
     "watch": "bun run src/cli/agy-watch.ts",
     "agy-watch": "bun run src/cli/agy-watch.ts",

@@ -1,0 +1,33 @@
+{
+  "issueId": "align-sse-audio-delta-frames",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:43:27.334Z",
+  "baseCommit": "0a54faebc4c7c2b09b23b9e1cd260969965c4efb",
+  "redProof": {
+    "observedAt": "2026-09-25T19:41:17.447Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/sse-chunk-boundaries.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/sse-chunk-boundaries.test.ts:\n\n# Unhandled error between tests\n-------------------------------\nSyntaxError: Export named 'alignAudioDelta' not found in module '/Users/deast/repos/davideast/tts-flash/studio/src/lib/narration-server.ts'.\n-------------------------------\n\n\n 0 pass\n 1 fail\n 1 error\nRan 1 test across 1 file. [438.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/sse-chunk-boundaries.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/sse-chunk-boundaries.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/src/lib/narration-server.ts",
+        "lines": 44
+      }
+    ],
+    "diffLines": 44,
+    "diffFingerprint": "c34177e98782b6adb9ab6c9a952c2756e78a3c3b056f00805dd431ae131feba6"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "All SSE audio deltas emitted to the client are 2-byte aligned",
+      "No dropped audio samples on stream completion",
+      "Total byte counts and duration calculations match actual emitted samples"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

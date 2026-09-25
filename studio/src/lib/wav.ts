@@ -61,6 +61,45 @@ export function wrapPcmAsWav(pcm: Uint8Array): Uint8Array {
   return wav;
 }
 
+/** Returns true if the byte array starts with canonical ASCII 'RIFF' header signature. */
+export function isRiffHeader(bytes: Uint8Array): boolean {
+  if (bytes.byteLength < 4) return false;
+  return (
+    bytes[0] === 0x52 && // 'R'
+    bytes[1] === 0x49 && // 'I'
+    bytes[2] === 0x46 && // 'F'
+    bytes[3] === 0x46    // 'F'
+  );
+}
+
+/**
+ * Aligns a 16-bit PCM chunk with any carry byte from a previous delta.
+ * Ensures the returned aligned slice represents complete 2-byte frames.
+ */
+export function alignPcmFrames(
+  chunk: Uint8Array,
+  carry: Uint8Array | number | null
+): { aligned: Uint8Array; carry: Uint8Array | null; carryByte: number | null } {
+  let combined: Uint8Array;
+  if (typeof carry === "number") {
+    combined = new Uint8Array(chunk.byteLength + 1);
+    combined[0] = carry;
+    combined.set(chunk, 1);
+  } else if (carry && carry.byteLength > 0) {
+    combined = new Uint8Array(carry.byteLength + chunk.byteLength);
+    combined.set(carry, 0);
+    combined.set(chunk, carry.byteLength);
+  } else {
+    combined = chunk;
+  }
+  const usable = combined.byteLength - (combined.byteLength % 2);
+  const aligned = combined.subarray(0, usable);
+  const hasCarry = usable < combined.byteLength;
+  const nextCarry = hasCarry ? combined.subarray(usable) : null;
+  const nextCarryByte = hasCarry ? combined[combined.byteLength - 1] : null;
+  return { aligned, carry: nextCarry, carryByte: nextCarryByte };
+}
+
 /**
  * The timings sidecar uploaded next to the audio, at
  * `narrations/{uid}/{id}.timings.json`.

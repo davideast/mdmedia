@@ -1,0 +1,45 @@
+{
+  "$schema": "../rules.json",
+  "id": "strip-riff-headers-in-pcm-player",
+  "title": "Strip 44-byte RIFF headers in StreamingPcmPlayer before audio sample decoding",
+  "screenshot": "n/a",
+  "rule": "TTS_WIRE_FRAME_ALIGNMENT",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/src/lib/pcm-player.ts",
+    "enclosingSymbol": "StreamingPcmPlayer.append",
+    "anchor": {
+      "contextBefore": "append(pcm: Uint8Array): void {",
+      "targetSnippet": "if (this.destroyed || pcm.byteLength === 0) return;",
+      "contextAfter": "let bytes = pcm;"
+    }
+  },
+  "violation": {
+    "problem": "StreamingPcmPlayer.append feeds incoming byte chunks directly into 16-bit PCM sample buffers without checking for RIFF/WAVE container headers. When unary or headed TTS chunks arrive, ASCII header bytes are decoded as loud 0.57 amplitude audio pops and shift the timeline by 22 samples.",
+    "expectedSolution": "Detect RIFF magic header bytes at offset 0 of incoming buffers in StreamingPcmPlayer.append() and strip the 44-byte container header before converting PCM bytes to float32 samples."
+  },
+  "steps": [
+    "In studio/src/lib/pcm-player.ts, in StreamingPcmPlayer.append(), inspect the first 4 bytes of incoming pcm.",
+    "If the first 4 bytes match ASCII RIFF and length is at least 44, strip the 44-byte header before decoding samples.",
+    "Ensure this.sampleCount only increments by raw PCM sample count, with zero samples added for standalone header chunks."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/src/lib/pcm-player.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/sse-wav-header-pollution.test.ts"
+    ],
+    "maxDiffLines": 35
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/sse-wav-header-pollution.test.ts"
+  },
+  "reviewChecklist": [
+    "StreamingPcmPlayer.append() strips 44-byte RIFF headers without throwing on short chunks",
+    "Raw PCM chunks without headers continue to append with zero regression",
+    "Carry byte logic for odd PCM frames functions correctly after header stripping"
+  ]
+}

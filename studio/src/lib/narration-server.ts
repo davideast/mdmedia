@@ -30,7 +30,7 @@ import {
   type Visibility,
   type VoiceName,
 } from "./types";
-import { wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
+import { alignPcmFrames, wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
 import {
   classifyNarrationError,
   type ClassifiedNarrationError,
@@ -52,6 +52,14 @@ const CANCELLED_MESSAGE = "This narration was cancelled before it finished.";
 import type { NarrationRequest } from './narration-request';
 export type { NarrationRequest };
 export { parseNarrationRequest } from './narration-request';
+
+export function alignAudioDelta(
+  chunk: Uint8Array,
+  carry: Uint8Array | null
+): { aligned: Uint8Array; carry: Uint8Array | null } {
+  const result = alignPcmFrames(chunk, carry);
+  return { aligned: result.aligned, carry: result.carry };
+}
 
 /** A human title for the narration, taken from the document where possible. */
 export function deriveTitle(markdown: string, fallbackText: string): string {
@@ -504,6 +512,8 @@ export function createNarrationStream({
       let pendingChunkParts: Uint8Array[] = [];
       let pendingChunkBytes = 0;
       const alignedChunks: AlignedChunk[] = [];
+      let sseCarry: Uint8Array | null = null;
+      let lastChunkIndex = 0;
 
       /**
        * `DocumentAudioPipeline` reports provider failures by emitting
@@ -522,16 +532,22 @@ export function createNarrationStream({
 
       bus.on("audio:delta", ({ chunkIndex, audioData }) => {
         if (cancelled || audioData.byteLength === 0) return;
+        lastChunkIndex = chunkIndex;
         const copy = new Uint8Array(audioData);
         allPcm.push(copy);
         pendingChunkParts.push(copy);
         pendingChunkBytes += copy.byteLength;
         totalBytes += copy.byteLength;
-        queue.push({
-          type: "audio",
-          chunkIndex,
-          pcm: Buffer.from(copy).toString("base64"),
-        });
+
+        const alignedResult = alignAudioDelta(copy, sseCarry);
+        sseCarry = alignedResult.carry;
+        if (alignedResult.aligned.byteLength > 0) {
+          queue.push({
+            type: "audio",
+            chunkIndex,
+            pcm: Buffer.from(alignedResult.aligned).toString("base64"),
+          });
+        }
       });
 
       const audioPath = audioObjectPath(uid, id);
@@ -650,6 +666,8 @@ export function createNarrationStream({
         });
         return;
       }
+
+      sseCarry = null;
 
       const durationMs = (await persistSnapshot("ready")) ?? Math.round(totalBytes / BYTES_PER_MS);
       queue.push({ type: "done", id, durationMs });

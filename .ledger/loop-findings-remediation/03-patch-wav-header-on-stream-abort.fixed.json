@@ -1,0 +1,33 @@
+{
+  "issueId": "patch-wav-header-on-stream-abort",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:40:57.739Z",
+  "baseCommit": "b0bd001b21fa71367b335a6bcb5eaeb50ef60f3a",
+  "redProof": {
+    "observedAt": "2026-09-25T19:39:00.575Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/stream-abort-wav-header.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/stream-abort-wav-header.test.ts:\n22 |       fs.unlinkSync(tmpFile);\n23 |     } catch {}\n24 | \n25 |     const isRiff = fileBytes.subarray(0, 4).toString('ascii') === 'RIFF';\n26 |     const isWave = fileBytes.subarray(8, 12).toString('ascii') === 'WAVE';\n27 |     expect(isRiff).toBe(true);\n                        ^\nerror: expect(received).toBe(expected)\n\nExpected: true\nReceived: false\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/stream-abort-wav-header.test.ts:27:20)\n(fail) Insight 9f6988ab: Midstream aborts corrupt WAV headers and drop timing > finalizes WAV header on pipeline:error when audio bytes have been written [83.58ms]\n\n 0 pass\n 1 fail\n 2 expect() calls\nRan 1 test across 1 file. [100.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/stream-abort-wav-header.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/stream-abort-wav-header.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "src/audio/wav-file-stream-sink.ts",
+        "lines": 15
+      }
+    ],
+    "diffLines": 15,
+    "diffFingerprint": "c588e036c4a522ef850d2dacd4a87cc1e21919ddf53340d8f1cfbe7a3bd38b35"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "Aborted streams with audio bytes written have valid RIFF/WAVE header fields",
+      "No unhandled promise rejections on stream abort",
+      "Normal pipeline:complete finalization continues to function idempotently"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}
