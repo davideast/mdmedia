@@ -28,7 +28,8 @@ export type VoiceName =
   | 'Vindemiatrix'
   | 'Sadachbia'
   | 'Sadaltager'
-  | 'Sulafat';
+  | 'Sulafat'
+  | (string & {});
 
 export interface TTSVoiceConfig {
   voice: VoiceName;

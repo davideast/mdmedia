@@ -1,0 +1,37 @@
+{
+  "issueId": "declarative-tts-provider-registry",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:54:12.254Z",
+  "baseCommit": "36aaefdd9c74a7c14141f0e46eb12af90ef132fd",
+  "redProof": {
+    "observedAt": "2026-09-25T19:52:15.788Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/model-provider-registry.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/model-provider-registry.test.ts:\n4 | describe('Insight d45ea8b2: Hardcoded Gemini Flash dispatch bypasses provider registry', () => {\n5 |   it('TTS subsystem exports a declarative ProviderRegistry and getTTSProvider', () => {\n6 |     const exportedKeys = Object.keys(ttsModule);\n7 |     const hasRegistry = exportedKeys.includes('ProviderRegistry') && exportedKeys.includes('getTTSProvider');\n8 | \n9 |     expect(hasRegistry).toBe(true);\n                            ^\nerror: expect(received).toBe(expected)\n\nExpected: true\nReceived: false\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/model-provider-registry.test.ts:9:25)\n(fail) Insight d45ea8b2: Hardcoded Gemini Flash dispatch bypasses provider registry > TTS subsystem exports a declarative ProviderRegistry and getTTSProvider [0.84ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [69.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/model-provider-registry.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/model-provider-registry.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "src/tts/index.ts",
+        "lines": 1
+      },
+      {
+        "path": "src/tts/provider-registry.ts",
+        "lines": 27
+      }
+    ],
+    "diffLines": 28,
+    "diffFingerprint": "dcd4ebb24c3e6966b61a5cb5d1a0ee868430e5f6cf9c7fd0d22dc5df0dc41186"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "ProviderRegistry allows registering and retrieving ITTSProvider implementations",
+      "GeminiTTSProvider is registered by default",
+      "Existing GeminiTTSProvider exports remain backwards-compatible"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

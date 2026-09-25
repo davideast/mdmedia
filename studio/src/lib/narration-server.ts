@@ -15,7 +15,7 @@ import {
 } from "mdmedia/narration";
 import { GeminiMarkdownStructureAdapter } from "mdmedia/markdown";
 import { DocumentAudioPipeline, UniversalEventBus } from "mdmedia/pipeline";
-import { GeminiTTSProvider, createGeminiClient } from "mdmedia/tts";
+import { GeminiTTSProvider, createGeminiClient, getTTSProvider } from "mdmedia/tts";
 import type { DocumentChunk } from "mdmedia/types";
 
 import { adminAuth, adminBucket, adminDb } from "./firebase-admin";
@@ -501,10 +501,10 @@ export function createNarrationStream({
       queue.push({ type: "transcript", transcript, chunkOffsets: offsets });
 
       const bus = new UniversalEventBus();
-      pipeline = new DocumentAudioPipeline(
-        new GeminiTTSProvider(client, 3, selectedModel),
-        bus,
-      );
+      const ttsProvider =
+        getTTSProvider("gemini", client, { maxRetries: 3, model: selectedModel }) ??
+        new GeminiTTSProvider(client, 3, selectedModel);
+      pipeline = new DocumentAudioPipeline(ttsProvider, bus);
 
       const allPcm: Uint8Array[] = [];
       let totalBytes = 0;

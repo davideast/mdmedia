@@ -1,0 +1,46 @@
+{
+  "$schema": "../rules.json",
+  "id": "declarative-tts-provider-registry",
+  "title": "Introduce declarative ProviderRegistry abstraction for TTS and video models",
+  "screenshot": "n/a",
+  "rule": "DECLARATIVE_PROVIDER_REGISTRY",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "src/tts/index.ts",
+    "enclosingSymbol": "module",
+    "anchor": {
+      "contextBefore": "export * from './tts-provider.interface.js';",
+      "targetSnippet": "export * from './backoff.js';",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "src/tts/ lacks a provider registry or factory abstraction, forcing callers across CLI, TUI, sidecar, and Studio to hardcode imperative new GeminiTTSProvider(...) calls.",
+    "expectedSolution": "Export a ProviderRegistry class and getTTSProvider factory helper in src/tts/ allowing declarative provider registration and lookup."
+  },
+  "steps": [
+    "In src/tts/, implement and export a ProviderRegistry class supporting register() and get() for ITTSProvider instances.",
+    "Export ProviderRegistry and getTTSProvider from src/tts/index.ts.",
+    "Register GeminiTTSProvider as the default provider under 'gemini'."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "src/tts/index.ts",
+      "src/tts/provider-registry.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/model-provider-registry.test.ts"
+    ],
+    "maxDiffLines": 60
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/model-provider-registry.test.ts"
+  },
+  "reviewChecklist": [
+    "ProviderRegistry allows registering and retrieving ITTSProvider implementations",
+    "GeminiTTSProvider is registered by default",
+    "Existing GeminiTTSProvider exports remain backwards-compatible"
+  ]
+}
