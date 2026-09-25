@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "vendored-mdmedia-dependency",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.191Z",
+  "file": "studio/package.json",
+  "enclosingSymbol": "dependencies.mdmedia",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "file:../mdmedia-0.1.0.tgz"
+    ],
+    "requiredPatternsPresent": [
+      "\"vendor:mdmedia\"",
+      "\"mdmedia\": \"file:./vendor/mdmedia-0.1.0.tgz\""
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "share-box-writes-uid",
+  "title": "[007] Share box resolves the email and writes the uid",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/src/components/narration/narration-settings.tsx",
+    "enclosingSymbol": "addInvitee",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "commit(\"shared\", [...narration.sharedWith, value]);",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`addInvitee` writes the typed email into `sharedWith`.",
+    "expectedSolution": "Call `/api/users/resolve`, show an error on 404, then write the uid and label optimistically; render labels."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "commit(\"shared\", [...narration.sharedWith, value])"
+    ],
+    "requiredPatterns": [
+      "/api/users/resolve",
+      "sharedWithLabels"
+    ]
+  }
+}

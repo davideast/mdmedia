@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "hermetic-dockerfile",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.191Z",
+  "file": "Dockerfile",
+  "enclosingSymbol": "build stages",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "GOOGLE_APPLICATION_CREDENTIALS",
+      "PYRIC_SANDBOX",
+      "NEXT_PUBLIC_PYRIC_GEMINI_API_KEY",
+      "@pyric/cli/register",
+      ".env.local"
+    ],
+    "requiredPatternsPresent": [
+      "npm pack",
+      "npm pkg delete devDependencies.@pyric/cli",
+      "npm pkg delete scripts.postinstall",
+      "next build",
+      "8080"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

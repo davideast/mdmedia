@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "hosted-case-share-by-uid",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.195Z",
+  "file": "studio/scripts/verify-rules-hosted.mjs",
+  "enclosingSymbol": "cases",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "shared by uid",
+      "sharedWithLabels"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "stale-streaming-recovery",
+  "title": "[007] Mark interrupted narrations as errors",
+  "screenshot": "n/a",
+  "rule": "LONG_REQUESTS_BYPASS_HOSTING",
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "markStaleStreaming",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new function)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "If an instance stops mid-generation the narration stays `streaming` forever.",
+    "expectedSolution": "Mark `streaming` older than `STALE_STREAMING_MS` (15 min by `updatedAt`) as `error` with `errorCode: \"interrupted\"`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "STALE_STREAMING_MS",
+      "errorCode: \"interrupted\""
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "../rules.json",
+  "id": "deploy-runbook",
+  "title": "[007] Document the ordered deploy in the README",
+  "screenshot": "n/a",
+  "rule": "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
+  "target": {
+    "file": "studio/README.md",
+    "enclosingSymbol": "## Deploy",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(missing section)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No deploy procedure exists; order and flags matter for security and for synthesis past Hosting's 60 s cut.",
+    "expectedSolution": "Add `## Deploy`: preflight \u2192 rules \u2192 `gcloud run deploy` with secrets, no CPU throttling, timeout, max instances \u2192 hosting; AI Logic stays disabled."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "## Deploy",
+      "npm --prefix studio run deploy:preflight",
+      "firebase deploy --only firestore:rules,storage",
+      "gcloud run deploy studio",
+      "--set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest",
+      "--no-cpu-throttling",
+      "--max-instances",
+      "firebase deploy --only hosting",
+      "AI Logic"
+    ]
+  }
+}

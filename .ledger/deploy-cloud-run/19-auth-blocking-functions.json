@@ -1,0 +1,32 @@
+{
+  "$schema": "../rules.json",
+  "id": "auth-blocking-functions",
+  "title": "[007] Blocking functions reject accounts not on the allowlist",
+  "screenshot": "n/a",
+  "rule": "AUTH_BLOCKING_ALLOWLIST",
+  "target": {
+    "file": "functions/src/index.ts",
+    "enclosingSymbol": "assertAllowlisted",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Any Google account can obtain a Firebase ID token.",
+    "expectedSolution": "`beforeUserCreated` and `beforeUserSignedIn` call `assertAllowlisted`, which requires a verified email with an `allowlist/{email}` doc or throws `permission-denied`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "beforeUserCreated",
+      "beforeUserSignedIn",
+      "assertAllowlisted",
+      "emailVerified",
+      "allowlist",
+      "permission-denied"
+    ]
+  }
+}

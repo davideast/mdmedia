@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "hosted-case-share-by-uid",
+  "title": "[007] Hosted matrix covers a narration shared by uid with labels",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/scripts/verify-rules-hosted.mjs",
+    "enclosingSymbol": "cases",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new cases)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No hosted case proves the new update shape or a uid-based shared read.",
+    "expectedSolution": "Add ALLOW cases for an owner update with `sharedWithLabels` and for a read of a narration shared by uid."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "shared by uid",
+      "sharedWithLabels"
+    ]
+  }
+}

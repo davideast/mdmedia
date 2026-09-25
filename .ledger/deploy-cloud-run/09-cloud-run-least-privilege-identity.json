@@ -1,0 +1,34 @@
+{
+  "$schema": "../rules.json",
+  "id": "cloud-run-least-privilege-identity",
+  "title": "[007] Document a dedicated least-privilege runtime service account",
+  "screenshot": "n/a",
+  "rule": "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
+  "target": {
+    "file": "studio/README.md",
+    "enclosingSymbol": "## Deploy",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(missing section)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Cloud Run would otherwise run as the default compute account, often with Editor.",
+    "expectedSolution": "Document `studio-run@` with only datastore.user, bucket-scoped storage.objectAdmin, secret-scoped secretAccessor, and firebaseauth.viewer; no key files."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "roles/editor"
+    ],
+    "requiredPatterns": [
+      "studio-run@",
+      "roles/datastore.user",
+      "roles/storage.objectAdmin",
+      "roles/secretmanager.secretAccessor",
+      "roles/firebaseauth.viewer",
+      "--service-account"
+    ]
+  }
+}

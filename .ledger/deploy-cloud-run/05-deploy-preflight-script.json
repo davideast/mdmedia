@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "deploy-preflight-script",
+  "title": "[007] Add a deploy preflight that fails on client AI, stale rules, or failing verification",
+  "screenshot": "n/a",
+  "rule": "HERMETIC_DEPLOY_BUILD",
+  "target": {
+    "file": "studio/scripts/deploy-preflight.mjs",
+    "enclosingSymbol": "main",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Nothing stops a deploy with a browser Gemini key, a client AI import, or rules artifacts that drifted from their modules.",
+    "expectedSolution": "Check the env var, grep `studio/src` for `firebase/ai`, re-resolve both rules and byte-compare, run `rules:verify` and `rules:verify:hosted`; exit 1 on any failure."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "NEXT_PUBLIC_PYRIC_GEMINI_API_KEY",
+      "firebase/ai",
+      "rules resolve",
+      "rules:verify:hosted",
+      "process.exit(1)"
+    ]
+  }
+}

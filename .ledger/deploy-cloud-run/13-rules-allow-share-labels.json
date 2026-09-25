@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "rules-allow-share-labels",
+  "title": "[007] Allow and bound sharedWithLabels in narration updates",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "match /narrations/{narrationId}",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": ".hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The update field allowlist would reject the new label map.",
+    "expectedSolution": "Add `'sharedWithLabels'` to `hasOnly` and require a map of at most 50 entries."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "'sharedWithLabels'",
+      "get('sharedWithLabels', {}).size() <= 50"
+    ]
+  }
+}

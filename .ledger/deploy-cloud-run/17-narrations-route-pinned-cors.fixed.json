@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "narrations-route-pinned-cors",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.195Z",
+  "file": "studio/src/app/api/narrations/route.ts",
+  "enclosingSymbol": "OPTIONS",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "\"Access-Control-Allow-Origin\": \"*\""
+    ],
+    "requiredPatternsPresent": [
+      "export async function OPTIONS",
+      "ALLOWED_WEB_ORIGINS",
+      "Access-Control-Allow-Origin",
+      "Vary"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

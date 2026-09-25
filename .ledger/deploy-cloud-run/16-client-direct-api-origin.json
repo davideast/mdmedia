@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "client-direct-api-origin",
+  "title": "[007] POST narrations to the Cloud Run origin",
+  "screenshot": "n/a",
+  "rule": "LONG_REQUESTS_BYPASS_HOSTING",
+  "target": {
+    "file": "studio/src/lib/use-narration-stream.ts",
+    "enclosingSymbol": "createNarration",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "fetch('/api/narrations'",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Through Hosting the synthesis stream is cut at 60 s.",
+    "expectedSolution": "Prefix the POST with `process.env.NEXT_PUBLIC_API_ORIGIN ?? ''`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "NEXT_PUBLIC_API_ORIGIN"
+    ]
+  }
+}
