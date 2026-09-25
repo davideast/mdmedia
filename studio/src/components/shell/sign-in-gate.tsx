@@ -37,7 +37,7 @@ function GoogleGlyph() {
  * identifiers, or how accounts are stored.
  */
 export function SignInGate() {
-  const { signIn } = useAuth();
+  const { signIn, accessDenied } = useAuth();
   const [working, setWorking] = useState(false);
 
   const start = async () => {
@@ -63,6 +63,15 @@ export function SignInGate() {
           </p>
         </div>
 
+        {accessDenied ? (
+          <div
+            role="alert"
+            className="w-full rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--surface-1)] px-4 py-3 text-left text-[0.84rem] text-[color:var(--fg-secondary)]"
+          >
+            This account is not on the studio allowlist. Sign in with an approved email address or request access from an administrator.
+          </div>
+        ) : null}
+
         <Button
           type="button"
           size="lg"
@@ -76,7 +85,7 @@ export function SignInGate() {
         </Button>
 
         <p className="t-meta max-w-[34ch]">
-          New here? Continuing with Google creates your account.
+          Access is restricted to allowlisted Google accounts.
         </p>
       </div>
     </div>

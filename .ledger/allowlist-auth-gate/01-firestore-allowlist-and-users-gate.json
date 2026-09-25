@@ -1,0 +1,39 @@
+{
+  "$schema": "../rules.json",
+  "id": "firestore-allowlist-and-users-gate",
+  "title": "Define self-only allowlist/{email} rules and gate users/{uid} creation on isAllowlisted()",
+  "screenshot": "n/a",
+  "rule": "ALLOWLIST_NORMALIZED_SELF_LOOKUP_RULES",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "secondaryFile": "studio/firestore.rules",
+    "enclosingSymbol": "service cloud.firestore",
+    "anchor": {
+      "contextBefore": "import { isAuthenticated, isOwner } from 'auth';\nimport { hasRequired, validString, isOneOf } from 'validation';\nimport { immutableFields } from 'lifecycle';\n\nservice cloud.firestore {\n  match /databases/{database}/documents {",
+      "targetSnippet": "    match /users/{uid} {\n      allow read, write: if isOwner(uid);\n    }",
+      "contextAfter": "    match /narrations/{narrationId} {"
+    }
+  },
+  "violation": {
+    "problem": "studio/firestore.modules.rules currently has no /allowlist/{email} match block and permits any signed-in Google user to create and read users/{uid} via `allow read, write: if isOwner(uid);` without checking verified email membership in the allowlist collection.",
+    "expectedSolution": "Import `hasClaim` from `'membership'`, define `hasVerifiedEmail()` and `isAllowlisted()` using `exists(/databases/$(database)/documents/allowlist/$(request.auth.token['email'].lower()))`, add `match /allowlist/{email}` permitting `get` only on the caller's own verified lowercase email (`allow list, write: if false;`), gate `match /users/{uid}` on `isAllowlisted()`, and resolve `studio/firestore.modules.rules` to `studio/firestore.rules`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "allow read, write: if isOwner(uid);"
+    ],
+    "requiredPatterns": [
+      "import { hasClaim } from 'membership';",
+      "function hasVerifiedEmail()",
+      "function isAllowlisted()",
+      "request.auth.token['email_verified'] == true",
+      "exists(/databases/$(database)/documents/allowlist/$(request.auth.token['email'].lower()))",
+      "match /allowlist/{email}",
+      "request.auth.token['email'].lower() == email",
+      "allow list, write: if false;",
+      "allow get: if isOwner(uid) && isAllowlisted();",
+      "allow create, update: if isOwner(uid) && isAllowlisted();"
+    ]
+  }
+}

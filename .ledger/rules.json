@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": ".ledger/rules.json",
+  "title": "Standing Architectural Rules & Ledger Schema",
+  "description": "General JSON Schema defining standing architectural rules, Firebase security invariants, and verification contracts for mechanical issue ledgers.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "rule",
+    "target",
+    "violation",
+    "oracle"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URI or relative path of the schema governing this document."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Unique kebab-case issue identifier."
+    },
+    "title": {
+      "type": "string",
+      "description": "Imperative summary of the architectural violation or defect."
+    },
+    "screenshot": {
+      "type": "string",
+      "description": "Optional artifact filename or URL of the visual evidence/review."
+    },
+    "rule": {
+      "type": "string",
+      "description": "Canonical standing architectural rule or recognized alias being enforced.",
+      "enum": [
+        "ALLOWLIST_NORMALIZED_SELF_LOOKUP_RULES",
+        "ALLOWLIST_MUTATION_BOUNDARY_PARITY",
+        "ADMIN_SDK_ALLOWLIST_ENFORCEMENT",
+        "CLIENT_AUTH_ALLOWLIST_GATE",
+        "ZERO_BACKWARDS_COMPATIBILITY",
+        "REQUIRE_NAMED_BOOLEANS",
+        "NO_BOOLEAN_COERCION_CHAINS",
+        "NO_SILENT_ERROR_SWALLOWING",
+        "NO_UNTYPED_ANY_CALLBACKS",
+        "STORE_CENTRALIZATION_NO_BYPASS",
+        "NO_HARDCODED_DOMAIN_STRINGS",
+        "COLLAPSE_DUPLICATE_STATE_MACHINES",
+        "NO_REGEX_IN_DOMAIN_PARSING",
+        "ATOMIC_FILE_OPERATIONS",
+        "ELIMINATE_DEAD_CODE",
+        "REQUIRE_EXHAUSTIVE_SWITCH"
+      ]
+    },
+    "target": {
+      "type": "object",
+      "description": "The exact source code location containing the violation.",
+      "required": ["file"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Relative path to the primary file under review from the project root."
+        },
+        "secondaryFile": {
+          "type": "string",
+          "description": "Optional relative path to a secondary file affected by the violation."
+        },
+        "enclosingSymbol": {
+          "type": "string",
+          "description": "Function, class, or module enclosing the target violation."
+        },
+        "anchor": {
+          "type": "object",
+          "description": "Contextual anchor to locate the code snippet precisely.",
+          "properties": {
+            "contextBefore": { "type": "string" },
+            "targetSnippet": { "type": "string" },
+            "contextAfter": { "type": "string" }
+          }
+        }
+      }
+    },
+    "violation": {
+      "type": "object",
+      "description": "The defect narrative and required architectural remediation.",
+      "required": ["problem", "expectedSolution"],
+      "properties": {
+        "problem": {
+          "type": "string",
+          "description": "Detailed explanation of what rule is violated and why."
+        },
+        "expectedSolution": {
+          "type": "string",
+          "description": "The exact architectural remediation required to close the issue."
+        }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "description": "Mechanical verification specification.",
+      "required": ["type", "forbiddenPatterns"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["invariants", "ast", "unit_test"],
+          "description": "Oracle execution model."
+        },
+        "forbiddenPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Strings or tokens that MUST NOT appear in the target files for the issue to be marked fixed."
+        },
+        "requiredPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Strings or tokens that MUST appear in the target files for the issue to be marked fixed."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "standingRules": {
+      "ALLOWLIST_NORMALIZED_SELF_LOOKUP_RULES": {
+        "id": "ALLOWLIST_NORMALIZED_SELF_LOOKUP_RULES",
+        "category": "Firebase Authorization & Identity",
+        "summary": "Gate account profile creation and reads on a verified, lowercase-normalized email allowlist lookup with self-only read and no collection enumeration.",
+        "description": "Any authenticated Google OAuth user can currently create and read `users/{uid}` without allowlist membership. Furthermore, allowlist documents must be keyed by lowercase email (`allowlist/{email}`), require `request.auth.token['email_verified'] == true` via `hasClaim('email')`, permit `get` only when `request.auth.token['email'].lower() == email`, deny `list` and `write`, and regenerate `studio/firestore.rules` from `studio/firestore.modules.rules`.",
+        "antiPatterns": [
+          "allow read, write: if isOwner(uid);",
+          "allow read: if isAuthenticated();"
+        ],
+        "remediation": "Import `hasClaim` from `'membership'`, define `hasVerifiedEmail()` and `isAllowlisted()` using `exists(/databases/$(database)/documents/allowlist/$(request.auth.token['email'].lower()))`, expose `/allowlist/{email}` with self-only `allow get` and `allow list, write: if false;`, gate `/users/{uid}` on `isAllowlisted()`, and resolve `studio/firestore.modules.rules` to `studio/firestore.rules`."
+      },
+      "ALLOWLIST_MUTATION_BOUNDARY_PARITY": {
+        "id": "ALLOWLIST_MUTATION_BOUNDARY_PARITY",
+        "category": "Firebase Authorization & Identity",
+        "summary": "Require `isAllowlisted()` across all user-authored Firestore collection mutations (`narrations` and `playlists`) and maintain modular build parity.",
+        "description": "Gating `users/{uid}` alone leaves a privilege gap where a non-allowlisted or revoked Firebase Auth user can still directly invoke Firestore `create`, `update`, or `delete` on `narrations/{narrationId}` and `playlists/{playlistId}` if they only check `isOwner(...)`.",
+        "antiPatterns": [
+          "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()",
+          "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])"
+        ],
+        "remediation": "Require `isAllowlisted()` on `create`, `update`, and `delete` in both `match /narrations/{narrationId}` and `match /playlists/{playlistId}` in `studio/firestore.modules.rules`, then regenerate `studio/firestore.rules` via `pyric firestore rules resolve`."
+      },
+      "ADMIN_SDK_ALLOWLIST_ENFORCEMENT": {
+        "id": "ADMIN_SDK_ALLOWLIST_ENFORCEMENT",
+        "category": "Trusted Server & Admin SDK Boundary",
+        "summary": "Server Admin SDK token verification must enforce verified email and Firestore allowlist membership before returning a caller UID.",
+        "description": "Because `adminDb()` and `adminBucket()` bypass Firestore and Storage Security Rules completely, returning `decoded.uid` from `verifyIdToken` without checking `decoded.email_verified === true` and `adminDb().collection('allowlist').doc(email).get()` allows non-allowlisted or revoked users to trigger Gemini TTS synthesis (`POST /api/narrations`) and mutate server-managed resources.",
+        "antiPatterns": [
+          "const decoded = await adminAuth().verifyIdToken(token.trim(), true);\n    return decoded.uid;"
+        ],
+        "remediation": "In `verifyIdToken` (`studio/src/lib/firebase-admin.ts`), normalize `decoded.email?.trim().toLowerCase()`, verify `decoded.email_verified === true`, and confirm `(await adminDb().collection('allowlist').doc(email).get()).exists` before returning `decoded.uid`."
+      },
+      "CLIENT_AUTH_ALLOWLIST_GATE": {
+        "id": "CLIENT_AUTH_ALLOWLIST_GATE",
+        "category": "Client Session & Subscription Hygiene",
+        "summary": "Client AuthProvider must verify `allowlist/{email}` membership with session guarding before provisioning `users/{uid}` or mounting the signed-in shell.",
+        "description": "When `onAuthStateChanged` emits a `firebaseUser`, immediately calling `upsertUserProfile` and `onSnapshot(userRef(uid))` without first verifying `allowlist/{email}` causes non-allowlisted users to enter the app shell with denied writes and unguarded async state transitions, while `SignInGate` gives no feedback that account creation is allowlist-restricted.",
+        "antiPatterns": [
+          "const nextUser = toAuthUser(firebaseUser);\n      uidRef.current = nextUser.uid;\n      setUser(nextUser);\n\n      void upsertUserProfile({",
+          "New here? Continuing with Google creates your account."
+        ],
+        "remediation": "Guard the async auth transition with a session counter (`loadSessionRef.current++`), check `isEmailAllowlisted(nextUser.email)` against `allowlist/{email}` before calling `upsertUserProfile` or attaching `onSnapshot`, sign out non-allowlisted users (`await signOut(auth())`), expose `accessDenied` on `AuthState`, and render an explicit allowlist denial notice in `SignInGate`."
+      },
+      "NO_SILENT_ERROR_SWALLOWING": {
+        "id": "NO_SILENT_ERROR_SWALLOWING",
+        "category": "Reliability & Error Handling",
+        "summary": "Catch blocks must log, rethrow, or handle errors explicitly.",
+        "description": "Empty catch blocks and silent error suppression hide bugs, race conditions, and corrupted state.",
+        "antiPatterns": [
+          "catch {}",
+          "catch (_) {}"
+        ],
+        "remediation": "Handle expected errors with specific condition checks, or rethrow with contextual wrapping."
+      },
+      "REQUIRE_NAMED_BOOLEANS": {
+        "id": "REQUIRE_NAMED_BOOLEANS",
+        "category": "Code Quality & Readability",
+        "summary": "Replace compound inline conditions with self-documenting const booleans.",
+        "description": "Nested inline boolean logic increases cognitive load and hides branch conditions.",
+        "antiPatterns": [
+          "if (res.ok && !res.pending && (data.count > 0 || forced))"
+        ],
+        "remediation": "Extract conditions into descriptive variables: const hasData = data.count > 0; const isReady = res.ok && !res.pending && (hasData || forced);"
+      },
+      "NO_BOOLEAN_COERCION_CHAINS": {
+        "id": "NO_BOOLEAN_COERCION_CHAINS",
+        "category": "Type Safety",
+        "summary": "Eliminate double-negation or nested Boolean(...) coercion chains.",
+        "description": "Chains like Boolean(Boolean(x)) or !!Boolean(x) obscure the underlying value and type contract.",
+        "antiPatterns": [
+          "Boolean(Boolean(",
+          "!!Boolean("
+        ],
+        "remediation": "Use explicit equality checks or a single Boolean(x) / !!x."
+      },
+      "ATOMIC_FILE_OPERATIONS": {
+        "id": "ATOMIC_FILE_OPERATIONS",
+        "category": "Concurrency & Safety",
+        "summary": "Prevent TOCTOU file system race conditions using atomic file descriptor flags.",
+        "description": "Checking fs.existsSync() immediately before fs.writeFileSync() creates a time-of-check to time-of-use vulnerability.",
+        "antiPatterns": [
+          "if (!fs.existsSync(file)) { fs.writeFileSync(file, data); }"
+        ],
+        "remediation": "Use atomic openSync with O_CREAT | O_EXCL and catch EEXIST, or write via atomic rename."
+      },
+      "ZERO_BACKWARDS_COMPATIBILITY": {
+        "id": "ZERO_BACKWARDS_COMPATIBILITY",
+        "category": "Architecture & Clean Baseline",
+        "summary": "Zero backwards compatibility for unreleased software or deprecated internal paths.",
+        "description": "Retaining legacy shims, fallback paths, and compatibility layers for unreleased software introduces dead code and store bypasses.",
+        "antiPatterns": [
+          "// Fallback to legacy path",
+          "const LEGACY_DIR ="
+        ],
+        "remediation": "Purge legacy fallbacks completely. Standardize on the canonical store or path."
+      }
+    }
+  }
+}

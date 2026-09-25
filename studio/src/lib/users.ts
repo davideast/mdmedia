@@ -83,6 +83,25 @@ export function userRef(uid: string) {
   return doc(db(), 'users', uid);
 }
 
+export function allowlistRef(email: string) {
+  return doc(db(), 'allowlist', email.trim().toLowerCase());
+}
+
+/**
+ * Check whether the signed-in user's email is present in `allowlist/{email}`.
+ * Security Rules permit `get` only on the caller's own verified lowercase email.
+ */
+export async function isEmailAllowlisted(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return false;
+  try {
+    const snapshot = await getDoc(allowlistRef(normalized));
+    return snapshot.exists();
+  } catch {
+    return false;
+  }
+}
+
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const snapshot = await getDoc(userRef(uid));
   return snapshot.exists() ? toUserProfile(snapshot) : null;

@@ -80,7 +80,8 @@
     "studio:bg": "npm --prefix studio run dev:bg",
     "studio:stop": "npm --prefix studio run dev:stop",
     "studio:status": "npm --prefix studio run dev:status",
-    "studio:logs": "npm --prefix studio run dev:logs"
+    "studio:logs": "npm --prefix studio run dev:logs",
+    "studio:allowlist": "npm --prefix studio run allowlist --"
   },
   "dependencies": {
     "@google/genai": "^2.15.0",

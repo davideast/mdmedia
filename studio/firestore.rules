@@ -6,6 +6,9 @@ service cloud.firestore {
   function isOwner(userId) {
     return isAuthenticated() && request.auth.uid == userId;
   }
+  function hasClaim(claim) {
+    return request.auth != null && request.auth.token[claim] != null;
+  }
   function hasRequired(fields) {
     return request.resource.data.keys().hasAll(fields);
   }
@@ -19,6 +22,12 @@ service cloud.firestore {
     return request.resource.data.diff(resource.data).unchangedKeys().hasAll(fields);
   }
   match /databases/{database}/documents {
+    function hasVerifiedEmail() {
+      return isAuthenticated() && hasClaim('email') && request.auth.token['email'] is string && hasClaim('email_verified') && request.auth.token['email_verified'] == true;
+    }
+    function isAllowlisted() {
+      return hasVerifiedEmail() && exists(/databases/$(database)/documents/allowlist/$(request.auth.token['email'].lower()));
+    }
     function canReadNarration() {
       return isOwner(resource.data.ownerUid) || resource.data.visibility == 'public' || resource.data.visibility == 'shared' && isAuthenticated() && request.auth.uid in resource.data.sharedWith;
     }
@@ -31,21 +40,27 @@ service cloud.firestore {
     function validPlaylistFields() {
       return validString('title', 1, 200) && request.resource.data.ownerUid is string && request.resource.data.description is string && request.resource.data.narrationIds is list && request.resource.data.narrationIds.size() <= 100 && request.resource.data.createdAt is number && request.resource.data.updatedAt is number;
     }
+    match /allowlist/{email} {
+      allow get: if hasVerifiedEmail() && request.auth.token['email'].lower() == email;
+      allow list, write: if false;
+    }
     match /users/{uid} {
-      allow read, write: if isOwner(uid);
+      allow get: if isOwner(uid) && isAllowlisted();
+      allow create, update: if isOwner(uid) && isAllowlisted();
+      allow list, delete: if false;
     }
     match /narrations/{narrationId} {
       allow get, list: if canReadNarration();
-      allow create: if isOwner(request.resource.data.ownerUid) && hasRequiredNarrationFields() && validNarrationFields();
-      allow update: if isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validNarrationFields();
-      allow delete: if isOwner(resource.data.ownerUid);
+      allow create: if isAllowlisted() && isOwner(request.resource.data.ownerUid) && hasRequiredNarrationFields() && validNarrationFields();
+      allow update: if isAllowlisted() && isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validNarrationFields();
+      allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);
     }
     match /playlists/{playlistId} {
       allow get, list: if isOwner(resource.data.ownerUid);
-      allow create: if isOwner(request.resource.data.ownerUid) && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt']) && validPlaylistFields();
-      allow update: if isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validPlaylistFields();
-      allow delete: if isOwner(resource.data.ownerUid);
+      allow create: if isAllowlisted() && isOwner(request.resource.data.ownerUid) && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt']) && validPlaylistFields();
+      allow update: if isAllowlisted() && isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validPlaylistFields();
+      allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);
     }
   }
 }
-// @pyric-source-map: [{"generatedLine":2,"authoredLine":18,"authoredCol":1,"authoredFile":"firestore.rules"},{"generatedLine":3,"authoredLine":3,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":6,"authoredLine":7,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":9,"authoredLine":11,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":12,"authoredLine":22,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":15,"authoredLine":30,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":18,"authoredLine":29,"authoredCol":8,"authoredFile":"lifecycle"},{"generatedLine":21,"authoredLine":19,"authoredCol":3,"authoredFile":"firestore.modules.rules"},{"generatedLine":22,"authoredLine":68,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":25,"authoredLine":76,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":28,"authoredLine":101,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":31,"authoredLine":113,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":34,"authoredLine":24,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":35,"authoredLine":25,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(uid)"},{"generatedLine":37,"authoredLine":28,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":38,"authoredLine":38,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"canReadNarration()"},{"generatedLine":39,"authoredLine":40,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(request.resource.data.ownerUid) && hasRequiredNarrationFields() && validNarrationFields()"},{"generatedLine":40,"authoredLine":46,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validNarrationFields()"},{"generatedLine":41,"authoredLine":50,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid)"},{"generatedLine":43,"authoredLine":53,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":44,"authoredLine":54,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid)"},{"generatedLine":45,"authoredLine":56,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(request.resource.data.ownerUid) && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt']) && validPlaylistFields()"},{"generatedLine":46,"authoredLine":60,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validPlaylistFields()"},{"generatedLine":47,"authoredLine":64,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid)"}]
+// @pyric-source-map: [{"generatedLine":2,"authoredLine":20,"authoredCol":1,"authoredFile":"firestore.rules"},{"generatedLine":3,"authoredLine":3,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":6,"authoredLine":7,"authoredCol":8,"authoredFile":"auth"},{"generatedLine":9,"authoredLine":21,"authoredCol":8,"authoredFile":"membership"},{"generatedLine":12,"authoredLine":11,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":15,"authoredLine":22,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":18,"authoredLine":30,"authoredCol":8,"authoredFile":"validation"},{"generatedLine":21,"authoredLine":29,"authoredCol":8,"authoredFile":"lifecycle"},{"generatedLine":24,"authoredLine":21,"authoredCol":3,"authoredFile":"firestore.modules.rules"},{"generatedLine":25,"authoredLine":87,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":28,"authoredLine":95,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":31,"authoredLine":100,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":34,"authoredLine":108,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":37,"authoredLine":133,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":40,"authoredLine":145,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":43,"authoredLine":27,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":44,"authoredLine":28,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"hasVerifiedEmail() && request.auth.token['email'].lower() == email"},{"generatedLine":45,"authoredLine":30,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"false"},{"generatedLine":47,"authoredLine":37,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":48,"authoredLine":38,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(uid) && isAllowlisted()"},{"generatedLine":49,"authoredLine":39,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(uid) && isAllowlisted()"},{"generatedLine":50,"authoredLine":40,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"false"},{"generatedLine":52,"authoredLine":43,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":53,"authoredLine":53,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"canReadNarration()"},{"generatedLine":54,"authoredLine":55,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(request.resource.data.ownerUid) && hasRequiredNarrationFields() && validNarrationFields()"},{"generatedLine":55,"authoredLine":62,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validNarrationFields()"},{"generatedLine":56,"authoredLine":67,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(resource.data.ownerUid)"},{"generatedLine":58,"authoredLine":70,"authoredCol":5,"authoredFile":"firestore.modules.rules"},{"generatedLine":59,"authoredLine":71,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isOwner(resource.data.ownerUid)"},{"generatedLine":60,"authoredLine":73,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(request.resource.data.ownerUid) && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt']) && validPlaylistFields()"},{"generatedLine":61,"authoredLine":78,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(resource.data.ownerUid) && immutableFields(['ownerUid', 'createdAt']) && validPlaylistFields()"},{"generatedLine":62,"authoredLine":83,"authoredCol":7,"authoredFile":"firestore.modules.rules","expression":"isAllowlisted() && isOwner(resource.data.ownerUid)"}]

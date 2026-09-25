@@ -81,6 +81,16 @@ async function runStudioAssurance() {
     },
     state: {
       firestore: {
+        // Allowlist collection (only alice and bob are allowlisted; eve is not)
+        'allowlist/alice@example.com': {
+          email: 'alice@example.com',
+          addedAt: 1000000,
+        },
+        'allowlist/bob@example.com': {
+          email: 'bob@example.com',
+          addedAt: 1000000,
+        },
+
         // Users collection
         'users/alice': {
           uid: 'alice',
@@ -207,9 +217,27 @@ async function runStudioAssurance() {
       ],
       auth: {
         users: [
-          { uid: 'alice', email: 'alice@example.com', password: 'pw-alice-secret' },
-          { uid: 'bob', email: 'bob@example.com', password: 'pw-bob-secret' },
-          { uid: 'eve', email: 'eve@example.com', password: 'pw-eve-secret' },
+          {
+            uid: 'alice',
+            email: 'alice@example.com',
+            password: 'pw-alice-secret',
+            emailVerified: true,
+            customClaims: { email: 'alice@example.com', email_verified: true },
+          },
+          {
+            uid: 'bob',
+            email: 'bob@example.com',
+            password: 'pw-bob-secret',
+            emailVerified: true,
+            customClaims: { email: 'bob@example.com', email_verified: true },
+          },
+          {
+            uid: 'eve',
+            email: 'eve@example.com',
+            password: 'pw-eve-secret',
+            emailVerified: true,
+            customClaims: { email: 'eve@example.com', email_verified: true },
+          },
         ],
       },
     },
@@ -296,6 +324,13 @@ async function runStudioAssurance() {
       },
     },
     {
+      id: 'obs-alice-read-own-allowlist',
+      actorId: 'actor-alice',
+      result: 'ALLOW',
+      source: 'authored',
+      operation: { service: 'firestore', method: 'get', path: 'allowlist/alice@example.com' },
+    },
+    {
       id: 'obs-alice-read-private-audio',
       actorId: 'actor-alice',
       result: 'ALLOW',
@@ -322,6 +357,30 @@ async function runStudioAssurance() {
   banner(3, 'Define Explicit Security Invariants');
 
   const invariants = [
+    {
+      id: 'inv-allowlist-enumeration-prohibition',
+      service: 'firestore',
+      statement: 'A user must not read another user allowlist document.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
+    {
+      id: 'inv-allowlist-self-write-prohibition',
+      service: 'firestore',
+      statement: 'A client must not create or mutate allowlist documents.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
+    {
+      id: 'inv-non-allowlisted-profile-gate',
+      service: 'firestore',
+      statement: 'A non-allowlisted user must not read or create their own user profile document.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
     {
       id: 'inv-user-profile-isolation',
       service: 'firestore',
@@ -398,7 +457,47 @@ async function runStudioAssurance() {
   // -------------------------------------------------------------------------
   banner(4, 'Propose Single-Dimension Mutations (Path, Payload, Operation)');
 
-  // 4a. Path Mutations: Eve attempts unauthorized reads against various resources
+  // 4a. Path & Operation Mutations on Allowlist & Profile Gates
+  const p0a = campaign.propose({
+    observationId: 'obs-alice-read-own-allowlist',
+    invariantId: 'inv-allowlist-enumeration-prohibition',
+    mutations: [
+      {
+        id: 'probe-alice-read-bob-allowlist',
+        dimension: 'path',
+        description: 'Alice attempts to read Bob allowlist document.',
+        operation: { service: 'firestore', method: 'get', path: 'allowlist/bob@example.com' },
+      },
+    ],
+  });
+
+  const p0b = campaign.propose({
+    observationId: 'obs-alice-read-own-allowlist',
+    invariantId: 'inv-allowlist-self-write-prohibition',
+    mutations: [
+      {
+        id: 'probe-alice-delete-own-allowlist',
+        dimension: 'operation',
+        description: 'Alice attempts to delete her own allowlist document from the client.',
+        operation: { service: 'firestore', method: 'delete', path: 'allowlist/alice@example.com' },
+      },
+    ],
+  });
+
+  const p0c = campaign.propose({
+    observationId: 'obs-eve-read-public-narr',
+    invariantId: 'inv-non-allowlisted-profile-gate',
+    mutations: [
+      {
+        id: 'probe-eve-read-own-non-allowlisted-profile',
+        dimension: 'path',
+        description: 'Non-allowlisted Eve attempts to read users/eve.',
+        operation: { service: 'firestore', method: 'get', path: 'users/eve' },
+      },
+    ],
+  });
+
+  // 4b. Path Mutations: Eve attempts unauthorized reads against various resources
   const p1 = campaign.propose({
     observationId: 'obs-eve-read-public-narr',
     invariantId: 'inv-user-profile-isolation',
@@ -451,7 +550,7 @@ async function runStudioAssurance() {
     ],
   });
 
-  // 4b. Payload Mutation: Alice attempts to update playlist and transfer ownership to Eve
+  // 4c. Payload Mutation: Alice attempts to update playlist and transfer ownership to Eve
   const p2 = campaign.propose({
     observationId: 'obs-alice-update-playlist',
     invariantId: 'inv-narration-ownership-immutability',
@@ -476,7 +575,7 @@ async function runStudioAssurance() {
     ],
   });
 
-  // 4c. Operation Mutation: Bob (who has shared read) attempts to delete the shared narration
+  // 4d. Operation Mutation: Bob (who has shared read) attempts to delete the shared narration
   const p3 = campaign.propose({
     observationId: 'obs-bob-read-shared-narr',
     invariantId: 'inv-narration-delete-authorization',
@@ -490,7 +589,7 @@ async function runStudioAssurance() {
     ],
   });
 
-  // 4d. Operation Mutation: Alice attempts delete on storage object (client write prohibition)
+  // 4e. Operation Mutation: Alice attempts delete on storage object (client write prohibition)
   const p4 = campaign.propose({
     observationId: 'obs-alice-read-private-audio',
     invariantId: 'inv-storage-client-write-prohibition',
@@ -508,7 +607,7 @@ async function runStudioAssurance() {
     ],
   });
 
-  // 4e. Path Mutation: Anon attempts to read Alice's private audio in storage
+  // 4f. Path Mutation: Anon attempts to read Alice's private audio in storage
   const p5 = campaign.propose({
     observationId: 'obs-anon-read-public-audio',
     invariantId: 'inv-storage-private-confidentiality',
@@ -522,7 +621,7 @@ async function runStudioAssurance() {
     ],
   });
 
-  const totalProbes = p1.length + p1b.length + p1c.length + p1d.length + p2.length + p3.length + p4.length + p5.length;
+  const totalProbes = p0a.length + p0b.length + p0c.length + p1.length + p1b.length + p1c.length + p1d.length + p2.length + p3.length + p4.length + p5.length;
   console.log(`${c.green}✓${c.reset} Proposed ${totalProbes} bounded adversarial probes across path, payload, and operation dimensions.`);
 
   // -------------------------------------------------------------------------

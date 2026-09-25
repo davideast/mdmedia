@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-22T14:37:28.165Z",
+  "timestamp": "2026-09-25T01:52:12.494Z",
   "campaignId": "studio-authorization-audit-v1",
   "summary": {
-    "probes": 8,
-    "controlsPassed": 8,
+    "probes": 11,
+    "controlsPassed": 11,
     "localCounterexamples": 0,
     "candidateSignals": 0,
-    "noCounterexamples": 8,
+    "noCounterexamples": 11,
     "engineGaps": 0,
     "invalidProbes": 0
   },
@@ -18,6 +18,30 @@
     ]
   },
   "results": [
+    {
+      "probeId": "probe-alice-read-bob-allowlist",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "A user must not read another user allowlist document.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-alice-delete-own-allowlist",
+      "dimension": "operation",
+      "classification": "no-counterexample",
+      "invariant": "A client must not create or mutate allowlist documents.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-eve-read-own-non-allowlisted-profile",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "A non-allowlisted user must not read or create their own user profile document.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
     {
       "probeId": "probe-eve-read-alice-profile",
       "dimension": "path",

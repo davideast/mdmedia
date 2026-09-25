@@ -78,3 +78,57 @@ if (fs.existsSync(socketMessagePath)) {
     console.log('[patch] Patched socket-message.js backlog cap to 768 MiB');
   }
 }
+
+// 6. Patch pyric/dist/auth/sandbox-backend.js and auth-session-seeder.js to synthesize email + email_verified claims on OAuth/Google sign-in
+const sandboxBackendPath = path.join(__dirname, '..', 'node_modules', 'pyric', 'dist', 'auth', 'sandbox-backend.js');
+if (fs.existsSync(sandboxBackendPath)) {
+  let content = fs.readFileSync(sandboxBackendPath, 'utf8');
+  let changed = false;
+
+  const targetDetached = `    establishDetachedSession(user, signInProvider, tenantId) {
+        this.signInProviderByUid.set(user.uid, signInProvider);
+        const stored = this.usersByUid.get(user.uid);
+        const claims = stored?.customClaims ?? {};`;
+  const replacementDetached = `    establishDetachedSession(user, signInProvider, tenantId) {
+        this.signInProviderByUid.set(user.uid, signInProvider);
+        const stored = this.usersByUid.get(user.uid);
+        const isFederated = typeof signInProvider === 'string' && signInProvider.includes('.');
+        const emailVerified = Boolean(stored?.emailVerified || isFederated || stored?.providerUserInfo?.some((p) => p.providerId?.includes('.')));
+        if (stored && emailVerified && !stored.emailVerified) {
+            stored.emailVerified = true;
+        }
+        if (emailVerified && !user.emailVerified) {
+            user.emailVerified = true;
+        }
+        const baseEmailClaims = user.email ? { email: user.email, email_verified: emailVerified } : {};
+        const claims = { ...baseEmailClaims, ...(stored?.customClaims ?? {}) };`;
+
+  if (content.includes(targetDetached)) {
+    content = content.replace(targetDetached, replacementDetached);
+    changed = true;
+  }
+
+  const targetLiveClaims = `    liveClaims(uid, fallback) {
+        return this.usersByUid.get(uid)?.customClaims ?? fallback;
+    }`;
+  const replacementLiveClaims = `    liveClaims(uid, fallback) {
+        const stored = this.usersByUid.get(uid);
+        if (!stored)
+            return fallback;
+        const isFederated = (this.signInProviderByUid.get(uid) ?? '').includes('.') || Boolean(stored.providerUserInfo?.some((p) => p.providerId?.includes('.')));
+        const emailVerified = Boolean(stored.emailVerified || isFederated);
+        const baseEmailClaims = stored.email ? { email: stored.email, email_verified: emailVerified } : {};
+        return { ...baseEmailClaims, ...stored.customClaims };
+    }`;
+
+  if (content.includes(targetLiveClaims)) {
+    content = content.replace(targetLiveClaims, replacementLiveClaims);
+    changed = true;
+  }
+
+  if (changed) {
+    fs.writeFileSync(sandboxBackendPath, content, 'utf8');
+    console.log('[patch] Patched pyric sandbox-backend.js to synthesize email and email_verified claims');
+  }
+}
+

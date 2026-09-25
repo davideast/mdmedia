@@ -52,8 +52,8 @@ export const adminBucket = (): Bucket => getStorage(adminApp()).bucket();
 
 /**
  * Resolve the caller's uid from an `Authorization: Bearer <idToken>` header.
- * Returns `null` for a missing, malformed, expired, or revoked token; callers
- * translate that into a plain "please sign in" response.
+ * Returns `null` for a missing, malformed, expired, revoked, or non-allowlisted
+ * token; callers translate that into a plain "please sign in" response.
  */
 export async function verifyIdToken(authorizationHeader: string | null): Promise<string | null> {
   if (!authorizationHeader) return null;
@@ -63,6 +63,14 @@ export async function verifyIdToken(authorizationHeader: string | null): Promise
 
   try {
     const decoded = await adminAuth().verifyIdToken(token.trim(), true);
+    const email = decoded.email?.trim().toLowerCase();
+    if (!email || decoded.email_verified !== true) {
+      return null;
+    }
+
+    const allowlistDoc = await adminDb().collection('allowlist').doc(email).get();
+    if (!allowlistDoc.exists) return null;
+
     return decoded.uid;
   } catch (error) {
     // A silent 401 is undebuggable. Say why in development; stay quiet in

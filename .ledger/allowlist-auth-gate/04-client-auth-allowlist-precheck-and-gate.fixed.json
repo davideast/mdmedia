@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "client-auth-allowlist-precheck-and-gate",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T01:48:48.994Z",
+  "file": "studio/src/lib/auth-context.tsx",
+  "enclosingSymbol": "AuthProvider & SignInGate",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "const nextUser = toAuthUser(firebaseUser);\n      uidRef.current = nextUser.uid;\n      setUser(nextUser);\n\n      void upsertUserProfile({",
+      "New here? Continuing with Google creates your account."
+    ],
+    "requiredPatternsPresent": [
+      "loadSessionRef.current",
+      "isEmailAllowlisted",
+      "accessDenied",
+      "await signOut(auth())"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

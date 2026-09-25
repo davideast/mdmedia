@@ -1,6 +1,54 @@
 [
   {
     "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-alice-read-bob-allowlist",
+    "actorId": "actor-alice",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A user must not read another user allowlist document.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "allowlist/bob@example.com"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-alice-delete-own-allowlist",
+    "actorId": "actor-alice",
+    "dimension": "operation",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A client must not create or mutate allowlist documents.",
+    "operation": {
+      "service": "firestore",
+      "method": "delete",
+      "path": "allowlist/alice@example.com"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
+    "probeId": "probe-eve-read-own-non-allowlisted-profile",
+    "actorId": "actor-eve",
+    "dimension": "path",
+    "classification": "no-counterexample",
+    "expect": "DENY",
+    "observedDecision": "DENY",
+    "controlDecision": "ALLOW",
+    "invariant": "A non-allowlisted user must not read or create their own user profile document.",
+    "operation": {
+      "service": "firestore",
+      "method": "get",
+      "path": "users/eve"
+    }
+  },
+  {
+    "schema": "pyric.assurance.case.v1",
     "probeId": "probe-eve-read-alice-profile",
     "actorId": "actor-eve",
     "dimension": "path",

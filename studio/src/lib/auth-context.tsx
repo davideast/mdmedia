@@ -30,6 +30,7 @@ import { onSnapshot, type Unsubscribe } from 'firebase/firestore';
 
 import { auth } from '@/lib/firebase';
 import {
+  isEmailAllowlisted,
   saveProfileFields,
   saveSettings,
   toUserProfile,
@@ -49,6 +50,7 @@ export interface AuthState {
   user: AuthUser | null;
   profile: UserProfile | null;
   loading: boolean;
+  accessDenied: boolean;
   signIn: () => Promise<void>;
   signOutUser: () => Promise<void>;
   updateSettings: (patch: Partial<UserSettings>) => Promise<void>;
@@ -70,11 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   // The live profile subscription, replaced on every session change.
   const profileUnsubscribe = useRef<Unsubscribe | null>(null);
   // Read by the action callbacks so they never close over a stale session.
   const uidRef = useRef<string | null>(null);
+  // Async session guard so superseded auth state transitions abort immediately
+  // and never attach orphaned Firestore listeners.
+  const loadSessionRef = useRef(0);
 
   useEffect(() => {
     const stopProfile = () => {
@@ -83,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     };
 
     const unsubscribeAuth = onAuthStateChanged(auth(), (firebaseUser) => {
+      const sessionId = ++loadSessionRef.current;
       stopProfile();
 
       if (!firebaseUser) {
@@ -94,39 +101,62 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
       }
 
       const nextUser = toAuthUser(firebaseUser);
-      uidRef.current = nextUser.uid;
-      setUser(nextUser);
 
-      void upsertUserProfile({
-        uid: nextUser.uid,
-        displayName: nextUser.displayName,
-        email: nextUser.email,
-        photoURL: nextUser.photoURL,
-      }).catch(() => {
-        // A transient write failure is not a session failure: the snapshot
-        // below still delivers the profile once it is reachable.
-      });
+      void (async () => {
+        const allowed = await isEmailAllowlisted(nextUser.email);
+        if (loadSessionRef.current !== sessionId) return;
 
-      profileUnsubscribe.current = onSnapshot(
-        userRef(nextUser.uid),
-        (snapshot) => {
-          setProfile(snapshot.exists() ? toUserProfile(snapshot) : null);
-          setLoading(false);
-        },
-        () => {
+        if (!allowed) {
+          uidRef.current = null;
+          setUser(null);
           setProfile(null);
+          setAccessDenied(true);
+          await signOut(auth());
           setLoading(false);
-        },
-      );
+          return;
+        }
+
+        setAccessDenied(false);
+        uidRef.current = nextUser.uid;
+        setUser(nextUser);
+
+        void upsertUserProfile({
+          uid: nextUser.uid,
+          displayName: nextUser.displayName,
+          email: nextUser.email,
+          photoURL: nextUser.photoURL,
+        }).catch(() => {
+          // A transient write failure is not a session failure: the snapshot
+          // below still delivers the profile once it is reachable.
+        });
+
+        if (loadSessionRef.current !== sessionId) return;
+
+        profileUnsubscribe.current = onSnapshot(
+          userRef(nextUser.uid),
+          (snapshot) => {
+            if (loadSessionRef.current !== sessionId) return;
+            setProfile(snapshot.exists() ? toUserProfile(snapshot) : null);
+            setLoading(false);
+          },
+          () => {
+            if (loadSessionRef.current !== sessionId) return;
+            setProfile(null);
+            setLoading(false);
+          },
+        );
+      })();
     });
 
     return () => {
+      loadSessionRef.current++;
       stopProfile();
       unsubscribeAuth();
     };
   }, []);
 
   const signIn = useCallback(async () => {
+    setAccessDenied(false);
     await signInWithPopup(auth(), new GoogleAuthProvider());
   }, []);
 
@@ -147,8 +177,17 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
   }, []);
 
   const value = useMemo<AuthState>(
-    () => ({ user, profile, loading, signIn, signOutUser, updateSettings, updateProfile }),
-    [user, profile, loading, signIn, signOutUser, updateSettings, updateProfile],
+    () => ({
+      user,
+      profile,
+      loading,
+      accessDenied,
+      signIn,
+      signOutUser,
+      updateSettings,
+      updateProfile,
+    }),
+    [user, profile, loading, accessDenied, signIn, signOutUser, updateSettings, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
