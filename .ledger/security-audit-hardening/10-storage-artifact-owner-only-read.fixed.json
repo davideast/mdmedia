@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "storage-artifact-owner-only-read",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:10:27.868Z",
+  "file": "studio/storage.rules",
+  "enclosingSymbol": "match /narrations/{ownerUid}/{fileName}",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "resource.metadata.visibility == 'public'"
+    ],
+    "requiredPatternsPresent": [
+      "allow read: if isOwner(ownerUid);"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

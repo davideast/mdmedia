@@ -1,0 +1,34 @@
+{
+  "$schema": "../rules.json",
+  "id": "replayable-allowlist-fixture",
+  "title": "[006] Commit a synthetic fixture whose first writes bootstrap the allowlist",
+  "screenshot": "n/a",
+  "rule": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+  "target": {
+    "file": "studio/test/fixtures/allowlist-journey.session.json",
+    "enclosingSymbol": "events",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new fixture)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`pyric verify` replays from an empty database. The only capture relies on allowlist docs seeded outside the session (3 state-drift failures) and contains real emails.",
+    "expectedSolution": "Capture from a fresh sandbox with `studio:allowlist add alice@example.test bob@example.test --local` as the first action, then the alice/bob/mallory journey. Commit it with synthetic identities only."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "@gmail.com",
+      "@google.com",
+      "@live.com"
+    ],
+    "requiredPatterns": [
+      "pyric.verify.fixture.v1",
+      "allowlist/alice@example.test",
+      "allowlist/bob@example.test",
+      "\"admin\":true"
+    ]
+  }
+}

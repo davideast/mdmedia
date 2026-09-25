@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "narration-read-requires-real-user",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:10:27.870Z",
+  "file": "studio/firestore.modules.rules",
+  "enclosingSymbol": "canReadNarration",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "return isOwner(resource.data.ownerUid)\n        || resource.data.visibility == 'public'"
+    ],
+    "requiredPatternsPresent": [
+      "return resource.data.visibility == 'public'",
+      "|| (isAllowlisted()"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

@@ -18,18 +18,18 @@ describe('Narration Streaming Lifecycle & Pre-Creation Resilience', () => {
 
   describe('Seam 1: Immediate Document Initialization (narration-server.ts)', () => {
     it('seeds the Firestore document before executing GeminiNarrationAdapter or long-running async steps', () => {
-      // Find position of initial docRef.set and position of adaptForNarration
-      const initialSetIndex = narrationServerSource.indexOf('await docRef.set(');
+      // Find position of initial doc write (tx.set in transaction) and position of adaptForNarration
+      const initialSetIndex = narrationServerSource.indexOf('tx.set(docRef, initialNarration)');
       const adaptIndex = narrationServerSource.indexOf('adaptForNarration(');
 
       expect(initialSetIndex).toBeGreaterThan(-1);
       expect(adaptIndex).toBeGreaterThan(-1);
-      // docRef.set MUST occur before adaptForNarration so the document exists in Firestore immediately
+      // Initial document seeding MUST occur before adaptForNarration so the document exists in Firestore immediately
       expect(initialSetIndex).toBeLessThan(adaptIndex);
     });
 
     it('sets docWritten = true immediately upon seeding initial document', () => {
-      const setDocPos = narrationServerSource.indexOf('await docRef.set(');
+      const setDocPos = narrationServerSource.indexOf('tx.set(docRef, initialNarration)');
       const docWrittenPos = narrationServerSource.indexOf('docWritten = true;', setDocPos);
 
       expect(docWrittenPos).toBeGreaterThan(-1);

@@ -49,13 +49,27 @@
         "NO_REGEX_IN_DOMAIN_PARSING",
         "ATOMIC_FILE_OPERATIONS",
         "ELIMINATE_DEAD_CODE",
-        "REQUIRE_EXHAUSTIVE_SWITCH"
+        "REQUIRE_EXHAUSTIVE_SWITCH",
+        "ADMIN_WRITE_OWNERSHIP_GUARD",
+        "SERVER_DERIVED_STORAGE_PATHS",
+        "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+        "CLIENT_WRITE_FIELD_ALLOWLIST",
+        "REAL_USER_READ_GATE",
+        "REPLAYABLE_REGRESSION_BOOTSTRAP",
+        "NO_CLIENT_AI_ENDPOINTS",
+        "HERMETIC_DEPLOY_BUILD",
+        "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
+        "SHARE_BY_RESOLVED_UID",
+        "LONG_REQUESTS_BYPASS_HOSTING",
+        "AUTH_BLOCKING_ALLOWLIST"
       ]
     },
     "target": {
       "type": "object",
       "description": "The exact source code location containing the violation.",
-      "required": ["file"],
+      "required": [
+        "file"
+      ],
       "properties": {
         "file": {
           "type": "string",
@@ -73,9 +87,15 @@
           "type": "object",
           "description": "Contextual anchor to locate the code snippet precisely.",
           "properties": {
-            "contextBefore": { "type": "string" },
-            "targetSnippet": { "type": "string" },
-            "contextAfter": { "type": "string" }
+            "contextBefore": {
+              "type": "string"
+            },
+            "targetSnippet": {
+              "type": "string"
+            },
+            "contextAfter": {
+              "type": "string"
+            }
           }
         }
       }
@@ -83,7 +103,10 @@
     "violation": {
       "type": "object",
       "description": "The defect narrative and required architectural remediation.",
-      "required": ["problem", "expectedSolution"],
+      "required": [
+        "problem",
+        "expectedSolution"
+      ],
       "properties": {
         "problem": {
           "type": "string",
@@ -98,21 +121,32 @@
     "oracle": {
       "type": "object",
       "description": "Mechanical verification specification.",
-      "required": ["type", "forbiddenPatterns"],
+      "required": [
+        "type",
+        "forbiddenPatterns"
+      ],
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["invariants", "ast", "unit_test"],
+          "enum": [
+            "invariants",
+            "ast",
+            "unit_test"
+          ],
           "description": "Oracle execution model."
         },
         "forbiddenPatterns": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Strings or tokens that MUST NOT appear in the target files for the issue to be marked fixed."
         },
         "requiredPatterns": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Strings or tokens that MUST appear in the target files for the issue to be marked fixed."
         }
       }
@@ -215,6 +249,138 @@
           "const LEGACY_DIR ="
         ],
         "remediation": "Purge legacy fallbacks completely. Standardize on the canonical store or path."
+      },
+      "ADMIN_WRITE_OWNERSHIP_GUARD": {
+        "id": "ADMIN_WRITE_OWNERSHIP_GUARD",
+        "category": "Authorization & Identity",
+        "summary": "Admin SDK writes to user-owned documents must verify existing ownership inside a transaction before writing.",
+        "description": "Admin credentials bypass Security Rules. A route that writes a caller-chosen document id with `docRef.set(...)` lets one user overwrite and take ownership of another user's document. The Rules layer cannot observe or block this path, so the server must enforce ownership itself.",
+        "antiPatterns": [
+          "await docRef.set(initialNarration);",
+          "activeStreams.set(id, { uid, abort: abortStream }); // without an owner check"
+        ],
+        "remediation": "Reserve client-supplied ids with an ownership pre-check (`claimNarrationId`) that returns 409, and make the authoritative write a server transaction that refuses when `snap.data()?.ownerUid !== uid`. Never replace another uid's in-memory stream handle."
+      },
+      "SERVER_DERIVED_STORAGE_PATHS": {
+        "id": "SERVER_DERIVED_STORAGE_PATHS",
+        "category": "Authorization & Identity",
+        "summary": "Admin SDK Storage access must derive object paths from the authorized identity, never from client-writable document fields.",
+        "description": "Routes that read `narration.audioPath` / `narration.timingsPath` and download with `adminBucket()` let an owner repoint their own document at another user's private object. This is a confused-deputy read that bypasses Storage Rules.",
+        "antiPatterns": [
+          "narration.audioPath || audioObjectPath(",
+          "narration.timingsPath || timingsObjectPath("
+        ],
+        "remediation": "Build every server-side object path with `audioObjectPath(narration.ownerUid, id)` / `timingsObjectPath(narration.ownerUid, id)` after the document read has been authorized."
+      },
+      "STORAGE_RULES_NO_STALE_METADATA_AUTH": {
+        "id": "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+        "category": "Authorization & Identity",
+        "summary": "Storage Rules must not authorize reads from object metadata that is not kept in sync with the authoritative Firestore state.",
+        "description": "Object `metadata.visibility` is written once at synthesis time and never rewritten when the Firestore narration changes visibility. A `resource.metadata.visibility == 'public'` branch therefore keeps un-published audio publicly readable.",
+        "antiPatterns": [
+          "resource.metadata.visibility == 'public'",
+          "metadata: { ownerUid: uid, visibility: request.visibility }"
+        ],
+        "remediation": "Make client Storage reads owner-only (`allow read: if isOwner(ownerUid);`) and serve shared and public playback through server routes that authorize against the current Firestore document. Stop writing authorization-looking metadata."
+      },
+      "CLIENT_WRITE_FIELD_ALLOWLIST": {
+        "id": "CLIENT_WRITE_FIELD_ALLOWLIST",
+        "category": "Data Integrity & Model Fit",
+        "summary": "Client updates must be limited to the keys the UI edits; documents created only by the server must refuse client creates.",
+        "description": "Update rules without `diff().affectedKeys().hasOnly([...])` let an owner forge server-owned fields (status, durationMs, Storage paths, author snapshot) and add unknown keys. A client create rule on a server-created collection lets clients author complete documents with forged state.",
+        "antiPatterns": [
+          "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()"
+        ],
+        "remediation": "Use `allow create: if false;` for server-created collections, and `request.resource.data.diff(resource.data).affectedKeys().hasOnly([...client-edited keys])` on client-updatable documents."
+      },
+      "REAL_USER_READ_GATE": {
+        "id": "REAL_USER_READ_GATE",
+        "category": "Authorization & Identity",
+        "summary": "Every non-public read must require an allowlisted account; only explicitly public documents are open to everyone.",
+        "description": "Read rules that check only `isOwner` or `sharedWith` membership let non-allowlisted or de-allowlisted accounts read shared content and their own data directly from Firestore, even though the server (`verifyIdToken`) refuses them. Rules and server disagree.",
+        "antiPatterns": [
+          "allow get, list: if isOwner(resource.data.ownerUid);",
+          "return isOwner(resource.data.ownerUid)\n        || resource.data.visibility == 'public'"
+        ],
+        "remediation": "Allow `visibility == 'public'` for anyone. Gate the owner and shared branches (and owner-only collections such as playlists) behind `isAllowlisted()`."
+      },
+      "REPLAYABLE_REGRESSION_BOOTSTRAP": {
+        "id": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+        "category": "Production Readiness & Regression Safety",
+        "summary": "Regression fixtures must carry their own bootstrap; hosted parity and operator bootstrap must be scripted and documented.",
+        "description": "`pyric verify` replays from an empty database and only re-issues captured writes. State seeded out-of-band (for example allowlist documents written directly to the store) makes a correct capture fail on replay. Pyric-derived hosted cases omit `exists()` mocks. The production allowlist bootstrap (IAM \u2192 `studio:allowlist add`) is undocumented.",
+        "antiPatterns": [
+          "Allowlist documents seeded outside the captured session",
+          "Committed fixtures containing real account emails"
+        ],
+        "remediation": "Record the allowlist bootstrap as admin writes inside the capture. Commit a synthetic-identity fixture with a `rules:verify` script. Add a mock-aware hosted harness (`rules:verify:hosted`), an operator runbook in `studio/README.md`, and upstream Pyric reports in `studio/PYRIC.md`."
+      },
+      "NO_CLIENT_AI_ENDPOINTS": {
+        "id": "NO_CLIENT_AI_ENDPOINTS",
+        "category": "Firebase Authorization & Identity",
+        "summary": "Model calls run only on the server, behind the allowlisted identity check.",
+        "description": "Firebase AI Logic is reachable with the public web config and cannot check the Firestore allowlist; App Check attests the app, not the user. A client `getGenerativeModel`/`getAI` handle lets anyone spend Gemini quota.",
+        "antiPatterns": [
+          "import { getAI, getGenerativeModel } from 'firebase/ai'",
+          "NEXT_PUBLIC_*_GEMINI_API_KEY set at build time"
+        ],
+        "remediation": "Remove `firebase/ai` from the client. Put any model feature behind a Cloud Run route that calls `verifyIdToken`. Leave AI Logic disabled in the console."
+      },
+      "HERMETIC_DEPLOY_BUILD": {
+        "id": "HERMETIC_DEPLOY_BUILD",
+        "category": "Production Readiness & Regression Safety",
+        "summary": "A clean clone must build the production image with no local-only artifacts, dev sandboxes, or secrets.",
+        "description": "`studio` installs `mdmedia` from a gitignored tarball outside its directory and Pyric from gitignored local tarballs, so a clean build cannot install. Dev-only wiring (Pyric register, sandbox URLs, browser Gemini keys) must never reach the production image.",
+        "antiPatterns": [
+          "\"mdmedia\": \"file:../mdmedia-0.1.0.tgz\"",
+          "COPY of .env files or service-account JSON into the image",
+          "PYRIC_SANDBOX or @pyric/cli/register in the runtime environment"
+        ],
+        "remediation": "Build and pack `mdmedia` inside the image, strip Pyric devDependencies before install, ignore secrets in `.dockerignore`, and gate deploys on a preflight script."
+      },
+      "DEPLOY_RUNBOOK_LEAST_PRIVILEGE": {
+        "id": "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
+        "category": "Production Readiness & Regression Safety",
+        "summary": "Deploys are documented, ordered rules-first, and run under a dedicated least-privilege identity with secrets in Secret Manager.",
+        "description": "There is no hosting config, no runtime identity, and no deploy order. Deploying the app before the hardened rules, or running with a key file or the default compute account, widens access.",
+        "antiPatterns": [
+          "GOOGLE_APPLICATION_CREDENTIALS key file in production",
+          "Default compute service account with Editor",
+          "App deployed before firestore/storage rules"
+        ],
+        "remediation": "Hosting rewrites to Cloud Run; a dedicated service account with scoped roles; `GEMINI_API_KEY` via `--set-secrets`; deploy order preflight \u2192 rules \u2192 Cloud Run \u2192 Hosting, documented in `studio/README.md`."
+      },
+      "SHARE_BY_RESOLVED_UID": {
+        "id": "SHARE_BY_RESOLVED_UID",
+        "category": "Firebase Authorization & Identity",
+        "summary": "Share lists hold uids resolved server-side from allowlisted emails; the rules authorize on uid.",
+        "description": "The share box writes emails into `sharedWith`, but the rules and `loadReadableNarration` check `request.auth.uid in sharedWith`, so sharing never grants access.",
+        "antiPatterns": [
+          "commit(\"shared\", [...narration.sharedWith, value])",
+          "Resolving emails to uids in the client"
+        ],
+        "remediation": "Resolve through `POST /api/users/resolve` (caller and target allowlisted), write the uid plus a `sharedWithLabels` display map, and allow `sharedWithLabels` in the update field allowlist."
+      },
+      "LONG_REQUESTS_BYPASS_HOSTING": {
+        "id": "LONG_REQUESTS_BYPASS_HOSTING",
+        "category": "Production Readiness & Regression Safety",
+        "summary": "Requests that can run longer than Hosting's rewrite limit go to Cloud Run directly, with origin-pinned CORS and recovery for interrupted work.",
+        "description": "Hosting cuts rewritten requests at 60 s while synthesis runs up to 300 s, and background work can be lost on scale-in or redeploy.",
+        "antiPatterns": [
+          "Access-Control-Allow-Origin: *",
+          "Narrations left in status streaming forever"
+        ],
+        "remediation": "POST to `NEXT_PUBLIC_API_ORIGIN`, allow only `ALLOWED_WEB_ORIGINS`, and mark stale `streaming` narrations as `error`/`interrupted`."
+      },
+      "AUTH_BLOCKING_ALLOWLIST": {
+        "id": "AUTH_BLOCKING_ALLOWLIST",
+        "category": "Firebase Authorization & Identity",
+        "summary": "Accounts not on the allowlist never obtain a Firebase ID token.",
+        "description": "Any Google account can create a Firebase Auth user and receive a token; only rules and routes stop it afterwards.",
+        "antiPatterns": [
+          "Relying only on post-sign-in checks for account creation"
+        ],
+        "remediation": "Identity Platform blocking functions `beforeUserCreated` and `beforeUserSignedIn` reject unverified or non-allowlisted emails."
       }
     }
   }

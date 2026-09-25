@@ -26,6 +26,7 @@ import {
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
+import { currentIdToken } from "@/lib/firebase";
 import { deleteNarration, updateVisibility } from "@/lib/narrations";
 import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import {
@@ -105,20 +106,32 @@ export function NarrationSettings({
     offlineMetadata,
   );
 
-  const commit = (visibility: Visibility, sharedWith: string[]) => {
+  const commit = (
+    visibility: Visibility,
+    sharedWith: string[],
+    sharedWithLabels?: Record<string, string>,
+  ) => {
     if (!narration) return;
     try {
-      updateVisibility(narration.id, visibility, sharedWith);
+      updateVisibility(
+        narration.id,
+        visibility,
+        sharedWith,
+        sharedWithLabels ?? narration.sharedWithLabels,
+      );
     } catch {
       toast.error("That change did not save. Try again.");
     }
   };
 
-  const addInvitee = () => {
+  const addInvitee = async () => {
     if (!narration) return;
     const value = invitee.trim().toLowerCase();
     if (value.length === 0) return;
-    if (narration.sharedWith.includes(value)) {
+    if (
+      narration.sharedWith.includes(value) ||
+      Object.values(narration.sharedWithLabels ?? {}).includes(value)
+    ) {
       setInvitee("");
       return;
     }
@@ -126,8 +139,35 @@ export function NarrationSettings({
       toast.error(`You can share with up to ${MAX_SHARED_WITH} people.`);
       return;
     }
-    commit("shared", [...narration.sharedWith, value]);
-    setInvitee("");
+    try {
+      const token = await currentIdToken();
+      const res = await fetch("/api/users/resolve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ email: value }),
+      });
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+        toast.error(
+          payload?.error ?? "Could not find an active allowlisted account for that email.",
+        );
+        return;
+      }
+      const resolved = (await res.json()) as { uid: string; email: string };
+      if (!narration.sharedWith.includes(resolved.uid)) {
+        const nextLabels = {
+          ...(narration.sharedWithLabels ?? {}),
+          [resolved.uid]: resolved.email,
+        };
+        commit("shared", [...narration.sharedWith, resolved.uid], nextLabels);
+      }
+      setInvitee("");
+    } catch {
+      toast.error("Could not verify that email address. Try again.");
+    }
   };
 
   const handleTogglePlaylist = (playlist: Playlist) => {
@@ -506,27 +546,35 @@ export function NarrationSettings({
               </div>
 
               <ul className="grid max-h-48 gap-1 overflow-y-auto">
-                {narration.sharedWith.map((person) => (
-                  <li
-                    key={person}
-                    className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted"
-                  >
-                    <span className="truncate text-[0.8rem]">{person}</span>
-                    <button
-                      type="button"
-                      aria-label={`Remove ${person}`}
-                      onClick={() =>
-                        commit(
-                          "shared",
-                          narration.sharedWith.filter((entry) => entry !== person),
-                        )
-                      }
-                      className="text-ink-faint transition-colors hover:text-foreground"
+                {narration.sharedWith.map((person) => {
+                  const label = narration.sharedWithLabels?.[person] ?? person;
+                  return (
+                    <li
+                      key={person}
+                      className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted"
                     >
-                      <X size={13} strokeWidth={2} />
-                    </button>
-                  </li>
-                ))}
+                      <span className="truncate text-[0.8rem]" title={label}>
+                        {label}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Remove ${label}`}
+                        onClick={() => {
+                          const nextLabels = { ...(narration.sharedWithLabels ?? {}) };
+                          delete nextLabels[person];
+                          commit(
+                            "shared",
+                            narration.sharedWith.filter((entry) => entry !== person),
+                            nextLabels,
+                          );
+                        }}
+                        className="text-ink-faint transition-colors hover:text-foreground"
+                      >
+                        <X size={13} strokeWidth={2} />
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : null}

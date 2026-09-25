@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "timings-route-derived-path",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:08:51.210Z",
+  "file": "studio/src/app/api/narrations/[id]/timings/route.ts",
+  "enclosingSymbol": "GET",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "narration.timingsPath ||"
+    ],
+    "requiredPatternsPresent": [
+      "const objectPath = timingsObjectPath(narration.ownerUid, id);"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

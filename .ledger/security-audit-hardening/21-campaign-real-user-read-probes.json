@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "campaign-real-user-read-probes",
+  "title": "[005] Campaign probes non-allowlisted shared reads and removed owners",
+  "screenshot": "n/a",
+  "rule": "REAL_USER_READ_GATE",
+  "target": {
+    "file": "studio/scripts/run-authorization-campaign.mjs",
+    "enclosingSymbol": "runStudioAssurance",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new probes)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No campaign probe challenges reads by non-allowlisted recipients or de-allowlisted owners.",
+    "expectedSolution": "Add control `obs-eve-get-public` (ALLOW) and DENY probes `probe-eve-nonallowlisted-read-shared` and `probe-removed-owner-read-own` (actor `actor-alice-removed`)."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "id: 'obs-eve-get-public'",
+      "id: 'probe-eve-nonallowlisted-read-shared'",
+      "id: 'probe-removed-owner-read-own'",
+      "id: 'actor-alice-removed'"
+    ]
+  }
+}

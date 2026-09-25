@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "narration-id-ownership-test",
+  "title": "[001] Add narration-id ownership regression test",
+  "screenshot": "n/a",
+  "rule": "ADMIN_WRITE_OWNERSHIP_GUARD",
+  "target": {
+    "file": "test/studio/narration-id-ownership.test.ts",
+    "enclosingSymbol": "describe",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No test locks down the ownership guard on the Admin create path.",
+    "expectedSolution": "Create the test asserting route.ts calls claimNarrationId before createNarrationStream and narration-server.ts has no bare `docRef.set(initialNarration)`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "claimNarrationId",
+      "docRef.set(initialNarration)"
+    ]
+  }
+}

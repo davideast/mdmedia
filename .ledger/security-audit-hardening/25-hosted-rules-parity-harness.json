@@ -1,0 +1,33 @@
+{
+  "$schema": "../rules.json",
+  "id": "hosted-rules-parity-harness",
+  "title": "[006] Mock-aware Rules Test API harness using the Firebase CLI login",
+  "screenshot": "n/a",
+  "rule": "REPLAYABLE_REGRESSION_BOOTSTRAP",
+  "target": {
+    "file": "studio/scripts/verify-rules-hosted.mjs",
+    "enclosingSymbol": "main",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Pyric-derived hosted cases omit exists()/get() mocks, and `--engine rules-test-api` accepts only service-account keys, so there is no repeatable hosted check.",
+    "expectedSolution": "Port the audit harness: read project from .firebaserc, refresh the CLI token in memory, call only `projects/{id}:test` with functionMocks, print a pyric/hosted/secure table, and exit 1 on mismatch. Never write credentials to disk."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "writeFileSync",
+      "GOOGLE_APPLICATION_CREDENTIALS="
+    ],
+    "requiredPatterns": [
+      "firebaserules.googleapis.com",
+      "functionMocks",
+      "process.exit(1)",
+      ".firebaserc"
+    ]
+  }
+}

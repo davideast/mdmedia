@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "active-stream-owner-guard",
+  "title": "[001] Never replace another uid's active stream handle",
+  "screenshot": "n/a",
+  "rule": "ADMIN_WRITE_OWNERSHIP_GUARD",
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "createNarrationStream",
+    "anchor": {
+      "contextBefore": "  activeStreams.set(id, { uid, abort: abortStream });",
+      "targetSnippet": "  activeStreams.set(id, { uid, abort: abortStream });",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`activeStreams.set(id, …)` unconditionally replaces the abort handle for an id, so a foreign caller can hijack or cancel another user's in-flight generation.",
+    "expectedSolution": "Read `activeStreams.get(id)` first and throw when `existingStream.uid !== uid`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "existingStream.uid !== uid"
+    ]
+  }
+}

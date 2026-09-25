@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-09-25T01:52:12.494Z",
+  "timestamp": "2026-09-25T03:39:19.201Z",
   "campaignId": "studio-authorization-audit-v1",
   "summary": {
-    "probes": 11,
-    "controlsPassed": 11,
+    "probes": 19,
+    "controlsPassed": 16,
     "localCounterexamples": 0,
     "candidateSignals": 0,
-    "noCounterexamples": 11,
+    "noCounterexamples": 16,
     "engineGaps": 0,
-    "invalidProbes": 0
+    "invalidProbes": 3
   },
   "target": {
     "network": "forbid",
@@ -99,10 +99,74 @@
       "mutationDecision": "DENY"
     },
     {
+      "probeId": "probe-anon-read-public-audio",
+      "dimension": "path",
+      "classification": "invalid-probe",
+      "invariant": "Storage narration audio may only be read directly by the owner.",
+      "controlDecision": "DENY",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-read-public-audio",
+      "dimension": "path",
+      "classification": "invalid-probe",
+      "invariant": "Storage narration audio may only be read directly by the owner.",
+      "controlDecision": "DENY",
+      "mutationDecision": "DENY"
+    },
+    {
       "probeId": "probe-anon-read-private-storage",
       "dimension": "path",
-      "classification": "no-counterexample",
+      "classification": "invalid-probe",
       "invariant": "An unauthenticated visitor must not read private audio objects in storage.",
+      "controlDecision": "DENY",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-forge-status",
+      "dimension": "payload",
+      "classification": "no-counterexample",
+      "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-repoint-audio-path",
+      "dimension": "payload",
+      "classification": "no-counterexample",
+      "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-unknown-key",
+      "dimension": "payload",
+      "classification": "no-counterexample",
+      "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-bob-client-create-narration",
+      "dimension": "operation",
+      "classification": "no-counterexample",
+      "invariant": "Client narration updates may only modify title, visibility, sharedWith, and updatedAt.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-eve-nonallowlisted-read-shared",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "Non-public narration reads require an allowlisted user.",
+      "controlDecision": "ALLOW",
+      "mutationDecision": "DENY"
+    },
+    {
+      "probeId": "probe-removed-owner-read-own",
+      "dimension": "path",
+      "classification": "no-counterexample",
+      "invariant": "Non-public narration reads require an allowlisted user.",
       "controlDecision": "ALLOW",
       "mutationDecision": "DENY"
     }

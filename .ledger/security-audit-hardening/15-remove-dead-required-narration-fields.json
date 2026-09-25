@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "remove-dead-required-narration-fields",
+  "title": "[004] Delete hasRequiredNarrationFields after client create is removed",
+  "screenshot": "n/a",
+  "rule": "ELIMINATE_DEAD_CODE",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "hasRequiredNarrationFields",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "    function hasRequiredNarrationFields() {",
+      "contextAfter": "      return hasRequired(["
+    }
+  },
+  "violation": {
+    "problem": "The helper exists only for the client create rule that plan 004 removes.",
+    "expectedSolution": "Delete the function."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "function hasRequiredNarrationFields()"
+    ],
+    "requiredPatterns": []
+  }
+}

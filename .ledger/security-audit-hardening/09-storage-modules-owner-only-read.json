@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "storage-modules-owner-only-read",
+  "title": "[003] storage.modules.rules: owner-only reads, no metadata public branch",
+  "screenshot": "n/a",
+  "rule": "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+  "target": {
+    "file": "studio/storage.modules.rules",
+    "enclosingSymbol": "match /narrations/{ownerUid}/{fileName}",
+    "anchor": {
+      "contextBefore": "      // the server after it checks `sharedWith` in Firestore.",
+      "targetSnippet": "      allow read: if isOwner(ownerUid)\n        || resource.metadata.visibility == 'public';",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Public reads are authorized from object metadata written once at synthesis. Un-publishing in Firestore leaves audio public (hosted Rules Test API: signed-out read → ALLOW).",
+    "expectedSolution": "Replace it with `allow read: if isOwner(ownerUid);` and a DELIBERATE comment explaining server-mediated shared/public playback."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "resource.metadata.visibility == 'public'"
+    ],
+    "requiredPatterns": [
+      "allow read: if isOwner(ownerUid);",
+      "DELIBERATE: no metadata-based public branch"
+    ]
+  }
+}

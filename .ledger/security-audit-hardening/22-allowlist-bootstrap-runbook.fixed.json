@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "allowlist-bootstrap-runbook",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:03:13.391Z",
+  "file": "studio/README.md",
+  "enclosingSymbol": "## Allowlist bootstrap",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "## Allowlist bootstrap",
+      "bun run studio:allowlist add",
+      "bun run studio:allowlist check",
+      "--revoke-tokens",
+      "roles/datastore.user"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

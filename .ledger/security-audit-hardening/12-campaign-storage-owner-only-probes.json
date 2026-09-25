@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "campaign-storage-owner-only-probes",
+  "title": "[003] Campaign encodes owner-only Storage reads",
+  "screenshot": "n/a",
+  "rule": "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+  "target": {
+    "file": "studio/scripts/run-authorization-campaign.mjs",
+    "enclosingSymbol": "runStudioAssurance",
+    "anchor": {
+      "contextBefore": "    {",
+      "targetSnippet": "      id: 'obs-anon-read-public-audio',",
+      "contextAfter": "      actorId: 'actor-anon',"
+    }
+  },
+  "violation": {
+    "problem": "The campaign treats a signed-out public-audio read as a known-good ALLOW, which encodes the vulnerable policy.",
+    "expectedSolution": "Replace it with control `obs-alice-read-public-audio` (ALLOW) plus probes `probe-anon-read-public-audio` and `probe-bob-read-public-audio`, both expected DENY."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "id: 'obs-anon-read-public-audio'"
+    ],
+    "requiredPatterns": [
+      "id: 'obs-alice-read-public-audio'",
+      "id: 'probe-anon-read-public-audio'",
+      "id: 'probe-bob-read-public-audio'"
+    ]
+  }
+}

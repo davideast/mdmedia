@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "storage-artifact-owner-only-read",
+  "title": "[003] Regenerated storage.rules carries the owner-only read",
+  "screenshot": "n/a",
+  "rule": "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+  "target": {
+    "file": "studio/storage.rules",
+    "enclosingSymbol": "match /narrations/{ownerUid}/{fileName}",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "      allow read: if isOwner(ownerUid) || resource.metadata.visibility == 'public';",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The deployable artifact still grants metadata-based public reads.",
+    "expectedSolution": "Regenerate with `npm --prefix studio run rules:build:storage`. Never hand-edit."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "resource.metadata.visibility == 'public'"
+    ],
+    "requiredPatterns": [
+      "allow read: if isOwner(ownerUid);"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "storage-metadata-no-visibility",
+  "title": "[003] Stop writing visibility into Storage object metadata",
+  "screenshot": "n/a",
+  "rule": "STORAGE_RULES_NO_STALE_METADATA_AUTH",
+  "target": {
+    "file": "studio/src/lib/narration-server.ts",
+    "enclosingSymbol": "createNarrationStream.run",
+    "anchor": {
+      "contextBefore": "      const timingsPath = timingsObjectPath(uid, id);",
+      "targetSnippet": "      const objectMetadata = { metadata: { ownerUid: uid, visibility: request.visibility } };",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Visibility metadata goes stale on every visibility change and invites authorization from it again.",
+    "expectedSolution": "Write only `{ metadata: { ownerUid: uid } }`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "visibility: request.visibility } };"
+    ],
+    "requiredPatterns": [
+      "const objectMetadata = { metadata: { ownerUid: uid } };"
+    ]
+  }
+}

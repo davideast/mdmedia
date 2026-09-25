@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "replayable-allowlist-fixture",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:17:40.288Z",
+  "file": "studio/test/fixtures/allowlist-journey.session.json",
+  "enclosingSymbol": "events",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "@gmail.com",
+      "@google.com",
+      "@live.com"
+    ],
+    "requiredPatternsPresent": [
+      "pyric.verify.fixture.v1",
+      "allowlist/alice@example.test",
+      "allowlist/bob@example.test",
+      "\"admin\":true"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

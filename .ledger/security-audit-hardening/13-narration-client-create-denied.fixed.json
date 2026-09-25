@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "narration-client-create-denied",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:10:27.868Z",
+  "file": "studio/firestore.modules.rules",
+  "enclosingSymbol": "match /narrations/{narrationId}",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()"
+    ],
+    "requiredPatternsPresent": [
+      "DELIBERATE: narrations are created only by the synthesis route"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

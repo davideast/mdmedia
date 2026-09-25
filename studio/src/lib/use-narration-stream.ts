@@ -214,7 +214,8 @@ export function useNarrationStream(): NarrationStreamState {
 
       let response: Response;
       try {
-        response = await fetch('/api/narrations', {
+        const apiOrigin = (process.env.NEXT_PUBLIC_API_ORIGIN ?? '').replace(/\/+$/, '');
+        response = await fetch(`${apiOrigin}/api/narrations`, {
           method: 'POST',
           signal: controller.signal,
           headers: {
@@ -431,13 +432,10 @@ export function useNarrationStream(): NarrationStreamState {
 
       const token = await currentIdToken();
       if (session !== loadSessionRef.current) return;
-      if (!token) {
-        setStatus('error');
-        setErrorMessage(SIGN_IN_REQUIRED);
-        return;
-      }
 
-      const headers = { Authorization: `Bearer ${token}` };
+      // Public narrations play without a token; the server answers 401 for
+      // anything else, and that message surfaces on the final checkpoint.
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
       let lastDurationMs = -1;
       let autoPlayed = false;
       let loadChain = Promise.resolve();

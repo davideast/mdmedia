@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "campaign-narration-field-probes",
+  "title": "[004] Campaign probes forged fields and client creates",
+  "screenshot": "n/a",
+  "rule": "CLIENT_WRITE_FIELD_ALLOWLIST",
+  "target": {
+    "file": "studio/scripts/run-authorization-campaign.mjs",
+    "enclosingSymbol": "runStudioAssurance",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new probes)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "No campaign probe challenges server-owned narration fields or client creates.",
+    "expectedSolution": "Add control `obs-bob-update-own-title` and DENY probes `probe-bob-forge-status`, `probe-bob-repoint-audio-path`, `probe-bob-unknown-key`, `probe-bob-client-create-narration`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "id: 'obs-bob-update-own-title'",
+      "id: 'probe-bob-forge-status'",
+      "id: 'probe-bob-repoint-audio-path'",
+      "id: 'probe-bob-unknown-key'",
+      "id: 'probe-bob-client-create-narration'"
+    ]
+  }
+}

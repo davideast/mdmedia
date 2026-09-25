@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "rules-verify-scripts",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T03:14:22.094Z",
+  "file": "studio/package.json",
+  "enclosingSymbol": "scripts",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "\"rules:verify\": \"pyric verify test/fixtures/allowlist-journey.session.json",
+      "\"rules:verify:hosted\": \"node scripts/verify-rules-hosted.mjs\""
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

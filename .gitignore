@@ -19,5 +19,8 @@ examples/
 .env*.local
 .dev.pid
 .dev.log
+studio/vendor/
+functions/lib/
 studio/.firebase/
+
 

@@ -1,0 +1,28 @@
+{
+  "$schema": "../rules.json",
+  "id": "route-rejects-foreign-narration-id",
+  "title": "[001] POST /api/narrations returns 409 for ids owned by another user",
+  "screenshot": "n/a",
+  "rule": "ADMIN_WRITE_OWNERSHIP_GUARD",
+  "target": {
+    "file": "studio/src/app/api/narrations/route.ts",
+    "enclosingSymbol": "POST",
+    "anchor": {
+      "contextBefore": "  const id = parsed.id ?? newNarrationId();",
+      "targetSnippet": "  const stream = createNarrationStream({",
+      "contextAfter": "    uid,"
+    }
+  },
+  "violation": {
+    "problem": "The route passes any shape-valid client id straight into createNarrationStream, which overwrites existing narrations with Admin credentials.",
+    "expectedSolution": "Call `claimNarrationId(id, uid)` before `createNarrationStream` and return a 409 JSON response when it is false."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "claimNarrationId(id, uid)",
+      "status: 409"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "audio-route-derived-path",
+  "title": "[002] Audio route derives the object path from ownerUid + id",
+  "screenshot": "n/a",
+  "rule": "SERVER_DERIVED_STORAGE_PATHS",
+  "target": {
+    "file": "studio/src/app/api/narrations/[id]/audio/route.ts",
+    "enclosingSymbol": "GET",
+    "anchor": {
+      "contextBefore": "  }",
+      "targetSnippet": "  const objectPath = narration.audioPath || audioObjectPath(narration.ownerUid, id);",
+      "contextAfter": "  const urlObj = new URL(request.url);"
+    }
+  },
+  "violation": {
+    "problem": "The route trusts the owner-writable `narration.audioPath` and downloads it with adminBucket(), a confused-deputy read of any bucket object (hosted Rules Test API: owner can rewrite audioPath → ALLOW).",
+    "expectedSolution": "Use `const objectPath = audioObjectPath(narration.ownerUid, id);`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "narration.audioPath ||"
+    ],
+    "requiredPatterns": [
+      "const objectPath = audioObjectPath(narration.ownerUid, id);"
+    ]
+  }
+}

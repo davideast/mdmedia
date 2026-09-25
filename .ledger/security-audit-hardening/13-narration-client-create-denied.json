@@ -1,0 +1,29 @@
+{
+  "$schema": "../rules.json",
+  "id": "narration-client-create-denied",
+  "title": "[004] Narrations are server-created: allow create: if false",
+  "screenshot": "n/a",
+  "rule": "CLIENT_WRITE_FIELD_ALLOWLIST",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "enclosingSymbol": "match /narrations/{narrationId}",
+    "anchor": {
+      "contextBefore": "      allow get, list: if canReadNarration();",
+      "targetSnippet": "      allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()\n        && validNarrationFields();",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Clients can author whole narrations with forged status and Storage paths, although only the Admin synthesis route creates them.",
+    "expectedSolution": "Replace it with `allow create: if false;` and a DELIBERATE comment."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()"
+    ],
+    "requiredPatterns": [
+      "DELIBERATE: narrations are created only by the synthesis route"
+    ]
+  }
+}

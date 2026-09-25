@@ -82,12 +82,12 @@ async function runStudioAssurance() {
     state: {
       firestore: {
         // Allowlist collection (only alice and bob are allowlisted; eve is not)
-        'allowlist/alice@example.com': {
-          email: 'alice@example.com',
+        'allowlist/alice@example.test': {
+          email: 'alice@example.test',
           addedAt: 1000000,
         },
-        'allowlist/bob@example.com': {
-          email: 'bob@example.com',
+        'allowlist/bob@example.test': {
+          email: 'bob@example.test',
           addedAt: 1000000,
         },
 
@@ -95,7 +95,7 @@ async function runStudioAssurance() {
         'users/alice': {
           uid: 'alice',
           displayName: 'Alice Creator',
-          email: 'alice@example.com',
+          email: 'alice@example.test',
           photoURL: 'https://example.com/alice.png',
           settings: {
             theme: 'dark',
@@ -108,7 +108,7 @@ async function runStudioAssurance() {
         'users/bob': {
           uid: 'bob',
           displayName: 'Bob Collaborator',
-          email: 'bob@example.com',
+          email: 'bob@example.test',
           photoURL: 'https://example.com/bob.png',
           settings: {
             theme: 'light',
@@ -121,7 +121,7 @@ async function runStudioAssurance() {
         'users/eve': {
           uid: 'eve',
           displayName: 'Eve Adversary',
-          email: 'eve@example.com',
+          email: 'eve@example.test',
           photoURL: 'https://example.com/eve.png',
           settings: {
             theme: 'system',
@@ -165,9 +165,47 @@ async function runStudioAssurance() {
           audioPath: 'narrations/alice/narr-shared.wav',
           timingsPath: 'narrations/alice/narr-shared.timings.json',
           visibility: 'shared',
-          sharedWith: ['bob'],
+          sharedWith: ['bob', 'eve'],
           authorName: 'Alice Creator',
           authorPhoto: 'https://example.com/alice.png',
+          createdAt: 1000000,
+          updatedAt: 1000000,
+        },
+        'narrations/narr-bob': {
+          ownerUid: 'bob',
+          title: 'Bob Personal Narration',
+          sourceMarkdown: '# Bob Story\nCollaborative document.',
+          transcript: 'Collaborative document.',
+          voice: 'Kore',
+          promptStyle: 'expressive',
+          adapted: false,
+          status: 'ready',
+          durationMs: 8400,
+          audioPath: 'narrations/bob/narr-bob.wav',
+          timingsPath: 'narrations/bob/narr-bob.timings.json',
+          visibility: 'private',
+          sharedWith: [],
+          authorName: 'Bob Collaborator',
+          authorPhoto: 'https://example.com/bob.png',
+          createdAt: 1000000,
+          updatedAt: 1000000,
+        },
+        'narrations/narr-alice2': {
+          ownerUid: 'alice2',
+          title: 'Alice2 Removed Owner Story',
+          sourceMarkdown: '# Private Doc\nSecret document.',
+          transcript: 'Secret document.',
+          voice: 'Puck',
+          promptStyle: 'natural',
+          adapted: false,
+          status: 'ready',
+          durationMs: 12500,
+          audioPath: 'narrations/alice2/narr-alice2.wav',
+          timingsPath: 'narrations/alice2/narr-alice2.timings.json',
+          visibility: 'private',
+          sharedWith: [],
+          authorName: 'Alice2',
+          authorPhoto: '',
           createdAt: 1000000,
           updatedAt: 1000000,
         },
@@ -219,24 +257,31 @@ async function runStudioAssurance() {
         users: [
           {
             uid: 'alice',
-            email: 'alice@example.com',
+            email: 'alice@example.test',
             password: 'pw-alice-secret',
             emailVerified: true,
-            customClaims: { email: 'alice@example.com', email_verified: true },
+            customClaims: { email: 'alice@example.test', email_verified: true },
           },
           {
             uid: 'bob',
-            email: 'bob@example.com',
+            email: 'bob@example.test',
             password: 'pw-bob-secret',
             emailVerified: true,
-            customClaims: { email: 'bob@example.com', email_verified: true },
+            customClaims: { email: 'bob@example.test', email_verified: true },
           },
           {
             uid: 'eve',
-            email: 'eve@example.com',
+            email: 'eve@example.test',
             password: 'pw-eve-secret',
             emailVerified: true,
-            customClaims: { email: 'eve@example.com', email_verified: true },
+            customClaims: { email: 'eve@example.test', email_verified: true },
+          },
+          {
+            uid: 'alice2',
+            email: 'alice2@example.test',
+            password: 'pw-alice2-secret',
+            emailVerified: true,
+            customClaims: { email: 'alice2@example.test', email_verified: true },
           },
         ],
       },
@@ -259,22 +304,26 @@ async function runStudioAssurance() {
   // Actors
   campaign.addActor({
     id: 'actor-alice',
-    acquisition: { kind: 'password', email: 'alice@example.com', password: 'pw-alice-secret' },
+    acquisition: { kind: 'password', email: 'alice@example.test', password: 'pw-alice-secret' },
   });
   campaign.addActor({
     id: 'actor-bob',
-    acquisition: { kind: 'password', email: 'bob@example.com', password: 'pw-bob-secret' },
+    acquisition: { kind: 'password', email: 'bob@example.test', password: 'pw-bob-secret' },
   });
   campaign.addActor({
     id: 'actor-eve',
-    acquisition: { kind: 'password', email: 'eve@example.com', password: 'pw-eve-secret' },
+    acquisition: { kind: 'password', email: 'eve@example.test', password: 'pw-eve-secret' },
   });
   campaign.addActor({
     id: 'actor-anon',
     acquisition: { kind: 'anonymous-request' },
   });
+  campaign.addActor({
+    id: 'actor-alice-removed',
+    acquisition: { kind: 'password', email: 'alice2@example.test', password: 'pw-alice2-secret' },
+  });
 
-  console.log(`${c.green}✓${c.reset} Mapped 4 actors: actor-alice (owner), actor-bob (collaborator), actor-eve (adversary), actor-anon (unauthenticated)`);
+  console.log(`${c.green}✓${c.reset} Mapped 5 actors: actor-alice, actor-bob, actor-eve, actor-anon, actor-alice-removed`);
 
   // Observations (Baseline ALLOW controls)
   const observations = [
@@ -300,7 +349,29 @@ async function runStudioAssurance() {
       operation: { service: 'firestore', method: 'get', path: 'narrations/narr-shared' },
     },
     {
+      id: 'obs-bob-update-own-title',
+      actorId: 'actor-bob',
+      result: 'ALLOW',
+      source: 'authored',
+      operation: {
+        service: 'firestore',
+        method: 'update',
+        path: 'narrations/narr-bob',
+        data: {
+          title: 'Bob Renamed Narration',
+          updatedAt: 1000500,
+        },
+      },
+    },
+    {
       id: 'obs-eve-read-public-narr',
+      actorId: 'actor-eve',
+      result: 'ALLOW',
+      source: 'authored',
+      operation: { service: 'firestore', method: 'get', path: 'narrations/narr-public' },
+    },
+    {
+      id: 'obs-eve-get-public',
       actorId: 'actor-eve',
       result: 'ALLOW',
       source: 'authored',
@@ -328,7 +399,7 @@ async function runStudioAssurance() {
       actorId: 'actor-alice',
       result: 'ALLOW',
       source: 'authored',
-      operation: { service: 'firestore', method: 'get', path: 'allowlist/alice@example.com' },
+      operation: { service: 'firestore', method: 'get', path: 'allowlist/alice@example.test' },
     },
     {
       id: 'obs-alice-read-private-audio',
@@ -338,8 +409,8 @@ async function runStudioAssurance() {
       operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-private.wav' },
     },
     {
-      id: 'obs-anon-read-public-audio',
-      actorId: 'actor-anon',
+      id: 'obs-alice-read-public-audio',
+      actorId: 'actor-alice',
       result: 'ALLOW',
       source: 'authored',
       operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-public.wav' },
@@ -445,6 +516,30 @@ async function runStudioAssurance() {
       source: 'declared',
       confidence: 'authoritative',
     },
+    {
+      id: 'inv-storage-owner-only',
+      service: 'storage',
+      statement: 'Storage narration audio may only be read directly by the owner.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
+    {
+      id: 'inv-narration-client-field-allowlist',
+      service: 'firestore',
+      statement: 'Client narration updates may only modify title, visibility, sharedWith, and updatedAt.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
+    {
+      id: 'inv-narration-real-user-read',
+      service: 'firestore',
+      statement: 'Non-public narration reads require an allowlisted user.',
+      expected: 'DENY',
+      source: 'declared',
+      confidence: 'authoritative',
+    },
   ];
 
   for (const inv of invariants) {
@@ -466,7 +561,7 @@ async function runStudioAssurance() {
         id: 'probe-alice-read-bob-allowlist',
         dimension: 'path',
         description: 'Alice attempts to read Bob allowlist document.',
-        operation: { service: 'firestore', method: 'get', path: 'allowlist/bob@example.com' },
+        operation: { service: 'firestore', method: 'get', path: 'allowlist/bob@example.test' },
       },
     ],
   });
@@ -479,7 +574,7 @@ async function runStudioAssurance() {
         id: 'probe-alice-delete-own-allowlist',
         dimension: 'operation',
         description: 'Alice attempts to delete her own allowlist document from the client.',
-        operation: { service: 'firestore', method: 'delete', path: 'allowlist/alice@example.com' },
+        operation: { service: 'firestore', method: 'delete', path: 'allowlist/alice@example.test' },
       },
     ],
   });
@@ -607,21 +702,141 @@ async function runStudioAssurance() {
     ],
   });
 
-  // 4f. Path Mutation: Anon attempts to read Alice's private audio in storage
-  const p5 = campaign.propose({
-    observationId: 'obs-anon-read-public-audio',
+  // 4f. Storage Owner-Only Probes (Item 12)
+  campaign.addProbe({
+    id: 'probe-anon-read-public-audio',
+    actorId: 'actor-anon',
+    invariantId: 'inv-storage-owner-only',
+    control: { service: 'storage', method: 'get', path: 'narrations/alice/narr-private.wav' },
+    mutation: {
+      dimension: 'path',
+      description: 'Signed-out visitor attempts to read public audio in storage (owner-only policy).',
+      operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-public.wav' },
+    },
+  });
+
+  campaign.addProbe({
+    id: 'probe-bob-read-public-audio',
+    actorId: 'actor-bob',
+    invariantId: 'inv-storage-owner-only',
+    control: { service: 'storage', method: 'get', path: 'narrations/alice/narr-private.wav' },
+    mutation: {
+      dimension: 'path',
+      description: 'Authenticated non-owner Bob attempts to read public audio in storage (owner-only policy).',
+      operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-public.wav' },
+    },
+  });
+
+  campaign.addProbe({
+    id: 'probe-anon-read-private-storage',
+    actorId: 'actor-anon',
     invariantId: 'inv-storage-private-confidentiality',
+    control: { service: 'storage', method: 'get', path: 'narrations/alice/narr-public.wav' },
+    mutation: {
+      dimension: 'path',
+      description: 'Unauthenticated visitor attempts to read private audio object in storage.',
+      operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-private.wav' },
+    },
+  });
+
+  // 4g. Narration Field Allowlist & Client Create Probes (Item 17)
+  const pFieldProbes = campaign.propose({
+    observationId: 'obs-bob-update-own-title',
+    invariantId: 'inv-narration-client-field-allowlist',
     mutations: [
       {
-        id: 'probe-anon-read-private-storage',
-        dimension: 'path',
-        description: 'Unauthenticated visitor attempts to read private audio object in storage.',
-        operation: { service: 'storage', method: 'get', path: 'narrations/alice/narr-private.wav' },
+        id: 'probe-bob-forge-status',
+        dimension: 'payload',
+        description: 'Bob attempts to forge status on own narration.',
+        operation: {
+          service: 'firestore',
+          method: 'update',
+          path: 'narrations/narr-bob',
+          data: {
+            title: 'Bob Renamed Narration',
+            status: 'streaming',
+            updatedAt: 1000500,
+          },
+        },
+      },
+      {
+        id: 'probe-bob-repoint-audio-path',
+        dimension: 'payload',
+        description: 'Bob attempts to rewrite audioPath to another user namespace.',
+        operation: {
+          service: 'firestore',
+          method: 'update',
+          path: 'narrations/narr-bob',
+          data: {
+            title: 'Bob Renamed Narration',
+            audioPath: 'narrations/alice/narr-private.wav',
+            updatedAt: 1000500,
+          },
+        },
+      },
+      {
+        id: 'probe-bob-unknown-key',
+        dimension: 'payload',
+        description: 'Bob attempts to inject unknown extra field into narration document.',
+        operation: {
+          service: 'firestore',
+          method: 'update',
+          path: 'narrations/narr-bob',
+          data: {
+            title: 'Bob Renamed Narration',
+            featured: true,
+            updatedAt: 1000500,
+          },
+        },
+      },
+      {
+        id: 'probe-bob-client-create-narration',
+        dimension: 'operation',
+        description: 'Bob attempts to create narration directly from client.',
+        operation: {
+          service: 'firestore',
+          method: 'create',
+          path: 'narrations/narr-bob',
+          data: {
+            title: 'Bob Renamed Narration',
+            updatedAt: 1000500,
+          },
+        },
       },
     ],
   });
 
-  const totalProbes = p0a.length + p0b.length + p0c.length + p1.length + p1b.length + p1c.length + p1d.length + p2.length + p3.length + p4.length + p5.length;
+  // 4h. Real-User Read Gate Probes (Item 21)
+  const pRealUserProbes = campaign.propose({
+    observationId: 'obs-eve-get-public',
+    invariantId: 'inv-narration-real-user-read',
+    mutations: [
+      {
+        id: 'probe-eve-nonallowlisted-read-shared',
+        dimension: 'path',
+        description: 'Non-allowlisted Eve attempts to read a narration shared with her.',
+        operation: {
+          service: 'firestore',
+          method: 'get',
+          path: 'narrations/narr-shared',
+        },
+      },
+    ],
+  });
+
+  campaign.addProbe({
+    id: 'probe-removed-owner-read-own',
+    actorId: 'actor-alice-removed',
+    invariantId: 'inv-narration-real-user-read',
+    control: { service: 'firestore', method: 'get', path: 'narrations/narr-public' },
+    mutation: {
+      dimension: 'path',
+      description: 'Removed/non-allowlisted owner attempts to read their own private narration.',
+      operation: { service: 'firestore', method: 'get', path: 'narrations/narr-alice2' },
+    },
+  });
+
+  const totalProbes = p0a.length + p0b.length + p0c.length + p1.length + p1b.length + p1c.length + p1d.length + p2.length + p3.length + p4.length + 3 + pFieldProbes.length + pRealUserProbes.length + 1;
   console.log(`${c.green}✓${c.reset} Proposed ${totalProbes} bounded adversarial probes across path, payload, and operation dimensions.`);
 
   // -------------------------------------------------------------------------

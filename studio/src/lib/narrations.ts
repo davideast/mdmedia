@@ -75,6 +75,17 @@ function asStringList(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
 }
 
+function asStringMap(value: unknown): Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const out: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof entry === 'string') {
+      out[key] = entry;
+    }
+  }
+  return out;
+}
+
 /**
  * Shape a raw snapshot into a {@link Narration}.
  *
@@ -106,6 +117,7 @@ export function toNarration(snapshot: {
     timingsPath: asString(data.timingsPath),
     visibility: asVisibility(data.visibility),
     sharedWith: asStringList(data.sharedWith),
+    sharedWithLabels: asStringMap(data.sharedWithLabels),
     authorName: asString(data.authorName),
     authorPhoto: asString(data.authorPhoto),
     createdAt: asNumber(data.createdAt),
@@ -180,19 +192,29 @@ export async function getNarrationOnce(id: string): Promise<Narration | null> {
 }
 
 /**
- * Change who can reach a narration. `sharedWith` is always written alongside
- * the visibility so the two can never disagree, and it is trimmed to the same
- * bound the Rules enforce.
+ * Change who can reach a narration. `sharedWith` and `sharedWithLabels` are
+ * always written alongside the visibility so they can never disagree, and both
+ * are trimmed to the same bound the Rules enforce.
  */
 export function updateVisibility(
   id: string,
   visibility: Visibility,
   sharedWith: string[],
+  sharedWithLabels?: Record<string, string>,
 ): void {
   const recipients = visibility === 'shared' ? sharedWith.slice(0, MAX_SHARED_WITH) : [];
+  const labels: Record<string, string> = {};
+  if (visibility === 'shared' && sharedWithLabels) {
+    for (const uid of recipients) {
+      if (typeof sharedWithLabels[uid] === 'string') {
+        labels[uid] = sharedWithLabels[uid]!;
+      }
+    }
+  }
   void updateDoc(doc(db(), 'narrations', id), {
     visibility,
     sharedWith: recipients,
+    sharedWithLabels: labels,
     updatedAt: Date.now(),
   }).catch((err) => {
     console.error(`[narrations] failed to update visibility for ${id}:`, err);
