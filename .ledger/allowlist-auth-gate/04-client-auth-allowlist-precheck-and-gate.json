@@ -1,0 +1,34 @@
+{
+  "$schema": "../rules.json",
+  "id": "client-auth-allowlist-precheck-and-gate",
+  "title": "Verify allowlist/{email} before provisioning users/{uid} and surface accessDenied in SignInGate",
+  "screenshot": "n/a",
+  "rule": "CLIENT_AUTH_ALLOWLIST_GATE",
+  "target": {
+    "file": "studio/src/lib/auth-context.tsx",
+    "secondaryFile": "studio/src/components/shell/sign-in-gate.tsx",
+    "enclosingSymbol": "AuthProvider & SignInGate",
+    "anchor": {
+      "contextBefore": "      if (!firebaseUser) {\n        uidRef.current = null;\n        setUser(null);\n        setProfile(null);\n        setLoading(false);\n        return;\n      }",
+      "targetSnippet": "      const nextUser = toAuthUser(firebaseUser);\n      uidRef.current = nextUser.uid;\n      setUser(nextUser);\n\n      void upsertUserProfile({\n        uid: nextUser.uid,\n        displayName: nextUser.displayName,\n        email: nextUser.email,\n        photoURL: nextUser.photoURL,\n      }).catch(() => {",
+      "contextAfter": "      profileUnsubscribe.current = onSnapshot("
+    }
+  },
+  "violation": {
+    "problem": "AuthProvider in studio/src/lib/auth-context.tsx immediately sets `user`, calls `upsertUserProfile(...)`, and attaches `onSnapshot(userRef(nextUser.uid), ...)` before verifying that `allowlist/{email}` exists, without an async session guard (`loadSessionRef.current++`). Non-allowlisted users mount the signed-in app shell with rejected Firestore writes, and SignInGate tells users 'New here? Continuing with Google creates your account.' with no allowlist denial message.",
+    "expectedSolution": "Add `isEmailAllowlisted` in `studio/src/lib/users.ts` (reading `doc(db(), 'allowlist', email.trim().toLowerCase())`), guard async auth resolution in `AuthProvider` with `loadSessionRef.current++`, check `isEmailAllowlisted(nextUser.email)` before setting `user` or calling `upsertUserProfile`, call `await signOut(auth())` and set `accessDenied: true` when not allowlisted, and render the allowlist denial state in `SignInGate`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "const nextUser = toAuthUser(firebaseUser);\n      uidRef.current = nextUser.uid;\n      setUser(nextUser);\n\n      void upsertUserProfile({",
+      "New here? Continuing with Google creates your account."
+    ],
+    "requiredPatterns": [
+      "loadSessionRef.current",
+      "isEmailAllowlisted",
+      "accessDenied",
+      "await signOut(auth())"
+    ]
+  }
+}

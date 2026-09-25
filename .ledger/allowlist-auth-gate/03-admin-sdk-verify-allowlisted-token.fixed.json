@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "admin-sdk-verify-allowlisted-token",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T01:48:48.994Z",
+  "file": "studio/src/lib/firebase-admin.ts",
+  "enclosingSymbol": "verifyIdToken",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "const decoded = await adminAuth().verifyIdToken(token.trim(), true);\n    return decoded.uid;"
+    ],
+    "requiredPatternsPresent": [
+      "decoded.email?.trim().toLowerCase()",
+      "decoded.email_verified !== true",
+      "adminDb().collection('allowlist').doc(email).get()",
+      "if (!allowlistDoc.exists) return null;"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

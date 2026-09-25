@@ -1,0 +1,36 @@
+{
+  "$schema": "../rules.json",
+  "id": "firestore-narrations-playlists-allowlist-gate",
+  "title": "Enforce isAllowlisted() on narrations and playlists mutations and regenerate firestore.rules",
+  "screenshot": "n/a",
+  "rule": "ALLOWLIST_MUTATION_BOUNDARY_PARITY",
+  "target": {
+    "file": "studio/firestore.modules.rules",
+    "secondaryFile": "studio/firestore.rules",
+    "enclosingSymbol": "match /narrations/{narrationId} & match /playlists/{playlistId}",
+    "anchor": {
+      "contextBefore": "      allow get, list: if canReadNarration();",
+      "targetSnippet": "      allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()\n        && validNarrationFields();\n\n      // Only the owner may edit, and the two fields that establish provenance\n      // can never be rewritten after creation.\n      allow update: if isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();\n\n      allow delete: if isOwner(resource.data.ownerUid);",
+      "contextAfter": "    }\n\n    match /playlists/{playlistId} {"
+    }
+  },
+  "violation": {
+    "problem": "match /narrations/{narrationId} and match /playlists/{playlistId} currently authorize create, update, and delete using only isOwner(...). A non-allowlisted or revoked Firebase Auth user can bypass profile creation and directly create or mutate narrations and playlists.",
+    "expectedSolution": "Require `isAllowlisted()` on `create`, `update`, and `delete` in both `match /narrations/{narrationId}` and `match /playlists/{playlistId}` in `studio/firestore.modules.rules`, and regenerate `studio/firestore.rules` via `npm --prefix studio run rules:build:firestore` so the compiled artifact includes `function isAllowlisted()`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()",
+      "allow update: if isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
+      "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])"
+    ],
+    "requiredPatterns": [
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()",
+      "allow update: if isAllowlisted()\n        && isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
+      "allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);",
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])",
+      "function hasClaim(claim)"
+    ]
+  }
+}

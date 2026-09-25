@@ -1,0 +1,32 @@
+{
+  "$schema": "../rules.json",
+  "id": "admin-sdk-verify-allowlisted-token",
+  "title": "Enforce verified email and Firestore allowlist lookup inside server verifyIdToken",
+  "screenshot": "n/a",
+  "rule": "ADMIN_SDK_ALLOWLIST_ENFORCEMENT",
+  "target": {
+    "file": "studio/src/lib/firebase-admin.ts",
+    "enclosingSymbol": "verifyIdToken",
+    "anchor": {
+      "contextBefore": "export async function verifyIdToken(authorizationHeader: string | null): Promise<string | null> {\n  if (!authorizationHeader) return null;\n\n  const [scheme, token] = authorizationHeader.split(' ');\n  if (!token || scheme?.toLowerCase() !== 'bearer') return null;",
+      "targetSnippet": "  try {\n    const decoded = await adminAuth().verifyIdToken(token.trim(), true);\n    return decoded.uid;\n  } catch (error) {",
+      "contextAfter": "    if (process.env.NODE_ENV !== 'production') {"
+    }
+  },
+  "violation": {
+    "problem": "verifyIdToken in studio/src/lib/firebase-admin.ts returns decoded.uid immediately after adminAuth().verifyIdToken(...) without verifying decoded.email_verified === true or checking adminDb().collection('allowlist').doc(email).get(). Because server API routes (/api/narrations/*) use adminDb() and adminBucket() (which bypass Firestore Security Rules), non-allowlisted or revoked users can trigger Gemini TTS synthesis and server-side mutations.",
+    "expectedSolution": "Normalize `decoded.email?.trim().toLowerCase()`, require `decoded.email_verified === true`, and verify `(await adminDb().collection('allowlist').doc(email).get()).exists` inside `verifyIdToken` before returning `decoded.uid`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "const decoded = await adminAuth().verifyIdToken(token.trim(), true);\n    return decoded.uid;"
+    ],
+    "requiredPatterns": [
+      "decoded.email?.trim().toLowerCase()",
+      "decoded.email_verified !== true",
+      "adminDb().collection('allowlist').doc(email).get()",
+      "if (!allowlistDoc.exists) return null;"
+    ]
+  }
+}

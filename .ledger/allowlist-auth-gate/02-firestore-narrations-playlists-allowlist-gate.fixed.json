@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "firestore-narrations-playlists-allowlist-gate",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T01:48:48.994Z",
+  "file": "studio/firestore.modules.rules",
+  "enclosingSymbol": "match /narrations/{narrationId} & match /playlists/{playlistId}",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()",
+      "allow update: if isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
+      "allow create: if isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])"
+    ],
+    "requiredPatternsPresent": [
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequiredNarrationFields()",
+      "allow update: if isAllowlisted()\n        && isOwner(resource.data.ownerUid)\n        && immutableFields(['ownerUid', 'createdAt'])\n        && validNarrationFields();",
+      "allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);",
+      "allow create: if isAllowlisted()\n        && isOwner(request.resource.data.ownerUid)\n        && hasRequired(['ownerUid', 'title', 'description', 'narrationIds', 'createdAt', 'updatedAt'])",
+      "function hasClaim(claim)"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}
