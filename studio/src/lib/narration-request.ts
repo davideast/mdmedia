@@ -21,6 +21,8 @@ export interface NarrationRequest {
   voice: VoiceName;
   model?: TTSModelName;
   promptStyle: string;
+  speed?: number;
+  verbalizeDiagrams?: boolean;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
@@ -30,7 +32,10 @@ export interface NarrationRequest {
 const VISIBILITIES: readonly Visibility[] = ['private', 'shared', 'public'];
 
 function isVoice(value: unknown): value is VoiceName {
-  return typeof value === 'string' && (VOICES as readonly string[]).includes(value);
+  return (
+    typeof value === 'string' &&
+    ((VOICES as readonly string[]).includes(value) || /^[A-Za-z0-9_-]{2,64}$/.test(value))
+  );
 }
 
 function isTTSModel(value: unknown): value is TTSModelName {
@@ -58,12 +63,20 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
       ? raw.id
       : undefined;
 
+  const speed =
+    typeof raw.speed === 'number' && !Number.isNaN(raw.speed)
+      ? Math.min(2.5, Math.max(0.5, raw.speed))
+      : undefined;
+
   return {
     id: customId,
     markdown,
     voice: raw.voice,
     model: isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL,
     promptStyle: typeof raw.promptStyle === 'string' ? raw.promptStyle : '',
+    speed,
+    verbalizeDiagrams:
+      typeof raw.verbalizeDiagrams === 'boolean' ? raw.verbalizeDiagrams : undefined,
     rewriteForNarration: raw.rewriteForNarration === true,
     rewriteInstructions:
       typeof raw.rewriteInstructions === 'string' && raw.rewriteInstructions.trim().length > 0

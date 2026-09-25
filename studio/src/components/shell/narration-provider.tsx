@@ -43,6 +43,8 @@ export interface Draft {
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
   visibility: Visibility;
+  speed?: number;
+  verbalizeDiagrams?: boolean;
 }
 
 export interface PlaylistQueueState {
@@ -179,6 +181,8 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       rewriteForNarration: settings.rewriteForNarration,
       rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,
       visibility: settings.defaultVisibility,
+      speed: 1.0,
+      verbalizeDiagrams: false,
       ...overrides,
     }),
     [settings, overrides],

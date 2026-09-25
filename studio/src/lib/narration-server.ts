@@ -459,7 +459,10 @@ export function createNarrationStream({
       const documentChunks = chunkSpeakableParagraphs(
         parseMarkdownToSpeakableParagraphs(
           script.trim().length > 0 ? script : sourceMarkdown,
-          { preserveHeadings: true },
+          {
+            preserveHeadings: true,
+            verbalizeDiagrams: request.verbalizeDiagrams,
+          },
         ),
         MAX_CHUNK_CHARS,
       );
@@ -480,6 +483,8 @@ export function createNarrationStream({
         title,
         transcript,
         updatedAt: Date.now(),
+        ...(request.speed !== undefined ? { speed: request.speed } : {}),
+        ...(request.verbalizeDiagrams !== undefined ? { verbalizeDiagrams: request.verbalizeDiagrams } : {}),
       });
 
       if (cancelled) {
@@ -495,6 +500,8 @@ export function createNarrationStream({
         title,
         voice: request.voice,
         model: selectedModel,
+        speed: request.speed,
+        verbalizeDiagrams: request.verbalizeDiagrams,
         totalChunks: documentChunks.length,
         totalChars: transcript.length,
       });
