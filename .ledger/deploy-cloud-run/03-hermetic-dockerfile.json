@@ -1,0 +1,37 @@
+{
+  "$schema": "../rules.json",
+  "id": "hermetic-dockerfile",
+  "title": "[007] Add a multi-stage Dockerfile that builds from a clean clone",
+  "screenshot": "n/a",
+  "rule": "HERMETIC_DEPLOY_BUILD",
+  "target": {
+    "file": "Dockerfile",
+    "enclosingSymbol": "build stages",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "There is no production build definition, and a clean install fails on local tarballs.",
+    "expectedSolution": "Build and pack mdmedia, strip Pyric devDependencies and postinstall, run `next build`, and start on 8080 with no dev or secret wiring."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "GOOGLE_APPLICATION_CREDENTIALS",
+      "PYRIC_SANDBOX",
+      "NEXT_PUBLIC_PYRIC_GEMINI_API_KEY",
+      "@pyric/cli/register",
+      ".env.local"
+    ],
+    "requiredPatterns": [
+      "npm pack",
+      "npm pkg delete devDependencies.@pyric/cli",
+      "npm pkg delete scripts.postinstall",
+      "next build",
+      "8080"
+    ]
+  }
+}

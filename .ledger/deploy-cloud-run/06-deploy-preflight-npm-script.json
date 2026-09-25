@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "deploy-preflight-npm-script",
+  "title": "[007] Wire the preflight as an npm script",
+  "screenshot": "n/a",
+  "rule": "HERMETIC_DEPLOY_BUILD",
+  "target": {
+    "file": "studio/package.json",
+    "enclosingSymbol": "scripts",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "\"scripts\": {",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The preflight must be one command in the runbook.",
+    "expectedSolution": "Add `deploy:preflight`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "\"deploy:preflight\": \"node scripts/deploy-preflight.mjs\""
+    ]
+  }
+}

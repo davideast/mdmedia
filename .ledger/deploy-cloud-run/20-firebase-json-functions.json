@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "firebase-json-functions",
+  "title": "[007] Register the functions codebase",
+  "screenshot": "n/a",
+  "rule": "AUTH_BLOCKING_ALLOWLIST",
+  "target": {
+    "file": "studio/firebase.json",
+    "enclosingSymbol": "functions",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "\"storage\": {",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Blocking functions cannot deploy without a functions target.",
+    "expectedSolution": "Add a `functions` entry pointing at the codebase."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "\"functions\""
+    ]
+  }
+}

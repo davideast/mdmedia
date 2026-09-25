@@ -36,6 +36,9 @@ jobs:
       - name: Verify Type Integrity (tsc --noEmit)
         run: bunx tsc --noEmit
 
+      - name: Build Package (dist/)
+        run: bun run build
+
       - name: Run Unit Test Suite (bun test)
         run: bun test
 

@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "narrations-share-labels",
+  "title": "[007] Persist and read sharedWithLabels with sharedWith",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/src/lib/narrations.ts",
+    "enclosingSymbol": "updateVisibility",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "export function updateVisibility(",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Uids alone are unreadable in the share list.",
+    "expectedSolution": "`updateVisibility` writes `sharedWithLabels` alongside `sharedWith` (cleared unless shared); `toNarration` reads it."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "sharedWithLabels"
+    ]
+  }
+}

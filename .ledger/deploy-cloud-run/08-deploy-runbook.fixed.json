@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "deploy-runbook",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.193Z",
+  "file": "studio/README.md",
+  "enclosingSymbol": "## Deploy",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "## Deploy",
+      "npm --prefix studio run deploy:preflight",
+      "firebase deploy --only firestore:rules,storage",
+      "gcloud run deploy studio",
+      "--set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest",
+      "--no-cpu-throttling",
+      "--max-instances",
+      "firebase deploy --only hosting",
+      "AI Logic"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

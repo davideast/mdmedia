@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "no-client-ai-logic",
+  "title": "[007] Remove the client AI Logic model",
+  "screenshot": "n/a",
+  "rule": "NO_CLIENT_AI_ENDPOINTS",
+  "target": {
+    "file": "studio/src/lib/firebase.ts",
+    "enclosingSymbol": "module",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "export const assistModel = (): GenerativeModel =>",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`assistModel` exposes Gemini through AI Logic to anyone holding the public web config; it has no callers.",
+    "expectedSolution": "Delete the `firebase/ai` import and `assistModel`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "firebase/ai",
+      "getGenerativeModel",
+      "getAI("
+    ],
+    "requiredPatterns": [
+      "export const storage = (): FirebaseStorage"
+    ]
+  }
+}

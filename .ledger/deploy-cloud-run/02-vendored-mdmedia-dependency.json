@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "vendored-mdmedia-dependency",
+  "title": "[007] Install mdmedia from a tarball built inside studio",
+  "screenshot": "n/a",
+  "rule": "HERMETIC_DEPLOY_BUILD",
+  "target": {
+    "file": "studio/package.json",
+    "enclosingSymbol": "dependencies.mdmedia",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "\"mdmedia\": \"file:../mdmedia-0.1.0.tgz\",",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`mdmedia` points at `file:../mdmedia-0.1.0.tgz`, which is gitignored, absent, and outside `studio/`.",
+    "expectedSolution": "Add a `vendor:mdmedia` script that builds and packs the root package into `studio/vendor/`, and point the dependency there."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "file:../mdmedia-0.1.0.tgz"
+    ],
+    "requiredPatterns": [
+      "\"vendor:mdmedia\"",
+      "\"mdmedia\": \"file:./vendor/mdmedia-0.1.0.tgz\""
+    ]
+  }
+}

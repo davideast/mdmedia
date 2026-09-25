@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "rules-allow-share-labels",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.194Z",
+  "file": "studio/firestore.modules.rules",
+  "enclosingSymbol": "match /narrations/{narrationId}",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "'sharedWithLabels'",
+      "get('sharedWithLabels', {}).size() <= 50"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

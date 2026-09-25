@@ -1,0 +1,32 @@
+{
+  "$schema": "../rules.json",
+  "id": "narrations-route-pinned-cors",
+  "title": "[007] Origin-pinned CORS on the narrations POST",
+  "screenshot": "n/a",
+  "rule": "LONG_REQUESTS_BYPASS_HOSTING",
+  "target": {
+    "file": "studio/src/app/api/narrations/route.ts",
+    "enclosingSymbol": "OPTIONS",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new handler)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "A cross-origin POST from the Hosting domain needs CORS; a wildcard would let any site drive it with a stolen token.",
+    "expectedSolution": "Answer OPTIONS and echo `Access-Control-Allow-Origin` only for origins in `ALLOWED_WEB_ORIGINS`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [
+      "\"Access-Control-Allow-Origin\": \"*\""
+    ],
+    "requiredPatterns": [
+      "export async function OPTIONS",
+      "ALLOWED_WEB_ORIGINS",
+      "Access-Control-Allow-Origin",
+      "Vary"
+    ]
+  }
+}

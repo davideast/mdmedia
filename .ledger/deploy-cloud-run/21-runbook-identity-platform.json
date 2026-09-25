@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "runbook-identity-platform",
+  "title": "[007] Document Identity Platform and blocking-function registration",
+  "screenshot": "n/a",
+  "rule": "AUTH_BLOCKING_ALLOWLIST",
+  "target": {
+    "file": "studio/README.md",
+    "enclosingSymbol": "## Deploy",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(missing section)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "Blocking functions require an Identity Platform upgrade and manual registration.",
+    "expectedSolution": "Document the upgrade, `firebase deploy --only functions`, registration, and the new deploy order."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "Identity Platform",
+      "firebase deploy --only functions",
+      "Blocking functions",
+      "beforeUserSignedIn"
+    ]
+  }
+}

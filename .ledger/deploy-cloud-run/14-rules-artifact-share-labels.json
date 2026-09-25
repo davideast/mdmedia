@@ -1,0 +1,27 @@
+{
+  "$schema": "../rules.json",
+  "id": "rules-artifact-share-labels",
+  "title": "[007] Regenerate firestore.rules with the label key",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/firestore.rules",
+    "enclosingSymbol": "match /narrations/{narrationId}",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": ".hasOnly(['title', 'visibility', 'sharedWith', 'updatedAt'])",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "The deployable artifact must match the modules source.",
+    "expectedSolution": "Run `npm --prefix studio run rules:build:firestore`."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "'sharedWithLabels'"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "../rules.json",
+  "id": "user-resolve-route",
+  "title": "[007] Resolve an allowlisted email to a uid on the server",
+  "screenshot": "n/a",
+  "rule": "SHARE_BY_RESOLVED_UID",
+  "target": {
+    "file": "studio/src/app/api/users/resolve/route.ts",
+    "enclosingSymbol": "POST",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "(new file)",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "There is no way to turn a recipient's email into the uid the rules check.",
+    "expectedSolution": "Require an allowlisted caller; return {uid,email} only if the target is allowlisted and has a verified Auth user, else 404."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "verifyIdToken",
+      "getUserByEmail",
+      "allowlist",
+      "emailVerified",
+      "status: 404"
+    ]
+  }
+}

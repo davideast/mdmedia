@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "runbook-identity-platform",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.196Z",
+  "file": "studio/README.md",
+  "enclosingSymbol": "## Deploy",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "Identity Platform",
+      "firebase deploy --only functions",
+      "Blocking functions",
+      "beforeUserSignedIn"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

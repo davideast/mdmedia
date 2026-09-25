@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "deploy-preflight-npm-script",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.192Z",
+  "file": "studio/package.json",
+  "enclosingSymbol": "scripts",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [],
+    "requiredPatternsPresent": [
+      "\"deploy:preflight\": \"node scripts/deploy-preflight.mjs\""
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "issueId": "cloud-run-least-privilege-identity",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T04:42:51.193Z",
+  "file": "studio/README.md",
+  "enclosingSymbol": "## Deploy",
+  "verification": {
+    "oracleType": "invariants",
+    "forbiddenPatternsAbsent": [
+      "roles/editor"
+    ],
+    "requiredPatternsPresent": [
+      "studio-run@",
+      "roles/datastore.user",
+      "roles/storage.objectAdmin",
+      "roles/secretmanager.secretAccessor",
+      "roles/firebaseauth.viewer",
+      "--service-account"
+    ],
+    "verifiedBy": "scripts/ledger.ts"
+  }
+}

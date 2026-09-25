@@ -19,8 +19,11 @@
     "rules:build:firestore": "pyric firestore rules resolve firestore.modules.rules --out firestore.rules",
     "rules:build:storage": "pyric storage rules resolve storage.modules.rules --out storage.rules",
     "rules:verify": "pyric verify test/fixtures/allowlist-journey.session.json --rules firestore=firestore.rules",
+    "rules:verify:hosted": "node scripts/verify-rules-hosted.mjs",
     "test:assurance": "node scripts/run-authorization-campaign.mjs",
     "allowlist": "node scripts/allowlist.mjs",
+    "vendor:mdmedia": "npm --prefix .. run build && mkdir -p vendor && npm pack .. --pack-destination ./vendor",
+    "deploy:preflight": "node scripts/deploy-preflight.mjs",
     "postinstall": "node scripts/patch-pyric-bridge-port.js"
   },
   "dependencies": {

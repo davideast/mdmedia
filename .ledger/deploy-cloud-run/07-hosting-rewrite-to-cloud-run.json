@@ -1,0 +1,30 @@
+{
+  "$schema": "../rules.json",
+  "id": "hosting-rewrite-to-cloud-run",
+  "title": "[007] Add a Hosting config that rewrites to the Cloud Run service",
+  "screenshot": "n/a",
+  "rule": "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
+  "target": {
+    "file": "studio/firebase.json",
+    "enclosingSymbol": "hosting",
+    "anchor": {
+      "contextBefore": "",
+      "targetSnippet": "\"storage\": {",
+      "contextAfter": ""
+    }
+  },
+  "violation": {
+    "problem": "`firebase.json` has no hosting target.",
+    "expectedSolution": "Add `hosting.rewrites` with `run.serviceId` `studio` and a region."
+  },
+  "oracle": {
+    "type": "invariants",
+    "forbiddenPatterns": [],
+    "requiredPatterns": [
+      "\"hosting\"",
+      "\"rewrites\"",
+      "\"serviceId\": \"studio\"",
+      "\"region\""
+    ]
+  }
+}
