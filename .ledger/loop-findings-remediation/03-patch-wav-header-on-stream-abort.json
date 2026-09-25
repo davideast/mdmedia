@@ -1,0 +1,44 @@
+{
+  "$schema": "../rules.json",
+  "id": "patch-wav-header-on-stream-abort",
+  "title": "Patch WAV header data lengths upon midstream abort or pipeline error",
+  "screenshot": "n/a",
+  "rule": "SAFE_STREAM_HEADER_FINALIZATION",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "src/audio/wav-file-stream-sink.ts",
+    "enclosingSymbol": "WavFileStreamSink.attachToEventBus",
+    "anchor": {
+      "contextBefore": "this.unsubscribeComplete = eventBus.on('pipeline:complete', () =>",
+      "targetSnippet": "this.unsubscribeError = eventBus.on('pipeline:error', () => this.closeStream());",
+      "contextAfter": "detach(): void {"
+    }
+  },
+  "violation": {
+    "problem": "WavFileStreamSink writes a 44-byte zeroed placeholder on open. When pipeline:error is received (e.g. client aborts or network drops midstream), closeStream() is called without rewriting the header, leaving 44 bytes of all zeros (0x00) on disk and making partial audio unplayable.",
+    "expectedSolution": "When pipeline:error occurs, if bytesWritten > 0, rewrite the 44-byte header with the actual bytesWritten before closing, or unlink the file if zero audio was generated."
+  },
+  "steps": [
+    "In src/audio/wav-file-stream-sink.ts, in attachToEventBus(), update the pipeline:error handler to finalize the header with bytesWritten if audio has been written.",
+    "Ensure closeStream() cleanly closes file handles without leaving all-zero 44-byte headers on disk."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "src/audio/wav-file-stream-sink.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/stream-abort-wav-header.test.ts"
+    ],
+    "maxDiffLines": 40
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/stream-abort-wav-header.test.ts"
+  },
+  "reviewChecklist": [
+    "Aborted streams with audio bytes written have valid RIFF/WAVE header fields",
+    "No unhandled promise rejections on stream abort",
+    "Normal pipeline:complete finalization continues to function idempotently"
+  ]
+}

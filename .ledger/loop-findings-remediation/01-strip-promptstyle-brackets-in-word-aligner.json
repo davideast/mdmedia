@@ -1,0 +1,45 @@
+{
+  "$schema": "../rules.json",
+  "id": "strip-promptstyle-brackets-in-word-aligner",
+  "title": "Strip bracketed promptstyle directives before word alignment tokenization",
+  "screenshot": "n/a",
+  "rule": "PROMPT_STYLE_DIRECTIVE_STRIPPING",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "src/audio/player/word-aligner.ts",
+    "enclosingSymbol": "extractWordTimingsFromPcm",
+    "anchor": {
+      "contextBefore": "export function extractWordTimingsFromPcm(",
+      "targetSnippet": "const regex = /\\S+/g;",
+      "contextAfter": "while ((match = regex.exec(text)) !== null)"
+    }
+  },
+  "violation": {
+    "problem": "extractWordTimingsFromPcm tokenizes bracketed style instructions (e.g. [style: whisper]) as spoken words, creating phantom word timestamps, advancing wordIndex by 2, and corrupting transcript synchronization.",
+    "expectedSolution": "Filter out bracketed prompt directives from text before tokenizing spoken words so that only true spoken words receive timing metadata."
+  },
+  "steps": [
+    "In src/audio/player/word-aligner.ts, inside extractWordTimingsFromPcm(), sanitize or filter bracketed prompt directives (e.g. [style: ...] or [...]) before tokenizing spoken words.",
+    "Ensure word indices start at 0 for the first true spoken word.",
+    "Preserve accurate character start and end offsets mapped to the spoken words in the text."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "src/audio/player/word-aligner.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/promptstyle-word-alignment.test.ts"
+    ],
+    "maxDiffLines": 40
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/promptstyle-word-alignment.test.ts"
+  },
+  "reviewChecklist": [
+    "Bracket directives like [style: whisper] produce zero word timing entries",
+    "Spoken words start at wordIndex 0 with accurate character offsets",
+    "Existing word alignment calculations and smoothing logic remain intact"
+  ]
+}

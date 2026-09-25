@@ -61,7 +61,14 @@
         "DEPLOY_RUNBOOK_LEAST_PRIVILEGE",
         "SHARE_BY_RESOLVED_UID",
         "LONG_REQUESTS_BYPASS_HOSTING",
-        "AUTH_BLOCKING_ALLOWLIST"
+        "AUTH_BLOCKING_ALLOWLIST",
+        "GRACE_PERIOD_STRICTMODE_HYGIENE",
+        "PROMPT_STYLE_DIRECTIVE_STRIPPING",
+        "TTS_WIRE_FRAME_ALIGNMENT",
+        "SAFE_STREAM_HEADER_FINALIZATION",
+        "OPFS_RESILIENT_STORAGE_FAILOVER",
+        "CROSS_SURFACE_PARAMETER_PARITY",
+        "DECLARATIVE_PROVIDER_REGISTRY"
       ]
     },
     "target": {
@@ -381,6 +388,81 @@
           "Relying only on post-sign-in checks for account creation"
         ],
         "remediation": "Identity Platform blocking functions `beforeUserCreated` and `beforeUserSignedIn` reject unverified or non-allowlisted emails."
+      },
+      "GRACE_PERIOD_STRICTMODE_HYGIENE": {
+        "id": "GRACE_PERIOD_STRICTMODE_HYGIENE",
+        "category": "Client Session & Subscription Hygiene",
+        "summary": "Real-time subscriptions must maintain ref-counted or tokenized handles across React 18 StrictMode double-mount cycles.",
+        "description": "Storing subscriber callbacks in a bare Set causes StrictMode remounts with identical callback references to collapse to a single entry. The first cleanup deletes the callback, reducing subscriber count to 0 and triggering grace-period detachment while the remounted component is active.",
+        "antiPatterns": [
+          "entry.subscribers.add(callback);",
+          "entry.subscribers.delete(callback);"
+        ],
+        "remediation": "Track subscriptions by unique token/subscription ID handles or reference counters rather than bare callback sets. Ensure cleanup for one handle does not prematurely drop active sibling handles."
+      },
+      "PROMPT_STYLE_DIRECTIVE_STRIPPING": {
+        "id": "PROMPT_STYLE_DIRECTIVE_STRIPPING",
+        "category": "Audio & Speech Wire Conformance",
+        "summary": "Non-spoken stage directions and bracketed prompt directives must be stripped before word alignment tokenization.",
+        "description": "Including bracketed style directives like [style: whisper] or [whisper] in word-alignment tokenization indexes non-spoken characters, pushes spoken words to offset indices, and steals vocal energy onset windows, misaligning transcript highlights.",
+        "antiPatterns": [
+          "const regex = /\\S+/g; // without stripping bracket directives",
+          "tokens.push({ wordIndex: index++, word, charStart, charEnd })"
+        ],
+        "remediation": "Strip bracketed directives ([style: ...], [...]) before tokenizing spoken words or map spoken words to source document offsets without creating spoken tokens for directives."
+      },
+      "TTS_WIRE_FRAME_ALIGNMENT": {
+        "id": "TTS_WIRE_FRAME_ALIGNMENT",
+        "category": "Audio & Speech Wire Conformance",
+        "summary": "Streaming audio payloads must enforce 2-byte 16-bit PCM frame alignment and strip WAV container headers.",
+        "description": "Streaming endpoints that emit odd-byte audio chunks split 16-bit PCM sample frames across network packets. Streaming players that fail to detect and strip 44-byte RIFF headers decode ASCII metadata as audible waveforms, causing loud pops and phase drift.",
+        "antiPatterns": [
+          "queue.push({ type: 'audio', pcm: Buffer.from(copy).toString('base64') }); // unaligned odd bytes",
+          "player.append(wavWithHeader); // without stripping 44-byte RIFF header"
+        ],
+        "remediation": "Enforce 2-byte sample alignment on all audio deltas, carry odd trailing bytes across frames, and strip 44-byte RIFF headers in streaming players before decoding samples."
+      },
+      "SAFE_STREAM_HEADER_FINALIZATION": {
+        "id": "SAFE_STREAM_HEADER_FINALIZATION",
+        "category": "Audio & Speech Wire Conformance",
+        "summary": "Audio sinks must rewrite data lengths upon stream abort or error, or cleanly unlink incomplete files.",
+        "description": "Writing a 44-byte zeroed placeholder at the start of a WAV file and closing on stream abort/error without patching the header leaves corrupted, unplayable files with zeroed headers on disk or in Cloud Storage.",
+        "antiPatterns": [
+          "eventBus.on('pipeline:error', () => this.closeStream()); // without header rewrite"
+        ],
+        "remediation": "Intercept abort and error events in audio file sinks to write createWavHeader with the actual bytesWritten, or unlink the incomplete file."
+      },
+      "OPFS_RESILIENT_STORAGE_FAILOVER": {
+        "id": "OPFS_RESILIENT_STORAGE_FAILOVER",
+        "category": "Client Storage & Offline Resilience",
+        "summary": "Media storage services must handle OPFS lock contention and quota exceptions with in-memory failover.",
+        "description": "Origin Private File System createWritable() throws NoModificationAllowedError under concurrent tab access and QuotaExceededError when limits are reached. Unhandled exceptions crash recording and playback.",
+        "antiPatterns": [
+          "const writable = await handle.createWritable(); // without try/catch or fallback"
+        ],
+        "remediation": "Wrap OPFS file operations with lock retry/backoff and fall back gracefully to MemoryStorageAdapter upon persistent lock contention or quota failure."
+      },
+      "CROSS_SURFACE_PARAMETER_PARITY": {
+        "id": "CROSS_SURFACE_PARAMETER_PARITY",
+        "category": "API & Surface Parity",
+        "summary": "Studio API routes and UI controls must accept and forward all core pipeline parameters supported by the CLI.",
+        "description": "Dropping speed, verbalizeDiagrams, or custom voice parameters in parseNarrationRequest forces hardcoded defaults and denies users capabilities available via the CLI.",
+        "antiPatterns": [
+          "return { id, markdown, voice, model, promptStyle, rewriteForNarration, visibility }; // speed dropped",
+          "if (!isVoice(raw.voice)) return null; // rejects valid custom voices"
+        ],
+        "remediation": "Include speed, verbalizeDiagrams, and extensible voice support in NarrationRequest, and forward them from Studio routes to DocumentAudioPipeline."
+      },
+      "DECLARATIVE_PROVIDER_REGISTRY": {
+        "id": "DECLARATIVE_PROVIDER_REGISTRY",
+        "category": "Architecture & Clean Baseline",
+        "summary": "Subsystems must dispatch model providers through a declarative registry rather than imperative hardcoded constructors.",
+        "description": "Directly instantiating new GeminiTTSProvider across CLI, TUI, sidecar, and Studio requires shotgun surgery to add alternative TTS or video providers.",
+        "antiPatterns": [
+          "new GeminiTTSProvider(client)",
+          "provider = new GeminiTTSProvider(client);"
+        ],
+        "remediation": "Provide a centralized ProviderRegistry / factory interface in src/tts/ and src/video/ that decouples provider instantiation from consuming callers."
       }
     }
   }

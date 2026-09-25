@@ -1,0 +1,33 @@
+{
+  "issueId": "strip-promptstyle-brackets-in-word-aligner",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:36:07.444Z",
+  "baseCommit": "05ce6b6a20bbddf77a46b03feccd10a04b893e45",
+  "redProof": {
+    "observedAt": "2026-09-25T19:33:48.632Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/promptstyle-word-alignment.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/promptstyle-word-alignment.test.ts:\n 6 | \n 7 |   it('strips bracketed prompt directives so only spoken words are aligned with correct indices and offsets', () => {\n 8 |     const text = '[style: whisper] Hello world';\n 9 |     const timings = extractWordTimingsFromPcm(pcmBuffer, text);\n10 | \n11 |     expect(timings.map((t) => t.word)).toEqual(['Hello', 'world']);\n                                            ^\nerror: expect(received).toEqual(expected)\n\n  [\n+   \"[style:\",\n+   \"whisper]\",\n    \"Hello\",\n    \"world\",\n  ]\n\n- Expected  - 0\n+ Received  + 2\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/promptstyle-word-alignment.test.ts:11:40)\n(fail) Insight 08605905: PromptStyle bracket syntax corrupts word alignment offsets > strips bracketed prompt directives so only spoken words are aligned with correct indices and offsets [0.73ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [11.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/promptstyle-word-alignment.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/promptstyle-word-alignment.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "src/audio/player/word-aligner.ts",
+        "lines": 5
+      }
+    ],
+    "diffLines": 5,
+    "diffFingerprint": "2715c2da3d1f53fa0254e16e0b6c8f9d3d6d15617c2adb7205933fbce319c18a"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "Bracket directives like [style: whisper] produce zero word timing entries",
+      "Spoken words start at wordIndex 0 with accurate character offsets",
+      "Existing word alignment calculations and smoothing logic remain intact"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

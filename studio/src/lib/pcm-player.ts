@@ -9,6 +9,7 @@
  */
 
 import { SAMPLE_RATE, WAV_HEADER_BYTES } from "./types";
+import { alignPcmFrames, isRiffHeader } from "./wav";
 import { timeStretchWsola } from "./wsola";
 
 const MIN_RATE = 0.5;
@@ -86,25 +87,20 @@ export class StreamingPcmPlayer {
   append(pcm: Uint8Array): void {
     if (this.destroyed || pcm.byteLength === 0) return;
 
-    let bytes = pcm;
-    if (this.carryByte !== null) {
-      const joined = new Uint8Array(pcm.byteLength + 1);
-      joined[0] = this.carryByte;
-      joined.set(pcm, 1);
-      bytes = joined;
-      this.carryByte = null;
+    if (pcm.byteLength >= WAV_HEADER_BYTES && isRiffHeader(pcm)) {
+      pcm = extractPcm(pcm);
+      if (pcm.byteLength === 0) return;
     }
-    const usableBytes = bytes.byteLength - (bytes.byteLength % 2);
-    if (usableBytes < bytes.byteLength) {
-      this.carryByte = bytes[bytes.byteLength - 1];
-    }
-    if (usableBytes === 0) return;
 
-    const incoming = usableBytes / 2;
+    const { aligned, carryByte } = alignPcmFrames(pcm, this.carryByte);
+    this.carryByte = carryByte;
+    if (aligned.byteLength === 0) return;
+
+    const incoming = aligned.byteLength / 2;
     this.ensureCapacity(this.sampleCount + incoming);
     for (let i = 0; i < incoming; i += 1) {
-      const lo = bytes[i * 2];
-      const hi = bytes[i * 2 + 1];
+      const lo = aligned[i * 2];
+      const hi = aligned[i * 2 + 1];
       const signed = ((hi << 8) | lo) << 16 >> 16;
       this.samples[this.sampleCount + i] = signed / 32768;
     }
