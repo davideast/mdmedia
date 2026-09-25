@@ -1,0 +1,33 @@
+{
+  "issueId": "cross-surface-speed-and-diagram-parity",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:49:48.187Z",
+  "baseCommit": "2c09d85cda4119ba667fea4cf4d68861446dd19f",
+  "redProof": {
+    "observedAt": "2026-09-25T19:48:10.706Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/cross-surface-parameter-parity.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/cross-surface-parameter-parity.test.ts:\n16 |       verbalizeDiagrams: true,\n17 |     };\n18 | \n19 |     const parsed = parseNarrationRequest(payload);\n20 |     expect(parsed).not.toBeNull();\n21 |     expect((parsed as any).speed).toBe(1.25);\n                                       ^\nerror: expect(received).toBe(expected)\n\nExpected: 1.25\nReceived: undefined\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/cross-surface-parameter-parity.test.ts:21:35)\n(fail) Cross-Surface Feature & Parameter Parity (Insights 3a52ffa3, 10e4de4b, 3f1c0264, f25b0691) > Studio request parser preserves speed and verbalizeDiagrams options [4.46ms]\n\n 0 pass\n 1 fail\n 2 expect() calls\nRan 1 test across 1 file. [16.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/cross-surface-parameter-parity.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/cross-surface-parameter-parity.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/src/lib/narration-request.ts",
+        "lines": 9
+      }
+    ],
+    "diffLines": 9,
+    "diffFingerprint": "b110763cc1f9d348fcdfb6ed788a66d91b85898577176ae0bc0f30405b3f8836"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "speed is preserved in NarrationRequest and clamped between 0.5 and 2.5",
+      "verbalizeDiagrams boolean flag is preserved in NarrationRequest",
+      "Invalid speed values gracefully clamp or default without rejecting valid requests"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

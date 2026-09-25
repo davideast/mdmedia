@@ -28,6 +28,8 @@ export interface GenerationJob {
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
   visibility: Visibility;
+  speed?: number;
+  verbalizeDiagrams?: boolean;
   status: JobStatus;
   errorMessage: string | null;
   errorCode?: string;
@@ -54,6 +56,8 @@ export interface GenerationQueueState {
     rewriteInstructions?: string;
     structureMarkdown?: boolean;
     visibility: Visibility;
+    speed?: number;
+    verbalizeDiagrams?: boolean;
   }) => Promise<string>;
   retryJob: (jobId: string) => Promise<string | null>;
   cancelJob: (jobId: string) => void;
@@ -144,6 +148,8 @@ export function useGenerationQueue(): GenerationQueueState {
       rewriteInstructions?: string;
       structureMarkdown?: boolean;
       visibility: Visibility;
+      speed?: number;
+      verbalizeDiagrams?: boolean;
     }): Promise<string> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
       const narrationId = generateNarrationId();
@@ -163,6 +169,8 @@ export function useGenerationQueue(): GenerationQueueState {
         rewriteInstructions: input.rewriteInstructions,
         structureMarkdown: input.structureMarkdown,
         visibility: input.visibility,
+        speed: input.speed,
+        verbalizeDiagrams: input.verbalizeDiagrams,
         status: 'queued',
         errorMessage: null,
         totalChunks: 0,
@@ -360,7 +368,10 @@ export function useGenerationQueue(): GenerationQueueState {
         promptStyle: existingJob.promptStyle,
         rewriteForNarration: existingJob.rewriteForNarration,
         rewriteInstructions: existingJob.rewriteInstructions,
+        structureMarkdown: existingJob.structureMarkdown,
         visibility: existingJob.visibility,
+        speed: existingJob.speed,
+        verbalizeDiagrams: existingJob.verbalizeDiagrams,
       });
     },
     [dismissJob, queueNarration],

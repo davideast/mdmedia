@@ -40,7 +40,7 @@ export const VOICES = [
   "Sulafat",
 ] as const;
 
-export type VoiceName = (typeof VOICES)[number];
+export type VoiceName = (typeof VOICES)[number] | (string & {});
 
 export const DEFAULT_VOICE: VoiceName = "Kore";
 
@@ -108,6 +108,8 @@ export interface Narration {
   voice: VoiceName;
   model?: TTSModelName;
   promptStyle: string;
+  speed?: number;
+  verbalizeDiagrams?: boolean;
   /** Whether the source was rewritten for the ear before synthesis. */
   adapted: boolean;
   status: NarrationStatus;
@@ -267,6 +269,8 @@ export interface StreamMetaEvent {
   model?: TTSModelName;
   totalChunks: number;
   totalChars: number;
+  speed?: number;
+  verbalizeDiagrams?: boolean;
 }
 
 /** The full spoken script, sent once, before any audio. The reader renders

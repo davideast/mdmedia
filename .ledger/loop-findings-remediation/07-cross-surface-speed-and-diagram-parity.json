@@ -1,0 +1,46 @@
+{
+  "$schema": "../rules.json",
+  "id": "cross-surface-speed-and-diagram-parity",
+  "title": "Preserve playback speed and diagram options in Studio NarrationRequest",
+  "screenshot": "n/a",
+  "rule": "CROSS_SURFACE_PARAMETER_PARITY",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/src/lib/narration-request.ts",
+    "enclosingSymbol": "parseNarrationRequest",
+    "anchor": {
+      "contextBefore": "export interface NarrationRequest {",
+      "targetSnippet": "export function parseNarrationRequest(body: unknown): NarrationRequest | null {",
+      "contextAfter": "return {\n    id: customId,"
+    }
+  },
+  "violation": {
+    "problem": "parseNarrationRequest silently drops speed and verbalizeDiagrams, preventing Studio users from configuring audio tempo or diagram verbalization options supported by the core CLI and pipeline.",
+    "expectedSolution": "Update NarrationRequest interface and parseNarrationRequest() to validate and preserve speed?: number (clamped between 0.5 and 2.5) and verbalizeDiagrams?: boolean."
+  },
+  "steps": [
+    "In studio/src/lib/narration-request.ts, add speed?: number and verbalizeDiagrams?: boolean to NarrationRequest interface.",
+    "In parseNarrationRequest(), parse and clamp speed if provided (0.5 to 2.5).",
+    "In parseNarrationRequest(), parse verbalizeDiagrams boolean flag.",
+    "Return both properties in the validated request object."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/src/lib/narration-request.ts"
+    ],
+    "lockedFiles": [
+      "test/regression/cross-surface-parameter-parity.test.ts"
+    ],
+    "maxDiffLines": 35
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/cross-surface-parameter-parity.test.ts"
+  },
+  "reviewChecklist": [
+    "speed is preserved in NarrationRequest and clamped between 0.5 and 2.5",
+    "verbalizeDiagrams boolean flag is preserved in NarrationRequest",
+    "Invalid speed values gracefully clamp or default without rejecting valid requests"
+  ]
+}

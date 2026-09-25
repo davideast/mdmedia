@@ -54,6 +54,11 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="max-h-72">
+            {!VOICES.includes(draft.voice as any) && draft.voice ? (
+              <SelectItem key={draft.voice} value={draft.voice}>
+                {draft.voice} (Custom)
+              </SelectItem>
+            ) : null}
             {VOICES.map((voice) => (
               <SelectItem key={voice} value={voice}>
                 {voice}
@@ -85,6 +90,26 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
       </div>
 
       <div className="grid gap-2">
+        <Label htmlFor="speed" className="t-label">
+          Pace
+        </Label>
+        <Select
+          value={String(draft.speed ?? 1.0)}
+          onValueChange={(value) => setDraft({ speed: parseFloat(value) })}
+        >
+          <SelectTrigger id="speed" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0.75">0.75x (Relaxed)</SelectItem>
+            <SelectItem value="1">1.0x (Normal)</SelectItem>
+            <SelectItem value="1.25">1.25x (Brisk)</SelectItem>
+            <SelectItem value="1.5">1.5x (Fast)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-2">
         <Label htmlFor="style" className="t-label">
           Delivery
         </Label>
@@ -111,6 +136,22 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
           id="structure"
           checked={draft.structureMarkdown ?? false}
           onCheckedChange={(checked) => setDraft({ structureMarkdown: checked })}
+        />
+      </div>
+
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+        <div className="grid gap-0.5">
+          <Label htmlFor="verbalize-diagrams" className="t-card-title cursor-pointer font-normal">
+            Verbalize diagrams
+          </Label>
+          <span className="text-[0.78rem] text-ink-muted">
+            Translate Mermaid and ASCII diagrams into spoken descriptions.
+          </span>
+        </div>
+        <Switch
+          id="verbalize-diagrams"
+          checked={draft.verbalizeDiagrams ?? false}
+          onCheckedChange={(checked) => setDraft({ verbalizeDiagrams: checked })}
         />
       </div>
 

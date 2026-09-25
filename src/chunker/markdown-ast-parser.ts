@@ -332,6 +332,10 @@ export interface ParseMarkdownOptions {
    * render structured section headings while still speaking them naturally.
    */
   preserveHeadings?: boolean;
+  /**
+   * Whether to verbalize diagrams into spoken text descriptions.
+   */
+  verbalizeDiagrams?: boolean;
 }
 
 export function parseMarkdownToSpeakableParagraphs(

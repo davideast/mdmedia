@@ -64,6 +64,8 @@ export default function StudioPage() {
         rewriteInstructions: draft.rewriteInstructions?.trim() || undefined,
         structureMarkdown: draft.structureMarkdown,
         visibility: draft.visibility,
+        speed: draft.speed,
+        verbalizeDiagrams: draft.verbalizeDiagrams,
       });
       setDraft({ markdown: "" });
       toast.success("Narration queued for processing", {
