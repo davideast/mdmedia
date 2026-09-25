@@ -1,0 +1,37 @@
+{
+  "issueId": "hermetic-studio-dockerignore-and-standalone",
+  "status": "VERIFIED_FIXED",
+  "fixedAt": "2026-09-25T19:51:45.936Z",
+  "baseCommit": "6e32ee250e37222e9adb560d20f73ace8bbdc809",
+  "redProof": {
+    "observedAt": "2026-09-25T19:50:12.452Z",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/packaging-and-docker-hermeticity.test.ts` exited 1\nbun test v1.3.14 (0d9b296a)\n\n\ntest/regression/packaging-and-docker-hermeticity.test.ts:\n 8 |   it('Studio container and build configuration must be hermetic and standalone-enabled', () => {\n 9 |     const studioDockerignoreExists = fs.existsSync(path.join(rootDir, 'studio', '.dockerignore'));\n10 |     const nextConfigContent = fs.readFileSync(path.join(rootDir, 'studio', 'next.config.ts'), 'utf8');\n11 |     const hasStandalone = nextConfigContent.includes('standalone');\n12 | \n13 |     expect(studioDockerignoreExists).toBe(true);\n                                          ^\nerror: expect(received).toBe(expected)\n\nExpected: true\nReceived: false\n\n      at <anonymous> (/Users/deast/repos/davideast/tts-flash/test/regression/packaging-and-docker-hermeticity.test.ts:13:38)\n(fail) Packaging, Subpath Export Maps & Container Hermeticity (Insights 4ffb88f5, 3f0ffec0, 59cd7e9f, c12fc3d4) > Studio container and build configuration must be hermetic and standalone-enabled [0.77ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [15.00ms]"
+  },
+  "verification": {
+    "oracleType": "command",
+    "oracle": "`VERIFY_ORACLE=1 bun test test/regression/packaging-and-docker-hermeticity.test.ts` exits 0.",
+    "summary": "`VERIFY_ORACLE=1 bun test test/regression/packaging-and-docker-hermeticity.test.ts` exited 0",
+    "changedFiles": [
+      {
+        "path": "studio/.dockerignore",
+        "lines": 7
+      },
+      {
+        "path": "studio/next.config.ts",
+        "lines": 1
+      }
+    ],
+    "diffLines": 8,
+    "diffFingerprint": "62a6cfd543856955ba0bdd81d9ae744d1cedfba219ec0465295ab54a9139d41a"
+  },
+  "review": {
+    "reviewer": "ledger-reviewer",
+    "note": null,
+    "checklist": [
+      "studio/.dockerignore excludes node_modules, .next, and secrets",
+      "studio/next.config.ts specifies output: 'standalone'",
+      "Production builds remain hermetic and isolated from local build artifacts"
+    ],
+    "rejectionsBeforeApproval": []
+  }
+}

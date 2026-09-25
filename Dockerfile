@@ -51,14 +51,13 @@ FROM node:22-slim AS runner
 WORKDIR /workspace/studio
 ENV NODE_ENV=production \
     PORT=8080 \
+    HOSTNAME=0.0.0.0 \
     FIREBASE_PROJECT_ID=mdmedia-dev \
     FIREBASE_STORAGE_BUCKET=mdmedia-dev.firebasestorage.app
 EXPOSE 8080
 
-COPY --from=studio-build /workspace/studio/package.json ./package.json
-COPY --from=studio-build /workspace/studio/node_modules ./node_modules
-COPY --from=studio-build /workspace/studio/.next ./.next
 COPY --from=studio-build /workspace/studio/public ./public
-COPY --from=studio-build /workspace/studio/next.config.ts ./next.config.ts
+COPY --from=studio-build /workspace/studio/.next/standalone ./
+COPY --from=studio-build /workspace/studio/.next/static ./.next/static
 
-CMD ["npx", "next", "start", "-p", "8080"]
+CMD ["node", "server.js"]

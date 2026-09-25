@@ -1,0 +1,46 @@
+{
+  "$schema": "../rules.json",
+  "id": "hermetic-studio-dockerignore-and-standalone",
+  "title": "Establish scoped studio/.dockerignore and enable Next.js standalone tracing",
+  "screenshot": "n/a",
+  "rule": "HERMETIC_DEPLOY_BUILD",
+  "tier": "fast",
+  "dependsOn": [],
+  "target": {
+    "file": "studio/next.config.ts",
+    "secondaryFile": "studio/.dockerignore",
+    "enclosingSymbol": "nextConfig",
+    "anchor": {
+      "contextBefore": "const nextConfig: NextConfig = {",
+      "targetSnippet": "const nextConfig: NextConfig = {",
+      "contextAfter": "async redirects() {"
+    }
+  },
+  "violation": {
+    "problem": "studio/.dockerignore is missing, allowing host node_modules and local artifacts to bleed into container builds when initiated from studio/. Furthermore, studio/next.config.ts lacks output: 'standalone', forcing Dockerfile to copy full node_modules into the runtime container.",
+    "expectedSolution": "Add studio/.dockerignore excluding node_modules, .next, and secrets, and configure output: 'standalone' in studio/next.config.ts."
+  },
+  "steps": [
+    "Create studio/.dockerignore containing node_modules, .next, .env*, and build caches.",
+    "In studio/next.config.ts, add output: 'standalone' to the nextConfig object."
+  ],
+  "scope": {
+    "allowedFiles": [
+      "studio/next.config.ts",
+      "studio/.dockerignore"
+    ],
+    "lockedFiles": [
+      "test/regression/packaging-and-docker-hermeticity.test.ts"
+    ],
+    "maxDiffLines": 30
+  },
+  "oracle": {
+    "type": "command",
+    "command": "VERIFY_ORACLE=1 bun test test/regression/packaging-and-docker-hermeticity.test.ts"
+  },
+  "reviewChecklist": [
+    "studio/.dockerignore excludes node_modules, .next, and secrets",
+    "studio/next.config.ts specifies output: 'standalone'",
+    "Production builds remain hermetic and isolated from local build artifacts"
+  ]
+}
