@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   async redirects() {
     return [
       {
