@@ -19,4 +19,5 @@ examples/
 .env*.local
 .dev.pid
 .dev.log
+studio/.firebase/
 
