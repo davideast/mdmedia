@@ -82,6 +82,7 @@ async function verifyPackagingAndConsumerHarness() {
 import * as root from 'mdmedia';
 import * as audio from 'mdmedia/audio';
 import * as video from 'mdmedia/video';
+import * as music from 'mdmedia/music';
 import * as chunker from 'mdmedia/chunker';
 import * as pipeline from 'mdmedia/pipeline';
 import * as config from 'mdmedia/config';
@@ -94,6 +95,7 @@ if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdme
 if (!audio.extractWordTimingsFromPcm) throw new Error('Missing extractWordTimingsFromPcm in mdmedia/audio');
 if (!audio.getActiveWordAtPosition) throw new Error('Missing getActiveWordAtPosition in mdmedia/audio');
 if (!video.GeminiOmniVideoProvider) throw new Error('Missing GeminiOmniVideoProvider in mdmedia/video');
+if (!music.LyriaMusicProvider) throw new Error('Missing LyriaMusicProvider in mdmedia/music');
 if (!chunker.prepareDocumentChunks) throw new Error('Missing prepareDocumentChunks in mdmedia/chunker');
 if (!chunker.mapChunkToMarkdown) throw new Error('Missing mapChunkToMarkdown in mdmedia/chunker');
 if (!pipeline.UniversalEventBus) throw new Error('Missing UniversalEventBus in mdmedia/pipeline');
@@ -135,6 +137,7 @@ import type { DocumentHighlight } from 'mdmedia/chunker';
 import type { VoiceName } from 'mdmedia/types';
 import type { DocumentChunk, IFileReader, PipelineEventMap, SynthesisOptions } from 'mdmedia/types';
 import type { GenerateVideoOptions } from 'mdmedia/video';
+import type { GenerateMusicOptions } from 'mdmedia/music';
 import type { StudioState } from 'mdmedia/studio';
 import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
 import type { WordHighlight } from 'mdmedia/audio';

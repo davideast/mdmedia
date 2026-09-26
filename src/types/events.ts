@@ -39,6 +39,20 @@ export interface VideoPipelineCompletedEvent {
   totalBytesGenerated: number;
 }
 
+export interface MusicGenerationStartedEvent {
+  prompt: string;
+}
+
+export interface MusicGenerationCompletedEvent {
+  interactionId: string;
+  audioBytes: Uint8Array;
+  lyrics?: string;
+}
+
+export interface MusicPipelineCompletedEvent {
+  totalBytesGenerated: number;
+}
+
 export type PipelineEventMap = {
   'pipeline:start': PipelineStartedEvent;
   'chunk:start': ChunkStartedEvent;
@@ -49,4 +63,8 @@ export type PipelineEventMap = {
   'scene:start': SceneStartedEvent;
   'scene:complete': SceneCompletedEvent;
   'video:pipeline:complete': VideoPipelineCompletedEvent;
+  'music:start': MusicGenerationStartedEvent;
+  'music:complete': MusicGenerationCompletedEvent;
+  'music:pipeline:complete': MusicPipelineCompletedEvent;
 };
+

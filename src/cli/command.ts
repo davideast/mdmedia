@@ -2,7 +2,7 @@ import { defineCommand } from 'citty';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration } from './runner.js';
+import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration, runMusicGeneration } from './runner.js';
 import type { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
 import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 
@@ -468,16 +468,108 @@ export const imageCommand = defineCommand({
   },
 });
 
+export const musicCommand = defineCommand({
+  meta: {
+    name: 'music',
+    description: 'Generate music and songs from text prompts via Lyria 3.5',
+  },
+  args: {
+    prompt: {
+      type: 'string',
+      alias: 'p',
+      description: 'Text prompt describing the music to generate',
+    },
+    input: {
+      type: 'string',
+      alias: 'i',
+      description: 'Path to input markdown (.md) file with song prompt/lyrics',
+    },
+    output: {
+      type: 'string',
+      alias: 'o',
+      description: 'Path for output audio file (.mp3 or .wav)',
+      default: 'output.mp3',
+    },
+    model: {
+      type: 'string',
+      alias: 'm',
+      description: 'Lyria model name (lyria-3.5 or lyria-3-clip-preview)',
+    },
+    clip: {
+      type: 'boolean',
+      description: 'Use Lyria 3 Clip model for a 30-second preview clip',
+      default: false,
+    },
+    format: {
+      type: 'string',
+      alias: 'f',
+      description: 'Output format (mp3 or wav)',
+    },
+    ref: {
+      type: 'string',
+      alias: 'r',
+      description: 'Comma-separated reference image paths for image-inspired music',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'Gemini API Key',
+    },
+    maxRetries: {
+      type: 'string',
+      description: 'Max retry attempts for API calls',
+    },
+    verbose: {
+      type: 'boolean',
+      description: 'Enable verbose logging',
+      default: false,
+    },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const referenceImages = args.ref
+      ? args.ref.split(',').map((s) => s.trim())
+      : undefined;
+
+    const effectiveModel = args.clip ? 'lyria-3-clip-preview' : args.model;
+
+    const resolved = resolveConfig(
+      {
+        mode: 'music',
+        musicModel: effectiveModel,
+        outputFormat: args.format as 'mp3' | 'wav' | undefined,
+        musicReferenceImages: referenceImages,
+        apiKey: args.apiKey,
+        maxRetries: args.maxRetries ? Number(args.maxRetries) : undefined,
+      },
+      fileConfig
+    );
+
+    await runMusicGeneration({
+      prompt: args.prompt,
+      input: args.input,
+      output: args.output,
+      model: resolved.music.model,
+      outputFormat: resolved.music.outputFormat,
+      referenceImages: resolved.music.referenceImages,
+      apiKey: resolved.apiKey,
+      maxRetries: resolved.maxRetries,
+      verbose: args.verbose,
+    });
+  },
+});
+
 export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: '0.1.0',
-    description: 'Transform markdown documents into rich audio, video, and image media via Gemini Flash 3.1 & Gemini Omni Flash',
+    description: 'Transform markdown documents into rich audio, video, and music media via Gemini Flash 3.1, Gemini Omni Flash, and Lyria 3.5',
   },
   subCommands: {
     audio: audioCommand,
     video: videoCommand,
     image: imageCommand,
+    music: musicCommand,
     adapt: adaptCommand,
     watch: watchCommand,
     studio: studioCommand,

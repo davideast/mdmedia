@@ -196,3 +196,58 @@ export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<
     );
   }
 }
+
+export interface RunMusicGenerationArgs {
+  prompt?: string;
+  input?: string;
+  output: string;
+  model?: string;
+  outputFormat?: 'mp3' | 'wav';
+  referenceImages?: string[];
+  apiKey?: string;
+  maxRetries?: number;
+  verbose?: boolean;
+}
+
+export async function runMusicGeneration(args: RunMusicGenerationArgs): Promise<void> {
+  let prompt = args.prompt || '';
+  if (!prompt && args.input) {
+    const fileReader = new NodeFileReader();
+    prompt = await fileReader.readText(args.input);
+  }
+  if (!prompt) {
+    throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
+  }
+
+  const eventBus = new UniversalEventBus();
+  const progressLogger = new ProgressLogger(args.verbose);
+  progressLogger.attach(eventBus);
+
+  const apiKey = args.apiKey ?? new NodeEnvProvider().getApiKey();
+  const genaiClient = apiKey
+    ? new GoogleGenAI({ apiKey })
+    : createGeminiClient(new NodeEnvProvider());
+
+  const { LyriaMusicProvider } = await import('../music/lyria-music-provider.js');
+  const { DocumentMusicPipeline } = await import('../pipeline/document-music-pipeline.js');
+  const { NodeMusicFileWriter } = await import('../music/music-file-writer.js');
+
+  const musicProvider = new LyriaMusicProvider(genaiClient, args.maxRetries, args.model);
+  const pipeline = new DocumentMusicPipeline(musicProvider, eventBus);
+
+  const result = await pipeline.generate(prompt, {
+    model: args.model,
+    outputFormat: args.outputFormat,
+    referenceImages: args.referenceImages,
+  });
+
+  const fileWriter = new NodeMusicFileWriter();
+  await fileWriter.writeMusicFile(args.output, result.audioBytes);
+
+  const sizeKb = (result.audioBytes.byteLength / 1024).toFixed(1);
+  console.log(`[Success] Music file created at: ${args.output} (${sizeKb} KB)`);
+  if (result.lyrics) {
+    console.log(`\n[Lyrics]\n${result.lyrics}`);
+  }
+}
+

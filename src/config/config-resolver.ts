@@ -1,6 +1,6 @@
 import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
-import type { AudioConfig, MdMediaConfig, NarrationConfig, VideoConfig } from './file-config.js';
+import type { AudioConfig, MdMediaConfig, MusicConfig, NarrationConfig, VideoConfig } from './file-config.js';
 
 export interface ResolvedAudioConfig {
   readonly voice: VoiceName;
@@ -24,10 +24,17 @@ export interface ResolvedNarrationConfig {
   readonly model: string;
 }
 
+export interface ResolvedMusicConfig {
+  readonly model: string;
+  readonly outputFormat: 'mp3' | 'wav';
+  readonly referenceImages?: string[];
+}
+
 export interface ResolvedConfig {
   readonly mode: MediaType;
   readonly audio: ResolvedAudioConfig;
   readonly video: ResolvedVideoConfig;
+  readonly music: ResolvedMusicConfig;
   readonly narration: ResolvedNarrationConfig;
   readonly maxChars: number;
   readonly maxRetries: number;
@@ -49,6 +56,9 @@ export interface CLIArgs {
   referenceImages?: string[];
   firstFrame?: string;
   previousInteractionId?: string;
+  musicModel?: string;
+  outputFormat?: 'mp3' | 'wav';
+  musicReferenceImages?: string[];
   maxChars?: number;
   maxRetries?: number;
   apiKey?: string;
@@ -63,6 +73,7 @@ export function resolveConfig(
 
   const audioConfig: AudioConfig = fileConfig.audio ?? {};
   const videoConfig: VideoConfig = fileConfig.video ?? {};
+  const musicConfig: MusicConfig = fileConfig.music ?? {};
   const narrationConfig: NarrationConfig = fileConfig.narration ?? {};
 
   const resolvedAudio: ResolvedAudioConfig = {
@@ -82,6 +93,12 @@ export function resolveConfig(
     previousInteractionId: cliArgs.previousInteractionId ?? videoConfig.previousInteractionId,
   };
 
+  const resolvedMusic: ResolvedMusicConfig = {
+    model: cliArgs.musicModel ?? musicConfig.model ?? 'lyria-3.5',
+    outputFormat: cliArgs.outputFormat ?? musicConfig.outputFormat ?? 'mp3',
+    referenceImages: cliArgs.musicReferenceImages ?? musicConfig.referenceImages,
+  };
+
   const resolvedNarration: ResolvedNarrationConfig = {
     enabled: cliArgs.narration ?? narrationConfig.enabled ?? false,
     model: cliArgs.narrationModel ?? narrationConfig.model ?? 'gemini-3.5-flash-lite',
@@ -91,6 +108,7 @@ export function resolveConfig(
     mode,
     audio: resolvedAudio,
     video: resolvedVideo,
+    music: resolvedMusic,
     narration: resolvedNarration,
     maxChars: cliArgs.maxChars ?? fileConfig.maxChars ?? 400,
     maxRetries: cliArgs.maxRetries ?? fileConfig.maxRetries ?? 3,
