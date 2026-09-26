@@ -1,7 +1,7 @@
 {
   "name": "mdmedia",
   "version": "0.1.0",
-  "description": "Convert markdown documents into rich audio and video media via Gemini Flash 3.1 TTS and Gemini Omni Flash",
+  "description": "Convert markdown documents into rich audio, video, and music media via Gemini Flash 3.1 TTS, Gemini Omni Flash, and Lyria 3.5",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,6 +17,10 @@
     "./video": {
       "types": "./dist/video/index.d.ts",
       "import": "./dist/video/index.js"
+    },
+    "./music": {
+      "types": "./dist/music/index.d.ts",
+      "import": "./dist/music/index.js"
     },
     "./chunker": {
       "types": "./dist/chunker/index.d.ts",

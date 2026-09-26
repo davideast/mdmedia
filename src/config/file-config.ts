@@ -23,10 +23,17 @@ export interface NarrationConfig {
   readonly model?: string;
 }
 
+export interface MusicConfig {
+  readonly model?: string;
+  readonly outputFormat?: 'mp3' | 'wav';
+  readonly referenceImages?: string[];
+}
+
 export interface MdMediaConfig {
   readonly mode?: MediaType;
   readonly audio?: AudioConfig;
   readonly video?: VideoConfig;
+  readonly music?: MusicConfig;
   readonly narration?: NarrationConfig;
   readonly maxChars?: number;
   readonly maxRetries?: number;
