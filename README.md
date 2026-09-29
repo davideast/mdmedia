@@ -36,14 +36,15 @@ mdmedia audio -i article.md -v Fenrir -s "Read in an energetic, engaging tone su
 
 #### ElevenLabs narration
 
-Set an [ElevenLabs API key](https://elevenlabs.io/docs/api-reference/text-to-speech/stream) and use a voice ID from your ElevenLabs account:
+Set an [ElevenLabs API key](https://elevenlabs.io/docs/api-reference/text-to-speech/stream), then use a voice name from your account:
 
 ```bash
 export ELEVENLABS_API_KEY=your_key
-mdmedia audio -i article.md -o article.wav --provider elevenlabs --voice JBFqnCBsd6RMkjVDRZzb
+mdmedia voices --search George
+mdmedia audio -i article.md -o article.wav --provider elevenlabs --voice George
 ```
 
-ElevenLabs audio is requested as 24 kHz PCM, so the same WAV output and live playback work. `--style` accepts Gemini delivery notes only; ElevenLabs rejects a free-form delivery note rather than speaking it. `--narration` script rewriting still requires `GEMINI_API_KEY`.
+Voice names are resolved through ElevenLabs' voice list and require an API key with `voices_read` permission. A TTS-only key can still use a voice ID directly, for example `--voice JBFqnCBsd6RMkjVDRZzb` (George). `mdmedia voices` lists available names and IDs; duplicate names must be selected by ID. ElevenLabs audio is requested as 24 kHz PCM, so the same WAV output and live playback work. `--style` accepts Gemini delivery notes only; ElevenLabs rejects a free-form delivery note rather than speaking it. `--narration` script rewriting still requires `GEMINI_API_KEY`.
 
 ---
 
@@ -109,7 +110,7 @@ If `.mdmedia.json` exists in the working directory, options are loaded automatic
 }
 ```
 
-For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice ID, and optionally `audio.model` (default: `eleven_multilingual_v2`). You can put its key in `audio.apiKey` or `ELEVENLABS_API_KEY`. A Gemini `audio.model`, voice, or style from the file is ignored when `--provider elevenlabs` overrides a Gemini file configuration.
+For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice name or ID, and optionally `audio.model` (default: `eleven_multilingual_v2`). You can put its key in `audio.apiKey` or `ELEVENLABS_API_KEY`. `ELEVENLABS_VOICE` supplies a default name or ID; the existing `ELEVENLABS_VOICE_ID` also works. A Gemini `audio.model`, voice, or style from the file is ignored when `--provider elevenlabs` overrides a Gemini file configuration.
 
 ---
 
@@ -122,7 +123,7 @@ For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice
 | `--input` | `-i` | *(required)* | Path to source `.md` file |
 | `--output` | `-o` | `output.wav` | Destination path for audio file |
 | `--provider` | | `gemini` | `gemini` or `elevenlabs` |
-| `--voice` | `-v` | `Kore` for Gemini | Gemini voice name or required ElevenLabs voice ID (can use `ELEVENLABS_VOICE_ID`) |
+| `--voice` | `-v` | `Kore` for Gemini | Gemini voice name or ElevenLabs voice name/ID (can use `ELEVENLABS_VOICE`) |
 | `--style` | `-s` | `undefined` | Gemini delivery note; unsupported with ElevenLabs |
 | `--play` | `-p` | `false` | Play audio in real-time through speakers as chunks stream |
 | `--maxChars` | `-c` | `400` | Target character threshold for sentence-boundary chunk splits |
@@ -169,14 +170,17 @@ const pipeline = new DocumentAudioPipeline(provider, eventBus);
 await pipeline.processDocument(chunks, 'Puck', 'Clear documentary cadence');
 ```
 
-For ElevenLabs, use the `chunks` and `eventBus` from the example above and create the provider through the selection interface. Set `ELEVENLABS_API_KEY` first:
+For ElevenLabs, a TypeScript caller can produce a WAV without setting up the PCM pipeline directly. Set `ELEVENLABS_API_KEY` first:
 
 ```typescript
-import { createTTSProvider } from 'mdmedia/tts';
+import { runAudioSynthesis } from 'mdmedia';
 
-const provider = createTTSProvider({ provider: 'elevenlabs' });
-const pipeline = new DocumentAudioPipeline(provider, eventBus);
-await pipeline.processDocument(chunks, 'JBFqnCBsd6RMkjVDRZzb');
+await runAudioSynthesis({
+  input: 'document.md',
+  output: 'output.wav',
+  provider: 'elevenlabs',
+  voice: 'George',
+});
 ```
 
 ### Video Generation

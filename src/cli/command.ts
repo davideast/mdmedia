@@ -4,7 +4,8 @@ import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration, runMusicGeneration } from './runner.js';
 import type { ITTSProvider } from '../tts/tts-provider.interface.js';
-import { createTTSProvider } from '../tts/provider-registry.js';
+import { createTTSProvider, resolveTTSSelection } from '../tts/provider-registry.js';
+import { ElevenLabsVoiceCatalog } from '../tts/elevenlabs-voices.js';
 import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 
 export const audioCommand = defineCommand({
@@ -32,7 +33,7 @@ export const audioCommand = defineCommand({
     voice: {
       type: 'string',
       alias: 'v',
-      description: 'Gemini voice name or ElevenLabs voice ID',
+      description: 'Gemini voice name or ElevenLabs voice name/ID',
     },
     style: {
       type: 'string',
@@ -114,6 +115,39 @@ export const audioCommand = defineCommand({
       narration: resolved.narration.enabled,
       narrationModel: resolved.narration.model,
     });
+  },
+});
+
+export const voicesCommand = defineCommand({
+  meta: {
+    name: 'voices',
+    description: 'List ElevenLabs voice names and IDs available to your API key',
+  },
+  args: {
+    search: {
+      type: 'string',
+      alias: 's',
+      description: 'Filter ElevenLabs voices by name or description',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'ElevenLabs API key (defaults to ELEVENLABS_API_KEY)',
+    },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const selection = resolveTTSSelection({
+      requested: { provider: 'elevenlabs', apiKey: args.apiKey },
+      configured: fileConfig.audio,
+      env: process.env,
+    });
+    const voices = await new ElevenLabsVoiceCatalog(selection.apiKey ?? '').list(args.search);
+    if (voices.length === 0) {
+      console.log('No ElevenLabs voices found.');
+      return;
+    }
+    for (const voice of voices) console.log(`${voice.name}\t${voice.id}`);
   },
 });
 
@@ -230,7 +264,7 @@ export const watchCommand = defineCommand({
     voice: {
       type: 'string',
       alias: 'v',
-      description: 'Gemini voice name or ElevenLabs voice ID',
+      description: 'Gemini voice name or ElevenLabs voice name/ID',
     },
     style: {
       type: 'string',
@@ -580,10 +614,11 @@ export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: '0.1.0',
-    description: 'Transform markdown documents into rich audio, video, and music media via Gemini Flash 3.1, Gemini Omni Flash, and Lyria 3.5',
+    description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, and music with Lyria',
   },
   subCommands: {
     audio: audioCommand,
+    voices: voicesCommand,
     video: videoCommand,
     image: imageCommand,
     music: musicCommand,

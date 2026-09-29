@@ -8,7 +8,7 @@ describe('ElevenLabs narration', () => {
     const resolved = resolveConfig(
       { mode: 'audio', audioProvider: 'ElevenLabs' },
       { apiKey: 'gemini-file-key', audio: { voice: 'Puck', model: 'gemini-file-model' } },
-      { ELEVENLABS_API_KEY: 'eleven-key', ELEVENLABS_VOICE_ID: 'eleven-voice' }
+      { ELEVENLABS_API_KEY: 'eleven-key', ELEVENLABS_VOICE_ID: 'JBFqnCBsd6RMkjVDRZzb' }
     );
     let requestOptions: RequestInit | undefined;
     const provider = createTTSProvider({
@@ -26,14 +26,14 @@ describe('ElevenLabs narration', () => {
     }
 
     expect(resolved.audio.provider).toBe('elevenlabs');
-    expect(resolved.audio.voice).toBe('eleven-voice');
+    expect(resolved.audio.voice).toBe('JBFqnCBsd6RMkjVDRZzb');
     expect(resolved.apiKey).toBe('eleven-key');
     expect(JSON.parse(String(requestOptions?.body)).model_id).toBe('eleven_multilingual_v2');
   });
 
   it('rejects unusable voice and style at provider creation', () => {
     expect(() => createTTSProvider({ provider: 'elevenlabs', apiKey: 'key', voice: '' }))
-      .toThrow('An ElevenLabs voice ID is required.');
+      .toThrow('An ElevenLabs voice name or ID is required.');
     expect(() => createTTSProvider({ provider: 'elevenlabs', apiKey: 'key', voice: 'id', style: 'gentle' }))
       .toThrow('Free-form --style delivery notes are not supported by ElevenLabs TTS.');
   });
@@ -63,13 +63,13 @@ describe('ElevenLabs narration', () => {
       request,
     });
     const chunks: Uint8Array[] = [];
-    for await (const chunk of provider.streamAudio('Read this paragraph.', 'voice-id')) {
+    for await (const chunk of provider.streamAudio('Read this paragraph.', 'JBFqnCBsd6RMkjVDRZzb')) {
       chunks.push(chunk);
     }
 
     expect(chunks).toEqual([Uint8Array.of(0, 0), Uint8Array.of(16, 0)]);
     expect(requestUrl).toBe(
-      'https://api.elevenlabs.io/v1/text-to-speech/voice-id/stream?output_format=pcm_24000'
+      'https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb/stream?output_format=pcm_24000'
     );
     expect(requestOptions?.method).toBe('POST');
     expect(requestOptions?.headers).toEqual({
@@ -97,7 +97,7 @@ describe('ElevenLabs narration', () => {
         })
       );
     const provider = new ElevenLabsTTSProvider('test-key', 0, undefined, request);
-    const stream = provider.streamAudio('Hello.', 'voice-id')[Symbol.asyncIterator]();
+    const stream = provider.streamAudio('Hello.', 'JBFqnCBsd6RMkjVDRZzb')[Symbol.asyncIterator]();
 
     expect((await stream.next()).value).toEqual(Uint8Array.of(0, 0));
     await stream.return?.();
@@ -109,7 +109,7 @@ describe('ElevenLabs narration', () => {
     const provider = new ElevenLabsTTSProvider('test-key', 0, undefined, request);
 
     const consume = async () => {
-      for await (const _ of provider.streamAudio('Hello.', 'voice-id')) {
+      for await (const _ of provider.streamAudio('Hello.', 'JBFqnCBsd6RMkjVDRZzb')) {
         // consume
       }
     };

@@ -62,7 +62,7 @@ export function resolveTTSSelection({
   const voice =
     requested.voice ??
     (switchedProvider ? undefined : configured.voice) ??
-    (provider === 'elevenlabs' ? env.ELEVENLABS_VOICE_ID ?? '' : 'Kore');
+    (provider === 'elevenlabs' ? env.ELEVENLABS_VOICE ?? env.ELEVENLABS_VOICE_ID ?? '' : 'Kore');
   const style = requested.style ?? (switchedProvider ? undefined : configured.style);
   const model =
     requested.model ??

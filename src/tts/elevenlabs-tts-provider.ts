@@ -1,5 +1,6 @@
 import type { VoiceName } from '../types/voice.js';
 import { calculateBackoffMs, delay } from './backoff.js';
+import { ElevenLabsVoiceCatalog } from './elevenlabs-voices.js';
 import type { ITTSProvider } from './tts-provider.interface.js';
 
 export const DEFAULT_ELEVENLABS_TTS_MODEL = 'eleven_multilingual_v2';
@@ -22,9 +23,14 @@ function isRetryable(error: unknown): boolean {
 
 /** Streams headerless 24 kHz, 16-bit mono PCM for the existing narration pipeline. */
 export class ElevenLabsTTSProvider implements ITTSProvider {
+  private readonly voiceCatalog: ElevenLabsVoiceCatalog;
+  private readonly voiceIds = new Map<string, Promise<string>>();
+
   static validateSelection(voice?: VoiceName, promptStyle?: string, requireVoice = false): void {
     if ((requireVoice || voice !== undefined) && !voice?.trim()) {
-      throw new Error('An ElevenLabs voice ID is required. Set --voice or ELEVENLABS_VOICE_ID.');
+      throw new Error(
+        'An ElevenLabs voice name or ID is required. Set --voice, ELEVENLABS_VOICE, or ELEVENLABS_VOICE_ID.'
+      );
     }
     if (promptStyle?.trim()) {
       throw new Error('Free-form --style delivery notes are not supported by ElevenLabs TTS.');
@@ -40,6 +46,19 @@ export class ElevenLabsTTSProvider implements ITTSProvider {
     if (!apiKey.trim()) {
       throw new Error('ELEVENLABS_API_KEY environment variable is required.');
     }
+    this.voiceCatalog = new ElevenLabsVoiceCatalog(apiKey, request);
+  }
+
+  private resolveVoiceId(voice: VoiceName): Promise<string> {
+    const reference = voice.trim();
+    const existing = this.voiceIds.get(reference);
+    if (existing) return existing;
+    const resolved = this.voiceCatalog.resolve(reference).catch((error) => {
+      this.voiceIds.delete(reference);
+      throw error;
+    });
+    this.voiceIds.set(reference, resolved);
+    return resolved;
   }
 
   async *streamAudio(
@@ -48,9 +67,10 @@ export class ElevenLabsTTSProvider implements ITTSProvider {
     promptStyle?: string
   ): AsyncIterable<Uint8Array> {
     ElevenLabsTTSProvider.validateSelection(voice, promptStyle, true);
+    const voiceId = await this.resolveVoiceId(voice);
 
     const url = new URL(
-      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}/stream`
+      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}/stream`
     );
     url.searchParams.set('output_format', 'pcm_24000');
 
