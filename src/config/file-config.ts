@@ -2,6 +2,8 @@ import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/m
 import type { VoiceName } from '../types/voice.js';
 
 export interface AudioConfig {
+  readonly provider?: string;
+  readonly apiKey?: string;
   readonly voice?: VoiceName;
   readonly style?: string;
   readonly model?: string;

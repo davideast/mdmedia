@@ -3,13 +3,15 @@ import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration, runMusicGeneration } from './runner.js';
-import type { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
+import type { ITTSProvider } from '../tts/tts-provider.interface.js';
+import { createTTSProvider, resolveTTSSelection } from '../tts/provider-registry.js';
+import { ElevenLabsVoiceCatalog } from '../tts/elevenlabs-voices.js';
 import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 
 export const audioCommand = defineCommand({
   meta: {
     name: 'audio',
-    description: 'Convert markdown documents into spoken audio narration via Gemini Flash 3.1 TTS',
+    description: 'Convert markdown documents into spoken audio narration via Gemini or ElevenLabs',
   },
   args: {
     input: {
@@ -24,15 +26,19 @@ export const audioCommand = defineCommand({
       description: 'Path for output audio (.wav) file',
       default: 'output.wav',
     },
+    provider: {
+      type: 'string',
+      description: 'TTS provider (gemini or elevenlabs)',
+    },
     voice: {
       type: 'string',
       alias: 'v',
-      description: 'Gemini TTS voice name (e.g. Kore, Puck, Zephyr)',
+      description: 'Gemini voice name or ElevenLabs voice name/ID',
     },
     style: {
       type: 'string',
       alias: 's',
-      description: 'Director notes / style prompt for speech delivery',
+      description: 'Gemini delivery note (not supported with ElevenLabs)',
     },
     maxChars: {
       type: 'string',
@@ -42,12 +48,12 @@ export const audioCommand = defineCommand({
     model: {
       type: 'string',
       alias: 'm',
-      description: 'Gemini TTS model name',
+      description: 'Model name for the selected TTS provider',
     },
     apiKey: {
       type: 'string',
       alias: 'k',
-      description: 'Gemini API Key',
+      description: 'API key for the selected TTS provider',
     },
     maxRetries: {
       type: 'string',
@@ -80,6 +86,7 @@ export const audioCommand = defineCommand({
     const resolved = resolveConfig(
       {
         mode: 'audio',
+        audioProvider: args.provider,
         voice: args.voice as VoiceName | undefined,
         style: args.style,
         audioModel: args.model,
@@ -96,6 +103,7 @@ export const audioCommand = defineCommand({
     await runAudioSynthesis({
       input: args.input,
       output: args.output,
+      provider: resolved.audio.provider,
       voice: resolved.audio.voice,
       style: resolved.audio.style,
       maxChars: resolved.maxChars,
@@ -107,6 +115,39 @@ export const audioCommand = defineCommand({
       narration: resolved.narration.enabled,
       narrationModel: resolved.narration.model,
     });
+  },
+});
+
+export const voicesCommand = defineCommand({
+  meta: {
+    name: 'voices',
+    description: 'List ElevenLabs voice names and IDs available to your API key',
+  },
+  args: {
+    search: {
+      type: 'string',
+      alias: 's',
+      description: 'Filter ElevenLabs voices by name or description',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'ElevenLabs API key (defaults to ELEVENLABS_API_KEY)',
+    },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const selection = resolveTTSSelection({
+      requested: { provider: 'elevenlabs', apiKey: args.apiKey },
+      configured: fileConfig.audio,
+      env: process.env,
+    });
+    const voices = await new ElevenLabsVoiceCatalog(selection.apiKey ?? '').list(args.search);
+    if (voices.length === 0) {
+      console.log('No ElevenLabs voices found.');
+      return;
+    }
+    for (const voice of voices) console.log(`${voice.name}\t${voice.id}`);
   },
 });
 
@@ -223,14 +264,12 @@ export const watchCommand = defineCommand({
     voice: {
       type: 'string',
       alias: 'v',
-      description: 'Gemini TTS voice name (e.g. Puck, Kore, Fenrir)',
-      default: 'Puck',
+      description: 'Gemini voice name or ElevenLabs voice name/ID',
     },
     style: {
       type: 'string',
       alias: 's',
-      description: 'Delivery style prompt',
-      default: 'Clear, concise engineering assistant narration.',
+      description: 'Gemini delivery note',
     },
   },
   async run({ args }) {
@@ -239,7 +278,7 @@ export const watchCommand = defineCommand({
     const { fileURLToPath } = await import('node:url');
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const scriptPath = path.join(__dirname, 'agy-watch.js');
-    spawn(process.execPath, [scriptPath, args.voice, args.style], {
+    spawn(process.execPath, [scriptPath, args.voice ?? '', args.style ?? ''], {
       stdio: 'inherit',
       env: process.env,
     });
@@ -274,32 +313,44 @@ export const studioCommand = defineCommand({
   async run() {
     const { startStudioTui } = await import('../tui/app.js');
     const { loadConfigFile } = await import('../config/config-loader.js');
+    const { resolveConfig } = await import('../config/config-resolver.js');
     const { GoogleGenAI } = await import('@google/genai');
-    const { GeminiTTSProvider } = await import('../tts/gemini-tts-provider.js');
     const { GeminiNarrationAdapter } = await import('../narration/gemini-narration-adapter.js');
     const { StudioStore } = await import('../studio/studio-store.js');
     const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
 
     const fileConfig = await loadConfigFile(process.cwd());
-    const apiKey = getGeminiApiKey();
-    let provider: GeminiTTSProvider | undefined;
+    const geminiApiKey = getGeminiApiKey();
+    const resolved = resolveConfig(
+      { mode: 'audio' },
+      fileConfig,
+      { ...process.env, GEMINI_API_KEY: geminiApiKey }
+    );
+    let provider: ITTSProvider | undefined;
     let narrationAdapter: GeminiNarrationAdapter | undefined;
 
-    if (apiKey) {
-      const client = new GoogleGenAI({ apiKey });
-      provider = new GeminiTTSProvider(client);
-      if (fileConfig?.narration?.enabled) {
-        narrationAdapter = new GeminiNarrationAdapter(client, {
-          model: fileConfig.narration.model,
-        });
-      }
+    if (resolved.apiKey) {
+      provider = createTTSProvider({
+        provider: resolved.audio.provider,
+        apiKey: resolved.apiKey,
+        model: resolved.audio.model,
+        voice: resolved.audio.voice,
+        style: resolved.audio.style,
+        maxRetries: resolved.maxRetries,
+      });
+    }
+    if (fileConfig?.narration?.enabled && geminiApiKey) {
+      narrationAdapter = new GeminiNarrationAdapter(new GoogleGenAI({ apiKey: geminiApiKey }), {
+        model: fileConfig.narration.model,
+      });
     }
 
     const store = new StudioStore({
       ttsProvider: provider,
       narrationAdapter,
       enableLiveAudio: true,
-      defaultVoice: fileConfig?.audio?.voice,
+      defaultVoice: resolved.audio.voice,
+      defaultStyle: resolved.audio.style,
     });
 
     await startStudioTui(store);
@@ -563,10 +614,11 @@ export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: '0.1.0',
-    description: 'Transform markdown documents into rich audio, video, and music media via Gemini Flash 3.1, Gemini Omni Flash, and Lyria 3.5',
+    description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, and music with Lyria',
   },
   subCommands: {
     audio: audioCommand,
+    voices: voicesCommand,
     video: videoCommand,
     image: imageCommand,
     music: musicCommand,
@@ -576,5 +628,3 @@ export const mainCommand = defineCommand({
     plugin: pluginCommand,
   },
 });
-
-

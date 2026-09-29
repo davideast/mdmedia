@@ -15,10 +15,11 @@ import {
   UniversalEventBus,
 } from '../pipeline/index.js';
 import {
-  GeminiTTSProvider,
   NodeEnvProvider,
   createGeminiClient,
+  createTTSProvider,
 } from '../tts/index.js';
+import { normalizeTTSProviderName } from '../tts/provider-name.js';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import {
@@ -30,6 +31,7 @@ import { ProgressLogger } from './progress-logger.js';
 export interface RunAudioSynthesisArgs {
   input: string;
   output: string;
+  provider?: string;
   voice: VoiceName;
   style?: string;
   maxChars?: number;
@@ -95,11 +97,25 @@ export async function runNarrationAdaptation(args: RunNarrationAdaptationArgs): 
 }
 
 export async function runAudioSynthesis(args: RunAudioSynthesisArgs): Promise<void> {
+  const ttsProvider = createTTSProvider({
+    provider: args.provider,
+    apiKey: args.apiKey,
+    model: args.model,
+    voice: args.voice,
+    style: args.style,
+    maxRetries: args.maxRetries,
+  });
   const fileReader = new NodeFileReader();
   let rawMarkdown = await fileReader.readText(args.input);
 
   if (args.narration) {
-    const apiKey = args.apiKey ?? new NodeEnvProvider().getApiKey();
+    // Script adaptation still uses Gemini when ElevenLabs performs speech synthesis.
+    const ttsProviderName = normalizeTTSProviderName(
+      args.provider ?? process.env.MDMEDIA_TTS_PROVIDER ?? 'gemini'
+    );
+    const apiKey =
+      (ttsProviderName === 'gemini' ? args.apiKey : undefined) ??
+      new NodeEnvProvider().getApiKey();
     const genaiClient = apiKey
       ? new GoogleGenAI({ apiKey })
       : createGeminiClient(new NodeEnvProvider());
@@ -135,12 +151,6 @@ export async function runAudioSynthesis(args: RunAudioSynthesisArgs): Promise<vo
     livePlayerSink.attachToEventBus(eventBus);
   }
 
-  const apiKey = args.apiKey ?? new NodeEnvProvider().getApiKey();
-  const genaiClient = apiKey
-    ? new GoogleGenAI({ apiKey })
-    : createGeminiClient(new NodeEnvProvider());
-
-  const ttsProvider = new GeminiTTSProvider(genaiClient, args.maxRetries, args.model);
   const pipeline = new DocumentAudioPipeline(ttsProvider, eventBus);
 
   await pipeline.processDocument(chunks, args.voice, args.style);
@@ -250,4 +260,3 @@ export async function runMusicGeneration(args: RunMusicGenerationArgs): Promise<
     console.log(`\n[Lyrics]\n${result.lyrics}`);
   }
 }
-

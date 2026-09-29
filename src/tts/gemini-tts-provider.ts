@@ -4,11 +4,13 @@ import { base64ToUint8Array } from './base64-to-uint8array.js';
 import type { ITTSProvider } from './tts-provider.interface.js';
 import { delay, calculateBackoffMs } from './backoff.js';
 
+export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-3.1-flash-tts-preview';
+
 export class GeminiTTSProvider implements ITTSProvider {
   constructor(
     private readonly client: GoogleGenAI,
     private readonly maxRetries = 3,
-    private readonly model = 'gemini-3.1-flash-tts-preview'
+    private readonly model = DEFAULT_GEMINI_TTS_MODEL
   ) {}
 
   async *streamAudio(

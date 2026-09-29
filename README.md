@@ -1,6 +1,6 @@
 # mdmedia
 
-Transform Markdown documents into rich audio and video media using Gemini's native multimodal generative models (**Gemini Flash 3.1 TTS** and **Gemini Omni Flash**).
+Transform Markdown documents into audio, video, and music. Audio narration supports **Gemini TTS** and **ElevenLabs Text to Speech**.
 
 ---
 
@@ -33,6 +33,18 @@ mdmedia audio -i article.md -o output.wav -v Puck --play
 ```bash
 mdmedia audio -i article.md -v Fenrir -s "Read in an energetic, engaging tone suitable for a tech podcast."
 ```
+
+#### ElevenLabs narration
+
+Set an [ElevenLabs API key](https://elevenlabs.io/docs/api-reference/text-to-speech/stream), then use a voice name from your account:
+
+```bash
+export ELEVENLABS_API_KEY=your_key
+mdmedia voices --search George
+mdmedia audio -i article.md -o article.wav --provider elevenlabs --voice George
+```
+
+Voice names are resolved through ElevenLabs' voice list and require an API key with `voices_read` permission. A TTS-only key can still use a voice ID directly, for example `--voice JBFqnCBsd6RMkjVDRZzb` (George). `mdmedia voices` lists available names and IDs; duplicate names must be selected by ID. ElevenLabs audio is requested as 24 kHz PCM, so the same WAV output and live playback work. `--style` accepts Gemini delivery notes only; ElevenLabs rejects a free-form delivery note rather than speaking it. `--narration` script rewriting still requires `GEMINI_API_KEY`.
 
 ---
 
@@ -74,13 +86,14 @@ mdmedia video -i edit-prompt.md -o edited.mp4 --interactionId v1_abc123
 If `.mdmedia.json` exists in the working directory, options are loaded automatically. Precedence:
 1. CLI flags
 2. `.mdmedia.json` file values
-3. Environment variables (`GEMINI_API_KEY`)
+3. Environment variables (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `MDMEDIA_TTS_PROVIDER`)
 4. Built-in defaults
 
 ```json
 {
   "mode": "audio",
   "audio": {
+    "provider": "gemini",
     "voice": "Puck",
     "style": "Speak clearly with an authoritative, calm cadence.",
     "model": "gemini-3.1-flash-tts-preview",
@@ -97,6 +110,8 @@ If `.mdmedia.json` exists in the working directory, options are loaded automatic
 }
 ```
 
+For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice name or ID, and optionally `audio.model` (default: `eleven_multilingual_v2`). You can put its key in `audio.apiKey` or `ELEVENLABS_API_KEY`. `ELEVENLABS_VOICE` supplies a default name or ID; the existing `ELEVENLABS_VOICE_ID` also works. A Gemini `audio.model`, voice, or style from the file is ignored when `--provider elevenlabs` overrides a Gemini file configuration.
+
 ---
 
 ## CLI Reference
@@ -107,11 +122,13 @@ If `.mdmedia.json` exists in the working directory, options are loaded automatic
 | :--- | :--- | :--- | :--- |
 | `--input` | `-i` | *(required)* | Path to source `.md` file |
 | `--output` | `-o` | `output.wav` | Destination path for audio file |
-| `--voice` | `-v` | `Kore` | Voice name (`Kore`, `Puck`, `Fenrir`, `Charon`, `Zephyr`, etc.) |
-| `--style` | `-s` | `undefined` | Prompt directing tone, pacing, or delivery |
+| `--provider` | | `gemini` | `gemini` or `elevenlabs` |
+| `--voice` | `-v` | `Kore` for Gemini | Gemini voice name or ElevenLabs voice name/ID (can use `ELEVENLABS_VOICE`) |
+| `--style` | `-s` | `undefined` | Gemini delivery note; unsupported with ElevenLabs |
 | `--play` | `-p` | `false` | Play audio in real-time through speakers as chunks stream |
 | `--maxChars` | `-c` | `400` | Target character threshold for sentence-boundary chunk splits |
-| `--model` | `-m` | `gemini-3.1-flash-tts-preview` | Gemini TTS model endpoint |
+| `--model` | `-m` | Provider default | Gemini or ElevenLabs TTS model ID |
+| `--apiKey` | `-k` | Provider environment key | Key for the selected TTS provider |
 
 ### `mdmedia video` Options
 
@@ -153,6 +170,19 @@ const pipeline = new DocumentAudioPipeline(provider, eventBus);
 await pipeline.processDocument(chunks, 'Puck', 'Clear documentary cadence');
 ```
 
+For ElevenLabs, a TypeScript caller can produce a WAV without setting up the PCM pipeline directly. Set `ELEVENLABS_API_KEY` first:
+
+```typescript
+import { runAudioSynthesis } from 'mdmedia';
+
+await runAudioSynthesis({
+  input: 'document.md',
+  output: 'output.wav',
+  provider: 'elevenlabs',
+  voice: 'George',
+});
+```
+
 ### Video Generation
 ```typescript
 import { GoogleGenAI } from '@google/genai';
@@ -183,7 +213,7 @@ await fileWriter.writeVideoFile('scene.mp4', results[0].videoBytes);
 
 ### Prerequisites
 - Node.js 18+ or Bun 1.0+
-- A Gemini API Key ([Google AI Studio](https://aistudio.google.com/))
+- A Gemini API key for Gemini generation or an ElevenLabs API key for ElevenLabs narration
 
 ### Global Installation
 ```bash

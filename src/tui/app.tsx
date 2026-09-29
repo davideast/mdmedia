@@ -3,8 +3,10 @@ import { useKeyboard, createRoot } from '@opentui/react';
 import { createCliRenderer } from '@opentui/core';
 import { StudioStore } from '../studio/studio-store.js';
 import { AntigravityWatcher, getGeminiApiKey } from '../studio/antigravity-watcher.js';
-import { GoogleGenAI } from '@google/genai';
-import { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
+import { createTTSProvider } from '../tts/provider-registry.js';
+import type { ITTSProvider } from '../tts/tts-provider.interface.js';
+import { loadConfigFile } from '../config/config-loader.js';
+import { resolveConfig } from '../config/config-resolver.js';
 import { useStudioStore } from './hooks/use-studio-store.js';
 import { HeaderBar } from './components/header-bar.js';
 import { LibraryPane } from './components/library-pane.js';
@@ -340,15 +342,28 @@ export function StudioApp({ store, onExit }: StudioAppProps) {
 export async function startStudioTui(store?: StudioStore): Promise<void> {
   let activeStore = store;
   if (!activeStore) {
-    let provider: GeminiTTSProvider | undefined;
-    const apiKey = getGeminiApiKey();
-    if (apiKey) {
-      const client = new GoogleGenAI({ apiKey });
-      provider = new GeminiTTSProvider(client);
+    let provider: ITTSProvider | undefined;
+    const fileConfig = await loadConfigFile(process.cwd());
+    const resolved = resolveConfig(
+      { mode: 'audio' },
+      fileConfig,
+      { ...process.env, GEMINI_API_KEY: getGeminiApiKey() }
+    );
+    if (resolved.apiKey) {
+      provider = createTTSProvider({
+        provider: resolved.audio.provider,
+        apiKey: resolved.apiKey,
+        model: resolved.audio.model,
+        voice: resolved.audio.voice,
+        style: resolved.audio.style,
+        maxRetries: resolved.maxRetries,
+      });
     }
     activeStore = new StudioStore({
       ttsProvider: provider,
       enableLiveAudio: true,
+      defaultVoice: resolved.audio.voice,
+      defaultStyle: resolved.audio.style,
     });
   }
 
