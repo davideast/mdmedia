@@ -377,7 +377,9 @@ export function createNarrationStream({
         sourceMarkdown: request.markdown,
         transcript: "",
         voice: request.voice,
-        model: request.model ?? DEFAULT_TTS_MODEL,
+        voiceProvider: request.voiceProvider,
+        voiceId: request.voiceId,
+        ...(request.model ? { model: request.model } : {}),
         promptStyle: request.promptStyle,
         adapted: request.rewriteForNarration,
         status: "streaming",
@@ -492,13 +494,16 @@ export function createNarrationStream({
         return;
       }
 
-      const selectedModel = request.model ?? DEFAULT_TTS_MODEL;
+      const selectedModel = request.voiceProvider === "gemini"
+        ? request.model ?? DEFAULT_TTS_MODEL
+        : undefined;
 
       queue.push({
         type: "meta",
         id,
         title,
         voice: request.voice,
+        voiceProvider: request.voiceProvider,
         model: selectedModel,
         speed: request.speed,
         verbalizeDiagrams: request.verbalizeDiagrams,
@@ -509,8 +514,11 @@ export function createNarrationStream({
 
       const bus = new UniversalEventBus();
       const ttsProvider = createTTSProvider({
-        provider: "gemini",
+        provider: request.voiceProvider,
         geminiClient: client,
+        apiKey: request.voiceProvider === "elevenlabs"
+          ? process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY
+          : undefined,
         maxRetries: 3,
         model: selectedModel,
       });
@@ -648,7 +656,11 @@ export function createNarrationStream({
           .catch(() => undefined);
       });
 
-      await pipeline.processDocument(documentChunks, request.voice, request.promptStyle);
+      await pipeline.processDocument(
+        documentChunks,
+        request.voiceId,
+        request.voiceProvider === "gemini" ? request.promptStyle : undefined,
+      );
       await checkpointChain;
 
       if (cancelled) {
@@ -662,6 +674,7 @@ export function createNarrationStream({
           {
             currentChunkIndex: currentProcessingChunkIndex,
             promptStyle: request.promptStyle,
+            voiceProvider: request.voiceProvider,
           }
         );
         await failDocument(classified);
@@ -692,6 +705,7 @@ export function createNarrationStream({
       const classified = classifyNarrationError(pipelineError ?? error, {
         currentChunkIndex: currentProcessingChunkIndex,
         promptStyle: request.promptStyle,
+        voiceProvider: request.voiceProvider,
       });
       await failDocument(classified);
       await discardObjects();

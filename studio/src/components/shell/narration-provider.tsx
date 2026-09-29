@@ -22,7 +22,7 @@ import {
   type Narration,
   type Playlist,
   type TTSModelName,
-  type VoiceName,
+  type VoiceChoice,
   type Visibility,
 } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
@@ -36,7 +36,7 @@ export type { GenerationJob, GenerationQueueState };
 
 export interface Draft {
   markdown: string;
-  voice: VoiceName;
+  voice: VoiceChoice;
   model: TTSModelName;
   promptStyle: string;
   rewriteForNarration: boolean;
@@ -175,7 +175,11 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   const draft = useMemo<Draft>(
     () => ({
       markdown: "",
-      voice: settings.defaultVoice,
+      voice: {
+        provider: settings.defaultVoiceProvider ?? "gemini",
+        id: settings.defaultVoiceId ?? settings.defaultVoice,
+        name: settings.defaultVoice,
+      },
       model: DEFAULT_TTS_MODEL,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,

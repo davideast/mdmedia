@@ -112,8 +112,8 @@ describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
       expect(narrationProvider).toContain("DEFAULT_TTS_MODEL");
     });
 
-    it("StudioPage passes draft.model to queueNarration", () => {
-      expect(studioPage).toContain("model: draft.model");
+    it("StudioPage passes the Gemini model only for Gemini voices", () => {
+      expect(studioPage).toContain('model: draft.voice.provider === "gemini" ? draft.model : undefined');
     });
 
     it("useGenerationQueue forwards model in job state and API payload", () => {

@@ -38,6 +38,7 @@ import {
   DEFAULT_HIGHLIGHT_COLOR,
   HIGHLIGHT_COLORS,
   MAX_SHARED_WITH,
+  VOICE_PROVIDER_LABEL,
   type HighlightColorId,
   type Narration,
   type Playlist,
@@ -584,7 +585,7 @@ export function NarrationSettings({
               <div className="grid min-w-0 gap-0.5">
                 <dt className="t-label">Voice</dt>
                 <dd className="truncate text-[0.85rem]" title={narration.voice}>
-                  {narration.voice}
+                  {narration.voice} <span className="text-ink-muted">· {VOICE_PROVIDER_LABEL[narration.voiceProvider ?? "gemini"]}</span>
                 </dd>
               </div>
               {narration.authorName ? (

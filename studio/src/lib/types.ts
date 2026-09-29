@@ -42,6 +42,30 @@ export const VOICES = [
 
 export type VoiceName = (typeof VOICES)[number] | (string & {});
 
+export type VoiceProvider = "gemini" | "elevenlabs";
+
+export const VOICE_PROVIDER_LABEL: Record<VoiceProvider, string> = {
+  gemini: "Gemini",
+  elevenlabs: "ElevenLabs",
+};
+
+export function isElevenLabsVoiceId(value: unknown): value is string {
+  return typeof value === "string" && /^[A-Za-z0-9]{20}$/.test(value);
+}
+
+/** The UI keeps the display name separate from the provider's stable identifier. */
+export interface VoiceChoice {
+  provider: VoiceProvider;
+  id: string;
+  name: string;
+}
+
+export const DAVID_EAST_VOICE: VoiceChoice = {
+  provider: "elevenlabs",
+  id: "wRBqiUImuos9q2tqnfBn",
+  name: "David East",
+};
+
 export const DEFAULT_VOICE: VoiceName = "Kore";
 
 /** Supported Gemini TTS models for audio generation. */
@@ -106,6 +130,8 @@ export interface Narration {
   /** What was actually spoken. The reader renders this. */
   transcript: string;
   voice: VoiceName;
+  voiceProvider?: VoiceProvider;
+  voiceId?: string;
   model?: TTSModelName;
   promptStyle: string;
   speed?: number;
@@ -220,6 +246,8 @@ export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structu
 
 export interface UserSettings {
   defaultVoice: VoiceName;
+  defaultVoiceProvider?: VoiceProvider;
+  defaultVoiceId?: string;
   defaultPromptStyle: string;
   /** Rewrite markdown for the ear before synthesis. */
   rewriteForNarration: boolean;
@@ -266,6 +294,7 @@ export interface StreamMetaEvent {
   id: string;
   title: string;
   voice: VoiceName;
+  voiceProvider?: VoiceProvider;
   model?: TTSModelName;
   totalChunks: number;
   totalChars: number;

@@ -1,3 +1,4 @@
+import { ElevenLabsVoiceCatalog } from "mdmedia/tts";
 import { verifyIdToken } from "@/lib/firebase-admin";
 import {
   claimNarrationId,
@@ -57,6 +58,25 @@ export async function POST(request: Request): Promise<Response> {
       { message: "Add some text and choose a voice before creating a narration." },
       { status: 400, headers: cors },
     );
+  }
+
+  if (parsed.voiceProvider === "elevenlabs") {
+    const apiKey = process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY;
+    if (!apiKey) {
+      return Response.json(
+        { message: "ElevenLabs narration is unavailable." },
+        { status: 503, headers: cors },
+      );
+    }
+    try {
+      const voice = await new ElevenLabsVoiceCatalog(apiKey).get(parsed.voiceId);
+      parsed.voice = voice.name;
+    } catch {
+      return Response.json(
+        { message: "That ElevenLabs voice is unavailable. Choose another voice." },
+        { status: 400, headers: cors },
+      );
+    }
   }
 
   const conflict = () =>

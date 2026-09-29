@@ -103,6 +103,7 @@ Never run Cloud Run under the default compute service account. Create a dedicate
 - `roles/datastore.user` on the project (for Admin SDK reads/writes on `allowlist`, `narrations`, `users`)
 - `roles/storage.objectAdmin` scoped to the narration Storage bucket
 - `roles/secretmanager.secretAccessor` scoped to the `GEMINI_API_KEY` secret
+- `roles/secretmanager.secretAccessor` scoped to the `ELEVENLABS_API_KEY` secret
 - `roles/firebaseauth.viewer` on the project (for `verifyIdToken` and `getUserByEmail` in `/api/users/resolve`)
 
 ### 2. Identity Platform & Blocking Functions
@@ -135,7 +136,7 @@ gcloud run deploy studio \
   --source . \
   --region us-central1 \
   --service-account studio-run@${PROJECT_ID}.iam.gserviceaccount.com \
-  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest \
+  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest,ELEVENLABS_API_KEY=ELEVENLABS_API_KEY:latest \
   --set-env-vars ALLOWED_WEB_ORIGINS=https://${PROJECT_ID}.web.app,https://${PROJECT_ID}.firebaseapp.com \
   --no-cpu-throttling \
   --timeout 900 \
@@ -145,4 +146,3 @@ gcloud run deploy studio \
 # 5. Deploy Firebase Hosting rewrite
 firebase deploy --only hosting
 ```
-

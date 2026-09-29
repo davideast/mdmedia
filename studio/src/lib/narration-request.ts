@@ -7,11 +7,13 @@
 
 import {
   DEFAULT_TTS_MODEL,
+  isElevenLabsVoiceId,
   TTS_MODELS,
   VOICES,
   type TTSModelName,
   type Visibility,
   type VoiceName,
+  type VoiceProvider,
 } from './types';
 
 /** The validated body of `POST /api/narrations`. */
@@ -19,6 +21,8 @@ export interface NarrationRequest {
   id?: string;
   markdown: string;
   voice: VoiceName;
+  voiceProvider: VoiceProvider;
+  voiceId: string;
   model?: TTSModelName;
   promptStyle: string;
   speed?: number;
@@ -52,7 +56,17 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   const raw = body as Record<string, unknown>;
   const markdown = typeof raw.markdown === 'string' ? raw.markdown : '';
   if (markdown.trim().length === 0) return null;
-  if (!isVoice(raw.voice)) return null;
+  const voiceProvider = raw.voiceProvider === undefined ? 'gemini' : raw.voiceProvider;
+  if (voiceProvider !== 'gemini' && voiceProvider !== 'elevenlabs') return null;
+  const elevenLabsVoice =
+    voiceProvider === 'elevenlabs' &&
+    typeof raw.voice === 'string' &&
+    raw.voice.trim().length > 0 &&
+    raw.voice.length <= 100 &&
+    !/[\u0000-\u001f\u007f]/.test(raw.voice) &&
+    isElevenLabsVoiceId(raw.voiceId);
+  if (!elevenLabsVoice && (voiceProvider !== 'gemini' || !isVoice(raw.voice))) return null;
+  if (voiceProvider === 'gemini' && raw.voiceId !== undefined && raw.voiceId !== raw.voice) return null;
   if (!isVisibility(raw.visibility)) return null;
 
   const RESERVED_IDS = new Set(['narrations', 'new', 'settings', 'playlists', 'queue', 'library']);
@@ -71,9 +85,14 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   return {
     id: customId,
     markdown,
-    voice: raw.voice,
-    model: isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL,
-    promptStyle: typeof raw.promptStyle === 'string' ? raw.promptStyle : '',
+    voice: raw.voice as VoiceName,
+    voiceProvider,
+    voiceId: voiceProvider === 'elevenlabs' ? raw.voiceId as string : raw.voice as string,
+    model: voiceProvider === 'gemini'
+      ? (isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL)
+      : undefined,
+    promptStyle: voiceProvider === 'gemini' && typeof raw.promptStyle === 'string'
+      ? raw.promptStyle : '',
     speed,
     verbalizeDiagrams:
       typeof raw.verbalizeDiagrams === 'boolean' ? raw.verbalizeDiagrams : undefined,

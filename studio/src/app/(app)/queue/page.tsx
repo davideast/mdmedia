@@ -277,7 +277,7 @@ export default function QueuePage() {
   const handleEditInStudio = (job: GenerationJob) => {
     setDraft({
       markdown: job.markdown,
-      voice: job.voice,
+      voice: { provider: job.voiceProvider, id: job.voiceId, name: job.voice },
       promptStyle: job.promptStyle,
       rewriteForNarration: job.rewriteForNarration,
       rewriteInstructions: job.rewriteInstructions,

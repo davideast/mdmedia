@@ -21,6 +21,7 @@ import {
 import { db } from '@/lib/firebase';
 import {
   DEFAULT_SETTINGS,
+  isElevenLabsVoiceId,
   HIGHLIGHT_COLORS,
   type HighlightColorId,
   type UserProfile,
@@ -42,6 +43,16 @@ function toSettings(value: unknown): UserSettings {
     : DEFAULT_SETTINGS.highlightColor;
   return {
     defaultVoice: raw.defaultVoice ?? DEFAULT_SETTINGS.defaultVoice,
+    defaultVoiceProvider:
+      raw.defaultVoiceProvider === 'elevenlabs' &&
+      isElevenLabsVoiceId(raw.defaultVoiceId)
+        ? 'elevenlabs'
+        : 'gemini',
+    defaultVoiceId:
+      raw.defaultVoiceProvider === 'elevenlabs' &&
+      isElevenLabsVoiceId(raw.defaultVoiceId)
+        ? raw.defaultVoiceId
+        : raw.defaultVoice ?? DEFAULT_SETTINGS.defaultVoice,
     defaultPromptStyle: asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle),
     rewriteForNarration:
       typeof raw.rewriteForNarration === 'boolean'

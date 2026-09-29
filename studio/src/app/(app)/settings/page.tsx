@@ -17,15 +17,14 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
 import {
   DEFAULT_SETTINGS,
   HIGHLIGHT_COLORS,
-  VOICES,
   type HighlightColorId,
   type UserSettings,
   type Visibility,
-  type VoiceName,
 } from "@/lib/types";
 
 const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string }> = [
@@ -142,38 +141,39 @@ export default function SettingsPage() {
           <Separator />
 
           <Row label="Reader" htmlFor="default-voice">
-            <Select
-              value={settings.defaultVoice}
-              onValueChange={(value) => save({ defaultVoice: value as VoiceName })}
-            >
-              <SelectTrigger id="default-voice" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {VOICES.map((voice) => (
-                  <SelectItem key={voice} value={voice}>
-                    {voice}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
-
-          <Separator />
-
-          <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
-            <Textarea
-              id="default-style"
-              defaultValue={settings.defaultPromptStyle}
-              rows={3}
-              className="resize-none"
-              onBlur={(event) => {
-                if (event.target.value !== settings.defaultPromptStyle) {
-                  save({ defaultPromptStyle: event.target.value });
-                }
+            <VoicePicker
+              id="default-voice"
+              value={{
+                provider: settings.defaultVoiceProvider ?? "gemini",
+                id: settings.defaultVoiceId ?? settings.defaultVoice,
+                name: settings.defaultVoice,
               }}
+              onChange={(voice) => save({
+                defaultVoice: voice.name,
+                defaultVoiceProvider: voice.provider,
+                defaultVoiceId: voice.id,
+              })}
             />
           </Row>
+
+          {settings.defaultVoiceProvider !== "elevenlabs" ? (
+            <>
+              <Separator />
+              <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
+                <Textarea
+                  id="default-style"
+                  defaultValue={settings.defaultPromptStyle}
+                  rows={3}
+                  className="resize-none"
+                  onBlur={(event) => {
+                    if (event.target.value !== settings.defaultPromptStyle) {
+                      save({ defaultPromptStyle: event.target.value });
+                    }
+                  }}
+                />
+              </Row>
+            </>
+          ) : null}
 
           <Separator />
 
