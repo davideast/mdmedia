@@ -1,10 +1,11 @@
 import readline from 'node:readline';
 import { GoogleGenAI } from '@google/genai';
-import { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
+import { createTTSProvider } from '../tts/provider-registry.js';
 import { AudioLibrary } from '../storage/audio-library.js';
 import { PlaybackEngine } from '../audio/player/playback-engine.js';
 import { StudioStore } from '../studio/studio-store.js';
 import { loadConfigFile } from '../config/config-loader.js';
+import { resolveConfig } from '../config/config-resolver.js';
 import { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 import {
   getGeminiApiKey,
@@ -15,27 +16,46 @@ import { parseListenCommand } from './listen-parser.js';
 import type { VoiceName } from '../types/voice.js';
 
 async function main() {
-  const defaultVoice = (process.argv[2] as VoiceName) || 'Puck';
-  const defaultStyle = process.argv[3] || undefined;
-  const apiKey = process.env.GEMINI_API_KEY || getGeminiApiKey();
-
-  if (!apiKey) {
-    console.error('Error: GEMINI_API_KEY environment variable is required.');
-    process.exit(1);
-  }
-
-  const client = new GoogleGenAI({ apiKey });
-  const provider = new GeminiTTSProvider(client);
+  const requestedVoice = process.argv[2]?.trim()
+    ? (process.argv[2] as VoiceName)
+    : undefined;
+  const requestedStyle = process.argv[3] || undefined;
+  const geminiApiKey = process.env.GEMINI_API_KEY || getGeminiApiKey();
+  const fileConfig = await loadConfigFile(process.cwd());
+  const resolved = resolveConfig(
+    { mode: 'audio', voice: requestedVoice, style: requestedStyle },
+    fileConfig,
+    { ...process.env, GEMINI_API_KEY: geminiApiKey }
+  );
   const library = new AudioLibrary();
   const player = new PlaybackEngine();
 
-  const fileConfig = await loadConfigFile(process.cwd());
   let narrationAdapter: GeminiNarrationAdapter | undefined;
   if (fileConfig?.narration?.enabled) {
-    narrationAdapter = new GeminiNarrationAdapter(client, {
+    if (!geminiApiKey) throw new Error('GEMINI_API_KEY is required for narration rewriting.');
+    narrationAdapter = new GeminiNarrationAdapter(new GoogleGenAI({ apiKey: geminiApiKey }), {
       model: fileConfig.narration.model,
     });
   }
+
+  const defaultVoice =
+    requestedVoice ??
+    (resolved.audio.provider === 'gemini' && !fileConfig.audio?.voice
+      ? 'Puck'
+      : resolved.audio.voice);
+  const defaultStyle =
+    requestedStyle ?? resolved.audio.style ??
+    (resolved.audio.provider === 'gemini'
+      ? 'Clear, concise engineering assistant narration.'
+      : undefined);
+  const provider = createTTSProvider({
+    provider: resolved.audio.provider,
+    apiKey: resolved.apiKey,
+    model: resolved.audio.model,
+    voice: defaultVoice,
+    style: defaultStyle,
+    maxRetries: resolved.maxRetries,
+  });
 
   const studioStore = new StudioStore({
     library,
@@ -43,7 +63,7 @@ async function main() {
     ttsProvider: provider,
     narrationAdapter,
     enableLiveAudio: true,
-    defaultVoice: fileConfig?.audio?.voice ?? defaultVoice,
+    defaultVoice,
     defaultStyle,
   });
 

@@ -2,12 +2,13 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { GoogleGenAI } from '@google/genai';
 import { parseMarkdownToSpeakableParagraphs } from '../chunker/markdown-ast-parser.js';
 import { chunkSpeakableParagraphs } from '../chunker/word-boundary-chunker.js';
 import { UniversalEventBus } from '../pipeline/pipeline-event-bus.js';
 import { DocumentAudioPipeline } from '../pipeline/document-audio-pipeline.js';
-import { GeminiTTSProvider } from '../tts/gemini-tts-provider.js';
+import { createTTSProvider } from '../tts/provider-registry.js';
+import { loadConfigFile } from '../config/config-loader.js';
+import { resolveConfig } from '../config/config-resolver.js';
 import { WavFileStreamSink } from '../audio/wav-file-stream-sink.js';
 import { LiveAudioPlayerSink } from '../audio/live-audio-player-sink.js';
 import { ChunkQueueAudioPlayer } from '../audio/player/chunk-queue-audio-player.js';
@@ -120,7 +121,7 @@ export function startNarratorSidecarServer(staticDir: string): void {
 
   async function narrateMarkdown({
     markdown,
-    voice = 'Puck',
+    voice,
     style = '',
     playSpeaker = true,
   }: {
@@ -129,10 +130,17 @@ export function startNarratorSidecarServer(staticDir: string): void {
     style?: string;
     playSpeaker?: boolean;
   }) {
-    const apiKey = getGeminiApiKey();
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured in environment or ~/.gemini/.env');
-    }
+    const fileConfig = await loadConfigFile(process.cwd());
+    const resolved = resolveConfig(
+      { mode: 'audio', voice, style: style || undefined },
+      fileConfig,
+      { ...process.env, GEMINI_API_KEY: getGeminiApiKey() }
+    );
+    const selectedVoice =
+      voice ??
+      (resolved.audio.provider === 'gemini' && !fileConfig.audio?.voice
+        ? 'Puck'
+        : resolved.audio.voice);
 
     if (activePipeline) {
       activePipeline.abort();
@@ -160,11 +168,17 @@ export function startNarratorSidecarServer(staticDir: string): void {
       liveSink.attachToEventBus(eventBus);
     }
 
-    const client = new GoogleGenAI({ apiKey });
-    const provider = new GeminiTTSProvider(client);
+    const provider = createTTSProvider({
+      provider: resolved.audio.provider,
+      apiKey: resolved.apiKey,
+      model: resolved.audio.model,
+      voice: selectedVoice,
+      style: resolved.audio.style,
+      maxRetries: resolved.maxRetries,
+    });
     activePipeline = new DocumentAudioPipeline(provider, eventBus);
 
-    await activePipeline.processDocument(chunks, voice, style || undefined);
+    await activePipeline.processDocument(chunks, selectedVoice, resolved.audio.style);
 
     let savedTrackId: string | undefined;
     if (fs.existsSync(LATEST_WAV_PATH)) {
@@ -175,8 +189,8 @@ export function startNarratorSidecarServer(staticDir: string): void {
           stepIndex: Math.floor(Date.now() / 1000),
           markdown,
           audioBuffer,
-          voice,
-          style: style || undefined,
+          voice: selectedVoice,
+          style: resolved.audio.style,
         });
         savedTrackId = track.id;
       } catch (err) {

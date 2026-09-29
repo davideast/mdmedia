@@ -1,8 +1,10 @@
 import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
-import type { AudioConfig, MdMediaConfig, MusicConfig, NarrationConfig, VideoConfig } from './file-config.js';
+import type { MdMediaConfig, MusicConfig, NarrationConfig, VideoConfig } from './file-config.js';
+import { resolveTTSSelection } from '../tts/provider-registry.js';
 
 export interface ResolvedAudioConfig {
+  readonly provider: string;
   readonly voice: VoiceName;
   readonly style?: string;
   readonly model: string;
@@ -43,6 +45,7 @@ export interface ResolvedConfig {
 
 export interface CLIArgs {
   mode?: MediaType;
+  audioProvider?: string;
   voice?: VoiceName;
   style?: string;
   audioModel?: string;
@@ -71,16 +74,30 @@ export function resolveConfig(
 ): ResolvedConfig {
   const mode = cliArgs.mode ?? fileConfig.mode ?? 'audio';
 
-  const audioConfig: AudioConfig = fileConfig.audio ?? {};
   const videoConfig: VideoConfig = fileConfig.video ?? {};
   const musicConfig: MusicConfig = fileConfig.music ?? {};
   const narrationConfig: NarrationConfig = fileConfig.narration ?? {};
 
+  const audioSelection = resolveTTSSelection({
+    requested: {
+      provider: cliArgs.audioProvider,
+      voice: cliArgs.voice,
+      style: cliArgs.style,
+      model: cliArgs.audioModel,
+      apiKey: cliArgs.apiKey,
+    },
+    configured: fileConfig.audio,
+    legacyApiKey: fileConfig.apiKey,
+    env,
+    forSynthesis: mode === 'audio',
+  });
+
   const resolvedAudio: ResolvedAudioConfig = {
-    voice: cliArgs.voice ?? audioConfig.voice ?? 'Kore',
-    style: cliArgs.style ?? audioConfig.style,
-    model: cliArgs.audioModel ?? audioConfig.model ?? 'gemini-3.1-flash-tts-preview',
-    play: cliArgs.play ?? audioConfig.play ?? false,
+    provider: audioSelection.provider,
+    voice: audioSelection.voice,
+    style: audioSelection.style,
+    model: audioSelection.model,
+    play: cliArgs.play ?? fileConfig.audio?.play ?? false,
   };
 
   const resolvedVideo: ResolvedVideoConfig = {
@@ -112,6 +129,9 @@ export function resolveConfig(
     narration: resolvedNarration,
     maxChars: cliArgs.maxChars ?? fileConfig.maxChars ?? 400,
     maxRetries: cliArgs.maxRetries ?? fileConfig.maxRetries ?? 3,
-    apiKey: cliArgs.apiKey ?? fileConfig.apiKey ?? env.GEMINI_API_KEY,
+    apiKey:
+      mode === 'audio'
+        ? audioSelection.apiKey
+        : cliArgs.apiKey ?? fileConfig.apiKey ?? env.GEMINI_API_KEY,
   };
 }

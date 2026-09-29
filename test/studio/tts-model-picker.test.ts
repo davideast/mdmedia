@@ -120,8 +120,9 @@ describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
       expect(generationQueue).toContain("model?: TTSModelName");
     });
 
-    it("narration-server instantiates GeminiTTSProvider with selected model", () => {
-      expect(narrationServer).toContain("GeminiTTSProvider(client, 3,");
+    it("narration-server passes the selected model into TTS provider selection", () => {
+      expect(narrationServer).toContain("createTTSProvider({");
+      expect(narrationServer).toContain("model: selectedModel");
     });
 
     it("GeminiTTSProvider sends selected model to interactions.create API payload", async () => {
