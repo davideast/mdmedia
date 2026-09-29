@@ -435,8 +435,8 @@ export function createNarrationStream({
        * 1. Script Adaptation: If rewrite is enabled, the delivery note informs
        *    phrasing, sentence pacing, and vocabulary.
        * 2. TTS Voice Synthesis: In `pipeline.processDocument`, the delivery note
-       *    is passed to `GeminiTTSProvider`, which supplies it as stage directions
-       *    to steer the voice persona, tone, and cadence without speaking them aloud.
+       *    is passed to `GeminiTTSProvider`. Gemini 3.8 receives it as speech
+       *    metadata, separate from the verbatim transcript sent for speech.
        */
       const deliveryNote = request.promptStyle.trim();
       const adaptationInstructions =
