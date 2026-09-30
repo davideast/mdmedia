@@ -124,14 +124,16 @@ export function downloadNarration(
       // Explicit downloads must never report success after falling back to
       // the in-memory adapter, which disappears when the app closes.
       const mediaStore = downloadMediaStore(uid);
-      await mediaStore.saveTrack(id, audioBlob, mergedTimings);
-      await updateDownloadCatalog(uid, (current) => ({
+      await updateDownloadCatalog(uid, async (current) => {
+        await mediaStore.saveTrack(id, audioBlob, mergedTimings);
+        return ({
         ...current,
         tracks: { ...current.tracks, [id]: trackFromTimings(id, mergedTimings, metadata?.voice) },
         individualIds: asIndividual && !current.individualIds.includes(id)
           ? [...current.individualIds, id]
           : current.individualIds,
-      }));
+        });
+      });
       notifyOfflineChange(id, true, false);
       return true;
     } catch (err) {

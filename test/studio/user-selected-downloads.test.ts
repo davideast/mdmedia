@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach, spyOn } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
@@ -8,7 +8,8 @@ import {
   removeOfflineNarration,
   subscribeOfflineChange,
 } from "../../studio/src/lib/offline-manager";
-import { getMediaStore } from "../../studio/src/lib/media-store";
+import { savePlaylistDownload } from "../../studio/src/lib/playlist-download";
+import { MediaStoreService, getMediaStore } from "../../studio/src/lib/media-store";
 import { downloadMediaStore, readDownloadCatalog, updateDownloadCatalog, removeIndividualDownload, removeDownloadedPlaylist, removePendingPlaylist } from "../../studio/src/lib/download-catalog";
 import type { NarrationTimingsFile } from "../../studio/src/lib/wav";
 
@@ -170,6 +171,45 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
         expect((await readDownloadCatalog(uid)).tracks[testId]).toBeUndefined();
       });
     }
+
+    it("serializes playlist saving with cleanup of the same audio", async () => {
+      await downloadMediaStore(uid).saveTrack(testId, new Blob([sampleWavBytes]), sampleTimings);
+      await updateDownloadCatalog(uid, (catalog) => ({ ...catalog,
+        tracks: { [testId]: { id: testId, title: sampleTimings.title!, voice: 'Kore', durationMs: 2500, savedAt: 1 } },
+        individualIds: [testId],
+      }));
+      let release!: () => void;
+      let reached!: () => void;
+      const blocked = new Promise<void>((resolve) => { release = resolve; });
+      const entered = new Promise<void>((resolve) => { reached = resolve; });
+      const originalDelete = MediaStoreService.prototype.delete;
+      const deletion = spyOn(MediaStoreService.prototype, 'delete').mockImplementation(async function (this: MediaStoreService, id: string) {
+        reached();
+        await blocked;
+        return originalDelete.call(this, id);
+      });
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = (async (url: string | URL | Request) => url.toString().includes('/audio')
+        ? new Response(sampleWavBytes) : new Response(JSON.stringify(sampleTimings))) as typeof fetch;
+      try {
+        const removing = removeIndividualDownload(uid, testId);
+        await entered;
+        const narration = { id: testId, ownerUid: uid, title: sampleTimings.title!, sourceMarkdown: 'Text', transcript: 'Text',
+          voice: 'Kore' as const, voiceProvider: 'gemini' as const, promptStyle: '', adapted: false, status: 'ready' as const,
+          durationMs: 2500, audioPath: '', timingsPath: '', visibility: 'private' as const, sharedWith: [], authorName: '', authorPhoto: '', createdAt: 1, updatedAt: 1 };
+        const saving = savePlaylistDownload(uid, { id: 'new-playlist', ownerUid: uid, title: 'B', description: '', narrationIds: [testId], createdAt: 1, updatedAt: 1 }, new Map([[testId, narration]]));
+        release();
+        await Promise.all([removing, saving]);
+        expect(await downloadMediaStore(uid).has(testId)).toBe(true);
+        const catalog = await readDownloadCatalog(uid);
+        expect(catalog.playlists[0]?.narrationIds).toEqual([testId]);
+        expect(catalog.tracks[testId]?.title).toBe(sampleTimings.title);
+      } finally {
+        release();
+        deletion.mockRestore();
+        globalThis.fetch = originalFetch;
+      }
+    });
 
     it("requires an account before downloading", async () => {
       await expect(downloadNarration(testId)).rejects.toThrow('Sign in before downloading.');

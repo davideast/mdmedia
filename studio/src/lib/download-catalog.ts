@@ -68,10 +68,10 @@ export async function readDownloadCatalog(uid: string): Promise<DownloadCatalog>
 
 const queues = new Map<string, Promise<unknown>>();
 
-export async function updateDownloadCatalog(uid: string, edit: (current: DownloadCatalog) => DownloadCatalog): Promise<DownloadCatalog> {
+export async function updateDownloadCatalog(uid: string, edit: (current: DownloadCatalog) => DownloadCatalog | Promise<DownloadCatalog>): Promise<DownloadCatalog> {
   const previous = queues.get(uid) ?? Promise.resolve();
   const operation = previous.catch(() => {}).then(async () => {
-    const next = edit(await readDownloadCatalog(uid));
+    const next = await edit(await readDownloadCatalog(uid));
     const handle = await (await directory(uid)).getFileHandle('catalog.json', { create: true });
     const writable = await handle.createWritable();
     try { await writable.write(JSON.stringify(next)); } finally { await writable.close(); }
@@ -98,59 +98,48 @@ export function isDownloadReferenced(catalog: DownloadCatalog, id: string): bool
     [...catalog.playlists, ...catalog.pendingPlaylists].some((playlist) => playlist.narrationIds.includes(id));
 }
 
+/** Ownership decisions, file deletion, and catalog writes share the account queue. */
+export async function removeUnreferencedDownloads(uid: string, ids: Iterable<string>): Promise<void> {
+  await updateDownloadCatalog(uid, async (current) => {
+    const tracks = { ...current.tracks };
+    for (const id of ids) {
+      if (isDownloadReferenced(current, id)) continue;
+      await downloadMediaStore(uid).delete(id);
+      delete tracks[id];
+    }
+    return { ...current, tracks };
+  });
+}
+
 export async function removeIndividualDownload(uid: string, id: string): Promise<void> {
-  const next = await updateDownloadCatalog(uid, (current) => ({
+  await updateDownloadCatalog(uid, (current) => ({
     ...current,
     individualIds: current.individualIds.filter((item) => item !== id),
   }));
-  if (!isDownloadReferenced(next, id)) {
-    await downloadMediaStore(uid).delete(id);
-    await updateDownloadCatalog(uid, (current) => {
-      const tracks = { ...current.tracks };
-      delete tracks[id];
-      return { ...current, tracks };
-    });
-  }
+  await removeUnreferencedDownloads(uid, [id]);
 }
 
 export async function removeDownloadedPlaylist(uid: string, id: string): Promise<void> {
-  const before = await readDownloadCatalog(uid);
-  const removed = before.playlists.find((item) => item.id === id);
-  if (!removed) return;
-  const removedIds = new Set([...removed.narrationIds, ...(before.pendingPlaylists.find((item) => item.id === id)?.narrationIds ?? [])]);
-  const next = await updateDownloadCatalog(uid, (current) => ({
-    ...current,
-    playlists: current.playlists.filter((item) => item.id !== id),
-    pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id),
-  }));
-  for (const trackId of removedIds) {
-    if (isDownloadReferenced(next, trackId)) continue;
-    await downloadMediaStore(uid).delete(trackId);
-    await updateDownloadCatalog(uid, (current) => {
-      const tracks = { ...current.tracks };
-      delete tracks[trackId];
-      return { ...current, tracks };
-    });
-  }
+  const removedIds = new Set<string>();
+  await updateDownloadCatalog(uid, (current) => {
+    const removed = current.playlists.find((item) => item.id === id);
+    if (!removed) return current;
+    for (const trackId of [...removed.narrationIds, ...(current.pendingPlaylists.find((item) => item.id === id)?.narrationIds ?? [])]) removedIds.add(trackId);
+    return { ...current,
+      playlists: current.playlists.filter((item) => item.id !== id),
+      pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id),
+    };
+  });
+  await removeUnreferencedDownloads(uid, removedIds);
 }
 
 export async function removePendingPlaylist(uid: string, id: string): Promise<void> {
-  const before = await readDownloadCatalog(uid);
-  const pending = before.pendingPlaylists.find((item) => item.id === id);
-  if (!pending) return;
-  const next = await updateDownloadCatalog(uid, (current) => ({
-    ...current,
-    pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id),
-  }));
-  for (const trackId of pending.narrationIds) {
-    if (isDownloadReferenced(next, trackId)) continue;
-    await downloadMediaStore(uid).delete(trackId);
-    await updateDownloadCatalog(uid, (current) => {
-      const tracks = { ...current.tracks };
-      delete tracks[trackId];
-      return { ...current, tracks };
-    });
-  }
+  const removedIds = new Set<string>();
+  await updateDownloadCatalog(uid, (current) => {
+    for (const trackId of current.pendingPlaylists.find((item) => item.id === id)?.narrationIds ?? []) removedIds.add(trackId);
+    return { ...current, pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id) };
+  });
+  await removeUnreferencedDownloads(uid, removedIds);
 }
 
 export async function listLegacyDownloads(): Promise<Array<{ id: string; timings: NarrationTimingsFile }>> {
@@ -179,12 +168,14 @@ export async function importLegacyDownloads(uid: string, tracks: Array<{ id: str
   for (const track of tracks) {
     const saved = await legacy.getTrack(track.id);
     if (!saved) continue;
-    await destination.saveTrack(track.id, saved.audioBlob, saved.timings);
-    await updateDownloadCatalog(uid, (current) => ({
+    await updateDownloadCatalog(uid, async (current) => {
+      await destination.saveTrack(track.id, saved.audioBlob, saved.timings);
+      return ({
       ...current,
       tracks: { ...current.tracks, [track.id]: trackFromTimings(track.id, saved.timings) },
       individualIds: current.individualIds.includes(track.id) ? current.individualIds : [...current.individualIds, track.id],
-    }));
+      });
+    });
     await legacy.delete(track.id);
   }
 }

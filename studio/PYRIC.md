@@ -3,7 +3,7 @@
 How local development works in this app, what is broken upstream, and what was
 worked around to get it running.
 
-- Pyric version: **`@pyric/cli` 0.1.0-alpha.23** (conformance-tested against Firebase 12.13.0)
+- Pyric version: **`@pyric/cli` 0.1.0-alpha.24** (conformance-tested against Firebase 12.13.0)
 - Installed from a **local checkout**, not npm: `/Users/deast/repos/davideast/pyric`
 - App: Next.js 16.3.5, App Router, Turbopack, npm
 
@@ -68,7 +68,7 @@ Run `npm run rules:build` before deploying.
 ```sh
 cd studio
 bash /Users/deast/repos/davideast/pyric/.agents/skills/pyric-node-host/scripts/pack-local.sh \
-  /Users/deast/repos/davideast/pyric .pyric-local
+  ~/repos/davideast/pyric .pyric-local
 npm install --save-dev ./.pyric-local/pyric-*.tgz ./.pyric-local/create-pyric-*.tgz
 npx --no-install pyric --version
 ```
@@ -101,7 +101,7 @@ imports, no `initializeSandbox()`, and no sandbox branches in `src/lib/` or
 ## 3. Upstream Pyric bugs found (worth reporting to the maintainers)
 
 All four were hit while wiring this app up. Line numbers refer to the installed
-`0.1.0-alpha.23` build under `studio/node_modules/`.
+`0.1.0-alpha.24` build under `studio/node_modules/`.
 
 ### 3.1 `@pyric/cli`'s `./next` export has no `require` condition
 
