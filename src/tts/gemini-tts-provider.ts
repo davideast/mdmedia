@@ -6,6 +6,10 @@ import { delay, calculateBackoffMs } from './backoff.js';
 
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-3.1-flash-tts-preview';
 
+function usesVerbatimTranscript(model: string): boolean {
+  return model === 'gemini-3.8-flash-tts' || model === 'gemini-3.8-flash-lite-tts';
+}
+
 export class GeminiTTSProvider implements ITTSProvider {
   constructor(
     private readonly client: GoogleGenAI,
@@ -23,14 +27,29 @@ export class GeminiTTSProvider implements ITTSProvider {
     while (true) {
       try {
         const trimmedStyle = promptStyle?.trim();
-        const formattedInput = trimmedStyle
-          ? `${trimmedStyle.startsWith('[') && trimmedStyle.endsWith(']') ? trimmedStyle : `[${trimmedStyle}]`}\n\n${text}`
-          : text;
+        const verbatimTranscript = usesVerbatimTranscript(this.model);
+        // Gemini 3.8 may speak inline directions, so only narration belongs in text.
+        const input = verbatimTranscript
+          ? [{
+              type: 'user_input',
+              content: [{
+                type: 'text',
+                text,
+                ...(trimmedStyle
+                  ? { annotations: [{ type: 'speech_metadata', style: trimmedStyle }] }
+                  : {}),
+              }],
+            }]
+          : trimmedStyle
+            ? `${trimmedStyle.startsWith('[') && trimmedStyle.endsWith(']') ? trimmedStyle : `[${trimmedStyle}]`}\n\n${text}`
+            : text;
 
         const payload: any = {
           model: this.model,
-          input: formattedInput,
-          response_format: { type: 'audio' },
+          input,
+          response_format: verbatimTranscript
+            ? { type: 'audio', mime_type: 'audio/l16', sample_rate: 24000 }
+            : { type: 'audio' },
           generation_config: {
             speech_config: [{ voice }],
           },

@@ -57,8 +57,8 @@ describe('Narration Creation Regression Tests', () => {
     });
   });
 
-  describe('GeminiTTSProvider promptStyle stage direction formatting (Root Cause 1: system_instruction rejection)', () => {
-    it('formats promptStyle as stage directions in input without setting system_instruction', async () => {
+  describe('Legacy Gemini 3.1 promptStyle formatting (system_instruction rejection)', () => {
+    it('uses stage directions in legacy 3.1 input without setting system_instruction', async () => {
       let capturedPayload: any = null;
       const fakeClient = {
         interactions: {

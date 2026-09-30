@@ -3,7 +3,7 @@ import type { GoogleGenAI } from '@google/genai';
 import { GeminiTTSProvider } from '../../src/tts/gemini-tts-provider.js';
 
 describe('GeminiTTSProvider', () => {
-  it('formats promptStyle as bracketed stage direction in input payload', async () => {
+  it('formats legacy 3.1 promptStyle as a bracketed stage direction', async () => {
     let capturedPayload: any = null;
 
     const mockAi = {
