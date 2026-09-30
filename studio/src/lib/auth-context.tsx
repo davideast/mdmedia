@@ -112,6 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
         return;
       }
 
+      setLoading(true);
+      setProfile(null);
       const nextUser = toAuthUser(firebaseUser);
 
       void (async () => {
@@ -145,7 +147,10 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
         uidRef.current = nextUser.uid;
         localSessionRef.current = false;
         setUser(nextUser);
-        setLoading(false);
+        // Online Settings must mount with the first saved profile, so uncontrolled
+        // fields hydrate correctly. Previously approved offline sessions may open
+        // Downloads without waiting for an unreachable profile service.
+        if (decision === 'unavailable') setLoading(false);
 
         if (decision === 'allowed') void upsertUserProfile({
           uid: nextUser.uid,
