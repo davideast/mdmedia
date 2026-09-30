@@ -1,3 +1,5 @@
+import { checkHostedConnection } from './check-hosted-connection.mjs';
+
 const origin = process.argv[2] || 'http://127.0.0.1:3000';
 const workerPath = new URL(origin).port === '3100' ? '/sw-preview.js' : '/sw.js';
 const assets = new Set();
@@ -27,4 +29,5 @@ const results = await Promise.all([...assets].map(async (asset) => {
 }));
 const failures = results.filter(Boolean);
 if (failures.length) throw new Error(failures.join('\n'));
-console.log(`${origin}: 2 pages, health endpoint, and ${assets.size} assets return 200.`);
+await checkHostedConnection(origin);
+console.log(`${origin}: 2 pages, health endpoint, ${assets.size} assets return 200; browser SDK attached to Pyric.`);

@@ -64,3 +64,19 @@ Manual browser acceptance checklist: actual tab navigation, refresh, Back/Forwar
 mobile overflow, offline downloaded-item tabs, and playback while switching documents.
 These checks require a connected preview browser; SDK/HTTP connectivity alone does not
 verify their UI behavior.
+
+## Hosted connection incident
+
+On 2026-09-30 the live service at `localhost:3000` intermittently exceeded Pyric's
+five-second browser attach deadline. The actual browser SDK reproduced the exact
+timeout twice in ten attempts against port 3473; even bridge health requests could
+take over eight seconds. The isolated preview bridge on port 3474 remained responsive.
+Restarting the existing launch service with its current build restored six consecutive
+attachments in 5–43ms and retained its persisted sandbox state. This is a recovery,
+not proof of the underlying cause of the stalls.
+
+`studio/scripts/check-hosted-connection.mjs` preserves the browser-transport probe.
+The release and asset checks now require an SDK attachment as well as HTTP readiness.
+`test/studio/hosted-connection-check.test.ts` uses real HTTP/WebSocket fixtures to
+cover successful attachment with the browser Origin header, the exact timeout despite
+HTTP 200, and rejection of a different project. Browser UI acceptance remains separate.

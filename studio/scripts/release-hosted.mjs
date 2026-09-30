@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { checkHostedConnection } from './check-hosted-connection.mjs';
 
 const live = '.next-hosted';
 const staged = '.next-hosted-staged';
@@ -68,6 +69,7 @@ try {
   await copyFile(join(live, 'sw.js'), worker);
   await bootstrap();
   await waitForServer();
+  await checkHostedConnection('http://127.0.0.1:3000');
   console.log(`Studio released. Previous build kept at ${backup}.`);
 } catch (error) {
   if (stopped) {
