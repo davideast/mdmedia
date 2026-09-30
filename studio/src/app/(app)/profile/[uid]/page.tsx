@@ -73,7 +73,7 @@ export default function ProfilePage() {
               {initials(user.displayName)}
             </AvatarFallback>
           </Avatar>
-          <div className="grid gap-1">
+          <div className="grid min-w-0 gap-1">
             <h1 className="t-h2 truncate">{profile?.displayName ?? user.displayName}</h1>
             <p className="t-meta truncate">{user.email}</p>
           </div>

@@ -252,7 +252,7 @@ export const Reader = memo(function Reader({
     <article
       style={highlightVars}
       className={cn(
-        "mx-auto grid w-full max-w-[68ch] gap-5 text-[1.0625rem] leading-[1.68] text-foreground",
+        "mx-auto grid w-full min-w-0 max-w-[68ch] gap-5 text-[1.0625rem] leading-[1.68] text-foreground [overflow-wrap:anywhere]",
         className,
       )}
     >
@@ -260,7 +260,7 @@ export const Reader = memo(function Reader({
         <div
           key={block.key}
           data-spoken={block.start <= spokenThrough}
-          className={cn("reader-block", BLOCK_CLASS[block.kind])}
+          className={cn("reader-block min-w-0", BLOCK_CLASS[block.kind])}
         >
           <BlockBody
             block={block}

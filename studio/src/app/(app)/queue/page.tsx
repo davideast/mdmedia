@@ -63,7 +63,7 @@ function ActiveJobCard({
 
         {/* Track: Title text */}
         <div className="track-title">
-          <h3 className="truncate text-[0.95rem] font-semibold text-foreground">
+          <h3 className="block min-w-0 text-[0.95rem] font-semibold text-foreground [overflow-wrap:anywhere] sm:truncate">
             {job.title}
           </h3>
         </div>
@@ -152,7 +152,7 @@ function CompletedJobCard({ job }: { job: GenerationJob }) {
 
       {/* Track: Title */}
       <div className="track-title">
-        <span className="truncate text-[0.9rem] font-medium text-foreground">
+        <span className="block min-w-0 text-[0.9rem] font-medium text-foreground [overflow-wrap:anywhere] sm:truncate">
           {job.title}
         </span>
       </div>
@@ -206,7 +206,7 @@ function FailedJobCard({
 
       {/* Track: Title */}
       <div className="track-title flex items-center gap-2 flex-wrap">
-        <span className="truncate text-[0.9rem] font-medium text-foreground">
+        <span className="block min-w-0 text-[0.9rem] font-medium text-foreground [overflow-wrap:anywhere] sm:truncate">
           {job.title}
         </span>
         {isPolicy && (
@@ -333,6 +333,7 @@ export default function QueuePage() {
       title="Queue"
       icon={<ListOrdered size={13} strokeWidth={2} />}
       viewGrid
+      gridVariant="wide"
       actions={
         completedJobs.length > 0 || failedJobs.length > 0 ? (
           <Button
@@ -397,7 +398,7 @@ export default function QueuePage() {
                       <Loader2 size={13} className="animate-spin text-primary" />
                     </div>
                     <div className="track-title">
-                      <span className="truncate text-[0.95rem] font-semibold text-foreground">
+                      <span className="block min-w-0 text-[0.95rem] font-semibold text-foreground [overflow-wrap:anywhere] sm:truncate">
                         {n.title}
                       </span>
                     </div>

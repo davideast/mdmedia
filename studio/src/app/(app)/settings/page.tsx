@@ -52,8 +52,8 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,18rem)] items-center gap-6">
-      <div className="grid gap-1">
+    <div className="grid min-w-0 grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-6">
+      <div className="grid min-w-0 gap-1">
         <Label htmlFor={htmlFor} className="t-card-title font-normal">
           {label}
         </Label>
@@ -88,7 +88,7 @@ export default function SettingsPage() {
     >
       <p className="t-lead">These apply to every new narration you start.</p>
 
-        <div className="grid gap-6">
+        <div className="grid min-w-0 gap-6">
           <Row label="Appearance" htmlFor="appearance-theme">
             <Select value={theme ?? "system"} onValueChange={setTheme}>
               <SelectTrigger id="appearance-theme" className="w-full">
@@ -111,7 +111,7 @@ export default function SettingsPage() {
             hint="Accessible inline highlight background and text color while listening."
             htmlFor="highlight-color"
           >
-            <div id="highlight-color" className="grid grid-cols-3 gap-2">
+            <div id="highlight-color" className="grid min-w-0 grid-cols-3 gap-2">
               {HIGHLIGHT_COLORS.map((preset) => {
                 const selected = highlightColor === preset.id;
                 return (
@@ -120,7 +120,7 @@ export default function SettingsPage() {
                     type="button"
                     aria-pressed={selected}
                     onClick={() => setHighlightColor(preset.id as HighlightColorId)}
-                    className={`flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left text-[0.78rem] transition-all ${
+                    className={`flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1.5 text-left text-[0.78rem] transition-all ${
                       selected
                         ? "border-foreground ring-1 ring-foreground"
                         : "border-border hover:border-border-strong"
@@ -132,7 +132,7 @@ export default function SettingsPage() {
                     >
                       Aa
                     </span>
-                    <span className="truncate">{preset.label.split(" ")[0]}</span>
+                    <span className="min-w-0 truncate">{preset.label.split(" ")[0]}</span>
                   </button>
                 );
               })}

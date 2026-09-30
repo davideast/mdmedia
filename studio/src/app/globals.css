@@ -798,6 +798,7 @@
     margin: 0;
     min-height: 100%;
     width: 100%;
+    min-width: 0;
     align-content: start;
   }
 
@@ -807,6 +808,16 @@
     }
     .view-grid {
       --view-gutter: 1rem;
+    }
+  }
+
+  @media (hover: hover) and (min-width: 641px) {
+    .playlist-reorder-controls {
+      opacity: 0;
+    }
+    .group:hover .playlist-reorder-controls,
+    .playlist-reorder-controls:focus-within {
+      opacity: 1;
     }
   }
 
@@ -841,6 +852,7 @@
   /* Direct children default to snapping inside the primary reading/content track */
   .view-grid-body > * {
     grid-column: content-start / content-end;
+    min-width: 0;
   }
 
   .view-grid-body > .col-wide {
@@ -858,6 +870,7 @@
       [status-start] 1.25rem [status-end text-start]
       minmax(0, 1fr) [text-end action-start]
       auto [action-end];
+    min-width: 0;
     column-gap: 0.75rem;
     row-gap: 0.25rem;
     align-items: center;
@@ -877,6 +890,11 @@
     min-width: 0;
   }
 
+  .item-track-grid .track-title > .truncate {
+    display: block;
+    min-width: 0;
+  }
+
   .item-track-grid .track-body {
     grid-column: text-start / text-end;
     min-width: 0;
@@ -886,9 +904,98 @@
     grid-column: action-start / action-end;
     grid-row: 1;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.375rem;
     justify-self: end;
+  }
+
+  @media (max-width: 640px) {
+    .item-track-grid {
+      grid-template-columns: [status-start] 1.25rem [status-end text-start] minmax(0, 1fr) [text-end];
+    }
+
+    .item-track-grid .track-actions {
+      grid-column: text-start / text-end;
+      grid-row: auto;
+      justify-self: start;
+      order: 1;
+    }
+
+    .item-track-grid .track-title {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .library-track-card {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "status title title"
+      ". excerpt excerpt"
+      ". details primary";
+    column-gap: 0.75rem;
+    row-gap: 0.25rem;
+    align-items: start;
+    min-width: 0;
+  }
+
+  .library-track-status {
+    grid-area: status;
+    display: flex;
+    min-height: 1.375rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .library-track-title {
+    grid-area: title;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .library-track-title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 0.5rem;
+  }
+
+  .library-track-title:focus-visible::after {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .library-track-excerpt {
+    grid-area: excerpt;
+    min-width: 0;
+  }
+
+  .library-track-details {
+    grid-area: details;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .library-track-tools {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .library-track-primary {
+    grid-area: primary;
+    position: relative;
+    z-index: 1;
+    align-self: center;
+    justify-self: end;
+    margin-left: 0.75rem;
   }
 
   /* Responsive Floating Audio Transport Bar (Container Query Architecture) */
@@ -942,4 +1049,3 @@
     }
   }
 }
-
