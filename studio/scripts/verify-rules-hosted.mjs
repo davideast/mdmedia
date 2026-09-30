@@ -131,6 +131,16 @@ const fsCases = [
   // --- 007 / Share by Resolved UID & Labels
   ['007 bob updates own narration sharedWith & sharedWithLabels', 'ALLOW', { method: 'update', path: D + 'narrations/bob-own', auth: { uid: 'bob', token: t('bob@example.test') }, resource: { data: narr('bob', 'shared', { sharedWith: ['alice'], sharedWithLabels: { alice: 'alice@example.test' }, updatedAt: 2000 }) } }, allow(true), narr('bob', 'private')],
   ['007 allowlisted bob reads narration shared by uid with labels', 'ALLOW', { method: 'get', path: D + 'narrations/alice-shared-uid', auth: { uid: 'bob', token: t('bob@example.test') } }, allow(true), narr('alice', 'shared', { sharedWith: ['bob'], sharedWithLabels: { bob: 'bob@example.test' } })],
+
+  // --- Voice catalog and private voice metadata
+  ['voice: client cannot read shared catalog', 'DENY', { method: 'get', path: D + 'voiceCatalog/elevenlabs-voice', auth: { uid: 'alice', token: t('alice@example.test') } }, allow(true), { voiceId: 'ABCDEFGHIJKLMNOPQRST' }],
+  ['voice: client cannot write shared catalog', 'DENY', { method: 'create', path: D + 'voiceCatalog/elevenlabs-voice', auth: { uid: 'alice', token: t('alice@example.test') }, resource: { data: { voiceId: 'ABCDEFGHIJKLMNOPQRST' } } }, allow(true), null],
+  ['voice: client cannot read a grant', 'DENY', { method: 'get', path: D + 'users/alice/voiceGrants/elevenlabs-voice', auth: { uid: 'alice', token: t('alice@example.test') } }, allow(true), { voiceId: 'ABCDEFGHIJKLMNOPQRST' }],
+  ['voice: client cannot write a grant', 'DENY', { method: 'create', path: D + 'users/alice/voiceGrants/elevenlabs-voice', auth: { uid: 'alice', token: t('alice@example.test') }, resource: { data: { voiceId: 'ABCDEFGHIJKLMNOPQRST' } } }, allow(true), null],
+  ['voice: visitor reads new ElevenLabs narration without provider ID', 'ALLOW', { method: 'get', path: D + 'narrations/new-elevenlabs', auth: null }, [], narr('alice', 'public', { voice: 'Private reader', voiceProvider: 'elevenlabs' })],
+  ['voice: visitor cannot read legacy ElevenLabs provider ID', 'DENY', { method: 'get', path: D + 'narrations/old-elevenlabs', auth: null }, [], narr('alice', 'public', { voice: 'Private reader', voiceProvider: 'elevenlabs', voiceId: 'ABCDEFGHIJKLMNOPQRST' })],
+  ['voice: recipient cannot read legacy shared provider ID', 'DENY', { method: 'get', path: D + 'narrations/old-shared-elevenlabs', auth: { uid: 'bob', token: t('bob@example.test') } }, allow(true), narr('alice', 'shared', { sharedWith: ['bob'], voiceProvider: 'elevenlabs', voiceId: 'ABCDEFGHIJKLMNOPQRST' })],
+  ['voice: owner still reads legacy private provider ID', 'ALLOW', { method: 'get', path: D + 'narrations/own-elevenlabs', auth: { uid: 'alice', token: t('alice@example.test') } }, allow(true), narr('alice', 'private', { voiceProvider: 'elevenlabs', voiceId: 'ABCDEFGHIJKLMNOPQRST' })],
 ];
 
 // Storage test cases: [description, expected, requestObject]

@@ -25,6 +25,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 
+import { isVoiceDisplayName } from './voice-name.mjs';
 import { auth, db } from '@/lib/firebase';
 import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
@@ -32,7 +33,6 @@ import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
   DEFAULT_VOICE,
   MAX_SHARED_WITH,
-  VOICES,
   type Narration,
   type NarrationStatus,
   type Visibility,
@@ -54,7 +54,7 @@ function asNumber(value: unknown, fallback = 0): number {
 }
 
 function asVoice(value: unknown): VoiceName {
-  return typeof value === 'string' && (VOICES as readonly string[]).includes(value)
+  return isVoiceDisplayName(value)
     ? (value as VoiceName)
     : DEFAULT_VOICE;
 }
@@ -109,6 +109,9 @@ export function toNarration(snapshot: {
     sourceMarkdown: asString(data.sourceMarkdown),
     transcript: asString(data.transcript),
     voice: asVoice(data.voice),
+    voiceProvider: data.voiceProvider === 'elevenlabs' ? 'elevenlabs' : 'gemini',
+    ...(data.voiceProvider === 'elevenlabs'
+      ? {} : { voiceId: asString(data.voiceId, asVoice(data.voice)) }),
     promptStyle: asString(data.promptStyle),
     adapted: data.adapted === true,
     status: asStatus(data.status),

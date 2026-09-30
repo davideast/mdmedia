@@ -85,6 +85,42 @@ bun run studio:allowlist remove user@example.test --revoke-tokens
 
 Clients can never write the allowlist; all provisioning flows require prior entry by an authorized operator.
 
+## Voice catalog and personal voices
+
+Studio separates voice availability from each person's preferences:
+
+| Firestore path | Contents | Writer |
+| --- | --- | --- |
+| `voiceCatalog/elevenlabs:{voiceId}` | Enabled voices shared with all Studio users, optional `featuredRank` | Operator only |
+| `users/{uid}/voiceGrants/elevenlabs:{voiceId}` | Private voice grants for one user | Operator only |
+| `users/{uid}.settings` | Default reader and ordered `pinnedVoiceRefs` | That user |
+
+The server checks the catalog or the caller's grant before returning ElevenLabs metadata or creating a narration. A saved default or pin never grants access. The picker shows the default, personal pins, shared featured voices, then other authorized voices. Client reads and writes of the first two paths are denied by Firestore Rules; use the operator CLI:
+
+```bash
+# The existing ElevenLabs key must be able to retrieve a voice before it can
+# be enabled or granted. Quote names containing spaces.
+bun run voices grant dceast@gmail.com <personal-voice-id> "David East" --local
+bun run voices shared <account-voice-id> "Shared reader" --rank 1 --enabled --reviewed --local
+bun run voices list dceast@gmail.com --local
+bun run voices list --local
+```
+
+Use `--cloud` in place of `--local` only when targeting production. `--sandbox <url>` selects a specific live Pyric sandbox. `revoke <email> <voice-id>` removes a grant. The CLI's default for a new shared voice is **disabled**.
+
+The public ElevenLabs Voice Library currently lists “Burt Reynolds™ - Deep, Smooth and clear” as `4YYIPFl9wE5c4L2eu2Gb`, but Studio's configured key cannot retrieve that ID. Keep a candidate record disabled until an operator has added it to the backend account, confirmed its resulting usable voice ID, and reviewed the listing's identity and permitted use. The `--enabled --reviewed` command checks synthesis with Studio's model and records the review and sample time before the voice appears. Do not put personal voice IDs or API keys in application code or client-writable settings.
+
+New ElevenLabs narrations omit provider voice IDs from their shareable document. Firestore Rules hide older public/shared ElevenLabs narrations that still contain `voiceId` from non-owners; the owner can still read them. Run the cloud migration with an authorized Google application credential (`GOOGLE_APPLICATION_CREDENTIALS` or Application Default Credentials with Firestore write access) to remove that field and restore their public/shared reads:
+
+```bash
+npm run voices:scrub-legacy -- --cloud mdmedia-dev
+npm run voices:scrub-legacy -- --cloud mdmedia-dev --apply
+```
+
+The first command is a dry run. The second removes only `voiceId` from ElevenLabs narration documents and checks each document's update time before writing. Rerun it if concurrent changes interrupt the migration.
+
+The current backend still uses one ElevenLabs key for synthesis. Studio's grants prevent other signed-in users from invoking private voices through its routes. For provider-level isolation, move shared voices to a dedicated ElevenLabs service account and route personal voices through a separately scoped credential or explicit provider sharing. Store credentials in a secret manager, never Firestore.
+
 ## Rules verification
 
 Three checks cover the Security Rules, and each proves something different:
@@ -119,6 +155,7 @@ Never run Cloud Run under the default compute service account. Create a dedicate
 - `roles/datastore.user` on the project (for Admin SDK reads/writes on `allowlist`, `narrations`, `users`)
 - `roles/storage.objectAdmin` scoped to the narration Storage bucket
 - `roles/secretmanager.secretAccessor` scoped to the `GEMINI_API_KEY` secret
+- `roles/secretmanager.secretAccessor` scoped to the `ELEVENLABS_API_KEY` secret
 - `roles/firebaseauth.viewer` on the project (for `verifyIdToken` and `getUserByEmail` in `/api/users/resolve`)
 
 ### 2. Identity Platform & Blocking Functions
@@ -151,7 +188,7 @@ gcloud run deploy studio \
   --source . \
   --region us-central1 \
   --service-account studio-run@${PROJECT_ID}.iam.gserviceaccount.com \
-  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest \
+  --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest,ELEVENLABS_API_KEY=ELEVENLABS_API_KEY:latest \
   --set-env-vars ALLOWED_WEB_ORIGINS=https://${PROJECT_ID}.web.app,https://${PROJECT_ID}.firebaseapp.com \
   --no-cpu-throttling \
   --timeout 900 \

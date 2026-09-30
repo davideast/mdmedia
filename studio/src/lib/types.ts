@@ -42,6 +42,34 @@ export const VOICES = [
 
 export type VoiceName = (typeof VOICES)[number] | (string & {});
 
+export type VoiceProvider = "gemini" | "elevenlabs";
+
+export const VOICE_PROVIDER_LABEL: Record<VoiceProvider, string> = {
+  gemini: "Gemini",
+  elevenlabs: "ElevenLabs",
+};
+
+export function isElevenLabsVoiceId(value: unknown): value is string {
+  return typeof value === "string" && /^[A-Za-z0-9]{20}$/.test(value);
+}
+
+/** The UI keeps the display name separate from the provider's stable identifier. */
+export interface VoiceChoice {
+  provider: VoiceProvider;
+  id: string;
+  name: string;
+}
+
+/** A stable preference key. Names and permission to use a voice live elsewhere. */
+export type VoiceRef = Pick<VoiceChoice, "provider" | "id">;
+
+export function isVoiceRef(value: unknown): value is VoiceRef {
+  if (!value || typeof value !== "object") return false;
+  const ref = value as Partial<VoiceRef>;
+  return (ref.provider === "gemini" && (VOICES as readonly string[]).includes(ref.id ?? ""))
+    || (ref.provider === "elevenlabs" && isElevenLabsVoiceId(ref.id));
+}
+
 export const DEFAULT_VOICE: VoiceName = "Kore";
 
 /** Supported Gemini TTS models for audio generation. */
@@ -106,6 +134,8 @@ export interface Narration {
   /** What was actually spoken. The reader renders this. */
   transcript: string;
   voice: VoiceName;
+  voiceProvider?: VoiceProvider;
+  voiceId?: string;
   model?: TTSModelName;
   promptStyle: string;
   speed?: number;
@@ -220,6 +250,13 @@ export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structu
 
 export interface UserSettings {
   defaultVoice: VoiceName;
+  /** New preference shape; legacy provider/id fields remain readable during migration. */
+  defaultVoiceRef?: VoiceRef;
+  defaultVoiceProvider?: VoiceProvider;
+  defaultVoiceId?: string;
+  pinnedVoiceRefs?: VoiceRef[];
+  /** Gemini TTS model used for new narrations with a Gemini reader. */
+  defaultGeminiModel: TTSModelName;
   defaultPromptStyle: string;
   /** Rewrite markdown for the ear before synthesis. */
   rewriteForNarration: boolean;
@@ -233,12 +270,30 @@ export interface UserSettings {
 
 export const DEFAULT_SETTINGS: UserSettings = {
   defaultVoice: DEFAULT_VOICE,
+  defaultVoiceRef: { provider: "gemini", id: DEFAULT_VOICE },
+  pinnedVoiceRefs: [],
+  defaultGeminiModel: DEFAULT_TTS_MODEL,
   defaultPromptStyle: "Warm, unhurried narration.",
   rewriteForNarration: true,
   autoPlay: true,
   defaultVisibility: "private",
   highlightColor: DEFAULT_HIGHLIGHT_COLOR,
 };
+
+/** Read current and legacy settings through one migration path. */
+export function readDefaultVoiceRef(value: unknown): VoiceRef {
+  const raw = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  if (isVoiceRef(raw.defaultVoiceRef)) return raw.defaultVoiceRef;
+  const legacy = { provider: raw.defaultVoiceProvider, id: raw.defaultVoiceId };
+  if (isVoiceRef(legacy)) return legacy;
+  const gemini = { provider: "gemini", id: raw.defaultVoice };
+  return isVoiceRef(gemini) ? gemini : { provider: "gemini", id: DEFAULT_VOICE };
+}
+
+export function settingsDefaultVoice(settings: UserSettings): VoiceChoice {
+  const ref = readDefaultVoiceRef(settings);
+  return { ...ref, name: ref.provider === "gemini" ? ref.id : settings.defaultVoice };
+}
 
 /* ==========================================================================
    The NDJSON stream contract for POST /api/narrations
@@ -266,6 +321,7 @@ export interface StreamMetaEvent {
   id: string;
   title: string;
   voice: VoiceName;
+  voiceProvider?: VoiceProvider;
   model?: TTSModelName;
   totalChunks: number;
   totalChars: number;

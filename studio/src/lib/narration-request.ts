@@ -1,3 +1,4 @@
+import { isVoiceDisplayName } from "./voice-name.mjs";
 /**
  * Narration request parsing, validation, and ID generation.
  *
@@ -7,11 +8,13 @@
 
 import {
   DEFAULT_TTS_MODEL,
+  isElevenLabsVoiceId,
   TTS_MODELS,
   VOICES,
   type TTSModelName,
   type Visibility,
   type VoiceName,
+  type VoiceProvider,
 } from './types';
 
 /** The validated body of `POST /api/narrations`. */
@@ -19,6 +22,8 @@ export interface NarrationRequest {
   id?: string;
   markdown: string;
   voice: VoiceName;
+  voiceProvider: VoiceProvider;
+  voiceId: string;
   model?: TTSModelName;
   promptStyle: string;
   speed?: number;
@@ -27,6 +32,13 @@ export interface NarrationRequest {
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
   visibility: Visibility;
+}
+
+/** Metadata safe to place in a narration that may later be public or shared. */
+export function publicNarrationVoiceMetadata(request: Pick<NarrationRequest, 'voiceProvider' | 'voiceId'>) {
+  return request.voiceProvider === 'elevenlabs'
+    ? { voiceProvider: request.voiceProvider }
+    : { voiceProvider: request.voiceProvider, voiceId: request.voiceId };
 }
 
 const VISIBILITIES: readonly Visibility[] = ['private', 'shared', 'public'];
@@ -52,7 +64,14 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   const raw = body as Record<string, unknown>;
   const markdown = typeof raw.markdown === 'string' ? raw.markdown : '';
   if (markdown.trim().length === 0) return null;
-  if (!isVoice(raw.voice)) return null;
+  const voiceProvider = raw.voiceProvider === undefined ? 'gemini' : raw.voiceProvider;
+  if (voiceProvider !== 'gemini' && voiceProvider !== 'elevenlabs') return null;
+  const elevenLabsVoice =
+    voiceProvider === 'elevenlabs' &&
+    isVoiceDisplayName(raw.voice) &&
+    isElevenLabsVoiceId(raw.voiceId);
+  if (!elevenLabsVoice && (voiceProvider !== 'gemini' || !isVoice(raw.voice))) return null;
+  if (voiceProvider === 'gemini' && raw.voiceId !== undefined && raw.voiceId !== raw.voice) return null;
   if (!isVisibility(raw.visibility)) return null;
 
   const RESERVED_IDS = new Set(['narrations', 'new', 'settings', 'playlists', 'queue', 'library']);
@@ -71,9 +90,14 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   return {
     id: customId,
     markdown,
-    voice: raw.voice,
-    model: isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL,
-    promptStyle: typeof raw.promptStyle === 'string' ? raw.promptStyle : '',
+    voice: raw.voice as VoiceName,
+    voiceProvider,
+    voiceId: voiceProvider === 'elevenlabs' ? raw.voiceId as string : raw.voice as string,
+    model: voiceProvider === 'gemini'
+      ? (isTTSModel(raw.model) ? raw.model : DEFAULT_TTS_MODEL)
+      : undefined,
+    promptStyle: voiceProvider === 'gemini' && typeof raw.promptStyle === 'string'
+      ? raw.promptStyle : '',
     speed,
     verbalizeDiagrams:
       typeof raw.verbalizeDiagrams === 'boolean' ? raw.verbalizeDiagrams : undefined,
