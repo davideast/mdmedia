@@ -51,6 +51,32 @@ squash commit) and rebuild using the existing staged release workflow. Do not re
 clean the original dirty checkout. The `mdmedia.workspace.v1:<uid>` browser data is a new,
 isolated storage key: the previous app ignores it and existing downloads are unaffected.
 
+### Live release on 2026-09-30
+
+The feature was initially available only on the isolated preview at port 3100. It was
+then promoted to the existing launch service at port 3000 with build
+`XHaQ_7WznQVX2GszhZVya`. The release was built with the original Studio project key
+and bridge port 3473, so it retains the live sandbox's identities, narrations, and audio.
+The original dirty source checkout remains untouched; only production build artifacts
+and the matching generated worker were replaced.
+
+The previous build `gNcLRRl7vjNwDfO2iEfNq` is retained in the original checkout at
+`studio/.next-hosted-previous-1790785434182-22617`, including its service worker.
+To roll back the live service, copy that directory to `studio/.next-hosted-staged`
+(only when staging is empty), then run this worktree's `studio/scripts/release-hosted.mjs`
+with the original checkout's `studio` directory as the working directory. The release
+script checks the worker/build pair, retains the displaced build, and automatically
+restores it if health or actual browser SDK attachment fails. Startup allows three
+minutes for hosted sandbox restoration and source hashing.
+
+The exact Tailscale HTTPS origin passed the page, asset, health, and browser SDK checks.
+Chrome UI checks confirmed the live tab strip, opening Settings while audio kept
+playing, deep-link tab restoration, tab selection updating the route, Back/Forward,
+and retaining the tab set after refresh. At a 484px viewport, explicit narration Play
+loaded a six-minute track and enabled the bottom transport. This is browser viewport
+verification, not verification on the user's Android hardware. The reported disabled
+phone transport still needs its narration and displayed duration to reproduce.
+
 ## Regression checks
 
 `test/studio/workspace-routing.test.ts` exercises the workspace public interface for URL

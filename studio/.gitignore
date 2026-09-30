@@ -17,6 +17,7 @@
 /.next/
 /.next-hosted/
 /.next-hosted-staged/
+/.next-hosted-release/
 /.next-hosted-previous-*/
 /out/
 /public/sw.js
