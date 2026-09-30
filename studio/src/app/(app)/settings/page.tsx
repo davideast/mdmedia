@@ -186,6 +186,7 @@ export default function SettingsPage() {
               <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
                 <Textarea
                   id="default-style"
+                  key={`${profile?.uid ?? "defaults"}:${settings.defaultPromptStyle}`}
                   defaultValue={settings.defaultPromptStyle}
                   rows={3}
                   className="resize-none"
