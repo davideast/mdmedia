@@ -18,6 +18,7 @@ export interface ClassifiedNarrationError {
 export interface NarrationErrorContext {
   currentChunkIndex?: number;
   promptStyle?: string;
+  voiceProvider?: "gemini" | "elevenlabs";
 }
 
 const POLICY_KEYWORDS = [
@@ -41,6 +42,8 @@ const QUOTA_KEYWORDS = [
 
 const AUTH_KEYWORDS = [
   "gemini_api_key",
+  "elevenlabs_api_key",
+  "eleven_labs_key",
   "api_key_invalid",
   "api key not valid",
   "unauthorized",
@@ -98,6 +101,17 @@ export function classifyNarrationError(
     };
   }
 
+  if (lowerMessage.includes("subscription_required") || lowerMessage.includes("ivc_not_permitted")) {
+    return {
+      code: "VOICE_PLAN_REQUIRED",
+      category: "config",
+      message: "This ElevenLabs voice is not available on the current plan.",
+      actionableHint: "Choose another voice or use an ElevenLabs plan that supports this voice.",
+      chunkIndex,
+      retryable: false,
+    };
+  }
+
   // 2. Quota / Rate Limiting (429)
   const isQuota =
     status === 429 ||
@@ -126,7 +140,11 @@ export function classifyNarrationError(
       code: "AUTH_CONFIG_ERROR",
       category: "config",
       message: "Narration is temporarily unavailable due to an API configuration error.",
-      actionableHint: "Verify that your Gemini API key is valid and has permissions enabled.",
+      actionableHint: lowerMessage.includes("gemini_api_key")
+        ? "Verify that your Gemini API key is valid and has permissions enabled."
+        : context?.voiceProvider === "elevenlabs"
+        ? "Verify that your ElevenLabs API key is valid and has speech synthesis permission."
+        : "Verify that your Gemini API key is valid and has permissions enabled.",
       chunkIndex,
       retryable: false,
     };

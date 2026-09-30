@@ -274,10 +274,15 @@ function createFirebaseCliRestBackend(projectId, accessToken, userEmail) {
     'Content-Type': 'application/json',
   };
 
+  const pathUrl = (parts) => `${baseUrl}/${parts.map(encodeURIComponent).join('/')}`;
+
   function makeDocRef(collectionName, docId) {
-    const docUrl = `${baseUrl}/${encodeURIComponent(collectionName)}/${encodeURIComponent(docId)}`;
+    const docUrl = pathUrl([...collectionName.split('/'), docId]);
     return {
       id: docId,
+      collection(subcollectionName) {
+        return makeCollectionRef(`${collectionName}/${docId}/${subcollectionName}`);
+      },
       async get() {
         const res = await fetch(docUrl, { headers });
         if (res.status === 404) {
@@ -313,37 +318,41 @@ function createFirebaseCliRestBackend(projectId, accessToken, userEmail) {
     };
   }
 
+  function makeCollectionRef(collectionName) {
+    return {
+      doc(docId) {
+        return makeDocRef(collectionName, docId);
+      },
+      async get() {
+        const docs = [];
+        let pageToken = '';
+        do {
+          const url = `${pathUrl(collectionName.split('/'))}${
+            pageToken ? `?pageToken=${encodeURIComponent(pageToken)}` : ''
+          }`;
+          const res = await fetch(url, { headers });
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(
+              `Firestore LIST ${collectionName} failed (${res.status}): ${text}`,
+            );
+          }
+          const json = await res.json();
+          for (const rawDoc of json.documents ?? []) {
+            const id = String(rawDoc.name ?? '').split('/').pop() ?? '';
+            const data = fromFirestoreFields(rawDoc.fields);
+            docs.push({ id, exists: true, data: () => data });
+          }
+          pageToken = json.nextPageToken ?? '';
+        } while (pageToken);
+        return { docs };
+      },
+    };
+  }
+
   const db = {
     collection(collectionName) {
-      return {
-        doc(docId) {
-          return makeDocRef(collectionName, docId);
-        },
-        async get() {
-          const docs = [];
-          let pageToken = '';
-          do {
-            const url = `${baseUrl}/${encodeURIComponent(collectionName)}${
-              pageToken ? `?pageToken=${encodeURIComponent(pageToken)}` : ''
-            }`;
-            const res = await fetch(url, { headers });
-            if (!res.ok) {
-              const text = await res.text();
-              throw new Error(
-                `Firestore LIST ${collectionName} failed (${res.status}): ${text}`,
-              );
-            }
-            const json = await res.json();
-            for (const rawDoc of json.documents ?? []) {
-              const id = String(rawDoc.name ?? '').split('/').pop() ?? '';
-              const data = fromFirestoreFields(rawDoc.fields);
-              docs.push({ id, exists: true, data: () => data });
-            }
-            pageToken = json.nextPageToken ?? '';
-          } while (pageToken);
-          return { docs };
-        },
-      };
+      return makeCollectionRef(collectionName);
     },
   };
 
@@ -357,7 +366,10 @@ function createFirebaseCliRestBackend(projectId, accessToken, userEmail) {
         headers,
         body: JSON.stringify({ email: [email] }),
       });
-      if (!res.ok) throw new Error(`Auth lookup failed (${res.status})`);
+      if (!res.ok) {
+        const detail = await res.json().catch(() => null);
+        throw new Error(`Auth lookup failed (${res.status}): ${detail?.error?.status ?? 'unknown'}`);
+      }
       const json = await res.json();
       const user = json.users?.[0];
       if (!user?.localId) throw new Error('auth/user-not-found');
@@ -386,7 +398,7 @@ function createFirebaseCliRestBackend(projectId, accessToken, userEmail) {
   };
 }
 
-async function openBackend(options) {
+export async function openBackend(options) {
   loadEnvLocal();
 
   if (!options.local) {

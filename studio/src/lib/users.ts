@@ -22,7 +22,10 @@ import {
 import { db } from '@/lib/firebase';
 import {
   DEFAULT_SETTINGS,
+  isVoiceRef,
+  readDefaultVoiceRef,
   HIGHLIGHT_COLORS,
+  TTS_MODELS,
   type HighlightColorId,
   type UserProfile,
   type UserSettings,
@@ -38,11 +41,25 @@ function asNumber(value: unknown, fallback = 0): number {
 
 function toSettings(value: unknown): UserSettings {
   const raw = (value ?? {}) as Partial<UserSettings>;
+  const defaultVoiceRef = readDefaultVoiceRef(raw);
+  const pinnedVoiceRefs = Array.isArray(raw.pinnedVoiceRefs)
+    ? raw.pinnedVoiceRefs.filter(isVoiceRef).filter((ref, index, refs) =>
+      refs.findIndex((other) => other.provider === ref.provider && other.id === ref.id) === index).slice(0, 20)
+    : [];
+  const preferredGeminiModel = raw.defaultGeminiModel;
   const validHighlight = HIGHLIGHT_COLORS.some((c) => c.id === raw.highlightColor)
     ? (raw.highlightColor as HighlightColorId)
     : DEFAULT_SETTINGS.highlightColor;
   return {
-    defaultVoice: raw.defaultVoice ?? DEFAULT_SETTINGS.defaultVoice,
+    defaultVoice: defaultVoiceRef.provider === 'gemini'
+      ? defaultVoiceRef.id : asString(raw.defaultVoice, defaultVoiceRef.id),
+    defaultVoiceRef,
+    defaultVoiceProvider: defaultVoiceRef.provider,
+    defaultVoiceId: defaultVoiceRef.id,
+    pinnedVoiceRefs,
+    defaultGeminiModel: preferredGeminiModel && TTS_MODELS.includes(preferredGeminiModel)
+      ? preferredGeminiModel
+      : DEFAULT_SETTINGS.defaultGeminiModel,
     defaultPromptStyle: asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle),
     rewriteForNarration:
       typeof raw.rewriteForNarration === 'boolean'

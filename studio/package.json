@@ -26,6 +26,8 @@
     "rules:verify:hosted": "node scripts/verify-rules-hosted.mjs",
     "test:assurance": "node scripts/run-authorization-campaign.mjs",
     "allowlist": "node scripts/allowlist.mjs",
+    "voices": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/voices.mjs",
+    "voices:scrub-legacy": "node scripts/scrub-private-voice-ids.mjs",
     "vendor:mdmedia": "npm --prefix .. run build && mkdir -p vendor && npm pack .. --pack-destination ./vendor",
     "deploy:preflight": "node scripts/deploy-preflight.mjs",
     "postinstall": "node scripts/patch-pyric-bridge-port.js"

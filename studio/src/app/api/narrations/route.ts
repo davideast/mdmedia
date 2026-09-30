@@ -1,4 +1,6 @@
+import { ElevenLabsVoiceCatalog } from "mdmedia/tts";
 import { verifyIdToken } from "@/lib/firebase-admin";
+import { getAuthorizedVoice } from "@/lib/voice-access";
 import {
   claimNarrationId,
   createNarrationStream,
@@ -57,6 +59,35 @@ export async function POST(request: Request): Promise<Response> {
       { message: "Add some text and choose a voice before creating a narration." },
       { status: 400, headers: cors },
     );
+  }
+
+  if (parsed.voiceProvider === "elevenlabs") {
+    let accessible;
+    try {
+      accessible = await getAuthorizedVoice(uid, parsed.voiceId);
+    } catch (error) {
+      console.error("[narrations] voice access lookup failed:", error);
+      return Response.json({ message: "Could not verify voice access." }, { status: 503, headers: cors });
+    }
+    if (!accessible) {
+      return Response.json({ message: "You do not have access to that voice." }, { status: 403, headers: cors });
+    }
+    const apiKey = process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY;
+    if (!apiKey) {
+      return Response.json(
+        { message: "ElevenLabs narration is unavailable." },
+        { status: 503, headers: cors },
+      );
+    }
+    try {
+      const voice = await new ElevenLabsVoiceCatalog(apiKey).get(parsed.voiceId);
+      parsed.voice = accessible.name || voice.name;
+    } catch {
+      return Response.json(
+        { message: "That ElevenLabs voice is unavailable. Choose another voice." },
+        { status: 400, headers: cors },
+      );
+    }
   }
 
   const conflict = () =>

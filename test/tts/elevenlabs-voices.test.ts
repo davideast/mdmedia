@@ -4,7 +4,7 @@ import { ElevenLabsTTSProvider } from '../../src/tts/elevenlabs-tts-provider.js'
 import { resolveConfig } from '../../src/config/config-resolver.js';
 
 function voiceResponse(
-  voices: Array<{ voice_id: string; name: string }>,
+  voices: Array<{ voice_id: string; name: string; preview_url?: string | null }>,
   nextPageToken: string | null = null
 ): Response {
   return Response.json({
@@ -81,6 +81,29 @@ describe('ElevenLabs voice references', () => {
       { id: 'id-adam', name: 'Adam' },
       { id: 'id-rachel', name: 'Rachel' },
     ]);
+  });
+
+  it('exposes hosted samples while keeping voices without samples usable', async () => {
+    const request: typeof fetch = async (input) => {
+      const url = new URL(String(input));
+      if (url.pathname === '/v2/voices') return voiceResponse([
+        { voice_id: 'voice-with-sample', name: 'Sampled', preview_url: 'https://example.com/sample.mp3' },
+        { voice_id: 'voice-no-sample', name: 'Silent', preview_url: null },
+      ]);
+      return Response.json({
+        voice_id: 'voice-with-sample',
+        name: 'Sampled',
+        preview_url: 'https://example.com/sample.mp3',
+      });
+    };
+    const catalog = new ElevenLabsVoiceCatalog('key', request);
+    expect((await catalog.listPage()).voices).toEqual([
+      { id: 'voice-with-sample', name: 'Sampled', previewUrl: 'https://example.com/sample.mp3' },
+      { id: 'voice-no-sample', name: 'Silent', previewUrl: null },
+    ]);
+    expect(await catalog.get('voice-with-sample')).toEqual({
+      id: 'voice-with-sample', name: 'Sampled', previewUrl: 'https://example.com/sample.mp3',
+    });
   });
 
   it('asks for an ID when a name is ambiguous', async () => {

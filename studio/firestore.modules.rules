@@ -40,6 +40,16 @@ service cloud.firestore {
       allow list, delete: if false;
     }
 
+    // Voice availability is server-managed. A user's editable settings map is
+    // only a preference and cannot grant access to a private provider voice.
+    match /voiceCatalog/{voiceId} {
+      allow read, write: if false;
+    }
+
+    match /users/{uid}/voiceGrants/{voiceId} {
+      allow read, write: if false;
+    }
+
     match /narrations/{narrationId} {
 
       // Reads are authorized per document. For a query (`list`), Firestore
@@ -107,11 +117,19 @@ service cloud.firestore {
     // user of the app (an allowlisted account): the owner, or a named recipient.
     // Mirrors the server gate in src/lib/firebase-admin.ts#verifyIdToken.
     function canReadNarration() {
-      return resource.data.visibility == 'public'
+      return (resource.data.visibility == 'public' && safeVoiceMetadata())
         || (isAllowlisted()
             && (isOwner(resource.data.ownerUid)
                 || (resource.data.visibility == 'shared'
-                    && request.auth.uid in resource.data.sharedWith)));
+                    && request.auth.uid in resource.data.sharedWith
+                    && safeVoiceMetadata())));
+    }
+
+    // Rules cannot redact fields. Until legacy narrations are migrated, block
+    // non-owner reads of documents containing a private provider voice ID.
+    function safeVoiceMetadata() {
+      return resource.data.get('voiceProvider', 'gemini') != 'elevenlabs'
+        || !resource.data.keys().hasAny(['voiceId']);
     }
 
     // Shape checks on the incoming document. Applied to create and update
@@ -142,4 +160,3 @@ service cloud.firestore {
     }
   }
 }
-

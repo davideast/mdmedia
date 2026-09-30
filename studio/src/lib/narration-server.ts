@@ -49,7 +49,7 @@ const EMPTY_SOURCE_FAILURE =
   "There was nothing to narrate in this document. Add some text and try again.";
 const CANCELLED_MESSAGE = "This narration was cancelled before it finished.";
 
-import type { NarrationRequest } from './narration-request';
+import { publicNarrationVoiceMetadata, type NarrationRequest } from './narration-request';
 export type { NarrationRequest };
 export { parseNarrationRequest } from './narration-request';
 
@@ -305,7 +305,7 @@ export function createNarrationStream({
   const failDocument = async (error: ClassifiedNarrationError | string) => {
     if (!docWritten) return;
     try {
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         status: "error",
         updatedAt: Date.now(),
       };
@@ -377,7 +377,8 @@ export function createNarrationStream({
         sourceMarkdown: request.markdown,
         transcript: "",
         voice: request.voice,
-        model: request.model ?? DEFAULT_TTS_MODEL,
+        ...publicNarrationVoiceMetadata(request),
+        ...(request.model ? { model: request.model } : {}),
         promptStyle: request.promptStyle,
         adapted: request.rewriteForNarration,
         status: "streaming",
@@ -492,13 +493,16 @@ export function createNarrationStream({
         return;
       }
 
-      const selectedModel = request.model ?? DEFAULT_TTS_MODEL;
+      const selectedModel = request.voiceProvider === "gemini"
+        ? request.model ?? DEFAULT_TTS_MODEL
+        : undefined;
 
       queue.push({
         type: "meta",
         id,
         title,
         voice: request.voice,
+        voiceProvider: request.voiceProvider,
         model: selectedModel,
         speed: request.speed,
         verbalizeDiagrams: request.verbalizeDiagrams,
@@ -509,8 +513,11 @@ export function createNarrationStream({
 
       const bus = new UniversalEventBus();
       const ttsProvider = createTTSProvider({
-        provider: "gemini",
+        provider: request.voiceProvider,
         geminiClient: client,
+        apiKey: request.voiceProvider === "elevenlabs"
+          ? process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY
+          : undefined,
         maxRetries: 3,
         model: selectedModel,
       });
@@ -648,7 +655,11 @@ export function createNarrationStream({
           .catch(() => undefined);
       });
 
-      await pipeline.processDocument(documentChunks, request.voice, request.promptStyle);
+      await pipeline.processDocument(
+        documentChunks,
+        request.voiceId,
+        request.voiceProvider === "gemini" ? request.promptStyle : undefined,
+      );
       await checkpointChain;
 
       if (cancelled) {
@@ -662,6 +673,7 @@ export function createNarrationStream({
           {
             currentChunkIndex: currentProcessingChunkIndex,
             promptStyle: request.promptStyle,
+            voiceProvider: request.voiceProvider,
           }
         );
         await failDocument(classified);
@@ -692,6 +704,7 @@ export function createNarrationStream({
       const classified = classifyNarrationError(pipelineError ?? error, {
         currentChunkIndex: currentProcessingChunkIndex,
         promptStyle: request.promptStyle,
+        voiceProvider: request.voiceProvider,
       });
       await failDocument(classified);
       await discardObjects();
