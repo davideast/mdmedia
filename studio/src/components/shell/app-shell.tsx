@@ -15,6 +15,7 @@ import { useNarration } from "@/components/shell/narration-provider";
 import { NavRail } from "@/components/shell/nav-rail";
 import { ShellContext, type ShellContextValue } from "@/components/shell/shell-context";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { useMediaSession } from "@/lib/use-media-session";
 import { useConnectivity } from "@/lib/connectivity";
 import { useOfflinePlayback } from "@/components/shell/offline-playback-provider";
 
@@ -77,6 +78,32 @@ export function AppShell({
   const onlineScreenDisabled = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
   const offlinePlayback = useOfflinePlayback();
+  // One active transport owns both the player bar and the system media controls.
+  const usingDownloads = !stream.playing && offlinePlayback.track !== null;
+  useEffect(() => {
+    if (stream.playing) offlinePlayback.stop();
+  }, [stream.playing, offlinePlayback.stop]);
+  useMediaSession(usingDownloads ? {
+    player: offlinePlayback.player,
+    title: offlinePlayback.track!.title,
+    artist: offlinePlayback.track!.voice || 'mdmedia',
+    album: offlinePlayback.playlistTitle || 'Downloads',
+    playing: offlinePlayback.playing,
+    positionMs: offlinePlayback.positionMs,
+    durationMs: offlinePlayback.durationMs,
+    previous: offlinePlayback.previous,
+    next: offlinePlayback.index + 1 < offlinePlayback.queueLength ? offlinePlayback.next : undefined,
+  } : {
+    player: stream.player,
+    title: stream.title || 'Narration',
+    artist: stream.voice || 'mdmedia',
+    album: queue?.playlistTitle || 'mdmedia studio',
+    playing: stream.playing,
+    positionMs: stream.positionMs,
+    durationMs: stream.durationMs,
+    previous: !offline && queue ? previousTrack : undefined,
+    next: !offline && queue && queue.index + 1 < queue.tracks.length ? nextTrack : undefined,
+  });
   const breakpoints = useResponsiveBreakpoints();
   const hasContext = pathname.startsWith("/studio") || pathname.startsWith("/narration/");
   const isNarrationRoute = pathname.startsWith("/narration/");
@@ -263,14 +290,14 @@ export function AppShell({
       </div>
       {showPlayerBar ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-3 sm:px-6 sm:pb-5">
-          {offlinePlayback.track ? (
+          {usingDownloads ? (
             <AudioPlayerBar
               player={offlinePlayback.player}
               positionMs={offlinePlayback.positionMs}
               durationMs={offlinePlayback.durationMs}
               playing={offlinePlayback.playing}
               busy={false}
-              title={offlinePlayback.track.title}
+              title={offlinePlayback.track!.title}
               subtitle={offlinePlayback.playlistTitle || 'Downloads'}
               href="/downloads"
               onPrevious={offlinePlayback.previous}

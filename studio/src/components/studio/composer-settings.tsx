@@ -123,8 +123,8 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-        <div className="grid gap-0.5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="grid min-w-0 gap-0.5">
           <Label htmlFor="structure" className="t-card-title cursor-pointer font-normal">
             Clean document structure
           </Label>
@@ -139,8 +139,8 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-        <div className="grid gap-0.5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="grid min-w-0 gap-0.5">
           <Label htmlFor="verbalize-diagrams" className="t-card-title cursor-pointer font-normal">
             Verbalize diagrams
           </Label>
@@ -155,7 +155,7 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <Label htmlFor="rewrite" className="t-card-title cursor-pointer font-normal">
           Rewrite for the ear
         </Label>

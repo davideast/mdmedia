@@ -72,7 +72,7 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
 
   describe("View and item alignment across pages (zero nudging)", () => {
     it("LibraryPage uses viewGrid and does not use px-8 py-8 or mx-auto centering wrappers", () => {
-      expect(libraryPage).toContain("<WorkbenchPanel\n      title=\"Library\"\n      icon={<Library size={13} strokeWidth={2} />}\n      viewGrid\n    >");
+      expect(libraryPage).toContain('viewGrid\n      gridVariant="wide"');
       expect(libraryPage).not.toContain('bodyClassName="px-8 py-8"');
       expect(libraryPage).not.toContain("mx-auto grid w-full max-w-[68ch]");
     });
@@ -82,12 +82,13 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
       expect(libraryPage).not.toContain("chunksCount");
     });
 
-    it("LibraryNarrationCard uses item-track-grid and does NOT use pl-5.5 or pl-5 ad-hoc nudging", () => {
-      expect(libraryPage).toContain("item-track-grid");
-      expect(libraryPage).toContain("track-status");
-      expect(libraryPage).toContain("track-title");
-      expect(libraryPage).toContain("track-body");
-      expect(libraryPage).toContain("track-actions");
+    it("LibraryNarrationCard separates the title, details, tools, and primary action into aligned grid areas", () => {
+      expect(libraryPage).toContain("library-track-card");
+      expect(libraryPage).toContain("library-track-status");
+      expect(libraryPage).toContain("library-track-title");
+      expect(libraryPage).toContain("library-track-details");
+      expect(libraryPage).toContain("library-track-tools");
+      expect(libraryPage).toContain("library-track-primary");
       expect(libraryPage).not.toContain("pl-5.5");
       expect(libraryPage).not.toContain("pl-5");
     });
@@ -95,6 +96,7 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
     it("QueuePage uses viewGrid and does not use px-8 py-8 or mx-auto centering wrappers", () => {
       expect(queuePage).toContain("<WorkbenchPanel\n      title=\"Queue\"\n      icon={<ListOrdered size={13} strokeWidth={2} />}\n      viewGrid");
       expect(queuePage).not.toContain('bodyClassName="px-8 py-8"');
+      expect(queuePage).toContain('viewGrid\n      gridVariant="wide"');
       expect(queuePage).not.toContain("mx-auto grid w-full max-w-[68ch]");
     });
 

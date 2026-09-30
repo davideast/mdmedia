@@ -11,16 +11,17 @@ import {
 import { savePlaylistDownload } from "../../studio/src/lib/playlist-download";
 import { MediaStoreService, getMediaStore } from "../../studio/src/lib/media-store";
 import { downloadMediaStore, readDownloadCatalog, updateDownloadCatalog, removeIndividualDownload, removeDownloadedPlaylist, removePendingPlaylist } from "../../studio/src/lib/download-catalog";
+import { loadDownloadedTrack } from "../../studio/src/lib/download-playback";
 import type { NarrationTimingsFile } from "../../studio/src/lib/wav";
 
-function memoryDirectory() {
+function memoryDirectory(beforeRead?: (name: string) => Promise<void>) {
   const directories = new Map<string, ReturnType<typeof memoryDirectory>>();
   const files = new Map<string, Blob>();
   return {
     async getDirectoryHandle(name: string, options?: { create?: boolean }) {
       if (!directories.has(name)) {
         if (!options?.create) throw new DOMException('Missing directory', 'NotFoundError');
-        directories.set(name, memoryDirectory());
+        directories.set(name, memoryDirectory(beforeRead));
       }
       return directories.get(name)!;
     },
@@ -30,7 +31,7 @@ function memoryDirectory() {
         files.set(name, new Blob());
       }
       return {
-        getFile: async () => files.get(name)!,
+        getFile: async () => { await beforeRead?.(name); return files.get(name)!; },
         createWritable: async () => ({
           write: async (data: BlobPart) => { files.set(name, new Blob([data])); },
           close: async () => {},
@@ -210,6 +211,33 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
         globalThis.fetch = originalFetch;
       }
     });
+    for (const phase of ['audio', 'catalog'] as const) {
+      it(`ignores a stopped or superseded selection awaiting ${phase}`, async () => {
+        let release!: () => void;
+        let reached!: () => void;
+        let armed = false;
+        const blocked = new Promise<void>((resolve) => { release = resolve; });
+        const entered = new Promise<void>((resolve) => { reached = resolve; });
+        const directory = memoryDirectory(async (name) => {
+          if (armed && name === (phase === 'audio' ? `${testId}.wav` : 'catalog.json')) {
+            reached();
+            await blocked;
+          }
+        });
+        Object.defineProperty(navigator, 'storage', { configurable: true, value: { getDirectory: async () => directory } });
+        await downloadMediaStore(uid).saveTrack(testId, new Blob([sampleWavBytes]), sampleTimings);
+        await updateDownloadCatalog(uid, (catalog) => ({ ...catalog,
+          tracks: { [testId]: { id: testId, title: sampleTimings.title!, voice: 'Kore', durationMs: 2500, savedAt: 1 } },
+        }));
+        let current = true;
+        armed = true;
+        const selection = loadDownloadedTrack(uid, testId, () => current);
+        await entered;
+        current = false;
+        release();
+        expect(await selection).toBeNull();
+      });
+    }
 
     it("requires an account before downloading", async () => {
       await expect(downloadNarration(testId)).rejects.toThrow('Sign in before downloading.');

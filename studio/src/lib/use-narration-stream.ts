@@ -261,6 +261,7 @@ export function useNarrationStream(): NarrationStreamState {
             break;
           }
           case 'done':
+            activePlayer.completeStream();
             setId(event.id);
             setStatus('ready');
             break;

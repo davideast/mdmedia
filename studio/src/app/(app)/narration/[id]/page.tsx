@@ -233,7 +233,7 @@ export default function NarrationPage() {
           <span
             onDoubleClick={startEditingTitle}
             title="Double-click to rename"
-            className="cursor-text truncate rounded-xs px-1 -mx-1 transition-colors hover:bg-muted"
+            className="min-w-0 cursor-text truncate rounded-xs px-1 -mx-1 transition-colors hover:bg-muted"
           >
             {displayTitle}
           </span>

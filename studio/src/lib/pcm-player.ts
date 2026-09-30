@@ -1,6 +1,7 @@
 /**
- * A Web Audio player for 24 kHz / 16-bit / mono PCM that can start playing
- * before the stream has finished arriving.
+ * A player for 24 kHz / 16-bit / mono PCM that can start playing before the
+ * stream has finished arriving. Finished WAV recordings use an audio element
+ * so mobile browsers expose playback to the operating system media controls.
  *
  * The sample buffer grows as chunks land. Playback is a chain of
  * `AudioBufferSourceNode`s scheduled back to back, so appending never
@@ -9,7 +10,7 @@
  */
 
 import { SAMPLE_RATE, WAV_HEADER_BYTES } from "./types";
-import { alignPcmFrames, isRiffHeader } from "./wav";
+import { alignPcmFrames, isRiffHeader, wrapPcmAsWav } from "./wav";
 import { timeStretchWsola } from "./wsola";
 
 const MIN_RATE = 0.5;
@@ -66,6 +67,10 @@ export class StreamingPcmPlayer {
   private context: AudioContext | null = null;
   private gain: GainNode | null = null;
   private readonly sources = new Set<AudioBufferSourceNode>();
+  private nativeAudio: HTMLAudioElement | null = null;
+  private nativeUrl: string | null = null;
+  private nativeActive = false;
+  private handoffToken = 0;
 
   private scheduledSamples = 0;
   private nextStartTime = 0;
@@ -112,6 +117,23 @@ export class StreamingPcmPlayer {
 
   async play(): Promise<void> {
     if (this.destroyed) return;
+    if (this.nativeAudio) {
+      this.activateNative();
+      const audio = this.nativeAudio;
+      if (this.pausedMs >= this.durationMs) {
+        this.pausedMs = 0;
+        audio.currentTime = 0;
+      }
+      try {
+        await audio.play();
+      } catch {
+        if (this.nativeAudio === audio && !this.destroyed) {
+          this.isPlaying = false;
+          this.notify();
+        }
+      }
+      return;
+    }
     const context = this.ensureContext();
     if (!context) return;
 
@@ -135,10 +157,18 @@ export class StreamingPcmPlayer {
   }
 
   pause(): void {
-    if (!this.isPlaying) return;
+    if (!this.isPlaying && (this.nativeAudio?.paused ?? true)) return;
     this.pausedMs = this.positionMs;
     this.isPlaying = false;
-    this.stopSources();
+    this.handoffToken += 1;
+    if (this.nativeActive) {
+      this.nativeAudio?.pause();
+    } else {
+      this.nativeAudio?.pause();
+      this.stopSources();
+      // A finished checkpoint may have arrived while Web Audio was playing.
+      this.activateNative();
+    }
     this.stopFrameLoop();
     this.notify();
   }
@@ -146,7 +176,9 @@ export class StreamingPcmPlayer {
   seek(ms: number): void {
     const target = clamp(ms, 0, this.durationMs);
     this.pausedMs = target;
-    if (this.isPlaying) {
+    if (this.nativeActive && this.nativeAudio) {
+      this.nativeAudio.currentTime = target / 1000;
+    } else if (this.isPlaying) {
       this.restartFrom(target);
     }
     this.notify();
@@ -165,7 +197,8 @@ export class StreamingPcmPlayer {
     if (next === this.rateValue) return;
     const resumeAt = this.positionMs;
     this.rateValue = next;
-    if (this.isPlaying) {
+    if (this.nativeAudio) this.nativeAudio.playbackRate = next;
+    if (this.isPlaying && !this.nativeActive) {
       this.pausedMs = resumeAt;
       this.restartFrom(resumeAt);
     }
@@ -174,6 +207,7 @@ export class StreamingPcmPlayer {
 
   setVolume(volume: number): void {
     this.volumeValue = clamp(volume, 0, 1);
+    if (this.nativeAudio) this.nativeAudio.volume = this.volumeValue;
     if (this.gain && this.context) {
       this.gain.gain.setValueAtTime(this.volumeValue, this.context.currentTime);
     }
@@ -181,6 +215,12 @@ export class StreamingPcmPlayer {
   }
 
   get positionMs(): number {
+    if (this.nativeActive && this.nativeAudio) {
+      if (this.nativeAudio.readyState < HTMLMediaElement.HAVE_METADATA) {
+        return clamp(this.pausedMs, 0, this.durationMs);
+      }
+      return clamp(this.nativeAudio.currentTime * 1000, 0, this.durationMs);
+    }
     if (!this.isPlaying || !this.context) {
       return clamp(this.pausedMs, 0, this.durationMs);
     }
@@ -194,6 +234,21 @@ export class StreamingPcmPlayer {
 
   get playing(): boolean {
     return this.isPlaying;
+  }
+
+  /** Marks a live PCM stream complete and hands its recording to native media playback. */
+  completeStream(): void {
+    if (this.destroyed || this.complete) return;
+    this.complete = true;
+    if (this.sampleCount > 0 && !this.nativeAudio) {
+      const pcm = new Uint8Array(this.sampleCount * 2);
+      const view = new DataView(pcm.buffer);
+      for (let i = 0; i < this.sampleCount; i += 1) {
+        view.setInt16(i * 2, Math.round(this.samples[i] * 32768), true);
+      }
+      this.prepareNativeAudio(wrapPcmAsWav(pcm));
+    }
+    this.notify();
   }
 
   subscribe(callback: Subscriber): () => void {
@@ -222,6 +277,7 @@ export class StreamingPcmPlayer {
       }
       if (options?.final !== false) {
         this.complete = true;
+        this.prepareNativeAudio(bytes);
       }
       this.notify();
       return;
@@ -229,6 +285,7 @@ export class StreamingPcmPlayer {
 
     this.stopSources();
     this.stopFrameLoop();
+    this.disposeNativeAudio();
     this.isPlaying = false;
     this.sampleCount = 0;
     this.scheduledSamples = 0;
@@ -238,6 +295,7 @@ export class StreamingPcmPlayer {
     this.append(pcm);
     if (options?.final !== false) {
       this.complete = true;
+      this.prepareNativeAudio(bytes);
     }
     this.notify();
   }
@@ -248,6 +306,7 @@ export class StreamingPcmPlayer {
     this.stopSources();
     this.stopFrameLoop();
     this.clearStarveTimer();
+    this.disposeNativeAudio();
     this.subscribers.clear();
     const context = this.context;
     this.context = null;
@@ -262,6 +321,113 @@ export class StreamingPcmPlayer {
     const grown = new Float32Array(capacity);
     grown.set(this.samples.subarray(0, this.sampleCount));
     this.samples = grown;
+  }
+
+  private prepareNativeAudio(bytes: Uint8Array): void {
+    if (this.nativeAudio || typeof document === "undefined" ||
+        typeof URL.createObjectURL !== "function") return;
+
+    const audio = document.createElement("audio");
+    const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "audio/wav" }));
+    audio.src = url;
+    audio.preload = "auto";
+    audio.playbackRate = this.rateValue;
+    audio.volume = this.volumeValue;
+    audio.style.display = "none";
+    document.body.appendChild(audio);
+    audio.addEventListener("playing", () => {
+      if (!this.nativeActive || this.destroyed) return;
+      this.isPlaying = true;
+      this.startFrameLoop();
+      this.notify();
+    });
+    audio.addEventListener("pause", () => {
+      if (!this.nativeActive || this.destroyed || audio.ended) return;
+      this.pausedMs = audio.currentTime * 1000;
+      this.isPlaying = false;
+      this.stopFrameLoop();
+      this.notify();
+    });
+    audio.addEventListener("ended", () => {
+      if (this.nativeActive && !this.destroyed) this.finish();
+    });
+    audio.addEventListener("timeupdate", () => {
+      if (this.nativeActive && !this.destroyed) this.notify();
+    });
+    audio.addEventListener("seeked", () => {
+      if (this.nativeActive && !this.destroyed) this.notify();
+    });
+    this.nativeAudio = audio;
+    this.nativeUrl = url;
+    if (this.isPlaying) this.handoffToNative(audio);
+    else this.activateNative();
+  }
+
+  private handoffToNative(audio: HTMLAudioElement): void {
+    const token = ++this.handoffToken;
+    const begin = () => {
+      if (this.destroyed || this.nativeAudio !== audio || this.nativeActive ||
+          !this.isPlaying || token !== this.handoffToken) return;
+      const seekTo = (ms: number) => {
+        const seconds = ms / 1000;
+        audio.currentTime = Number.isFinite(audio.duration)
+          ? Math.min(seconds, audio.duration)
+          : seconds;
+      };
+      seekTo(this.positionMs);
+      const onPlaying = () => {
+        if (this.destroyed || this.nativeAudio !== audio || this.nativeActive ||
+            !this.isPlaying || token !== this.handoffToken) return;
+        const position = this.positionMs;
+        seekTo(position);
+        this.stopSources();
+        this.clearStarveTimer();
+        this.nativeActive = true;
+        this.pausedMs = position;
+        this.notify();
+      };
+      audio.addEventListener("playing", onPlaying, { once: true });
+      void audio.play().catch(() => {
+        audio.removeEventListener("playing", onPlaying);
+      });
+    };
+    if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) begin();
+    else audio.addEventListener("loadedmetadata", begin, { once: true });
+  }
+
+  private activateNative(): void {
+    if (!this.nativeAudio || this.nativeActive) return;
+    this.handoffToken += 1;
+    const position = this.positionMs;
+    this.nativeAudio.pause();
+    this.stopSources();
+    this.clearStarveTimer();
+    this.nativeActive = true;
+    this.pausedMs = position;
+    const audio = this.nativeAudio;
+    const seek = () => {
+      if (this.nativeAudio === audio && this.nativeActive) {
+        const targetSeconds = this.pausedMs / 1000;
+        audio.currentTime = Math.min(targetSeconds, audio.duration || targetSeconds);
+      }
+    };
+    if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) seek();
+    else audio.addEventListener("loadedmetadata", seek, { once: true });
+  }
+
+  private disposeNativeAudio(): void {
+    this.handoffToken += 1;
+    const audio = this.nativeAudio;
+    this.nativeAudio = null;
+    this.nativeActive = false;
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      audio.remove();
+    }
+    if (this.nativeUrl) URL.revokeObjectURL(this.nativeUrl);
+    this.nativeUrl = null;
   }
 
   private ensureContext(): AudioContext | null {
@@ -384,6 +550,7 @@ export class StreamingPcmPlayer {
     this.isPlaying = false;
     this.pausedMs = this.durationMs;
     this.stopSources();
+    if (!this.nativeActive) this.activateNative();
     this.stopFrameLoop();
     this.notify();
   }
