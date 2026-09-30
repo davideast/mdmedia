@@ -7,6 +7,7 @@ import { ContextPanel } from "@/components/shell/context-panel";
 import { NarrationProvider } from "@/components/shell/narration-provider";
 import { SignInGate } from "@/components/shell/sign-in-gate";
 import { useAuth } from "@/lib/auth-context";
+import { OfflinePlaybackProvider } from "@/components/shell/offline-playback-provider";
 
 /**
  * Gate + shell for every signed-in surface.
@@ -30,7 +31,9 @@ export function AppFrame({ children }: { children: ReactNode }) {
 
   return (
     <NarrationProvider>
-      <AppShell context={<ContextPanel />}>{children}</AppShell>
+      <OfflinePlaybackProvider>
+        <AppShell context={<ContextPanel />}>{children}</AppShell>
+      </OfflinePlaybackProvider>
     </NarrationProvider>
   );
 }

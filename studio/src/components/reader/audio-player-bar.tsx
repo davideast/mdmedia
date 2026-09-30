@@ -19,7 +19,15 @@ import { useCallback, useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import type { StreamingPcmPlayer } from "@/lib/pcm-player";
+export interface PlaybackTransport {
+  readonly rate: number;
+  play(): void | Promise<void>;
+  pause(): void;
+  seek(positionMs: number): void;
+  scrub(deltaMs: number): void;
+  setRate(rate: number): void;
+  setVolume(volume: number): void;
+}
 
 const SPEED_PRESETS = [0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 const MIN_SPEED = 0.5;
@@ -117,7 +125,7 @@ function PlaybackSpeedPopover({
         side="top"
         align="end"
         sideOffset={10}
-        className="flex w-[364px] flex-col gap-4 p-4 shadow-2xl"
+        className="flex w-[min(364px,calc(100vw-2rem))] flex-col gap-4 p-4 shadow-2xl"
       >
         {/* Header: Label + Monospace Active Value (No Reset button) */}
         <div className="flex items-center justify-between">
@@ -218,7 +226,7 @@ export function AudioPlayerBar({
   hasNext = false,
   className,
 }: {
-  player: StreamingPcmPlayer | null;
+  player: PlaybackTransport | null;
   positionMs: number;
   durationMs: number;
   playing: boolean;

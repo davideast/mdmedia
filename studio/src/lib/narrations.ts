@@ -259,7 +259,7 @@ export async function deleteNarration(id: string): Promise<void> {
 
   // 2. Clean up local OPFS offline track immediately (non-fatal if missing)
   try {
-    await removeOfflineNarration(id).catch(() => {});
+    await removeOfflineNarration(id, auth().currentUser?.uid).catch(() => {});
   } catch {
     // Non-fatal if offline media store cleanup encounters an issue
   }

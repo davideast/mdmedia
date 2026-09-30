@@ -4,7 +4,11 @@ import { pathToFileURL } from "node:url";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: process.env.PYRIC_SANDBOX_FORCE === '1' ? undefined : 'standalone',
+  // A staged hosted build must never replace the files used by the running server.
+  distDir: process.env.MDMEDIA_DIST_DIR ?? (process.env.PYRIC_SANDBOX_FORCE === '1' ? '.next-hosted' : '.next'),
+  allowedDevOrigins: (process.env.MDMEDIA_ALLOWED_DEV_ORIGINS ?? '')
+    .split(',').map((host) => host.trim()).filter(Boolean),
   async redirects() {
     return [
       {
@@ -65,9 +69,11 @@ function findPyricCliDir(): string | null {
 }
 
 export default async function buildConfig(): Promise<NextConfig> {
-  // `withPyric` is an identity passthrough under NODE_ENV=production anyway,
-  // so skip the whole dance during `next build`.
-  const cliDir = process.env.NODE_ENV === "production" ? null : findPyricCliDir();
+  // Pyric explicitly supports a compiled local sandbox with PYRIC_SANDBOX_FORCE=1.
+  // A regular production build still uses the real Firebase SDK.
+  const usesRealFirebase =
+    process.env.NODE_ENV === "production" && process.env.PYRIC_SANDBOX_FORCE !== "1";
+  const cliDir = usesRealFirebase ? null : findPyricCliDir();
 
   if (!cliDir) {
     // Production (or Pyric not installed): keep the `pyric-sdk-init` specifier
@@ -120,7 +126,10 @@ export default async function buildConfig(): Promise<NextConfig> {
    * `firebase` / `firebase-admin` as server-external so the Node loader hook
    * installed by `pyric sandbox` can substitute them server-side.
    */
-  const config = withPyric(nextConfig, {
+  const config = withPyric({
+    ...nextConfig,
+    env: { ...nextConfig.env, NEXT_PUBLIC_PYRIC_PROJECT_KEY: __dirname },
+  }, {
     // The rewrite target is normally derived from PYRIC_SANDBOX, but the
     // built-in fallback is port 4000 while `pyric sandbox` listens on 3473.
     // Pin it so `/__pyric/*` proxies correctly even if the env var is missing.
@@ -145,11 +154,7 @@ export default async function buildConfig(): Promise<NextConfig> {
    * as the aliased `firebase/auth`, so both share one module instance and the
    * resolver is actually visible to `signInWithPopup`.
    */
-  const authEntry: string | undefined = config?.turbopack?.resolveAlias?.["firebase/auth"];
-  const initEntry =
-    typeof authEntry === "string"
-      ? path.join(path.dirname(authEntry), "init.js")
-      : path.join(cliDir, "dist", "serve", "entries", "init.js");
+  const initEntry = path.join(cliDir, "dist", "serve", "entries", "init.js");
 
   config.turbopack = config.turbopack ?? {};
   config.turbopack.resolveAlias = {

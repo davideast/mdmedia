@@ -3,7 +3,7 @@
 How local development works in this app, what is broken upstream, and what was
 worked around to get it running.
 
-- Pyric version: **`@pyric/cli` 0.1.0-alpha.23** (conformance-tested against Firebase 12.13.0)
+- Pyric version: **`@pyric/cli` 0.1.0-alpha.24** (conformance-tested against Firebase 12.13.0)
 - Installed from a **local checkout**, not npm: `/Users/deast/repos/davideast/pyric`
 - App: Next.js 16.3.5, App Router, Turbopack, npm
 
@@ -68,7 +68,7 @@ Run `npm run rules:build` before deploying.
 ```sh
 cd studio
 bash /Users/deast/repos/davideast/pyric/.agents/skills/pyric-node-host/scripts/pack-local.sh \
-  /Users/deast/repos/davideast/pyric .pyric-local
+  ~/repos/davideast/pyric .pyric-local
 npm install --save-dev ./.pyric-local/pyric-*.tgz ./.pyric-local/create-pyric-*.tgz
 npx --no-install pyric --version
 ```
@@ -101,7 +101,7 @@ imports, no `initializeSandbox()`, and no sandbox branches in `src/lib/` or
 ## 3. Upstream Pyric bugs found (worth reporting to the maintainers)
 
 All four were hit while wiring this app up. Line numbers refer to the installed
-`0.1.0-alpha.23` build under `studio/node_modules/`.
+`0.1.0-alpha.24` build under `studio/node_modules/`.
 
 ### 3.1 `@pyric/cli`'s `./next` export has no `require` condition
 
@@ -235,7 +235,7 @@ needs all three points, not just the missing method.
 **Workaround here:** none in Pyric-owned code — the app maps snapshots
 explicitly at its call sites (`toNarration`, `toUserProfile`) instead.
 
-### 3.4 `--hosted` cannot work with `next dev`
+### 3.4 `--hosted` needs Next-side bridge wiring
 
 Two independent blockers:
 
@@ -263,8 +263,10 @@ The Next adapter landed (2026-07-24) well before hosted mode (2026-09-19) and wa
 never updated for it. `--hosted` is also implemented but undocumented in
 `pyric --help`.
 
-**Workaround here:** use SharedWorker mode (`--bridge --persist`) and stamp the
-global ourselves — see §4.1.
+**Workaround here:** stamp the hosted payload before Pyric's client modules run,
+provide the current project path through `next.config.ts`, and patch Pyric's
+bridge URL helper in `scripts/patch-pyric-bridge-port.js` so a page on port 3000
+connects to the hosted WebSocket on port 3473. See §4.1.
 
 ### 3.5 Next 16 Turbopack externalizes `firebase-admin` as `firebase-admin-<hash>`, bypassing `@pyric/cli/register`
 
@@ -410,8 +412,8 @@ Everything Pyric-specific lives in files nobody else owns:
 
 ### 4.1 Page-init stamp — fixes "Missing Pyric page initialization"
 
-`src/pyric-bootstrap/page-init.ts` sets `globalThis.__PYRIC_WORKER_INIT__` to the
-SharedWorker payload `{hosted:false, projectKey:null, bridgeUrl:null}`.
+`src/pyric-bootstrap/page-init.ts` sets `globalThis.__PYRIC_WORKER_INIT__` to a
+hosted payload with the current studio path and the bridge on port 3473.
 
 Two things are load-bearing:
 
@@ -464,14 +466,15 @@ empty module) so the specifier stays resolvable and production ships no Pyric co
 - Next may warn that a webpack config is present while using Turbopack;
   `withPyric` always sets both. The Turbopack aliases are the ones in effect.
 
-### 4.4 Uncapping Pyric Storage & Bridge limits (`scripts/patch-pyric-bridge-port.js`)
+### 4.4 Local Pyric patches (`scripts/patch-pyric-bridge-port.js`)
 
-To allow narrations of any length to save and play in the studio, [`scripts/patch-pyric-bridge-port.js`](file:///Users/deast/repos/davideast/tts-flash/studio/scripts/patch-pyric-bridge-port.js) (hooked to `postinstall` in `package.json`) automatically patches:
+[`scripts/patch-pyric-bridge-port.js`](scripts/patch-pyric-bridge-port.js) runs at `postinstall` and patches:
 1. `bridge-url.js` to preserve the bridge port `3473` under Next.js port `3000`.
-2. `serve/worker/protocol/storage.js` to raise `MAX_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
-3. `bridge/protocol.js` to raise `MAX_BRIDGE_FRAME_BYTES` and `MAX_QUEUED_OPERATION_BYTES` from 12/24 MiB to **768 MiB**.
-4. `pyric-admin/dist/storage/index.js` to raise `MAX_REMOTE_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
-5. `bridge/server/socket-message.js` to raise the socket output backlog cap from 24 MiB to **768 MiB**.
+2. `cli/serve.js` to pass `--allowed-host` to the hosted namespace routes, so Tailscale requests with an Origin header reach `/__pyric/diagnostics`.
+3. `serve/worker/protocol/storage.js` to raise `MAX_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
+4. `bridge/protocol.js` to raise `MAX_BRIDGE_FRAME_BYTES` and `MAX_QUEUED_OPERATION_BYTES` from 12/24 MiB to **768 MiB**.
+5. `pyric-admin/dist/storage/index.js` to raise `MAX_REMOTE_STORAGE_OP_BYTES` from 8 MiB to **512 MiB**.
+6. `bridge/server/socket-message.js` to raise the socket output backlog cap from 24 MiB to **768 MiB**.
 
 ---
 
@@ -520,10 +523,10 @@ Firebase AI Logic, so none of the above applies to it. The real key is in
 |---|---|
 | Sandbox host + rules deployment | ✅ working |
 | `/__pyric/*` rewrite through the Next port | ✅ working |
-| SharedWorker sandbox + MCP bridge WebSocket | ✅ connected |
+| Node hosted sandbox + MCP bridge WebSocket | ✅ hosted health and persistence verified |
 | Page-init stamp (§3.4 blocker 1) | ✅ worked around |
-| Google `signInWithPopup` | ✅ working — picker opens, sign-in completes |
+| Google `signInWithPopup` | ⚠️ not reverified on the current hosted build |
 | Runtime chip | ✅ mounts ("Open pyric", bottom-right) |
 | `collection().withConverter()` | ⚠️ upstream bug §3.3 — handled in app code |
 | Client-side AI Logic pass-through | ❌ not possible — see §5 |
-| `--hosted` mode | ❌ not usable with `next dev` — see §3.4 |
+| `--hosted` mode | ✅ running with the local Pyric build and §3.4 workaround |

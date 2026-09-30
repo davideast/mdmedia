@@ -10,6 +10,7 @@
 import {
   doc,
   getDoc,
+  getDocFromServer,
   setDoc,
   updateDoc,
   type DocumentData,
@@ -92,13 +93,18 @@ export function allowlistRef(email: string) {
  * Security Rules permit `get` only on the caller's own verified lowercase email.
  */
 export async function isEmailAllowlisted(email: string): Promise<boolean> {
+  return (await checkEmailAllowlist(email)) === 'allowed';
+}
+
+export async function checkEmailAllowlist(email: string): Promise<'allowed' | 'denied' | 'unavailable'> {
   const normalized = email.trim().toLowerCase();
-  if (!normalized) return false;
+  if (!normalized) return 'denied';
   try {
-    const snapshot = await getDoc(allowlistRef(normalized));
-    return snapshot.exists();
-  } catch {
-    return false;
+    const snapshot = await getDocFromServer(allowlistRef(normalized));
+    return snapshot.exists() ? 'allowed' : 'denied';
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    return code === 'permission-denied' || code === 'unauthenticated' ? 'denied' : 'unavailable';
   }
 }
 

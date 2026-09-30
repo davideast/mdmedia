@@ -97,8 +97,9 @@ export function NarrationSettings({
       title: effectiveTitle,
       sourceMarkdown: effectiveSourceMarkdown,
       adapted: effectiveAdapted,
+      voice: effectiveVoice ?? undefined,
     }),
-    [effectiveTitle, effectiveSourceMarkdown, effectiveAdapted],
+    [effectiveTitle, effectiveSourceMarkdown, effectiveAdapted, effectiveVoice],
   );
 
   const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
@@ -353,7 +354,7 @@ export function NarrationSettings({
                           : "text-ink-muted hover:bg-muted hover:text-foreground",
                       )}
                     >
-                      <span className="flex min-w-0 items-center gap-2">
+                      <span className="flex min-w-0 flex-1 items-center gap-2">
                         <span
                           className={cn(
                             "inline-flex size-4 flex-none items-center justify-center rounded-[3px] border transition-colors",
@@ -364,7 +365,7 @@ export function NarrationSettings({
                         >
                           {included ? <Check size={11} strokeWidth={2.5} /> : null}
                         </span>
-                        <span className="truncate">{playlist.title}</span>
+                        <span className="block min-w-0 truncate">{playlist.title}</span>
                       </span>
                       <span className="flex-none font-mono text-[11px] tabular-nums text-ink-faint">
                         {playlist.narrationIds.length}
@@ -445,8 +446,8 @@ export function NarrationSettings({
               size="sm"
               onClick={async () => {
                 try {
-                  await remove();
-                  toast.info("Removed from offline storage");
+                  const remains = await remove();
+                  toast.info(remains ? "Still saved in a downloaded playlist" : "Removed from offline storage");
                 } catch {
                   toast.error("Could not remove narration from offline storage.");
                 }
@@ -521,7 +522,7 @@ export function NarrationSettings({
               <Label htmlFor="invite" className="t-label">
                 People
               </Label>
-              <div className="grid grid-cols-[1fr_auto] gap-2">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2">
                 <Input
                   id="invite"
                   value={invitee}
@@ -551,9 +552,9 @@ export function NarrationSettings({
                   return (
                     <li
                       key={person}
-                      className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted"
+                      className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted"
                     >
-                      <span className="truncate text-[0.8rem]" title={label}>
+                      <span className="block min-w-0 truncate text-[0.8rem]" title={label}>
                         {label}
                       </span>
                       <button

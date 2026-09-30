@@ -15,7 +15,12 @@
 
 # next.js
 /.next/
+/.next-hosted/
+/.next-hosted-staged/
+/.next-hosted-previous-*/
 /out/
+/public/sw.js
+/public/sw-preview.js
 
 # production
 /build
@@ -53,4 +58,3 @@ next-env.d.ts
 # background dev server
 .dev.pid
 .dev.log
-

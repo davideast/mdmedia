@@ -51,8 +51,8 @@ function isPidAlive(pid) {
   try {
     process.kill(pid, 0);
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    return error?.code === 'EPERM';
   }
 }
 
@@ -101,8 +101,9 @@ async function start() {
   console.log(`[studio-dev] Launching pyric sandbox --hosted -- next dev --port ${PORT}...`);
 
   const child = spawn(
-    'npx',
-    ['pyric', 'sandbox', '--hosted', '--', 'next', 'dev', '--port', PORT],
+    process.execPath,
+    [path.join(STUDIO_DIR, 'node_modules', '@pyric', 'cli', 'dist', 'cli', 'index.js'),
+      'sandbox', '--hosted', '--', 'next', 'dev', '--port', PORT],
     {
       cwd: STUDIO_DIR,
       detached: true,

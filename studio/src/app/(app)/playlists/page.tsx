@@ -8,8 +8,10 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Download,
   GripVertical,
   ListMusic,
+  Loader2,
   Pause,
   Pencil,
   Play,
@@ -33,6 +35,9 @@ import {
   watchMyPlaylists,
 } from "@/lib/playlists";
 import type { Narration, Playlist } from "@/lib/types";
+import { readDownloadCatalog, subscribeDownloads } from "@/lib/download-catalog";
+import { savePlaylistDownload } from "@/lib/playlist-download";
+import { useConnectivity } from "@/lib/connectivity";
 
 function formatDuration(ms: number): string {
   const total = Math.max(0, Math.round(ms / 1000));
@@ -43,6 +48,7 @@ function formatDuration(ms: number): string {
 
 export default function PlaylistsPage() {
   const { user } = useAuth();
+  const online = useConnectivity() === 'online';
   const { stream, queue, playPlaylist } = useNarration();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [narrations, setNarrations] = useState<Narration[]>([]);
@@ -51,6 +57,16 @@ export default function PlaylistsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [downloaded, setDownloaded] = useState<Record<string, number>>({});
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!user) return;
+    const reload = () => { void readDownloadCatalog(user.uid).then((catalog) =>
+      setDownloaded(Object.fromEntries(catalog.playlists.map((item) => [item.id, item.sourceUpdatedAt])))).catch(() => {}); };
+    reload();
+    return subscribeDownloads(reload);
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -208,6 +224,20 @@ export default function PlaylistsPage() {
     playPlaylist(playlist, tracks, startIndex);
   };
 
+  const handleDownloadPlaylist = async (playlist: Playlist) => {
+    if (!user || !online) return;
+    setDownloadProgress((value) => ({ ...value, [playlist.id]: 'Preparing…' }));
+    try {
+      await savePlaylistDownload(user.uid, playlist, narrationMap, (done, total) =>
+        setDownloadProgress((value) => ({ ...value, [playlist.id]: `${done}/${total}` })));
+      toast.success(`Saved "${playlist.title}" to Downloads`);
+    } catch (error) {
+      toast.error((error as Error).message || 'Could not save playlist. Retry the download.');
+    } finally {
+      setDownloadProgress((value) => { const next = { ...value }; delete next[playlist.id]; return next; });
+    }
+  };
+
   return (
     <WorkbenchPanel
       title="Playlists"
@@ -216,7 +246,7 @@ export default function PlaylistsPage() {
       gridVariant="wide"
     >
       {/* Create new playlist bar */}
-        <div className="grid gap-3 rounded-lg border border-border bg-card p-4">
+        <div className="grid min-w-0 gap-3 rounded-lg border border-border bg-card p-4">
           <div className="t-label">New playlist</div>
           <div className="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
             <Input
@@ -253,7 +283,7 @@ export default function PlaylistsPage() {
         </div>
 
         {/* Playlists list */}
-        <div className="grid content-start gap-4">
+        <div className="grid min-w-0 grid-cols-1 content-start gap-4">
           {playlists.length === 0 ? (
             <p className="t-lead pt-6">
               No playlists yet. Create one above or add any narration from its right-hand Details panel.
@@ -272,7 +302,7 @@ export default function PlaylistsPage() {
                 <section
                   key={playlist.id}
                   className={cn(
-                    "grid gap-4 rounded-lg border bg-card p-5 transition-colors",
+                    "grid min-w-0 grid-cols-1 gap-4 rounded-lg border bg-card p-4 transition-colors sm:p-5",
                     isActivePlaylist ? "border-border-strong" : "border-border",
                   )}
                 >
@@ -327,15 +357,15 @@ export default function PlaylistsPage() {
                           </div>
                         ) : (
                           <>
-                            <div className="flex items-center gap-2">
-                              <h2 className="t-card-title truncate">{playlist.title}</h2>
-                              <span className="inline-flex items-center gap-2.5 t-mono tabular-nums text-ink-faint">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                              <h2 className="t-card-title min-w-0 [overflow-wrap:anywhere]">{playlist.title}</h2>
+                              <span className="inline-flex flex-wrap items-center gap-x-2.5 t-mono tabular-nums text-ink-faint">
                                 <span>{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
                                 <span>{formatDuration(totalMs)}</span>
                               </span>
                             </div>
                             {playlist.description ? (
-                              <p className="t-card-desc mt-0.5">{playlist.description}</p>
+                              <p className="t-card-desc mt-0.5 [overflow-wrap:anywhere]">{playlist.description}</p>
                             ) : null}
                           </>
                         )}
@@ -348,8 +378,21 @@ export default function PlaylistsPage() {
                           type="button"
                           variant="ghost"
                           size="icon-xs"
+                          onClick={() => void handleDownloadPlaylist(playlist)}
+                          disabled={!online || tracks.length === 0 || !!downloadProgress[playlist.id]}
+                          aria-label={`${downloaded[playlist.id] ? 'Update' : 'Download'} ${playlist.title} for offline listening`}
+                          title={downloadProgress[playlist.id] || (downloaded[playlist.id] ? 'Update downloaded playlist' : 'Download playlist')}
+                          className="size-9 sm:size-6"
+                        >
+                          {downloadProgress[playlist.id] ? <Loader2 size={13} className="animate-spin" /> : downloaded[playlist.id] && downloaded[playlist.id] >= playlist.updatedAt ? <Check size={13} /> : <Download size={13} />}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-xs"
                           onClick={() => startEdit(playlist)}
                           aria-label={`Edit ${playlist.title}`}
+                          className="size-9 sm:size-6"
                         >
                           <Pencil size={13} strokeWidth={2} />
                         </Button>
@@ -359,6 +402,7 @@ export default function PlaylistsPage() {
                           size="icon-xs"
                           onClick={() => handleDelete(playlist)}
                           aria-label={`Delete ${playlist.title}`}
+                          className="size-9 sm:size-6"
                         >
                           <Trash2 size={13} strokeWidth={2} />
                         </Button>
@@ -368,7 +412,7 @@ export default function PlaylistsPage() {
 
                   {/* Tracks table */}
                   {tracks.length > 0 ? (
-                    <ol className="grid divide-y divide-border rounded-md border border-border bg-background">
+                    <ol className="grid min-w-0 grid-cols-1 divide-y divide-border rounded-md border border-border bg-background">
                       {tracks.map((track, idx) => {
                         const isTrackActive = stream.id === track.id;
                         const isTrackPlaying = isTrackActive && stream.playing;
@@ -381,7 +425,7 @@ export default function PlaylistsPage() {
                             onDrop={(event) => onDrop(event, playlist, idx)}
                             onDragEnd={onDragEnd}
                             className={cn(
-                              "group flex items-center justify-between gap-3 px-3 py-2 text-[0.83rem] transition-colors select-none",
+                              "group flex min-w-0 flex-col items-stretch gap-2 px-3 py-2 text-[0.83rem] transition-colors select-none sm:flex-row sm:items-center sm:justify-between",
                               isTrackActive ? "bg-accent/70" : "hover:bg-muted/60",
                               dragState?.playlistId === playlist.id &&
                                 dragState.fromIndex === idx &&
@@ -404,7 +448,7 @@ export default function PlaylistsPage() {
                                 type="button"
                                 onClick={() => handlePlayPlaylist(playlist, tracks, idx)}
                                 aria-label={isTrackPlaying ? `Pause ${track.title}` : `Play ${track.title}`}
-                                className="inline-flex size-6 flex-none items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-accent hover:text-foreground"
+                                className="inline-flex size-10 flex-none items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-accent hover:text-foreground sm:size-6"
                               >
                                 {isTrackPlaying ? (
                                   <AudioLines size={13} strokeWidth={2.2} className="text-foreground" />
@@ -414,14 +458,14 @@ export default function PlaylistsPage() {
                               </button>
                               <Link
                                 href={`/narration/${track.id}`}
-                                className="min-w-0 flex-1 truncate font-medium text-foreground underline-offset-4 hover:underline"
+                                className="min-w-0 flex-1 font-medium text-foreground underline-offset-4 [overflow-wrap:anywhere] hover:underline sm:truncate"
                               >
                                 {track.title}
                               </Link>
                             </div>
 
-                            <div className="flex flex-none items-center gap-3">
-                              <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                            <div className="flex min-w-0 items-center justify-end gap-3 sm:flex-none">
+                              <div className="playlist-reorder-controls flex items-center gap-0.5 transition-opacity">
                                 <button
                                   type="button"
                                   disabled={idx === 0}
@@ -431,7 +475,7 @@ export default function PlaylistsPage() {
                                   }}
                                   aria-label="Move track up"
                                   title="Move track up"
-                                  className="rounded p-1 text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none"
+                                  className="inline-flex size-10 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
                                 >
                                   <ChevronUp size={12} strokeWidth={2.2} />
                                 </button>
@@ -444,7 +488,7 @@ export default function PlaylistsPage() {
                                   }}
                                   aria-label="Move track down"
                                   title="Move track down"
-                                  className="rounded p-1 text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:opacity-20 disabled:pointer-events-none"
+                                  className="inline-flex size-10 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
                                 >
                                   <ChevronDown size={12} strokeWidth={2.2} />
                                 </button>
@@ -460,7 +504,7 @@ export default function PlaylistsPage() {
                                 type="button"
                                 onClick={() => handleToggleTrack(playlist, track.id)}
                                 aria-label={`Remove ${track.title} from ${playlist.title}`}
-                                className="inline-flex size-6 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-muted hover:text-foreground"
+                                className="inline-flex size-10 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-muted hover:text-foreground sm:size-6"
                               >
                                 <X size={13} strokeWidth={2} />
                               </button>
@@ -494,7 +538,7 @@ export default function PlaylistsPage() {
                                     : "text-ink-muted hover:bg-muted hover:text-foreground",
                                 )}
                               >
-                                <span className="flex min-w-0 items-center gap-2">
+                                <span className="flex min-w-0 flex-1 items-center gap-2">
                                   <span
                                     className={cn(
                                       "inline-flex size-4 flex-none items-center justify-center rounded-[3px] border",
@@ -505,9 +549,9 @@ export default function PlaylistsPage() {
                                   >
                                     {included ? <Check size={11} strokeWidth={2.5} /> : null}
                                   </span>
-                                  <span className="truncate">{item.title}</span>
+                                  <span className="block min-w-0 truncate">{item.title}</span>
                                 </span>
-                                <span className="t-mono tabular-nums text-ink-faint">
+                                <span className="t-mono flex-none tabular-nums text-ink-faint">
                                   {formatDuration(item.durationMs)}
                                 </span>
                               </button>

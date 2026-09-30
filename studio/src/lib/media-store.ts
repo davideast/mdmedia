@@ -266,14 +266,14 @@ export interface MediaStore {
 }
 
 export class MediaStoreService implements MediaStore {
-  constructor(private adapter: MediaStorageAdapter) {}
+  constructor(private adapter: MediaStorageAdapter, private requirePersistentStorage = false, private pathPrefix = '') {}
 
   private audioPath(id: string): string {
-    return `narrations/${id}.wav`;
+    return `${this.pathPrefix}narrations/${id}.wav`;
   }
 
   private timingsPath(id: string): string {
-    return `narrations/${id}.timings.json`;
+    return `${this.pathPrefix}narrations/${id}.timings.json`;
   }
 
   private async withFailover<T>(op: () => Promise<T>): Promise<T> {
@@ -281,9 +281,12 @@ export class MediaStoreService implements MediaStore {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await op();
-      } catch (err: any) {
-        const errorName = err?.name || '';
-        const errorMessage = String(err?.message || '');
+      } catch (err) {
+        const error = err && typeof err === 'object'
+          ? err as { name?: unknown; message?: unknown }
+          : null;
+        const errorName = String(error?.name ?? '');
+        const errorMessage = String(error?.message ?? '');
         const isLockError =
           errorName === 'NoModificationAllowedError' ||
           errorName.includes('NoModification') ||
@@ -297,7 +300,7 @@ export class MediaStoreService implements MediaStore {
           continue;
         }
 
-        if (isLockError || isQuotaError) {
+        if ((isLockError || isQuotaError) && !this.requirePersistentStorage) {
           if (!(this.adapter instanceof MemoryStorageAdapter)) {
             this.adapter = new MemoryStorageAdapter();
           }
@@ -380,7 +383,7 @@ export class MediaStoreService implements MediaStore {
     const safeOp = async <T>(op: () => Promise<T>): Promise<T> => {
       try {
         return await this.withFailover(op);
-      } catch (err) {
+      } catch {
         if (!(this.adapter instanceof MemoryStorageAdapter)) {
           this.adapter = new MemoryStorageAdapter();
           let offset = 0;
@@ -445,4 +448,3 @@ export function getMediaStore(customAdapter?: MediaStorageAdapter): MediaStore {
   }
   return defaultMediaStore;
 }
-

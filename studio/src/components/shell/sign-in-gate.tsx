@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/brand-mark";
 import { useAuth } from "@/lib/auth-context";
+import { useConnectivity } from "@/lib/connectivity";
 
 function GoogleGlyph() {
   return (
@@ -38,6 +39,7 @@ function GoogleGlyph() {
  */
 export function SignInGate() {
   const { signIn, accessDenied } = useAuth();
+  const offline = useConnectivity() === 'offline';
   const [working, setWorking] = useState(false);
 
   const start = async () => {
@@ -72,12 +74,18 @@ export function SignInGate() {
           </div>
         ) : null}
 
+        {offline && !accessDenied ? (
+          <div role="status" className="w-full rounded-lg border border-border bg-card px-4 py-3 text-left text-sm text-ink-muted">
+            Studio is offline. Sign in online once with an approved account to make its downloads available offline on this device.
+          </div>
+        ) : null}
+
         <Button
           type="button"
           size="lg"
           variant="outline"
           onClick={start}
-          disabled={working}
+          disabled={working || offline}
           className="h-11 w-full gap-2.5 rounded-full text-[0.9rem]"
         >
           {working ? <Loader2 size={17} className="animate-spin" /> : <GoogleGlyph />}
