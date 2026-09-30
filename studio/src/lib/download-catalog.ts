@@ -92,12 +92,18 @@ export function trackFromTimings(id: string, timings: NarrationTimingsFile, voic
   };
 }
 
+/** A partial playlist owns saved audio while its download can still be resumed. */
+export function isDownloadReferenced(catalog: DownloadCatalog, id: string): boolean {
+  return catalog.individualIds.includes(id) ||
+    [...catalog.playlists, ...catalog.pendingPlaylists].some((playlist) => playlist.narrationIds.includes(id));
+}
+
 export async function removeIndividualDownload(uid: string, id: string): Promise<void> {
   const next = await updateDownloadCatalog(uid, (current) => ({
     ...current,
     individualIds: current.individualIds.filter((item) => item !== id),
   }));
-  if (!next.playlists.some((playlist) => playlist.narrationIds.includes(id))) {
+  if (!isDownloadReferenced(next, id)) {
     await downloadMediaStore(uid).delete(id);
     await updateDownloadCatalog(uid, (current) => {
       const tracks = { ...current.tracks };
@@ -118,7 +124,7 @@ export async function removeDownloadedPlaylist(uid: string, id: string): Promise
     pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id),
   }));
   for (const trackId of removedIds) {
-    if (next.individualIds.includes(trackId) || next.playlists.some((item) => item.narrationIds.includes(trackId))) continue;
+    if (isDownloadReferenced(next, trackId)) continue;
     await downloadMediaStore(uid).delete(trackId);
     await updateDownloadCatalog(uid, (current) => {
       const tracks = { ...current.tracks };
@@ -137,7 +143,7 @@ export async function removePendingPlaylist(uid: string, id: string): Promise<vo
     pendingPlaylists: current.pendingPlaylists.filter((item) => item.id !== id),
   }));
   for (const trackId of pending.narrationIds) {
-    if (next.individualIds.includes(trackId) || next.playlists.some((item) => item.narrationIds.includes(trackId)) || next.pendingPlaylists.some((item) => item.narrationIds.includes(trackId))) continue;
+    if (isDownloadReferenced(next, trackId)) continue;
     await downloadMediaStore(uid).delete(trackId);
     await updateDownloadCatalog(uid, (current) => {
       const tracks = { ...current.tracks };

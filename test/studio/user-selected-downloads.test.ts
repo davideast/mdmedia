@@ -9,7 +9,7 @@ import {
   subscribeOfflineChange,
 } from "../../studio/src/lib/offline-manager";
 import { getMediaStore } from "../../studio/src/lib/media-store";
-import { downloadMediaStore, readDownloadCatalog } from "../../studio/src/lib/download-catalog";
+import { downloadMediaStore, readDownloadCatalog, updateDownloadCatalog, removeIndividualDownload, removeDownloadedPlaylist, removePendingPlaylist } from "../../studio/src/lib/download-catalog";
 import type { NarrationTimingsFile } from "../../studio/src/lib/wav";
 
 function memoryDirectory() {
@@ -149,6 +149,27 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
         globalThis.fetch = originalFetch;
       }
     });
+
+    for (const owner of ['individual', 'playlist'] as const) {
+      it(`retains audio owned by a partial playlist when removing a ${owner} download`, async () => {
+        await downloadMediaStore(uid).saveTrack(testId, new Blob([sampleWavBytes]), sampleTimings);
+        const playlist = { id: 'completed', title: 'A', description: '', narrationIds: [testId], sourceUpdatedAt: 1, savedAt: 1 };
+        await updateDownloadCatalog(uid, (catalog) => ({
+          ...catalog,
+          tracks: { [testId]: { id: testId, title: sampleTimings.title!, voice: 'Kore', durationMs: 2500, savedAt: 1 } },
+          individualIds: owner === 'individual' ? [testId] : [],
+          playlists: owner === 'playlist' ? [playlist] : [],
+          pendingPlaylists: [{ ...playlist, id: 'partial', title: 'B' }],
+        }));
+        if (owner === 'individual') await removeIndividualDownload(uid, testId);
+        else await removeDownloadedPlaylist(uid, 'completed');
+        expect(await downloadMediaStore(uid).has(testId)).toBe(true);
+        expect((await readDownloadCatalog(uid)).tracks[testId]?.title).toBe(sampleTimings.title);
+        await removePendingPlaylist(uid, 'partial');
+        expect(await downloadMediaStore(uid).has(testId)).toBe(false);
+        expect((await readDownloadCatalog(uid)).tracks[testId]).toBeUndefined();
+      });
+    }
 
     it("requires an account before downloading", async () => {
       await expect(downloadNarration(testId)).rejects.toThrow('Sign in before downloading.');

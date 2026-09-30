@@ -1,4 +1,4 @@
-import { downloadMediaStore, readDownloadCatalog, updateDownloadCatalog } from './download-catalog';
+import { isDownloadReferenced, downloadMediaStore, readDownloadCatalog, updateDownloadCatalog } from './download-catalog';
 import { downloadNarration } from './offline-manager';
 import type { Narration, Playlist } from './types';
 
@@ -71,7 +71,7 @@ export async function savePlaylistDownload(
     ],
   }));
   for (const id of previous?.narrationIds ?? []) {
-    if (next.individualIds.includes(id) || next.playlists.some((item) => item.narrationIds.includes(id)) || next.pendingPlaylists.some((item) => item.narrationIds.includes(id))) continue;
+    if (isDownloadReferenced(next, id)) continue;
     await downloadMediaStore(uid).delete(id);
     await updateDownloadCatalog(uid, (current) => {
       const updatedTracks = { ...current.tracks };
