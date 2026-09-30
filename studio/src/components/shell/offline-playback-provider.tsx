@@ -3,7 +3,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { PlaybackTransport } from '@/components/reader/audio-player-bar';
 import { useAuth } from '@/lib/auth-context';
-import { downloadMediaStore, readDownloadCatalog, type DownloadedTrack } from '@/lib/download-catalog';
+import type { DownloadedTrack } from '@/lib/download-catalog';
+import { loadDownloadedTrack } from '@/lib/download-playback';
 
 interface LocalPlayback {
   player: PlaybackTransport | null;
@@ -24,6 +25,9 @@ const Context = createContext<LocalPlayback | null>(null);
 
 export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const loadGeneration = useRef(0);
+  const uidRef = useRef(user?.uid);
+  uidRef.current = user?.uid;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrl = useRef<string | null>(null);
   const sequence = useRef<string[]>([]);
@@ -39,6 +43,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
   const [queueLength, setQueueLength] = useState(0);
 
   const stop = useCallback(() => {
+    loadGeneration.current++;
     audioRef.current?.pause();
     if (audioRef.current) audioRef.current.removeAttribute('src');
     if (objectUrl.current) URL.revokeObjectURL(objectUrl.current);
@@ -50,11 +55,10 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     setPlaying(false);
     setPositionMs(0);
     setDurationMs(0);
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = null;
-      navigator.mediaSession.playbackState = 'none';
-    }
+
   }, []);
+
+  useEffect(() => { stop(); }, [user?.uid, stop]);
 
   useEffect(() => {
     const audio = new Audio();
@@ -73,18 +77,20 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnded);
-    return () => { audio.pause(); audio.removeAttribute('src'); if (objectUrl.current) URL.revokeObjectURL(objectUrl.current); audioRef.current = null; };
+    return () => { loadGeneration.current++; audio.pause(); audio.removeAttribute('src'); if (objectUrl.current) URL.revokeObjectURL(objectUrl.current); audioRef.current = null; };
   }, []);
 
   const load = useCallback(async (nextIndex: number) => {
     if (!user || !audioRef.current) return;
     const id = sequence.current[nextIndex];
     if (!id) return;
-    const media = await downloadMediaStore(user.uid).getTrack(id);
-    if (!media) throw new Error('This download is missing from this device.');
-    const catalog = await readDownloadCatalog(user.uid);
-    const nextTrack = catalog.tracks[id];
-    if (!nextTrack) throw new Error('This download is not in your library.');
+    const audio = audioRef.current;
+    const uid = user.uid;
+    const generation = ++loadGeneration.current;
+    const current = () => generation === loadGeneration.current && audioRef.current === audio && uidRef.current === uid;
+    const saved = await loadDownloadedTrack(uid, id, current);
+    if (!saved || !current()) return;
+    const { media, track: nextTrack } = saved;
     audioRef.current.pause();
     if (objectUrl.current) URL.revokeObjectURL(objectUrl.current);
     objectUrl.current = URL.createObjectURL(media.audioBlob);
@@ -94,15 +100,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     setTrack(nextTrack);
     setPositionMs(0);
     setDurationMs(nextTrack.durationMs);
-    if ('mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: nextTrack.title,
-        artist: nextTrack.voice || 'mdmedia',
-        album: playlistName.current || 'Downloads',
-        artwork: [{ src: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
-      });
-    }
-    await audioRef.current.play();
+    await audio.play();
   }, [user]);
   useEffect(() => { loadRef.current = load; }, [load]);
 
@@ -130,31 +128,6 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     setRate: (rate) => { if (audioRef.current) audioRef.current.playbackRate = rate; },
     setVolume: (volume) => { if (audioRef.current) audioRef.current.volume = volume; },
   }), []);
-
-  useEffect(() => {
-    if (!track || !('mediaSession' in navigator)) return;
-    const session = navigator.mediaSession;
-    const actions: Partial<Record<MediaSessionAction, MediaSessionActionHandler>> = {
-      play: () => { void audioRef.current?.play(); },
-      pause: () => audioRef.current?.pause(),
-      stop: () => audioRef.current?.pause(),
-      seekbackward: (detail) => player.scrub(-(detail.seekOffset ?? 10) * 1000),
-      seekforward: (detail) => player.scrub((detail.seekOffset ?? 10) * 1000),
-      seekto: (detail) => { if (detail.seekTime !== undefined) player.seek(detail.seekTime * 1000); },
-      previoustrack: previous,
-      nexttrack: next,
-    };
-    for (const [name, handler] of Object.entries(actions)) {
-      try { session.setActionHandler(name as MediaSessionAction, handler); } catch { /* unsupported */ }
-    }
-    return () => { for (const name of Object.keys(actions)) { try { session.setActionHandler(name as MediaSessionAction, null); } catch { /* unsupported */ } } };
-  }, [track, player, next, previous]);
-
-  useEffect(() => {
-    if (!track || !('mediaSession' in navigator)) return;
-    navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
-    try { navigator.mediaSession.setPositionState({ duration: durationMs / 1000, position: Math.min(positionMs, durationMs) / 1000, playbackRate: player.rate }); } catch { /* unsupported */ }
-  }, [track, playing, durationMs, positionMs, player]);
 
   const value = useMemo<LocalPlayback>(() => ({
     player: track ? player : null,
