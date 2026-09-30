@@ -47,7 +47,7 @@ if (typeof document !== "undefined" && projectKey && globalThis.__PYRIC_WORKER_I
   globalThis.__PYRIC_WORKER_INIT__ = {
     hosted: true,
     projectKey,
-    bridgeUrl: "ws://localhost:3473/__pyric/sandbox",
+    bridgeUrl: process.env.NEXT_PUBLIC_PYRIC_BRIDGE_URL ?? null,
   };
 }
 

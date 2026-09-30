@@ -12,6 +12,7 @@ import {
   type TTSModelName,
   type Visibility,
   type VoiceName,
+  type VoiceProvider,
 } from './types';
 
 export type JobStatus = 'queued' | 'starting' | 'streaming' | 'ready' | 'error';
@@ -22,6 +23,8 @@ export interface GenerationJob {
   title: string;
   markdown: string;
   voice: VoiceName;
+  voiceProvider: VoiceProvider;
+  voiceId: string;
   model?: TTSModelName;
   promptStyle: string;
   rewriteForNarration: boolean;
@@ -50,6 +53,8 @@ export interface GenerationQueueState {
   queueNarration: (input: {
     markdown: string;
     voice: VoiceName;
+    voiceProvider: VoiceProvider;
+    voiceId: string;
     model?: TTSModelName;
     promptStyle: string;
     rewriteForNarration: boolean;
@@ -142,6 +147,8 @@ export function useGenerationQueue(): GenerationQueueState {
     async (input: {
       markdown: string;
       voice: VoiceName;
+      voiceProvider: VoiceProvider;
+      voiceId: string;
       model?: TTSModelName;
       promptStyle: string;
       rewriteForNarration: boolean;
@@ -163,7 +170,9 @@ export function useGenerationQueue(): GenerationQueueState {
         title,
         markdown: input.markdown,
         voice: input.voice,
-        model: input.model ?? DEFAULT_TTS_MODEL,
+        voiceProvider: input.voiceProvider,
+        voiceId: input.voiceId,
+        model: input.voiceProvider === 'gemini' ? input.model ?? DEFAULT_TTS_MODEL : undefined,
         promptStyle: input.promptStyle,
         rewriteForNarration: input.rewriteForNarration,
         rewriteInstructions: input.rewriteInstructions,
@@ -364,6 +373,8 @@ export function useGenerationQueue(): GenerationQueueState {
       return queueNarration({
         markdown: existingJob.markdown,
         voice: existingJob.voice,
+        voiceProvider: existingJob.voiceProvider,
+        voiceId: existingJob.voiceId,
         model: existingJob.model,
         promptStyle: existingJob.promptStyle,
         rewriteForNarration: existingJob.rewriteForNarration,

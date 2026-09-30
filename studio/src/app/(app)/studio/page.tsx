@@ -11,7 +11,7 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useAuth } from "@/lib/auth-context";
 import { watchMyNarrations } from "@/lib/narrations";
-import type { Narration } from "@/lib/types";
+import { DEFAULT_TTS_MODEL, VOICE_PROVIDER_LABEL, type Narration } from "@/lib/types";
 
 const MIN_CHARS = 40;
 
@@ -38,7 +38,7 @@ function HistoryRow({ narration }: { narration: Narration }) {
 
 export default function StudioPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { draft, setDraft, generationQueue } = useNarration();
   const [history, setHistory] = useState<Narration[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -57,9 +57,13 @@ export default function StudioPage() {
     try {
       await generationQueue.queueNarration({
         markdown: markdownToSynthesize,
-        voice: draft.voice,
-        model: draft.model,
-        promptStyle: draft.promptStyle,
+        voice: draft.voice.name,
+        voiceProvider: draft.voice.provider,
+        voiceId: draft.voice.id,
+        model: draft.voice.provider === "gemini"
+          ? profile?.settings.defaultGeminiModel ?? DEFAULT_TTS_MODEL
+          : undefined,
+        promptStyle: draft.voice.provider === "gemini" ? draft.promptStyle : "",
         rewriteForNarration: draft.rewriteForNarration,
         rewriteInstructions: draft.rewriteInstructions?.trim() || undefined,
         structureMarkdown: draft.structureMarkdown,
@@ -101,7 +105,7 @@ export default function StudioPage() {
 
         <div className="grid min-w-0 grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
           <p className="t-meta">
-            {tooShort ? "A paragraph or two is enough to start." : `${draft.voice} will read this.`}
+            {tooShort ? "A paragraph or two is enough to start." : `${draft.voice.name} (${VOICE_PROVIDER_LABEL[draft.voice.provider]}) will read this.`}
           </p>
           <Button
             type="button"

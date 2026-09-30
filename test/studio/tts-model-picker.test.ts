@@ -3,11 +3,12 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { GoogleGenAI } from "@google/genai";
 import {
+  DEFAULT_SETTINGS,
   TTS_MODELS,
   DEFAULT_TTS_MODEL,
-  type TTSModelName,
 } from "../../studio/src/lib/types";
 import { parseNarrationRequest } from "../../studio/src/lib/narration-request";
+import { toUserProfile } from "../../studio/src/lib/users";
 import { GeminiTTSProvider } from "../../src/tts/gemini-tts-provider.js";
 
 describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
@@ -23,6 +24,10 @@ describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
     import.meta.dir,
     "../../studio/src/app/(app)/studio/page.tsx",
   );
+  const settingsPagePath = resolve(
+    import.meta.dir,
+    "../../studio/src/app/(app)/settings/page.tsx",
+  );
   const narrationServerPath = resolve(
     import.meta.dir,
     "../../studio/src/lib/narration-server.ts",
@@ -35,6 +40,7 @@ describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
   const composerSettings = readFileSync(composerSettingsPath, "utf8");
   const narrationProvider = readFileSync(narrationProviderPath, "utf8");
   const studioPage = readFileSync(studioPagePath, "utf8");
+  const settingsPage = readFileSync(settingsPagePath, "utf8");
   const narrationServer = readFileSync(narrationServerPath, "utf8");
   const generationQueue = readFileSync(generationQueuePath, "utf8");
 
@@ -93,27 +99,34 @@ describe("TTS Model Picker & Audio Generation Wiring Architecture", () => {
     });
   });
 
-  describe("Composer Settings Drawer (Right Settings Panel)", () => {
-    it("renders Model picker label and select element", () => {
-      expect(composerSettings).toContain("Model");
-      expect(composerSettings).toContain('id="model"');
-      expect(composerSettings).toContain("setDraft({ model:");
+  describe("Gemini model preference", () => {
+    it("falls back for profiles saved before the setting existed or with an invalid model", () => {
+      const profile = (settings: Record<string, unknown>) => toUserProfile({
+        id: "david",
+        data: () => ({ settings }),
+      });
+      expect(profile({}).settings.defaultGeminiModel).toBe(DEFAULT_TTS_MODEL);
+      expect(profile({ defaultGeminiModel: "unknown" }).settings.defaultGeminiModel).toBe(DEFAULT_TTS_MODEL);
+      expect(profile({ defaultGeminiModel: TTS_MODELS[1] }).settings.defaultGeminiModel).toBe(TTS_MODELS[1]);
+      expect(DEFAULT_SETTINGS.defaultGeminiModel).toBe(DEFAULT_TTS_MODEL);
     });
 
-    it("populates select options from TTS_MODELS", () => {
-      expect(composerSettings).toContain("TTS_MODELS.map");
-      expect(composerSettings).toContain("DEFAULT_TTS_MODEL");
+    it("places the choice in user settings and removes the per-narration control", () => {
+      expect(settingsPage).toContain('label="Gemini model"');
+      expect(settingsPage).toContain("TTS_MODELS.map");
+      expect(settingsPage).toContain("save({ defaultGeminiModel:");
+      expect(composerSettings).not.toContain('id="model"');
     });
   });
 
   describe("Audio Generation Pipeline Wiring", () => {
-    it("NarrationProvider includes model in Draft state with default", () => {
-      expect(narrationProvider).toContain("model: TTSModelName");
-      expect(narrationProvider).toContain("DEFAULT_TTS_MODEL");
+    it("does not keep a separate model override in the draft", () => {
+      expect(narrationProvider).not.toContain("model: TTSModelName");
     });
 
-    it("StudioPage passes draft.model to queueNarration", () => {
-      expect(studioPage).toContain("model: draft.model");
+    it("StudioPage passes the Gemini model only for Gemini voices", () => {
+      expect(studioPage).toContain('draft.voice.provider === "gemini"');
+      expect(studioPage).toContain("profile?.settings.defaultGeminiModel ?? DEFAULT_TTS_MODEL");
     });
 
     it("useGenerationQueue forwards model in job state and API payload", () => {
