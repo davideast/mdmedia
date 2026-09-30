@@ -12,14 +12,10 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
+import { VoicePicker } from "@/components/studio/voice-picker";
 import {
   DEFAULT_HEADING_INSTRUCTIONS,
-  DEFAULT_TTS_MODEL,
-  TTS_MODELS,
-  VOICES,
-  type TTSModelName,
   type Visibility,
-  type VoiceName,
 } from "@/lib/types";
 import { SlidersHorizontal } from "lucide-react";
 
@@ -46,47 +42,7 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         <Label htmlFor="voice" className="t-label">
           Reader
         </Label>
-        <Select
-          value={draft.voice}
-          onValueChange={(value) => setDraft({ voice: value as VoiceName })}
-        >
-          <SelectTrigger id="voice" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="max-h-72">
-            {!VOICES.includes(draft.voice as any) && draft.voice ? (
-              <SelectItem key={draft.voice} value={draft.voice}>
-                {draft.voice} (Custom)
-              </SelectItem>
-            ) : null}
-            {VOICES.map((voice) => (
-              <SelectItem key={voice} value={voice}>
-                {voice}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="model" className="t-label">
-          Model
-        </Label>
-        <Select
-          value={draft.model ?? DEFAULT_TTS_MODEL}
-          onValueChange={(value) => setDraft({ model: value as TTSModelName })}
-        >
-          <SelectTrigger id="model" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TTS_MODELS.map((model) => (
-              <SelectItem key={model} value={model}>
-                {model}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <VoicePicker id="voice" value={draft.voice} onChange={(voice) => setDraft({ voice })} />
       </div>
 
       <div className="grid gap-2">
@@ -109,19 +65,21 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         </Select>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="style" className="t-label">
-          Delivery
-        </Label>
-        <Textarea
-          id="style"
-          value={draft.promptStyle}
-          onChange={(event) => setDraft({ promptStyle: event.target.value })}
-          rows={3}
-          className="resize-none"
-          placeholder="Warm, unhurried narration."
-        />
-      </div>
+      {draft.voice.provider === "gemini" ? (
+        <div className="grid gap-2">
+          <Label htmlFor="style" className="t-label">
+            Delivery
+          </Label>
+          <Textarea
+            id="style"
+            value={draft.promptStyle}
+            onChange={(event) => setDraft({ promptStyle: event.target.value })}
+            rows={3}
+            className="resize-none"
+            placeholder="Warm, unhurried narration."
+          />
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="grid min-w-0 gap-0.5">

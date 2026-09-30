@@ -29,6 +29,7 @@ import {
 import { onSnapshot, type Unsubscribe } from 'firebase/firestore';
 
 import { auth } from '@/lib/firebase';
+import { DEFAULT_SETTINGS, DEFAULT_VOICE, settingsDefaultVoice, type VoiceChoice } from '@/lib/types';
 import {
   checkEmailAllowlist,
   saveProfileFields,
@@ -50,6 +51,8 @@ export interface AuthUser {
 export interface AuthState {
   user: AuthUser | null;
   profile: UserProfile | null;
+  /** Saved default when usable; Kore while an ElevenLabs grant is unverified or absent. */
+  defaultReader: VoiceChoice;
   loading: boolean;
   accessDenied: boolean;
   signIn: () => Promise<void>;
@@ -77,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
+  const [checkedDefault, setCheckedDefault] = useState<{ uid: string; id: string; allowed: boolean } | null>(null);
 
   // The live profile subscription, replaced on every session change.
   const profileUnsubscribe = useRef<Unsubscribe | null>(null);
@@ -222,6 +226,58 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     if (connectivity === 'online') recheck();
     return () => window.removeEventListener('online', recheck);
   }, [connectivity]);
+  // A saved default is only a preference. Keep it intact if a grant is missing;
+  // use Kore for drafts until access can be verified.
+  const preferredDefault = profile ? settingsDefaultVoice(profile.settings) : null;
+  const preferredProvider = preferredDefault?.provider;
+  const preferredId = preferredDefault?.id;
+  const preferredName = preferredDefault?.name;
+  const elevenLabsDefaultId = preferredProvider === 'elevenlabs' ? preferredId : null;
+  const ownerUid = user?.uid;
+  const defaultReader = useMemo<VoiceChoice>(() => {
+    if (preferredProvider === 'elevenlabs'
+      && (checkedDefault?.uid !== ownerUid || checkedDefault?.id !== preferredId
+        || checkedDefault?.allowed !== true)) {
+      return { provider: 'gemini', id: DEFAULT_VOICE, name: DEFAULT_VOICE };
+    }
+    return preferredProvider && preferredId && preferredName
+      ? { provider: preferredProvider, id: preferredId, name: preferredName }
+      : settingsDefaultVoice(DEFAULT_SETTINGS);
+  }, [preferredProvider, preferredId, preferredName, ownerUid,
+    checkedDefault?.uid, checkedDefault?.id, checkedDefault?.allowed]);
+  useEffect(() => {
+    if (!ownerUid || !elevenLabsDefaultId || connectivity !== 'online') return;
+    const controller = new AbortController();
+    let latestRequest = 0;
+    const checkAccess = () => {
+      void (async () => {
+        const request = ++latestRequest;
+        try {
+          const token = await auth().currentUser?.getIdToken();
+          if (!token || controller.signal.aborted) return;
+          const response = await fetch(`/api/voices?id=${encodeURIComponent(elevenLabsDefaultId)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
+          });
+          if ((response.ok || response.status === 404) && !controller.signal.aborted
+            && request === latestRequest) {
+            setCheckedDefault({ uid: ownerUid, id: elevenLabsDefaultId, allowed: response.ok });
+          }
+        } catch {
+          // Network/provider errors are not evidence that a grant was revoked.
+        }
+      })();
+    };
+    const onVisible = () => { if (document.visibilityState === 'visible') checkAccess(); };
+    checkAccess();
+    window.addEventListener('focus', checkAccess);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      controller.abort();
+      window.removeEventListener('focus', checkAccess);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [ownerUid, elevenLabsDefaultId, connectivity]);
 
   const signIn = useCallback(async () => {
     setAccessDenied(false);
@@ -253,6 +309,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     () => ({
       user,
       profile,
+      defaultReader,
       loading,
       accessDenied,
       signIn,
@@ -260,7 +317,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
       updateSettings,
       updateProfile,
     }),
-    [user, profile, loading, accessDenied, signIn, signOutUser, updateSettings, updateProfile],
+    [user, profile, defaultReader, loading, accessDenied, signIn, signOutUser, updateSettings, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

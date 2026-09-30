@@ -16,13 +16,11 @@ import {
   DEFAULT_HEADING_INSTRUCTIONS,
   DEFAULT_HIGHLIGHT_COLOR,
   DEFAULT_SETTINGS,
-  DEFAULT_TTS_MODEL,
   HIGHLIGHT_COLORS,
   type HighlightColorId,
   type Narration,
   type Playlist,
-  type TTSModelName,
-  type VoiceName,
+  type VoiceChoice,
   type Visibility,
 } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
@@ -36,8 +34,7 @@ export type { GenerationJob, GenerationQueueState };
 
 export interface Draft {
   markdown: string;
-  voice: VoiceName;
-  model: TTSModelName;
+  voice: VoiceChoice;
   promptStyle: string;
   rewriteForNarration: boolean;
   rewriteInstructions?: string;
@@ -89,7 +86,7 @@ const NarrationContext = createContext<NarrationContextValue | null>(null);
 export function NarrationProvider({ children }: { children: ReactNode }) {
   const stream = useNarrationStream();
   const generationQueue = useGenerationQueue();
-  const { user, profile, updateSettings } = useAuth();
+  const { user, profile, defaultReader, updateSettings } = useAuth();
 
   const settings = profile?.settings ?? DEFAULT_SETTINGS;
 
@@ -175,8 +172,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   const draft = useMemo<Draft>(
     () => ({
       markdown: "",
-      voice: settings.defaultVoice,
-      model: DEFAULT_TTS_MODEL,
+      voice: defaultReader,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
       rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,
@@ -185,7 +181,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       verbalizeDiagrams: false,
       ...overrides,
     }),
-    [settings, overrides],
+    [settings, defaultReader, overrides],
   );
 
   const setDraft = useCallback((patch: Partial<Draft>) => {
