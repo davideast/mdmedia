@@ -27,7 +27,6 @@ function NarrationContextPanel({
   const [narration, setNarration] = useState<Narration | null>(null);
 
   useEffect(() => {
-    setNarration(null);
     return watchNarration(id, setNarration);
   }, [id]);
 
@@ -35,7 +34,7 @@ function NarrationContextPanel({
     <NarrationSettings
       narration={narration}
       narrationId={id}
-      canEdit={narration === null ? user !== null : user !== null && narration.ownerUid === user.uid}
+      canEdit={narration !== null && user !== null && narration.ownerUid === user.uid}
       actions={actions}
     />
   );
@@ -123,7 +122,7 @@ export function ContextPanel({
   if (isNarration) {
     const id = pathname.split("/")[2];
     if (id !== undefined && id.length > 0) {
-      return <NarrationContextPanel id={id} actions={collapseAction} />;
+      return <NarrationContextPanel key={id} id={id} actions={collapseAction} />;
     }
   }
 

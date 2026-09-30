@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
-import { Check, Code2, Download, FileCheck, FileText, Info, ListMusic, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Check, Code2, Download, FileCheck, FileText, Info, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useWorkspace, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
@@ -35,7 +36,6 @@ import {
   watchMyPlaylists,
 } from "@/lib/playlists";
 import {
-  DEFAULT_HIGHLIGHT_COLOR,
   HIGHLIGHT_COLORS,
   MAX_SHARED_WITH,
   VOICE_PROVIDER_LABEL,
@@ -63,21 +63,19 @@ export function NarrationSettings({
   canEdit: boolean;
   actions?: React.ReactNode;
 }) {
+  const { store, activeTab } = useWorkspace();
   const router = useRouter();
   const { user } = useAuth();
   const { stream, highlightColor, setHighlightColor, documentView, setDocumentView } =
     useNarration();
   const [pending, startTransition] = useTransition();
-  const [invitee, setInvitee] = useState("");
+  const [invitee, setInvitee] = useWorkspaceField("invitee", "");
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
+  const [newPlaylistTitle, setNewPlaylistTitle] = useWorkspaceField("newPlaylistTitle", "");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setPlaylists([]);
-      return;
-    }
+    if (!user) return;
     const unsubP = watchMyPlaylists(user.uid, setPlaylists);
     return () => {
       unsubP();
@@ -85,10 +83,11 @@ export function NarrationSettings({
   }, [user]);
 
   const effectiveId = narration?.id ?? narrationId ?? stream.id;
-  const effectiveVoice = narration?.voice ?? stream.voice;
-  const effectiveTitle = narration?.title ?? stream.title;
-  const effectiveSourceMarkdown = narration?.sourceMarkdown ?? stream.sourceMarkdown ?? undefined;
-  const effectiveAdapted = narration?.adapted ?? stream.adapted;
+  const matchingStream = stream.id === effectiveId;
+  const effectiveVoice = narration?.voice ?? (matchingStream ? stream.voice : null);
+  const effectiveTitle = narration?.title ?? (matchingStream ? stream.title : "Narration");
+  const effectiveSourceMarkdown = narration?.sourceMarkdown ?? (matchingStream ? stream.sourceMarkdown : undefined) ?? undefined;
+  const effectiveAdapted = narration?.adapted ?? (matchingStream ? stream.adapted : false);
   const isReady =
     narration?.status === "ready" ||
     (stream.id === effectiveId && stream.status === "ready");
@@ -166,7 +165,7 @@ export function NarrationSettings({
         };
         commit("shared", [...narration.sharedWith, resolved.uid], nextLabels);
       }
-      setInvitee("");
+      if (activeTab) store.acknowledgeField(activeTab.id, "invitee", invitee);
     } catch {
       toast.error("Could not verify that email address. Try again.");
     }
@@ -212,7 +211,7 @@ export function NarrationSettings({
     });
   };
 
-  const isAdapted = (narration?.adapted ?? stream.adapted) === true;
+  const isAdapted = effectiveAdapted === true;
 
   return (
     <WorkbenchPanel

@@ -31,6 +31,7 @@ import { onSnapshot, type Unsubscribe } from 'firebase/firestore';
 import { auth } from '@/lib/firebase';
 import { DEFAULT_SETTINGS, DEFAULT_VOICE, settingsDefaultVoice, type VoiceChoice } from '@/lib/types';
 import {
+  type MutationFeedback,
   checkEmailAllowlist,
   saveProfileFields,
   saveSettings,
@@ -57,8 +58,8 @@ export interface AuthState {
   accessDenied: boolean;
   signIn: () => Promise<void>;
   signOutUser: () => Promise<void>;
-  updateSettings: (patch: Partial<UserSettings>) => Promise<void>;
-  updateProfile: (patch: { displayName?: string; bio?: string }) => Promise<void>;
+  updateSettings: (patch: Partial<UserSettings>, feedback?: MutationFeedback) => Promise<void>;
+  updateProfile: (patch: { displayName?: string; bio?: string }, feedback?: MutationFeedback) => Promise<void>;
 }
 
 function toAuthUser(user: User): AuthUser {
@@ -298,16 +299,16 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     await signOut(auth());
   }, []);
 
-  const updateSettings = useCallback(async (patch: Partial<UserSettings>) => {
+  const updateSettings = useCallback(async (patch: Partial<UserSettings>, feedback?: MutationFeedback) => {
     const uid = uidRef.current;
     if (!uid) return;
-    saveSettings(uid, patch);
+    saveSettings(uid, patch, feedback);
   }, []);
 
-  const updateProfile = useCallback(async (patch: { displayName?: string; bio?: string }) => {
+  const updateProfile = useCallback(async (patch: { displayName?: string; bio?: string }, feedback?: MutationFeedback) => {
     const uid = uidRef.current;
     if (!uid) return;
-    saveProfileFields(uid, patch);
+    saveProfileFields(uid, patch, feedback);
   }, []);
 
   const value = useMemo<AuthState>(

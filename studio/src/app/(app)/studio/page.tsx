@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AudioLines, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
+import { useWorkspace } from "@/components/shell/workspace-provider";
 import { useAuth } from "@/lib/auth-context";
 import { watchMyNarrations } from "@/lib/narrations";
 import { DEFAULT_TTS_MODEL, VOICE_PROVIDER_LABEL, type Narration } from "@/lib/types";
@@ -40,6 +41,7 @@ export default function StudioPage() {
   const router = useRouter();
   const { user, profile } = useAuth();
   const { draft, setDraft, generationQueue } = useNarration();
+  const { state: workspace, store, draftId, replaceCurrent, storageUnavailable } = useWorkspace();
   const [history, setHistory] = useState<Narration[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,7 +57,7 @@ export default function StudioPage() {
     if (markdownToSynthesize.length < MIN_CHARS) return;
     setSubmitting(true);
     try {
-      await generationQueue.queueNarration({
+      const queued = await generationQueue.queueNarration({
         markdown: markdownToSynthesize,
         voice: draft.voice.name,
         voiceProvider: draft.voice.provider,
@@ -71,7 +73,8 @@ export default function StudioPage() {
         speed: draft.speed,
         verbalizeDiagrams: draft.verbalizeDiagrams,
       });
-      setDraft({ markdown: "" });
+      store.clearDraft(draftId);
+      replaceCurrent(`/narration/${queued.narrationId}`, markdownToSynthesize.split("\n")[0].replace(/^#+\s*/, "").slice(0, 80));
       toast.success("Narration queued for processing", {
         action: {
           label: "View Queue",
@@ -87,7 +90,8 @@ export default function StudioPage() {
 
   return (
     <WorkbenchPanel
-      title="Studio"
+      workspacePage
+      title={draft.markdown.trim().split("\n")[0].replace(/^#+\s*/, "").slice(0, 80) || "New narration"}
       icon={<AudioLines size={13} strokeWidth={2} />}
       bodyClassName="gap-0 p-0"
     >
@@ -106,6 +110,7 @@ export default function StudioPage() {
         <div className="grid min-w-0 grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
           <p className="t-meta">
             {tooShort ? "A paragraph or two is enough to start." : `${draft.voice.name} (${VOICE_PROVIDER_LABEL[draft.voice.provider]}) will read this.`}
+            {draft.markdown && !storageUnavailable ? <span className="ml-2">Saved on this device.</span> : null}
           </p>
           <Button
             type="button"
@@ -120,6 +125,16 @@ export default function StudioPage() {
         </div>
       </div>
 
+      {Object.entries(workspace.drafts).some(([id, saved]) => id !== draftId && saved.markdown?.trim()) ? (
+        <section className="grid gap-2 border-t border-border p-4 sm:p-6">
+          <h2 className="t-label">Saved drafts on this device</h2>
+          {Object.entries(workspace.drafts).filter(([id, saved]) => id !== draftId && saved.markdown?.trim()).map(([id, saved]) => (
+            <Link key={id} href={`/studio?draft=${encodeURIComponent(id)}`} className="truncate rounded-md px-3 py-2 text-sm hover:bg-muted">
+              {saved.markdown?.trim().split("\n")[0].replace(/^#+\s*/, "").slice(0, 100) || "Untitled draft"}
+            </Link>
+          ))}
+        </section>
+      ) : null}
       {history.length === 0 ? null : (
         <section className="grid min-w-0 gap-2 border-t border-border p-4 sm:p-6">
           <h2 className="item-label-lockup t-label">

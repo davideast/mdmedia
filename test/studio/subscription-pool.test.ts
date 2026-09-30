@@ -122,4 +122,24 @@ describe('multicastSubscribe', () => {
     await new Promise((r) => setTimeout(r, 80));
     expect(detachCount).toBe(1); // Now detached cleanly
   });
+  it('replays a permission failure without replaying obsolete private data', () => {
+    clearSubscriptionPool();
+    let emitData: (value: string) => void = () => {};
+    let fail: (error: unknown) => void = () => {};
+    const start = (data: (value: string) => void, error?: (error: unknown) => void) => {
+      emitData = data; fail = error!; return () => {};
+    };
+    multicastSubscribe('denied', start, () => {});
+    emitData('Private cached content');
+    fail(new Error('Permission denied'));
+    const received: string[] = [];
+    const errors: unknown[] = [];
+    multicastSubscribe('denied', start, (value) => received.push(value), 200, (error) => errors.push(error));
+    expect(received).toEqual([]);
+    expect(errors).toHaveLength(1);
+    // A genuinely new successful snapshot may recover the view.
+    emitData('New authorized content');
+    expect(received).toEqual(['New authorized content']);
+    clearSubscriptionPool();
+  });
 });

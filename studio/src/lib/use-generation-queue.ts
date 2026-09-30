@@ -63,8 +63,8 @@ export interface GenerationQueueState {
     visibility: Visibility;
     speed?: number;
     verbalizeDiagrams?: boolean;
-  }) => Promise<string>;
-  retryJob: (jobId: string) => Promise<string | null>;
+  }) => Promise<{ jobId: string; narrationId: string }>;
+  retryJob: (jobId: string) => Promise<{ jobId: string; narrationId: string } | null>;
   cancelJob: (jobId: string) => void;
   dismissJob: (jobId: string) => void;
   clearCompleted: () => void;
@@ -157,7 +157,7 @@ export function useGenerationQueue(): GenerationQueueState {
       visibility: Visibility;
       speed?: number;
       verbalizeDiagrams?: boolean;
-    }): Promise<string> => {
+    }): Promise<{ jobId: string; narrationId: string }> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
       const narrationId = generateNarrationId();
       const controller = new AbortController();
@@ -356,7 +356,7 @@ export function useGenerationQueue(): GenerationQueueState {
         }
       })();
 
-      return jobId;
+      return { jobId, narrationId };
     },
     [router, updateJob],
   );
@@ -366,7 +366,7 @@ export function useGenerationQueue(): GenerationQueueState {
   ).length;
 
   const retryJob = useCallback(
-    async (jobId: string): Promise<string | null> => {
+    async (jobId: string): Promise<{ jobId: string; narrationId: string } | null> => {
       const existingJob = jobsRef.current.find((job) => job.id === jobId);
       if (!existingJob) return null;
       dismissJob(jobId);

@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { useRouteQuery, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useAuth } from "@/lib/auth-context";
 import { watchMyNarrations } from "@/lib/narrations";
 import {
@@ -51,12 +52,14 @@ export default function PlaylistsPage() {
   const online = useConnectivity() === 'online';
   const { stream, queue, playPlaylist } = useNarration();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlistsLoaded, setPlaylistsLoaded] = useState(false);
   const [narrations, setNarrations] = useState<Narration[]>([]);
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
+  const [selectedPlaylist] = useRouteQuery("playlist");
+  const [newTitle, setNewTitle] = useWorkspaceField("newTitle", "");
+  const [newDescription, setNewDescription] = useWorkspaceField("newDescription", "");
+  const [editingId, setEditingId] = useWorkspaceField<string | null>("editingId", null);
+  const [editTitle, setEditTitle] = useWorkspaceField("editTitle", "");
+  const [editDescription, setEditDescription] = useWorkspaceField("editDescription", "");
   const [downloaded, setDownloaded] = useState<Record<string, number>>({});
   const [downloadProgress, setDownloadProgress] = useState<Record<string, string>>({});
 
@@ -70,7 +73,7 @@ export default function PlaylistsPage() {
 
   useEffect(() => {
     if (!user) return;
-    const unsubPlaylists = watchMyPlaylists(user.uid, setPlaylists);
+    const unsubPlaylists = watchMyPlaylists(user.uid, (items) => { setPlaylists(items); setPlaylistsLoaded(true); });
     const unsubNarrations = watchMyNarrations(user.uid, setNarrations);
     return () => {
       unsubPlaylists();
@@ -240,12 +243,15 @@ export default function PlaylistsPage() {
 
   return (
     <WorkbenchPanel
-      title="Playlists"
+      workspacePage
+      title={selectedPlaylist ? playlists.find((playlist) => playlist.id === selectedPlaylist)?.title ?? "Playlist" : "Playlists"}
       icon={<ListMusic size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"
     >
+      {selectedPlaylist ? <Link href="/playlists" className="text-sm text-primary underline underline-offset-2">All playlists</Link> : null}
       {/* Create new playlist bar */}
+      {!selectedPlaylist ? (
         <div className="grid min-w-0 gap-3 rounded-lg border border-border bg-card p-4">
           <div className="t-label">New playlist</div>
           <div className="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
@@ -282,14 +288,17 @@ export default function PlaylistsPage() {
           </div>
         </div>
 
+      ) : null}
         {/* Playlists list */}
         <div className="grid min-w-0 grid-cols-1 content-start gap-4">
-          {playlists.length === 0 ? (
+          {selectedPlaylist && playlistsLoaded && !playlists.some((item) => item.id === selectedPlaylist) ? (
+            <p role="status" className="t-lead pt-6">This playlist is unavailable or was deleted. <Link href="/playlists" className="text-primary underline">All playlists</Link></p>
+          ) : playlists.length === 0 ? (
             <p className="t-lead pt-6">
               No playlists yet. Create one above or add any narration from its right-hand Details panel.
             </p>
           ) : (
-            playlists.map((playlist) => {
+            playlists.filter((playlist) => !selectedPlaylist || playlist.id === selectedPlaylist).map((playlist) => {
               const tracks = playlist.narrationIds
                 .map((id) => narrationMap.get(id))
                 .filter((item): item is Narration => item !== undefined);
@@ -358,7 +367,7 @@ export default function PlaylistsPage() {
                         ) : (
                           <>
                             <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                              <h2 className="t-card-title min-w-0 [overflow-wrap:anywhere]">{playlist.title}</h2>
+                              <h2 className="t-card-title min-w-0 [overflow-wrap:anywhere]"><Link href={`/playlists?playlist=${encodeURIComponent(playlist.id)}`} className="hover:text-primary">{playlist.title}</Link></h2>
                               <span className="inline-flex flex-wrap items-center gap-x-2.5 t-mono tabular-nums text-ink-faint">
                                 <span>{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
                                 <span>{formatDuration(totalMs)}</span>

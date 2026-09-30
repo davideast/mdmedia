@@ -171,21 +171,23 @@ export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => 
   );
 }
 
-export function watchNarration(id: string, cb: (narration: Narration | null) => void): Unsubscribe {
+export function watchNarration(id: string, cb: (narration: Narration | null) => void, onError?: (error: Error) => void): Unsubscribe {
   return multicastSubscribe<Narration | null>(
     `narration:${id}`,
-    (onData, onError) => {
+    (onData, reportError) => {
       return onSnapshot(
         narrationRef(id),
         (snapshot) => {
           onData(snapshot.exists() ? toNarration(snapshot) : null);
         },
         (error) => {
-          onError?.(error);
+          reportError?.(error);
         },
       );
     },
     cb,
+    200,
+    onError ? (error) => onError(error instanceof Error ? error : new Error(String(error))) : undefined,
   );
 }
 

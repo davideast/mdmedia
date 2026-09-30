@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { useOfflinePlayback } from '@/components/shell/offline-playback-provider';
+import { useRouteQuery } from '@/components/shell/workspace-provider';
 import { useNarration } from '@/components/shell/narration-provider';
 import { useAuth } from '@/lib/auth-context';
 import { useConnectivity } from '@/lib/connectivity';
@@ -43,7 +44,9 @@ export default function DownloadsPage() {
   const [available, setAvailable] = useState<Record<string, boolean>>({});
   const [legacy, setLegacy] = useState<Array<{ id: string; timings: NarrationTimingsFile }>>([]);
   const [importing, setImporting] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useRouteQuery('q');
+  const [selectedPlaylist, selectPlaylist] = useRouteQuery('playlist');
+  const [selectedTrack, selectTrack] = useRouteQuery('track');
   const [sourcePlaylists, setSourcePlaylists] = useState<Playlist[]>([]);
   const [sourceTracks, setSourceTracks] = useState<Narration[]>([]);
   const [progress, setProgress] = useState<Record<string, string>>({});
@@ -85,16 +88,25 @@ export default function DownloadsPage() {
   const trackMap = useMemo(() => new Map(sourceTracks.map((item) => [item.id, item])), [sourceTracks]);
   const needle = query.trim().toLowerCase();
   const playlists = (catalog?.playlists ?? []).filter((item) =>
-    item.title.toLowerCase().includes(needle) || item.narrationIds.some((id) => catalog?.tracks[id]?.title.toLowerCase().includes(needle)));
+    !selectedTrack && (!selectedPlaylist || selectedPlaylist === item.id) &&
+    (item.title.toLowerCase().includes(needle) || item.narrationIds.some((id) => catalog?.tracks[id]?.title.toLowerCase().includes(needle))));
   const pending = (catalog?.pendingPlaylists ?? []).filter((item) =>
-    !catalog?.playlists.some((saved) => saved.id === item.id) && item.title.toLowerCase().includes(needle));
+    !selectedTrack && (!selectedPlaylist || selectedPlaylist === item.id) && !catalog?.playlists.some((saved) => saved.id === item.id) && item.title.toLowerCase().includes(needle));
   const pendingById = new Map((catalog?.pendingPlaylists ?? []).map((item) => [item.id, item]));
   const grouped = new Set((catalog?.playlists ?? []).flatMap((item) => item.narrationIds));
-  const individualIds = (catalog?.individualIds ?? []).filter((id) => !grouped.has(id) && catalog?.tracks[id]?.title.toLowerCase().includes(needle));
+  const individualIds = selectedTrack ? catalog?.tracks[selectedTrack] ? [selectedTrack] : [] : selectedPlaylist ? []
+    : (catalog?.individualIds ?? []).filter((id) => !grouped.has(id) && catalog?.tracks[id]?.title.toLowerCase().includes(needle));
+  const pageTitle = selectedPlaylist ? catalog?.playlists.find((item) => item.id === selectedPlaylist)?.title ?? 'Downloaded playlist'
+    : selectedTrack ? catalog?.tracks[selectedTrack]?.title ?? 'Downloaded narration' : 'Downloads';
+  const openDownload = (name: 'playlist' | 'track', id: string) => {
+    const url = new URL('/downloads', window.location.origin);
+    url.searchParams.set(name, id);
+    window.history.pushState(null, '', `${url.pathname}${url.search}`);
+  };
 
-  const play = async (ids: string[], index: number, title?: string) => {
+  const play = async (ids: string[], index: number, title?: string, playlistId?: string) => {
     stream.player?.pause();
-    try { await playback.playTracks(ids, index, title); } catch (error) { toast.error((error as Error).message); }
+    try { await playback.playTracks(ids, index, title, playlistId); } catch (error) { toast.error((error as Error).message); }
   };
 
   const update = async (id: string) => {
@@ -115,11 +127,11 @@ export default function DownloadsPage() {
     }
   };
 
-  const trackRow = (track: DownloadedTrack, ids: string[], index: number, removable: boolean, playlistTitle?: string, enabled = true) => (
+  const trackRow = (track: DownloadedTrack, ids: string[], index: number, removable: boolean, playlistTitle?: string, enabled = true, playlistId?: string) => (
     <li key={track.id} className="flex min-w-0 items-center gap-3 border-t border-border px-3 py-2.5 first:border-t-0">
       <button
         type="button"
-        onClick={() => void play(ids, index, playlistTitle)}
+        onClick={() => void play(ids, index, playlistTitle, playlistId)}
         disabled={!enabled || !available[track.id]}
         aria-label={`${playback.track?.id === track.id && playback.playing ? 'Restart' : 'Play'} ${track.title}`}
         className="inline-flex size-9 flex-none items-center justify-center rounded-full text-ink-muted hover:bg-accent hover:text-foreground disabled:opacity-35"
@@ -127,7 +139,7 @@ export default function DownloadsPage() {
         {playback.track?.id === track.id && playback.playing ? <Pause size={15} /> : <Play size={15} />}
       </button>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[0.85rem] font-medium text-foreground">{track.title}</div>
+        <button type="button" className="block max-w-full truncate text-left text-[0.85rem] font-medium text-foreground hover:text-primary" onClick={() => openDownload('track', track.id)}>{track.title}</button>
         <div className="t-mono text-[0.72rem] text-ink-muted">{track.voice || 'Narration'} · {duration(track.durationMs)}{available[track.id] ? '' : ' · Missing from device'}</div>
       </div>
       {removable ? (
@@ -140,10 +152,11 @@ export default function DownloadsPage() {
   );
 
   return (
-    <WorkbenchPanel title="Downloads" icon={<HardDriveDownload size={13} strokeWidth={2} />} viewGrid gridVariant="wide">
+    <WorkbenchPanel workspacePage title={pageTitle} icon={<HardDriveDownload size={13} strokeWidth={2} />} viewGrid gridVariant="wide">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="t-section-title">Downloads</h1>
+          <h1 className="t-section-title">{pageTitle}</h1>
+          {selectedPlaylist || selectedTrack ? <button type="button" onClick={() => { selectPlaylist(''); selectTrack(''); }} className="text-sm text-primary underline underline-offset-2">All downloads</button> : null}
           <p className="t-lead">Saved on this device for listening without Studio.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -188,7 +201,7 @@ export default function DownloadsPage() {
       {catalog && playlists.length === 0 && pending.length === 0 && individualIds.length === 0 ? (
         <div className="grid justify-items-center gap-2 rounded-lg border border-dashed border-border p-10 text-center">
           <HardDriveDownload size={24} className="text-ink-muted" />
-          <h2 className="t-card-title">{needle ? 'No matching downloads' : 'No downloads on this device yet'}</h2>
+          <h2 className="t-card-title">{selectedPlaylist || selectedTrack ? 'This download is unavailable on this device' : needle ? 'No matching downloads' : 'No downloads on this device yet'}</h2>
           <p className="t-card-desc">{online ? 'Use the download action in Library or Playlists to save audio here.' : 'Connect to Studio to save narrations for offline listening.'}</p>
           {online ? <Button asChild variant="outline" size="sm"><a href="/library">Open Library</a></Button> : null}
         </div>
@@ -207,26 +220,26 @@ export default function DownloadsPage() {
                   <div className="flex min-w-0 items-center gap-3">
                     <ListMusic size={18} className="flex-none text-primary" />
                     <div className="min-w-0">
-                      <h3 className="t-card-title truncate">{playlist.title}</h3>
+                      <h3 className="t-card-title truncate"><button type="button" className="hover:text-primary" onClick={() => openDownload('playlist', playlist.id)}>{playlist.title}</button></h3>
                       <p className="t-card-desc">{playlist.narrationIds.length} tracks · {newer ? 'Update available' : 'Saved playlist'}{complete ? '' : ' · Incomplete on device'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Button size="sm" variant="secondary" disabled={!complete} onClick={() => void play(playlist.narrationIds, 0, playlist.title)}><Play size={13} /> Play</Button>
+                    <Button size="sm" variant="secondary" disabled={!complete} onClick={() => void play(playlist.narrationIds, 0, playlist.title, playlist.id)}><Play size={13} /> Play</Button>
                     <Button size="sm" variant="outline" disabled={!online || !source || !!progress[playlist.id]} title={!online ? 'Requires Studio connection' : undefined} onClick={() => void update(playlist.id)}>
                       {progress[playlist.id] ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
                       {failed[playlist.id] || pendingById.has(playlist.id) ? 'Retry' : newer ? 'Update' : 'Refresh'}
                     </Button>
                     <Button size="sm" variant="ghost" aria-label={`Remove ${playlist.title} download`} title="Remove playlist download" onClick={() => {
                       if (!user) return;
-                      void removeDownloadedPlaylist(user.uid, playlist.id).then(() => { if (playback.playlistTitle === playlist.title) playback.stop(); toast.success('Playlist download removed'); }).catch(() => toast.error('Could not remove playlist download.'));
+                      void removeDownloadedPlaylist(user.uid, playlist.id).then(() => { if (playback.playlistId === playlist.id) playback.stop(); toast.success('Playlist download removed'); }).catch(() => toast.error('Could not remove playlist download.'));
                     }}><Trash2 size={14} /></Button>
                   </div>
                 </div>
                 {progress[playlist.id] ? <p role="status" className="px-4 pb-2 text-xs text-ink-muted">{progress[playlist.id]}</p> : null}
                 {failed[playlist.id] || pendingById.has(playlist.id) ? <p className="px-4 pb-2 text-xs text-destructive">Update stopped. The previous playlist is still playable; retry when ready.</p> : null}
                 {playlist.description ? <p className="px-4 pb-3 text-sm text-ink-muted">{playlist.description}</p> : null}
-                <ol className="border-t border-border bg-background">{playlist.narrationIds.map((id, index) => catalog?.tracks[id] ? trackRow(catalog.tracks[id], playlist.narrationIds, index, false, playlist.title, complete) : <li key={id} className="p-3 text-sm text-destructive">Missing track metadata</li>)}</ol>
+                <ol className="border-t border-border bg-background">{playlist.narrationIds.map((id, index) => catalog?.tracks[id] ? trackRow(catalog.tracks[id], playlist.narrationIds, index, false, playlist.title, complete, playlist.id) : <li key={id} className="p-3 text-sm text-destructive">Missing track metadata</li>)}</ol>
               </div>
             );
           })}
@@ -260,7 +273,7 @@ export default function DownloadsPage() {
       {individualIds.length > 0 ? (
         <section className="grid gap-3">
           <h2 className="t-label">Individual downloads ({individualIds.length})</h2>
-          <ol className="rounded-lg border border-border bg-card">{individualIds.map((id, index) => catalog?.tracks[id] ? trackRow(catalog.tracks[id], individualIds, index, true) : null)}</ol>
+          <ol className="rounded-lg border border-border bg-card">{individualIds.map((id, index) => catalog?.tracks[id] ? trackRow(catalog.tracks[id], individualIds, index, catalog.individualIds.includes(id)) : null)}</ol>
         </section>
       ) : null}
       <div className="h-24" aria-hidden />

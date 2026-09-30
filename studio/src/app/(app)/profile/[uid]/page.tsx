@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useAuth } from "@/lib/auth-context";
+import { useWorkspace, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { watchMyNarrations } from "@/lib/narrations";
 import type { Narration } from "@/lib/types";
 
@@ -29,9 +30,12 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export default function ProfilePage() {
+  const { store, activeTab } = useWorkspace();
   const params = useParams<{ uid: string }>();
   const { user, profile, updateProfile } = useAuth();
   const [items, setItems] = useState<Narration[]>([]);
+  const [editedName, setEditedName] = useWorkspaceField<string | null>("name", null);
+  const [editedBio, setEditedBio] = useWorkspaceField<string | null>("bio", null);
 
   const isSelf = user !== null && user.uid === params.uid;
 
@@ -42,7 +46,7 @@ export default function ProfilePage() {
 
   if (!isSelf) {
     return (
-      <WorkbenchPanel title="Profile" icon={<UserRound size={13} strokeWidth={2} />} viewGrid>
+      <WorkbenchPanel workspacePage title="Profile" icon={<UserRound size={13} strokeWidth={2} />} viewGrid>
         <p className="t-lead">This profile is private.</p>
       </WorkbenchPanel>
     );
@@ -52,15 +56,20 @@ export default function ProfilePage() {
   const minutes = Math.round(totalMs / 60_000);
 
   const commit = (patch: { displayName?: string; bio?: string }) => {
-    try {
-      void updateProfile(patch);
-    } catch {
-      toast.error("That did not save. Try again.");
-    }
+    const tabId = activeTab?.id;
+    void updateProfile(patch, {
+      onSaved: () => {
+        if (!tabId) return;
+        if (patch.displayName !== undefined) store.acknowledgeField(tabId, "name", patch.displayName);
+        if (patch.bio !== undefined) store.acknowledgeField(tabId, "bio", patch.bio);
+      },
+      onError: () => toast.error("That did not save. Your edit is kept on this device."),
+    });
   };
 
   return (
     <WorkbenchPanel
+      workspacePage
       title="Profile"
       icon={<UserRound size={13} strokeWidth={2} />}
       viewGrid
@@ -87,7 +96,8 @@ export default function ProfilePage() {
             <Input
               id="name"
               className="h-10"
-              defaultValue={profile?.displayName ?? user.displayName}
+              value={editedName ?? profile?.displayName ?? user.displayName}
+              onChange={(event) => setEditedName(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") event.currentTarget.blur();
               }}
@@ -106,7 +116,8 @@ export default function ProfilePage() {
             <Input
               id="bio"
               className="h-10"
-              defaultValue={profile?.bio ?? ""}
+              value={editedBio ?? profile?.bio ?? ""}
+              onChange={(event) => setEditedBio(event.target.value)}
               placeholder="A sentence about what you make."
               onKeyDown={(event) => {
                 if (event.key === "Enter") event.currentTarget.blur();
