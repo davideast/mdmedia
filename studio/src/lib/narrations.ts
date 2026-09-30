@@ -25,6 +25,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 
+import { isVoiceDisplayName } from './voice-name.mjs';
 import { auth, db } from '@/lib/firebase';
 import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
@@ -53,7 +54,7 @@ function asNumber(value: unknown, fallback = 0): number {
 }
 
 function asVoice(value: unknown): VoiceName {
-  return typeof value === 'string' && value.trim().length > 0 && value.length <= 100
+  return isVoiceDisplayName(value)
     ? (value as VoiceName)
     : DEFAULT_VOICE;
 }

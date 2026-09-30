@@ -1,3 +1,4 @@
+import { isVoiceDisplayName } from "./voice-name.mjs";
 /**
  * Narration request parsing, validation, and ID generation.
  *
@@ -67,10 +68,7 @@ export function parseNarrationRequest(body: unknown): NarrationRequest | null {
   if (voiceProvider !== 'gemini' && voiceProvider !== 'elevenlabs') return null;
   const elevenLabsVoice =
     voiceProvider === 'elevenlabs' &&
-    typeof raw.voice === 'string' &&
-    raw.voice.trim().length > 0 &&
-    raw.voice.length <= 100 &&
-    !/[\u0000-\u001f\u007f]/.test(raw.voice) &&
+    isVoiceDisplayName(raw.voice) &&
     isElevenLabsVoiceId(raw.voiceId);
   if (!elevenLabsVoice && (voiceProvider !== 'gemini' || !isVoice(raw.voice))) return null;
   if (voiceProvider === 'gemini' && raw.voiceId !== undefined && raw.voiceId !== raw.voice) return null;

@@ -1,3 +1,4 @@
+import { isVoiceDisplayName } from "./voice-name.mjs";
 import { isElevenLabsVoiceId, type VoiceChoice } from "./types";
 
 export interface AccessibleVoice extends VoiceChoice {
@@ -16,7 +17,7 @@ export function parseVoiceRecord(
   const raw = value as Record<string, unknown>;
   if (raw.provider !== "elevenlabs" || !isElevenLabsVoiceId(raw.voiceId)
     || documentId !== `elevenlabs:${raw.voiceId}` || raw.enabled !== true
-    || typeof raw.name !== "string" || !raw.name.trim() || raw.name.length > 160) return null;
+    || !isVoiceDisplayName(raw.name)) return null;
   const voice: AccessibleVoice = {
     provider: "elevenlabs", id: raw.voiceId, name: raw.name.trim(), source,
   };

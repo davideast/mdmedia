@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /** Operator-only voice catalog and per-user grant management. No client writes. */
+import { isVoiceDisplayName, MAX_VOICE_NAME_LENGTH } from '../src/lib/voice-name.mjs';
 import { isValidEmail, normalizeEmail, openBackend } from './allowlist.mjs';
 
 const VOICE_ID = /^[A-Za-z0-9]{20}$/;
@@ -96,7 +97,7 @@ async function main() {
   const voiceId = command === 'shared' ? args[0] : command === 'list' ? null : args[1];
   if (voiceId && !VOICE_ID.test(voiceId)) throw new Error('ElevenLabs voice IDs must contain 20 letters or digits.');
   const name = command === 'shared' ? args[1] : command === 'grant' ? args[2] : null;
-  if (name !== null && (!name.trim() || name.length > 160)) throw new Error('Voice names must contain 1–160 characters.');
+  if (name !== null && !isVoiceDisplayName(name)) throw new Error(`Voice names must contain 1–${MAX_VOICE_NAME_LENGTH} characters without control characters.`);
   if (command === 'shared' && options.enabled === true && !options.reviewed) {
     throw new Error('--enabled requires --reviewed after checking identity and permitted use.');
   }
