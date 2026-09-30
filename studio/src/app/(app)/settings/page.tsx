@@ -22,8 +22,8 @@ import { useAuth } from "@/lib/auth-context";
 import {
   DEFAULT_SETTINGS,
   HIGHLIGHT_COLORS,
-  TTS_MODELS,
   settingsDefaultVoice,
+  TTS_MODELS,
   type HighlightColorId,
   type TTSModelName,
   type UserSettings,
@@ -67,7 +67,7 @@ function Row({
 }
 
 export default function SettingsPage() {
-  const { profile, updateSettings, signOutUser } = useAuth();
+  const { profile, defaultReader, updateSettings, signOutUser } = useAuth();
   const { highlightColor, setHighlightColor } = useNarration();
   const { theme, setTheme } = useTheme();
 
@@ -143,10 +143,13 @@ export default function SettingsPage() {
 
           <Separator />
 
-          <Row label="Reader" htmlFor="default-voice">
+          <Row label="Reader" htmlFor="default-voice"
+            hint={settingsDefaultVoice(settings).provider === "elevenlabs" && defaultReader.provider === "gemini"
+              ? "Kore is used until your saved ElevenLabs reader is available."
+              : undefined}>
             <VoicePicker
               id="default-voice"
-              value={settingsDefaultVoice(settings)}
+              value={defaultReader}
               onChange={(voice) => save({
                 defaultVoice: voice.name,
                 defaultVoiceRef: { provider: voice.provider, id: voice.id },
@@ -180,7 +183,7 @@ export default function SettingsPage() {
             </Select>
           </Row>
 
-          {settings.defaultVoiceProvider !== "elevenlabs" ? (
+          {defaultReader.provider !== "elevenlabs" ? (
             <>
               <Separator />
               <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
