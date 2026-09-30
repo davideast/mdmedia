@@ -16,6 +16,22 @@ if (fs.existsSync(bridgeUrlPath)) {
   }
 }
 
+// Hosted namespace routes use their own Host/Origin guard. The CLI passes
+// --allowed-host to the outer server and WebSocket mount, but omits it when
+// constructing the sandbox session. Forward it so proxied /__pyric requests
+// from the same tailnet hostname pass the namespace guard too.
+const serveCliPath = path.join(cliDist, 'cli', 'serve.js');
+if (fs.existsSync(serveCliPath)) {
+  let content = fs.readFileSync(serveCliPath, 'utf8');
+  const target = '            projectDir: opts.cwd,\n            firebaseConfig: config,';
+  const replacement = '            projectDir: opts.cwd,\n            boundHost: opts.host ?? \'localhost\',\n            allowedHosts: opts.allowedHosts,\n            firebaseConfig: config,';
+  if (content.includes(target)) {
+    content = content.replace(target, replacement);
+    fs.writeFileSync(serveCliPath, content, 'utf8');
+    console.log('[patch] Forwarded allowed hosts to Pyric hosted namespace routes');
+  }
+}
+
 // 2. Patch storage.js to uncap MAX_STORAGE_OP_BYTES for Node hosted SQLite storage (up to 512 MiB)
 const storageProtocolPath = path.join(cliDist, 'serve', 'worker', 'protocol', 'storage.js');
 if (fs.existsSync(storageProtocolPath)) {
@@ -131,4 +147,3 @@ if (fs.existsSync(sandboxBackendPath)) {
     console.log('[patch] Patched pyric sandbox-backend.js to synthesize email and email_verified claims');
   }
 }
-

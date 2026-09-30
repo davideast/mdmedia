@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   AudioLines,
+  Download,
   Library,
   ListMusic,
   ListOrdered,
@@ -21,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useAuth } from "@/lib/auth-context";
 import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
+import { useConnectivity } from "@/lib/connectivity";
 
 interface NavItem {
   href: string;
@@ -35,6 +37,7 @@ const NAV: readonly NavItem[] = [
   { href: "/queue", label: "Queue", icon: ListOrdered },
   { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
   { href: "/playlists", label: "Playlists", icon: ListMusic },
+  { href: "/downloads", label: "Downloads", icon: Download },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -65,6 +68,7 @@ export function NavRail({
   const { user } = useAuth();
   const { generationQueue } = useNarration();
   const { resolvedTheme, setTheme } = useTheme();
+  const offline = useConnectivity() === 'offline';
   const isDark = resolvedTheme === "dark";
   const activeCount = generationQueue.activeCount;
 
@@ -81,9 +85,13 @@ export function NavRail({
         )}
       >
         {docked ? null : (
-          <Link href="/" onClick={onNavigate} className="min-w-0">
-            <BrandMark className="text-[0.95rem]" />
-          </Link>
+          offline ? (
+            <span className="min-w-0 opacity-50" aria-disabled="true"><BrandMark className="text-[0.95rem]" /></span>
+          ) : (
+            <Link href="/" onClick={onNavigate} className="min-w-0">
+              <BrandMark className="text-[0.95rem]" />
+            </Link>
+          )
         )}
         <Tooltip>
           <TooltipTrigger
@@ -110,15 +118,14 @@ export function NavRail({
           const Icon = item.icon;
           const isQueue = item.href === "/queue";
           const showBadge = isQueue && activeCount > 0;
+          const disabled = offline && item.href !== '/downloads';
 
           const link = (
-            <Link
-              href={item.href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
+            <div
               className={cn(
                 "flex h-[30px] items-center rounded-md text-[13px] transition-colors",
                 docked ? "w-full justify-center" : "gap-2 px-2",
+                disabled && "cursor-not-allowed opacity-40",
                 active
                   ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                   : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
@@ -143,7 +150,13 @@ export function NavRail({
                   ) : null}
                 </>
               )}
-            </Link>
+            </div>
+          );
+
+          const itemControl = disabled ? (
+            <div aria-disabled="true" title={`${item.label} requires Studio connection`}>{link}</div>
+          ) : (
+            <Link href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined}>{link}</Link>
           );
 
           const tooltipLabel =
@@ -151,13 +164,13 @@ export function NavRail({
 
           return (
             <li key={item.href}>
-              {docked ? (
+              {docked && !disabled ? (
                 <Tooltip>
-                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipTrigger asChild>{itemControl}</TooltipTrigger>
                   <TooltipContent side="right">{tooltipLabel}</TooltipContent>
                 </Tooltip>
               ) : (
-                link
+                itemControl
               )}
             </li>
           );
@@ -186,7 +199,15 @@ export function NavRail({
           <TooltipContent side="right">Toggle theme</TooltipContent>
         </Tooltip>
 
-        {user === null ? null : (
+        {user === null ? null : offline ? (
+          <div aria-disabled="true" title="Profile requires Studio connection" className={cn(
+            "flex h-[30px] cursor-not-allowed items-center rounded-md text-[13px] text-ink-muted opacity-40",
+            docked ? "w-full justify-center" : "gap-2 px-2",
+          )}>
+            <UserRound size={16} strokeWidth={2} />
+            {docked ? null : <span className="truncate">{user.displayName}</span>}
+          </div>
+        ) : (
           <Tooltip>
             <TooltipTrigger asChild>
               <Link

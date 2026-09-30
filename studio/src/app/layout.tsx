@@ -4,6 +4,8 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth-context";
+import { OfflineServiceWorker } from "@/components/offline-service-worker";
+import { ConnectivityProvider } from "@/lib/connectivity";
 import "./globals.css";
 
 const display = Plus_Jakarta_Sans({
@@ -30,6 +32,7 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "mdmedia studio",
   description: "Turn writing into narration you can read along with.",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       {
@@ -48,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <OfflineServiceWorker />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -55,10 +59,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           storageKey="mdmedia.theme"
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
-            <Toaster position="bottom-right" />
-          </AuthProvider>
+          <ConnectivityProvider>
+            <AuthProvider>
+              <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+              <Toaster position="bottom-right" />
+            </AuthProvider>
+          </ConnectivityProvider>
         </ThemeProvider>
       </body>
     </html>

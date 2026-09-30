@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getMediaStore } from './media-store';
 import type { NarrationTimingsFile } from './wav';
+import { useAuth } from './auth-context';
+import { downloadMediaStore, removeIndividualDownload, trackFromTimings, updateDownloadCatalog } from './download-catalog';
 
 async function currentIdToken(): Promise<string | null> {
   try {
@@ -17,6 +19,7 @@ export interface OfflineNarrationMetadata {
   title?: string;
   sourceMarkdown?: string;
   adapted?: boolean;
+  voice?: string;
 }
 
 export type OfflineChangeListener = (
@@ -52,16 +55,16 @@ function notifyOfflineChange(narrationId: string, isOffline: boolean, isDownload
 /**
  * Checks whether a narration is stored in local offline storage (OPFS).
  */
-export async function isNarrationOffline(id: string): Promise<boolean> {
-  const mediaStore = getMediaStore();
+export async function isNarrationOffline(id: string, uid?: string): Promise<boolean> {
+  const mediaStore = uid ? downloadMediaStore(uid) : getMediaStore();
   return await mediaStore.has(id);
 }
 
 /**
  * Checks whether a narration is currently being downloaded.
  */
-export function isNarrationDownloading(id: string): boolean {
-  return inFlightDownloads.has(id);
+export function isNarrationDownloading(id: string, uid = ''): boolean {
+  return inFlightDownloads.has(`${uid}:${id}`);
 }
 
 /**
@@ -71,15 +74,25 @@ export function isNarrationDownloading(id: string): boolean {
 export function downloadNarration(
   id: string,
   metadata?: OfflineNarrationMetadata,
+  uid?: string,
+  asIndividual = true,
 ): Promise<boolean> {
-  const existing = inFlightPromises.get(id);
+  if (!uid) return Promise.reject(new Error('Sign in before downloading.'));
+  const key = `${uid}:${id}`;
+  const existing = inFlightPromises.get(key);
   if (existing) return existing;
 
   const downloadPromise = (async () => {
-    inFlightDownloads.add(id);
+    inFlightDownloads.add(key);
     notifyOfflineChange(id, false, true);
 
     try {
+      if (typeof navigator.storage?.getDirectory !== 'function') {
+        throw new Error('Offline storage is unavailable in this browser.');
+      }
+      // Ask during the download gesture so the browser can retain the audio
+      // under storage pressure. A denied request does not prevent the download.
+      void navigator.storage.persist?.().catch(() => false);
       const token = await currentIdToken();
       const headers: Record<string, string> = {};
       if (token) {
@@ -108,31 +121,42 @@ export function downloadNarration(
         adapted: timingsFile.adapted ?? metadata?.adapted,
       };
 
-      const mediaStore = getMediaStore();
+      // Explicit downloads must never report success after falling back to
+      // the in-memory adapter, which disappears when the app closes.
+      const mediaStore = downloadMediaStore(uid);
       await mediaStore.saveTrack(id, audioBlob, mergedTimings);
+      await updateDownloadCatalog(uid, (current) => ({
+        ...current,
+        tracks: { ...current.tracks, [id]: trackFromTimings(id, mergedTimings, metadata?.voice) },
+        individualIds: asIndividual && !current.individualIds.includes(id)
+          ? [...current.individualIds, id]
+          : current.individualIds,
+      }));
       notifyOfflineChange(id, true, false);
       return true;
     } catch (err) {
-      const isStillOffline = await getMediaStore().has(id);
+      const isStillOffline = await downloadMediaStore(uid).has(id);
       notifyOfflineChange(id, isStillOffline, false);
       throw err;
     } finally {
-      inFlightDownloads.delete(id);
-      inFlightPromises.delete(id);
+      inFlightDownloads.delete(key);
+      inFlightPromises.delete(key);
     }
   })();
 
-  inFlightPromises.set(id, downloadPromise);
+  inFlightPromises.set(key, downloadPromise);
   return downloadPromise;
 }
 
 /**
  * Removes a narration from local offline storage.
  */
-export async function removeOfflineNarration(id: string): Promise<void> {
-  const mediaStore = getMediaStore();
-  await mediaStore.delete(id);
-  notifyOfflineChange(id, false, false);
+export async function removeOfflineNarration(id: string, uid?: string): Promise<boolean> {
+  if (uid) await removeIndividualDownload(uid, id);
+  else await getMediaStore().delete(id);
+  const remains = await isNarrationOffline(id, uid);
+  notifyOfflineChange(id, remains, false);
+  return remains;
 }
 
 /**
@@ -142,31 +166,34 @@ export function useOfflineStatus(
   narrationId: string | null | undefined,
   metadata?: OfflineNarrationMetadata,
 ) {
-  const [isDownloaded, setIsDownloaded] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(
-    narrationId ? isNarrationDownloading(narrationId) : false,
-  );
-  const metadataRef = useRef(metadata);
-  metadataRef.current = metadata;
+  const currentId = narrationId ?? null;
+  const { user } = useAuth();
+  const uid = user?.uid;
+  const [status, setStatus] = useState(() => ({
+    id: currentId,
+    isDownloaded: false,
+    isDownloading: currentId ? isNarrationDownloading(currentId, uid) : false,
+  }));
+  const isDownloaded = currentId === status.id && status.isDownloaded;
+  const isDownloading = currentId === status.id
+    ? status.isDownloading
+    : currentId ? isNarrationDownloading(currentId, uid) : false;
 
   useEffect(() => {
-    if (!narrationId) {
-      setIsDownloaded(false);
-      setIsDownloading(false);
-      return;
-    }
+    if (!currentId || !uid) return;
 
     let active = true;
-    setIsDownloading(isNarrationDownloading(narrationId));
-
-    void isNarrationOffline(narrationId).then((offline) => {
-      if (active) setIsDownloaded(offline);
+    void isNarrationOffline(currentId, uid).then((offline) => {
+      if (active) setStatus({
+        id: currentId,
+        isDownloaded: offline,
+        isDownloading: isNarrationDownloading(currentId, uid),
+      });
     });
 
     const unsubscribe = subscribeOfflineChange((changedId, offline, downloading) => {
-      if (changedId === narrationId && active) {
-        setIsDownloaded(offline);
-        setIsDownloading(downloading);
+      if (changedId === currentId && active) {
+        setStatus({ id: currentId, isDownloaded: offline, isDownloading: downloading });
       }
     });
 
@@ -174,17 +201,17 @@ export function useOfflineStatus(
       active = false;
       unsubscribe();
     };
-  }, [narrationId]);
+  }, [currentId, uid]);
 
   const download = useCallback(async () => {
-    if (!narrationId || isNarrationDownloading(narrationId)) return;
-    await downloadNarration(narrationId, metadataRef.current);
-  }, [narrationId]);
+    if (!currentId || !uid || isNarrationDownloading(currentId, uid)) return;
+    await downloadNarration(currentId, metadata, uid);
+  }, [currentId, metadata, uid]);
 
   const remove = useCallback(async () => {
-    if (!narrationId) return;
-    await removeOfflineNarration(narrationId);
-  }, [narrationId]);
+    if (!currentId || !uid) return;
+    return await removeOfflineNarration(currentId, uid);
+  }, [currentId, uid]);
 
   return {
     isDownloaded,

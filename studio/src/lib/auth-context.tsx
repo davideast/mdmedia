@@ -30,7 +30,7 @@ import { onSnapshot, type Unsubscribe } from 'firebase/firestore';
 
 import { auth } from '@/lib/firebase';
 import {
-  isEmailAllowlisted,
+  checkEmailAllowlist,
   saveProfileFields,
   saveSettings,
   toUserProfile,
@@ -38,6 +38,7 @@ import {
   userRef,
 } from '@/lib/users';
 import type { UserProfile, UserSettings } from '@/lib/types';
+import { useConnectivity } from '@/lib/connectivity';
 
 export interface AuthUser {
   uid: string;
@@ -67,8 +68,11 @@ function toAuthUser(user: User): AuthUser {
 }
 
 const AuthContext = createContext<AuthState | null>(null);
+const LAST_APPROVED_KEY = 'mdmedia.offline-last-approved.v1';
+const OFFLINE_LOCK_KEY = 'mdmedia.offline-locked.v1';
 
 export function AuthProvider({ children }: { children: ReactNode }): ReactElement {
+  const connectivity = useConnectivity();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,6 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
   // Async session guard so superseded auth state transitions abort immediately
   // and never attach orphaned Firestore listeners.
   const loadSessionRef = useRef(0);
+  const localSessionRef = useRef(false);
+
+  const grantKey = (uid: string) => `mdmedia.offline-grant.v1.${uid}`;
 
   useEffect(() => {
     const stopProfile = () => {
@@ -94,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
 
       if (!firebaseUser) {
         uidRef.current = null;
+        localSessionRef.current = false;
         setUser(null);
         setProfile(null);
         setLoading(false);
@@ -103,24 +111,39 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
       const nextUser = toAuthUser(firebaseUser);
 
       void (async () => {
-        const allowed = await isEmailAllowlisted(nextUser.email);
+        const decision = await Promise.race([
+          checkEmailAllowlist(nextUser.email),
+          new Promise<'unavailable'>((resolve) => window.setTimeout(() => resolve('unavailable'), 4500)),
+        ]);
         if (loadSessionRef.current !== sessionId) return;
 
-        if (!allowed) {
+        const approvedBefore = window.localStorage.getItem(grantKey(nextUser.uid)) === nextUser.email.toLowerCase();
+        if (decision === 'denied' || (decision === 'unavailable' && !approvedBefore)) {
           uidRef.current = null;
           setUser(null);
           setProfile(null);
-          setAccessDenied(true);
-          await signOut(auth());
+          setAccessDenied(decision === 'denied');
+          if (decision === 'denied') {
+            window.localStorage.removeItem(grantKey(nextUser.uid));
+            await signOut(auth());
+          }
           setLoading(false);
           return;
         }
 
+        if (decision === 'allowed') {
+          window.localStorage.setItem(grantKey(nextUser.uid), nextUser.email.toLowerCase());
+          window.localStorage.setItem(LAST_APPROVED_KEY, JSON.stringify(nextUser));
+          window.localStorage.removeItem(OFFLINE_LOCK_KEY);
+        }
+
         setAccessDenied(false);
         uidRef.current = nextUser.uid;
+        localSessionRef.current = false;
         setUser(nextUser);
+        setLoading(false);
 
-        void upsertUserProfile({
+        if (decision === 'allowed') void upsertUserProfile({
           uid: nextUser.uid,
           displayName: nextUser.displayName,
           email: nextUser.email,
@@ -155,12 +178,62 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     };
   }, []);
 
+  useEffect(() => {
+    if (connectivity === 'online' && localSessionRef.current) {
+      localSessionRef.current = false;
+      if (!auth().currentUser) {
+        uidRef.current = null;
+        queueMicrotask(() => {
+          setUser(null);
+          setProfile(null);
+        });
+      }
+      return;
+    }
+    if (connectivity !== 'offline' || loading || user || auth().currentUser || window.localStorage.getItem(OFFLINE_LOCK_KEY)) return;
+    try {
+      const cached = JSON.parse(window.localStorage.getItem(LAST_APPROVED_KEY) || 'null') as AuthUser | null;
+      if (!cached?.uid || !cached.email) return;
+      if (window.localStorage.getItem(grantKey(cached.uid)) !== cached.email.toLowerCase()) return;
+      localSessionRef.current = true;
+      uidRef.current = cached.uid;
+      queueMicrotask(() => setUser(cached));
+    } catch { /* No approved account has been stored on this device. */ }
+  }, [connectivity, loading, user]);
+
+  useEffect(() => {
+    const recheck = () => {
+      const current = auth().currentUser;
+      if (!current?.email) return;
+      void checkEmailAllowlist(current.email).then((decision) => {
+        if (auth().currentUser?.uid !== current.uid) return;
+        if (decision === 'allowed') {
+          window.localStorage.setItem(grantKey(current.uid), current.email!.toLowerCase());
+          if (uidRef.current === null) window.location.reload();
+        }
+        if (decision === 'denied') {
+          window.localStorage.removeItem(grantKey(current.uid));
+          setAccessDenied(true);
+          void signOut(auth());
+        }
+      });
+    };
+    window.addEventListener('online', recheck);
+    if (connectivity === 'online') recheck();
+    return () => window.removeEventListener('online', recheck);
+  }, [connectivity]);
+
   const signIn = useCallback(async () => {
     setAccessDenied(false);
     await signInWithPopup(auth(), new GoogleAuthProvider());
   }, []);
 
   const signOutUser = useCallback(async () => {
+    window.localStorage.setItem(OFFLINE_LOCK_KEY, '1');
+    localSessionRef.current = false;
+    uidRef.current = null;
+    setUser(null);
+    setProfile(null);
     await signOut(auth());
   }, []);
 

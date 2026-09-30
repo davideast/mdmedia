@@ -1,39 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Local development
 
-## Getting Started
-
-First, run the development server:
+Studio runs on Next.js with a local Pyric Node hosted sandbox. Node 22.15+, Bun, npm, and the local Pyric checkout are required. From the repository root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run build
+npm pack
+npm --prefix functions install
+npm --prefix functions run build
+cd studio
+bash ~/repos/davideast/pyric/.agents/skills/pyric-node-host/scripts/pack-local.sh ~/repos/davideast/pyric .pyric-local
+npm install
+npm run dev:bg
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The hosted sandbox listens on `http://localhost:3473` and stores its data in `studio/.pyric/state/hosted/`. Run `npm run dev:status`, `npm run dev:logs`, or `npm run dev:stop` from `studio/` to manage the server. The local Pyric tarballs in `.pyric-local/` are ignored by Git; rebuild them after updating the Pyric checkout. If Pyric's version changes, update the four `file:.pyric-local/*.tgz` entries in `package.json` to match.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set `GEMINI_API_KEY` in `studio/.env` for narration synthesis. The browser Firebase settings in `.env.local.example` are needed when connecting to the real Firebase project. Set `MDMEDIA_ALLOWED_DEV_ORIGINS` to a comma-separated list of Tailscale hostnames when using the development server through Tailscale.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Run at login on a Mac
 
-## Learn More
+The LaunchAgents run the hosted Pyric sandbox and a compiled Next.js production server under `launchd`, bound to `127.0.0.1`, and configure private Tailscale HTTPS proxies on ports `3000` and `3473`. Tailscale must be signed in with HTTPS enabled for the tailnet. Generate the agents for this checkout and hostname so machine paths do not enter the repository:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run studio:stop
+npm --prefix studio run build:hosted:initial
+node studio/scripts/install-launch-agents.mjs <mac>.<tailnet>.ts.net
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.mdmedia.studio.plist"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.mdmedia.studio.tailscale.plist"
+launchctl print "gui/$(id -u)/com.mdmedia.studio"
+tailscale serve status
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open `http://localhost:3000` on the Mac or `https://<mac>.<tailnet>.ts.net:3000` on a phone connected to the same tailnet. Logs go to `~/Library/Logs/mdmedia-studio*.log`. Both agents start when this user logs in; the Tailscale agent retries if Tailscale is not ready yet. The studio runs while the Mac is awake.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For later changes, build into a separate directory, inspect it on port 3100, then release it:
 
-## Deploy on Vercel
+```bash
+npm --prefix studio run build:hosted
+npm --prefix studio run preview:hosted
+# After reviewing the preview, stop it with Ctrl-C, then:
+npm --prefix studio run release:hosted
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`release:hosted` stops the Studio agent, swaps the staged build and matching service worker into place, restarts the agent, and checks its health. It restores the previous build if startup fails. The previous build remains in a timestamped `.next-hosted-previous-*` directory until you remove it. Do not rebuild `.next-hosted` while its server is running: the old HTML can then refer to JS and CSS files that have disappeared. To restart an agent after changing its plist, boot it out and bootstrap it again. `tailscale serve --bg` keeps its proxies configured after an agent stops, so disable them explicitly with `tailscale serve --https=3000 off` and `tailscale serve --https=3473 off` if you no longer want them shared.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Offline listening on a phone
+
+On the phone, open Studio through its Tailscale HTTPS address while the Mac is awake and sign in with an approved account. In **Library**, tap the download icon for individual narrations. In **Playlists**, use the download action to save a complete playlist. Open **Downloads** once while online, then install the site from the browser menu. The installed app starts in Studio when connected and opens Downloads when the Mac is unavailable. Downloads uses the same navigation and player dock as Studio, with Android Media Session controls for background playback. Playlist changes require a manual **Update** in Downloads or Playlists.
+
+Downloads belong to the approved account, browser profile, and exact origin (`https://<mac>.<tailnet>.ts.net:3000`). A download made through `localhost:3000`, another port, or another browser is a separate copy. When Studio is unavailable, server-dependent controls are disabled and Downloads remains available. Signing out locks access but leaves the local files in place. Browser site-data removal removes downloads and the cached app shell. The download action requests persistent browser storage when supported, but storage retention remains subject to the browser and device. Earlier unscoped downloads appear as a one-time import choice while online; do not import files that belong to another account.
 
 ## Allowlist bootstrap
 
@@ -145,4 +161,3 @@ gcloud run deploy studio \
 # 5. Deploy Firebase Hosting rewrite
 firebase deploy --only hosting
 ```
-

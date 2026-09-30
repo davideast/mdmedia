@@ -76,8 +76,9 @@ function LibraryNarrationCard({
       title: narration.title,
       sourceMarkdown: narration.sourceMarkdown,
       adapted: narration.adapted,
+      voice: narration.voice,
     }),
-    [narration.title, narration.sourceMarkdown, narration.adapted],
+    [narration.title, narration.sourceMarkdown, narration.adapted, narration.voice],
   );
   const { isDownloaded, isDownloading, download, remove } = useOfflineStatus(
     narration.id,
@@ -159,8 +160,8 @@ function LibraryNarrationCard({
             onClick={async (e) => {
               e.stopPropagation();
               try {
-                await remove();
-                toast.info("Removed from offline storage");
+                const remains = await remove();
+                toast.info(remains ? "Still saved in a downloaded playlist" : "Removed from offline storage");
               } catch {
                 toast.error("Could not remove narration from offline storage.");
               }
@@ -292,18 +293,23 @@ export default function LibraryPage() {
       icon={<Library size={13} strokeWidth={2} />}
       viewGrid
     >
-      <div className="relative">
-        <Search
-          size={15}
-          strokeWidth={2}
-          className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
-        />
-        <Input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search your narrations…"
-          className="h-10 rounded-full pl-9"
-        />
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search
+            size={15}
+            strokeWidth={2}
+            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-faint"
+          />
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search your narrations…"
+            className="h-10 rounded-full pl-9"
+          />
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/downloads">Downloads</Link>
+        </Button>
       </div>
 
       {filtered.length === 0 ? (

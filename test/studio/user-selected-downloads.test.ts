@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
@@ -9,7 +9,36 @@ import {
   subscribeOfflineChange,
 } from "../../studio/src/lib/offline-manager";
 import { getMediaStore } from "../../studio/src/lib/media-store";
+import { downloadMediaStore, readDownloadCatalog } from "../../studio/src/lib/download-catalog";
 import type { NarrationTimingsFile } from "../../studio/src/lib/wav";
+
+function memoryDirectory() {
+  const directories = new Map<string, ReturnType<typeof memoryDirectory>>();
+  const files = new Map<string, Blob>();
+  return {
+    async getDirectoryHandle(name: string, options?: { create?: boolean }) {
+      if (!directories.has(name)) {
+        if (!options?.create) throw new DOMException('Missing directory', 'NotFoundError');
+        directories.set(name, memoryDirectory());
+      }
+      return directories.get(name)!;
+    },
+    async getFileHandle(name: string, options?: { create?: boolean }) {
+      if (!files.has(name)) {
+        if (!options?.create) throw new DOMException('Missing file', 'NotFoundError');
+        files.set(name, new Blob());
+      }
+      return {
+        getFile: async () => files.get(name)!,
+        createWritable: async () => ({
+          write: async (data: BlobPart) => { files.set(name, new Blob([data])); },
+          close: async () => {},
+        }),
+      };
+    },
+    async removeEntry(name: string) { files.delete(name); },
+  };
+}
 
 describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
   const useNarrationStreamPath = resolve(import.meta.dir, "../../studio/src/lib/use-narration-stream.ts");
@@ -33,6 +62,8 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
 
   describe("Explicit Offline Manager Service", () => {
     const testId = "user-selected-test-123";
+    const uid = "approved-user";
+    const originalStorage = Object.getOwnPropertyDescriptor(navigator, 'storage');
     const sampleTimings: NarrationTimingsFile = {
       version: 1,
       title: "User Selected Narration",
@@ -45,7 +76,17 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
     const sampleWavBytes = new Uint8Array([82, 73, 70, 70, 36, 0, 0, 0, 87, 65, 86, 69]);
 
     beforeEach(async () => {
+      const directory = memoryDirectory();
+      Object.defineProperty(navigator, 'storage', { configurable: true, value: {
+        getDirectory: async () => directory,
+        persist: async () => true,
+      } });
       await getMediaStore().delete(testId);
+    });
+
+    afterEach(() => {
+      if (originalStorage) Object.defineProperty(navigator, 'storage', originalStorage);
+      else Reflect.deleteProperty(navigator, 'storage');
     });
 
     it("reports false when narration has not been selected for download", async () => {
@@ -78,23 +119,25 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
           events.push({ id, offline, downloading });
         });
 
-        const downloadTask1 = downloadNarration(testId, { title: "User Selected Narration" });
-        const downloadTask2 = downloadNarration(testId, { title: "User Selected Narration" });
+        const downloadTask1 = downloadNarration(testId, { title: "User Selected Narration", voice: "Kore" }, uid);
+        const downloadTask2 = downloadNarration(testId, { title: "User Selected Narration" }, uid);
 
         // Deduplication: both should return the same in-flight promise
         expect(downloadTask1).toBe(downloadTask2);
-        expect(isNarrationDownloading(testId)).toBe(true);
+        expect(isNarrationDownloading(testId, uid)).toBe(true);
 
         // Resolve audio
         resolveAudioFetch!(new Response(sampleWavBytes, { status: 200, headers: { "Content-Type": "audio/wav" } }));
         await downloadTask1;
 
-        expect(await isNarrationOffline(testId)).toBe(true);
-        expect(isNarrationDownloading(testId)).toBe(false);
+        expect(await isNarrationOffline(testId, uid)).toBe(true);
+        expect(await isNarrationOffline(testId, 'another-user')).toBe(false);
+        expect(isNarrationDownloading(testId, uid)).toBe(false);
 
-        const track = await getMediaStore().getTrack(testId);
+        const track = await downloadMediaStore(uid).getTrack(testId);
         expect(track).not.toBeNull();
         expect(track?.timings.title).toBe("User Selected Narration");
+        expect((await readDownloadCatalog(uid)).individualIds).toEqual([testId]);
 
         expect(events).toEqual([
           { id: testId, offline: false, downloading: true },
@@ -105,6 +148,10 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
       } finally {
         globalThis.fetch = originalFetch;
       }
+    });
+
+    it("requires an account before downloading", async () => {
+      await expect(downloadNarration(testId)).rejects.toThrow('Sign in before downloading.');
     });
 
     it("removes downloaded narration and notifies subscribers when removeOfflineNarration is invoked", async () => {
@@ -127,7 +174,7 @@ describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
     it("deleteNarration cleans up OPFS via removeOfflineNarration to notify subscribers", () => {
       const code = readFileSync(narrationsPath, "utf8");
       expect(code).toContain("removeOfflineNarration");
-      expect(code).toContain("await removeOfflineNarration(id)");
+      expect(code).toContain("await removeOfflineNarration(id, auth().currentUser?.uid)");
     });
   });
 

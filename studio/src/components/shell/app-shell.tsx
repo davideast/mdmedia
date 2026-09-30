@@ -15,6 +15,8 @@ import { useNarration } from "@/components/shell/narration-provider";
 import { NavRail } from "@/components/shell/nav-rail";
 import { ShellContext, type ShellContextValue } from "@/components/shell/shell-context";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { useConnectivity } from "@/lib/connectivity";
+import { useOfflinePlayback } from "@/components/shell/offline-playback-provider";
 
 const DOCK_KEY = "mdmedia.nav.docked.v1";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
@@ -71,7 +73,10 @@ export function AppShell({
   context?: ReactNode;
 }) {
   const pathname = usePathname();
+  const offline = useConnectivity() === 'offline';
+  const onlineScreenDisabled = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
+  const offlinePlayback = useOfflinePlayback();
   const breakpoints = useResponsiveBreakpoints();
   const hasContext = pathname.startsWith("/studio") || pathname.startsWith("/narration/");
   const isNarrationRoute = pathname.startsWith("/narration/");
@@ -89,7 +94,7 @@ export function AppShell({
   }, [pathname]);
 
   const busy = stream.status === "starting" || stream.status === "streaming";
-  const showPlayerBar =
+  const showPlayerBar = offlinePlayback.track !== null ||
     (isNarrationRoute && stream.transcript.length > 0) ||
     (stream.player !== null && stream.durationMs > 0);
 
@@ -247,9 +252,32 @@ export function AppShell({
         } as React.CSSProperties
       }
     >
-      {children}
+      {onlineScreenDisabled ? (
+        <div role="status" className="flex flex-none items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-sm text-foreground">
+          <span>Studio is offline. Online controls are disabled; your work stays here.</span>
+          <a href="/downloads" className="flex-none font-medium text-primary underline underline-offset-2">Open Downloads</a>
+        </div>
+      ) : null}
+      <div className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+        {children}
+      </div>
       {showPlayerBar ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-3 sm:px-6 sm:pb-5">
+          {offlinePlayback.track ? (
+            <AudioPlayerBar
+              player={offlinePlayback.player}
+              positionMs={offlinePlayback.positionMs}
+              durationMs={offlinePlayback.durationMs}
+              playing={offlinePlayback.playing}
+              busy={false}
+              title={offlinePlayback.track.title}
+              subtitle={offlinePlayback.playlistTitle || 'Downloads'}
+              href="/downloads"
+              onPrevious={offlinePlayback.previous}
+              onNext={offlinePlayback.queueLength > 1 ? offlinePlayback.next : undefined}
+              hasNext={offlinePlayback.index + 1 < offlinePlayback.queueLength}
+            />
+          ) : (
           <AudioPlayerBar
             player={stream.player}
             positionMs={stream.positionMs}
@@ -257,12 +285,13 @@ export function AppShell({
             playing={stream.playing}
             busy={busy}
             title={stream.title || undefined}
-            href={stream.id ? `/narration/${stream.id}` : undefined}
+            href={!offline && stream.id ? `/narration/${stream.id}` : undefined}
             subtitle={subtitle || undefined}
-            onPrevious={previousTrack}
-            onNext={queue ? nextTrack : undefined}
-            hasNext={queue !== null && queue.index + 1 < queue.tracks.length}
+            onPrevious={offline ? undefined : previousTrack}
+            onNext={!offline && queue ? nextTrack : undefined}
+            hasNext={!offline && queue !== null && queue.index + 1 < queue.tracks.length}
           />
+          )}
         </div>
       ) : null}
     </div>
@@ -354,7 +383,9 @@ export function AppShell({
                     }
                   }}
                 >
-                  <ContextPanel docked={false} onToggleDock={toggleContextDock} />
+                  <div className="h-full min-h-0" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+                    <ContextPanel docked={false} onToggleDock={toggleContextDock} />
+                  </div>
                 </ResizablePanel>
               </>
             ) : null}
@@ -369,7 +400,9 @@ export function AppShell({
             className="h-full flex-none border-l border-sidebar-border transition-[width] duration-200 ease-linear"
             style={{ width: 56 }}
           >
+          <div className="h-full" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
             <ContextPanel docked={true} onToggleDock={toggleContextDock} />
+          </div>
           </div>
         ) : null}
 
@@ -400,7 +433,9 @@ export function AppShell({
             >
               <SheetTitle className="sr-only">Details</SheetTitle>
               <SheetDescription className="sr-only">Narration and studio inspector panel</SheetDescription>
-              <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+              <div className="h-full" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+                <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+              </div>
             </SheetContent>
           </Sheet>
         ) : null}

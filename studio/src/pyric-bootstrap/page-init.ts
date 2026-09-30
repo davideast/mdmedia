@@ -27,11 +27,9 @@
  *   { hosted: boolean, projectKey: string | null, bridgeUrl: string | null,
  *     persistenceUnhealthy?: boolean }
  *
- * We use the SharedWorker (non-hosted) values. `--hosted` is deliberately not
- * used: hosted attach resolves its WebSocket with 'page-origin' routing, which
- * discards the bridge port and dials ws://localhost:3000/__pyric/sandbox — and
- * Next dev rewrites cannot proxy an `Upgrade: websocket`. The non-hosted path
- * uses 'bridge-port' routing, which keeps :3473 and therefore works.
+ * Next supplies the local project identity through next.config.ts. The
+ * postinstall Pyric bridge patch preserves the bridge port for the hosted
+ * WebSocket, which Next dev cannot proxy through its HTTP rewrites.
  */
 
 declare global {
@@ -43,10 +41,12 @@ declare global {
   var __PYRIC_AI_ENGINE__: { kind: string; apiKey?: string } | undefined;
 }
 
-if (typeof document !== "undefined" && globalThis.__PYRIC_WORKER_INIT__ === undefined) {
+const projectKey = process.env.NEXT_PUBLIC_PYRIC_PROJECT_KEY;
+
+if (typeof document !== "undefined" && projectKey && globalThis.__PYRIC_WORKER_INIT__ === undefined) {
   globalThis.__PYRIC_WORKER_INIT__ = {
     hosted: true,
-    projectKey: "/Users/deast/repos/davideast/tts-flash/studio",
+    projectKey,
     bridgeUrl: "ws://localhost:3473/__pyric/sandbox",
   };
 }
@@ -57,11 +57,8 @@ if (typeof document !== "undefined" && globalThis.__PYRIC_WORKER_INIT__ === unde
  * endpoints. `entries/ai.js` reads this wire lazily at `getAI()` call time, so
  * setting it here is early enough.
  *
- * NOTE: in SharedWorker mode the broker executes inside the browser worker, so
- * the key has to ride in the wire and is therefore visible to the browser.
- * That is why this is opt-in behind an explicitly-named NEXT_PUBLIC_ variable
- * rather than being read from the server-side GEMINI_API_KEY. Leave it unset
- * and Pyric's sandbox mirror answers instead.
+ * A NEXT_PUBLIC_ key is visible to the browser. This remains opt-in and does
+ * not read the server-side GEMINI_API_KEY. Leave it unset for the local mirror.
  */
 const geminiKey = process.env.NEXT_PUBLIC_PYRIC_GEMINI_API_KEY;
 

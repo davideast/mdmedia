@@ -88,12 +88,13 @@ describe('Allowlist Account Creation & Access Gate', () => {
 
     it('guards async allowlist resolution with loadSessionRef.current and signs out non-allowlisted users before provisioning users/{uid}', () => {
       expect(authContextSource).toContain('const sessionId = ++loadSessionRef.current;');
-      expect(authContextSource).toContain('const allowed = await isEmailAllowlisted(nextUser.email);');
+      expect(authContextSource).toContain('checkEmailAllowlist(nextUser.email)');
+      expect(authContextSource).toContain("decision === 'denied' || (decision === 'unavailable' && !approvedBefore)");
       expect(authContextSource).toContain('if (loadSessionRef.current !== sessionId) return;');
       expect(authContextSource).toContain('setAccessDenied(true);');
       expect(authContextSource).toContain('await signOut(auth());');
 
-      const allowlistCheckIdx = authContextSource.indexOf('await isEmailAllowlisted(nextUser.email)');
+      const allowlistCheckIdx = authContextSource.indexOf('checkEmailAllowlist(nextUser.email)');
       const upsertProfileIdx = authContextSource.indexOf('void upsertUserProfile({');
       const snapshotIdx = authContextSource.indexOf('profileUnsubscribe.current = onSnapshot(');
 
