@@ -126,14 +126,21 @@ export default async function buildConfig(): Promise<NextConfig> {
    * `firebase` / `firebase-admin` as server-external so the Node loader hook
    * installed by `pyric sandbox` can substitute them server-side.
    */
+  const sandboxUrl = (process.env.PYRIC_SANDBOX ?? "remote:http://127.0.0.1:3473")
+    .replace(/^remote:/, "")
+    .replace(/\/$/, "");
+  const bridgeUrl = new URL("/__pyric/sandbox", sandboxUrl);
+  bridgeUrl.protocol = bridgeUrl.protocol === "https:" ? "wss:" : "ws:";
+
   const config = withPyric({
     ...nextConfig,
-    env: { ...nextConfig.env, NEXT_PUBLIC_PYRIC_PROJECT_KEY: __dirname },
+    env: {
+      ...nextConfig.env,
+      NEXT_PUBLIC_PYRIC_PROJECT_KEY: process.env.PYRIC_PROJECT_KEY ?? __dirname,
+      NEXT_PUBLIC_PYRIC_BRIDGE_URL: bridgeUrl.toString(),
+    },
   }, {
-    // The rewrite target is normally derived from PYRIC_SANDBOX, but the
-    // built-in fallback is port 4000 while `pyric sandbox` listens on 3473.
-    // Pin it so `/__pyric/*` proxies correctly even if the env var is missing.
-    url: "http://127.0.0.1:3473",
+    url: sandboxUrl,
     // 'collapsed' — the floating Pyric runtime chip, mounted by the init entry
     // aliased below. See src/pyric-bootstrap/.
     runtimeChip: true,

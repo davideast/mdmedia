@@ -17,15 +17,17 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
 import {
   DEFAULT_SETTINGS,
   HIGHLIGHT_COLORS,
-  VOICES,
+  TTS_MODELS,
+  settingsDefaultVoice,
   type HighlightColorId,
+  type TTSModelName,
   type UserSettings,
   type Visibility,
-  type VoiceName,
 } from "@/lib/types";
 
 const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string }> = [
@@ -142,38 +144,61 @@ export default function SettingsPage() {
           <Separator />
 
           <Row label="Reader" htmlFor="default-voice">
+            <VoicePicker
+              id="default-voice"
+              value={settingsDefaultVoice(settings)}
+              onChange={(voice) => save({
+                defaultVoice: voice.name,
+                defaultVoiceRef: { provider: voice.provider, id: voice.id },
+                defaultVoiceProvider: voice.provider,
+                defaultVoiceId: voice.id,
+              })}
+            />
+          </Row>
+
+          <Separator />
+
+          <Row
+            label="Gemini model"
+            hint="Used when you choose a Gemini reader."
+            htmlFor="default-gemini-model"
+          >
             <Select
-              value={settings.defaultVoice}
-              onValueChange={(value) => save({ defaultVoice: value as VoiceName })}
+              value={settings.defaultGeminiModel}
+              onValueChange={(value) => save({ defaultGeminiModel: value as TTSModelName })}
             >
-              <SelectTrigger id="default-voice" className="w-full">
+              <SelectTrigger id="default-gemini-model" className="w-full">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {VOICES.map((voice) => (
-                  <SelectItem key={voice} value={voice}>
-                    {voice}
+              <SelectContent>
+                {TTS_MODELS.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </Row>
 
-          <Separator />
-
-          <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
-            <Textarea
-              id="default-style"
-              defaultValue={settings.defaultPromptStyle}
-              rows={3}
-              className="resize-none"
-              onBlur={(event) => {
-                if (event.target.value !== settings.defaultPromptStyle) {
-                  save({ defaultPromptStyle: event.target.value });
-                }
-              }}
-            />
-          </Row>
+          {settings.defaultVoiceProvider !== "elevenlabs" ? (
+            <>
+              <Separator />
+              <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
+                <Textarea
+                  id="default-style"
+                  key={`${profile?.uid ?? "defaults"}:${settings.defaultPromptStyle}`}
+                  defaultValue={settings.defaultPromptStyle}
+                  rows={3}
+                  className="resize-none"
+                  onBlur={(event) => {
+                    if (event.target.value !== settings.defaultPromptStyle) {
+                      save({ defaultPromptStyle: event.target.value });
+                    }
+                  }}
+                />
+              </Row>
+            </>
+          ) : null}
 
           <Separator />
 
