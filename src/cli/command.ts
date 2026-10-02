@@ -258,26 +258,6 @@ export const videoCommand = defineCommand({
   },
 });
 
-export const pluginCommand = defineCommand({
-  meta: {
-    name: 'plugin',
-    description: 'Install or manage the mdmedia Antigravity UI Plugin (~/.gemini/config/plugins/mdmedia_narrator)',
-  },
-  args: {
-    action: {
-      type: 'positional',
-      description: 'Action to perform (install)',
-      default: 'install',
-    },
-  },
-  async run() {
-    const { installAntigravityPlugin } = await import('./plugin-installer.js');
-    const targetDir = installAntigravityPlugin();
-    console.log(`✅ Installed mdmedia_narrator UI plugin to: ${targetDir}`);
-    console.log(`   Enable "mdmedia_narrator" in Antigravity UI Plugins to use in IDE & CLI.`);
-  },
-});
-
 export const adaptCommand = defineCommand({
   meta: {
     name: 'adapt',
@@ -380,7 +360,6 @@ export const imageCommand = defineCommand({
     const fs = await import('node:fs');
     const { execFileSync } = await import('node:child_process');
     const { GoogleGenAI } = await import('@google/genai');
-    const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
 
     let promptText = args.prompt || '';
     if (!promptText && args.input) {
@@ -390,9 +369,11 @@ export const imageCommand = defineCommand({
       throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
     }
 
-    const apiKey = args.apiKey || getGeminiApiKey();
+    const fileConfig = await loadConfigFile(process.cwd());
+    const resolved = resolveConfig({ apiKey: args.apiKey }, fileConfig);
+    const apiKey = resolved.apiKey;
     if (!apiKey) {
-      throw new Error('No GEMINI_API_KEY found in environment or ~/.gemini/.env');
+      throw new Error('GEMINI_API_KEY environment variable is required.');
     }
 
     const contents: any[] = [];
@@ -545,7 +526,6 @@ const SUBCOMMANDS = {
   image: imageCommand,
   music: musicCommand,
   adapt: adaptCommand,
-  plugin: pluginCommand,
 } as const;
 
 /**

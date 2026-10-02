@@ -11,10 +11,10 @@ import type {
 } from './types.js';
 
 export function getDefaultAudioLibraryDir(): string {
-  if (process.env.ANTIGRAVITY_AUDIO_DIR) {
-    return process.env.ANTIGRAVITY_AUDIO_DIR;
+  if (process.env.MDMEDIA_AUDIO_DIR) {
+    return process.env.MDMEDIA_AUDIO_DIR;
   }
-  return path.join(os.homedir(), '.gemini/antigravity/audio_library');
+  return path.join(os.homedir(), '.mdmedia/audio_library');
 }
 
 export class AudioLibrary extends EventEmitter {

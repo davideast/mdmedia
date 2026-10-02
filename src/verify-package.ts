@@ -30,16 +30,19 @@ async function verifyPackagingAndConsumerHarness() {
     exports: Record<string, { types: string; import: string }>;
   };
 
+  const childEnv: NodeJS.ProcessEnv = { ...process.env };
+  delete childEnv.npm_config_dry_run;
+
   // 1. Build production bundle
   console.log('\n--- 1. Building Production Package (dist/) ---');
-  execSync('bun run build', { stdio: 'inherit' });
+  execSync('bun run build', { stdio: 'inherit', env: childEnv });
   assert(fs.existsSync(resolve(process.cwd(), 'dist', 'bin.js')), 'dist/bin.js emitted');
   assert(fs.existsSync(resolve(process.cwd(), 'dist', 'index.d.ts')), 'dist/index.d.ts emitted');
 
   // 2. Pack npm tarball & verify manifest hygiene
   console.log('\n--- 2. Generating npm Package Tarball & Auditing Manifest (npm pack) ---');
   const dryRunJson = JSON.parse(
-    execSync('npm pack --dry-run --json', { encoding: 'utf-8' })
+    execSync('npm pack --dry-run --json', { encoding: 'utf-8', env: childEnv })
   ) as Array<{ files: Array<{ path: string }> }>;
   const packedPaths = new Set(dryRunJson[0]?.files.map((f) => f.path) ?? []);
 
@@ -51,8 +54,16 @@ async function verifyPackagingAndConsumerHarness() {
     !packedPaths.has('dist/verify-package.js') &&
       !packedPaths.has('dist/verify-port.js') &&
       !packedPaths.has('dist/cli/agy-watch.js') &&
-      ![...packedPaths].some((p) => p.startsWith('dist/tui/') || p.includes('.test.')),
-    'Tarball excludes dev verification scripts, TUI, watch script, and test files'
+      !packedPaths.has('dist/cli/plugin-installer.js') &&
+      !packedPaths.has('dist/cli/listen-parser.js') &&
+      ![...packedPaths].some(
+        (p) =>
+          p.startsWith('dist/tui/') ||
+          p.startsWith('dist/studio/') ||
+          p.startsWith('dist/sidecar/') ||
+          p.includes('.test.')
+      ),
+    'Tarball excludes dev verification scripts, TUI, studio, sidecar, watch/plugin scripts, and test files'
   );
 
   const missingExports: string[] = [];
@@ -67,16 +78,19 @@ async function verifyPackagingAndConsumerHarness() {
     `All ${Object.keys(pkgJson.exports).length} package.json export targets exist in tarball`
   );
 
-  const packOutput = execSync('npm pack --quiet', { encoding: 'utf-8' }).trim();
-  const tarballPath = resolve(process.cwd(), packOutput);
-  assert(fs.existsSync(tarballPath), `Tarball created: ${packOutput}`);
-
-  // 3. Prepare Consumer Sandbox
+  // 3. Prepare Consumer Sandbox & Pack Tarball into Sandbox
   console.log('\n--- 3. Creating Consumer Sandbox & Installing Package ---');
   if (fs.existsSync(SANDBOX_DIR)) {
     await rm(SANDBOX_DIR, { recursive: true, force: true });
   }
   fs.mkdirSync(SANDBOX_DIR, { recursive: true });
+
+  const packOutput = execSync(
+    `npm pack --quiet --pack-destination "${SANDBOX_DIR}"`,
+    { encoding: 'utf-8', env: childEnv }
+  ).trim();
+  const tarballPath = resolve(SANDBOX_DIR, packOutput);
+  assert(fs.existsSync(tarballPath), `Tarball created: ${packOutput}`);
 
   const consumerPackageJson = {
     name: 'mdmedia-consumer-test',
@@ -91,7 +105,7 @@ async function verifyPackagingAndConsumerHarness() {
     JSON.stringify(consumerPackageJson, null, 2)
   );
 
-  execSync('npm install --no-package-lock --silent', { cwd: SANDBOX_DIR });
+  execSync('npm install --no-package-lock --silent', { cwd: SANDBOX_DIR, env: childEnv });
   assert(
     fs.existsSync(resolve(SANDBOX_DIR, 'node_modules', 'mdmedia')),
     'mdmedia installed into consumer node_modules'
@@ -105,7 +119,7 @@ async function verifyPackagingAndConsumerHarness() {
   console.log('\n--- 4. Testing CLI Executable in Pure Standard Node.js ---');
   const cliHelpOutput = execSync(
     'node ./node_modules/.bin/mdmedia --help',
-    { cwd: SANDBOX_DIR, encoding: 'utf-8' }
+    { cwd: SANDBOX_DIR, encoding: 'utf-8', env: childEnv }
   );
   assert(
     cliHelpOutput.includes('mdmedia') &&
@@ -117,7 +131,7 @@ async function verifyPackagingAndConsumerHarness() {
 
   const versionOutput = execSync(
     './node_modules/.bin/mdmedia --version',
-    { cwd: SANDBOX_DIR, encoding: 'utf-8' }
+    { cwd: SANDBOX_DIR, encoding: 'utf-8', env: childEnv }
   ).trim();
   assert(
     versionOutput === pkgJson.version,
@@ -126,14 +140,14 @@ async function verifyPackagingAndConsumerHarness() {
 
   const audioHelpOutput = execSync(
     './node_modules/.bin/mdmedia audio --help',
-    { cwd: SANDBOX_DIR, encoding: 'utf-8' }
+    { cwd: SANDBOX_DIR, encoding: 'utf-8', env: childEnv }
   );
   assert(
     audioHelpOutput.includes('--input') && audioHelpOutput.includes('--voice'),
     'CLI subcommand (mdmedia audio --help) resolves flags cleanly'
   );
 
-  // 5. Test Programmatic ESM Runtime Resolution across all 13 subpath exports
+  // 5. Test Programmatic ESM Runtime Resolution across all 12 subpath exports
   console.log('\n--- 5. Testing Programmatic ESM Runtime Resolution ---');
   const esmTestScript = `
 import * as root from 'mdmedia';
@@ -148,7 +162,6 @@ import * as types from 'mdmedia/types';
 import * as narration from 'mdmedia/narration';
 import * as markdown from 'mdmedia/markdown';
 import * as storage from 'mdmedia/storage';
-import * as studio from 'mdmedia/studio';
 
 if (!root.runAudioSynthesis) throw new Error('Missing runAudioSynthesis in mdmedia root');
 if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdmedia/audio');
@@ -164,17 +177,14 @@ if (!tts.ElevenLabsTTSProvider) throw new Error('Missing ElevenLabsTTSProvider i
 if (!config.resolveConfig) throw new Error('Missing resolveConfig in mdmedia/config');
 if (!types) throw new Error('Missing mdmedia/types module');
 if (!storage.AudioLibrary) throw new Error('Missing AudioLibrary in mdmedia/storage');
-if (!studio.StudioStore) throw new Error('Missing StudioStore in mdmedia/studio');
-if (!studio.NarrationRecorder) throw new Error('Missing NarrationRecorder in mdmedia/studio');
-if (!studio.buildHighlightedMarkdownBlocks) throw new Error('Missing buildHighlightedMarkdownBlocks in mdmedia/studio');
 if (!narration.GeminiNarrationAdapter) throw new Error('Missing GeminiNarrationAdapter in mdmedia/narration');
 if (!markdown.GeminiMarkdownStructureAdapter) throw new Error('Missing GeminiMarkdownStructureAdapter in mdmedia/markdown');
 
-console.log('[ESM Runtime Test] All named exports across all 13 subpaths resolved cleanly!');
+console.log('[ESM Runtime Test] All named exports across all 12 subpaths resolved cleanly!');
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.mjs'), esmTestScript);
-  execSync('node consumer.mjs', { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'All 13 ESM subpath imports resolve at runtime without errors');
+  execSync('node consumer.mjs', { cwd: SANDBOX_DIR, stdio: 'inherit', env: childEnv });
+  assert(true, 'All 12 ESM subpath imports resolve at runtime without errors');
 
   // 6. Test TypeScript Consumer Declaration Compilation (.d.ts)
   console.log('\n--- 6. Testing TypeScript Type Declaration (.d.ts) Compilation ---');
@@ -200,7 +210,6 @@ import type { StoryboardScene, DocumentHighlight } from 'mdmedia/chunker';
 import type { VoiceName, DocumentChunk, IFileReader, PipelineEventMap, SynthesisOptions } from 'mdmedia/types';
 import type { GenerateVideoOptions } from 'mdmedia/video';
 import type { GenerateMusicOptions } from 'mdmedia/music';
-import type { StudioState } from 'mdmedia/studio';
 import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
 import type { WordHighlight } from 'mdmedia/audio';
 import type { INarrationAdapter } from 'mdmedia/narration';
@@ -220,7 +229,6 @@ const opts: GenerateVideoOptions = { aspectRatio: '16:9' };
 const musicOpts: GenerateMusicOptions = { outputFormat: 'mp3' };
 const bus = new UniversalEventBus();
 let runArgs: RunAudioSynthesisArgs | null = null;
-let state: StudioState | null = null;
 let word: WordTiming | null = null;
 let chunk: ChunkTiming | null = null;
 let highlight: WordHighlight | null = null;
@@ -241,7 +249,6 @@ export {
   musicOpts,
   bus,
   runArgs,
-  state,
   word,
   chunk,
   highlight,
@@ -259,12 +266,11 @@ export {
   await writeFile(resolve(SANDBOX_DIR, 'consumer.ts'), tsTestScript);
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
   const tscCmd = fs.existsSync(tscBin) ? `"${tscBin}"` : 'tsc';
-  execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'TypeScript compilation against all 13 mdmedia subpath declarations succeeded with 0 errors');
+  execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit', env: childEnv });
+  assert(true, 'TypeScript compilation against all 12 mdmedia subpath declarations succeeded with 0 errors');
 
   // Cleanup
   await rm(SANDBOX_DIR, { recursive: true, force: true });
-  await rm(tarballPath, { force: true });
 
   console.log(`\n=== Package Verification Results: ${passed}/${total} checks passed ===`);
   if (passed !== total) {

@@ -6,7 +6,7 @@ import * as cliCommands from '../../src/cli/command.js';
 import { installAntigravityPlugin } from '../../src/cli/plugin-installer.js';
 
 describe('Post-Publish Pre-Mortem Regressions', () => {
-  it('cuts TUI (@opentui/*, react, ./tui export) and watch/studio commands from the published CLI/SDK release', () => {
+  it('cuts TUI, studio, sidecar, and watch/studio/plugin commands from the published CLI/SDK release', () => {
     const pkgJson = JSON.parse(
       fs.readFileSync(path.resolve(import.meta.dir, '../../package.json'), 'utf8')
     );
@@ -15,16 +15,21 @@ describe('Post-Publish Pre-Mortem Regressions', () => {
     expect(pkgJson.dependencies).not.toHaveProperty('@opentui/react');
     expect(pkgJson.dependencies).not.toHaveProperty('react');
     expect(pkgJson.exports).not.toHaveProperty('./tui');
+    expect(pkgJson.exports).not.toHaveProperty('./studio');
 
     const rootIndexContent = fs.readFileSync(
       path.resolve(import.meta.dir, '../../src/index.ts'),
       'utf8'
     );
     expect(rootIndexContent).not.toContain('./tui/index.js');
+    expect(rootIndexContent).not.toContain('./studio/index.js');
+    expect(rootIndexContent).not.toContain('./sidecar/narrator-server.js');
+    expect(rootIndexContent).not.toContain('./cli/listen-parser.js');
 
     const subCommands = cliCommands.mainCommand.subCommands as Record<string, unknown>;
     expect(subCommands).not.toHaveProperty('watch');
     expect(subCommands).not.toHaveProperty('studio');
+    expect(subCommands).not.toHaveProperty('plugin');
   });
 
   it('routes top-level -i/-o invocations by output extension and supports --aspect on videoCommand per README', () => {
