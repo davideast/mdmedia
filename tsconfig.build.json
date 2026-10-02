@@ -14,6 +14,10 @@
     "src/verify-package.ts",
     "src/verify-port.ts",
     "src/tui/**/*",
-    "src/cli/agy-watch.ts"
+    "src/studio/**/*",
+    "src/sidecar/**/*",
+    "src/cli/agy-watch.ts",
+    "src/cli/plugin-installer.ts",
+    "src/cli/listen-parser.ts"
   ]
 }

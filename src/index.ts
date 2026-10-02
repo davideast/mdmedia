@@ -7,9 +7,7 @@ export * from './tts/index.js';
 export * from './config/index.js';
 export * from './types/index.js';
 export * from './cli/index.js';
-export * from './cli/listen-parser.js';
-export * from './sidecar/narrator-server.js';
 export * from './storage/index.js';
-export * from './studio/index.js';
 export * from './narration/index.js';
 export * from './markdown/index.js';
+

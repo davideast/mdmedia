@@ -22,6 +22,9 @@
     "cli"
   ],
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18"
   },
@@ -75,10 +78,6 @@
     "./storage": {
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js"
-    },
-    "./studio": {
-      "types": "./dist/studio/index.d.ts",
-      "import": "./dist/studio/index.js"
     }
   },
   "bin": {
