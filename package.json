@@ -79,10 +79,6 @@
     "./studio": {
       "types": "./dist/studio/index.d.ts",
       "import": "./dist/studio/index.js"
-    },
-    "./tui": {
-      "types": "./dist/tui/index.d.ts",
-      "import": "./dist/tui/index.js"
     }
   },
   "bin": {
@@ -103,9 +99,6 @@
     "test:proofs": "bun test test/regression/",
     "test:oracles": "VERIFY_ORACLE=1 bun test test/regression/",
     "verify": "bun run src/verify-port.ts && bun run verify-package",
-    "watch": "bun run src/cli/agy-watch.ts",
-    "agy-watch": "bun run src/cli/agy-watch.ts",
-    "studio": "bun run src/bin.ts studio",
     "studio:dev": "npm --prefix studio run dev",
     "studio:bg": "npm --prefix studio run dev:bg",
     "studio:stop": "npm --prefix studio run dev:stop",
@@ -115,13 +108,12 @@
   },
   "dependencies": {
     "@google/genai": "^2.15.0",
-    "@opentui/core": "^0.5.11",
-    "@opentui/react": "^0.5.11",
     "citty": "^0.2.2",
-    "marked": "^18.0.9",
-    "react": "^19.2.8"
+    "marked": "^18.0.9"
   },
   "devDependencies": {
+    "@opentui/core": "^0.5.11",
+    "@opentui/react": "^0.5.11",
     "@types/bun": "^1.2.4",
     "@types/node": "^26.1.2",
     "@types/prismjs": "^1.26.6",
@@ -137,6 +129,7 @@
     "next-themes": "^0.4.6",
     "prismjs": "^1.30.0",
     "radix-ui": "^1.6.7",
+    "react": "^19.2.8",
     "react-resizable-panels": "^4.13.1",
     "sonner": "^2.0.8",
     "typescript": "^5.9.3"

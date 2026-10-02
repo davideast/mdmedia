@@ -9,5 +9,11 @@
     "noEmit": false
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/verify-package.ts", "src/verify-port.ts"]
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/verify-package.ts",
+    "src/verify-port.ts",
+    "src/tui/**/*",
+    "src/cli/agy-watch.ts"
+  ]
 }

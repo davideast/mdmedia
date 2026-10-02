@@ -1,13 +1,12 @@
 import { defineCommand } from 'citty';
 import { createRequire } from 'node:module';
+import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration, runMusicGeneration } from './runner.js';
-import type { ITTSProvider } from '../tts/tts-provider.interface.js';
-import { createTTSProvider, resolveTTSSelection } from '../tts/provider-registry.js';
+import { resolveTTSSelection } from '../tts/provider-registry.js';
 import { ElevenLabsVoiceCatalog } from '../tts/elevenlabs-voices.js';
-import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
 
 const _require = createRequire(import.meta.url);
 const { version: pkgVersion } = _require('../../package.json');
@@ -180,7 +179,7 @@ export const videoCommand = defineCommand({
     },
     aspectRatio: {
       type: 'string',
-      alias: 'a',
+      alias: ['a', 'aspect'],
       description: 'Video aspect ratio ("16:9" or "9:16")',
     },
     task: {
@@ -259,36 +258,6 @@ export const videoCommand = defineCommand({
   },
 });
 
-export const watchCommand = defineCommand({
-  meta: {
-    name: 'watch',
-    description: 'Watch Antigravity conversations and automatically narrate new agent responses aloud',
-  },
-  args: {
-    voice: {
-      type: 'string',
-      alias: 'v',
-      description: 'Gemini voice name or ElevenLabs voice name/ID',
-    },
-    style: {
-      type: 'string',
-      alias: 's',
-      description: 'Gemini delivery note',
-    },
-  },
-  async run({ args }) {
-    const { spawn } = await import('node:child_process');
-    const path = await import('node:path');
-    const { fileURLToPath } = await import('node:url');
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const scriptPath = path.join(__dirname, 'agy-watch.js');
-    spawn(process.execPath, [scriptPath, args.voice ?? '', args.style ?? ''], {
-      stdio: 'inherit',
-      env: process.env,
-    });
-  },
-});
-
 export const pluginCommand = defineCommand({
   meta: {
     name: 'plugin',
@@ -306,58 +275,6 @@ export const pluginCommand = defineCommand({
     const targetDir = installAntigravityPlugin();
     console.log(`✅ Installed mdmedia_narrator UI plugin to: ${targetDir}`);
     console.log(`   Enable "mdmedia_narrator" in Antigravity UI Plugins to use in IDE & CLI.`);
-  },
-});
-
-export const studioCommand = defineCommand({
-  meta: {
-    name: 'studio',
-    description: 'Launch the interactive fullscreen OpenTUI Audio Studio terminal dashboard',
-  },
-  async run() {
-    const { startStudioTui } = await import('../tui/app.js');
-    const { loadConfigFile } = await import('../config/config-loader.js');
-    const { resolveConfig } = await import('../config/config-resolver.js');
-    const { GoogleGenAI } = await import('@google/genai');
-    const { GeminiNarrationAdapter } = await import('../narration/gemini-narration-adapter.js');
-    const { StudioStore } = await import('../studio/studio-store.js');
-    const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
-
-    const fileConfig = await loadConfigFile(process.cwd());
-    const geminiApiKey = getGeminiApiKey();
-    const resolved = resolveConfig(
-      { mode: 'audio' },
-      fileConfig,
-      { ...process.env, GEMINI_API_KEY: geminiApiKey }
-    );
-    let provider: ITTSProvider | undefined;
-    let narrationAdapter: GeminiNarrationAdapter | undefined;
-
-    if (resolved.apiKey) {
-      provider = createTTSProvider({
-        provider: resolved.audio.provider,
-        apiKey: resolved.apiKey,
-        model: resolved.audio.model,
-        voice: resolved.audio.voice,
-        style: resolved.audio.style,
-        maxRetries: resolved.maxRetries,
-      });
-    }
-    if (fileConfig?.narration?.enabled && geminiApiKey) {
-      narrationAdapter = new GeminiNarrationAdapter(new GoogleGenAI({ apiKey: geminiApiKey }), {
-        model: fileConfig.narration.model,
-      });
-    }
-
-    const store = new StudioStore({
-      ttsProvider: provider,
-      narrationAdapter,
-      enableLiveAudio: true,
-      defaultVoice: resolved.audio.voice,
-      defaultStyle: resolved.audio.style,
-    });
-
-    await startStudioTui(store);
   },
 });
 
@@ -449,7 +366,7 @@ export const imageCommand = defineCommand({
     },
     aspectRatio: {
       type: 'string',
-      alias: 'a',
+      alias: ['a', 'aspect'],
       description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
       default: '16:9',
     },
@@ -461,7 +378,6 @@ export const imageCommand = defineCommand({
   },
   async run({ args }) {
     const fs = await import('node:fs');
-    const path = await import('node:path');
     const { execFileSync } = await import('node:child_process');
     const { GoogleGenAI } = await import('@google/genai');
     const { getGeminiApiKey } = await import('../studio/antigravity-watcher.js');
@@ -622,21 +538,65 @@ export const musicCommand = defineCommand({
   },
 });
 
+const SUBCOMMANDS = {
+  audio: audioCommand,
+  voices: voicesCommand,
+  video: videoCommand,
+  image: imageCommand,
+  music: musicCommand,
+  adapt: adaptCommand,
+  plugin: pluginCommand,
+} as const;
+
+/**
+ * Routes top-level `-i <input> -o <output>` CLI invocations to the matching subcommand
+ * based on the output file extension when no explicit subcommand name is given.
+ */
+export function resolveSmartCliArgv(rawArgs: string[]): string[] {
+  if (rawArgs.length === 0) return rawArgs;
+  const firstArg = rawArgs[0];
+  if (firstArg in SUBCOMMANDS) return rawArgs;
+
+  let hasInputOrOutput = false;
+  let outputPath: string | undefined;
+
+  for (let i = 0; i < rawArgs.length; i++) {
+    const token = rawArgs[i];
+    if (token === '-i' || token === '--input') {
+      hasInputOrOutput = true;
+      i++;
+    } else if (token.startsWith('--input=')) {
+      hasInputOrOutput = true;
+    } else if (token === '-o' || token === '--output') {
+      hasInputOrOutput = true;
+      outputPath = rawArgs[i + 1];
+      i++;
+    } else if (token.startsWith('--output=')) {
+      hasInputOrOutput = true;
+      outputPath = token.slice('--output='.length);
+    }
+  }
+
+  if (!hasInputOrOutput) return rawArgs;
+
+  const ext = outputPath ? path.extname(outputPath).toLowerCase() : '.wav';
+  if (ext === '.mp4' || ext === '.mov' || ext === '.webm') {
+    return ['video', ...rawArgs];
+  }
+  if (ext === '.mp3') {
+    return ['music', ...rawArgs];
+  }
+  if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.webp') {
+    return ['image', ...rawArgs];
+  }
+  return ['audio', ...rawArgs];
+}
+
 export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: pkgVersion,
     description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, and music with Lyria',
   },
-  subCommands: {
-    audio: audioCommand,
-    voices: voicesCommand,
-    video: videoCommand,
-    image: imageCommand,
-    music: musicCommand,
-    adapt: adaptCommand,
-    watch: watchCommand,
-    studio: studioCommand,
-    plugin: pluginCommand,
-  },
+  subCommands: SUBCOMMANDS,
 });
