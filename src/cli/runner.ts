@@ -166,6 +166,31 @@ export async function runAudioSynthesis(args: RunAudioSynthesisArgs): Promise<vo
   );
 }
 
+export async function writeVideoSceneOutputs(
+  outputPath: string,
+  results: ReadonlyArray<{ videoBytes: Uint8Array }>
+): Promise<string[]> {
+  if (results.length === 0) return [];
+  const path = await import('node:path');
+  const fileWriter = new NodeVideoFileWriter();
+  const writtenPaths: string[] = [];
+  const parsed = path.parse(outputPath);
+
+  for (let i = 0; i < results.length; i++) {
+    const targetPath =
+      i === 0
+        ? outputPath
+        : path.join(parsed.dir, `${parsed.name}-${i + 1}${parsed.ext || '.mp4'}`);
+    await fileWriter.writeVideoFile(targetPath, results[i].videoBytes);
+    writtenPaths.push(targetPath);
+    console.log(
+      `[Success] Video clip created at: ${targetPath} (${(results[i].videoBytes.byteLength / 1024).toFixed(1)} KB)`
+    );
+  }
+
+  return writtenPaths;
+}
+
 export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<void> {
   const fileReader = new NodeFileReader();
   const scenes = await prepareStoryboardScenes(fileReader, args.input);
@@ -197,14 +222,7 @@ export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<
     previousInteractionId: args.previousInteractionId,
   });
 
-  if (results.length > 0) {
-    const fileWriter = new NodeVideoFileWriter();
-    // For single-scene or primary video generation, write output directly
-    await fileWriter.writeVideoFile(args.output, results[0].videoBytes);
-    console.log(
-      `[Success] Video clip created at: ${args.output} (${(results[0].videoBytes.byteLength / 1024).toFixed(1)} KB)`
-    );
-  }
+  await writeVideoSceneOutputs(args.output, results);
 }
 
 export interface RunMusicGenerationArgs {

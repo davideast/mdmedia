@@ -50,8 +50,9 @@ async function verifyPackagingAndConsumerHarness() {
   assert(
     !packedPaths.has('dist/verify-package.js') &&
       !packedPaths.has('dist/verify-port.js') &&
-      ![...packedPaths].some((p) => p.includes('.test.')),
-    'Tarball excludes dev verification scripts and test files'
+      !packedPaths.has('dist/cli/agy-watch.js') &&
+      ![...packedPaths].some((p) => p.startsWith('dist/tui/') || p.includes('.test.')),
+    'Tarball excludes dev verification scripts, TUI, watch script, and test files'
   );
 
   const missingExports: string[] = [];
@@ -132,7 +133,7 @@ async function verifyPackagingAndConsumerHarness() {
     'CLI subcommand (mdmedia audio --help) resolves flags cleanly'
   );
 
-  // 5. Test Programmatic ESM Runtime Resolution across all 14 subpath exports
+  // 5. Test Programmatic ESM Runtime Resolution across all 13 subpath exports
   console.log('\n--- 5. Testing Programmatic ESM Runtime Resolution ---');
   const esmTestScript = `
 import * as root from 'mdmedia';
@@ -148,7 +149,6 @@ import * as narration from 'mdmedia/narration';
 import * as markdown from 'mdmedia/markdown';
 import * as storage from 'mdmedia/storage';
 import * as studio from 'mdmedia/studio';
-import * as tui from 'mdmedia/tui';
 
 if (!root.runAudioSynthesis) throw new Error('Missing runAudioSynthesis in mdmedia root');
 if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdmedia/audio');
@@ -169,13 +169,12 @@ if (!studio.NarrationRecorder) throw new Error('Missing NarrationRecorder in mdm
 if (!studio.buildHighlightedMarkdownBlocks) throw new Error('Missing buildHighlightedMarkdownBlocks in mdmedia/studio');
 if (!narration.GeminiNarrationAdapter) throw new Error('Missing GeminiNarrationAdapter in mdmedia/narration');
 if (!markdown.GeminiMarkdownStructureAdapter) throw new Error('Missing GeminiMarkdownStructureAdapter in mdmedia/markdown');
-if (!tui.StudioApp) throw new Error('Missing StudioApp in mdmedia/tui');
 
-console.log('[ESM Runtime Test] All named exports across all 14 subpaths resolved cleanly!');
+console.log('[ESM Runtime Test] All named exports across all 13 subpaths resolved cleanly!');
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.mjs'), esmTestScript);
   execSync('node consumer.mjs', { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'All 14 ESM subpath imports resolve at runtime without errors');
+  assert(true, 'All 13 ESM subpath imports resolve at runtime without errors');
 
   // 6. Test TypeScript Consumer Declaration Compilation (.d.ts)
   console.log('\n--- 6. Testing TypeScript Type Declaration (.d.ts) Compilation ---');
@@ -208,7 +207,6 @@ import type { INarrationAdapter } from 'mdmedia/narration';
 import type { IMarkdownStructureAdapter } from 'mdmedia/markdown';
 import type { ITTSProvider } from 'mdmedia/tts';
 import type { ResolvedConfig } from 'mdmedia/config';
-import { StudioApp } from 'mdmedia/tui';
 import { UniversalEventBus } from 'mdmedia/pipeline';
 
 const scene: StoryboardScene = {
@@ -237,7 +235,6 @@ let evtMap: keyof PipelineEventMap = 'pipeline:complete';
 let synthOpts: SynthesisOptions | null = null;
 
 export {
-  StudioApp,
   scene,
   voice,
   opts,
@@ -263,7 +260,7 @@ export {
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
   const tscCmd = fs.existsSync(tscBin) ? `"${tscBin}"` : 'tsc';
   execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'TypeScript compilation against all 14 mdmedia subpath declarations succeeded with 0 errors');
+  assert(true, 'TypeScript compilation against all 13 mdmedia subpath declarations succeeded with 0 errors');
 
   // Cleanup
   await rm(SANDBOX_DIR, { recursive: true, force: true });
