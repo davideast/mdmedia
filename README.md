@@ -215,6 +215,8 @@ await fileWriter.writeVideoFile('scene.mp4', results[0].videoBytes);
 - Node.js 18+ or Bun 1.0+
 - A Gemini API key for Gemini generation or an ElevenLabs API key for ElevenLabs narration
 
+> **Note**: mdmedia is an ESM-only package. Use `import` syntax — CommonJS `require()` is not supported.
+
 ### Global Installation
 ```bash
 npm install -g mdmedia
@@ -225,3 +227,10 @@ npm install -g mdmedia
 ```bash
 bun run verify
 ```
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE) for details.
+
