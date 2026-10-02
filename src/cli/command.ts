@@ -1,4 +1,5 @@
 import { defineCommand } from 'citty';
+import { createRequire } from 'node:module';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
@@ -7,6 +8,9 @@ import type { ITTSProvider } from '../tts/tts-provider.interface.js';
 import { createTTSProvider, resolveTTSSelection } from '../tts/provider-registry.js';
 import { ElevenLabsVoiceCatalog } from '../tts/elevenlabs-voices.js';
 import type { GeminiNarrationAdapter } from '../narration/gemini-narration-adapter.js';
+
+const _require = createRequire(import.meta.url);
+const { version: pkgVersion } = _require('../../package.json');
 
 export const audioCommand = defineCommand({
   meta: {
@@ -479,8 +483,13 @@ export const imageCommand = defineCommand({
     if (args.ref && fs.existsSync(args.ref)) {
       let refPath = args.ref;
       let ext = path.extname(refPath).toLowerCase();
+      let tmpPng: string | undefined;
       if (ext === '.avif') {
-        const tmpPng = `/tmp/mdmedia_ref_${Date.now()}.png`;
+        const os = await import('node:os');
+        if (process.platform !== 'darwin') {
+          throw new Error('AVIF reference image conversion requires macOS (sips). Convert the image to PNG or JPEG first.');
+        }
+        tmpPng = path.join(os.tmpdir(), `mdmedia_ref_${Date.now()}.png`);
         execFileSync('sips', ['-s', 'format', 'png', refPath, '--out', tmpPng]);
         refPath = tmpPng;
         ext = '.png';
@@ -493,6 +502,9 @@ export const imageCommand = defineCommand({
           mimeType,
         },
       });
+      if (tmpPng) {
+        try { fs.unlinkSync(tmpPng); } catch {}
+      }
     }
     contents.push({ text: promptText });
 
@@ -613,7 +625,7 @@ export const musicCommand = defineCommand({
 export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
-    version: '0.1.0',
+    version: pkgVersion,
     description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, and music with Lyria',
   },
   subCommands: {

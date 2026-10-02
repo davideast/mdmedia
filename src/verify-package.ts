@@ -1,9 +1,10 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
-import { rm, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { readFile, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import { join, resolve } from 'node:path';
 
-const SANDBOX_DIR = '/tmp/mdmedia-consumer-sandbox';
+const SANDBOX_DIR = join(os.tmpdir(), 'mdmedia-consumer-sandbox');
 
 async function verifyPackagingAndConsumerHarness() {
   console.log('=== Running mdmedia Packaging & Consumer Sandbox Verification ===');
@@ -21,14 +22,50 @@ async function verifyPackagingAndConsumerHarness() {
     }
   }
 
+  const pkgJson = JSON.parse(
+    await readFile(resolve(process.cwd(), 'package.json'), 'utf-8')
+  ) as {
+    version: string;
+    bin: Record<string, string>;
+    exports: Record<string, { types: string; import: string }>;
+  };
+
   // 1. Build production bundle
   console.log('\n--- 1. Building Production Package (dist/) ---');
   execSync('bun run build', { stdio: 'inherit' });
   assert(fs.existsSync(resolve(process.cwd(), 'dist', 'bin.js')), 'dist/bin.js emitted');
   assert(fs.existsSync(resolve(process.cwd(), 'dist', 'index.d.ts')), 'dist/index.d.ts emitted');
 
-  // 2. Pack npm tarball
-  console.log('\n--- 2. Generating npm Package Tarball (npm pack) ---');
+  // 2. Pack npm tarball & verify manifest hygiene
+  console.log('\n--- 2. Generating npm Package Tarball & Auditing Manifest (npm pack) ---');
+  const dryRunJson = JSON.parse(
+    execSync('npm pack --dry-run --json', { encoding: 'utf-8' })
+  ) as Array<{ files: Array<{ path: string }> }>;
+  const packedPaths = new Set(dryRunJson[0]?.files.map((f) => f.path) ?? []);
+
+  assert(
+    packedPaths.has('LICENSE') && packedPaths.has('README.md') && packedPaths.has('package.json'),
+    'Tarball includes LICENSE, README.md, and package.json'
+  );
+  assert(
+    !packedPaths.has('dist/verify-package.js') &&
+      !packedPaths.has('dist/verify-port.js') &&
+      ![...packedPaths].some((p) => p.includes('.test.')),
+    'Tarball excludes dev verification scripts and test files'
+  );
+
+  const missingExports: string[] = [];
+  for (const [subpath, targets] of Object.entries(pkgJson.exports)) {
+    const importPath = targets.import.replace(/^\.\//, '');
+    const typesPath = targets.types.replace(/^\.\//, '');
+    if (!packedPaths.has(importPath)) missingExports.push(`${subpath} -> ${importPath}`);
+    if (!packedPaths.has(typesPath)) missingExports.push(`${subpath} -> ${typesPath}`);
+  }
+  assert(
+    missingExports.length === 0,
+    `All ${Object.keys(pkgJson.exports).length} package.json export targets exist in tarball`
+  );
+
   const packOutput = execSync('npm pack --quiet', { encoding: 'utf-8' }).trim();
   const tarballPath = resolve(process.cwd(), packOutput);
   assert(fs.existsSync(tarballPath), `Tarball created: ${packOutput}`);
@@ -63,20 +100,39 @@ async function verifyPackagingAndConsumerHarness() {
     'mdmedia CLI binary installed into node_modules/.bin'
   );
 
-  // 4. Test Pure Node CLI Executable
+  // 4. Test Pure Node CLI Executable (shebang, --version, --help, subcommand --help)
   console.log('\n--- 4. Testing CLI Executable in Pure Standard Node.js ---');
-  const cliOutput = execSync(
+  const cliHelpOutput = execSync(
     'node ./node_modules/.bin/mdmedia --help',
     { cwd: SANDBOX_DIR, encoding: 'utf-8' }
   );
   assert(
-    cliOutput.includes('mdmedia') &&
-      cliOutput.includes('audio') &&
-      cliOutput.includes('video'),
+    cliHelpOutput.includes('mdmedia') &&
+      cliHelpOutput.includes('audio') &&
+      cliHelpOutput.includes('video') &&
+      cliHelpOutput.includes('music'),
     'CLI executable executes with pure node and outputs commands'
   );
 
-  // 5. Test Programmatic ESM Runtime Resolution across all subpath exports
+  const versionOutput = execSync(
+    './node_modules/.bin/mdmedia --version',
+    { cwd: SANDBOX_DIR, encoding: 'utf-8' }
+  ).trim();
+  assert(
+    versionOutput === pkgJson.version,
+    `Direct shebang execution of ./node_modules/.bin/mdmedia --version outputs ${pkgJson.version} (got ${versionOutput})`
+  );
+
+  const audioHelpOutput = execSync(
+    './node_modules/.bin/mdmedia audio --help',
+    { cwd: SANDBOX_DIR, encoding: 'utf-8' }
+  );
+  assert(
+    audioHelpOutput.includes('--input') && audioHelpOutput.includes('--voice'),
+    'CLI subcommand (mdmedia audio --help) resolves flags cleanly'
+  );
+
+  // 5. Test Programmatic ESM Runtime Resolution across all 14 subpath exports
   console.log('\n--- 5. Testing Programmatic ESM Runtime Resolution ---');
   const esmTestScript = `
 import * as root from 'mdmedia';
@@ -85,12 +141,16 @@ import * as video from 'mdmedia/video';
 import * as music from 'mdmedia/music';
 import * as chunker from 'mdmedia/chunker';
 import * as pipeline from 'mdmedia/pipeline';
+import * as tts from 'mdmedia/tts';
 import * as config from 'mdmedia/config';
+import * as types from 'mdmedia/types';
+import * as narration from 'mdmedia/narration';
+import * as markdown from 'mdmedia/markdown';
 import * as storage from 'mdmedia/storage';
 import * as studio from 'mdmedia/studio';
-import * as narration from 'mdmedia/narration';
 import * as tui from 'mdmedia/tui';
 
+if (!root.runAudioSynthesis) throw new Error('Missing runAudioSynthesis in mdmedia root');
 if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdmedia/audio');
 if (!audio.extractWordTimingsFromPcm) throw new Error('Missing extractWordTimingsFromPcm in mdmedia/audio');
 if (!audio.getActiveWordAtPosition) throw new Error('Missing getActiveWordAtPosition in mdmedia/audio');
@@ -99,19 +159,23 @@ if (!music.LyriaMusicProvider) throw new Error('Missing LyriaMusicProvider in md
 if (!chunker.prepareDocumentChunks) throw new Error('Missing prepareDocumentChunks in mdmedia/chunker');
 if (!chunker.mapChunkToMarkdown) throw new Error('Missing mapChunkToMarkdown in mdmedia/chunker');
 if (!pipeline.UniversalEventBus) throw new Error('Missing UniversalEventBus in mdmedia/pipeline');
+if (!tts.GeminiTTSProvider) throw new Error('Missing GeminiTTSProvider in mdmedia/tts');
+if (!tts.ElevenLabsTTSProvider) throw new Error('Missing ElevenLabsTTSProvider in mdmedia/tts');
 if (!config.resolveConfig) throw new Error('Missing resolveConfig in mdmedia/config');
+if (!types) throw new Error('Missing mdmedia/types module');
 if (!storage.AudioLibrary) throw new Error('Missing AudioLibrary in mdmedia/storage');
 if (!studio.StudioStore) throw new Error('Missing StudioStore in mdmedia/studio');
 if (!studio.NarrationRecorder) throw new Error('Missing NarrationRecorder in mdmedia/studio');
 if (!studio.buildHighlightedMarkdownBlocks) throw new Error('Missing buildHighlightedMarkdownBlocks in mdmedia/studio');
 if (!narration.GeminiNarrationAdapter) throw new Error('Missing GeminiNarrationAdapter in mdmedia/narration');
+if (!markdown.GeminiMarkdownStructureAdapter) throw new Error('Missing GeminiMarkdownStructureAdapter in mdmedia/markdown');
 if (!tui.StudioApp) throw new Error('Missing StudioApp in mdmedia/tui');
 
-console.log('[ESM Runtime Test] All named exports from all subpaths resolved cleanly!');
+console.log('[ESM Runtime Test] All named exports across all 14 subpaths resolved cleanly!');
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.mjs'), esmTestScript);
   execSync('node consumer.mjs', { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'ESM subpath imports resolve at runtime without errors');
+  assert(true, 'All 14 ESM subpath imports resolve at runtime without errors');
 
   // 6. Test TypeScript Consumer Declaration Compilation (.d.ts)
   console.log('\n--- 6. Testing TypeScript Type Declaration (.d.ts) Compilation ---');
@@ -132,16 +196,19 @@ console.log('[ESM Runtime Test] All named exports from all subpaths resolved cle
   );
 
   const tsTestScript = `
-import type { StoryboardScene } from 'mdmedia/chunker';
-import type { DocumentHighlight } from 'mdmedia/chunker';
-import type { VoiceName } from 'mdmedia/types';
-import type { DocumentChunk, IFileReader, PipelineEventMap, SynthesisOptions } from 'mdmedia/types';
+import type { RunAudioSynthesisArgs } from 'mdmedia';
+import type { StoryboardScene, DocumentHighlight } from 'mdmedia/chunker';
+import type { VoiceName, DocumentChunk, IFileReader, PipelineEventMap, SynthesisOptions } from 'mdmedia/types';
 import type { GenerateVideoOptions } from 'mdmedia/video';
 import type { GenerateMusicOptions } from 'mdmedia/music';
 import type { StudioState } from 'mdmedia/studio';
 import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
 import type { WordHighlight } from 'mdmedia/audio';
 import type { INarrationAdapter } from 'mdmedia/narration';
+import type { IMarkdownStructureAdapter } from 'mdmedia/markdown';
+import type { ITTSProvider } from 'mdmedia/tts';
+import type { ResolvedConfig } from 'mdmedia/config';
+import { StudioApp } from 'mdmedia/tui';
 import { UniversalEventBus } from 'mdmedia/pipeline';
 
 const scene: StoryboardScene = {
@@ -152,25 +219,51 @@ const scene: StoryboardScene = {
 
 const voice: VoiceName = 'Puck';
 const opts: GenerateVideoOptions = { aspectRatio: '16:9' };
+const musicOpts: GenerateMusicOptions = { outputFormat: 'mp3' };
 const bus = new UniversalEventBus();
+let runArgs: RunAudioSynthesisArgs | null = null;
 let state: StudioState | null = null;
 let word: WordTiming | null = null;
 let chunk: ChunkTiming | null = null;
 let highlight: WordHighlight | null = null;
 let docHighlight: DocumentHighlight | null = null;
 let adapter: INarrationAdapter | null = null;
+let mdAdapter: IMarkdownStructureAdapter | null = null;
+let ttsProvider: ITTSProvider | null = null;
+let resolvedCfg: ResolvedConfig | null = null;
 let docChunk: DocumentChunk | null = null;
 let reader: IFileReader | null = null;
 let evtMap: keyof PipelineEventMap = 'pipeline:complete';
 let synthOpts: SynthesisOptions | null = null;
 
-export { scene, voice, opts, bus, state, word, chunk, highlight, docHighlight, adapter, docChunk, reader, evtMap, synthOpts };
+export {
+  StudioApp,
+  scene,
+  voice,
+  opts,
+  musicOpts,
+  bus,
+  runArgs,
+  state,
+  word,
+  chunk,
+  highlight,
+  docHighlight,
+  adapter,
+  mdAdapter,
+  ttsProvider,
+  resolvedCfg,
+  docChunk,
+  reader,
+  evtMap,
+  synthOpts,
+};
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.ts'), tsTestScript);
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
   const tscCmd = fs.existsSync(tscBin) ? `"${tscBin}"` : 'tsc';
   execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit' });
-  assert(true, 'TypeScript compilation against mdmedia declarations succeeded with 0 errors');
+  assert(true, 'TypeScript compilation against all 14 mdmedia subpath declarations succeeded with 0 errors');
 
   // Cleanup
   await rm(SANDBOX_DIR, { recursive: true, force: true });

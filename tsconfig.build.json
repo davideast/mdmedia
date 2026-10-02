@@ -9,5 +9,5 @@
     "noEmit": false
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts"]
+  "exclude": ["src/**/*.test.ts", "src/verify-package.ts", "src/verify-port.ts"]
 }

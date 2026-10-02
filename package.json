@@ -2,7 +2,29 @@
   "name": "mdmedia",
   "version": "0.1.0",
   "description": "Convert markdown into audio with Gemini or ElevenLabs, plus Gemini video and Lyria music",
+  "license": "MIT",
+  "author": "David East",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davideast/mdmedia"
+  },
+  "homepage": "https://github.com/davideast/mdmedia",
+  "keywords": [
+    "markdown",
+    "audio",
+    "tts",
+    "text-to-speech",
+    "gemini",
+    "elevenlabs",
+    "video",
+    "music",
+    "narration",
+    "cli"
+  ],
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -68,10 +90,12 @@
   },
   "files": [
     "dist",
+    "LICENSE",
     "README.md"
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/bin.js",
+    "prepublishOnly": "bun test && bun run verify",
     "verify-package": "bun run src/verify-package.ts",
     "dev": "bun run src/bin.ts",
     "start": "bun run src/bin.ts",
@@ -95,7 +119,6 @@
     "@opentui/react": "^0.5.11",
     "citty": "^0.2.2",
     "marked": "^18.0.9",
-    "marked-alert": "^2.1.2",
     "react": "^19.2.8"
   },
   "devDependencies": {
