@@ -1,5 +1,12 @@
 export const ELEVENLABS_API_BASE_URL = 'https://api.elevenlabs.io';
 
+/** Read the ElevenLabs key, accepting the ELEVEN_LABS_KEY alias that Studio also honors. */
+export function elevenLabsApiKeyFromEnv(
+  env: Record<string, string | undefined> = process.env
+): string | undefined {
+  return env.ELEVENLABS_API_KEY || env.ELEVEN_LABS_KEY || undefined;
+}
+
 export class ElevenLabsRequestError extends Error {
   constructor(
     readonly status: number,

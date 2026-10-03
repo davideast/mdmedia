@@ -1,5 +1,6 @@
 import type { ISoundEffectsProvider } from './sfx-provider.interface.js';
 import { ElevenLabsSoundEffectsProvider } from './elevenlabs-sfx-provider.js';
+import { elevenLabsApiKeyFromEnv } from '../elevenlabs/request-error.js';
 
 export interface SoundEffectsProviderOptions {
   apiKey?: string;
@@ -36,7 +37,7 @@ export const sfxRegistry = new SoundEffectsProviderRegistry();
 
 sfxRegistry.register('elevenlabs', (options: SoundEffectsProviderOptions = {}) =>
   new ElevenLabsSoundEffectsProvider(
-    options.apiKey ?? process.env.ELEVENLABS_API_KEY ?? '',
+    options.apiKey ?? elevenLabsApiKeyFromEnv() ?? '',
     options.maxRetries,
     options.model,
     options.request
