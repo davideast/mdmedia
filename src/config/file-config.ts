@@ -31,11 +31,22 @@ export interface MusicConfig {
   readonly referenceImages?: string[];
 }
 
+export interface SoundEffectsConfig {
+  readonly provider?: string;
+  readonly apiKey?: string;
+  readonly model?: string;
+  readonly outputFormat?: 'mp3' | 'wav';
+  readonly durationSeconds?: number;
+  readonly promptInfluence?: number;
+  readonly loop?: boolean;
+}
+
 export interface MdMediaConfig {
   readonly mode?: MediaType;
   readonly audio?: AudioConfig;
   readonly video?: VideoConfig;
   readonly music?: MusicConfig;
+  readonly sfx?: SoundEffectsConfig;
   readonly narration?: NarrationConfig;
   readonly maxChars?: number;
   readonly maxRetries?: number;
