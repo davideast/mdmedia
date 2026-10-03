@@ -1,4 +1,5 @@
-import { expect, test } from 'bun:test';
+import { existsSync } from 'node:fs';
+import { expect, test as bunTest } from 'bun:test';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
@@ -6,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const require = createRequire(new URL('../../studio/node_modules/@pyric/cli/package.json', import.meta.url));
 const { WebSocketServer } = require('ws');
+// Studio's Pyric CLI is a local tarball dependency that root CI never installs.
+const pyricInstalled = existsSync(fileURLToPath(new URL('../../studio/node_modules/@pyric/cli/dist/serve/worker/client/websocket-connection.js', import.meta.url)));
+const test = pyricInstalled ? bunTest : bunTest.skip;
 const check = fileURLToPath(new URL('../../studio/scripts/check-hosted-connection.mjs', import.meta.url));
 
 async function fixture(mode: 'attached' | 'stalled' | 'wrong-project') {
