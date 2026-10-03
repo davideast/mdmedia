@@ -46,7 +46,9 @@ describe('Narration Streaming Lifecycle & Pre-Creation Resilience', () => {
 
       // Must pass onError callback parameter into onSnapshot
       expect(watchNarrationDef).toContain('onSnapshot(');
-      expect(watchNarrationDef).toMatch(/onSnapshot\([^,]+,\s*\([^)]*\)\s*=>\s*\{[^}]*\},\s*\([^)]*\)\s*=>/);
+      expect(watchNarrationDef).toMatch(/onSnapshot\([^,]+,\s*\([^)]*\)\s*=>\s*\{[^}]*\},\s*reportError\s*,?\s*\)/);
+      // ...and re-attach on permission-denied while the document is still being created.
+      expect(watchNarrationDef).toContain('retryDeniedListener(');
     });
   });
 
