@@ -184,6 +184,19 @@ describe('Sound effects configuration', () => {
       .toBe('flag-key');
   });
 
+  it('accepts the ELEVEN_LABS_KEY alias, preferring ELEVENLABS_API_KEY', () => {
+    expect(resolveConfig({ mode: 'sfx' }, {}, { ELEVEN_LABS_KEY: 'alias-key' }).apiKey).toBe('alias-key');
+    expect(
+      resolveConfig({ mode: 'sfx' }, {}, { ELEVENLABS_API_KEY: 'main-key', ELEVEN_LABS_KEY: 'alias-key' })
+        .apiKey
+    ).toBe('main-key');
+    expect(
+      resolveConfig({ mode: 'audio', audioProvider: 'elevenlabs', voice: 'id' }, {}, {
+        ELEVEN_LABS_KEY: 'alias-key',
+      }).apiKey
+    ).toBe('alias-key');
+  });
+
   it('merges sfx options from flags over the config file', () => {
     const resolved = resolveConfig(
       { mode: 'sfx', durationSeconds: 4 },

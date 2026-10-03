@@ -10,6 +10,7 @@ import type {
 import { DEFAULT_ELEVENLABS_SFX_MODEL } from '../sfx/elevenlabs-sfx-provider.js';
 import { resolveTTSSelection } from '../tts/provider-registry.js';
 import { normalizeTTSProviderName } from '../tts/provider-name.js';
+import { elevenLabsApiKeyFromEnv } from '../elevenlabs/request-error.js';
 
 export interface ResolvedAudioConfig {
   readonly provider: string;
@@ -173,7 +174,7 @@ export function resolveConfig(
             (normalizeTTSProviderName(fileConfig.audio?.provider ?? '') === 'elevenlabs'
               ? fileConfig.audio?.apiKey
               : undefined) ??
-            env.ELEVENLABS_API_KEY
+            elevenLabsApiKeyFromEnv(env)
           : cliArgs.apiKey ?? fileConfig.apiKey ?? env.GEMINI_API_KEY,
   };
 }

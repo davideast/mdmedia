@@ -5,6 +5,7 @@ import type { ITTSProvider } from './tts-provider.interface.js';
 import { DEFAULT_GEMINI_TTS_MODEL, GeminiTTSProvider } from './gemini-tts-provider.js';
 import { DEFAULT_ELEVENLABS_TTS_MODEL, ElevenLabsTTSProvider } from './elevenlabs-tts-provider.js';
 import { normalizeTTSProviderName } from './provider-name.js';
+import { elevenLabsApiKeyFromEnv } from '../elevenlabs/request-error.js';
 
 export interface TTSProviderOptions {
   provider?: string;
@@ -71,7 +72,7 @@ export function resolveTTSSelection({
   const apiKey =
     requested.apiKey ??
     (switchedProvider ? undefined : configured.apiKey) ??
-    (provider === 'elevenlabs' ? env.ELEVENLABS_API_KEY : legacyApiKey ?? env.GEMINI_API_KEY);
+    (provider === 'elevenlabs' ? elevenLabsApiKeyFromEnv(env) : legacyApiKey ?? env.GEMINI_API_KEY);
 
   if (forSynthesis && provider === 'elevenlabs') {
     ElevenLabsTTSProvider.validateSelection(voice, style, true);
@@ -110,7 +111,7 @@ ttsRegistry.register('gemini', (client?: GoogleGenAI, options: TTSProviderOption
 
 ttsRegistry.register('elevenlabs', (_client?: unknown, options: TTSProviderOptions = {}) =>
   new ElevenLabsTTSProvider(
-    options.apiKey ?? process.env.ELEVENLABS_API_KEY ?? '',
+    options.apiKey ?? elevenLabsApiKeyFromEnv() ?? '',
     options.maxRetries,
     options.model,
     options.request

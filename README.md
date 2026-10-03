@@ -104,6 +104,8 @@ If `.mdmedia.json` exists in the working directory, options are loaded automatic
 3. Environment variables (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `MDMEDIA_TTS_PROVIDER`)
 4. Built-in defaults
 
+The CLI loads a `.env` file from the working directory (Node 20.12+ or Bun); variables already set in the shell take priority. `ELEVEN_LABS_KEY` is accepted as an alias for `ELEVENLABS_API_KEY`.
+
 ```json
 {
   "mode": "audio",
