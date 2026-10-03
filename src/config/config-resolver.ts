@@ -1,7 +1,15 @@
 import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
-import type { MdMediaConfig, MusicConfig, NarrationConfig, VideoConfig } from './file-config.js';
+import type {
+  MdMediaConfig,
+  MusicConfig,
+  NarrationConfig,
+  SoundEffectsConfig,
+  VideoConfig,
+} from './file-config.js';
+import { DEFAULT_ELEVENLABS_SFX_MODEL } from '../sfx/elevenlabs-sfx-provider.js';
 import { resolveTTSSelection } from '../tts/provider-registry.js';
+import { normalizeTTSProviderName } from '../tts/provider-name.js';
 
 export interface ResolvedAudioConfig {
   readonly provider: string;
@@ -32,11 +40,21 @@ export interface ResolvedMusicConfig {
   readonly referenceImages?: string[];
 }
 
+export interface ResolvedSoundEffectsConfig {
+  readonly provider: string;
+  readonly model: string;
+  readonly outputFormat: 'mp3' | 'wav';
+  readonly durationSeconds?: number;
+  readonly promptInfluence?: number;
+  readonly loop: boolean;
+}
+
 export interface ResolvedConfig {
   readonly mode: MediaType;
   readonly audio: ResolvedAudioConfig;
   readonly video: ResolvedVideoConfig;
   readonly music: ResolvedMusicConfig;
+  readonly sfx: ResolvedSoundEffectsConfig;
   readonly narration: ResolvedNarrationConfig;
   readonly maxChars: number;
   readonly maxRetries: number;
@@ -62,6 +80,11 @@ export interface CLIArgs {
   musicModel?: string;
   outputFormat?: 'mp3' | 'wav';
   musicReferenceImages?: string[];
+  sfxModel?: string;
+  sfxOutputFormat?: 'mp3' | 'wav';
+  durationSeconds?: number;
+  promptInfluence?: number;
+  loop?: boolean;
   maxChars?: number;
   maxRetries?: number;
   apiKey?: string;
@@ -76,6 +99,7 @@ export function resolveConfig(
 
   const videoConfig: VideoConfig = fileConfig.video ?? {};
   const musicConfig: MusicConfig = fileConfig.music ?? {};
+  const sfxConfig: SoundEffectsConfig = fileConfig.sfx ?? {};
   const narrationConfig: NarrationConfig = fileConfig.narration ?? {};
 
   const audioSelection = resolveTTSSelection({
@@ -116,6 +140,15 @@ export function resolveConfig(
     referenceImages: cliArgs.musicReferenceImages ?? musicConfig.referenceImages,
   };
 
+  const resolvedSfx: ResolvedSoundEffectsConfig = {
+    provider: (sfxConfig.provider ?? 'elevenlabs').toLowerCase(),
+    model: cliArgs.sfxModel ?? sfxConfig.model ?? DEFAULT_ELEVENLABS_SFX_MODEL,
+    outputFormat: cliArgs.sfxOutputFormat ?? sfxConfig.outputFormat ?? 'mp3',
+    durationSeconds: cliArgs.durationSeconds ?? sfxConfig.durationSeconds,
+    promptInfluence: cliArgs.promptInfluence ?? sfxConfig.promptInfluence,
+    loop: cliArgs.loop ?? sfxConfig.loop ?? false,
+  };
+
   const resolvedNarration: ResolvedNarrationConfig = {
     enabled: cliArgs.narration ?? narrationConfig.enabled ?? false,
     model: cliArgs.narrationModel ?? narrationConfig.model ?? 'gemini-3.5-flash-lite',
@@ -126,12 +159,21 @@ export function resolveConfig(
     audio: resolvedAudio,
     video: resolvedVideo,
     music: resolvedMusic,
+    sfx: resolvedSfx,
     narration: resolvedNarration,
     maxChars: cliArgs.maxChars ?? fileConfig.maxChars ?? 400,
     maxRetries: cliArgs.maxRetries ?? fileConfig.maxRetries ?? 3,
     apiKey:
       mode === 'audio'
         ? audioSelection.apiKey
-        : cliArgs.apiKey ?? fileConfig.apiKey ?? env.GEMINI_API_KEY,
+        : mode === 'sfx'
+          ? // The top-level apiKey is a Gemini key; never send it to ElevenLabs.
+            cliArgs.apiKey ??
+            sfxConfig.apiKey ??
+            (normalizeTTSProviderName(fileConfig.audio?.provider ?? '') === 'elevenlabs'
+              ? fileConfig.audio?.apiKey
+              : undefined) ??
+            env.ELEVENLABS_API_KEY
+          : cliArgs.apiKey ?? fileConfig.apiKey ?? env.GEMINI_API_KEY,
   };
 }

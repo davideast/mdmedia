@@ -1,6 +1,6 @@
 # mdmedia
 
-Transform Markdown documents into audio, video, and music. Audio narration supports **Gemini TTS** and **ElevenLabs Text to Speech**.
+Transform Markdown documents into audio, video, and music, and generate sound effects. Audio narration supports **Gemini TTS** and **ElevenLabs Text to Speech**; sound effects use **ElevenLabs Sound Effects**.
 
 ---
 
@@ -8,6 +8,7 @@ Transform Markdown documents into audio, video, and music. Audio narration suppo
 
 - **Audio Narration (`mdmedia audio`)**: Stream Markdown documents of any length into single `.wav` audio files with zero memory spikes and **real-time speaker playback (`-p, --play`)** while synthesis streams.
 - **Video Generation (`mdmedia video`)**: Convert Markdown storyboards, timecoded scenes, and reference images into `.mp4` video clips via **Gemini Omni Flash** (`gemini-omni-flash-preview`), supporting aspect ratio control (`16:9` / `9:16`), Files API URI polling, and stateful multi-turn editing.
+- **Sound Effects (`mdmedia sfx`)**: Generate `.mp3` or `.wav` sound effects from a text prompt via **ElevenLabs** (`eleven_text_to_sound_v2`), with duration, prompt influence, and seamless looping controls.
 - **Smart Extension Routing**: Run `mdmedia -i doc.md -o out.wav` or `mdmedia -i storyboard.md -o scene.mp4` and let `mdmedia` automatically detect the right multimodal pipeline.
 
 ---
@@ -81,6 +82,20 @@ mdmedia video -i edit-prompt.md -o edited.mp4 --interactionId v1_abc123
 
 ---
 
+### 3. Sound Effects (`mdmedia sfx`)
+
+Generate a sound effect from a prompt with your ElevenLabs API key:
+
+```bash
+export ELEVENLABS_API_KEY=your_key
+mdmedia sfx -p "heavy wooden door creaking open slowly" -o door.mp3 --duration 3
+mdmedia sfx -p "gentle rain on a tin roof" -o rain.wav --loop --influence 0.6
+```
+
+The output format follows the file extension (`.wav` is generated as 44.1 kHz PCM with a WAV header; anything else is MP3) unless `--format` is set. Without `--duration`, ElevenLabs picks a length. `sfx` always needs the subcommand name: smart extension routing keeps sending `.mp3` outputs to `music`.
+
+---
+
 ## Configuration File (`.mdmedia.json`)
 
 If `.mdmedia.json` exists in the working directory, options are loaded automatically. Precedence:
@@ -105,12 +120,19 @@ If `.mdmedia.json` exists in the working directory, options are loaded automatic
     "task": "text_to_video",
     "delivery": "uri"
   },
+  "sfx": {
+    "outputFormat": "mp3",
+    "promptInfluence": 0.3,
+    "loop": false
+  },
   "maxChars": 400,
   "maxRetries": 3
 }
 ```
 
 For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice name or ID, and optionally `audio.model` (default: `eleven_multilingual_v2`). You can put its key in `audio.apiKey` or `ELEVENLABS_API_KEY`. `ELEVENLABS_VOICE` supplies a default name or ID; the existing `ELEVENLABS_VOICE_ID` also works. A Gemini `audio.model`, voice, or style from the file is ignored when `--provider elevenlabs` overrides a Gemini file configuration.
+
+For sound effects, the `sfx` section accepts `model`, `outputFormat`, `durationSeconds`, `promptInfluence`, `loop`, and `apiKey`. The key is resolved from `--apiKey`, then `sfx.apiKey`, then `audio.apiKey` when `audio.provider` is `"elevenlabs"`, then `ELEVENLABS_API_KEY`. The top-level `apiKey` is a Gemini key and is never sent to ElevenLabs.
 
 ---
 
@@ -143,6 +165,20 @@ For ElevenLabs, set `audio.provider` to `"elevenlabs"`, `audio.voice` to a voice
 | `--firstFrame` | | `undefined` | Path to starting image frame |
 | `--interactionId` | | `undefined` | Previous interaction ID for stateful video editing |
 | `--model` | `-m` | `gemini-omni-flash-preview` | Gemini Omni Flash model endpoint |
+
+### `mdmedia sfx` Options
+
+| Flag | Short | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `--prompt` | `-p` | | Text describing the sound effect |
+| `--input` | `-i` | | File containing the prompt (used when `--prompt` is omitted) |
+| `--output` | `-o` | `sfx.mp3` | Destination path for the audio file |
+| `--duration` | `-d` | Model choice | Length in seconds, `0.5` to `30` |
+| `--influence` | | `0.3` | How closely to follow the prompt, `0` to `1` |
+| `--loop` | | `false` | Generate a seamlessly looping effect |
+| `--format` | `-f` | From output extension | `mp3` or `wav` |
+| `--model` | `-m` | `eleven_text_to_sound_v2` | ElevenLabs sound effects model |
+| `--apiKey` | `-k` | `ELEVENLABS_API_KEY` | ElevenLabs API key |
 
 ---
 

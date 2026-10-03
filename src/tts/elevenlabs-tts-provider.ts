@@ -1,25 +1,15 @@
+import {
+  ELEVENLABS_API_BASE_URL,
+  ElevenLabsRequestError,
+  isRetryableElevenLabsError,
+  readElevenLabsErrorDetail,
+} from '../elevenlabs/request-error.js';
 import type { VoiceName } from '../types/voice.js';
 import { calculateBackoffMs, delay } from './backoff.js';
 import { ElevenLabsVoiceCatalog } from './elevenlabs-voices.js';
 import type { ITTSProvider } from './tts-provider.interface.js';
 
 export const DEFAULT_ELEVENLABS_TTS_MODEL = 'eleven_multilingual_v2';
-
-class ElevenLabsRequestError extends Error {
-  constructor(
-    readonly status: number,
-    detail: string
-  ) {
-    super(`ElevenLabs TTS request failed (HTTP ${status})${detail ? `: ${detail}` : ''}`);
-    this.name = 'ElevenLabsRequestError';
-  }
-}
-
-function isRetryable(error: unknown): boolean {
-  return error instanceof ElevenLabsRequestError
-    ? error.status === 429 || error.status >= 500
-    : error instanceof TypeError;
-}
 
 /** Streams headerless 24 kHz, 16-bit mono PCM for the existing narration pipeline. */
 export class ElevenLabsTTSProvider implements ITTSProvider {
@@ -70,7 +60,7 @@ export class ElevenLabsTTSProvider implements ITTSProvider {
     const voiceId = await this.resolveVoiceId(voice);
 
     const url = new URL(
-      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}/stream`
+      `${ELEVENLABS_API_BASE_URL}/v1/text-to-speech/${encodeURIComponent(voiceId)}/stream`
     );
     url.searchParams.set('output_format', 'pcm_24000');
 
@@ -88,8 +78,7 @@ export class ElevenLabsTTSProvider implements ITTSProvider {
         });
 
         if (!response.ok) {
-          const detail = (await response.text().catch(() => '')).slice(0, 300);
-          throw new ElevenLabsRequestError(response.status, detail);
+          throw new ElevenLabsRequestError(response.status, await readElevenLabsErrorDetail(response));
         }
         if (!response.body) {
           throw new Error('ElevenLabs returned no audio stream.');
@@ -116,7 +105,7 @@ export class ElevenLabsTTSProvider implements ITTSProvider {
         }
       } catch (error) {
         // Retrying after audio reached a caller would duplicate the spoken prefix.
-        if (emittedAudio || attempt >= this.maxRetries || !isRetryable(error)) throw error;
+        if (emittedAudio || attempt >= this.maxRetries || !isRetryableElevenLabsError(error)) throw error;
         await delay(calculateBackoffMs(attempt));
       }
     }
