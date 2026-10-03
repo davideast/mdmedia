@@ -42,7 +42,7 @@ export interface NarrationStreamState {
     rewriteInstructions?: string;
     visibility: Visibility;
   }) => Promise<void>;
-  loadExisting: (id: string, options?: { autoPlay?: boolean }) => Promise<void>;
+  loadExisting: (id: string, options?: { autoPlay?: boolean; startAtMs?: number }) => Promise<void>;
   cancel: () => void;
 }
 
@@ -336,6 +336,7 @@ export function useNarrationStream(): NarrationStreamState {
         playerRef.current !== null &&
         playerRef.current.durationMs > 0
       ) {
+        if (options?.startAtMs !== undefined) playerRef.current.seek(options.startAtMs);
         if (options?.autoPlay) {
           void playerRef.current.play();
         }
@@ -384,6 +385,7 @@ export function useNarrationStream(): NarrationStreamState {
         if (session !== loadSessionRef.current) return;
 
         if (options?.autoPlay) {
+          if (options.startAtMs !== undefined) activePlayer.seek(options.startAtMs);
           void activePlayer.play();
         }
         setStatus('ready');
@@ -493,6 +495,7 @@ export function useNarrationStream(): NarrationStreamState {
 
           if (options?.autoPlay && !autoPlayed) {
             autoPlayed = true;
+            if (options.startAtMs !== undefined) activePlayer.seek(options.startAtMs);
             void activePlayer.play();
           }
           return true;

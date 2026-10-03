@@ -1,9 +1,10 @@
 "use client";
 
 import { cn } from "cn";
-import type { ReactNode } from "react";
+import { useEffect, useImperativeHandle, useRef, type ReactNode } from "react";
 import { PanelLeft, PanelRight } from "lucide-react";
 import { useOptionalShell } from "@/components/shell/shell-context";
+import { useOptionalWorkspace } from "@/components/shell/workspace-provider";
 
 /**
  * Panel chrome, ported from the jitro workbench study.
@@ -26,6 +27,7 @@ export function WorkbenchPanel({
   className,
   viewGrid = false,
   gridVariant = "content",
+  workspacePage = false,
 }: {
   title?: string;
   titleNode?: ReactNode;
@@ -40,8 +42,38 @@ export function WorkbenchPanel({
   className?: string;
   viewGrid?: boolean;
   gridVariant?: "content" | "wide" | "full" | "reader";
+  workspacePage?: boolean;
 }) {
   const shell = useOptionalShell();
+  const workspace = useOptionalWorkspace();
+  const tabId = workspacePage ? workspace?.activeTab?.id : undefined;
+  const store = workspace?.store;
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const restored = useRef(false);
+  useImperativeHandle(scrollRef, () => bodyRef.current!, []);
+
+  useEffect(() => {
+    if (tabId && title) store?.updateTab(tabId, { title });
+  }, [tabId, title, store]);
+
+  useEffect(() => {
+    if (!tabId || !store || !bodyRef.current) return;
+    const element = bodyRef.current;
+    const top = store.getSnapshot().tabs.find((tab) => tab.id === tabId)?.scrollTop ?? 0;
+    restored.current = false;
+    const restore = () => {
+      element.scrollTop = top;
+      if (top === 0 || element.scrollHeight - element.clientHeight >= top) { restored.current = true; observer.disconnect(); }
+    };
+    // Data/markdown often arrives after the panel mounts. Restore after it can actually scroll.
+    const observer = new MutationObserver(restore);
+    observer.observe(element, { childList: true, subtree: true });
+    restore();
+    const stopWaiting = () => { restored.current = true; observer.disconnect(); };
+    element.addEventListener("wheel", stopWaiting, { passive: true });
+    element.addEventListener("touchstart", stopWaiting, { passive: true });
+    return () => { observer.disconnect(); element.removeEventListener("wheel", stopWaiting); element.removeEventListener("touchstart", stopWaiting); };
+  }, [tabId, store]);
 
   return (
     <section className={cn("relative flex h-full min-h-0 min-w-0 flex-col bg-background", className)}>
@@ -106,7 +138,8 @@ export function WorkbenchPanel({
         </header>
       )}
       <div
-        ref={scrollRef}
+        ref={bodyRef}
+        onScroll={workspacePage ? (event) => { if (tabId && restored.current) store?.updateTab(tabId, { scrollTop: event.currentTarget.scrollTop }); } : undefined}
         className={cn(
           "min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
           !viewGrid && "flex flex-col",

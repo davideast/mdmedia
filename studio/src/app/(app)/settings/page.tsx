@@ -15,6 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useWorkspace, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { VoicePicker } from "@/components/studio/voice-picker";
@@ -67,15 +68,22 @@ function Row({
 }
 
 export default function SettingsPage() {
+  const { store, activeTab } = useWorkspace();
   const { profile, defaultReader, updateSettings, signOutUser } = useAuth();
   const { highlightColor, setHighlightColor } = useNarration();
   const { theme, setTheme } = useTheme();
+  const [editedDelivery, setEditedDelivery] = useWorkspaceField<string | null>("delivery", null);
 
   const settings: UserSettings = profile?.settings ?? DEFAULT_SETTINGS;
 
   const save = (patch: Partial<UserSettings>) => {
     try {
-      void updateSettings(patch);
+      void updateSettings(patch, {
+        onSaved: () => {
+          if (activeTab && patch.defaultPromptStyle !== undefined) store.acknowledgeField(activeTab.id, "delivery", patch.defaultPromptStyle);
+        },
+        onError: () => toast.error("That setting did not save. Your edit is kept on this device."),
+      });
     } catch {
       toast.error("That setting did not save. Try again.");
     }
@@ -83,6 +91,7 @@ export default function SettingsPage() {
 
   return (
     <WorkbenchPanel
+      workspacePage
       title="Settings"
       icon={<SettingsIcon size={13} strokeWidth={2} />}
       viewGrid
@@ -190,7 +199,8 @@ export default function SettingsPage() {
                 <Textarea
                   id="default-style"
                   key={`${profile?.uid ?? "defaults"}:${settings.defaultPromptStyle}`}
-                  defaultValue={settings.defaultPromptStyle}
+                  value={editedDelivery ?? settings.defaultPromptStyle}
+                  onChange={(event) => setEditedDelivery(event.target.value)}
                   rows={3}
                   className="resize-none"
                   onBlur={(event) => {

@@ -8,6 +8,7 @@ import { NarrationProvider } from "@/components/shell/narration-provider";
 import { SignInGate } from "@/components/shell/sign-in-gate";
 import { useAuth } from "@/lib/auth-context";
 import { OfflinePlaybackProvider } from "@/components/shell/offline-playback-provider";
+import { WorkspaceProvider } from "@/components/shell/workspace-provider";
 
 /**
  * Gate + shell for every signed-in surface.
@@ -30,10 +31,12 @@ export function AppFrame({ children }: { children: ReactNode }) {
   if (user === null) return <SignInGate />;
 
   return (
+    <WorkspaceProvider key={user.uid}>
     <NarrationProvider>
       <OfflinePlaybackProvider>
         <AppShell context={<ContextPanel />}>{children}</AppShell>
       </OfflinePlaybackProvider>
     </NarrationProvider>
+    </WorkspaceProvider>
   );
 }

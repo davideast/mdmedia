@@ -35,7 +35,8 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
       expect(narrationPage).toContain("case \"adapted\":");
       expect(narrationPage).toContain("navigator.clipboard.writeText(text)");
       expect(narrationPage).toContain("copied as markdown");
-      expect(narrationPage).toContain("setTimeout(() => setCopied(false), 2000)");
+      expect(narrationPage).toContain("setTimeout(() => setCopiedView(null), 2000)");
+      expect(narrationPage).toContain("copiedView === `${id}:${activeDocumentView}`");
     });
 
     it("renders clean icon-only copy button in WorkbenchPanel actions when narration is loaded", () => {

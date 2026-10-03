@@ -18,6 +18,8 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 import { useMediaSession } from "@/lib/use-media-session";
 import { useConnectivity } from "@/lib/connectivity";
 import { useOfflinePlayback } from "@/components/shell/offline-playback-provider";
+import { WorkspaceTabs } from "@/components/shell/workspace-tabs";
+import { useWorkspace } from "@/components/shell/workspace-provider";
 
 const DOCK_KEY = "mdmedia.nav.docked.v1";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
@@ -74,6 +76,7 @@ export function AppShell({
   context?: ReactNode;
 }) {
   const pathname = usePathname();
+  const { activeTab } = useWorkspace();
   const offline = useConnectivity() === 'offline';
   const onlineScreenDisabled = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
@@ -285,7 +288,7 @@ export function AppShell({
           <a href="/downloads" className="flex-none font-medium text-primary underline underline-offset-2">Open Downloads</a>
         </div>
       ) : null}
-      <div className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+      <div id="workspace-page" role="tabpanel" aria-labelledby={activeTab ? `workspace-tab-${activeTab.id}` : undefined} className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
         {children}
       </div>
       {showPlayerBar ? (
@@ -341,6 +344,9 @@ export function AppShell({
           </div>
         ) : null}
 
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <WorkspaceTabs />
+        <div className="flex min-h-0 min-w-0 flex-1">
         {showLeftResizable || showRightResizable ? (
           <ResizablePanelGroup
             key={`layout-${showLeftResizable ? "L" : "l"}-${showRightResizable ? "R" : "r"}`}
@@ -432,6 +438,8 @@ export function AppShell({
           </div>
           </div>
         ) : null}
+        </div>
+        </div>
 
         {/* Slide-over overlay sheet for NavRail on mobile */}
         <Sheet open={navSheetOpen} onOpenChange={setNavSheetOpen}>

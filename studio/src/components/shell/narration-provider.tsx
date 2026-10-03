@@ -24,6 +24,7 @@ import {
   type Visibility,
 } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
+import { useWorkspace } from "./workspace-provider";
 
 const HIGHLIGHT_STORAGE_KEY = "mdmedia.highlightColor";
 
@@ -70,6 +71,7 @@ interface NarrationContextValue {
   queue: PlaylistQueueState | null;
   playPlaylist: (playlist: Playlist, tracks: Narration[], startIndex?: number) => void;
   playTrack: (narration: Narration) => void;
+  playNarration: (id: string, startAtMs?: number) => void;
   nextTrack: () => void;
   previousTrack: () => void;
   documentView: DocumentView;
@@ -87,10 +89,11 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   const stream = useNarrationStream();
   const generationQueue = useGenerationQueue();
   const { user, profile, defaultReader, updateSettings } = useAuth();
+  const { store, state: workspace, draftId } = useWorkspace();
 
   const settings = profile?.settings ?? DEFAULT_SETTINGS;
 
-  const [overrides, setOverrides] = useState<Partial<Draft>>({});
+  const overrides = workspace.drafts[draftId];
   const [highlightColorOverride, setHighlightColorOverride] = useState<HighlightColorId | null>(
     null,
   );
@@ -185,12 +188,12 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   );
 
   const setDraft = useCallback((patch: Partial<Draft>) => {
-    setOverrides((previous) => ({ ...previous, ...patch }));
-  }, []);
+    store.setDraft(draftId, { ...draft, ...patch });
+  }, [store, draftId, draft]);
 
   const resetDraft = useCallback(() => {
-    setOverrides({});
-  }, []);
+    store.clearDraft(draftId);
+  }, [store, draftId]);
 
   const playPlaylist = useCallback(
     (playlist: Playlist, tracks: Narration[], startIndex = 0) => {
@@ -215,6 +218,11 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     },
     [stream],
   );
+
+  const playNarration = useCallback((id: string, startAtMs?: number) => {
+    setQueue(null);
+    void stream.loadExisting(id, { autoPlay: true, startAtMs });
+  }, [stream]);
 
   const nextTrack = useCallback(() => {
     if (queue === null) return;
@@ -271,6 +279,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       queue,
       playPlaylist,
       playTrack,
+      playNarration,
       nextTrack,
       previousTrack,
       documentView,
@@ -287,6 +296,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       queue,
       playPlaylist,
       playTrack,
+      playNarration,
       nextTrack,
       previousTrack,
       documentView,

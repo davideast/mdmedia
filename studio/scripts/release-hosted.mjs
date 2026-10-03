@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { checkHostedConnection } from './check-hosted-connection.mjs';
 
 const live = '.next-hosted';
 const staged = '.next-hosted-staged';
@@ -28,7 +29,9 @@ async function bootstrap() {
 }
 
 async function waitForServer() {
-  for (let attempt = 0; attempt < 30; attempt += 1) {
+  // Restoring the hosted sandbox and hashing its source can take two minutes.
+  const deadline = Date.now() + 180_000;
+  while (Date.now() < deadline) {
     try {
       const response = await fetch('http://127.0.0.1:3000/api/connectivity', {
         signal: AbortSignal.timeout(1000),
@@ -37,7 +40,7 @@ async function waitForServer() {
     } catch { /* The agent is still starting. */ }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  throw new Error('Studio did not become healthy on port 3000 within 30 seconds.');
+  throw new Error('Studio did not become healthy on port 3000 within three minutes.');
 }
 
 if (!existsSync(join(live, 'BUILD_ID')) ||
@@ -68,6 +71,7 @@ try {
   await copyFile(join(live, 'sw.js'), worker);
   await bootstrap();
   await waitForServer();
+  await checkHostedConnection('http://127.0.0.1:3000');
   console.log(`Studio released. Previous build kept at ${backup}.`);
 } catch (error) {
   if (stopped) {

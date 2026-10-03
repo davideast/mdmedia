@@ -86,7 +86,8 @@ describe("Reader Follow Mode & Floating Resume Architecture", () => {
   describe("WorkbenchPanel integration", () => {
     it("accepts scrollRef and passes it to the scrollable container", () => {
       expect(workbenchPanel).toContain("scrollRef?: React.Ref<HTMLDivElement>");
-      expect(workbenchPanel).toContain("ref={scrollRef}");
+      expect(workbenchPanel).toContain("ref={bodyRef}");
+      expect(workbenchPanel).toContain("useImperativeHandle(scrollRef, () => bodyRef.current!");
     });
 
     it("renders floating slot inside relative panel section", () => {

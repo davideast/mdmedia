@@ -7,7 +7,6 @@ import {
   AlertCircle,
   ArrowUpRight,
   CheckCircle2,
-  Clock,
   ListOrdered,
   Loader2,
   PenLine,
@@ -17,7 +16,6 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
@@ -25,6 +23,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
 import type { GenerationJob } from "@/lib/use-generation-queue";
+import { useWorkspace } from "@/components/shell/workspace-provider";
 import type { Narration } from "@/lib/types";
 
 function relativeTime(ms: number): string {
@@ -271,23 +270,31 @@ function FailedJobCard({
 export default function QueuePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { generationQueue, setDraft } = useNarration();
+  const { generationQueue } = useNarration();
+  const { store } = useWorkspace();
   const [firestoreNarrations, setFirestoreNarrations] = useState<Narration[]>([]);
 
   const handleEditInStudio = (job: GenerationJob) => {
-    setDraft({
+    const draftId = crypto.randomUUID();
+    store.setDraft(draftId, {
       markdown: job.markdown,
       voice: { provider: job.voiceProvider, id: job.voiceId, name: job.voice },
       promptStyle: job.promptStyle,
       rewriteForNarration: job.rewriteForNarration,
       rewriteInstructions: job.rewriteInstructions,
       visibility: job.visibility,
+      structureMarkdown: job.structureMarkdown,
+      speed: job.speed,
+      verbalizeDiagrams: job.verbalizeDiagrams,
     });
-    router.push("/studio");
+    router.push(`/studio?draft=${draftId}`);
   };
 
-  const handleRetry = (jobId: string) => {
-    void generationQueue.retryJob(jobId);
+  const handleRetry = async (jobId: string) => {
+    const old = generationQueue.jobs.find((job) => job.id === jobId);
+    const tab = store.getSnapshot().tabs.find((item) => item.key === `/narration/${old?.narrationId}`);
+    const next = await generationQueue.retryJob(jobId);
+    if (tab && next) store.replaceTab(tab.id, `/narration/${next.narrationId}`, old?.title);
   };
 
   useEffect(() => {
@@ -334,6 +341,7 @@ export default function QueuePage() {
       icon={<ListOrdered size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"
+      workspacePage
       actions={
         completedJobs.length > 0 || failedJobs.length > 0 ? (
           <Button

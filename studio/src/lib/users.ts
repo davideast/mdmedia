@@ -14,9 +14,6 @@ import {
   setDoc,
   updateDoc,
   type DocumentData,
-  type FirestoreDataConverter,
-  type QueryDocumentSnapshot,
-  type SnapshotOptions,
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase';
@@ -178,14 +175,20 @@ export async function upsertUserProfile(input: UpsertProfileInput): Promise<User
   return { ...current, ...patch, updatedAt: now };
 }
 
+export interface MutationFeedback {
+  onSaved?: () => void;
+  onError?: (error: unknown) => void;
+}
+
 /** Merge a settings patch without clobbering the keys it leaves alone. */
-export function saveSettings(uid: string, patch: Partial<UserSettings>): void {
+export function saveSettings(uid: string, patch: Partial<UserSettings>, feedback?: MutationFeedback): void {
   const fields: Record<string, unknown> = { updatedAt: Date.now() };
   for (const [key, value] of Object.entries(patch)) {
     if (value === undefined) continue;
     fields[`settings.${key}`] = value;
   }
-  void updateDoc(doc(db(), 'users', uid), fields).catch((err) => {
+  void updateDoc(doc(db(), 'users', uid), fields).then(() => feedback?.onSaved?.()).catch((err) => {
+    feedback?.onError?.(err);
     console.error(`[users] failed to save settings for ${uid}:`, err);
   });
 }
@@ -194,11 +197,13 @@ export function saveSettings(uid: string, patch: Partial<UserSettings>): void {
 export function saveProfileFields(
   uid: string,
   patch: { displayName?: string; bio?: string },
+  feedback?: MutationFeedback,
 ): void {
   const fields: Record<string, unknown> = { updatedAt: Date.now() };
   if (patch.displayName !== undefined) fields.displayName = patch.displayName;
   if (patch.bio !== undefined) fields.bio = patch.bio;
-  void updateDoc(doc(db(), 'users', uid), fields).catch((err) => {
+  void updateDoc(doc(db(), 'users', uid), fields).then(() => feedback?.onSaved?.()).catch((err) => {
+    feedback?.onError?.(err);
     console.error(`[users] failed to save profile fields for ${uid}:`, err);
   });
 }

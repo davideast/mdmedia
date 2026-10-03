@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
+import { useRouteQuery } from "@/components/shell/workspace-provider";
 import { useAuth } from "@/lib/auth-context";
 import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
 import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
@@ -228,7 +229,7 @@ export default function LibraryPage() {
   const { user } = useAuth();
   const { stream, playTrack } = useNarration();
   const [items, setItems] = useState<Narration[]>([]);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useRouteQuery("q");
   const [itemToDelete, setItemToDelete] = useState<Narration | null>(null);
 
   useEffect(() => {
@@ -270,6 +271,7 @@ export default function LibraryPage() {
 
   return (
     <WorkbenchPanel
+      workspacePage
       title="Library"
       icon={<Library size={13} strokeWidth={2} />}
       viewGrid

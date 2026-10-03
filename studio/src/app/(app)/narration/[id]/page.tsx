@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { BookOpen, Check, Copy, FileText, Loader2 } from "lucide-react";
+import { BookOpen, Check, Copy, FileText, Loader2, Pause, Play } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/reader/follow-button";
@@ -12,13 +12,23 @@ import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
 import { updateNarrationTitle } from "@/lib/narrations";
+import { useNarrationDocument } from "@/lib/use-narration-document";
+import { useWorkspaceField } from "@/components/shell/workspace-provider";
 
 export default function NarrationPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const searchParams = useSearchParams();
   const docParam = searchParams.get("doc");
-  const { stream, documentView, setDocumentView, generationQueue } = useNarration();
+  const { stream: playback, playNarration, documentView, setDocumentView, generationQueue } = useNarration();
+  const document = useNarrationDocument(id);
+  const isLive = playback.id === id;
+  const stream = isLive ? playback : {
+    id, title: document?.title ?? "", voice: document?.voice ?? null, transcript: document?.transcript ?? "",
+    sourceMarkdown: document?.sourceMarkdown ?? null, adapted: document?.adapted ?? false,
+    chunks: document?.chunks ?? [], status: document?.status ?? "loading", errorMessage: document?.errorMessage ?? null,
+    player: null, playing: false, activeWord: null, durationMs: 0, positionMs: 0,
+  };
 
   // Immediate synchronous projection: if docParam is present, use it directly during render
   // so page reloads load the active tab first with zero layout shift or hydration mismatch.
@@ -39,24 +49,14 @@ export default function NarrationPage() {
   const failedQueueJob = generationQueue.jobs.find(
     (j) => j.narrationId === id && j.status === "error",
   );
-  const [editingTitle, setEditingTitle] = useState(false);
-  const [draftTitle, setDraftTitle] = useState("");
+  const [editingTitle, setEditingTitle] = useWorkspaceField("editingTitle", false);
+  const [draftTitle, setDraftTitle] = useWorkspaceField("draftTitle", "");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const isSubmittingRef = useRef(false);
   const isCancelledRef = useRef(false);
 
-  // Only load from storage when this is not the narration already streaming
-  // through the provider — replay must not interrupt a live synthesis.
-  const isLive = stream.id === id;
-
-  useEffect(() => {
-    if (isLive) return;
-    void stream.loadExisting(id);
-    // `stream` is a stable object from the provider; re-running on every render
-    // of it would restart the load.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isLive]);
+  // Viewing another document never loads or resets the application's player.
 
   useEffect(() => {
     if (editingTitle) {
@@ -84,8 +84,8 @@ export default function NarrationPage() {
   const audioLoaded = stream.player !== null && stream.durationMs > 0;
 
   const handleSeekWord = (startMs: number) => {
-    if (!stream.player || stream.durationMs <= 0) return;
-    stream.player.seek(startMs);
+    if (isLive && playback.player) playback.player.seek(startMs);
+    else playNarration(id, startMs);
   };
 
   const displayTitle =
@@ -116,12 +116,12 @@ export default function NarrationPage() {
     isSubmittingRef.current = true;
     setEditingTitle(false);
     const previousTitle = stream.title;
-    stream.setTitle(trimmed);
+    if (isLive) playback.setTitle(trimmed);
     try {
       updateNarrationTitle(id, trimmed);
       toast.success("Title updated");
     } catch {
-      stream.setTitle(previousTitle);
+      if (isLive) playback.setTitle(previousTitle);
       toast.error("Could not update title.");
     } finally {
       isSubmittingRef.current = false;
@@ -134,7 +134,8 @@ export default function NarrationPage() {
     Boolean(activeQueueJob);
   const empty = stream.transcript.length === 0;
 
-  const [copied, setCopied] = useState(false);
+  const [copiedView, setCopiedView] = useState<string | null>(null);
+  const copied = copiedView === `${id}:${activeDocumentView}`;
 
   const documentConfig = useMemo(() => {
     switch (activeDocumentView) {
@@ -160,10 +161,6 @@ export default function NarrationPage() {
     }
   }, [activeDocumentView, stream.sourceMarkdown, stream.transcript]);
 
-  useEffect(() => {
-    setCopied(false);
-  }, [activeDocumentView]);
-
   const handleCopy = async () => {
     const text = documentConfig.text;
     if (!text || text.trim().length === 0) {
@@ -172,11 +169,11 @@ export default function NarrationPage() {
     }
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
+      setCopiedView(`${id}:${activeDocumentView}`);
       toast.success(
         `${documentConfig.name.charAt(0).toUpperCase() + documentConfig.name.slice(1)} copied as markdown`,
       );
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopiedView(null), 2000);
     } catch {
       toast.error("Could not copy markdown to clipboard.");
     }
@@ -192,6 +189,7 @@ export default function NarrationPage() {
 
   return (
     <WorkbenchPanel
+      workspacePage
       title={displayTitle}
       scrollRef={scrollContainerRef}
       floating={
@@ -241,6 +239,13 @@ export default function NarrationPage() {
       }
       actions={
         <div className="flex items-center gap-1">
+          <Button type="button" size="sm" disabled={empty || stream.status === "error"} aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
+            onClick={() => {
+              if (isLive && playback.player) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
+              else playNarration(id);
+            }} className="h-8 gap-1.5">
+            {stream.playing ? <Pause size={13} /> : <Play size={13} />}<span>{stream.playing ? "Pause" : "Play"}</span>
+          </Button>
           {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
           {!empty ? (
             <Button
@@ -270,7 +275,7 @@ export default function NarrationPage() {
         </div>
       }
     >
-      {stream.status === "error" || failedQueueJob ? (
+      {stream.status === "error" && !activeQueueJob || failedQueueJob ? (
         <p className="text-[0.95rem] text-ink-muted">
           {failedQueueJob?.errorMessage ??
             stream.errorMessage ??
@@ -331,8 +336,8 @@ export default function NarrationPage() {
           activeCharEnd={stream.activeWord?.charEnd ?? null}
           spokenThrough={spokenThrough}
           words={words}
-          audioLoaded={audioLoaded}
-          loadedDurationMs={stream.durationMs}
+          audioLoaded={audioLoaded || words.length > 0}
+          loadedDurationMs={isLive ? stream.durationMs : words.reduce((end, word) => Math.max(end, word.endMs), 0)}
           onSeekWord={handleSeekWord}
         />
       )}

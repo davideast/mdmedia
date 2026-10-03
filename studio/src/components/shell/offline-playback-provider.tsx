@@ -10,12 +10,13 @@ interface LocalPlayback {
   player: PlaybackTransport | null;
   track: DownloadedTrack | null;
   playlistTitle: string | null;
+  playlistId: string | null;
   positionMs: number;
   durationMs: number;
   playing: boolean;
   index: number;
   queueLength: number;
-  playTracks: (ids: string[], index?: number, playlistTitle?: string) => Promise<void>;
+  playTracks: (ids: string[], index?: number, playlistTitle?: string, playlistId?: string) => Promise<void>;
   next: () => void;
   previous: () => void;
   stop: () => void;
@@ -32,7 +33,6 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
   const objectUrl = useRef<string | null>(null);
   const sequence = useRef<string[]>([]);
   const sequenceIndex = useRef(0);
-  const playlistName = useRef<string | null>(null);
   const loadRef = useRef<(index: number) => Promise<void>>(async () => {});
   const [track, setTrack] = useState<DownloadedTrack | null>(null);
   const [positionMs, setPositionMs] = useState(0);
@@ -40,6 +40,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
   const [playing, setPlaying] = useState(false);
   const [index, setIndex] = useState(0);
   const [playlistTitle, setPlaylistTitle] = useState<string | null>(null);
+  const [playlistId, setPlaylistId] = useState<string | null>(null);
   const [queueLength, setQueueLength] = useState(0);
 
   const stop = useCallback(() => {
@@ -51,6 +52,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     sequence.current = [];
     setQueueLength(0);
     setPlaylistTitle(null);
+    setPlaylistId(null);
     setTrack(null);
     setPlaying(false);
     setPositionMs(0);
@@ -104,9 +106,9 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
   }, [user]);
   useEffect(() => { loadRef.current = load; }, [load]);
 
-  const playTracks = useCallback(async (ids: string[], startIndex = 0, title?: string) => {
+  const playTracks = useCallback(async (ids: string[], startIndex = 0, title?: string, id?: string) => {
     sequence.current = ids;
-    playlistName.current = title || null;
+    setPlaylistId(id || null);
     setQueueLength(ids.length);
     setPlaylistTitle(title || null);
     await load(startIndex);
@@ -133,6 +135,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     player: track ? player : null,
     track,
     playlistTitle,
+    playlistId,
     positionMs,
     durationMs,
     playing,
@@ -142,7 +145,7 @@ export function OfflinePlaybackProvider({ children }: { children: ReactNode }) {
     next,
     previous,
     stop,
-  }), [track, player, playlistTitle, positionMs, durationMs, playing, index, queueLength, playTracks, next, previous, stop]);
+  }), [track, player, playlistTitle, playlistId, positionMs, durationMs, playing, index, queueLength, playTracks, next, previous, stop]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

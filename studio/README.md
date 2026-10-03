@@ -45,6 +45,19 @@ npm --prefix studio run release:hosted
 
 `release:hosted` stops the Studio agent, swaps the staged build and matching service worker into place, restarts the agent, and checks its health. It restores the previous build if startup fails. The previous build remains in a timestamped `.next-hosted-previous-*` directory until you remove it. Do not rebuild `.next-hosted` while its server is running: the old HTML can then refer to JS and CSS files that have disappeared. To restart an agent after changing its plist, boot it out and bootstrap it again. `tailscale serve --bg` keeps its proxies configured after an agent stops, so disable them explicitly with `tailscale serve --https=3000 off` and `tailscale serve --https=3473 off` if you no longer want them shared.
 
+### Checking the hosted connection
+
+```bash
+npm --prefix studio run check:hosted-connection -- http://localhost:3000
+node studio/scripts/check-hosted-assets.mjs http://127.0.0.1:3100
+```
+
+The connection check uses the served Pyric initialization, browser Origin header,
+and actual browser SDK worker-port attachment. It fails on Pyric's five-second
+attach timeout or a different sandbox project. Asset checks and `release:hosted`
+also require this attachment; a release restores the previous build if it fails.
+This check does not render the application or verify sign-in and playback.
+
 ### Offline listening on a phone
 
 On the phone, open Studio through its Tailscale HTTPS address while the Mac is awake and sign in with an approved account. In **Library**, tap the download icon for individual narrations. In **Playlists**, use the download action to save a complete playlist. Open **Downloads** once while online, then install the site from the browser menu. The installed app starts in Studio when connected and opens Downloads when the Mac is unavailable. Downloads uses the same navigation and player dock as Studio, with Android Media Session controls for background playback. Playlist changes require a manual **Update** in Downloads or Playlists.

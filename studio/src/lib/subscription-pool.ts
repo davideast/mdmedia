@@ -2,6 +2,8 @@ import type { Unsubscribe } from "firebase/firestore";
 
 interface PoolEntry<T> {
   subscribers: Map<number, (data: T) => void>;
+  errorSubscribers: Map<number, (error: unknown) => void>;
+  latestError?: unknown;
   latestData: T | undefined;
   hasData: boolean;
   unsubscribeFirestore: Unsubscribe | null;
@@ -30,12 +32,14 @@ export function multicastSubscribe<T>(
   ) => Unsubscribe,
   callback: (data: T) => void,
   gracePeriodMs = 200,
+  onError?: (error: unknown) => void,
 ): Unsubscribe {
   let entry = pool.get(key) as PoolEntry<T> | undefined;
 
   if (!entry) {
     entry = {
       subscribers: new Map(),
+      errorSubscribers: new Map(),
       latestData: undefined,
       hasData: false,
       unsubscribeFirestore: null,
@@ -48,6 +52,7 @@ export function multicastSubscribe<T>(
       (data: T) => {
         if (!pool.has(key)) return;
         activeEntry.latestData = data;
+        activeEntry.latestError = undefined;
         activeEntry.hasData = true;
         for (const sub of activeEntry.subscribers.values()) {
           try {
@@ -58,6 +63,15 @@ export function multicastSubscribe<T>(
         }
       },
       (err) => {
+        if (!pool.has(key)) return;
+        activeEntry.latestError = err;
+        activeEntry.latestData = undefined;
+        activeEntry.hasData = false;
+        for (const report of activeEntry.errorSubscribers.values()) {
+          try { report(err); } catch (error) {
+            console.error(`[subscription-pool] Error in error subscriber for ${key}:`, error);
+          }
+        }
         console.error(`[subscription-pool] Firestore error on ${key}:`, err);
       },
     );
@@ -69,6 +83,10 @@ export function multicastSubscribe<T>(
 
   const subId = nextSubId++;
   entry.subscribers.set(subId, callback);
+  if (onError) {
+    entry.errorSubscribers.set(subId, onError);
+    if (entry.latestError !== undefined) onError(entry.latestError);
+  }
 
   // Deliver current cached snapshot immediately if available
   if (entry.hasData && entry.latestData !== undefined) {
@@ -84,6 +102,7 @@ export function multicastSubscribe<T>(
     if (!currentEntry) return;
 
     currentEntry.subscribers.delete(subId);
+    currentEntry.errorSubscribers.delete(subId);
 
     if (currentEntry.subscribers.size === 0) {
       if (currentEntry.cleanupTimer !== null) {
