@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { GoogleGenAI } from '@google/genai';
 import { ChunkQueueAudioPlayer, LiveAudioPlayerSink, WavFileStreamSink } from '../audio/index.js';
 import {
@@ -191,9 +192,28 @@ export async function writeVideoSceneOutputs(
   return writtenPaths;
 }
 
+/**
+ * Image paths written in a storyboard (`<FIRST_FRAME>`, `<IMAGE_REF_N>`) are relative to the
+ * storyboard file, not to wherever the command runs. Absolute paths are left alone.
+ */
+export function resolveStoryboardPaths<
+  T extends { firstFrame?: string; referenceImages: string[] },
+>(scenes: T[], storyboardPath: string): T[] {
+  const base = path.dirname(path.resolve(storyboardPath));
+  const at = (p: string) => (path.isAbsolute(p) ? p : path.resolve(base, p));
+  return scenes.map((scene) => ({
+    ...scene,
+    ...(scene.firstFrame ? { firstFrame: at(scene.firstFrame) } : {}),
+    referenceImages: scene.referenceImages.map(at),
+  }));
+}
+
 export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<void> {
   const fileReader = new NodeFileReader();
-  const scenes = await prepareStoryboardScenes(fileReader, args.input);
+  const scenes = resolveStoryboardPaths(
+    await prepareStoryboardScenes(fileReader, args.input),
+    args.input
+  );
 
   if (scenes.length === 0) {
     console.warn(`[Warning] No video storyboard scenes found in ${args.input}`);

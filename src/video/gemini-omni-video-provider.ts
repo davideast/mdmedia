@@ -43,7 +43,14 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     const inputs: Array<{ type: string; data?: string; mime_type?: string; text?: string }> = [];
 
     // Attach first frame image if specified
-    if (options.firstFrame && fs.existsSync(options.firstFrame)) {
+    // A missing image would otherwise be skipped silently, and the clip generated without it.
+    for (const imagePath of [options.firstFrame, ...(options.referenceImages ?? [])]) {
+      if (imagePath && !fs.existsSync(imagePath)) {
+        throw new Error(`Reference image not found: ${imagePath}`);
+      }
+    }
+
+    if (options.firstFrame) {
       const fileBytes = await readFile(options.firstFrame);
       inputs.push({
         type: 'image',
@@ -55,14 +62,12 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     // Attach reference images if specified
     if (options.referenceImages) {
       for (const refPath of options.referenceImages) {
-        if (fs.existsSync(refPath)) {
-          const refBytes = await readFile(refPath);
-          inputs.push({
-            type: 'image',
-            data: Buffer.from(refBytes).toString('base64'),
-            mime_type: getMimeType(refPath),
-          });
-        }
+        const refBytes = await readFile(refPath);
+        inputs.push({
+          type: 'image',
+          data: Buffer.from(refBytes).toString('base64'),
+          mime_type: getMimeType(refPath),
+        });
       }
     }
 

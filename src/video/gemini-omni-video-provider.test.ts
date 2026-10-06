@@ -105,4 +105,27 @@ describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
     expect(attempts).toBe(2);
     expect(result.interactionId).toBe('interaction_retry_success');
   });
+
+  it('refuses a reference image that does not exist, rather than generating without it', async () => {
+    let called = false;
+    const mockAi = {
+      interactions: {
+        create: async () => {
+          called = true;
+          return { id: 'x', output_video: { data: '' } };
+        },
+      },
+    } as unknown as GoogleGenAI;
+    const provider = new GeminiOmniVideoProvider(mockAi, 1);
+    await expect(
+      provider.generateVideoClip('A walk cycle', {
+        aspectRatio: '16:9',
+        task: 'reference_to_video',
+        delivery: 'inline',
+        referenceImages: ['/does/not/exist.jpg'],
+      })
+    ).rejects.toThrow('Reference image not found: /does/not/exist.jpg');
+    expect(called).toBe(false);
+  });
 });
+

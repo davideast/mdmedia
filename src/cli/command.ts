@@ -317,6 +317,19 @@ export const adaptCommand = defineCommand({
   },
 });
 
+/** The image request's config: aspect ratio, and the output size when one is asked for. */
+export function imageGenerationConfig(
+  aspectRatio: string,
+  size?: string,
+): { aspectRatio: string; imageSize?: '1K' | '2K' | '4K' } {
+  if (size === undefined || size === '') return { aspectRatio };
+  const imageSize = size.toUpperCase();
+  if (imageSize !== '1K' && imageSize !== '2K' && imageSize !== '4K') {
+    throw new Error(`--size must be 1K, 2K or 4K (got ${size})`);
+  }
+  return { aspectRatio, imageSize };
+}
+
 export const imageCommand = defineCommand({
   meta: {
     name: 'image',
@@ -356,6 +369,10 @@ export const imageCommand = defineCommand({
       description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
       default: '16:9',
     },
+    size: {
+      type: 'string',
+      description: 'Output resolution: 1K, 2K or 4K (defaults to the model choice, 1K)',
+    },
     apiKey: {
       type: 'string',
       alias: 'k',
@@ -382,8 +399,13 @@ export const imageCommand = defineCommand({
       throw new Error('GEMINI_API_KEY environment variable is required.');
     }
 
+    const imageConfig = imageGenerationConfig(args.aspectRatio, args.size);
+
     const contents: any[] = [];
-    if (args.ref && fs.existsSync(args.ref)) {
+    if (args.ref && !fs.existsSync(args.ref)) {
+      throw new Error(`Reference image not found: ${args.ref}`);
+    }
+    if (args.ref) {
       let refPath = args.ref;
       let ext = path.extname(refPath).toLowerCase();
       let tmpPng: string | undefined;
@@ -412,13 +434,13 @@ export const imageCommand = defineCommand({
     contents.push({ text: promptText });
 
     const ai = new GoogleGenAI({ apiKey });
-    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
+    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.size ? `, ${args.size}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
     const res = await ai.models.generateContent({
       model: args.model,
       contents: contents.length === 1 ? contents[0].text : contents,
       config: {
         responseModalities: ['IMAGE'],
-        imageConfig: { aspectRatio: args.aspectRatio },
+        imageConfig,
       },
     });
 
