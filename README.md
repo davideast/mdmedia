@@ -69,9 +69,16 @@ You can structure storyboards with scene headers (`# Scene`), timecodes (`[0-3s]
 [3-6s] Warm golden hour lighting illuminates the room.
 ```
 
+Image paths in a storyboard are resolved relative to the storyboard file. A referenced image that doesn't exist is an error rather than being skipped.
+
 Generate video with explicit image tags or command-line reference images:
 ```bash
 mdmedia video -i script.md -o action.mp4 --firstFrame start.png --ref character.png
+```
+
+`mdmedia image` takes `--size 1K|2K|4K` for the output resolution (the model's default is 1K):
+```bash
+mdmedia image -p "A pixel art village square" -a 3:2 --size 4K -o village.png
 ```
 
 #### Stateful Iterative Video Editing
