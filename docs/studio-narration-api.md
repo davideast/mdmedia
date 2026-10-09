@@ -127,9 +127,10 @@ Revoke from Settings → Connected apps, or `mdmedia studio logout`.
 
 ## Coding agents
 
-`mdmedia studio install-skill` installs a Claude Code skill
-(`~/.claude/skills/mdmedia-narrate/SKILL.md`); `--print` emits the same text
-for `AGENTS.md`. It tells agents to:
+The `mdmedia` agent skill lives in `.agents/skills/mdmedia` in the
+[Agent Skills](https://agentskills.io) format. `mdmedia studio install-skill`
+copies it to `~/.agents/skills/mdmedia`, the cross-client location (`--dir`
+picks another). For the studio, it tells agents to:
 
 - narrate only when the user asks, and only what they pointed at;
 - run `mdmedia studio narrate -i file.md --json` and reply with `links.web`;

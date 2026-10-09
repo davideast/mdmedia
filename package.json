@@ -90,6 +90,7 @@
   },
   "files": [
     "dist",
+    ".agents/skills",
     "LICENSE",
     "README.md"
   ],

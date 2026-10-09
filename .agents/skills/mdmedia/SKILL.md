@@ -1,14 +1,15 @@
 ---
 name: mdmedia
 description: Make media from markdown and prompts with the `mdmedia` CLI. Use when the user asks to narrate or read something aloud, put narrations in a playlist or arrange playlists, or generate audio, video, images, music, or sound effects.
+compatibility: Requires the mdmedia CLI on PATH. Studio commands need a studio connected with `mdmedia studio login`.
 ---
 
 `mdmedia` has two kinds of work. Pick the branch first; it decides everything else.
 
 | The user wants | Branch | Read |
 | --- | --- | --- |
-| A narration to listen to in their studio, or playlist changes | **studio** | [STUDIO.md](STUDIO.md) |
-| A media file on disk: `.wav`, `.mp4`, `.png`, `.mp3`, a narration script | **files** | [FILES.md](FILES.md) |
+| A narration to listen to in their studio, or playlist changes | **studio** | [STUDIO.md](references/STUDIO.md) |
+| A media file on disk: `.wav`, `.mp4`, `.png`, `.mp3`, a narration script | **files** | [FILES.md](references/FILES.md) |
 
 "Narrate this" with no file named means **studio**: the user listens there. Use
 **files** for audio only when they ask for a file, a path, or offline output.

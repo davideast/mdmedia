@@ -18,7 +18,7 @@ import {
   readCredentials,
   writeCredentials,
 } from '../remote/credentials.js';
-import { NARRATE_SKILL, NARRATE_SKILL_NAME } from '../remote/skill.js';
+import { installSkill, skillSourceDir } from '../remote/skill.js';
 
 function connectedClient(): StudioClient {
   const credentials = readCredentials();
@@ -415,22 +415,20 @@ const playlist = defineCommand({
   },
 });
 
-const installSkill = defineCommand({
-  meta: { name: 'install-skill', description: 'Teach coding agents to narrate through your studio when you ask' },
+const installSkillCommand = defineCommand({
+  meta: { name: 'install-skill', description: 'Install the mdmedia agent skill (Agent Skills format) so coding agents can use mdmedia when you ask' },
   args: {
-    dir: { type: 'string', description: 'Skills directory (default ~/.claude/skills)' },
-    print: { type: 'boolean', description: 'Print the instructions instead, e.g. to paste into AGENTS.md' },
+    dir: { type: 'string', description: 'Skills directory (default ~/.agents/skills)' },
+    print: { type: 'boolean', description: 'Print the skill\'s location instead of installing it' },
   },
-  async run({ args }) {
-    if (args.print) { process.stdout.write(NARRATE_SKILL); return; }
-    const dir = path.join(args.dir ?? path.join(os.homedir(), '.claude', 'skills'), NARRATE_SKILL_NAME);
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'SKILL.md'), NARRATE_SKILL);
-    console.log(`Installed ${path.join(dir, 'SKILL.md')}. Agents will narrate through your studio when you ask.`);
+  run({ args }) {
+    if (args.print) { console.log(skillSourceDir()); return; }
+    const installed = installSkill(args.dir ?? path.join(os.homedir(), '.agents', 'skills'));
+    console.log(`Installed ${installed}.`);
   },
 });
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, status, narrations, playlist, 'install-skill': installSkill },
+  subCommands: { login, logout, options, narrate, status, narrations, playlist, 'install-skill': installSkillCommand },
 });
