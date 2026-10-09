@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is the elderly FEMALE in BURGUNDY collar and silver muzzle. Low measured older WOMAN voice, dignified, slightly breathless indignation but no injury. Looks RIGHT toward Bruno. At 0.5s say exactly \"Someone locked me in. After I found this.\" Finish by 4.5s. A brief downward eye glance toward the tuft at lower right, with muzzle closed. At 5.8s say exactly \"Sebastian's fur.\" Finish by 7.0s. Do not touch or move the fur or rake. No other words. Eight seconds total."
+  },
+  "fingerprint": "cf5f37cd23dcc7eea8b85d26353d458424046d1f66234720a71a9bf434c7a2ef",
+  "interactionId": "v1_Chd2TExGYXJIT0o1M0JfUFVQaTVyRGtBYxIXdkxMRmFySE9KNTNCX1BVUGk1ckRrQWM",
+  "durationSeconds": 8,
+  "review": "pending"
+}

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-hall-bruno",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-bruno.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. BRUNO is the navy-collared adult male. Warm adult male BARITONE, concerned but restrained. Looks LEFT toward grandmother. At 0.5 seconds say exactly: \"You still keep my brother's collar.\" Finish by 3.5 seconds, close muzzle and hold a sad, questioning look. No other words."
+  },
+  "fingerprint": "ed34bd947e2ad79d90f960d6b10ec74281995912a073b07d2205eac7b55d5f00",
+  "interactionId": "v1_ChdMN0xGYXYyMUYtR3pfUFVQd2JhOW1RdxIXTDdMRmF2MjFGLUd6X1BVUHdiYTltUXc",
+  "durationSeconds": 5.035,
+  "review": "pending"
+}

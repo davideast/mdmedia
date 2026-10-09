@@ -1,4 +1,9 @@
+import {readScriptPlacement} from './script-timeline';
+import {readVideoScript,readVideoBrief} from './video-script';
+import {readAudioPlacements} from './audio-placement';
 import type { Draft } from '../components/shell/narration-provider';
+import { readSceneDraft } from './scene-direction';
+import { isVideoId, type SceneDraftRecord, type SceneBeatClip } from './video-generation';
 
 export interface WorkspaceTab {
   id: string;
@@ -9,11 +14,14 @@ export interface WorkspaceTab {
   fields: Record<string, string | boolean | number | null>;
 }
 
+export interface WorkspaceProject { id:string; name:string; documents:Record<string,string> }
 export interface WorkspaceSnapshot {
+  projects?:Record<string,WorkspaceProject>;
   version: 1;
   tabs: WorkspaceTab[];
   activeId: string | null;
   drafts: Record<string, Partial<Draft>>;
+  sceneDrafts: Record<string, SceneDraftRecord>;
 }
 
 export interface WorkspaceStorage {
@@ -25,10 +33,11 @@ export interface WorkspaceStorage {
 }
 
 const ORIGIN = 'https://workspace.local';
-export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
+export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {}, sceneDrafts: {} };
 const PAGE_TITLES: Record<string, string> = {
-  '/studio': 'Draft', '/library': 'Library', '/queue': 'Queue',
+  '/studio': 'Draft', '/library': 'Library', '/queue': 'Activity',
   '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings',
+  '/studio/scene': 'Video', '/projects':'Projects',
 };
 
 /** URLs identify views. A tab's key identifies the item even when its view/query changes. */
@@ -37,7 +46,7 @@ export function workspaceRoute(href: string): { href: string; key: string; title
   const url = new URL(href, ORIGIN);
   if (url.origin !== ORIGIN || url.pathname === '/' || /^\/(api|_next)(\/|$)/.test(url.pathname)) return null;
   const path = url.pathname.replace(/\/$/, '');
-  const draftId = path === '/studio' ? url.searchParams.get('draft') || 'default' : undefined;
+  const draftId = path === '/studio' || path === '/studio/scene' ? url.searchParams.get('draft') || 'default' : undefined;
   const entity = draftId ?? url.searchParams.get('playlist') ?? url.searchParams.get('track');
   return {
     href: `${path}${url.search}${url.hash}`,
@@ -88,7 +97,47 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
       if (saved.drafts && typeof saved.drafts === 'object') {
         for (const [id, draft] of Object.entries(saved.drafts)) drafts[id] = readDraft(draft);
       }
-      return { version: 1, tabs, drafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
+      const sceneDrafts: Record<string, SceneDraftRecord> = Object.create(null);
+      for (const [id, record] of Object.entries(saved.sceneDrafts ?? {})) {
+        if (!record || typeof record !== 'object' || !('draft' in record)) continue;
+        const draft = readSceneDraft({ version: 1, draft: record.draft });
+        if (!draft) continue;
+        const beatClips: Record<string, SceneBeatClip> = Object.create(null);
+        if ('beatClips' in record && record.beatClips && typeof record.beatClips === 'object') {
+          for (const [beatId, clip] of Object.entries(record.beatClips)) {
+            if (!clip || typeof clip !== 'object' || !draft.beats.some(beat => beat.id === beatId)) continue;
+            const value = clip as Partial<SceneBeatClip>;
+            beatClips[beatId] = {
+              ...(readScriptPlacement(value.placement)?{placement:readScriptPlacement(value.placement)}:{}),
+              ...(isVideoId(value.pendingVideoId??'')?{pendingVideoId:value.pendingVideoId}:{}),
+              ...(value.timingAccepted?{timingAccepted:true}:{}),
+              ...(Array.isArray(value.takeHistory)?{takeHistory:value.takeHistory.filter(take=>take&&isVideoId(take.videoId)&&[take.inSeconds,take.outSeconds].every(value=>value===undefined||typeof value==='number'&&Number.isFinite(value)&&value>=0)).slice(-20)}:{}),
+              ...(typeof value.videoId === 'string' && isVideoId(value.videoId) ? {videoId:value.videoId} : {}),
+              ...(typeof value.inSeconds === 'number' && Number.isFinite(value.inSeconds) && value.inSeconds >= 0 ? {inSeconds:value.inSeconds} : {}),
+              ...(typeof value.outSeconds === 'number' && Number.isFinite(value.outSeconds) && value.outSeconds > 0 ? {outSeconds:value.outSeconds} : {}),
+              muted:value.muted === true, excluded:value.excluded === true,
+              ...(value.generationMode==='continue'?{generationMode:'continue' as const}:{}),
+              ...(value.transition==='fade'?{transition:'fade' as const}:{}),
+              ...(typeof value.transitionSeconds==='number'&&Number.isFinite(value.transitionSeconds)&&value.transitionSeconds>0?{transitionSeconds:value.transitionSeconds}:{}),
+            };
+          }
+        }
+        sceneDrafts[id] = { draft,...(readVideoScript((record as Record<string,unknown>).builtScript)?{builtScript:readVideoScript((record as Record<string,unknown>).builtScript)!}:{}),...(readVideoBrief((record as Record<string,unknown>).videoBrief)?{videoBrief:readVideoBrief((record as Record<string,unknown>).videoBrief)!}:{}),...('title' in record&&typeof record.title==='string'?{title:record.title.slice(0,100)}:{}),...((record as Record<string,unknown>).audioPlacements?{audioPlacements:readAudioPlacements((record as Record<string,unknown>).audioPlacements)}:{}), ...(Object.keys(beatClips).length ? {beatClips}:{}),
+          ...('videoId' in record && typeof record.videoId === 'string' && isVideoId(record.videoId) ? { videoId: record.videoId } : {}),
+          ...('exportId' in record && typeof record.exportId === 'string' && isVideoId(record.exportId) ? { exportId: record.exportId } : {}),
+          ...('view' in record && record.view === 'tracks' ? {view:'tracks' as const} : {}),
+        };
+      }
+      const projects:Record<string,WorkspaceProject>={};
+      for(const [id,value] of Object.entries(saved.projects??{})){
+        if(!value||typeof value!=='object')continue;
+        const item=value as Record<string,unknown>;
+        if(typeof item.name!=='string')continue;
+        const documents:Record<string,string>={};
+        for(const [href,title] of Object.entries(item.documents&&typeof item.documents==='object'?item.documents:{}))if(workspaceRoute(href)&&typeof title==='string')documents[href]=title.slice(0,200);
+        projects[id]={id,name:item.name.slice(0,100),documents};
+      }
+      return { version: 1, tabs, drafts, sceneDrafts,...(Object.keys(projects).length?{projects}:{}), activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
   } catch { return EMPTY_WORKSPACE; }
 }
 
@@ -106,6 +155,23 @@ function mergeRecord<T extends object>(base: T | undefined, local: T, remote: T 
 }
 
 function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remote: WorkspaceSnapshot): WorkspaceSnapshot {
+  const projects={...remote.projects};
+  for(const [id,project] of Object.entries(local.projects??{}))if(!equal(base.projects?.[id],project))projects[id]={...mergeRecord(base.projects?.[id],project,projects[id]),documents:mergeRecord(base.projects?.[id]?.documents,project.documents,projects[id]?.documents)};
+  const sceneDrafts = { ...remote.sceneDrafts };
+  for (const id of new Set([...Object.keys(base.sceneDrafts), ...Object.keys(local.sceneDrafts)])) {
+    if (equal(base.sceneDrafts[id], local.sceneDrafts[id])) continue;
+    if (!Object.hasOwn(local.sceneDrafts, id)) delete sceneDrafts[id];
+    else {
+      const merged = mergeRecord(base.sceneDrafts[id], local.sceneDrafts[id], remote.sceneDrafts[id]);
+      const beats = { ...remote.sceneDrafts[id]?.beatClips };
+      for (const beatId of new Set([...Object.keys(base.sceneDrafts[id]?.beatClips ?? {}), ...Object.keys(local.sceneDrafts[id]?.beatClips ?? {})])) {
+        const before = base.sceneDrafts[id]?.beatClips?.[beatId]; const next = local.sceneDrafts[id]?.beatClips?.[beatId];
+        if (equal(before,next)) continue;
+        if (!next) delete beats[beatId]; else beats[beatId] = mergeRecord(before,next,beats[beatId]);
+      }
+      sceneDrafts[id] = {...merged,...(Object.keys(beats).length ? {beatClips:beats}:{})};
+    }
+  }
   const drafts = { ...remote.drafts };
   for (const id of new Set([...Object.keys(base.drafts), ...Object.keys(local.drafts)])) {
     if (equal(base.drafts[id], local.drafts[id])) continue;
@@ -126,7 +192,7 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     tabs.set(tab.id, merged);
   }
   const uniqueTabs = [...tabs.values()].filter((tab, index, items) => items.findIndex((item) => item.key === tab.key) === index);
-  return { version: 1, drafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
+  return { version: 1, drafts, sceneDrafts,...(Object.keys(projects).length?{projects}:{}), tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
 }
 
 /** Account-scoped, serializable workspace. No players, requests, or React trees live here. */
@@ -194,7 +260,12 @@ export class WorkspaceStore {
   replaceTab(id: string, href: string, title?: string): void {
     const route = workspaceRoute(href);
     if (!route) return;
-    this.change({ ...this.snapshot, tabs: this.snapshot.tabs
+    const previous=this.snapshot.tabs.find(tab=>tab.id===id);
+    const projects={...this.snapshot.projects};
+    if(previous)for(const [projectId,project] of Object.entries(projects))if(project.documents[previous.href]){
+      const documents={...project.documents};delete documents[previous.href];documents[route.href]=title||previous.title;projects[projectId]={...project,documents};
+    }
+    this.change({ ...this.snapshot,...(Object.keys(projects).length?{projects}:{}), tabs: this.snapshot.tabs
       .filter((tab) => tab.key !== route.key || tab.id === id)
       .map((tab) => tab.id === id ? { ...tab, key: route.key, href: route.href, title: title || route.title, scrollTop: 0 } : tab) });
   }
@@ -214,8 +285,16 @@ export class WorkspaceStore {
     return this.snapshot.activeId === active?.id && active ? active.href : '/library';
   }
 
+  setProject(project:WorkspaceProject):void {
+    this.change({...this.snapshot,projects:{...this.snapshot.projects,[project.id]:project}});
+  }
+
   setDraft(id: string, patch: Partial<Draft>): void {
     this.change({ ...this.snapshot, drafts: { ...this.snapshot.drafts, [id]: { ...this.snapshot.drafts[id], ...patch } } });
+  }
+
+  setSceneDraft(id: string, record: SceneDraftRecord): void {
+    this.change({ ...this.snapshot, sceneDrafts: { ...this.snapshot.sceneDrafts, [id]: record } });
   }
 
   clearDraft(id: string): void {

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "mystery-rescue-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      ".design/beneath-double-coat/mystery-finish/accepted-bruno.jpg",
+      ".design/beneath-double-coat/mystery-finish/accepted-sadie.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+    "prompt": "Photorealistic cinematic still, prestige soap opera starring real quadrupedal Bernese Mountain Dogs. No humans, human anatomy, clothing, extra animals, writing or subtitles. Match every reference face, collar, age, lighting and pine architecture exactly. No reaching or holding props.  Same camera and exact grooming room as reference 1. Keep elderly Heidi LEFT in burgundy collar, SAME pose and face, same low platform, tuft, silver rake, vent, window, open door. Add exactly TWO seated dogs just INSIDE the doorway on the RIGHT, behind the platform, no overlap: Bruno in NAVY collar from reference 2 sits middle-right, looking LEFT at Heidi; Sadie from reference 3 with GREEN collar and narrow white blaze sits far-right beside Bruno, looking LEFT. THREE dogs total, elderly Heidi left, Bruno middle-right, Sadie right. Keep whole dogs natural, all paws on floor. They have just reached the room. No threatening pose, no crowding, nothing moving. Preserve floor space between Heidi and the two visitors. Clear wide master for a family conversation."
+  },
+  {
+    "id": "mystery-exterior-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-heidi-otto.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/exterior-master.jpg",
+    "prompt": "Photorealistic cinematic still, prestige soap opera starring real quadrupedal Bernese Mountain Dogs. No humans, human anatomy, clothing, extra animals, writing or subtitles. Match every reference face, collar, age, lighting and pine architecture exactly. No reaching or holding props.  Exterior reverse orientation for the estate in reference: a large elegant Alpine chalet with honey-pine interior, timber and stone exterior, large closed multipane windows glowing warm, snow-heavy evergreen trees beyond. Same still clear winter MORNING, not night or storm. Camera is just inside a shadowed wooden garden toolshed, looking out through its OPEN doorway across a short snowy garden toward the estate wall and its lit windows 20 metres away. Foreground left wooden shed doorjamb, snow beyond the threshold. Empty scene, NO animals or people. The house fills distant right half of composition, gives viewers a clear line of sight back to the family inside. Cinematic 16:9, restrained atmosphere, no horror effects."
+  }
+]

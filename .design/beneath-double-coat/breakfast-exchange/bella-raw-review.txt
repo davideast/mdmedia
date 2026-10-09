@@ -1,0 +1,13 @@
+This is TWO UNEDITED source performances, not a finished conversation. Each deliberately contains silent gaps for editorial intercutting. Do not flag these gaps as a pacing problem in the raw takes.
+
+0–10 seconds: SADIE, an adult female Bernese Mountain Dog with an emerald green collar and a narrower white facial blaze, in the accepted breakfast close-up. Her husband remains OFFSCREEN camera-right. Only Sadie speaks. Intended three separate lines in order:
+"And rosemary."
+"Bella. Your ex."
+"And you stayed until midnight?"
+
+10–20 seconds: BRUNO, an adult male Bernese Mountain Dog with a navy collar, broad white chest, in the accepted breakfast close-up. His wife remains OFFSCREEN camera-left. Only Bruno speaks. Intended three separate lines in order:
+"Sadie..."
+"She offered me a snack."
+"It was very good cheese."
+
+Transcribe what is actually audible, with accurate word onset and ending timestamps. Do not substitute intended text for actual audio. The timing of these lines determines safe edit points. Identify whether all six lines are present exactly once, with clear female/male ownership and canine jaw articulation. There must be only ONE dog in each close-up, no humans, no additional animals, no motion or anatomy failures, no new props and no unsolicited music or voices. The fixed close-up, existing room, wardrobe-free real-dog anatomy and restrained expression should be stable. A silent dog glance is normal. State uncertainty where necessary.

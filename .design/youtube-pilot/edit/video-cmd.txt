@@ -1,0 +1,5 @@
+$ bun --env-file=studio/.env src/bin.ts video -i
+/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/launch.md --firstFrame
+/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/ship.png --task
+image_to_video --model gemini-omni-1.1-flash -o
+/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/launch.mp4 --maxRetries 0

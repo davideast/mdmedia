@@ -1,0 +1,2 @@
+// Established Waterline still used by the approved scene-composer study.
+export const WATERLINE_PREVIEW = "https://lh3.googleusercontent.com/aida/AEtjO1XM7_7lXCf9Hx27QDVgyN572V6HVIMB1LgkiM295s2brS3fYJ87mh6XwKjtuOsIJe8M8D8PSQf0J2VrhefqQwqX_CDK542EI0rbMaueZHJrHFbIkURYHj1uTq2ZsItn23cXRX62GhA-UUJF3uMBgP1KypSc6j84WdZOabPJ9AkeEhTTQde5Y5vYvRruF4r8yp18_Ez9XQRz07ngqCzAr7Rk9Ojnx_WN6Hmr7S361uhXXEzAbvz3cuFnl5qEi_5ro156JI6Va1chZYg=s0";

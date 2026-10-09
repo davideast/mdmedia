@@ -1,0 +1,9 @@
+{
+  "references": [
+    ".design/beneath-double-coat/heidi-otto-proof/first-frame.jpg"
+  ],
+  "firstFrames": {
+    "script_s01": ".design/beneath-double-coat/heidi-otto-proof/first-frame.jpg"
+  },
+  "concurrency": 1
+}

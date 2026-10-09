@@ -1,0 +1,464 @@
+{
+  "version": 2,
+  "id": "mystery-reveal",
+  "title": "Family evidence and the lookalike",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human anatomy",
+      "extra dogs"
+    ],
+    "maxWordsPerSecond": 3.5,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "hall-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+      "sha256": "1b0bdc7c8466e150aba4df7dbe1c607d3c54806faefc04c91e6c23dbf5414f83"
+    },
+    {
+      "id": "hall",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.mp4"
+    },
+    {
+      "id": "groom-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      "sha256": "c6079282da3ad42dbbe82eb47f5243112a0c781dbd2f97903119629e2d403ebf"
+    },
+    {
+      "id": "groom",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.mp4"
+    },
+    {
+      "id": "rescue-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+      "sha256": "f4b6a9227c520824386fa769e5092a36581a85f9aeb4ce949f539563a6a6b5ee"
+    },
+    {
+      "id": "rescue",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4"
+    },
+    {
+      "id": "rescue-bruno-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+      "sha256": "289e9c0a4ba38fc8e81de41eab9191adbf23bbff6283c26d6db3e202269a151f"
+    },
+    {
+      "id": "rescue-bruno",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4"
+    },
+    {
+      "id": "rescue-heidi-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+      "sha256": "57e4285fc39e469c0cd678c549cbfc452266a0a66450b6d24525fbbe08fdbbfe"
+    },
+    {
+      "id": "rescue-heidi",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4"
+    },
+    {
+      "id": "rescue-sadie-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+      "sha256": "823c32e8e50ebcb6c8fa32c00fb15e93ec3c5d6572333cb32a09cdedcad19c1a"
+    },
+    {
+      "id": "rescue-sadie",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-sadie.mp4"
+    }
+  ],
+  "characters": [
+    {
+      "id": "heidi",
+      "description": "Elderly silver-muzzled burgundy-collared Bernese",
+      "voice": "Low measured older woman",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Navy-collared large Bernese",
+      "voice": "Warm male baritone",
+      "silent": false
+    },
+    {
+      "id": "sadie",
+      "description": "Green-collared slimmer female Bernese, narrow white blaze",
+      "voice": "Controlled medium-low woman",
+      "silent": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "breakfast",
+      "description": "The established family has finished breakfast."
+    },
+    {
+      "id": "hall",
+      "description": "The adjacent hall holds a brother memorial and leads to grooming room."
+    },
+    {
+      "id": "groom",
+      "description": "Heidi is beside a tuft in the grooming room; door open and vent running."
+    }
+  ],
+  "initialFacts": [
+    "breakfast",
+    "groom"
+  ],
+  "scenes": [
+    {
+      "id": "hall",
+      "location": "hall in snowy Alpenrose estate",
+      "situation": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "hall"
+    },
+    {
+      "id": "groom",
+      "location": "groom in snowy Alpenrose estate",
+      "situation": "After the planned pawprint insert, establish the adjoining room before dialogue.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "groom"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "rescue-bruno-1",
+      "speaker": "bruno",
+      "text": "Otto got the door. Grandmother, what happened?"
+    },
+    {
+      "id": "rescue-bruno-2",
+      "speaker": "bruno",
+      "text": "He is."
+    },
+    {
+      "id": "rescue-heidi-1",
+      "speaker": "heidi",
+      "text": "Someone locked me in. After I found this."
+    },
+    {
+      "id": "rescue-heidi-2",
+      "speaker": "heidi",
+      "text": "Sebastian's fur."
+    },
+    {
+      "id": "rescue-sadie-1",
+      "speaker": "sadie",
+      "text": "Your brother? You said he was dead."
+    }
+  ],
+  "takes": [
+    {
+      "id": "rescue",
+      "sceneId": "groom",
+      "setupId": "rescue-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "rescue",
+      "referenceAssetIds": [
+        "rescue-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        },
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "Left toward Heidi"
+        },
+        {
+          "characterId": "sadie",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone, ventilation off, no voices."
+    },
+    {
+      "id": "rescue-bruno",
+      "sceneId": "groom",
+      "setupId": "rescue-bruno",
+      "method": "generate",
+      "duration": 8,
+      "assetId": "rescue-bruno",
+      "referenceAssetIds": [
+        "rescue-bruno-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated, small face motion, no prop contact",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "rescue-bruno-1",
+          "start": 0.5,
+          "end": 4.2,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "rescue-bruno-2",
+          "start": 6,
+          "end": 7,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Clean individual character speech, quiet room, ventilation off."
+    },
+    {
+      "id": "rescue-heidi",
+      "sceneId": "groom",
+      "setupId": "rescue-heidi",
+      "method": "generate",
+      "duration": 8,
+      "assetId": "rescue-heidi",
+      "referenceAssetIds": [
+        "rescue-heidi-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated, small face motion, no prop contact",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "rescue-heidi-1",
+          "start": 0.5,
+          "end": 4.5,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "rescue-heidi-2",
+          "start": 5.8,
+          "end": 7,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Clean individual character speech, quiet room, ventilation off."
+    },
+    {
+      "id": "rescue-sadie",
+      "sceneId": "groom",
+      "setupId": "rescue-sadie",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "rescue-sadie",
+      "referenceAssetIds": [
+        "rescue-sadie-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "right",
+          "eyeline": "Left toward Bruno"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated, small face motion, no prop contact",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "rescue-sadie-1",
+          "start": 0.5,
+          "end": 4,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Clean individual character speech, quiet room, ventilation off."
+    }
+  ],
+  "shots": [
+    {
+      "id": "rescue",
+      "takeId": "rescue",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "opening",
+        "reason": "After the planned alarm and offscreen rescue, family has reached same open doorway. Separate master for new positions.",
+        "bridge": "time-passage",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "question",
+      "takeId": "rescue-bruno",
+      "in": 0,
+      "out": 4.5,
+      "purpose": "answer",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Question and reply with one visible speaker, same master positions.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "explanation",
+      "takeId": "rescue-heidi",
+      "in": 0,
+      "out": 7.5,
+      "purpose": "answer",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Question and reply with one visible speaker, same master positions.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "challenge",
+      "takeId": "rescue-sadie",
+      "in": 0,
+      "out": 4.5,
+      "purpose": "answer",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Question and reply with one visible speaker, same master positions.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "denial",
+      "takeId": "rescue-bruno",
+      "in": 5.5,
+      "out": 8,
+      "purpose": "answer",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Question and reply with one visible speaker, same master positions.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "durationSeconds": 28,
+  "transition": "hard cuts",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/attention.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "attention",
+      "sequenceStart": 0,
+      "sequenceEnd": 3
+    },
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/family.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "family",
+      "sequenceStart": 3,
+      "sequenceEnd": 6
+    },
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/penny-performance.mp4",
+      "start": 0,
+      "end": 8,
+      "label": "penny-performance",
+      "sequenceStart": 6,
+      "sequenceEnd": 14
+    },
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/bruno-performance.mp4",
+      "start": 0,
+      "end": 5,
+      "label": "bruno-performance",
+      "sequenceStart": 14,
+      "sequenceEnd": 19
+    },
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/sadie-performance.mp4",
+      "start": 0,
+      "end": 9,
+      "label": "sadie-performance",
+      "sequenceStart": 19,
+      "sequenceEnd": 28
+    }
+  ]
+}

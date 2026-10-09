@@ -147,3 +147,30 @@ if (fs.existsSync(sandboxBackendPath)) {
     console.log('[patch] Patched pyric sandbox-backend.js to synthesize email and email_verified claims');
   }
 }
+
+// 7. A slow first WebSocket handshake must not permanently close every Firebase
+// service until reload. Reuse alpha24's existing bounded-backoff reconnect path.
+const workerRuntimePath = path.join(cliDist, 'serve', 'entries', 'worker-runtime.js');
+if (fs.existsSync(workerRuntimePath)) {
+  const content = fs.readFileSync(workerRuntimePath, 'utf8');
+  const target = "        url: toPageOriginWsUrl(bridgeUrl, location, 'page-origin'),\n        projectKey,";
+  const replacement = target + '\n        retryInitialConnection: true,';
+  if (!content.includes('retryInitialConnection: true') && content.includes(target)) {
+    fs.writeFileSync(workerRuntimePath, content.replace(target, replacement));
+    console.log('[patch] Enabled hosted sandbox startup reconnection');
+  }
+}
+
+// Requests queued before the first attachment have never reached the host. Keep
+// their promises alive while reconnecting. After attachment, retain the SDK's
+// rejection behavior: an in-flight mutation must never be blindly retried.
+const websocketPath = path.join(cliDist, 'serve', 'worker', 'client', 'websocket-connection.js');
+if (fs.existsSync(websocketPath)) {
+  const content = fs.readFileSync(websocketPath, 'utf8');
+  const target = "        rejectPendingRequests(port, new FirebaseError('unavailable', CONNECTION_LOST));";
+  const replacement = "        if (hasEverAttached)\n            rejectPendingRequests(port, new FirebaseError('unavailable', CONNECTION_LOST));";
+  if (!content.includes(replacement) && content.includes(target)) {
+    fs.writeFileSync(websocketPath, content.replace(target, replacement));
+    console.log('[patch] Preserve unsent requests during hosted startup retries');
+  }
+}

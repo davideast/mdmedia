@@ -1,0 +1,56 @@
+{
+  "retelling": "An older dog remembers an absent relative, finds fur, is suddenly trapped, then is safe with her family. A similar dog appears outside. I cannot explain the missing rescue or why the family considers the fur persuasive.",
+  "understood": [
+    {
+      "claim": "Sebastian is the male dog's brother.",
+      "at": 4
+    },
+    {
+      "claim": "The family says Sebastian is dead only shortly before the exterior reveal.",
+      "at": 38
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Who heard the alarm and went to help?",
+      "at": 23
+    }
+  ],
+  "checks": [
+    {
+      "category": "audience-understanding",
+      "at": 8,
+      "evidence": "Sebastian is named in two lines, without establishing what the loss means to Heidi or Bruno.",
+      "repair": "Give the memorial conversation a response and disagreement before discovering a clue.",
+      "verdict": "fail"
+    },
+    {
+      "category": "causality",
+      "at": 23,
+      "evidence": "Confinement jumps directly to rescue aftermath; nobody is seen hearing or responding.",
+      "repair": "Add the family hearing and responding, or remove confinement from this short.",
+      "verdict": "fail"
+    },
+    {
+      "category": "reactions",
+      "at": 15,
+      "evidence": "Recognition immediately becomes a threat before Heidi or the audience can react to the discovery.",
+      "repair": "Let recognition cause a visible reaction and a decision to summon the family.",
+      "verdict": "fail"
+    },
+    {
+      "category": "reveal-setup",
+      "at": 42,
+      "evidence": "The presumed death is stated seconds before the lookalike appears, leaving little established belief to overturn.",
+      "repair": "Establish the death and family disagreement in the memorial scene before the discovery.",
+      "verdict": "fail"
+    },
+    {
+      "category": "story-density",
+      "at": 45,
+      "evidence": "The 49-second act introduces an absent brother, discovery, confinement, rescue and lookalike; these are multiple plot turns with little causal development.",
+      "repair": "Split into complete scenes and defer the confinement/rescue subplot.",
+      "verdict": "fail"
+    }
+  ]
+}

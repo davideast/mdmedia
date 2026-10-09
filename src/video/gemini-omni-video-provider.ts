@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import { readFile, unlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
+import { readMp4Duration } from './mp4-duration.js';
 import { calculateBackoffMs, isRetryableError } from '../tts/backoff.js';
 import type {
   GenerateVideoOptions,
@@ -36,6 +38,12 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     prompt: string,
     options: GenerateVideoOptions = {}
   ): Promise<VideoGenerationResult> {
+    const timeout = AbortSignal.timeout(options.timeoutMs ?? 10 * 60 * 1000);
+    const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout;
+    signal.throwIfAborted();
+    if (options.durationSeconds !== undefined && (!Number.isFinite(options.durationSeconds) || options.durationSeconds < 3 || options.durationSeconds > 10)) {
+      throw new RangeError('Omni generates 3–10 seconds per turn. Extend the video for longer scenes.');
+    }
     const model = options.model ?? this.defaultModel;
     let attempt = 0;
 
@@ -43,7 +51,7 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     const inputs: Array<{ type: string; data?: string; mime_type?: string; text?: string }> = [];
 
     // Attach first frame image if specified
-    if (options.firstFrame && fs.existsSync(options.firstFrame)) {
+    if (options.firstFrame) {
       const fileBytes = await readFile(options.firstFrame);
       inputs.push({
         type: 'image',
@@ -55,14 +63,12 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     // Attach reference images if specified
     if (options.referenceImages) {
       for (const refPath of options.referenceImages) {
-        if (fs.existsSync(refPath)) {
-          const refBytes = await readFile(refPath);
-          inputs.push({
-            type: 'image',
-            data: Buffer.from(refBytes).toString('base64'),
-            mime_type: getMimeType(refPath),
-          });
-        }
+        const refBytes = await readFile(refPath);
+        inputs.push({
+          type: 'image',
+          data: Buffer.from(refBytes).toString('base64'),
+          mime_type: getMimeType(refPath),
+        });
       }
     }
 
@@ -80,9 +86,11 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     if (options.delivery) {
       responseFormat.delivery = options.delivery;
     }
+    if (options.durationSeconds !== undefined) responseFormat.duration = `${options.durationSeconds}s`;
 
     const payload: Record<string, any> = {
       model,
+      store: true,
       input: inputs.length === 1 && inputs[0].text ? inputs[0].text : inputs,
       response_format: responseFormat,
     };
@@ -101,27 +109,34 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
 
     while (true) {
       try {
-        const interaction = (await (this.client as any).interactions.create(payload)) as any;
+        signal.throwIfAborted();
+        const interaction = (await (this.client as any).interactions.create(payload, { signal })) as any;
         const interactionId = interaction.id || `omni_${Date.now()}`;
+        const output = interaction.output_video ?? interaction.steps
+          ?.filter((step: any) => step.type === 'model_output')
+          .flatMap((step: any) => step.content ?? [])
+          .find((content: any) => content.type === 'video');
 
         // 1. Check for URI delivery (Files API)
-        if (interaction.output_video?.uri) {
-          const uri = interaction.output_video.uri;
+        if (output?.uri) {
+          const uri = output.uri;
           const match = uri.match(/files\/([a-zA-Z0-9_\-]+)/);
           const fileId = match ? match[1] : uri.split('/').pop();
           const fileName = `files/${fileId}`;
 
           // Poll until active
           while (true) {
-            const fInfo = await (this.client as any).files.get({ name: fileName });
-            const state = fInfo.state?.name || fInfo.state;
+            signal.throwIfAborted();
+            const fInfo = await this.client.files.get({ name: fileName, config: { abortSignal: signal } });
+            const rawState: unknown = fInfo.state;
+            const state = rawState && typeof rawState === 'object' && 'name' in rawState ? rawState.name : rawState;
             if (state === 'ACTIVE') {
               break;
             }
             if (state === 'FAILED') {
               throw new Error(`Video generation failed on server for file ${fileName}`);
             }
-            await new Promise((res) => setTimeout(res, 3000));
+            await delay(3000, undefined, { signal });
           }
 
           const tempDownloadPath = path.join(
@@ -131,13 +146,15 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
 
           try {
             await (this.client as any).files.download({
-              file: interaction.output_video,
+              file: output,
               downloadPath: tempDownloadPath,
+              config: { abortSignal: signal },
             });
             const downloadedBytes = await readFile(tempDownloadPath);
             return {
               interactionId,
               videoBytes: new Uint8Array(downloadedBytes),
+              durationSeconds: readMp4Duration(downloadedBytes),
             };
           } finally {
             if (fs.existsSync(tempDownloadPath)) {
@@ -147,34 +164,20 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
         }
 
         // 2. Check for inline base64 output
-        if (interaction.output_video?.data) {
+        if (output?.data) {
           const videoBytes = new Uint8Array(
-            Buffer.from(interaction.output_video.data, 'base64')
+            Buffer.from(output.data, 'base64')
           );
           return {
             interactionId,
             videoBytes,
+            durationSeconds: readMp4Duration(videoBytes),
           };
-        }
-
-        // 3. Check steps for REST-like response structure
-        if (interaction.steps) {
-          for (const step of interaction.steps) {
-            if (step.type === 'model_output' && Array.isArray(step.content)) {
-              for (const c of step.content) {
-                if (c.type === 'video' && c.data) {
-                  return {
-                    interactionId,
-                    videoBytes: new Uint8Array(Buffer.from(c.data, 'base64')),
-                  };
-                }
-              }
-            }
-          }
         }
 
         throw new Error('Gemini Omni did not return any video data or URI in response');
       } catch (err: any) {
+        signal.throwIfAborted();
         if (attempt >= this.maxRetries || !isRetryableError(err)) {
           throw err;
         }
@@ -182,7 +185,7 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
         console.warn(
           `[GeminiOmniVideoProvider] Retrying in ${delayMs}ms due to error: ${err.message || err}`
         );
-        await new Promise((res) => setTimeout(res, delayMs));
+        await delay(delayMs, undefined, { signal });
         attempt++;
       }
     }

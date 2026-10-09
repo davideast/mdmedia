@@ -1,0 +1,168 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 4.167,
+      "words": "Otto, you were meant to clear the path, not bring it in.",
+      "voice": "female, authoritative",
+      "visibleSpeaker": "Heidi (right dog)",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 4.5,
+      "endSeconds": 7.5,
+      "words": "Breakfast is waiting, grandmother.",
+      "voice": "male, gentle",
+      "visibleSpeaker": "Otto (left dog)",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 8.5,
+      "endSeconds": 11.5,
+      "words": "Good morning, grandmother.",
+      "voice": "male, clear",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 12.0,
+      "endSeconds": 16.167,
+      "words": "Bruno, your wife's waiting in the breakfast room.",
+      "voice": "female, authoritative",
+      "visibleSpeaker": "Heidi (right dog)",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 17.0,
+      "endSeconds": 19.5,
+      "words": "Is Sadie still angry?",
+      "voice": "male, tentative",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 26.875,
+      "endSeconds": 29.167,
+      "words": "You came home after midnight.",
+      "voice": "female, accusatory",
+      "visibleSpeaker": "Sadie",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 29.167,
+      "endSeconds": 31.5,
+      "words": "I went for a walk.",
+      "voice": "male, defensive",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 31.5,
+      "endSeconds": 34.0,
+      "words": "Then why do you smell like Parmesan?",
+      "voice": "female, accusatory",
+      "visibleSpeaker": "Sadie",
+      "confidence": "high"
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 8.0,
+      "characters": [
+        "Heidi",
+        "Otto"
+      ]
+    },
+    {
+      "startSeconds": 8.0,
+      "endSeconds": 11.833,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 11.833,
+      "endSeconds": 16.833,
+      "characters": [
+        "Heidi",
+        "Otto"
+      ]
+    },
+    {
+      "startSeconds": 16.833,
+      "endSeconds": 20.0,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 20.0,
+      "endSeconds": 23.0,
+      "characters": [
+        "Sadie",
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 23.0,
+      "endSeconds": 24.875,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 24.875,
+      "endSeconds": 26.875,
+      "characters": [
+        "Sadie",
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 26.875,
+      "endSeconds": 29.167,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 29.167,
+      "endSeconds": 31.5,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 31.5,
+      "endSeconds": 34.0,
+      "characters": [
+        "Sadie"
+      ]
+    }
+  ],
+  "continuityFindings": [
+    "20.0-26.8s: Room decor, untouched cheese plate, and dog collars (green for Sadie, navy for Bruno) remain consistent across cuts.",
+    "23.0-24.8s: The cutaway to Sadie's reaction effectively masks the time needed for Bruno to enter and sit down, acting as a natural editorial time compression."
+  ],
+  "speakerErrors": [
+    "None detected. Jaw articulation correctly maps to speaker audio."
+  ],
+  "unwantedFigures": [
+    "None detected. Only target characters are present."
+  ],
+  "physicalDefects": [
+    "None observed. Transitions and motions are stable."
+  ],
+  "pacingAndAudio": [
+    "20.0-26.8s: The silent lead-in with ambient pawsteps successfully establishes location and tension before the dialogue begins, fixing previous abruptness.",
+    "Dialogue pacing feels natural and clear."
+  ],
+  "materialFailures": [
+    "None."
+  ],
+  "uncertainties": [
+    "None."
+  ],
+  "acceptable": true
+}

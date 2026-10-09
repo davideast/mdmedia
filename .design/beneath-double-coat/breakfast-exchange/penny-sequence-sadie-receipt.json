@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "penny-sequence-sadie",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/penny-introduction/sadie-performance.mp4",
+    "firstFrame": ".design/beneath-double-coat/penny-introduction/sadie-close.jpg",
+    "seconds": 9,
+    "prompt": "Photorealistic prestige dog soap opera, same warm snowy-estate breakfast scene as supplied actual video frame. Exactly ONE real Bernese Mountain Dog on camera, the exact one visible in the first frame. Preserve this exact head, markings, collar, age, background and framing. A single locked close-up, no cuts or camera movement. Dog remains seated, with small natural canine jaw motion synchronized to its OWN clearly audible voice, small expressive eye/ear motion and restrained head motion. No human face, body, hands, child, person, extra animal, second dog, text or subtitles. Canine anatomy remains canine, no human lips/teeth or human facial morph. No standing, gestures or props. NO narrator, offscreen speaker, added dialogue, music, laughter, barking or sound effects. Clean natural speech with quiet continuous room tone. Neutral English accent. Silent gaps mean mouth rests closed. Both scripted lines belong to this one dog, not different characters. SADIE is the adult female with GREEN collar and narrow white blaze. Her voice is a controlled medium-low adult FEMALE voice, dry and precise with warm restrained wit, matching the prior breakfast exchange. She looks camera-RIGHT toward her daughter. At 0.6s say exactly: \"Penny, your father is changing the subject.\" Finish around 3.7s. Hold a listening expression with closed muzzle until 5.2s. Then say exactly: \"Yes. He's had quite enough.\" A crisp comic answer, finish by 7.7s, then a very slight satisfied head tilt. Nine seconds total."
+  },
+  "fingerprint": "770ae653a1e8d35ccc8a047ab5f8d072e81c613c7f86f1e395e4fd081ccfd474",
+  "interactionId": "v1_ChcxcURGYXNxd0RMeS1fUFVQNV8tMmlRMBIXMXFERmFzcXdETHktX1BVUDVfLTJpUTA",
+  "durationSeconds": 9.003,
+  "review": "pending"
+}

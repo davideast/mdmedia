@@ -1,0 +1,121 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 11.75,
+      "endSeconds": 14.0,
+      "words": "Dad, are you in trouble?",
+      "voice": "young girl voice",
+      "visibleSpeaker": "Penny the puppy",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 14.0,
+      "endSeconds": 17.0,
+      "words": "Your mother and I are discussing breakfast.",
+      "voice": "adult male voice",
+      "visibleSpeaker": "Bruno",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 17.75,
+      "endSeconds": 21.0,
+      "words": "Penny, your father is changing the subject.",
+      "voice": "adult female voice",
+      "visibleSpeaker": "Sadie",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 21.75,
+      "endSeconds": 24.0,
+      "words": "Then can I have his cheese?",
+      "voice": "young girl voice",
+      "visibleSpeaker": "Penny the puppy",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 24.0,
+      "endSeconds": 26.75,
+      "words": "Yes, he's had quite enough.",
+      "voice": "adult female voice",
+      "visibleSpeaker": "Sadie",
+      "confidence": 0.95
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 2.25,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 2.25,
+      "endSeconds": 5.75,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 5.75,
+      "endSeconds": 11.75,
+      "characters": [
+        "Sadie",
+        "Bruno",
+        "Penny"
+      ]
+    },
+    {
+      "startSeconds": 11.75,
+      "endSeconds": 14.0,
+      "characters": [
+        "Penny"
+      ]
+    },
+    {
+      "startSeconds": 14.0,
+      "endSeconds": 17.75,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 17.75,
+      "endSeconds": 21.75,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 21.75,
+      "endSeconds": 24.0,
+      "characters": [
+        "Penny"
+      ]
+    },
+    {
+      "startSeconds": 24.0,
+      "endSeconds": 27.0,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 27.0,
+      "endSeconds": 28.25,
+      "characters": [
+        "Sadie",
+        "Bruno",
+        "Penny"
+      ]
+    }
+  ],
+  "continuityFindings": [],
+  "speakerErrors": [],
+  "unwantedFigures": [],
+  "physicalDefects": [],
+  "pacingAndAudio": [],
+  "materialFailures": [],
+  "uncertainties": [],
+  "acceptable": true
+}

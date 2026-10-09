@@ -1,4 +1,6 @@
 import { defineCommand } from 'citty';
+import {projectCommand} from './project-command.js';
+import { productionCommand } from './production-command.js';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
@@ -520,6 +522,8 @@ export const musicCommand = defineCommand({
 });
 
 const SUBCOMMANDS = {
+  production: productionCommand,
+  project: projectCommand,
   audio: audioCommand,
   voices: voicesCommand,
   video: videoCommand,

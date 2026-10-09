@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+    "seconds": 3,
+    "prompt": "Exactly THREE photorealistic real Bernese Mountain Dogs in this exact grooming room. Elderly gray-muzzled Heidi burgundy collar LEFT; large Bruno navy collar MIDDLE-RIGHT; slimmer Sadie green collar FAR RIGHT. Preserve exact reference composition, faces, collars, body positions, warm winter light, door open, tuft and silver rake resting on platform. Locked wide shot, no cuts. Seated bodies and paws remain still. Heidi looks at Bruno, Bruno at Heidi, Sadie glances between them. Tiny blinks, breathing and eye motion only. All mouths CLOSED, no speech, voices, music or barking. Quiet room tone, ventilation is OFF. No humans, human anatomy, extra dogs, captions, standing, moving furniture or touching props. Calm, concerned family reaction."
+  },
+  "fingerprint": "060f839807efd6766e07272833256457f29ef48feff77347770f9958a8413006",
+  "interactionId": "v1_Chc0TEhGYXByQUtjNlVfdU1Qc2V6Y3VBMBIXNExIRmFwckFLYzZVX3VNUHNlemN1QTA",
+  "durationSeconds": 3.029,
+  "review": "pending"
+}

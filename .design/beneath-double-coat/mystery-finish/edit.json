@@ -1,0 +1,122 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+    "start": 0.0,
+    "end": 2.25,
+    "label": "Hall geography and memorial"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4",
+    "start": 1.25,
+    "end": 4.208333333333333,
+    "label": "Brother relationship"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-heidi-mastered.mp4",
+    "start": 0.3333333333333333,
+    "end": 3.75,
+    "label": "Sebastian named; gaze toward pawprints"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/prints-clean.mp4",
+    "start": 0.0,
+    "end": 1.5,
+    "label": "Pawprints lead into adjacent room"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+    "start": 0.0,
+    "end": 1.5,
+    "label": "Heidi and clue in grooming room"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4",
+    "start": 0.5,
+    "end": 4.25,
+    "label": "Recognition and offscreen door closure"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/alarm-repair.mp4",
+    "start": 0.0,
+    "end": 7.083333333333333,
+    "label": "Continuous alarm from preceding frame"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+    "start": 0.0,
+    "end": 1.75,
+    "label": "Open door; family arrives after rescue"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "start": 0.7916666666666666,
+    "end": 4.875,
+    "label": "Otto opened door; concern for Heidi"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+    "start": 0.3333333333333333,
+    "end": 4.166666666666667,
+    "label": "Heidi explains discovery"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/fur-insert-clean.mp4",
+    "start": 0.0,
+    "end": 1.1666666666666667,
+    "label": "Same fur, no prop handling"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+    "start": 5.333333333333333,
+    "end": 7.333333333333333,
+    "label": "Sebastian identification"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-sadie-mastered.mp4",
+    "start": 0.3333333333333333,
+    "end": 1.5,
+    "label": "Your brother?"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "start": 4.916666666666667,
+    "end": 5.5,
+    "label": "Bruno listens, same performance"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-sadie-mastered.mp4",
+    "start": 2.5833333333333335,
+    "end": 4.291666666666667,
+    "label": "You said he was dead"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "start": 5.833333333333333,
+    "end": 7.0,
+    "label": "He is"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+    "start": 0.0,
+    "end": 2.25,
+    "label": "Spatial bridge from house to shed"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+    "start": 0.25,
+    "end": 3.25,
+    "label": "Brown-collared lookalike outside"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "start": 7.041666666666667,
+    "end": 7.958333333333333,
+    "label": "Navy-collared Bruno remains inside"
+  },
+  {
+    "file": ".design/beneath-double-coat/story-first/title.mp4",
+    "start": 0.0,
+    "end": 3.0,
+    "label": "End title"
+  }
+]

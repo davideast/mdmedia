@@ -5,10 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
-  AudioLines,
-  Download,
+  FolderOpen,
   Library,
-  ListMusic,
   ListOrdered,
   Moon,
   PanelLeftClose,
@@ -17,6 +15,8 @@ import {
   Sun,
   UserRound,
 } from "lucide-react";
+import {useSceneComposer} from "@/components/scene/scene-composer-provider";
+import { CreateMenu } from "./create-menu";
 import type { LucideIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
@@ -33,15 +33,14 @@ interface NavItem {
 }
 
 const NAV: readonly NavItem[] = [
-  { href: "/studio", label: "Studio", icon: AudioLines },
-  { href: "/queue", label: "Queue", icon: ListOrdered },
-  { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
-  { href: "/playlists", label: "Playlists", icon: ListMusic },
-  { href: "/downloads", label: "Downloads", icon: Download },
+  { href: "/projects", label: "Projects", icon: FolderOpen },
+  { href: "/library", label: "Library", icon: Library },
+  { href: "/queue", label: "Activity", icon: ListOrdered },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 function isActive(pathname: string, item: NavItem): boolean {
+  if (item.href==='/library'&&['/downloads','/playlists'].includes(pathname))return true;
   if (pathname === item.href) return true;
   if (pathname.startsWith(`${item.href}/`)) return true;
   if (item.prefix !== undefined && pathname.startsWith(item.prefix)) return true;
@@ -70,7 +69,8 @@ export function NavRail({
   const { resolvedTheme, setTheme } = useTheme();
   const offline = useConnectivity() === 'offline';
   const isDark = resolvedTheme === "dark";
-  const activeCount = generationQueue.activeCount;
+  const {activeVideoCount}=useSceneComposer();
+  const activeCount = generationQueue.activeCount+activeVideoCount;
 
   return (
     <nav
@@ -88,7 +88,7 @@ export function NavRail({
           offline ? (
             <span className="min-w-0 opacity-50" aria-disabled="true"><BrandMark className="text-[0.95rem]" /></span>
           ) : (
-            <Link href="/" onClick={onNavigate} className="min-w-0">
+            <Link href="/projects" onClick={onNavigate} className="min-w-0">
               <BrandMark className="text-[0.95rem]" />
             </Link>
           )
@@ -113,6 +113,7 @@ export function NavRail({
       </div>
 
       <ul className={cn("flex min-h-0 flex-col gap-1 overflow-y-auto py-2", docked ? "px-2" : "px-3")}>
+        <li className="mb-3"><CreateMenu compact={docked}/></li>
         {NAV.map((item) => {
           const active = isActive(pathname, item);
           const Icon = item.icon;
@@ -133,12 +134,6 @@ export function NavRail({
             >
               <div className="relative flex flex-none items-center justify-center">
                 <Icon size={16} strokeWidth={2} className="flex-none" />
-                {docked && showBadge ? (
-                  <span className="absolute -top-1 -right-1 flex size-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex size-2 rounded-full bg-primary" />
-                  </span>
-                ) : null}
               </div>
               {docked ? null : (
                 <>

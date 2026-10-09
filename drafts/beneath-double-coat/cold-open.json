@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-cold-open",
+  "title": "Beneath the Double Coat \u2014 Cold Open",
+  "productionNotes": "Prestige daytime soap opera performed by photorealistic Bernese Mountain Dogs. Every character, including veterinarian and groundskeeper, is a dog. Absolute dramatic sincerity; humor comes from canine instincts interrupting melodrama. Real quadrupedal anatomy, paws and weight. Restrained speaking muzzle animation, expressive ears and posture; no human hands or upright bodies. Objects are moved with noses, mouths and paws.\nAlpenrose Estate: Alpine mansion, snow outside, dark carved wood, Persian rugs, warm lamps and marble floors. Hard cuts for new angles or locations; continuous movement within connected shots. No automatic fades. Preserve identities, collar colors, voices and room geography across cuts. Only the named characters appear.\nHEIDI: elderly female, silver muzzle, narrow blaze, burgundy collar; low imperious voice. SEBASTIAN, initially called BRUNO: large male, symmetrical rust eyebrows, broad white chest, immaculate coat, navy collar, no ear scar; smooth defensive voice. REAL BRUNO: nearly identical male, weathered coat, faded brown collar, four-stitch scar on LEFT ear; warm gravelly voice. SADIE: slender blaze, emerald collar; precise, controlled female voice. MAPLE: rounded rust eyebrows, teal collar and stethoscope; clipped professional female voice. OTTO: stocky shaggy male, ochre collar; earnest breathless voice. PENNY: small fluffy puppy, lavender collar, innocent voice. MYSTERY DOG: massive Bernese with silver tag, face obscured.\nUse the scripted dialogue exactly, with no narrator except the labeled flashback voiceover. Original mournful piano, trembling strings and restrained organ, always below speech. Room tone from first frame, paw steps and collar jingles. Dramatic stings followed by silence for comic reactions. No laugh track. \n",
+  "reviewNotes": [],
+  "parts": [
+    {
+      "id": "cold-open",
+      "continuity": "planned",
+      "script": {
+        "title": "The Secret in the Snow \u2014 Cold Open",
+        "sourceTranscript": "HEIDI: No... it cannot be. After all these years... You are alive.\n\nHEIDI: Who is there?\n\nHEIDI: You would not.\n\nHEIDI: YOU MONSTER!",
+        "sourceDescription": "Cold open adapted from the supplied screenplay.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "Muddy footprints",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "A continuous descending camera move from the snowy Alpine mansion at dawn to muddy paw prints on its immaculate front steps. No dogs visible.",
+            "audio": "Cold wind, distant bark, a low piano note.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s02",
+            "title": "The discovery",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: No... it cannot be. After all these years... You are alive.",
+            "visual": "Grooming room. Heidi sniffs black fur beside a silver undercoat rake on a low platform. Her ears rise.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s03",
+            "title": "Locked in",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Who is there?",
+            "visual": "A shadow crosses the hall. Heidi turns. Door closes; she rushes to paw it.",
+            "audio": "Door latch clicks. Ventilation hum abruptly stops.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s04",
+            "title": "The thermostat",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: You would not.",
+            "visual": "Continue the same room and camera movement. Camera follows Heidi\u2019s horrified gaze to the wall thermostat as its display rises from 72\u00b0F to 73\u00b0F, then gently returns to Heidi. No cut.",
+            "audio": "Silence where the vent had been. Rising strings.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s05",
+            "title": "You monster",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: YOU MONSTER!",
+            "visual": "Continue the same shot. Heidi throws her front paws against the locked door in theatrical horror as the room gets warmer. She stays a realistic quadrupedal dog. Hold her reaction at the end.",
+            "audio": "Paw impacts, dramatic sting, abrupt silence.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s06",
+            "title": "Title",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Black title card: BENEATH THE DOUBLE COAT. Macro insert of a strand of drool falling in slow motion.",
+            "audio": "One mournful piano note.",
+            "pauseSeconds": 1.5
+          }
+        ]
+      }
+    }
+  ]
+}

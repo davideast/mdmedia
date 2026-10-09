@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "reviews": [],
+  "speech": [
+    {
+      "takeId": "sadie-performance",
+      "assetHash": "b540fdcde2bcbec979511197d8edb1e8702b57b7e1be0a36d859c2cab271a914",
+      "lineId": "late",
+      "start": 0.714,
+      "end": 2.485,
+      "text": "You came home after midnight.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-performance",
+      "assetHash": "b540fdcde2bcbec979511197d8edb1e8702b57b7e1be0a36d859c2cab271a914",
+      "lineId": "cheese",
+      "start": 4.658,
+      "end": 6.74,
+      "text": "Then why do you smell like Parmesan?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-excuse",
+      "assetHash": "6ad87d0181eb07d157120e8c4b2f5601ef3c9c1da053a49b28818049fa2ddd82",
+      "lineId": "walk",
+      "start": 1.228,
+      "end": 2.142,
+      "text": "I went for a walk.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "herb",
+      "start": 0.49,
+      "end": 1.323,
+      "text": "And rosemary.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "bella-name",
+      "start": 3.095,
+      "end": 3.434,
+      "text": "Bella.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "bella-ex",
+      "start": 5.755,
+      "end": 6.456,
+      "text": "Your ex.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "absurdity",
+      "start": 7.295,
+      "end": 8.557,
+      "text": "And you stayed until midnight?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "sadie-reply",
+      "start": 0.81,
+      "end": 1.276,
+      "text": "Sadie...",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "snack",
+      "start": 3,
+      "end": 4.276,
+      "text": "She offered me a snack.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "payoff",
+      "start": 6.159,
+      "end": 7.62,
+      "text": "It was very good cheese.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    }
+  ]
+}

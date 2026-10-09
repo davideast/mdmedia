@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "bcfca3654482c83fef04bc9493176b8a10642925b80dc3af3441603842e951e4",
+      "stage": "edit",
+      "targetId": "mystery-finish",
+      "assetHash": "3c74018b69103fdc4e6227df2b84fde71a74ebaa881a8c193532b44bb209362b",
+      "reviewer": "Local editorial reconciliation of Gemini 3.1 Pro AV review, blind source/fragment transcripts, silence measurements and inspected repaired inserts",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Final-act AV review: narrative sequence follows the missing-brother setup, recognition, alarm, evidence and denial. Initial family facts come from preserved 73.458s opening. The exterior orients the shed before lookalike reveal."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Final-act AV review found logical location transitions and offscreen rescue sufficiently explained. Continuous alarm begins from actual groom-heidi frame 101/24, following edit out 102/24. Other transitions are deliberate cuts with explicit bridges."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Actual masters and close-ups compared locally; whole-act AV review found cohesive interiors and collar identities. Green collar is smaller/less readable in wide, clearly established in close-up. Final interior return reuses actual Bruno footage. Repaired inserts retain hall doorway and same grooming platform."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Full-act audiovisual review found voice assignment consistent and jaw articulation adequate. Fifteen short audio fragments independently transcribed all required words without clipping. Isolated two-word voice-age classification varied; full source and AV context support Bruno ownership, not a second speaker."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Removed 1.333 seconds of lead/tail time after review. Selected lines retain measured speech windows; pauses remaining cover eyelines, evidence, location orientation and the lookalike reveal. Final new act 49.083 seconds, without replaying setup dialogue."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Reviewed contact sheets and whole-act video: no humans or broken body/prop interaction. Repaired flagged partial muzzle by cropping wholly below it; inspected new crop. Revised pawprint insert inspected: rounded toe pads and central pad, no fingers or limbs. All dialogue dogs remain seated."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Blind full-source and fragment transcription confirms complete dialogue. Original clipped alarm tail excluded and replaced. Hall Heidi and Sadie gain adjusted +2dB; reviewer found stable levels. No unintended narrator or added music; fur insert does not restore earlier ventilation audio. Ambient noise is retained as room tone, not claimed as a separately verified effects stem."
+        }
+      ]
+    }
+  ],
+  "speech": [
+    {
+      "takeId": "hall-bruno",
+      "lineId": "line-0",
+      "start": 1.8,
+      "end": 3.85,
+      "text": "You still keep my brother's collar.",
+      "speaker": "bruno",
+      "assetHash": "310bf8d52aa47f5001f08a72265d63ec0241c773b58cb2787c5b1cbbbe1c3595",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-mastered",
+      "lineId": "line-1",
+      "start": 0.5,
+      "end": 3.2,
+      "text": "Someone should remember Sebastian.",
+      "speaker": "heidi",
+      "assetHash": "c5b3a614be157f9d06e61273515a91ffd1d35d0d564870d51fd65f6c3442bcc0",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi",
+      "lineId": "line-2",
+      "start": 0.9,
+      "end": 2.2,
+      "text": "That scent.",
+      "speaker": "heidi",
+      "assetHash": "e87ba881cbc93b755e42d3ed6ed41aa17f5c4e651b6910ef96744d30339b4779",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi",
+      "lineId": "line-3",
+      "start": 3.1,
+      "end": 4.2,
+      "text": "Sebastian?",
+      "speaker": "heidi",
+      "assetHash": "e87ba881cbc93b755e42d3ed6ed41aa17f5c4e651b6910ef96744d30339b4779",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "alarm-repair",
+      "lineId": "line-4",
+      "start": 0,
+      "end": 2.6,
+      "text": "Who locked the door?",
+      "speaker": "heidi",
+      "assetHash": "4901cd509d6850634b4be761daf9f5e248ac4e7889717efa42b7cde15a417927",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "alarm-repair",
+      "lineId": "line-5",
+      "start": 2.9,
+      "end": 4.55,
+      "text": "And turned off the air?",
+      "speaker": "heidi",
+      "assetHash": "4901cd509d6850634b4be761daf9f5e248ac4e7889717efa42b7cde15a417927",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "alarm-repair",
+      "lineId": "line-6",
+      "start": 5.3,
+      "end": 6.85,
+      "text": "You monster!",
+      "speaker": "heidi",
+      "assetHash": "4901cd509d6850634b4be761daf9f5e248ac4e7889717efa42b7cde15a417927",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-bruno",
+      "lineId": "line-7",
+      "start": 0.9,
+      "end": 2.25,
+      "text": "Otto got the door.",
+      "speaker": "bruno",
+      "assetHash": "6743ee44229f54bf1fe73e922280a3c1fdb21f0ec22432e7165b114b189dd738",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-bruno",
+      "lineId": "line-8",
+      "start": 2.6,
+      "end": 4.7,
+      "text": "Grandmother, what happened?",
+      "speaker": "bruno",
+      "assetHash": "6743ee44229f54bf1fe73e922280a3c1fdb21f0ec22432e7165b114b189dd738",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-bruno",
+      "lineId": "line-9",
+      "start": 5.9,
+      "end": 6.85,
+      "text": "He is.",
+      "speaker": "bruno",
+      "assetHash": "6743ee44229f54bf1fe73e922280a3c1fdb21f0ec22432e7165b114b189dd738",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-heidi",
+      "lineId": "line-10",
+      "start": 0.5,
+      "end": 2.2,
+      "text": "Someone locked me in.",
+      "speaker": "heidi",
+      "assetHash": "07f85b3f3b1d3d24da264ad3fc6336e860ff95dba71179308be4275296e6f26c",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-heidi",
+      "lineId": "line-11",
+      "start": 2.45,
+      "end": 4,
+      "text": "After I found this.",
+      "speaker": "heidi",
+      "assetHash": "07f85b3f3b1d3d24da264ad3fc6336e860ff95dba71179308be4275296e6f26c",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-heidi",
+      "lineId": "line-12",
+      "start": 5.55,
+      "end": 7.15,
+      "text": "Sebastian's fur.",
+      "speaker": "heidi",
+      "assetHash": "07f85b3f3b1d3d24da264ad3fc6336e860ff95dba71179308be4275296e6f26c",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-sadie-mastered",
+      "lineId": "line-13",
+      "start": 0.5,
+      "end": 1.45,
+      "text": "Your brother?",
+      "speaker": "sadie",
+      "assetHash": "0ec2f310eb5a2914563bcca609d749e4435c41aa1871e32ddac0b5689aa603b6",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "rescue-sadie-mastered",
+      "lineId": "line-14",
+      "start": 2.85,
+      "end": 4.25,
+      "text": "You said he was dead.",
+      "speaker": "sadie",
+      "assetHash": "0ec2f310eb5a2914563bcca609d749e4435c41aa1871e32ddac0b5689aa603b6",
+      "confidence": "confirmed"
+    }
+  ],
+  "feedback": [
+    {
+      "id": "847d951a-7e7d-44d9-af4b-565c2b60abd9",
+      "stage": "edit",
+      "targetId": "mystery-finish",
+      "planHash": "bcfca3654482c83fef04bc9493176b8a10642925b80dc3af3441603842e951e4",
+      "assetHash": "3c74018b69103fdc4e6227df2b84fde71a74ebaa881a8c193532b44bb209362b",
+      "reviewer": "user",
+      "verdict": "fail",
+      "evidence": "The story speeds up to the point where it completely falls apart.",
+      "repair": "Rebuild the ending around motivated scenes: establish Sebastian and the family stakes, then discovery, response, and an earned reveal."
+    }
+  ]
+}

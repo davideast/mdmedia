@@ -1,0 +1,9 @@
+[
+  {
+    "id":"penny-introduction-identity",
+    "kind":"image",
+    "output":".design/beneath-double-coat/penny-introduction/penny-identity.jpg",
+    "images":[".design/beneath-double-coat/breakfast-opening/cast.jpg"],
+    "prompt":"One photorealistic reference portrait of PENNY ONLY, the SMALL FEMALE BERNESE MOUNTAIN DOG PUPPY at the FAR RIGHT of the supplied approved cast image. Preserve that puppy's exact broad white forehead patch, rust eyebrows, small rounded juvenile muzzle, fluffy tricolor coat, floppy ears, lavender collar and juvenile proportions. She is a real quadrupedal puppy, distinctly smaller and younger than the four adults in the source. A seated three-quarter portrait, head and chest visible, neutral gray background. Preserve her identity, not one of the adults. Mouth resting closed, attentive mild curiosity. Exactly ONE puppy; no other dog, human, hands, costume, text, names, label, cast lineup, collage or objects. Landscape 16:9."
+  }
+]

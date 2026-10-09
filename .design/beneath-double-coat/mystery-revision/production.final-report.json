@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "d63d34050910751ce441491bb9b62468c2485df2b4706c8c89735f771040d998",
+  "durationSeconds": 176.51166666666663,
+  "status": "blocked",
+  "readiness": {
+    "technical": "valid",
+    "editorial": "blocked"
+  },
+  "issues": [
+    {
+      "code": "REVIEW_FINDING",
+      "at": "shot-s1",
+      "message": "speakers: At 132s, the line 'We heard you. What's happened?' is assigned to Sadie in the plan but the transcript identifies the speaker as Bruno, indicating either the wrong voice was used or the wrong dog is seen speaking.",
+      "repair": "Ensure Sadie is the character on camera and uses her assigned female voice for this line.",
+      "severity": "error",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_FINDING",
+      "at": "shot-s2",
+      "message": "speakers: At 148s, the line 'You really think he's been here?' is intended for Sadie but logged as Bruno in the independent transcript, suggesting a voice or visual mismatch.",
+      "repair": "Use Sadie's correct female voice and ensure her mouth moves for this line.",
+      "severity": "error",
+      "domain": "editorial"
+    },
+    {
+      "code": "AUDIENCE_UNCERTAINTY",
+      "at": "mystery-revision@167s",
+      "message": "Is the dog in the barn at the end Sebastian?",
+      "repair": "Determine whether this is a deliberate story question or a missing explanation; repair and review the revised sequence.",
+      "severity": "review",
+      "domain": "editorial"
+    }
+  ],
+  "resolvedIssues": [
+    {
+      "code": "SPEECH_PACING",
+      "at": "family-sadie",
+      "message": "Cue s2 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-b",
+      "message": "Cue h4 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-b",
+      "message": "Cue h3 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-bruno-b",
+      "message": "Cue b4 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-bruno-b",
+      "message": "Cue b3 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-a",
+      "message": "Cue h2 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-exterior-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-heidi-otto.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/exterior-master.jpg",
+    "prompt": "Photorealistic cinematic still, prestige soap opera starring real quadrupedal Bernese Mountain Dogs. No humans, human anatomy, clothing, extra animals, writing or subtitles. Match every reference face, collar, age, lighting and pine architecture exactly. No reaching or holding props.  Exterior reverse orientation for the estate in reference: a large elegant Alpine chalet with honey-pine interior, timber and stone exterior, large closed multipane windows glowing warm, snow-heavy evergreen trees beyond. Same still clear winter MORNING, not night or storm. Camera is just inside a shadowed wooden garden toolshed, looking out through its OPEN doorway across a short snowy garden toward the estate wall and its lit windows 20 metres away. Foreground left wooden shed doorjamb, snow beyond the threshold. Empty scene, NO animals or people. The house fills distant right half of composition, gives viewers a clear line of sight back to the family inside. Cinematic 16:9, restrained atmosphere, no horror effects."
+  },
+  "fingerprint": "d6ff1af5ce46e5a987466ad3f3c9e5b64aa3f481ac2598e181e642b6ef8d8845",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

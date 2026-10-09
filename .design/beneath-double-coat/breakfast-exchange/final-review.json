@@ -1,0 +1,105 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 12.5,
+      "endSeconds": 16.0,
+      "words": "Bruno. Your wife's waiting in the breakfast room.",
+      "voice": "older female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 17.0,
+      "endSeconds": 19.0,
+      "words": "Is Sadie still angry?",
+      "voice": "adult male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 22.0,
+      "endSeconds": 24.0,
+      "words": "You came home after midnight.",
+      "voice": "adult female",
+      "visibleSpeaker": "Sadie",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 24.5,
+      "endSeconds": 26.0,
+      "words": "I went for a walk.",
+      "voice": "adult male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 26.5,
+      "endSeconds": 29.5,
+      "words": "Then why do you smell like Parmesan?",
+      "voice": "adult female",
+      "visibleSpeaker": "Sadie",
+      "confidence": "high"
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 16.5,
+      "characters": [
+        "Heidi",
+        "Otto"
+      ]
+    },
+    {
+      "startSeconds": 16.5,
+      "endSeconds": 19.0,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 19.0,
+      "endSeconds": 21.5,
+      "characters": [
+        "Sadie",
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 21.5,
+      "endSeconds": 24.0,
+      "characters": [
+        "Sadie"
+      ]
+    },
+    {
+      "startSeconds": 24.0,
+      "endSeconds": 26.5,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 26.5,
+      "endSeconds": 30.0,
+      "characters": [
+        "Sadie"
+      ]
+    }
+  ],
+  "continuityFindings": [
+    "Location cut successfully transitions from doorway to breakfast room.",
+    "Breakfast wide shot perfectly maps to subsequent tight crop framing.",
+    "Sadie's two appearances are identical, satisfying the single-performance constraint."
+  ],
+  "speakerErrors": [],
+  "unwantedFigures": [],
+  "physicalDefects": [],
+  "pacingAndAudio": [
+    "Dialogue exchange flows cleanly.",
+    "No audio clipping or overlap."
+  ],
+  "materialFailures": [],
+  "uncertainties": [],
+  "acceptable": true
+}

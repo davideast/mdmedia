@@ -4,6 +4,31 @@ import { writeFile } from 'node:fs/promises';
 import { GeminiOmniVideoProvider } from './gemini-omni-video-provider.js';
 
 describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
+  it('fails before calling the model when an attached image is missing', async () => {
+    let calls = 0;
+    const client = { interactions: { create: async () => { calls++; } } } as unknown as GoogleGenAI;
+    const provider = new GeminiOmniVideoProvider(client, 0);
+    await expect(provider.generateVideoClip('Animate this', { firstFrame: '/private/tmp/mdmedia-missing-input.png' })).rejects.toThrow('ENOENT');
+    expect(calls).toBe(0);
+  });
+
+  it('bounds Files API polling without issuing another paid interaction', async () => {
+    let calls = 0;
+    const client = {
+      interactions: { create: async () => { calls++; return { id: 'pending', steps: [{ type: 'model_output', content: [{ type: 'video', uri: 'files/pending-file' }] }] }; } },
+      files: { get: async () => ({ state: 'PROCESSING' }) },
+    } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(client, 3).generateVideoClip('Scene', { timeoutMs: 30 })).rejects.toThrow();
+    expect(calls).toBe(1);
+  });
+
+  it('does not submit an already-aborted request', async () => {
+    let calls = 0;
+    const client = { interactions: { create: async () => { calls++; } } } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(client).generateVideoClip('Scene', { signal: AbortSignal.abort() })).rejects.toThrow();
+    expect(calls).toBe(0);
+  });
+
   it('generates video clip from text prompt with inline video data', async () => {
     const mockWavBase64 = Buffer.from('mock-mp4-video-data').toString('base64');
     let capturedParams: any = null;
@@ -35,12 +60,15 @@ describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
       aspectRatio: '16:9',
       task: 'text_to_video',
       delivery: 'inline',
+      durationSeconds: 6,
     });
 
     expect(result.interactionId).toBe('interaction_123');
     expect(new TextDecoder().decode(result.videoBytes)).toBe('mock-mp4-video-data');
     expect(capturedParams.model).toBe('gemini-omni-flash-preview');
     expect(capturedParams.response_format.aspect_ratio).toBe('16:9');
+    expect(capturedParams.response_format.duration).toBe('6s');
+    expect(capturedParams.store).toBe(true);
   });
 
   it('polls Files API when URI delivery is returned for larger videos', async () => {

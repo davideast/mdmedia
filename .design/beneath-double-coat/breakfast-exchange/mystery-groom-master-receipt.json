@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-groom-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-heidi-otto.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+    "prompt": "Photorealistic cinematic still from the same warm, timber-lined Alpine estate in winter morning. All characters are real quadrupedal Bernese Mountain Dogs with natural dog anatomy. No humans, people, hands, human clothing, human bodies, additional animals, captions or subtitles. Preserve the supplied dogs EXACTLY: facial markings, head shape, age, coat, collar. Paws stay on the floor. Dogs never handle props. Natural perspective, 16:9. Create a WIDE establishing view inside a modest light pine grooming room belonging to this same estate. Exactly ONE dog: HEIDI, elderly silver-muzzled burgundy-collared Bernese from LEFT of the reference. Remove the ochre-collared dog. Heidi seated LEFT foreground on the floor, turned three-quarter RIGHT. Immediately to her right is a low stationary wood grooming platform, only 15cm tall, with a little loose tuft of BLACK fur and a silver undercoat rake resting on it. Her face can smell the tuft without reaching or standing. A plain open wooden doorway at back RIGHT reveals the warm pine hall, no other characters. Simple rectangular metal ventilation grille HIGH on back LEFT wall. Closed snowy window far left. No mirrors. No human grooming tools held by anyone. The fur, rake, door and vent are stable background props. The mood is curious rather than threatening. Clear dog-scale geography, all four paws supported, Heidi recognizable and exactly the same age and face."
+  },
+  "fingerprint": "83221b1ff0d904530bac9a4b64c4e51b91e0126f421ed9e65847757fc7ffc251",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

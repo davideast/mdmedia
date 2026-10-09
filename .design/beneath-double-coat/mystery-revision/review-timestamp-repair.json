@@ -1,0 +1,5 @@
+{
+  "original": "rough-flash.evidence.json.pass-1.json",
+  "corrected": "rough-observation-seconds.json",
+  "reason": "MMSS integer timestamps confirmed against visible elapsed clock. Example 116 means 01:16 (76 seconds), 236 means 02:36 (156 seconds). No verdict, finding, role or wording changed."
+}

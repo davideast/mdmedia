@@ -1,0 +1,99 @@
+[
+  {
+    "start": 0,
+    "end": 2.4,
+    "source": "launch.mp4",
+    "in": 2.5,
+    "label": "MADE IN A TERMINAL"
+  },
+  {
+    "start": 2.4,
+    "end": 3.1,
+    "source": "edit/terminal-image.mp4",
+    "in": 0
+  },
+  {
+    "start": 3.1,
+    "end": 6.5,
+    "source": "presenter-3.mp4",
+    "in": 3.1,
+    "punch": true
+  },
+  {
+    "start": 6.5,
+    "end": 8.7,
+    "source": "edit/terminal-image.mp4",
+    "in": 0
+  },
+  {
+    "start": 8.7,
+    "end": 10,
+    "source": "ship.png",
+    "in": 0
+  },
+  {
+    "start": 10,
+    "end": 11.8,
+    "source": "edit/terminal-video.mp4",
+    "in": 0
+  },
+  {
+    "start": 11.8,
+    "end": 14.2,
+    "source": "launch.mp4",
+    "in": 0
+  },
+  {
+    "start": 14.2,
+    "end": 16.8,
+    "source": "edit/terminal-music.mp4",
+    "in": 0
+  },
+  {
+    "start": 16.8,
+    "end": 19.3,
+    "source": "launch.mp4",
+    "in": 3,
+    "label": "A VERY REASONABLE BUDGET"
+  },
+  {
+    "start": 19.3,
+    "end": 20,
+    "source": "launch.mp4",
+    "in": 5.5
+  },
+  {
+    "start": 20,
+    "end": 21.6,
+    "source": "presenter-3.mp4",
+    "in": 20,
+    "punch": true
+  },
+  {
+    "start": 21.6,
+    "end": 26,
+    "source": "launch.mp4",
+    "in": 2
+  },
+  {
+    "start": 26,
+    "end": 28.4,
+    "source": "presenter-3.mp4",
+    "in": 26,
+    "label": "IMAGE → VIDEO → MUSIC"
+  },
+  {
+    "start": 28.4,
+    "end": 29.2,
+    "source": "ship.png",
+    "in": 0,
+    "label": "IMAGE → VIDEO → MUSIC"
+  },
+  {
+    "start": 29.2,
+    "end": 30,
+    "source": "launch.mp4",
+    "in": 5,
+    "label": "IMAGE → VIDEO → MUSIC"
+  }
+]

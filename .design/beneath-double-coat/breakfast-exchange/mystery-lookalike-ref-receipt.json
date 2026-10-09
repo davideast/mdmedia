@@ -1,0 +1,15 @@
+{
+  "job": {
+    "id": "mystery-lookalike-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-bruno.jpg",
+      ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/lookalike.jpg",
+    "prompt": "Photorealistic cinematic dog soap opera. Exactly ONE dog with the EXACT face, white blaze, head shape, eyes and coat of Bruno in reference 1. The ONLY identity variation is a worn faded BROWN leather collar instead of navy. A head-and-chest close-up of this dog seated just INSIDE the same wooden garden toolshed from reference 2, reverse angle looking into the shadowed interior from the snowy threshold. Weathered dark wooden boards behind him, open doorjamb visible on left edge, soft cold winter-morning reflected light on his face. He faces camera slightly LEFT, silently watching the estate offscreen past camera. Entire face readable, collar clearly brown, no obscuring shadow on eyes. Natural real dog anatomy, mouth closed, no humans, no human clothing/body/face, no additional dogs, no text. Same estate and morning. This is not indoors in the pine family rooms, but the weathered shed just established. Serious watchful expression, no snarling or supernatural effects. 16:9."
+  },
+  "fingerprint": "dae11f49e5172065c4185130fa40f906b67b32340ff7b4878977f39aad0dae3f",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

@@ -1,0 +1,36 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 8.5,
+      "words": "Otto, you were meant to clear the path. Not bring it in. Breakfast is waiting.",
+      "voiceDescription": "Older, gentle female voice",
+      "visibleSpeaker": "Older dog on the left",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 10.1,
+      "endSeconds": 11.8,
+      "words": "Morning, Grandmother.",
+      "voiceDescription": "Adult warm male baritone",
+      "visibleSpeaker": "None (voiceover)",
+      "confidence": "High"
+    }
+  ],
+  "newShotStartSeconds": 9.66,
+  "newShotVisibleCast": "One Bernese Mountain Dog with a navy collar (Bruno)",
+  "humansOrExtraAnimals": "None",
+  "speakerErrors": "10.1-11.8: Dialogue occurs but the dog's mouth remains completely closed.",
+  "physicalDefects": "None; mostly static shot.",
+  "continuityAcrossCut": "Wood paneling style matches. Shifts from room interior to hallway doorway. Snow on floor is consistent context.",
+  "newShotFirstHalfSecondAudio": "Knocking/footstep sound and faint collar jingle. No speech.",
+  "safeAudioPrelapSeconds": 0.5,
+  "pacing": "Normal delivery speed; pause before speech is natural.",
+  "uncertainties": [
+    "Whether the sound effect before speech is a door or footsteps."
+  ],
+  "newShotAcceptable": false,
+  "reasons": [
+    "Bruno's mouth does not move at all while his line is spoken."
+  ]
+}

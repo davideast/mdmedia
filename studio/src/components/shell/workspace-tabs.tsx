@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AudioLines, BookOpen, Check, ChevronDown, Download, FileText, Library, ListMusic, ListOrdered, Loader2, Plus, Settings, UserRound, Volume2, WifiOff, X, CircleAlert } from "lucide-react";
+import { AudioLines, BookOpen, Check, ChevronDown, Download, FileText, Film, Library, ListMusic, ListOrdered, Loader2, Settings, UserRound, Volume2, WifiOff, X, CircleAlert } from "lucide-react";
+import { CreateMenu } from "./create-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { useWorkspace } from "./workspace-provider";
 import { useNarration } from "./narration-provider";
@@ -15,6 +16,7 @@ function itemIcon(href: string) {
   const path = href.split("?")[0];
   if (path.startsWith("/narration/")) return BookOpen;
   if (path === "/studio") return FileText;
+  if (path === "/studio/scene") return Film;
   if (path === "/library") return Library;
   if (path === "/playlists") return ListMusic;
   if (path === "/downloads") return Download;
@@ -25,15 +27,16 @@ function itemIcon(href: string) {
 }
 
 export function WorkspaceTabs() {
-  const { state, activeTab, store, selectTab, closeTab, newDraft, storageUnavailable } = useWorkspace();
+  const { state, activeTab, store, selectTab, closeTab, storageUnavailable } = useWorkspace();
   const { stream, queue, generationQueue } = useNarration();
   const downloads = useOfflinePlayback();
   const offline = useConnectivity() === "offline";
+  const documentTabs=state.tabs.filter(tab=>/^\/(studio(?:\?|$|\/scene)|narration\/)/.test(tab.href));
   const seenJobs = useRef(new Set<string>());
   const focusAfterClose = useRef(false);
   const selectedRef = useRef<HTMLButtonElement | null>(null);
   const [serverStatus, setServerStatus] = useState<Record<string, Narration["status"]>>({});
-  const watchedIds = JSON.stringify(state.tabs.map((tab) => new URL(tab.href, "https://workspace.local").pathname)
+  const watchedIds = JSON.stringify(documentTabs.map((tab) => new URL(tab.href, "https://workspace.local").pathname)
     .filter((path) => path.startsWith("/narration/")).map((path) => path.split("/")[2]).sort());
 
   useEffect(() => {
@@ -69,7 +72,7 @@ export function WorkspaceTabs() {
     focusAfterClose.current = activeTab?.id === id;
     closeTab(id);
   };
-  const selectableTabs = state.tabs.filter((tab) => !offline || new URL(tab.href, "https://workspace.local").pathname === "/downloads");
+  const selectableTabs = documentTabs.filter((tab) => !offline || new URL(tab.href, "https://workspace.local").pathname === "/downloads");
 
   const status = (tab: WorkspaceTab) => {
     const url = new URL(tab.href, "https://workspace.local");
@@ -93,7 +96,7 @@ export function WorkspaceTabs() {
   return (
     <div className="flex min-w-0 flex-none items-center border-b border-border bg-surface-inset">
       <div role="tablist" aria-label="Open workspace pages" className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
-        {state.tabs.map((tab) => {
+        {documentTabs.map((tab) => {
           const selected = activeTab?.id === tab.id;
           const { Icon, text, className } = status(tab);
           const label = `${tab.title}${text ? ` — ${text}` : ""}`;
@@ -119,12 +122,11 @@ export function WorkspaceTabs() {
           </div>;
         })}
       </div>
-      <Select value={activeTab?.id ?? ""} onValueChange={(id) => { const tab = state.tabs.find((item) => item.id === id); if (tab) selectTab(tab); }}>
-        <SelectTrigger aria-label={`Switch open page (${state.tabs.length})`} title="All open pages" className="h-9 w-10 flex-none border-0 bg-transparent px-2 [&>svg:last-child]:hidden"><ChevronDown size={16} /></SelectTrigger>
-        <SelectContent>{state.tabs.map((tab) => <SelectItem key={tab.id} value={tab.id} disabled={offline && new URL(tab.href, "https://workspace.local").pathname !== "/downloads"}>{tab.title} · {status(tab).text || "Open"}</SelectItem>)}</SelectContent>
+      <Select value={documentTabs.some(tab=>tab.id===activeTab?.id)?activeTab!.id:""} onValueChange={(id) => { const tab = state.tabs.find((item) => item.id === id); if (tab) selectTab(tab); }}>
+        <SelectTrigger aria-label={`Switch open page (${documentTabs.length})`} title="All open pages" className="h-9 w-10 flex-none border-0 bg-transparent px-2 [&>svg:last-child]:hidden"><ChevronDown size={16} /></SelectTrigger>
+        <SelectContent>{documentTabs.map((tab) => <SelectItem key={tab.id} value={tab.id} disabled={offline && new URL(tab.href, "https://workspace.local").pathname !== "/downloads"}>{tab.title} · {status(tab).text || "Open"}</SelectItem>)}</SelectContent>
       </Select>
-      <button type="button" onClick={newDraft} disabled={offline} aria-label="New narration draft" title={offline ? "Requires Studio connection" : "New narration draft"}
-        className="mx-1 inline-flex size-9 flex-none items-center justify-center rounded text-ink-muted hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"><Plus size={16} /></button>
+      <CreateMenu compact/>
       {storageUnavailable ? <span role="status" className="px-2 text-xs text-destructive" title="Browser storage is unavailable. Work is only kept until this page closes.">Not saved on device</span> : null}
     </div>
   );

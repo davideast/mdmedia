@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-hall-heidi-b",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/hall-heidi-b.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/HH-source-frame.jpg",
+    "seconds": 10,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. BURGUNDY-collared elderly female Heidi with silver muzzle. Low measured older WOMAN voice, warm, dry and dignified. Eyes RIGHT toward Bruno. Memory warms her, then concern and one faint scent catch her attention.\nAt 0.5s say EXACTLY: \"They never found him.\" Finish the complete last word by 2.7s, then close muzzle and silently listen.\nAt 3.5s say EXACTLY: \"You're allowed to miss him, Bruno.\" Finish the complete last word by 6.4s, then close muzzle and silently listen.\nAt 7s say EXACTLY: \"Wait. That smell...\" Finish the complete last word by 9.5s, then close muzzle and silently listen. Total 10s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "6c4fc31674007f67fc2abcfb9b3cb469a38078f68aef4ee6859698968fbb022e",
+  "interactionId": "v1_ChdoOHZGYXRmREk1V24xTWtQd01UbWdBVRIXaDh2RmF0ZkRJNVduMU1rUHdNVG1nQVU",
+  "durationSeconds": 10.006,
+  "review": "pending"
+}

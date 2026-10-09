@@ -1,0 +1,45 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 5.0,
+      "words": "Otto, you were meant to clear the path. Not bring it in.",
+      "voiceDescription": "older female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 5.5,
+      "endSeconds": 8.5,
+      "words": "Breakfast is waiting.",
+      "voiceDescription": "older female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 10.0,
+      "endSeconds": 11.5,
+      "words": "Morning, Grandmother.",
+      "voiceDescription": "warm male baritone",
+      "visibleSpeaker": "Bruno",
+      "confidence": "high"
+    }
+  ],
+  "newShotStartSeconds": 10.0,
+  "newShotVisibleCast": "Bruno (Bernese Mountain Dog with navy collar)",
+  "humansOrExtraAnimals": "None.",
+  "speakerErrors": "None.",
+  "physicalDefects": "None.",
+  "continuityAcrossCut": "Consistent warm wood environment and lighting. Plausible geography and eyeline from hallway into the room.",
+  "newShotFirstHalfSecondAudio": "Speech begins immediately with 'Morning'.",
+  "safeAudioPrelapSeconds": 0,
+  "pacing": "Roughly 1.5-second pause before the cut. Dialogue starts immediately on the cut, lacking the intended 0.5s prelap.",
+  "uncertainties": [],
+  "newShotAcceptable": true,
+  "reasons": [
+    "Bruno matches the required physical description and framing.",
+    "Dialogue is properly synchronized and attributed to Bruno.",
+    "Setting remains visually continuous with the first shot.",
+    "No humans, extra animals, or visual artifacts are present."
+  ]
+}

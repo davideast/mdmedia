@@ -1,0 +1,6 @@
+$ bun --env-file=studio/.env src/bin.ts image -p "An absurdly expensive cinematic science
+fiction film still. A sleek silver spaceship poised for launch above a colossal launch
+platform on a distant desert planet, bright cyan engines, billowing orange dust, tiny human
+silhouettes for scale, dramatic golden sunlight, photoreal practical model detail, wide
+dynamic composition, no words or logos." -o
+/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/ship.png --aspect 16:9

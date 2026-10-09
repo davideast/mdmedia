@@ -1,0 +1,56 @@
+[
+  {
+    "file": ".design/beneath-double-coat/bruno-introduction/breakfast-bruno-final.mp4",
+    "start": 0,
+    "end": 12.25,
+    "label": "Accepted Heidi–Otto opening and Bruno greeting"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/heidi-return.mp4",
+    "start": 0,
+    "end": 4.75,
+    "label": "Heidi sends Bruno to breakfast"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/bruno-concern.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "Bruno asks about Sadie"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-arrival.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "Sadie waits alone; Bruno begins to enter at right"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/sadie-arrival-reaction.mp4",
+    "start": 0,
+    "end": 1.875,
+    "label": "Sadie watches his arrival; pawsteps continue offscreen"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-establish.mp4",
+    "start": 0,
+    "end": 2,
+    "label": "Both now settled across the untouched breakfast"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+    "start": 0.375,
+    "end": 3,
+    "label": "Sadie: You came home after midnight"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/bruno-excuse.mp4",
+    "start": 0.8333333333333334,
+    "end": 3,
+    "label": "Bruno: I went for a walk"
+  },
+  {
+    "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+    "start": 4.375,
+    "end": 7.75,
+    "label": "Same Sadie take: Then why do you smell like Parmesan?"
+  }
+]

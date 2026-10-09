@@ -1,0 +1,8 @@
+[
+  {
+    "id":"sadie-waiting-frame", "kind":"image",
+    "output":".design/beneath-double-coat/breakfast-exchange/sadie-waiting-frame.jpg",
+    "images":[".design/beneath-double-coat/breakfast-exchange/breakfast-master.jpg"],
+    "prompt":"Edit this exact film frame to show the moment BEFORE Bruno arrives for breakfast. Preserve the original image composition, framing, lighting, furniture, table, cheese plate, window, snowy exterior and SADIE exactly. Remove ONLY the navy-collared male dog on the RIGHT (Bruno), filling that area with the same existing wooden sideboard and wooden floor continuing naturally behind him. His entire body, tail, paws and shadow must be absent. The right-hand place opposite Sadie is visibly EMPTY. SADIE, the emerald-green-collared Bernese Mountain Dog on the LEFT, stays in her original seated position with precisely the same face, markings, coat and size. She looks quietly toward that empty place, patiently irritated, mouth resting closed. Keep the original photorealistic room and all geometry; do not invent any doorway, extra furniture, breakfast dishes, text or characters. Only ONE dog visible, Sadie. No humans, reflections, ghosts, silhouettes or remnants of the removed dog. One full-frame 16:9 image. This is a matched opening frame for the same camera shot, not a new angle."
+  }
+]

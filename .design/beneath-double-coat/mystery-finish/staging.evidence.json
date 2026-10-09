@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "4fa2f8b3cb0cce0d2d90569738b05e4ba32eab54aec289fd3adebf56be3fc940",
+      "stage": "plan",
+      "targetId": "mystery-staging",
+      "reviewer": "Local editorial pre-mortem; references visually inspected",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Silent masters establish adjacent hall memorial and grooming-room clue before dialogue."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "This staging test uses explicit location cuts. Final edit includes the memorial exchange and pawprint bridge between these sources."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Inspected both generated reference images against accepted Heidi and Bruno frames. Burgundy and navy collars, pine estate and winter daylight are pinned. Rescue master inspected: same room, Heidi unchanged, Bruno and Sadie added at open doorway after explicit time passage."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "No voices in these masters; closed muzzles, dialogue recorded separately."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Three-second sources; final establishing range selected to avoid dead time."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Only breathing and small eye movements. All dogs seated, no prop contact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Quiet room tone in hall, stable ventilation in grooming room for later shutdown contrast."
+        }
+      ]
+    }
+  ],
+  "speech": []
+}

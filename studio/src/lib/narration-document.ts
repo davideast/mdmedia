@@ -4,6 +4,8 @@ import type { NarrationTimingsFile } from './wav';
 export interface NarrationDocument {
   id: string;
   title: string;
+  durationMs?:number;
+  ownerUid?: string;
   voice: string | null;
   transcript: string;
   sourceMarkdown: string | null;
@@ -35,7 +37,7 @@ export function observeNarrationDocument(id: string, source: DocumentSource, rec
       publish();
       return;
     }
-    document = { ...document, title: narration.title, voice: narration.voice, transcript: narration.transcript,
+    document = { ...document,ownerUid:narration.ownerUid,durationMs:narration.durationMs, title: narration.title, voice: narration.voice, transcript: narration.transcript,
       sourceMarkdown: narration.sourceMarkdown, adapted: narration.adapted, status: narration.status,
       errorMessage: narration.errorMessage ?? null };
     publish();

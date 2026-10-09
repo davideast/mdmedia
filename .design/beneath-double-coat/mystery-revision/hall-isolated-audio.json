@@ -1,0 +1,29 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/hall-heidi-a.mp4",
+    "transcript": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed. [Laughter] You were supposed to share it.",
+    "voice": "female",
+    "otherSounds": [
+      "laughter"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/hall-heidi-b.mp4",
+    "transcript": "They never found him. You're allowed to miss him, Bruno. Wait. That smell.",
+    "voice": "female",
+    "otherSounds": [
+      "barking"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/hall-bruno-c.mp4",
+    "transcript": "I do. That's why I can't keep looking at that. That looking at that.",
+    "voice": "male",
+    "otherSounds": [
+      "barking"
+    ],
+    "uncertainWords": []
+  }
+]

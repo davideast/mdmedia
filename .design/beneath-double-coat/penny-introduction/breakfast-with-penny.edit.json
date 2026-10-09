@@ -1,0 +1,22 @@
+{
+  "durationSeconds": 73.45833333333333,
+  "transition": "hard cuts",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-bella-complete.mp4",
+      "start": 0,
+      "end": 53.125,
+      "label": "Accepted preceding breakfast footage",
+      "sequenceStart": 0,
+      "sequenceEnd": 53.125
+    },
+    {
+      "file": ".design/beneath-double-coat/penny-introduction/penny-sequence.mp4",
+      "start": 0,
+      "end": 20.333333333333332,
+      "label": "Penny introduction and breakfast payoff",
+      "sequenceStart": 53.125,
+      "sequenceEnd": 73.45833333333333
+    }
+  ]
+}

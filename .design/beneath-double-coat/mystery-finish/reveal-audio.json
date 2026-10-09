@@ -1,0 +1,62 @@
+{
+  "utterances": [
+    {
+      "source": "rescue-bruno",
+      "startSeconds": 0.0,
+      "endSeconds": 1.6,
+      "text": "Otto got the door.",
+      "voice": "Male, clear, moderate pitch"
+    },
+    {
+      "source": "rescue-bruno",
+      "startSeconds": 2.8,
+      "endSeconds": 4.5,
+      "text": "Grandmother, what happened?",
+      "voice": "Male, clear, moderate pitch"
+    },
+    {
+      "source": "rescue-bruno",
+      "startSeconds": 5.8,
+      "endSeconds": 6.7,
+      "text": "He is.",
+      "voice": "Male, clear, moderate pitch"
+    },
+    {
+      "source": "rescue-heidi",
+      "startSeconds": 0.0,
+      "endSeconds": 1.8,
+      "text": "Someone locked me in.",
+      "voice": "Female, older, serious tone"
+    },
+    {
+      "source": "rescue-heidi",
+      "startSeconds": 2.0,
+      "endSeconds": 3.5,
+      "text": "after I found this.",
+      "voice": "Female, older, serious tone"
+    },
+    {
+      "source": "rescue-heidi",
+      "startSeconds": 5.4,
+      "endSeconds": 7.0,
+      "text": "Sebastian's fur.",
+      "voice": "Female, older, serious tone"
+    },
+    {
+      "source": "rescue-sadie",
+      "startSeconds": 0.0,
+      "endSeconds": 1.0,
+      "text": "Your brother?",
+      "voice": "Female, young adult, surprised tone"
+    },
+    {
+      "source": "rescue-sadie",
+      "startSeconds": 2.2,
+      "endSeconds": 3.9,
+      "text": "You said he was dead.",
+      "voice": "Female, young adult, surprised tone"
+    }
+  ],
+  "sounds": [],
+  "uncertainties": []
+}

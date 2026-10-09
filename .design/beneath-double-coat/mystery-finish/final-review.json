@@ -1,0 +1,47 @@
+{
+  "actualTranscript": [
+    "00:02.000 You still keep my brother's collar.",
+    "00:04.500 Someone should remember Sebastian.",
+    "00:12.500 That scent... Sebastian? Who locked the door?! And turned off the air... You monster!",
+    "00:23.500 Otto got the door.",
+    "00:25.000 Grandmother, what happened?",
+    "00:29.000 Someone locked me in. After I found this. Sebastian's fur.",
+    "00:36.500 Your brother? You said he was dead.",
+    "00:39.500 He is."
+  ],
+  "storyComprehension": [
+    "Narrative sequence aligns with the provided outline.",
+    "Transitions between locations are logical.",
+    "Offscreen events are sufficiently clarified by dialogue.",
+    "The concluding shots effectively establish the lookalike cliffhanger."
+  ],
+  "continuityFindings": [
+    "Primary collar colors are generally maintained.",
+    "Interior settings remain cohesive throughout the scenes.",
+    "Sadie's bright green collar is not clearly discernible in the wider group shot."
+  ],
+  "speakerErrors": [
+    "Voice assignments remain consistent for each dog.",
+    "Mouth articulation adequately matches the dialogue delivery."
+  ],
+  "unwantedFigures": [
+    "No human subjects are present in the footage."
+  ],
+  "physicalDefects": [
+    "The pawprints shown on the floor exhibit unusual, hand-like shapes.",
+    "A disembodied dog snout is visible floating in the corner of the frame during a close-up."
+  ],
+  "pacingAndAudio": [
+    "Volume levels are stable across dialogue.",
+    "Several extended silent pauses interrupt the conversational flow.",
+    "The designated lack of background music is present."
+  ],
+  "materialFailures": [
+    "00:08.750: Unnatural, hand-like pawprint rendering.",
+    "00:33.250: Disconnected floating animal head in frame."
+  ],
+  "uncertainties": [
+    "Visibility and consistency of Sadie's collar color in the group shot."
+  ],
+  "acceptable": false
+}

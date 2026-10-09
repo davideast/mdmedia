@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "1fdae94bce0ae1e520163b50612aff7a69726afad9c2db3f0ccac261738b046f",
+      "stage": "plan",
+      "targetId": "penny-staging",
+      "reviewer": "Local agent editorial pre-mortem; actual references inspected",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "The established marriage/room is inherited; attention precedes the silent puppy reveal. Dialogue will be planned separately after these frames are accepted."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "The attention source is seeded from the accepted final visible image (source master frame 68/24, rendered into full opening). The wider cut is motivated by parental gaze."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Compared both reference images locally: same left window, right sideboard, collars, table and untouched cube. Puppy is separately anchored to approved cast portrait. New family framing is explicitly a new setup."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "No dialogue in this staging batch. Both adults and puppy remain silent; no offscreen voice."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Two seconds attention plus two seconds reveal gives orientation before any words. The accepted half-second is review context, not additional story."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "All three remain seated, paws planted; only tiny eye/head turns. No entrance walking or food handling."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Quiet room tone, one collar tick. No music restart, narration or human voice."
+        }
+      ]
+    }
+  ],
+  "speech": []
+}

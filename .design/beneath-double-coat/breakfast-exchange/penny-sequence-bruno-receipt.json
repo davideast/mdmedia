@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "penny-sequence-bruno",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/penny-introduction/bruno-performance.mp4",
+    "firstFrame": ".design/beneath-double-coat/penny-introduction/bruno-close.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera, same warm snowy-estate breakfast scene as supplied actual video frame. Exactly ONE real Bernese Mountain Dog on camera, the exact one visible in the first frame. Preserve this exact head, markings, collar, age, background and framing. A single locked close-up, no cuts or camera movement. Dog remains seated, with small natural canine jaw motion synchronized to its OWN clearly audible voice, small expressive eye/ear motion and restrained head motion. No human face, body, hands, child, person, extra animal, second dog, text or subtitles. Canine anatomy remains canine, no human lips/teeth or human facial morph. No standing, gestures or props. NO narrator, offscreen speaker, added dialogue, music, laughter, barking or sound effects. Clean natural speech with quiet continuous room tone. Neutral English accent. Silent gaps mean mouth rests closed. Both scripted lines belong to this one dog, not different characters. BRUNO is the large adult male with navy collar. His voice is a warm adult MALE BARITONE, slightly sheepish and overly dignified, matching the prior breakfast exchange. He looks slightly DOWN and RIGHT to his daughter. At 0.6s say exactly: \"Your mother and I are discussing breakfast.\" One conversational phrase, finish by 3.7s. Then close muzzle and hold a gently guilty look. Five seconds total; no other words."
+  },
+  "fingerprint": "58a8db829b113f630f9df3e3fa751a76661274cea5ee57f16055208711f33460",
+  "interactionId": "v1_ChcxNkRGYXF5V0xjYVc5TW9QMF92VTZRURIXMTZERmFxeVdMY2FXOU1vUDBfdlU2UVE",
+  "durationSeconds": 5.014,
+  "review": "pending"
+}

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-hall-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. Animate exactly the supplied composition as one locked wide shot. Preserve exact faces, ages, collars, positions, furniture and lighting. No humans, hands, human anatomy, human clothing, additional dogs, words, captions, speaking, barking, music or cuts. All dogs remain seated, paws planted, no reaching or walking, only gentle breathing, blinks and tiny natural eye movements. Quiet room tone; no voices or music. Exactly TWO dogs. Elderly burgundy-collared Heidi LEFT and navy-collared Bruno RIGHT quietly look at the faded collar and two-puppy portrait between them. Props never move. Mouths closed."
+  },
+  "fingerprint": "df7dda1c480058e73653bc7bbe19668f6e1d707b4f546f1b3669916ddb85a107",
+  "interactionId": "v1_ChdZYkhGYXRYNUw1R1pqTWNQazVDOWlRcxIXWWJIRmF0WDVMNUdaak1jUGs1QzlpUXM",
+  "durationSeconds": 3.008,
+  "review": "pending"
+}

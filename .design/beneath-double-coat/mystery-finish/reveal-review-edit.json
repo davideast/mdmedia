@@ -1,0 +1,38 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "rescue-master"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "start": 0,
+    "end": 8,
+    "label": "rescue-bruno"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+    "start": 0,
+    "end": 8,
+    "label": "rescue-heidi"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/rescue-sadie.mp4",
+    "start": 0,
+    "end": 5,
+    "label": "rescue-sadie"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "exterior"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+    "start": 0,
+    "end": 4,
+    "label": "lookalike"
+  }
+]

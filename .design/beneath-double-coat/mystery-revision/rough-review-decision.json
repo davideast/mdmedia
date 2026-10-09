@@ -1,0 +1,9 @@
+{
+  "status": "proceed-to-performances",
+  "evidence": "rough-reviewed.evidence.json",
+  "storyChecks": "all five passed",
+  "comparisonFindings": [],
+  "retainedUncertainty": "Reviewer asked how talking dogs operate; intentional established fantasy premise, not new exposition to add. Retained in source evidence.",
+  "revision": "Extend final inside return to 2.5 seconds using the new Bruno performance, to make two-location contrast readable.",
+  "finalReviewRequired": true
+}

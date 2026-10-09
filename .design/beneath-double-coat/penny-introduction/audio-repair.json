@@ -1,0 +1,25 @@
+{
+  "method": "Fixed gain and silence replacement in unused raw Penny handles; video copied, no timing changes.",
+  "gainsDb": {
+    "penny": 5.8,
+    "bruno": 2.2,
+    "sadie": 1
+  },
+  "removed": [
+    {
+      "file": "penny-performance.mp4",
+      "from": 3.2,
+      "to": 4.3,
+      "reason": "Unrequested offscreen male Hmm, independently transcribed."
+    },
+    {
+      "file": "penny-performance.mp4",
+      "from": 6.5,
+      "to": 8,
+      "reason": "Unrequested canned audience laughter, independently transcribed."
+    }
+  ],
+  "sourceAudioEvidence": "audio-fragments.json",
+  "timingEvidence": "*-silence.log",
+  "editEndsBeforeUnwantedAudio": true
+}

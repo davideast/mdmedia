@@ -1,0 +1,30 @@
+{
+  "utterances": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 2.2,
+      "text": "Who locked the door",
+      "voice": "female"
+    },
+    {
+      "startSeconds": 2.2,
+      "endSeconds": 4.18,
+      "text": "and turned off the air?",
+      "voice": "female"
+    },
+    {
+      "startSeconds": 4.18,
+      "endSeconds": 6.84,
+      "text": "You monster!",
+      "voice": "female"
+    }
+  ],
+  "sounds": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 7.9,
+      "description": "Sound of wind or airflow"
+    }
+  ],
+  "uncertainties": []
+}

@@ -1,0 +1,278 @@
+{
+  "transcript": [
+    {
+      "speaker": "Grandmother",
+      "words": "Otto, you were meant to clear the path. Not bring it in. Breakfast is waiting.",
+      "at": 0
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Morning, Grandmother.",
+      "at": 9
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "Bruno. Your wife's waiting in the breakfast room.",
+      "at": 12
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Is Sadie still angry?",
+      "at": 16
+    },
+    {
+      "speaker": "Sadie",
+      "words": "You came home after midnight.",
+      "at": 26
+    },
+    {
+      "speaker": "Bruno",
+      "words": "I went for a walk.",
+      "at": 29
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Then why do you smell like parmesan? And rosemary?",
+      "at": 31
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Sadie.",
+      "at": 36
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Bella.",
+      "at": 38
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Your ex.",
+      "at": 40
+    },
+    {
+      "speaker": "Bruno",
+      "words": "She offered me a snack.",
+      "at": 41
+    },
+    {
+      "speaker": "Sadie",
+      "words": "And you stayed until midnight?",
+      "at": 44
+    },
+    {
+      "speaker": "Bruno",
+      "words": "It was very good cheese.",
+      "at": 46
+    },
+    {
+      "speaker": "Penny",
+      "words": "Dad, are you in trouble?",
+      "at": 56
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Your mother and I are discussing breakfast.",
+      "at": 58
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Penny, your father is changing the subject.",
+      "at": 102
+    },
+    {
+      "speaker": "Penny",
+      "words": "Then can I have his cheese?",
+      "at": 106
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Yes. He's had quite enough.",
+      "at": 108
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Grandmother? Come back in. Penny's negotiating for your breakfast.",
+      "at": 115
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+      "at": 119
+    },
+    {
+      "speaker": "Bruno",
+      "words": "My twin got the looks, I got the sausage.",
+      "at": 125
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "You were supposed to share it.",
+      "at": 129
+    },
+    {
+      "speaker": "Bruno",
+      "words": "We did. Then the kennel burned down. They never found him. He's dead, Grandmother. You can't spend every morning waiting.",
+      "at": 131
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "You're allowed to miss him, Bruno.",
+      "at": 141
+    },
+    {
+      "speaker": "Bruno",
+      "words": "I do. That's why I can't keep looking at that.",
+      "at": 143
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "Wait. That smell. From the grooming room.",
+      "at": 147
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "He used to hide in here. As if I couldn't smell him. Fresh fur. No, I'm imagining it. Bruno. Come and smell this.",
+      "at": 153
+    },
+    {
+      "speaker": "Bruno",
+      "words": "We heard you. What's happened?",
+      "at": 212
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "This smells like Sebastian.",
+      "at": 216
+    },
+    {
+      "speaker": "Bruno",
+      "words": "We all shed, Grandmother. It's probably mine.",
+      "at": 219
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "I thought that too. Then I smelled it again.",
+      "at": 223
+    },
+    {
+      "speaker": "Bruno",
+      "words": "You really think he's been here?",
+      "at": 228
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "I don't know. I need you to look.",
+      "at": 230
+    },
+    {
+      "speaker": "Bruno",
+      "words": "I wish it were him. I do. But nobody survived that fire.",
+      "at": 234
+    },
+    {
+      "speaker": "Grandmother",
+      "words": "Then whose scent is this?",
+      "at": 240
+    },
+    {
+      "speaker": "Title",
+      "words": "BENEATH THE DOUBLE COAT: The Secret in the Snow",
+      "at": 253
+    }
+  ],
+  "shots": [
+    {
+      "description": "Grandmother and Bruno sitting in a wooden room.",
+      "at": 0
+    },
+    {
+      "description": "Bruno in a hallway.",
+      "at": 9
+    },
+    {
+      "description": "Sadie sitting by a table with cheese.",
+      "at": 19
+    },
+    {
+      "description": "Bruno joins Sadie at the table.",
+      "at": 24
+    },
+    {
+      "description": "Penny the puppy appears.",
+      "at": 54
+    },
+    {
+      "description": "Grandmother and Bruno in a hallway with a picture frame.",
+      "at": 113
+    },
+    {
+      "description": "Grandmother in the grooming room looking at fur.",
+      "at": 151
+    },
+    {
+      "description": "Bruno and Sadie join Grandmother.",
+      "at": 210
+    },
+    {
+      "description": "View of a snow-covered exterior and a house from a barn.",
+      "at": 244
+    },
+    {
+      "description": "A dog sitting in the barn.",
+      "at": 247
+    },
+    {
+      "description": "Title card.",
+      "at": 253
+    }
+  ],
+  "defects": [],
+  "audience": {
+    "retelling": "Talking dogs discuss breakfast and infidelity before a grandmother dog discovers fresh fur that smells like her allegedly dead grandson.",
+    "understood": [
+      {
+        "claim": "Bruno is married to Sadie and they have a puppy.",
+        "at": 54
+      }
+    ],
+    "uncertainties": [
+      {
+        "question": "Is the dog in the barn at the end Sebastian?",
+        "at": 247
+      }
+    ],
+    "checks": [
+      {
+        "category": "audience-understanding",
+        "verdict": "pass",
+        "at": 24,
+        "evidence": "Relationships are established quickly through dialogue."
+      },
+      {
+        "category": "causality",
+        "verdict": "pass",
+        "at": 151,
+        "evidence": "The grandmother follows a scent to the grooming room."
+      },
+      {
+        "category": "reactions",
+        "verdict": "pass",
+        "at": 210,
+        "evidence": "Bruno and Sadie respond to the grandmother calling."
+      },
+      {
+        "category": "reveal-setup",
+        "verdict": "pass",
+        "at": 131,
+        "evidence": "Sebastian is established as dead before the scent is found."
+      },
+      {
+        "category": "story-density",
+        "verdict": "pass",
+        "at": 250,
+        "evidence": "Plots move at a moderate pace without excessive filler."
+      }
+    ]
+  }
+}

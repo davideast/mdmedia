@@ -85,7 +85,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [router, offline]);
   const closeTab = useCallback((id: string) => {
     const active = store.getSnapshot().activeId === id;
-    const next = store.close(id);
+    const documents=store.getSnapshot().tabs.filter(tab=>/^\/(studio(?:\?|$|\/scene)|narration\/)/.test(tab.href));
+    const index=documents.findIndex(tab=>tab.id===id);
+    const remaining=documents.filter(tab=>tab.id!==id);
+    const closed=store.close(id);
+    const next=index>=0?remaining[Math.min(index,remaining.length-1)]?.href??'/projects':closed;
     store.flush();
     if (active && next) {
       const target = offline ? store.getSnapshot().tabs.find((tab) => new URL(tab.href, window.location.origin).pathname === "/downloads")?.href ?? "/downloads" : next;
@@ -95,7 +99,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       else router.replace(target, { scroll: false });
     }
   }, [router, store, offline]);
-  const newDraft = useCallback(() => router.push(`/studio?draft=${crypto.randomUUID()}`), [router]);
+  const newDraft = useCallback(() => router.push(`${pathname === '/studio/scene' ? '/studio/scene' : '/studio'}?draft=${crypto.randomUUID()}`), [router, pathname]);
   const replaceCurrent = useCallback((next: string, title?: string) => {
     const id = store.getSnapshot().activeId;
     if (id) store.replaceTab(id, next, title);

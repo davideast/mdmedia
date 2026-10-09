@@ -1,0 +1,800 @@
+{
+  "version": 1,
+  "title": "Breakfast at Alpenrose",
+  "screenplay": {
+    "path": "drafts/beneath-double-coat/breakfast-exposition-90s.md",
+    "sha256": "8f687963ab41717e2f50e6f7668064cccf06d23a6ab7188acd2705f5fcba98f4"
+  },
+  "duration": 90,
+  "rules": [
+    "Photorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.",
+    "Sincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.",
+    "Objects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.",
+    "Use the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.",
+    "Only the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.",
+    "One winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles."
+  ],
+  "setting": "One snowbound Alpine estate at breakfast, shortly after dawn. Old money, warm wood, restrained luxury. Soft amber interior light contrasts with blue-white snow outside. No time or weather changes.\n\nThe breakfast room is rectangular:\n\n- **West wall / screen left in the master:** one inward-opening casement window, already open. Heidi rests on a low upholstered bench immediately beside it.\n- **North wall / rear of the master:** an open doorway into the entrance hall. Otto and Bruno enter here. The exterior front door connects to this hall, a short distance from the window.\n- **Center:** a low breakfast table. A small plate holding one cheddar cube sits at the near edge, reachable by Penny.\n- **Near-right table corner:** Bruno’s oversized chair. His front half can perch on it while his rear paws remain on the floor.\n- **Far side of the table:** Sadie, facing Bruno’s position. Penny starts on the floor beside her and crosses beneath the table toward Bruno.\n\nThe camera enters through the west window and settles into a master that shows the window at left, doorway behind the table, and Bruno’s chair at right. Subsequent angles stay on the same side of the Sadie–Bruno conversational axis. Heidi’s look toward Otto and Sadie’s look toward Bruno must match their positions.\n\n**Prop continuity:** the window starts open, closes once, then reopens and stays open. Penny’s bowl starts beside Bruno’s chair, where he displaces it; Sadie retrieves it. The cheddar cube remains on its plate until Penny takes it in the final shot. Otto leaves his snow brush outside before entering.",
+  "characters": {
+    "HEIDI": {
+      "identity": "Owner of Alpenrose; Bruno’s grandmother; Penny’s great-grandmother. Elderly female; silver muzzle; narrow white blaze; burgundy collar",
+      "voice": "Low, measured, imperious older female voice. Expects obedience. Affection lives beneath her authority.",
+      "silent": false,
+      "reference": "character_heidi"
+    },
+    "OTTO": {
+      "identity": "Estate groundskeeper; trusted, familiar household staff. Stocky adult male; shaggy cheeks; ochre collar",
+      "voice": "No dialogue in this opening. Earnest physical reactions. His eventual voice is a warm adult male voice, never Heidi’s.",
+      "silent": true,
+      "reference": "character_otto"
+    },
+    "BRUNO": {
+      "identity": "Heidi’s grandson; Sadie’s husband; Penny’s father, as the household understands it. Largest adult; broad white chest; symmetrical rust eyebrows; navy collar",
+      "voice": "Warm baritone, casually confident until questioned. Lumbering physical comedy.",
+      "silent": false,
+      "reference": "character_bruno"
+    },
+    "SADIE": {
+      "identity": "Bruno’s wife; Penny’s mother. Adult female; slimmer build; slender white blaze; emerald collar",
+      "voice": "Precise adult female voice, dry and controlled; distinct from Heidi’s lower, older voice.",
+      "silent": false,
+      "reference": "character_sadie"
+    },
+    "PENNY": {
+      "identity": "Bruno and Sadie’s young daughter. Clearly smaller puppy; broad white forehead patch; soft lavender collar",
+      "voice": "Bright young female voice. Direct and unembarrassed, without exaggerated baby talk.",
+      "silent": false,
+      "reference": "character_penny"
+    }
+  },
+  "assets": {
+    "character_heidi": {
+      "purpose": "Owner of Alpenrose; Bruno’s grandmother; Penny’s great-grandmother. Elderly female; silver muzzle; narrow white blaze; burgundy collar",
+      "path": null
+    },
+    "character_otto": {
+      "purpose": "Estate groundskeeper; trusted, familiar household staff. Stocky adult male; shaggy cheeks; ochre collar",
+      "path": null
+    },
+    "character_bruno": {
+      "purpose": "Heidi’s grandson; Sadie’s husband; Penny’s father, as the household understands it. Largest adult; broad white chest; symmetrical rust eyebrows; navy collar",
+      "path": null
+    },
+    "character_sadie": {
+      "purpose": "Bruno’s wife; Penny’s mother. Adult female; slimmer build; slender white blaze; emerald collar",
+      "path": null
+    },
+    "character_penny": {
+      "purpose": "Bruno and Sadie’s young daughter. Clearly smaller puppy; broad white forehead patch; soft lavender collar",
+      "path": null
+    },
+    "estate_exterior": {
+      "purpose": "Approved snowbound estate exterior showing open west window beside front entrance",
+      "path": null
+    },
+    "breakfast_room": {
+      "purpose": "Approved room master with fixed window, doorway, table, chairs and positions",
+      "path": null
+    }
+  },
+  "dialogue": [
+    {
+      "id": "d01",
+      "speaker": "HEIDI",
+      "start": 9,
+      "end": 11,
+      "text": "Otto! Breakfast.",
+      "delivery": "Call from inside, older low female voice",
+      "production": "native"
+    },
+    {
+      "id": "d02",
+      "speaker": "HEIDI",
+      "start": 25,
+      "end": 28,
+      "text": "Otto. We’ve discussed this.",
+      "delivery": "Measured, quietly imperious",
+      "production": "native"
+    },
+    {
+      "id": "d03",
+      "speaker": "BRUNO",
+      "start": 33,
+      "end": 35,
+      "text": "Morning, Grandmother.",
+      "delivery": "Warm casual baritone",
+      "production": "native"
+    },
+    {
+      "id": "d04",
+      "speaker": "HEIDI",
+      "start": 38,
+      "end": 40.5,
+      "text": "All four paws down, Bruno.",
+      "delivery": "Firm, unhurried",
+      "production": "native"
+    },
+    {
+      "id": "d05",
+      "speaker": "PENNY",
+      "start": 43.5,
+      "end": 47,
+      "text": "Dad, you’re sitting on my breakfast.",
+      "delivery": "Direct young female voice",
+      "production": "native"
+    },
+    {
+      "id": "d06",
+      "speaker": "SADIE",
+      "start": 52,
+      "end": 56.5,
+      "text": "Penny, your father thinks every chair belongs to him.",
+      "delivery": "Dry adult female voice",
+      "production": "native"
+    },
+    {
+      "id": "d07",
+      "speaker": "SADIE",
+      "start": 59,
+      "end": 61,
+      "text": "You came home late.",
+      "delivery": "Quiet, pointed",
+      "production": "native"
+    },
+    {
+      "id": "d08",
+      "speaker": "BRUNO",
+      "start": 62,
+      "end": 64,
+      "text": "Sadie, I went for a walk.",
+      "delivery": "Casual but defensive",
+      "production": "native"
+    },
+    {
+      "id": "d09",
+      "speaker": "SADIE",
+      "start": 70,
+      "end": 73,
+      "text": "A walk that serves Parmesan?",
+      "delivery": "Controlled suspicion",
+      "production": "native"
+    },
+    {
+      "id": "d10",
+      "speaker": "HEIDI",
+      "start": 74.5,
+      "end": 79,
+      "text": "We can investigate your marriage after breakfast.",
+      "delivery": "Practical older female voice; one continuous performance",
+      "production": "editorial"
+    },
+    {
+      "id": "d11",
+      "speaker": "PENNY",
+      "start": 87,
+      "end": 88,
+      "text": "What?",
+      "delivery": "Innocent, after swallowing",
+      "production": "native"
+    }
+  ],
+  "shots": [
+    {
+      "id": "s01",
+      "title": "The estate wakes",
+      "start": 0,
+      "end": 8,
+      "connection": "opening",
+      "previousShotId": null,
+      "visibleCharacters": {
+        "OTTO": "Outside on the front steps; only visible dog."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [],
+      "startState": "Snowbound estate at dawn; open west casement beside front entrance. Otto working outside; breakfast family inside; Bruno in hall.",
+      "endState": "Still moving toward open window. Otto at steps; brush outside; no dogs visible indoors.",
+      "camera": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.",
+      "actionCues": [
+        {
+          "start": 0,
+          "end": 5,
+          "action": "Otto noses a wide snow brush across the steps while camera approaches the open window."
+        },
+        {
+          "start": 5,
+          "end": 8,
+          "action": "Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent."
+        }
+      ],
+      "dialogueCues": [],
+      "sound": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+      "transition": "Opening establishes destination."
+    },
+    {
+      "id": "s02",
+      "title": "A voice from inside",
+      "start": 8,
+      "end": 16,
+      "connection": "continue",
+      "previousShotId": "s01",
+      "visibleCharacters": {
+        "OTTO": "Outside initially; leaves through front entrance, never through window.",
+        "HEIDI": "Revealed beside window after her offscreen call ends.",
+        "SADIE": "At table, visible only after camera enters.",
+        "PENNY": "Small puppy by Sadie, visible only after camera enters."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "Still moving toward open window. Otto at steps; brush outside; no dogs visible indoors.",
+      "endState": "Camera just inside still moving. Heidi left; Sadie and Penny at table. Otto in hall offscreen; Bruno absent.",
+      "camera": "Continue exact trajectory through open casement; no cut.",
+      "actionCues": [
+        {
+          "start": 8,
+          "end": 9,
+          "action": "Maintain camera approach speed and height."
+        },
+        {
+          "start": 9,
+          "end": 11,
+          "action": "Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed."
+        },
+        {
+          "start": 11,
+          "end": 16,
+          "action": "Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d01",
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+      "transition": "Same camera move. Heidi’s offscreen call draws attention indoors."
+    },
+    {
+      "id": "s03",
+      "title": "The household rules",
+      "start": 16,
+      "end": 24,
+      "connection": "continue",
+      "previousShotId": "s02",
+      "visibleCharacters": {
+        "HEIDI": "Beside window at left.",
+        "OTTO": "Enters rear doorway, then crosses to window.",
+        "SADIE": "Beyond table.",
+        "PENNY": "On floor near table."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "Camera just inside still moving. Heidi left; Sadie and Penny at table. Otto in hall offscreen; Bruno absent.",
+      "endState": "Window closed; Otto at latch; Heidi begins looking at him. Sadie and Penny at table; Bruno absent.",
+      "camera": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.",
+      "actionCues": [
+        {
+          "start": 16,
+          "end": 20,
+          "action": "Camera settles into master. Otto enters through rear doorway and crosses to window."
+        },
+        {
+          "start": 20,
+          "end": 24,
+          "action": "Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently."
+        }
+      ],
+      "dialogueCues": [],
+      "sound": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+      "transition": "Same camera move and room tone; Otto follows doorway route."
+    },
+    {
+      "id": "s04",
+      "title": "Heidi gets her way",
+      "start": 24,
+      "end": 31,
+      "connection": "cut",
+      "previousShotId": "s03",
+      "visibleCharacters": {
+        "HEIDI": "Foreground right in closer angle, beside window.",
+        "OTTO": "Background left beside latch."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [
+        {
+          "shotId": "s03",
+          "purpose": "Match preceding accepted end-state, action and prop positions."
+        }
+      ],
+      "startState": "Window closed; Otto at latch; Heidi begins looking at him. Sadie and Penny at table; Bruno absent.",
+      "endState": "Window reopened and stays open; Heidi relaxed; Otto clear of entry. Bruno approaching in hall.",
+      "camera": "Closer reaction angle; preserve physical positions and eyelines.",
+      "actionCues": [
+        {
+          "start": 24,
+          "end": 25,
+          "action": "Heidi completes look at Otto; he freezes."
+        },
+        {
+          "start": 25,
+          "end": 28,
+          "action": "Heidi alone speaks; Otto listens with mouth closed."
+        },
+        {
+          "start": 28,
+          "end": 31,
+          "action": "Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d02",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+      "transition": "Cut after window closure to Heidi’s reaction. Wind muffles then returns."
+    },
+    {
+      "id": "s05",
+      "title": "Meet the grandson",
+      "start": 31,
+      "end": 38,
+      "connection": "cut",
+      "previousShotId": "s04",
+      "visibleCharacters": {
+        "BRUNO": "Enters rear doorway, moves to chair at screen right.",
+        "HEIDI": "Visible at left beside window.",
+        "SADIE": "Beyond table.",
+        "PENNY": "Partially obscured beneath table.",
+        "OTTO": "Quiet background near window."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [
+        {
+          "shotId": "s04",
+          "purpose": "Match preceding accepted end-state, action and prop positions."
+        },
+        {
+          "shotId": "s03",
+          "purpose": "Preserve established room geography and lighting; use current preceding shot for prop state."
+        }
+      ],
+      "startState": "Window reopened and stays open; Heidi relaxed; Otto clear of entry. Bruno approaching in hall.",
+      "endState": "Bruno perched, forequarters on chair and rear paws down; bowl displaced under chair. Heidi looking at him.",
+      "camera": "Medium-wide includes entrance, Bruno’s chair and Heidi; same side of room axis.",
+      "actionCues": [
+        {
+          "start": 31,
+          "end": 33,
+          "action": "Bruno enters on approaching footstep sound and looks at Heidi."
+        },
+        {
+          "start": 33,
+          "end": 35,
+          "action": "Bruno alone greets grandmother; all others silent."
+        },
+        {
+          "start": 35,
+          "end": 38,
+          "action": "Bruno perches forequarters on chair, rear paws on floor. Rump nudges Penny’s bowl beneath chair. Hold awkward posture."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d03",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Bruno footsteps match preceding sound, chair creak; low continuous ambience.",
+      "transition": "Bruno’s paws and collar precede picture cut by 0.5s; entrance matches sound."
+    },
+    {
+      "id": "s06",
+      "title": "Grandmother’s authority",
+      "start": 38,
+      "end": 42,
+      "connection": "continue",
+      "previousShotId": "s05",
+      "visibleCharacters": {
+        "BRUNO": "Perched on chair at right, listening.",
+        "HEIDI": "Visible at left, facing Bruno.",
+        "SADIE": "Beyond table.",
+        "PENNY": "Partially obscured beneath table.",
+        "OTTO": "Quiet background near window."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "Bruno perched, forequarters on chair and rear paws down; bowl displaced under chair. Heidi looking at him.",
+      "endState": "Bruno halfway through lowering front paws; bowl remains beside rear paw.",
+      "camera": "Hold previous composition, no cut.",
+      "actionCues": [
+        {
+          "start": 38,
+          "end": 40.5,
+          "action": "Heidi alone corrects Bruno. He listens with mouth closed."
+        },
+        {
+          "start": 40.5,
+          "end": 42,
+          "action": "Bruno starts lowering front paws to floor; finish segment midway through descent."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d04",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet room tone and open-window wind beneath dialogue.",
+      "transition": "Same composition and exchange; no editorial cut."
+    },
+    {
+      "id": "s07",
+      "title": "Meet their daughter",
+      "start": 42,
+      "end": 50,
+      "connection": "continue",
+      "previousShotId": "s06",
+      "visibleCharacters": {
+        "BRUNO": "Lowering from chair at right.",
+        "PENNY": "Emerges beneath table near Bruno.",
+        "SADIE": "Beyond table, then approaches bowl.",
+        "HEIDI": "Left side.",
+        "OTTO": "Quiet background."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "Bruno halfway through lowering front paws; bowl remains beside rear paw.",
+      "endState": "Bruno on all fours; Penny beside bowl; Sadie approaching it. Cheese still on plate.",
+      "camera": "Hold previous composition and ongoing descent, no cut.",
+      "actionCues": [
+        {
+          "start": 42,
+          "end": 43.5,
+          "action": "Complete Bruno’s descent. Penny emerges, looks at Dad, then bowl beside his rear paw."
+        },
+        {
+          "start": 43.5,
+          "end": 47,
+          "action": "Penny alone speaks; Bruno silently follows her gaze."
+        },
+        {
+          "start": 47,
+          "end": 50,
+          "action": "Bruno shifts paw; Sadie starts approaching bowl from her established side."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d05",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Floor scuff and restrained crockery beneath dialogue.",
+      "transition": "Continue Bruno’s descent into Penny’s reveal."
+    },
+    {
+      "id": "s08",
+      "title": "Meet the mother",
+      "start": 50,
+      "end": 58,
+      "connection": "cut",
+      "previousShotId": "s07",
+      "visibleCharacters": {
+        "SADIE": "Foreground approaching bowl.",
+        "PENNY": "Foreground beside bowl.",
+        "BRUNO": "Face and navy collar visible at frame edge."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [
+        {
+          "shotId": "s07",
+          "purpose": "Match preceding accepted end-state, action and prop positions."
+        },
+        {
+          "shotId": "s03",
+          "purpose": "Preserve established room geography and lighting; use current preceding shot for prop state."
+        }
+      ],
+      "startState": "Bruno on all fours; Penny beside bowl; Sadie approaching it. Cheese still on plate.",
+      "endState": "Bowl free, Penny eating. Sadie turning toward Bruno; cheese untouched.",
+      "camera": "Lower closer angle on Sadie and Penny; match action, no axis crossing.",
+      "actionCues": [
+        {
+          "start": 50,
+          "end": 52,
+          "action": "Match Sadie’s approach. Nose bowl clear toward Penny. Finish using muzzle before speaking."
+        },
+        {
+          "start": 52,
+          "end": 56.5,
+          "action": "Sadie alone speaks; Penny listens, Bruno remains silent."
+        },
+        {
+          "start": 56.5,
+          "end": 58,
+          "action": "Penny eats from floor bowl. Sadie turns toward Bruno. Cheddar remains on separate plate."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d06",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Bowl slides, quiet eating after dialogue.",
+      "transition": "Cut on Sadie’s approach; match movement."
+    },
+    {
+      "id": "s09",
+      "title": "Husband and wife",
+      "start": 58,
+      "end": 66,
+      "connection": "cut",
+      "previousShotId": "s08",
+      "visibleCharacters": {
+        "SADIE": "Screen left facing Bruno.",
+        "BRUNO": "Screen right facing Sadie.",
+        "PENNY": "Low background eating from floor bowl."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [
+        {
+          "shotId": "s08",
+          "purpose": "Match preceding accepted end-state, action and prop positions."
+        },
+        {
+          "shotId": "s03",
+          "purpose": "Preserve established room geography and lighting; use current preceding shot for prop state."
+        }
+      ],
+      "startState": "Bowl free, Penny eating. Sadie turning toward Bruno; cheese untouched.",
+      "endState": "Sadie left and Bruno right, face to face. Penny eats behind them. Window remains open.",
+      "camera": "Settled two-shot: Sadie left, Bruno right; retain positions.",
+      "actionCues": [
+        {
+          "start": 58,
+          "end": 59,
+          "action": "Complete Sadie’s turn; Bruno notices her attention."
+        },
+        {
+          "start": 59,
+          "end": 61,
+          "action": "Sadie alone speaks; Bruno listens."
+        },
+        {
+          "start": 61,
+          "end": 62,
+          "action": "Silent pause. Sadie closes mouth before reply."
+        },
+        {
+          "start": 62,
+          "end": 64,
+          "action": "Bruno alone replies; Sadie listens."
+        },
+        {
+          "start": 64,
+          "end": 66,
+          "action": "Sadie studies him; Bruno attempts innocence; Penny quietly eats."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d07",
+          "visibility": "on-camera"
+        },
+        {
+          "dialogueId": "d08",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Open-window wind, quiet background breakfast; no music restart.",
+      "transition": "Cut on Sadie turning toward Bruno."
+    },
+    {
+      "id": "s10",
+      "title": "A suspicious aroma",
+      "start": 66,
+      "end": 75,
+      "connection": "continue",
+      "previousShotId": "s09",
+      "visibleCharacters": {
+        "SADIE": "Screen left facing Bruno.",
+        "BRUNO": "Screen right facing Sadie.",
+        "PENNY": "Low background with bowl."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "Sadie left and Bruno right, face to face. Penny eats behind them. Window remains open.",
+      "endState": "Sadie and Bruno begin looking toward offscreen Heidi. Penny pauses. d10 audio is ongoing across cut.",
+      "camera": "Continue same two-shot without reframing or reset.",
+      "actionCues": [
+        {
+          "start": 66,
+          "end": 69,
+          "action": "Sadie leans in and sniffs Bruno’s muzzle. Both silent."
+        },
+        {
+          "start": 69,
+          "end": 70,
+          "action": "Sadie withdraws slightly; recognition and silent pause."
+        },
+        {
+          "start": 70,
+          "end": 73,
+          "action": "Sadie alone asks her question. Bruno does not answer."
+        },
+        {
+          "start": 73,
+          "end": 74.5,
+          "action": "Hold Bruno’s closed-mouth reaction; no extra denial."
+        },
+        {
+          "start": 74.5,
+          "end": 75,
+          "action": "Everyone visible begins turning toward offscreen Heidi in response to editorial cue d10. Do not synthesize her voice here."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d09",
+          "visibility": "on-camera"
+        },
+        {
+          "dialogueId": "d10",
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Sniff, low room ambience. Reserve final 0.5s for external Heidi cue d10; no generated Heidi speech.",
+      "transition": "Continuous sniff, recognition and reaction."
+    },
+    {
+      "id": "s11",
+      "title": "Grandmother calls breakfast to order",
+      "start": 75,
+      "end": 83,
+      "connection": "cut",
+      "previousShotId": "s10",
+      "visibleCharacters": {
+        "HEIDI": "Room master, left by open window.",
+        "OTTO": "Quietly beside window.",
+        "SADIE": "Beyond table.",
+        "BRUNO": "Beside chair at right.",
+        "PENNY": "Near reachable cheese plate."
+      },
+      "referenceAssets": [
+        "character_heidi",
+        "character_otto",
+        "character_bruno",
+        "character_sadie",
+        "character_penny",
+        "estate_exterior",
+        "breakfast_room"
+      ],
+      "referenceFrames": [
+        {
+          "shotId": "s10",
+          "purpose": "Match preceding accepted end-state, action and prop positions."
+        },
+        {
+          "shotId": "s03",
+          "purpose": "Preserve established room geography and lighting; use current preceding shot for prop state."
+        }
+      ],
+      "startState": "Sadie and Bruno begin looking toward offscreen Heidi. Penny pauses. d10 audio is ongoing across cut.",
+      "endState": "All in same room positions; Heidi settled. Penny beside plate with cube still present; bowl on floor.",
+      "camera": "Established room master showing all five dogs and cheese plate.",
+      "actionCues": [
+        {
+          "start": 75,
+          "end": 79,
+          "action": "All listeners face Heidi. Reserve Heidi’s visible performance for synchronization with ongoing editorial cue d10; do not generate a second recording."
+        },
+        {
+          "start": 79,
+          "end": 83,
+          "action": "Heidi settles; adults break confrontation. Otto nods silently; Penny glances toward cheese."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d10",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Room ambience beneath separate ongoing cue d10; no generated Heidi speech.",
+      "transition": "One continuous Heidi audio cue d10 starts at 74.5s and crosses cut at 75s; do not duplicate it."
+    },
+    {
+      "id": "s12",
+      "title": "The real family priority",
+      "start": 83,
+      "end": 90,
+      "connection": "continue",
+      "previousShotId": "s11",
+      "visibleCharacters": {
+        "HEIDI": "Left by open window.",
+        "OTTO": "Quietly beside window.",
+        "SADIE": "Beyond table.",
+        "BRUNO": "Beside chair at right.",
+        "PENNY": "Near cheese plate at low table edge."
+      },
+      "referenceAssets": [],
+      "referenceFrames": [],
+      "startState": "All in same room positions; Heidi settled. Penny beside plate with cube still present; bowl on floor.",
+      "endState": "Plate empty; Penny has swallowed cheese and spoken. Adults react. Hard cut at 90s, no mystery reveal.",
+      "camera": "Continue wide; plate and Penny clearly readable, no insert.",
+      "actionCues": [
+        {
+          "start": 83,
+          "end": 85,
+          "action": "Penny reaches low table edge with muzzle and visibly takes single cheddar cube while adults look at Heidi."
+        },
+        {
+          "start": 85,
+          "end": 87,
+          "action": "Heidi looks at empty plate; adults follow gaze to Penny. Penny finishes chewing and swallows."
+        },
+        {
+          "start": 87,
+          "end": 88,
+          "action": "Penny alone says her line; adults silent."
+        },
+        {
+          "start": 88,
+          "end": 90,
+          "action": "Hold: Bruno impressed, Sadie unsurprised, Heidi offended, Otto looks away. End with hard cut."
+        }
+      ],
+      "dialogueCues": [
+        {
+          "dialogueId": "d11",
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet cheese taking and chewing; one gentle piano punctuation at end, no added dialogue.",
+      "transition": "Continuous wide and shared gaze; audience sees cheese taken before adults notice."
+    }
+  ]
+}

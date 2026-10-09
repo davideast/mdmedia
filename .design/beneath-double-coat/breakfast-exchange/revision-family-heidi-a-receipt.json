@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-family-heidi-a",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/family-heidi-a.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/RH-source-frame.jpg",
+    "seconds": 9,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. BURGUNDY-collared elderly female Heidi with silver muzzle. Low measured older WOMAN voice, warm, dry and dignified, same voice as earlier. Eyes RIGHT toward Bruno. Quietly troubled, asks family for help assessing what she found. No injury or breathlessness.\nAt 0.5s say EXACTLY: \"This smells like Sebastian.\" Finish the complete last word by 2.9s, then close muzzle and silently listen.\nAt 3.8s say EXACTLY: \"I thought that too. Then I smelled it again.\" Finish the complete last word by 8.4s, then close muzzle and silently listen. Total 9s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "76f0b042a8072052583753bf2228a3f4e281c919b045c4e60df92c71bc151207",
+  "interactionId": "v1_Chd6czNGYXBpTEpiaU1fdU1QaW9fUG1RWRIXenMzRmFwaUxKYmlNX3VNUGlvX1BtUVk",
+  "durationSeconds": 9.003,
+  "review": "pending"
+}

@@ -1,0 +1,32 @@
+{
+  "finalVideo": "breakfast-bruno-final.mp4",
+  "durationSeconds": 12.25,
+  "acceptedSource": "../heidi-otto-proof/heidi-otto-proof-v2.mp4",
+  "acceptedVideoRange": [
+    0,
+    10
+  ],
+  "brunoSource": "bruno-greeting-v2.mp4",
+  "brunoVideoRange": [
+    0.5,
+    2.75
+  ],
+  "brunoCrop": {
+    "width": 720,
+    "height": 404,
+    "x": 220,
+    "y": 65
+  },
+  "brunoAudioRange": [
+    0,
+    2.75
+  ],
+  "brunoAudioSequenceStart": 9.5,
+  "visualCutAt": 10,
+  "transition": "hard cut",
+  "audioEdit": "Half-second audio prelap; complete greeting preserved and synced after the visual cut.",
+  "studioDraft": "beneath-double-coat-bruno-introduction__sequence",
+  "studioContains": "Original accepted shot and unedited generated Bruno take; the finishing crop and audio prelap are in this local final export.",
+  "retainedRejectedTake": "bruno-greeting.mp4",
+  "review": "review-final.json"
+}

@@ -1,0 +1,132 @@
+{
+  "title": "Beneath the Double Coat — Breakfast",
+  "finalVideo": "breakfast-exchange-final.mp4",
+  "durationSeconds": 30.166666666666668,
+  "acceptedOpeningSeconds": 12.25,
+  "generatedPerformanceIds": [
+    "heidi-return",
+    "bruno-concern",
+    "breakfast-establish",
+    "sadie-performance",
+    "bruno-excuse"
+  ],
+  "referenceProvenance": {
+    "heidi-return-first.jpg": {
+      "source": "../heidi-otto-proof/heidi-otto-proof-v2.mp4",
+      "frameAt": 9
+    },
+    "bruno-return-first.jpg": {
+      "source": "../bruno-introduction/breakfast-bruno-final.mp4",
+      "frameAt": 12
+    },
+    "sadie-first.jpg": {
+      "source": "breakfast-establish.mp4",
+      "frameAt": 1.5,
+      "crop": {
+        "width": 640,
+        "height": 360,
+        "x": 80,
+        "y": 105
+      }
+    },
+    "bruno-breakfast-first.jpg": {
+      "source": "breakfast-establish.mp4",
+      "frameAt": 1.5,
+      "crop": {
+        "width": 640,
+        "height": 360,
+        "x": 640,
+        "y": 65
+      }
+    }
+  },
+  "dialogue": [
+    {
+      "speaker": "Heidi",
+      "words": "Bruno. Your wife's waiting in the breakfast room."
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Is Sadie still angry?"
+    },
+    {
+      "speaker": "Sadie",
+      "words": "You came home after midnight."
+    },
+    {
+      "speaker": "Bruno",
+      "words": "I went for a walk."
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Then why do you smell like Parmesan?"
+    }
+  ],
+  "returnStrategy": "The Heidi and Bruno doorway return first frames are taken directly from accepted footage. Both breakfast close-ups are crops of the same establishing video. Both Sadie appearances use different ranges of one source performance.",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/bruno-introduction/breakfast-bruno-final.mp4",
+      "start": 0,
+      "end": 12.25,
+      "label": "Accepted Heidi–Otto opening and Bruno greeting",
+      "sequenceStart": 0,
+      "sequenceEnd": 12.25
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/heidi-return.mp4",
+      "start": 0,
+      "end": 4.75,
+      "label": "Heidi sends Bruno to breakfast",
+      "sequenceStart": 12.25,
+      "sequenceEnd": 17
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/bruno-concern.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "Bruno asks about Sadie",
+      "sequenceStart": 17,
+      "sequenceEnd": 20
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-establish.mp4",
+      "start": 0,
+      "end": 2,
+      "label": "Establish spouses and breakfast geography",
+      "sequenceStart": 20,
+      "sequenceEnd": 22
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+      "start": 0.375,
+      "end": 3,
+      "label": "Sadie: You came home after midnight",
+      "sequenceStart": 22,
+      "sequenceEnd": 24.625
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/bruno-excuse.mp4",
+      "start": 0.8333333333333334,
+      "end": 3,
+      "label": "Bruno: I went for a walk",
+      "sequenceStart": 24.625,
+      "sequenceEnd": 26.791666666666668
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+      "start": 4.375,
+      "end": 7.75,
+      "label": "Same Sadie take: Then why do you smell like Parmesan?",
+      "sequenceStart": 26.791666666666668,
+      "sequenceEnd": 30.16666666666667
+    }
+  ],
+  "reviewFile": "final-review.json",
+  "status": "ready_for_user_review",
+  "review": {
+    "automatedReviewAcceptable": true,
+    "materialFailures": [],
+    "visualContactSheet": "final-contact.jpg",
+    "reviewFile": "final-review.json"
+  }
+}

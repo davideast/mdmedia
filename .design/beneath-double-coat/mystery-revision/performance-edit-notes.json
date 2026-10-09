@@ -1,0 +1,41 @@
+{
+  "retainedNaturalHesitations": {
+    "s1": "We heard you. Um, what's happened?",
+    "h13": "I don't know. I... I need you to look."
+  },
+  "repairs": [
+    {
+      "take": "family-bruno-b",
+      "issue": "Repeated that fire after complete first sentence",
+      "edit": "End selected spoken range at 2.71s, before second that at about 2.76s; silent reactions use 4–7.75s."
+    },
+    {
+      "take": "family-sadie",
+      "issue": "First question extends past draft cue timing",
+      "edit": "Use .95–5.15s for complete question; second question starts at 5.92s."
+    },
+    {
+      "take": "hall-heidi-a",
+      "issue": "Stray laughter before share line",
+      "edit": "Share shot starts at 7.05s; isolated trimmed audio verified complete sentence and no other sounds."
+    },
+    {
+      "take": "hall-bruno-twin",
+      "issue": "Stray bark/laughter in unused source handles",
+      "edit": "1.08–4.62s trimmed audio verified exact words and no other sounds."
+    },
+    {
+      "take": "hall-bruno-c",
+      "issue": "Extra echo after intended sentence",
+      "edit": "Use .7–4.25s only; intended complete sentence confirmed independently."
+    }
+  ],
+  "sourceReviewCautions": [
+    {
+      "file": "discovery-source-review.json",
+      "observation": "Multi-video reviewer reported entirely motionless muzzles and extra animal corner.",
+      "assessment": "Contact sheets at 2fps visibly show mouths opening and closing in both takes. Lower-right object is the stationary fur established by insert and room master, not a newly appearing full animal. Retain raw reviewer output; request independent whole-edit review rather than treating these labels as established fact."
+    }
+  ],
+  "durationTolerance": "Generation requests are <=10s. Source MP4 duration 10.006s includes audio packet padding; plan allows 10.05s (one 24fps frame) for measured container duration."
+}

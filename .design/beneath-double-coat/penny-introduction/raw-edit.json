@@ -1,0 +1,32 @@
+[
+  {
+    "file": ".design/beneath-double-coat/penny-introduction/attention.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "attention"
+  },
+  {
+    "file": ".design/beneath-double-coat/penny-introduction/family.mp4",
+    "start": 0,
+    "end": 3,
+    "label": "family"
+  },
+  {
+    "file": ".design/beneath-double-coat/penny-introduction/penny-performance.mp4",
+    "start": 0,
+    "end": 8,
+    "label": "penny-performance"
+  },
+  {
+    "file": ".design/beneath-double-coat/penny-introduction/bruno-performance.mp4",
+    "start": 0,
+    "end": 5,
+    "label": "bruno-performance"
+  },
+  {
+    "file": ".design/beneath-double-coat/penny-introduction/sadie-performance.mp4",
+    "start": 0,
+    "end": 9,
+    "label": "sadie-performance"
+  }
+]

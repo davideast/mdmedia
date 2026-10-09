@@ -29,6 +29,7 @@ import { isVoiceDisplayName } from './voice-name.mjs';
 import { auth, db } from '@/lib/firebase';
 import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
+import { retryDeniedListener } from '@/lib/retry-denied-listener';
 import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
   DEFAULT_VOICE,
@@ -171,17 +172,24 @@ export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => 
   );
 }
 
+// The synthesis route creates a narration with the Admin SDK moments after the
+// client learns its id; a listener attached in that gap is refused by Rules.
 export function watchNarration(id: string, cb: (narration: Narration | null) => void, onError?: (error: Error) => void): Unsubscribe {
   return multicastSubscribe<Narration | null>(
     `narration:${id}`,
     (onData, reportError) => {
-      return onSnapshot(
-        narrationRef(id),
-        (snapshot) => {
-          onData(snapshot.exists() ? toNarration(snapshot) : null);
-        },
+      return retryDeniedListener(
+        (reportError) =>
+          onSnapshot(
+            narrationRef(id),
+            (snapshot) => {
+              onData(snapshot.exists() ? toNarration(snapshot) : null);
+            },
+            (error) => reportError(error),
+          ),
         (error) => {
           reportError?.(error);
+          if ((error as { code?: string } | null)?.code === 'permission-denied') onData(null);
         },
       );
     },

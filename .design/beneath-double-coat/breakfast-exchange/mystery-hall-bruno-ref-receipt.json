@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-hall-bruno-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/hall-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/hall-bruno.jpg",
+    "prompt": "Create a matching cinematic close-up from the supplied ACTUAL video frame. Photorealistic natural Bernese dog anatomy, no human face or body, no text. Same scene, same instant, same pine background, morning light, collar, age and exact face. Do NOT redesign the room or dog. BRUNO, navy-collared adult on the RIGHT. Exactly ONE visible dog. Head and upper chest, looking LEFT toward Heidi. Include navy collar. Crop the other dog completely away. Same doorway behind him."
+  },
+  "fingerprint": "4256e8ebc123eaa6f7661b695d159ed26bbc090ddc2ad3816f378b379449470b",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

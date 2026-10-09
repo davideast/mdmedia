@@ -1,0 +1,15 @@
+{
+  "job": {
+    "id": "mystery-hall-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-heidi-otto.jpg",
+      ".design/beneath-double-coat/mystery-finish/accepted-bruno.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+    "prompt": "Photorealistic cinematic still from the same warm, timber-lined Alpine estate in winter morning. All characters are real quadrupedal Bernese Mountain Dogs with natural dog anatomy. No humans, people, hands, human clothing, human bodies, additional animals, captions or subtitles. Preserve the supplied dogs EXACTLY: facial markings, head shape, age, coat, collar. Paws stay on the floor. Dogs never handle props. Natural perspective, 16:9. Create a WIDE establishing view of the quiet hallway immediately outside the breakfast room. Warm honey-pine wall panels, closed snowy window at far left, doorway at back RIGHT visibly leading into the familiar breakfast room with low table and green plate, no dogs visible inside that room. Exactly TWO dogs: HEIDI, the elderly silver-muzzled burgundy-collared dog from the LEFT of reference 1, seated at camera LEFT. BRUNO, the navy-collared adult in reference 2, seated at camera RIGHT near the breakfast doorway. Omit the ochre-collared dog completely. Heidi and Bruno look toward a low oak bench between them. On the bench are a faded brown dog collar and a small framed old photograph of exactly TWO Bernese puppies, no lettering. At back LEFT a separate open doorway leads into a light pine grooming room; a small trail of muddy pawprints leads toward that doorway. Morning daylight, understated dramatic composition, quiet family history. No talking or reaching. Both whole bodies visible; Heidi left, Bruno right, collar/portrait center."
+  },
+  "fingerprint": "3f442a11e869b2b497d390c8f9de97d9705a1583fb8939ba2510674e51644137",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "penny-attention",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/penny-introduction/attention.mp4",
+    "firstFrame": ".design/beneath-double-coat/penny-introduction/accepted-exact-end.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. All visible characters are anatomically real Bernese Mountain Dogs. NO humans, people, hands, human bodies, clothes, extra dogs, visitors, text, captions, speech, voices, music, barking, laughing or cuts. Four canine legs per dog; no human limbs. No walking, standing up, paw gestures, touching furniture, reaching, eating or moving the cheese. All paws stay planted; only subtle canine eyes, ears, breathing and small head motion. Preserve lighting, collars, markings and every prop. Natural quiet indoor ambience. EXACTLY TWO adult dogs as shown in the first frame: Sadie left green collar, Bruno right navy collar. This is the next 3 seconds of that exact image. At 0.5 seconds a very soft offscreen collar tick from low camera-RIGHT draws both dogs' eyes toward the floor to the RIGHT beyond the edge of the frame. Bruno turns his head a little to his right and down; Sadie looks past the table to the same location. Do not look into the lens. Bodies and front paws remain completely still in their seated positions. No new dog enters or appears. Camera remains absolutely locked, same framing. End with both looking calmly toward the offscreen daughter. No dialogue."
+  },
+  "fingerprint": "7b6ee11f79a6ff7d01815d57e76444c42aeeb8349f16d6f767bba15ea92278d3",
+  "interactionId": "v1_ChdIS0RGYXR5eE1hYk9fdU1QdHFLOWlRcxIXSEtERmF0eXhNYWJPX3VNUHRxSzlpUXM",
+  "durationSeconds": 3.008,
+  "review": "pending"
+}

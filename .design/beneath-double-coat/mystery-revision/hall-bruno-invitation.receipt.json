@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-hall-bruno-invitation",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/hall-bruno-invitation.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/HB-source-frame.jpg",
+    "seconds": 7,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. NAVY-collared adult male Bruno, same broad white blaze. Warm low male baritone, restrained and conversational. Eyes LEFT toward his grandmother. Gradually reveals grief; never angry or theatrical shouting.\n After a short quiet lead-in, say this ONE complete utterance in a dry, matter-of-fact tone: \"Grandmother? Come back in. Penny's negotiating for your breakfast.\" No laughter, chuckle, bark, extra syllable, repeated phrase, second utterance or other voice. Finish all words naturally, close the muzzle and listen silently through the end. This is a 7-second clip."
+  },
+  "fingerprint": "ed5ac6ecdb83c72f4e57d130316947b106d3df26c2b9cf56d49f84ec7b341fb1",
+  "interactionId": "v1_Chc0c3pGYXEtaks4aTJfUFVQOE1TRm1RYxIXNHN6RmFxLWpLOGkyX1BVUDhNU0ZtUWM",
+  "durationSeconds": 7.019,
+  "review": "pending"
+}

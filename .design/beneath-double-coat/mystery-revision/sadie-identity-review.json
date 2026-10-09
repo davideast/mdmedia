@@ -1,0 +1,49 @@
+{
+  "clips": [
+    {
+      "id": "A",
+      "words": "Penny, your father is changing.",
+      "voice": "female, mature",
+      "collar": "green",
+      "markings": "black, white blaze, tan eyebrows and cheeks",
+      "mouthMotion": "none",
+      "defects": []
+    },
+    {
+      "id": "B",
+      "words": "We heard you. What's happened?",
+      "voice": "female, mature",
+      "collar": "green",
+      "markings": "black, white blaze, tan eyebrows and cheeks",
+      "mouthMotion": "none",
+      "defects": []
+    },
+    {
+      "id": "C",
+      "words": "Dead, grandmother. It's probably mine.",
+      "voice": "male, deep",
+      "collar": "blue",
+      "markings": "black, white blaze, tan eyebrows and cheeks",
+      "mouthMotion": "none",
+      "defects": []
+    },
+    {
+      "id": "D",
+      "words": "You really think he's been here?",
+      "voice": "female, mature",
+      "collar": "green",
+      "markings": "black, white blaze, tan eyebrows and cheeks",
+      "mouthMotion": "none",
+      "defects": []
+    }
+  ],
+  "matchingA": [
+    "B",
+    "D"
+  ],
+  "mismatchingA": [
+    "C"
+  ],
+  "uncertainty": [],
+  "reason": "Clips A, B, and D all feature a dog with a green collar and a female voiceover. Clip C features a dog with a blue collar and a male voiceover, indicating a different character."
+}

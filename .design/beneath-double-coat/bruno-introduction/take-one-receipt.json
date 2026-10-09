@@ -1,0 +1,282 @@
+{
+  "origin": "http://127.0.0.1:3101",
+  "draftId": "beneath-double-coat-bruno-introduction__sequence",
+  "record": {
+    "videoBrief": {
+      "prompt": "Imported screenplay: Breakfast — Bruno arrives\n\nFor the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+      "targetSeconds": 14,
+      "sourceIn": 0,
+      "sourceOut": 0,
+      "sourceUsage": "reference",
+      "submittedSourceUsage": "reference",
+      "submittedSource": "",
+      "submittedRange": "0:0",
+      "continuity": "planned",
+      "script": {
+        "title": "Breakfast — accepted opening and Bruno",
+        "sourceTranscript": "HEIDI: Otto. You were meant to clear the path. Not bring it in. Breakfast is waiting.\nBRUNO: Morning, Grandmother.",
+        "sourceDescription": "Keep the accepted Heidi–Otto video intact, followed by a referenced hard cut to Bruno at the same room doorway.",
+        "shots": [
+          {
+            "id": "accepted",
+            "title": "Heidi and Otto — accepted scene",
+            "seconds": 10,
+            "source": "screencast",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Previously accepted Heidi–Otto scene, used intact.",
+            "audio": "Preserve the accepted audio.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "bruno",
+            "title": "Bruno greets Grandmother",
+            "seconds": 4,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BRUNO: Morning, Grandmother.",
+            "visual": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.",
+            "audio": "At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.",
+            "pauseSeconds": 1
+          }
+        ]
+      },
+      "submittedPrompt": "Imported screenplay: Breakfast — Bruno arrives\n\nFor the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+      "submittedTarget": 14
+    },
+    "draft": {
+      "mode": "references",
+      "frame": "16:9",
+      "note": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+      "beats": [
+        {
+          "id": "script_accepted",
+          "start": 0,
+          "end": 10,
+          "text": "Previously accepted Heidi–Otto scene, used intact."
+        },
+        {
+          "id": "script_bruno",
+          "start": 10,
+          "end": 14,
+          "text": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nBRUNO: Morning, Grandmother.\n\nSound direction: At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue."
+        }
+      ]
+    },
+    "title": "Breakfast — accepted opening and Bruno",
+    "beatClips": {
+      "script_accepted": {
+        "placement": {
+          "id": "accepted",
+          "title": "Heidi and Otto — accepted scene",
+          "seconds": 10,
+          "source": "screencast",
+          "connection": "cut",
+          "dialogue": "",
+          "visual": "Previously accepted Heidi–Otto scene, used intact.",
+          "audio": "Preserve the accepted audio.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_6a8bac0ec9ec4ef887927c6214f473b8"
+      },
+      "script_bruno": {
+        "placement": {
+          "id": "bruno",
+          "title": "Bruno greets Grandmother",
+          "seconds": 4,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "BRUNO: Morning, Grandmother.",
+          "visual": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.",
+          "audio": "At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_d7fc43233078409ba620585429617322"
+      }
+    },
+    "builtScript": {
+      "title": "Breakfast — accepted opening and Bruno",
+      "sourceTranscript": "HEIDI: Otto. You were meant to clear the path. Not bring it in. Breakfast is waiting.\nBRUNO: Morning, Grandmother.",
+      "sourceDescription": "Keep the accepted Heidi–Otto video intact, followed by a referenced hard cut to Bruno at the same room doorway.",
+      "shots": [
+        {
+          "id": "accepted",
+          "title": "Heidi and Otto — accepted scene",
+          "seconds": 10,
+          "source": "screencast",
+          "connection": "cut",
+          "dialogue": "",
+          "visual": "Previously accepted Heidi–Otto scene, used intact.",
+          "audio": "Preserve the accepted audio.",
+          "pauseSeconds": 1
+        },
+        {
+          "id": "bruno",
+          "title": "Bruno greets Grandmother",
+          "seconds": 4,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "BRUNO: Morning, Grandmother.",
+          "visual": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.",
+          "audio": "At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.",
+          "pauseSeconds": 1
+        }
+      ]
+    },
+    "view": "tracks",
+    "exportId": "v_e47876e9f1f34e86888a9879bfb174ef"
+  },
+  "jobs": {
+    "v_6a8bac0ec9ec4ef887927c6214f473b8": {
+      "sourceAssetId": "s_a4d46005ea4e43f081d2d19b106c7ec7",
+      "id": "v_6a8bac0ec9ec4ef887927c6214f473b8",
+      "status": "ready",
+      "model": "uploaded-video",
+      "mode": "text",
+      "frame": "16:9",
+      "createdAt": 1791317642252,
+      "updatedAt": 1791317642252,
+      "durationSeconds": 10.027,
+      "canExtend": false
+    },
+    "v_3bbce110ed86495d93b87d5570ddad23": {
+      "id": "v_3bbce110ed86495d93b87d5570ddad23",
+      "status": "error",
+      "model": "gemini-omni-1.1-flash",
+      "mode": "references",
+      "frame": "16:9",
+      "createdAt": 1791317642341,
+      "updatedAt": 1791317643053,
+      "message": "The video could not be generated. Your direction is saved; try again.",
+      "requestedDurationSeconds": 4,
+      "direction": {
+        "beats": [
+          {
+            "id": "script_bruno",
+            "text": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nBRUNO: Morning, Grandmother.\n\nSound direction: At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue.",
+            "start": 0,
+            "end": 4
+          }
+        ],
+        "note": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+        "mode": "references",
+        "frame": "16:9"
+      },
+      "canExtend": false
+    },
+    "v_b05aec8ab122475789cb04f1e344199d": {
+      "id": "v_b05aec8ab122475789cb04f1e344199d",
+      "status": "error",
+      "model": "gemini-omni-1.1-flash",
+      "mode": "references",
+      "frame": "16:9",
+      "createdAt": 1791317646471,
+      "updatedAt": 1791317647103,
+      "message": "The video could not be generated. Your direction is saved; try again.",
+      "requestedDurationSeconds": 4,
+      "direction": {
+        "beats": [
+          {
+            "id": "script_bruno",
+            "text": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nBRUNO: Morning, Grandmother.\n\nSound direction: At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue.",
+            "start": 0,
+            "end": 4
+          }
+        ],
+        "note": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+        "mode": "references",
+        "frame": "16:9"
+      },
+      "canExtend": false
+    },
+    "v_db230d2d3512461fa97874a1f068bdec": {
+      "id": "v_db230d2d3512461fa97874a1f068bdec",
+      "status": "error",
+      "model": "gemini-omni-1.1-flash",
+      "mode": "references",
+      "frame": "16:9",
+      "createdAt": 1791317650623,
+      "updatedAt": 1791317651247,
+      "message": "The video could not be generated. Your direction is saved; try again.",
+      "requestedDurationSeconds": 4,
+      "direction": {
+        "beats": [
+          {
+            "id": "script_bruno",
+            "text": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nBRUNO: Morning, Grandmother.\n\nSound direction: At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue.",
+            "start": 0,
+            "end": 4
+          }
+        ],
+        "note": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+        "mode": "references",
+        "frame": "16:9"
+      },
+      "canExtend": false
+    },
+    "v_d7fc43233078409ba620585429617322": {
+      "id": "v_d7fc43233078409ba620585429617322",
+      "status": "ready",
+      "model": "gemini-omni-1.1-flash",
+      "mode": "references",
+      "frame": "16:9",
+      "createdAt": 1791317712726,
+      "updatedAt": 1791317742044,
+      "message": "",
+      "durationSeconds": 4.011,
+      "requestedDurationSeconds": 4,
+      "direction": {
+        "beats": [
+          {
+            "id": "script_bruno",
+            "text": "0–0.6s: hold the supplied doorway composition; Bruno is already paused at the threshold, looking toward screen left at offscreen Heidi. Mouth closed, no walking or body motion. 0.6–2.2s: BRUNO alone says the exact greeting with visible synchronized canine jaw and muzzle articulation, warm relaxed male baritone. 2.2–4s: close mouth, hold a brief expectant look toward Heidi. No extra dialogue, exaggerated expressions, or moving legs.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nBRUNO: Morning, Grandmother.\n\nSound direction: At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue.",
+            "start": 0,
+            "end": 4
+          }
+        ],
+        "note": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot.",
+        "mode": "references",
+        "frame": "16:9"
+      },
+      "canExtend": true
+    },
+    "v_e47876e9f1f34e86888a9879bfb174ef": {
+      "id": "v_e47876e9f1f34e86888a9879bfb174ef",
+      "status": "ready",
+      "model": "local-export",
+      "mode": "text",
+      "frame": "16:9",
+      "createdAt": 1791317745043,
+      "updatedAt": 1791317746111,
+      "message": "Final video ready",
+      "durationSeconds": 14.042,
+      "requestedDurationSeconds": 14.038,
+      "exportInputs": [
+        {
+          "videoId": "v_6a8bac0ec9ec4ef887927c6214f473b8",
+          "inSeconds": 0,
+          "outSeconds": 10.027,
+          "muted": false,
+          "transition": "cut",
+          "transitionSeconds": 0
+        },
+        {
+          "videoId": "v_d7fc43233078409ba620585429617322",
+          "inSeconds": 0,
+          "outSeconds": 4.011,
+          "muted": false,
+          "transition": "cut",
+          "transitionSeconds": 0
+        }
+      ],
+      "canExtend": false
+    }
+  },
+  "retries": {
+    "script_bruno": 0
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "mystery-hall-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. Animate exactly the supplied composition as one locked wide shot. Preserve exact faces, ages, collars, positions, furniture and lighting. No humans, hands, human anatomy, human clothing, additional dogs, words, captions, speaking, barking, music or cuts. All dogs remain seated, paws planted, no reaching or walking, only gentle breathing, blinks and tiny natural eye movements. Quiet room tone; no voices or music. Exactly TWO dogs. Elderly burgundy-collared Heidi LEFT and navy-collared Bruno RIGHT quietly look at the faded collar and two-puppy portrait between them. Props never move. Mouths closed."
+  },
+  {
+    "id": "mystery-groom-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. Animate exactly the supplied composition as one locked wide shot. Preserve exact faces, ages, collars, positions, furniture and lighting. No humans, hands, human anatomy, human clothing, additional dogs, words, captions, speaking, barking, music or cuts. All dogs remain seated, paws planted, no reaching or walking, only gentle breathing, blinks and tiny natural eye movements. Gentle constant ventilation hum; no voices or music. Exactly ONE dog: elderly burgundy-collared Heidi LEFT looks down toward the black tuft on the platform. She makes one very small nose sniff, not a large head movement. The silver rake and fur stay on the platform. Door stays open. Mouth closed. Ventilation continues evenly."
+  },
+  {
+    "id": "mystery-rescue-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+    "seconds": 3,
+    "prompt": "Exactly THREE photorealistic real Bernese Mountain Dogs in this exact grooming room. Elderly gray-muzzled Heidi burgundy collar LEFT; large Bruno navy collar MIDDLE-RIGHT; slimmer Sadie green collar FAR RIGHT. Preserve exact reference composition, faces, collars, body positions, warm winter light, door open, tuft and silver rake resting on platform. Locked wide shot, no cuts. Seated bodies and paws remain still. Heidi looks at Bruno, Bruno at Heidi, Sadie glances between them. Tiny blinks, breathing and eye motion only. All mouths CLOSED, no speech, voices, music or barking. Quiet room tone, ventilation is OFF. No humans, human anatomy, extra dogs, captions, standing, moving furniture or touching props. Calm, concerned family reaction."
+  }
+]

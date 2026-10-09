@@ -1,0 +1,31 @@
+{
+  "title": "Beneath the Double Coat — Penny joins breakfast",
+  "status": "ready_for_user_review",
+  "acceptedPrefix": {
+    "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-bella-complete.mp4",
+    "durationSeconds": 53.125,
+    "storyAndEditPreserved": true
+  },
+  "newSection": {
+    "file": ".design/beneath-double-coat/penny-introduction/penny-sequence.mp4",
+    "durationSeconds": 20.333333333333332,
+    "startInFullVideo": 53.125
+  },
+  "finalVideo": {
+    "file": ".design/beneath-double-coat/penny-introduction/breakfast-with-penny.mp4",
+    "durationSeconds": 73.45833333333333,
+    "sha256": "5604b31d1b3c85fe1b80e2fe170fd22a9fe894d7d0916da1f10ec9faee10f2cf"
+  },
+  "story": "Penny is revealed beside her parents, addresses Dad, is named by her mother, and asks for the cheese. Breakfast ends on Sadie’s response.",
+  "transition": "Source-frame anchored lead-in; gaze-motivated reveal; hard dialogue/reaction cuts; same saved performance per returning character.",
+  "reviewFiles": [
+    "context-review.json",
+    "audio-fragments.json",
+    "audio-repair.json",
+    "production.plan-report.json",
+    "production.takes-report.json",
+    "production.edit-report.json"
+  ],
+  "rawReview": "The first raw-footage Gemini request timed out; final edited context reviewed instead.",
+  "noStudioImportClaim": true
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { WorkspaceStore, workspaceRoute, type WorkspaceStorage } from '../../studio/src/lib/workspace';
+import { createSceneDraft } from '../../studio/src/lib/scene-direction';
 
 function memoryStorage(): WorkspaceStorage {
   const values = new Map<string, string>();
@@ -7,6 +8,24 @@ function memoryStorage(): WorkspaceStorage {
 }
 
 describe('route-based workspace tabs', () => {
+  it('keeps scene drafts and generated video ids independent and recoverable after closing a tab', () => {
+    const storage = memoryStorage();
+    const first = new WorkspaceStore('david'); first.restore(storage);
+    const scene = first.visit('/studio/scene?draft=a')!;
+    const draft = createSceneDraft(); draft.note = 'Keep this direction.';
+    first.setSceneDraft('a', { draft, videoId: `v_${'a'.repeat(32)}` });
+    first.visit('/studio/scene?draft=b'); first.setSceneDraft('b', { draft: { ...createSceneDraft(), frame: '9:16' } });
+    first.visit('/studio?draft=a');
+    expect(first.getSnapshot().tabs).toHaveLength(3);
+    first.close(scene.id); first.flush();
+    const refreshed = new WorkspaceStore('david'); refreshed.restore(storage);
+    expect(refreshed.getSnapshot().sceneDrafts.a).toEqual({ draft, videoId: `v_${'a'.repeat(32)}` });
+    expect(refreshed.getSnapshot().sceneDrafts.b.draft.frame).toBe('9:16');
+    refreshed.visit('/studio/scene?draft=a');
+    expect(refreshed.getSnapshot().sceneDrafts.a.draft.note).toBe('Keep this direction.');
+    first.dispose(); refreshed.dispose();
+  });
+
   it('opens any internal page and reuses its tab when the query or document mode changes', () => {
     const store = new WorkspaceStore('david');
     const library = store.visit('/library?q=running')!;

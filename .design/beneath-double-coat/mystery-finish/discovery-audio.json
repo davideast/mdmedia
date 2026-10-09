@@ -1,0 +1,61 @@
+{
+  "utterances": [
+    {
+      "source": "hall-bruno",
+      "startSeconds": 1.3,
+      "endSeconds": 4.2,
+      "text": "You still keep my brother's collar.",
+      "voice": "Deep, solemn male voice"
+    },
+    {
+      "source": "hall-heidi",
+      "startSeconds": 0.8,
+      "endSeconds": 3.9,
+      "text": "Someone should remember Sebastian.",
+      "voice": "Older female voice, soft and wistful"
+    },
+    {
+      "source": "groom-heidi",
+      "startSeconds": 0.9,
+      "endSeconds": 1.7,
+      "text": "That scent.",
+      "voice": "Older female voice, inquisitive"
+    },
+    {
+      "source": "groom-heidi",
+      "startSeconds": 2.9,
+      "endSeconds": 3.7,
+      "text": "Sebastian?",
+      "voice": "Older female voice, inquisitive"
+    },
+    {
+      "source": "groom-heidi",
+      "startSeconds": 4.9,
+      "endSeconds": 7.5,
+      "text": "Who locked the door and turned off the air?",
+      "voice": "Older female voice, growing panicked"
+    },
+    {
+      "source": "groom-heidi",
+      "startSeconds": 8.6,
+      "endSeconds": 9.1,
+      "text": "You m-",
+      "voice": "Older female voice, suddenly aggressive but cut off"
+    }
+  ],
+  "sounds": [
+    {
+      "source": "groom-heidi",
+      "startSeconds": 1.8,
+      "endSeconds": 2.4,
+      "description": "Door closing and latching"
+    },
+    {
+      "source": "groom-heidi",
+      "startSeconds": 7.7,
+      "endSeconds": 8.6,
+      "description": "Door handle rattling frantically"
+    }
+  ],
+  "uncertainties": []
+}

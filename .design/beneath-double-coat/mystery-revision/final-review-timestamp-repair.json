@@ -1,0 +1,5 @@
+{
+  "original": "final-review.evidence.json.pass-1.json",
+  "corrected": "final-observation-seconds.json",
+  "reason": "Reviewer used MMSS integers despite total-seconds request. Verified against exact edit: hall begins at 73.458s (review 113), grooming at ~111s (review151), title~173s (review253). Only timestamp units converted; all wording, role attributions, verdicts and uncertainties retained."
+}

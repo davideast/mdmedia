@@ -1,0 +1,16 @@
+{
+  "job": {
+    "id": "breakfast-master",
+    "kind": "image",
+    "output": ".design/beneath-double-coat/breakfast-exchange/breakfast-master.jpg",
+    "images": [
+      ".design/beneath-double-coat/bruno-introduction/accepted-room.jpg",
+      ".design/beneath-double-coat/bruno-introduction/bruno-reference.jpg",
+      ".design/beneath-double-coat/breakfast-exchange/sadie-identity.jpg"
+    ],
+    "prompt": "One photorealistic cinematic 16:9 master frame of the adjoining BREAKFAST ROOM in the same snowbound Alpine family house as Image 1. Image 1 defines warm amber timber wall panels and morning winter daylight; Image 2 is BRUNO's exact identity; Image 3 is SADIE's exact identity. Establish a quiet domestic breakfast confrontation. Exactly TWO natural quadrupedal Bernese Mountain Dogs already sitting comfortably on the floor, separated by a very low wooden breakfast table in the center foreground. SADIE LEFT, slimmer adult female, emerald green collar, her precise Image 3 face and narrow white blaze, facing three-quarter toward screen RIGHT at her husband. BRUNO RIGHT, larger adult male, navy collar, broad white chest, same face as Image 2, facing three-quarter toward screen LEFT at his wife. Both dogs' faces unobstructed, heads at roughly the same image height, eyes around upper third, each occupies its own left or right half; allow a clean single-character face/chest crop of either half. Camera dog-eye-level across the table; never looking down. Table stays BELOW their chests, with one small plate and one tiny cube of cheddar, entirely static. Background: matching warm paneled timber, closed window at left with snow outside, simple dark wooden sideboard at right, no mirrors or portraits. Natural interior consistent with Image 1; a neighboring breakfast alcove, not an ornate new mansion. Sadie is alert and skeptical, Bruno a little sheepish. Keep canine anatomy and closed relaxed mouths, no hands or clothing. No Heidi, Otto, puppies, humans, servants, human silhouettes, extra animals, seats for dogs, text, caption, label, logos, collage or motion. No one touching table or food."
+  },
+  "fingerprint": "a4f3398eceaea886ca0d23e450da4435cb58260f3dca2effbdcc0fe930ede87e",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

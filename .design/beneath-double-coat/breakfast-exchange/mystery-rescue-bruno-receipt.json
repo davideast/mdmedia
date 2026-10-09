@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-bruno",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. BRUNO is the adult male in NAVY collar. Warm low MALE BARITONE, slightly worried, same speaker throughout. Looks LEFT toward grandmother. At 0.5s say exactly \"Otto got the door. Grandmother, what happened?\" Finish by 4.2s. Close muzzle and listen until 6.0s. Then, with quiet finality, say exactly \"He is.\" Finish by 7.0s, close muzzle and hold an unsettled look. No other words. Eight seconds total."
+  },
+  "fingerprint": "7440a8b297b55477b5b1a94bcb3c4c9fb0fed5fda9efc1d481aa8804e48572a2",
+  "interactionId": "v1_ChZ2YkxGYXR3WnVwRFV5US1Oek1XSkJREhZ2YkxGYXR3WnVwRFV5US1Oek1XSkJR",
+  "durationSeconds": 8,
+  "review": "pending"
+}

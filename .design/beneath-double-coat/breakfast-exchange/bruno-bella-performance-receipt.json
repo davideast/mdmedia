@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "bruno-bella-performance",
+    "kind": "video",
+    "seconds": 10,
+    "output": ".design/beneath-double-coat/breakfast-exchange/bruno-bella-performance.mp4",
+    "firstFrame": ".design/beneath-double-coat/breakfast-exchange/bruno-bella-first.jpg",
+    "prompt": "TEN SECONDS, one unbroken close-up of BRUNO, the ONE adult male Bernese Mountain Dog in this exact first frame from his preceding breakfast reply. Preserve this exact face, broad white chest, navy collar, proportions, seated posture, wooden sideboard, warm daylight, lens and fixed framing. His wife Sadie is entirely OFFSCREEN to his left, the camera-left side. Maintain his gaze toward her. No one enters. Three short dialogue lines belong exclusively to BRUNO. Match the established warm adult male baritone, neutral English, conversational and mildly defensive, with a guilty comic sincerity rather than theatrical shouting. He articulates every word with clearly visible natural canine lower-jaw movement synchronized to his voice. Real canine muzzle and teeth, no human lips, small head and eye movement only. Start from the supplied closed-mouth image. At about 0.4–1.3 seconds he hesitates and says exactly: \"Sadie...\" From 1.3–3 seconds he listens in silence, jaw at rest. At about 3–5.3 seconds he offers the weak defense, exactly: \"She offered me a snack.\" From 5.3–6.5 seconds he silently considers her unseen response. At about 6.5–8.7 seconds he answers with completely sincere appreciation, exactly: \"It was very good cheese.\" From 8.7–10 seconds his mouth closes and his eyes briefly dip slightly toward the untouched breakfast below the crop. Keep the tiny downward glance; no eating, no reaching, no visible prop manipulation. The listening gaps are intentional editing handles for inserting Sadie's separately filmed lines: NO other voice during the gaps. Exactly these three lines, once each. Do not read names or timing labels. No added words, narrator, female voice, music or sound stings. Quiet continuous matching interior room ambience. Only Bruno is visible, a natural quadrupedal dog seated below frame. No humans, hands, other animals, human anatomy, clothing, walking, standing, camera movement, reframing, internal cuts, fades, titles or room redesign. A small living canine performance with synchronized speech, not a frozen still with voiceover."
+  },
+  "fingerprint": "1712aab57ea10bd00bf764ee5a304e4802554abf00475564eec1342ae7da6fc8",
+  "interactionId": "v1_ChdEbVRGYXJIcktmWE5fUFVQa0xmQ2lRYxIXRG1URmFySHJLZlhOX1BVUGtMZkNpUWM",
+  "durationSeconds": 10.006,
+  "review": "pending"
+}

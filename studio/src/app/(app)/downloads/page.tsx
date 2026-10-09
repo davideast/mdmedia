@@ -5,6 +5,7 @@ import { Check, Download, HardDriveDownload, ListMusic, Loader2, LogOut, Pause, 
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {LibraryNavigation} from "@/components/library/video-library";
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { useOfflinePlayback } from '@/components/shell/offline-playback-provider';
 import { useRouteQuery } from '@/components/shell/workspace-provider';
@@ -152,7 +153,7 @@ export default function DownloadsPage() {
   );
 
   return (
-    <WorkbenchPanel workspacePage title={pageTitle} icon={<HardDriveDownload size={13} strokeWidth={2} />} viewGrid gridVariant="wide">
+    <WorkbenchPanel workspacePage actions={<LibraryNavigation/>} title={pageTitle} icon={<HardDriveDownload size={13} strokeWidth={2} />} viewGrid gridVariant="wide">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="t-section-title">{pageTitle}</h1>

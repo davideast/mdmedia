@@ -1,0 +1,47 @@
+{
+  "references": [
+    ".design/beneath-double-coat/story-first/cast.jpg"
+  ],
+  "files": {
+    "script_s24": ".design/beneath-double-coat/story-first/title.mp4"
+  },
+  "captions": [
+    {
+      "text": "ROOM TEMPERATURE   72°F",
+      "start": 72,
+      "end": 74
+    },
+    {
+      "text": "ROOM TEMPERATURE   74°F",
+      "start": 74,
+      "end": 77
+    }
+  ],
+  "concurrency": 2,
+  "referenceFrom": {
+    "script_s07": [
+      "script_s03"
+    ],
+    "script_s10": [
+      "script_s09"
+    ],
+    "script_s16": [
+      "script_s12"
+    ],
+    "script_s17": [
+      "script_s06"
+    ],
+    "script_s18": [
+      "script_s12"
+    ],
+    "script_s22": [
+      "script_s01"
+    ],
+    "script_s23": [
+      "script_s21"
+    ],
+    "script_s13": [
+      "script_s12"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Beneath the Double Coat — The Secret in the Snow",
+  "output": ".design/beneath-double-coat/mystery-finish/the-secret-in-the-snow-complete.mp4",
+  "durationSeconds": 122.542,
+  "newSequenceStartsAt": 73.45833333333333,
+  "newSequenceDuration": 49.083333333333336,
+  "sha256": "74f0f806ce2366af396a22e350fc60bb0b8078550e5f4164be1325f849013cc6",
+  "bytes": 23223187,
+  "editManifest": ".design/beneath-double-coat/mystery-finish/complete-edit.json",
+  "productionPlan": ".design/beneath-double-coat/mystery-finish/production.plan.json",
+  "productionEvidence": ".design/beneath-double-coat/mystery-finish/production.evidence.json",
+  "lintReport": ".design/beneath-double-coat/mystery-finish/production.edit-report.json",
+  "delivery": "Local generated film; not imported into Studio",
+  "designStatus": "Provisional; no new CLI or Studio architecture implemented",
+  "editorialStatus": "needs-story-revision",
+  "userFeedback": "The story speeds up to the point where it completely falls apart.",
+  "acceptedOpeningSeconds": 73.45833333333333,
+  "revisionNotes": "drafts/beneath-double-coat/mystery-finish.md",
+  "lintScope": "The 49.083-second ending is technically valid and editorially blocked by saved user feedback. Legacy reviews lack the five story checks and a saved blind audience assessment; they do not establish story readiness."
+}

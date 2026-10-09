@@ -1,0 +1,82 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 7.0,
+      "words": "Otto, you were meant to clear the path, not bring it in. Breakfast is waiting.",
+      "voice": "Elderly female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 10.0,
+      "endSeconds": 11.5,
+      "words": "Morning, grandmother.",
+      "voice": "Male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 12.5,
+      "endSeconds": 16.0,
+      "words": "Bruno. Your wife's waiting in the breakfast room.",
+      "voice": "Elderly female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 17.5,
+      "endSeconds": 19.0,
+      "words": "Is Sadie still angry?",
+      "voice": "Male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 9.167,
+      "characters": [
+        "Heidi",
+        "Otto"
+      ]
+    },
+    {
+      "startSeconds": 9.167,
+      "endSeconds": 12.167,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 12.167,
+      "endSeconds": 17.0,
+      "characters": [
+        "Heidi",
+        "Otto"
+      ]
+    },
+    {
+      "startSeconds": 17.0,
+      "endSeconds": 21.0,
+      "characters": [
+        "Bruno"
+      ]
+    }
+  ],
+  "continuityFindings": [
+    "Return shot at 12.167 matches Heidi and Otto's initial framing and appearance.",
+    "Return shot at 17.0 matches Bruno's initial framing and appearance."
+  ],
+  "speakerErrors": [],
+  "unwantedFigures": [],
+  "physicalDefects": [],
+  "pacingAndAudio": [
+    "Dialogue is present as requested with no extra lines.",
+    "Voice consistency is maintained across cuts."
+  ],
+  "materialFailures": [],
+  "uncertainties": [],
+  "acceptable": true
+}

@@ -1,0 +1,125 @@
+{
+  "status": "generated and delivered for viewing",
+  "file": ".design/beneath-double-coat/mystery-revision/the-secret-in-the-snow-revised.mp4",
+  "durationSeconds": 176.562,
+  "sha256": "1697b9e6dfb2afeaf60f841097e3019ffd8a7e79d020b10e9490eb4ca6cb8647",
+  "opening": {
+    "file": ".design/beneath-double-coat/penny-introduction/breakfast-with-penny.mp4",
+    "seconds": 73.45833333333333,
+    "sha256": "5604b31d1b3c85fe1b80e2fe170fd22a9fe894d7d0916da1f10ec9faee10f2cf",
+    "content": "Accepted breakfast opening retained through Penny."
+  },
+  "ending": {
+    "seconds": 103.10366666666668,
+    "scenes": [
+      "Family memory establishes Sebastian as Bruno’s missing twin, the fire and their different responses to grief.",
+      "A scent motivates Heidi entering the adjacent grooming room; she doubts what she finds and calls Bruno.",
+      "The family tests the ordinary explanation; outside lookalike followed by actual Bruno still inside establishes the cliffhanger."
+    ],
+    "deferred": [
+      "Confinement",
+      "Overheating",
+      "Rescue"
+    ]
+  },
+  "validation": {
+    "decode": "Complete MP4 decoded without errors.",
+    "technical": "valid",
+    "blindStoryChecks": [
+      {
+        "category": "audience-understanding",
+        "verdict": "pass",
+        "at": 24,
+        "evidence": "Relationships are established quickly through dialogue."
+      },
+      {
+        "category": "causality",
+        "verdict": "pass",
+        "at": 111,
+        "evidence": "The grandmother follows a scent to the grooming room."
+      },
+      {
+        "category": "reactions",
+        "verdict": "pass",
+        "at": 130,
+        "evidence": "Bruno and Sadie respond to the grandmother calling."
+      },
+      {
+        "category": "reveal-setup",
+        "verdict": "pass",
+        "at": 91,
+        "evidence": "Sebastian is established as dead before the scent is found."
+      },
+      {
+        "category": "story-density",
+        "verdict": "pass",
+        "at": 170,
+        "evidence": "Plots move at a moderate pace without excessive filler."
+      }
+    ],
+    "fullFilmQualityChecks": [
+      {
+        "category": "exposition",
+        "verdict": "pass",
+        "at": 0,
+        "evidence": "The opening scene clearly establishes the dogs, their relationships, and the premise of breakfast waiting and questioning past whereabouts."
+      },
+      {
+        "category": "transitions",
+        "verdict": "pass",
+        "at": 19.5,
+        "evidence": "Cuts between hallway, rooms, and multi-dog shots maintain spatial geography and clear motivation."
+      },
+      {
+        "category": "continuity",
+        "verdict": "pass",
+        "at": 1.13,
+        "evidence": "Dog appearances, collars, and room settings remain consistent across cuts throughout the video."
+      },
+      {
+        "category": "speakers",
+        "verdict": "pass",
+        "at": 1,
+        "evidence": "Dialogue matches the visible talking dog on screen with consistent voices and gender matching throughout."
+      },
+      {
+        "category": "pacing",
+        "verdict": "pass",
+        "at": 2,
+        "evidence": "Dialogue delivery is natural with appropriate pauses and clear timing between conversational turns."
+      },
+      {
+        "category": "motion",
+        "verdict": "pass",
+        "at": 10,
+        "evidence": "Dog movements and facial articulations are consistent with the established photoreal talking animal style without anatomical distortions."
+      },
+      {
+        "category": "sound",
+        "verdict": "pass",
+        "at": 1,
+        "evidence": "Audio is clear, dialogue is audible, and voice consistency is maintained with no abrupt audio clipping."
+      }
+    ],
+    "speech": "25 line windows measured against native audio; actual complete words checked with independent source, fragment and final-film transcriptions.",
+    "sourceProvenance": "14 generated native-dialogue performances, first frames extracted from accepted sources; provider receipts saved beside clips."
+  },
+  "adjudication": {
+    "automatedReportStatus": "blocked",
+    "automatedEditorialStatus": "blocked",
+    "findingsRetained": true,
+    "resolutions": [
+      {
+        "finding": "Initial comparison calls Sadie’s s1 and s2 Bruno, relying on blind transcript labels.",
+        "resolution": "Independent anonymous A/B/C/D comparison confirms both new lines match accepted Sadie: female voice and green collar, distinct from blue-collared male Bruno. Primary frame inspection also matches these identities. Full-film quality review independently passes speakers.",
+        "evidence": "sadie-identity-review.json; accepted-sadie.jpg; family-sadie-motion-contact.jpg; final-quality-review.json"
+      },
+      {
+        "finding": "Blind reviewer asks whether outside dog is Sebastian.",
+        "resolution": "This is the deliberate unanswered cliffhanger, not missing family exposition. All five blind story checks pass. Preserve the question and raw review."
+      }
+    ],
+    "limitation": "Current linter retains every automated failure and has no adjudication mechanism. The raw report therefore remains editorially blocked despite documented resolution of the speaker misidentification; it has not been relabeled ready."
+  },
+  "previousRejectedRender": ".design/beneath-double-coat/mystery-finish/the-secret-in-the-snow-complete.mp4"
+}

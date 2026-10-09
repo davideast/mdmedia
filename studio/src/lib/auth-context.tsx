@@ -213,6 +213,9 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
 
   useEffect(() => {
     const recheck = () => {
+      // Initial auth/profile loading owns this decision. A concurrent allowlist
+      // reply must not reload the page before that session has been accepted.
+      if (loading) return;
       const current = auth().currentUser;
       if (!current?.email) return;
       void checkEmailAllowlist(current.email).then((decision) => {
@@ -231,7 +234,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactElemen
     window.addEventListener('online', recheck);
     if (connectivity === 'online') recheck();
     return () => window.removeEventListener('online', recheck);
-  }, [connectivity]);
+  }, [connectivity, loading]);
   // A saved default is only a preference. Keep it intact if a grant is missing;
   // use Kore for drafts until access can be verified.
   const preferredDefault = profile ? settingsDefaultVoice(profile.settings) : null;

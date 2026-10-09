@@ -1,0 +1,44 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.167,
+      "endSeconds": 4.167,
+      "words": "Otto, you were meant to clear the path, not bring it in.",
+      "voiceDescription": "Warm, mature female voice",
+      "visibleSpeaker": "Dog on the left (Heidi)",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 5.167,
+      "endSeconds": 7.0,
+      "words": "Breakfast is waiting.",
+      "voiceDescription": "Warm, mature female voice",
+      "visibleSpeaker": "Dog on the left (Heidi)",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 10.100,
+      "endSeconds": 12.0,
+      "words": "Morning, grandmother.",
+      "voiceDescription": "Adult warm male baritone",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    }
+  ],
+  "newShotStartSeconds": 10.0,
+  "newShotVisibleCast": "Bruno (one Bernese Mountain Dog with a navy collar)",
+  "humansOrExtraAnimals": "None",
+  "speakerErrors": "None. Bruno's mouth movement is limited but he clearly originates the audio.",
+  "physicalDefects": "10:00-11:00: Dog walks forward, violating the prompt's 'no walking' instruction. 10:06-10:08: Extra phantom paws/legs appear between and behind the front legs during the walk. 12:833: Dog sits.",
+  "continuityAcrossCut": "Severe mismatch. Shot 1 is a wide room with a window, floor lamp, and large red dog bed. Shot 2 abruptly places the dog in a narrow, fully wood-paneled hallway with multiple closed doors. The eyeline is also straight into the lens rather than toward the dogs from Shot 1.",
+  "newShotFirstHalfSecondAudio": "Pawstep sounds and floor creaks. No speech syllables occur here.",
+  "safeAudioPrelapSeconds": 0.6,
+  "pacing": "The delivery of the lines is fine, but the unprompted walking animation in Shot 2 delays the response unnecessarily.",
+  "uncertainties": [],
+  "newShotAcceptable": false,
+  "reasons": [
+    "The dog walks into the frame, directly violating the 'no walking' constraint.",
+    "Major continuity error: the location completely shifts from a room with a window to a narrow hallway.",
+    "Physical morphing: Extra legs appear behind the dog's front legs while walking."
+  ]
+}

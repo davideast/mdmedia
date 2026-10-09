@@ -1,0 +1,786 @@
+{
+  "version": 2,
+  "id": "alpenrose-breakfast",
+  "title": "Accepted breakfast exchange — 28.25s excerpt of the 53.125s opening",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human hands",
+      "additional dogs",
+      "Bella appearing on camera"
+    ],
+    "maxWordsPerSecond": 5,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "breakfast-establish",
+      "path": ".design/beneath-double-coat/breakfast-exchange/breakfast-establish.mp4",
+      "kind": "video",
+      "sha256": "a447bed01803ddf990ada4951c861232998bf7c6c856b8e550c0ecd84a529f81"
+    },
+    {
+      "id": "sadie-performance",
+      "path": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+      "kind": "video",
+      "sha256": "b540fdcde2bcbec979511197d8edb1e8702b57b7e1be0a36d859c2cab271a914"
+    },
+    {
+      "id": "bruno-excuse",
+      "path": ".design/beneath-double-coat/breakfast-exchange/bruno-excuse.mp4",
+      "kind": "video",
+      "sha256": "6ad87d0181eb07d157120e8c4b2f5601ef3c9c1da053a49b28818049fa2ddd82"
+    },
+    {
+      "id": "sadie-rosemary-performance",
+      "path": ".design/beneath-double-coat/breakfast-exchange/sadie-rosemary-performance.mp4",
+      "kind": "video",
+      "sha256": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407"
+    },
+    {
+      "id": "sadie-rosemary-first",
+      "path": ".design/beneath-double-coat/breakfast-exchange/sadie-rosemary-first.jpg",
+      "kind": "image",
+      "sha256": "f2d87cc56af6aebb3e686d9636898610304299f32cd4f13a935208c70d7502c6"
+    },
+    {
+      "id": "bruno-bella-performance",
+      "path": ".design/beneath-double-coat/breakfast-exchange/bruno-bella-performance.mp4",
+      "kind": "video",
+      "sha256": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747"
+    },
+    {
+      "id": "bruno-bella-first",
+      "path": ".design/beneath-double-coat/breakfast-exchange/bruno-bella-first.jpg",
+      "kind": "image",
+      "sha256": "5b280c1f9f97e6442fba116fde249d70255d1316f8b6dfa54dca83a993ed375e"
+    },
+    {
+      "id": "render",
+      "path": ".design/beneath-double-coat/breakfast-exchange/breakfast-bella-context.mp4",
+      "kind": "video",
+      "sha256": "753b942fba1a92aa383a0b9869d98542b11502f14959c99b5e6f1610a683ae13"
+    }
+  ],
+  "characters": [
+    {
+      "id": "sadie",
+      "description": "Adult female Bernese; green collar; narrow blaze; Bruno’s wife.",
+      "voice": "Controlled medium-low adult female, neutral English.",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Adult male Bernese; navy collar; broad white chest; Sadie’s husband.",
+      "voice": "Warm adult male baritone, neutral English.",
+      "silent": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "married",
+      "description": "The preceding accepted opening says Bruno’s wife is waiting in the breakfast room."
+    },
+    {
+      "id": "room",
+      "description": "Sadie and Bruno sit across untouched cheese in the snowy estate breakfast room."
+    },
+    {
+      "id": "late",
+      "description": "Bruno returned after midnight, upsetting Sadie."
+    },
+    {
+      "id": "walk",
+      "description": "He claims he went for a walk."
+    },
+    {
+      "id": "cheese",
+      "description": "Sadie smells Parmesan on him."
+    },
+    {
+      "id": "herb",
+      "description": "Rosemary gives her a clue."
+    },
+    {
+      "id": "bella-name",
+      "description": "Sadie recognizes Bella."
+    },
+    {
+      "id": "bella-ex",
+      "description": "Bella is Bruno’s ex."
+    },
+    {
+      "id": "snack",
+      "description": "Bruno says Bella offered him a snack."
+    },
+    {
+      "id": "absurdity",
+      "description": "The snack kept him out until midnight."
+    },
+    {
+      "id": "payoff",
+      "description": "Bruno sincerely prioritizes good cheese over his weak excuse."
+    }
+  ],
+  "initialFacts": [
+    "married"
+  ],
+  "scenes": [
+    {
+      "id": "breakfast",
+      "location": "Alpenrose breakfast room, winter morning",
+      "situation": "Sadie confronts her husband about his late return.",
+      "purpose": "Establish the marriage conflict and expose Bruno’s food-driven excuse.",
+      "orientationFact": "room"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "late",
+      "speaker": "sadie",
+      "text": "You came home after midnight."
+    },
+    {
+      "id": "cheese",
+      "speaker": "sadie",
+      "text": "Then why do you smell like Parmesan?"
+    },
+    {
+      "id": "walk",
+      "speaker": "bruno",
+      "text": "I went for a walk."
+    },
+    {
+      "id": "herb",
+      "speaker": "sadie",
+      "text": "And rosemary."
+    },
+    {
+      "id": "bella-name",
+      "speaker": "sadie",
+      "text": "Bella."
+    },
+    {
+      "id": "bella-ex",
+      "speaker": "sadie",
+      "text": "Your ex."
+    },
+    {
+      "id": "absurdity",
+      "speaker": "sadie",
+      "text": "And you stayed until midnight?"
+    },
+    {
+      "id": "sadie-reply",
+      "speaker": "bruno",
+      "text": "Sadie..."
+    },
+    {
+      "id": "snack",
+      "speaker": "bruno",
+      "text": "She offered me a snack."
+    },
+    {
+      "id": "payoff",
+      "speaker": "bruno",
+      "text": "It was very good cheese."
+    }
+  ],
+  "takes": [
+    {
+      "id": "breakfast-establish",
+      "sceneId": "breakfast",
+      "setupId": "master",
+      "method": "reuse",
+      "duration": 3,
+      "assetId": "breakfast-establish",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "two-shot",
+        "angle": "Eye level; established conversation axis",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "right"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "endState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Settled silent reaction across untouched cheese.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet continuous breakfast room ambience; no music or additional voices."
+    },
+    {
+      "id": "sadie-performance",
+      "sceneId": "breakfast",
+      "setupId": "sadie-close",
+      "method": "reuse",
+      "duration": 9,
+      "assetId": "sadie-performance",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Eye level; established conversation axis",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "endState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small canine eye, head and speaking-jaw movements; no prop handling.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "late",
+          "start": 0.714,
+          "end": 2.485,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "cheese",
+          "start": 4.658,
+          "end": 6.74,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet continuous breakfast room ambience; no music or additional voices."
+    },
+    {
+      "id": "bruno-excuse",
+      "sceneId": "breakfast",
+      "setupId": "bruno-close",
+      "method": "reuse",
+      "duration": 4,
+      "assetId": "bruno-excuse",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Eye level; established conversation axis",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "endState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small canine eye, head and speaking-jaw movements; no prop handling.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "walk",
+          "start": 1.228,
+          "end": 2.142,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet continuous breakfast room ambience; no music or additional voices."
+    },
+    {
+      "id": "sadie-rosemary-performance",
+      "sceneId": "breakfast",
+      "setupId": "sadie-close",
+      "method": "first-frame",
+      "duration": 10,
+      "assetId": "sadie-rosemary-performance",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Eye level; established conversation axis",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "endState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small canine eye, head and speaking-jaw movements; no prop handling.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "herb",
+          "start": 0.49,
+          "end": 1.323,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "bella-name",
+          "start": 3.095,
+          "end": 3.434,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "bella-ex",
+          "start": 5.755,
+          "end": 6.456,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "absurdity",
+          "start": 7.295,
+          "end": 8.557,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet continuous breakfast room ambience; no music or additional voices.",
+      "firstFrame": {
+        "assetId": "sadie-rosemary-first",
+        "fromTakeId": "sadie-performance",
+        "at": 7.708333333333333
+      }
+    },
+    {
+      "id": "bruno-bella-performance",
+      "sceneId": "breakfast",
+      "setupId": "bruno-close",
+      "method": "first-frame",
+      "duration": 10,
+      "assetId": "bruno-bella-performance",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Eye level; established conversation axis",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "endState": {
+        "location": "breakfast room",
+        "weather": "snow outside",
+        "light": "warm morning",
+        "cheese": "untouched on plate",
+        "sadie": "seated left",
+        "bruno": "seated right"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small canine eye, head and speaking-jaw movements; no prop handling.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "sadie-reply",
+          "start": 0.81,
+          "end": 1.276,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "snack",
+          "start": 3,
+          "end": 4.276,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "payoff",
+          "start": 6.159,
+          "end": 7.62,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Quiet continuous breakfast room ambience; no music or additional voices.",
+      "firstFrame": {
+        "assetId": "bruno-bella-first",
+        "fromTakeId": "bruno-excuse",
+        "at": 2.9583333333333335
+      }
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-01",
+      "takeId": "breakfast-establish",
+      "in": 0,
+      "out": 2,
+      "purpose": "establish",
+      "requires": [
+        "married"
+      ],
+      "establishes": [
+        {
+          "factId": "room",
+          "evidence": "Both now settled across the untouched breakfast"
+        }
+      ],
+      "transition": {
+        "type": "opening",
+        "reason": "Both now settled across the untouched breakfast",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-02",
+      "takeId": "sadie-performance",
+      "in": 0.375,
+      "out": 3,
+      "purpose": "question",
+      "requires": [
+        "room",
+        "married"
+      ],
+      "establishes": [
+        {
+          "factId": "late",
+          "evidence": "Sadie: You came home after midnight",
+          "lineId": "late"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Sadie: You came home after midnight",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-03",
+      "takeId": "bruno-excuse",
+      "in": 0.8333333333333334,
+      "out": 3,
+      "purpose": "answer",
+      "requires": [
+        "late"
+      ],
+      "establishes": [
+        {
+          "factId": "walk",
+          "evidence": "Bruno: I went for a walk",
+          "lineId": "walk"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Bruno: I went for a walk",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-04",
+      "takeId": "sadie-performance",
+      "in": 4.375,
+      "out": 7.75,
+      "purpose": "question",
+      "requires": [
+        "walk"
+      ],
+      "establishes": [
+        {
+          "factId": "cheese",
+          "evidence": "Same Sadie take: Then why do you smell like Parmesan?",
+          "lineId": "cheese"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same Sadie take: Then why do you smell like Parmesan?",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-05",
+      "takeId": "sadie-rosemary-performance",
+      "in": 0,
+      "out": 1.875,
+      "purpose": "escalation",
+      "requires": [
+        "cheese"
+      ],
+      "establishes": [
+        {
+          "factId": "herb",
+          "evidence": "Continue accepted Sadie close-up: And rosemary.",
+          "lineId": "herb"
+        }
+      ],
+      "transition": {
+        "type": "continuous",
+        "reason": "Continue accepted Sadie close-up: And rosemary.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-06",
+      "takeId": "bruno-bella-performance",
+      "in": 0.375,
+      "out": 2.25,
+      "purpose": "reaction",
+      "requires": [
+        "herb"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Bruno, same established reverse angle: Sadie...",
+        "bridge": "reaction",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-07",
+      "takeId": "sadie-rosemary-performance",
+      "in": 2.5416666666666665,
+      "out": 3.7916666666666665,
+      "purpose": "escalation",
+      "requires": [
+        "herb"
+      ],
+      "establishes": [
+        {
+          "factId": "bella-name",
+          "evidence": "Sadie identifies Bella by name.",
+          "lineId": "bella-name"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Sadie identifies Bella by name.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-08",
+      "takeId": "bruno-bella-performance",
+      "in": 4.666666666666667,
+      "out": 5.5,
+      "purpose": "reaction",
+      "requires": [
+        "bella-name"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Silent Bruno reaction compresses the long pause before Your ex.",
+        "bridge": "reaction",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-09",
+      "takeId": "sadie-rosemary-performance",
+      "in": 5.416666666666667,
+      "out": 6.791666666666667,
+      "purpose": "escalation",
+      "requires": [
+        "bella-name"
+      ],
+      "establishes": [
+        {
+          "factId": "bella-ex",
+          "evidence": "Return to same Sadie performance: Your ex.",
+          "lineId": "bella-ex"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Return to same Sadie performance: Your ex.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-10",
+      "takeId": "bruno-bella-performance",
+      "in": 2.5833333333333335,
+      "out": 5.25,
+      "purpose": "answer",
+      "requires": [
+        "bella-ex"
+      ],
+      "establishes": [
+        {
+          "factId": "snack",
+          "evidence": "Same Bruno performance: She offered me a snack.",
+          "lineId": "snack"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same Bruno performance: She offered me a snack.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-11",
+      "takeId": "sadie-rosemary-performance",
+      "in": 6.958333333333333,
+      "out": 9.208333333333334,
+      "purpose": "question",
+      "requires": [
+        "snack",
+        "late"
+      ],
+      "establishes": [
+        {
+          "factId": "absurdity",
+          "evidence": "Same Sadie performance: And you stayed until midnight?",
+          "lineId": "absurdity"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same Sadie performance: And you stayed until midnight?",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-12",
+      "takeId": "bruno-bella-performance",
+      "in": 5.791666666666667,
+      "out": 9.25,
+      "purpose": "payoff",
+      "requires": [
+        "absurdity"
+      ],
+      "establishes": [
+        {
+          "factId": "payoff",
+          "evidence": "Same Bruno performance: It was very good cheese. Hold his guilty glance.",
+          "lineId": "payoff"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same Bruno performance: It was very good cheese. Hold his guilty glance.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-13",
+      "takeId": "breakfast-establish",
+      "in": 0.375,
+      "out": 2.875,
+      "purpose": "reaction",
+      "requires": [
+        "payoff"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Return to the established wide two-shot; untouched cheddar remains between them.",
+        "bridge": "reaction",
+        "stateExceptions": []
+      }
+    }
+  ],
+  "renderAssetId": "render"
+}

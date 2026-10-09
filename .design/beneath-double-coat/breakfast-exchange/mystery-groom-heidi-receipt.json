@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-groom-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/groom-heidi.jpg",
+    "seconds": 10,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is elderly female, burgundy collar and gray muzzle. Low measured older WOMAN voice, same gentle gravel throughout. Maintain exact composition. Initially quiet steady ventilation hum. All door action is OFFSCREEN RIGHT, keep door out of frame. 0.4s: a tiny sniff, say exactly \"That scent. Sebastian?\" Finish by 2.6s. 2.9s: ONE wooden door slam and latch click OFFSCREEN RIGHT; Heidi sharply looks right without moving her body. At 3.4s ask exactly \"Who locked the door?\" Finish by 5.0s. At 5.4s the steady ventilation hum STOPS. At 5.9s, indignation rising, say exactly \"And turned off the air?\" Then at 8.0s snap loudly \"You monster!\" Finish by 9.3s. One character owns ALL lines and voice, no answer or second speaker. No injury, panting, collapse, walking, paws lifted or supernatural motion. Her outrage is a dry soap-opera joke."
+  },
+  "fingerprint": "86cfc00d3d1c71a1152698c9a748b96d7c402a161b02bc580e94bdb70d2940a6",
+  "interactionId": "v1_ChdMckxGYXFhRExwYWhfUFVQenFLMWlRMBIXTHJMRmFxYURMcGFoX1BVUHpxSzFpUTA",
+  "durationSeconds": 10.006,
+  "review": "pending"
+}

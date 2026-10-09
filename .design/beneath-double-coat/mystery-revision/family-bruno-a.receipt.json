@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-family-bruno-a",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/family-bruno-a.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/RB-source-frame.jpg",
+    "seconds": 10,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. NAVY-collared adult male Bruno, same broad white blaze. Warm low male baritone, restrained and conversational, same voice as earlier. Eyes LEFT toward Heidi. Concerned tenderness; belief his twin died is painful, not dismissive anger.\nAt 0.5s say EXACTLY: \"We all shed, Grandmother. It's probably mine.\" Finish the complete last word by 4.5s, then close muzzle and silently listen.\nAt 5.3s say EXACTLY: \"I wish it were him. I do.\" Finish the complete last word by 9.3s, then close muzzle and silently listen. Total 10s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "b381ac58d8b7a0f3dbe601195594c3ab5866f8882ecaa5996e8b7b1349b85341",
+  "interactionId": "v1_ChdxODNGYW9tQlBiV1YxTWtQeE4yLWtRVRIXcTgzRmFvbUJQYldWMU1rUHhOMi1rUVU",
+  "durationSeconds": 10.006,
+  "review": "pending"
+}

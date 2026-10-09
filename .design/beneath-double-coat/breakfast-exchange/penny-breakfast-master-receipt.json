@@ -1,0 +1,15 @@
+{
+  "job": {
+    "id": "penny-breakfast-master",
+    "kind": "image",
+    "output": ".design/beneath-double-coat/penny-introduction/penny-breakfast-master.jpg",
+    "images": [
+      ".design/beneath-double-coat/penny-introduction/accepted-exact-end.jpg",
+      ".design/beneath-double-coat/penny-introduction/penny-identity.jpg"
+    ],
+    "prompt": "Create the next shot of this exact photographic breakfast scene. IMAGE ONE is the actual accepted scene frame and controls the room, light, adult dogs, props and geography. IMAGE TWO is a portrait of the one NEW puppy to reveal. Camera has pulled BACK roughly two metres and a little right, widening the first image to reveal previously off-camera foreground floor. Preserve the exact first image's seated adult female Sadie at the LEFT of the low table (narrow white blaze, green collar), and larger adult male Bruno at the RIGHT behind the table (broad chest, navy collar). Same window with snowy trees at back LEFT, same pine-paneled corner, same brown sideboard at back RIGHT, same wooden floor, same low rectangular table with ONE small pale green plate and ONE cheddar cube. All these existing things remain in their same world positions; do not redesign, rearrange, add furniture or change weather. Reveal PENNY from image two ALREADY SITTING on the near-right foreground floor, well to the RIGHT of the table and forward of Bruno, a clear spatial separation from his paws and the table legs. She is their small young daughter, with exact reference markings and lavender collar, about one third adult body size; perspective must not make her look adult sized. Puppy faces LEFT and looks slightly up toward Bruno behind her. Bruno and Sadie turn their heads slightly toward this puppy, bodies still seated. Three real Bernese Mountain Dogs only, each with four anatomically canine legs, relaxed closed muzzles. Keep all three faces clearly readable and puppy recognizable, full bodies in frame, enough floor margin around them. Warm winter-morning photographic light, photorealistic quiet prestige soap opera. No human of any kind, person, hands, extra dogs, additional animals, clothing, plates of food, bowls, text or labels. This is a calm family master shot immediately following the first reference, with only the newly visible foreground revealing the puppy. Landscape 16:9."
+  },
+  "fingerprint": "f478c1e6f88896674431794d13fd36f184ba4188d75b8c1578522eec2c8741ec",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

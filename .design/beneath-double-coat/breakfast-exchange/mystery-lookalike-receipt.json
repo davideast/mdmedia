@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-lookalike",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/lookalike.jpg",
+    "seconds": 4,
+    "prompt": "Photorealistic single close-up of the EXACT Bernese Mountain Dog in this image, faded brown collar, inside this weathered wooden toolshed doorway in winter morning. EXACTLY ONE DOG. Preserve face, eyes, white blaze, collar, age and background. Seated, motionless body; only slow natural breathing and one blink. He watches the estate offscreen LEFT past camera, never looks into lens. Mouth remains CLOSED. No speech, voices, narration, music, barking, captions, humans, hands, human anatomy, extra animal or cuts. Locked camera. Very quiet soft winter breeze. A silent restrained cliffhanger, no aggressive or supernatural movement."
+  },
+  "fingerprint": "8c152218ea784a7827eb077ebc0ecafad9c6ada78a4fa10e2317ff02da954230",
+  "interactionId": "v1_Chd2YkxGYXFldFBQZW0xTWtQc29XRHVRWRIXdmJMRmFxZXRQUGVtMU1rUHNvV0R1UVk",
+  "durationSeconds": 4.032,
+  "review": "pending"
+}

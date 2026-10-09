@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "category": "speakers",
+      "verdict": "fail",
+      "evidence": "At 132s, the line 'We heard you. What's happened?' is assigned to Sadie in the plan but the transcript identifies the speaker as Bruno, indicating either the wrong voice was used or the wrong dog is seen speaking.",
+      "shotId": "shot-s1",
+      "at": 132.0,
+      "repair": "Ensure Sadie is the character on camera and uses her assigned female voice for this line."
+    },
+    {
+      "category": "speakers",
+      "verdict": "fail",
+      "evidence": "At 148s, the line 'You really think he's been here?' is intended for Sadie but logged as Bruno in the independent transcript, suggesting a voice or visual mismatch.",
+      "shotId": "shot-s2",
+      "at": 148.0,
+      "repair": "Use Sadie's correct female voice and ensure her mouth moves for this line."
+    },
+    {
+      "category": "continuity",
+      "verdict": "pass",
+      "evidence": "The transition to the estate exterior and the lookalike dog establishes the outside location clearly before showing the identical-looking dog in the snow.",
+      "shotId": "shot-estate-exterior",
+      "at": 164.0
+    }
+  ]
+}

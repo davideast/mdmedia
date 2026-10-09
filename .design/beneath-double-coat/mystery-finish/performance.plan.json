@@ -1,0 +1,543 @@
+{
+  "version": 2,
+  "id": "mystery-first-performances",
+  "title": "Memorial, discovery and alarm",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human anatomy",
+      "extra dogs"
+    ],
+    "maxWordsPerSecond": 3.5,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "hall-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+      "sha256": "1b0bdc7c8466e150aba4df7dbe1c607d3c54806faefc04c91e6c23dbf5414f83"
+    },
+    {
+      "id": "hall",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.mp4"
+    },
+    {
+      "id": "groom-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      "sha256": "c6079282da3ad42dbbe82eb47f5243112a0c781dbd2f97903119629e2d403ebf"
+    },
+    {
+      "id": "groom",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.mp4"
+    },
+    {
+      "id": "rescue-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+      "sha256": "f4b6a9227c520824386fa769e5092a36581a85f9aeb4ce949f539563a6a6b5ee"
+    },
+    {
+      "id": "rescue",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4"
+    },
+    {
+      "id": "hall-bruno-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-bruno.jpg",
+      "sha256": "2ed9375a420ad14cb98ab8429be0f67b3625d9a1a87dbfeec9738d52f0effbd0"
+    },
+    {
+      "id": "hall-bruno",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4"
+    },
+    {
+      "id": "hall-heidi-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-heidi.jpg",
+      "sha256": "62c9bbd6b5299ff09ff5a68ddf2bf268dd7c91e49e33f1629b92decf5b0073b2"
+    },
+    {
+      "id": "hall-heidi",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-heidi.mp4"
+    },
+    {
+      "id": "groom-heidi-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-heidi.jpg",
+      "sha256": "3579ac678cf9be38150e0acbfbcc6c5d3ce9d6e1a9704d4524f7cd1076cfb94f"
+    },
+    {
+      "id": "groom-heidi",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4"
+    }
+  ],
+  "characters": [
+    {
+      "id": "heidi",
+      "description": "Elderly silver-muzzled burgundy-collared Bernese",
+      "voice": "Low measured older woman",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Navy-collared large Bernese",
+      "voice": "Warm male baritone",
+      "silent": false
+    },
+    {
+      "id": "sadie",
+      "description": "Green-collared slimmer female Bernese, narrow white blaze",
+      "voice": "Controlled medium-low woman",
+      "silent": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "breakfast",
+      "description": "The established family has finished breakfast."
+    },
+    {
+      "id": "hall",
+      "description": "The adjacent hall holds a brother memorial and leads to grooming room."
+    },
+    {
+      "id": "groom",
+      "description": "Heidi is beside a tuft in the grooming room; door open and vent running."
+    },
+    {
+      "id": "brother",
+      "description": "Bruno has an absent brother whose collar is kept."
+    },
+    {
+      "id": "sebastian",
+      "description": "The absent brother is named Sebastian."
+    }
+  ],
+  "initialFacts": [
+    "breakfast"
+  ],
+  "scenes": [
+    {
+      "id": "hall",
+      "location": "hall in snowy Alpenrose estate",
+      "situation": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "hall"
+    },
+    {
+      "id": "groom",
+      "location": "groom in snowy Alpenrose estate",
+      "situation": "After the planned pawprint insert, establish the adjoining room before dialogue.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "groom"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "hall-bruno-1",
+      "speaker": "bruno",
+      "text": "You still keep my brother's collar."
+    },
+    {
+      "id": "hall-heidi-1",
+      "speaker": "heidi",
+      "text": "Someone should remember Sebastian."
+    },
+    {
+      "id": "groom-heidi-1",
+      "speaker": "heidi",
+      "text": "That scent. Sebastian?"
+    },
+    {
+      "id": "groom-heidi-2",
+      "speaker": "heidi",
+      "text": "Who locked the door?"
+    },
+    {
+      "id": "groom-heidi-3",
+      "speaker": "heidi",
+      "text": "And turned off the air?"
+    },
+    {
+      "id": "groom-heidi-4",
+      "speaker": "heidi",
+      "text": "You monster!"
+    }
+  ],
+  "takes": [
+    {
+      "id": "hall",
+      "sceneId": "hall",
+      "setupId": "hall-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "hall",
+      "referenceAssetIds": [
+        "hall-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno and collar"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left toward Heidi and collar"
+        }
+      ],
+      "startState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone; no voices or music."
+    },
+    {
+      "id": "groom",
+      "sceneId": "groom",
+      "setupId": "groom-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "groom",
+      "referenceAssetIds": [
+        "groom-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Down right toward fur"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Gentle constant ventilation hum; no voices or music."
+    },
+    {
+      "id": "hall-bruno",
+      "sceneId": "hall",
+      "setupId": "hall-bruno",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "hall-bruno",
+      "referenceAssetIds": [
+        "hall-bruno-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of established master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small natural jaw, eyes and head motion only; no body or prop motion.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "hall-bruno-1",
+          "start": 0.5,
+          "end": 3.5,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. BRUNO is the navy-collared adult male. Warm adult male BARITONE, concerned but restrained. Looks LEFT toward grandmother. At 0.5 seconds say exactly: \"You still keep my brother's collar.\" Finish by 3.5 seconds, close muzzle and hold a sad, questioning look. No other words."
+    },
+    {
+      "id": "hall-heidi",
+      "sceneId": "hall",
+      "setupId": "hall-heidi",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "hall-heidi",
+      "referenceAssetIds": [
+        "hall-heidi-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of established master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        }
+      ],
+      "startState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small natural jaw, eyes and head motion only; no body or prop motion.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "hall-heidi-1",
+          "start": 0.5,
+          "end": 3,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is the elderly gray-muzzled female, burgundy collar. Low measured older WOMAN voice, dry and dignified, never male. Looks RIGHT toward Bruno. At 0.5 seconds say exactly: \"Someone should remember Sebastian.\" Finish around 3 seconds, close muzzle. At 3.5 seconds her eyes lower toward muddy pawprints to her RIGHT beyond the frame; one small curious head tilt. No walking, other words or gestures."
+    },
+    {
+      "id": "groom-heidi",
+      "sceneId": "groom",
+      "setupId": "groom-heidi",
+      "method": "generate",
+      "duration": 10,
+      "assetId": "groom-heidi",
+      "referenceAssetIds": [
+        "groom-heidi-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Same side of established master",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward offscreen doorway"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Small natural jaw, eyes and head motion only; no body or prop motion.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "groom-heidi-1",
+          "start": 0.4,
+          "end": 2.6,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "groom-heidi-2",
+          "start": 3.4,
+          "end": 5,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "groom-heidi-3",
+          "start": 5.9,
+          "end": 7.6,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "groom-heidi-4",
+          "start": 8,
+          "end": 9.3,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is elderly female, burgundy collar and gray muzzle. Low measured older WOMAN voice, same gentle gravel throughout. Maintain exact composition. Initially quiet steady ventilation hum. All door action is OFFSCREEN RIGHT, keep door out of frame. 0.4s: a tiny sniff, say exactly \"That scent. Sebastian?\" Finish by 2.6s. 2.9s: ONE wooden door slam and latch click OFFSCREEN RIGHT; Heidi sharply looks right without moving her body. At 3.4s ask exactly \"Who locked the door?\" Finish by 5.0s. At 5.4s the steady ventilation hum STOPS. At 5.9s, indignation rising, say exactly \"And turned off the air?\" Then at 8.0s snap loudly \"You monster!\" Finish by 9.3s. One character owns ALL lines and voice, no answer or second speaker. No injury, panting, collapse, walking, paws lifted or supernatural motion. Her outrage is a dry soap-opera joke."
+    }
+  ],
+  "shots": [
+    {
+      "id": "hall",
+      "takeId": "hall",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "breakfast"
+      ],
+      "establishes": [
+        {
+          "factId": "hall",
+          "evidence": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno."
+        }
+      ],
+      "transition": {
+        "type": "opening",
+        "reason": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "hall-bruno",
+      "takeId": "hall-bruno",
+      "in": 0,
+      "out": 5,
+      "purpose": "answer",
+      "requires": [
+        "hall"
+      ],
+      "establishes": [
+        {
+          "factId": "brother",
+          "evidence": "Bruno identifies the memorial collar as belonging to his brother.",
+          "lineId": "hall-bruno-1"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Matched close-up of established speaker in same physical position. Door sound and ventilation change motivate alarm within a single uninterrupted take.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "hall-heidi",
+      "takeId": "hall-heidi",
+      "in": 0,
+      "out": 5,
+      "purpose": "answer",
+      "requires": [
+        "hall",
+        "brother"
+      ],
+      "establishes": [
+        {
+          "factId": "sebastian",
+          "evidence": "Heidi names the remembered brother.",
+          "lineId": "hall-heidi-1"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Matched close-up of established speaker in same physical position. Door sound and ventilation change motivate alarm within a single uninterrupted take.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "groom",
+      "takeId": "groom",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "breakfast"
+      ],
+      "establishes": [
+        {
+          "factId": "groom",
+          "evidence": "After the planned pawprint insert, establish the adjoining room before dialogue."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "After the planned pawprint insert, establish the adjoining room before dialogue.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "groom-heidi",
+      "takeId": "groom-heidi",
+      "in": 0,
+      "out": 10,
+      "purpose": "escalation",
+      "requires": [
+        "groom",
+        "sebastian"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Matched close-up of established speaker in same physical position. Door sound and ventilation change motivate alarm within a single uninterrupted take.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    }
+  ]
+}

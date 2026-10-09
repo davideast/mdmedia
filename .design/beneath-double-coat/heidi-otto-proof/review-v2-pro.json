@@ -1,0 +1,64 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 1.0,
+      "words": "Otto.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "none",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 1.1,
+      "endSeconds": 3.0,
+      "words": "You were meant to clear the path.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "Heidi",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 3.9,
+      "endSeconds": 5.0,
+      "words": "Not bring it in.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "Heidi",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 5.9,
+      "endSeconds": 7.5,
+      "words": "Breakfast is waiting.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "Heidi",
+      "confidence": "high"
+    }
+  ],
+  "castTimeline": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 9.916,
+      "visibleFigures": [
+        "Heidi",
+        "Otto"
+      ]
+    }
+  ],
+  "humansOrExtraAnimals": [],
+  "speakerErrors": [
+    "0.0-1.0: Heidi's mouth remains closed while 'Otto' is spoken, resulting in a voiceover effect.",
+    "1.1-7.5: Heidi's mouth movements are generic open/close motions that do not match the required phonemes."
+  ],
+  "physicalDefects": [
+    "0.0-9.916: Otto's front paws lack defined structure and blend unnaturally into the white substance on the floor."
+  ],
+  "continuityDefects": [],
+  "pacing": "Slow delivery with distinct, multi-second pauses between short sentences.",
+  "uncertainties": [
+    "Precise nature of the white substance by Otto's paws due to indistinct rendering."
+  ],
+  "pass": false,
+  "reasons": [
+    "The initial word is delivered entirely as a voiceover without corresponding mouth movement.",
+    "Subsequent dialogue lacks proper lip articulation from the intended speaker."
+  ]
+}

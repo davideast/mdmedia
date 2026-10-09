@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-sadie",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-sadie.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. SADIE is the adult FEMALE in GREEN collar. Controlled medium-low adult WOMAN voice with crisp natural diction, matching the established breakfast performance. Looks LEFT toward Bruno. At 0.5s say exactly \"Your brother? You said he was dead.\" One naturally surprised response, finish by 4.0s. Mouth closed at end, eyes fixed on him. No other words. Five seconds total."
+  },
+  "fingerprint": "5396e3c1a39f75464786d17db7977d0433967dd5755a760aa579964ba5fd03f8",
+  "interactionId": "v1_Chd2YkxGYXBDYkRvT3NzT0lQc3MyR2tBURIXdmJMRmFwQ2JEb09zc09JUHNzMkdrQVE",
+  "durationSeconds": 5.014,
+  "review": "pending"
+}

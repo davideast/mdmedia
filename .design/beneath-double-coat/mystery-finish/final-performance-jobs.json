@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mystery-rescue-bruno",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. BRUNO is the adult male in NAVY collar. Warm low MALE BARITONE, slightly worried, same speaker throughout. Looks LEFT toward grandmother. At 0.5s say exactly \"Otto got the door. Grandmother, what happened?\" Finish by 4.2s. Close muzzle and listen until 6.0s. Then, with quiet finality, say exactly \"He is.\" Finish by 7.0s, close muzzle and hold an unsettled look. No other words. Eight seconds total."
+  },
+  {
+    "id": "mystery-rescue-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is the elderly FEMALE in BURGUNDY collar and silver muzzle. Low measured older WOMAN voice, dignified, slightly breathless indignation but no injury. Looks RIGHT toward Bruno. At 0.5s say exactly \"Someone locked me in. After I found this.\" Finish by 4.5s. A brief downward eye glance toward the tuft at lower right, with muzzle closed. At 5.8s say exactly \"Sebastian's fur.\" Finish by 7.0s. Do not touch or move the fur or rake. No other words. Eight seconds total."
+  },
+  {
+    "id": "mystery-rescue-sadie",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-sadie.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. SADIE is the adult FEMALE in GREEN collar. Controlled medium-low adult WOMAN voice with crisp natural diction, matching the established breakfast performance. Looks LEFT toward Bruno. At 0.5s say exactly \"Your brother? You said he was dead.\" One naturally surprised response, finish by 4.0s. Mouth closed at end, eyes fixed on him. No other words. Five seconds total."
+  },
+  {
+    "id": "mystery-lookalike",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/lookalike.jpg",
+    "seconds": 4,
+    "prompt": "Photorealistic single close-up of the EXACT Bernese Mountain Dog in this image, faded brown collar, inside this weathered wooden toolshed doorway in winter morning. EXACTLY ONE DOG. Preserve face, eyes, white blaze, collar, age and background. Seated, motionless body; only slow natural breathing and one blink. He watches the estate offscreen LEFT past camera, never looks into lens. Mouth remains CLOSED. No speech, voices, narration, music, barking, captions, humans, hands, human anatomy, extra animal or cuts. Locked camera. Very quiet soft winter breeze. A silent restrained cliffhanger, no aggressive or supernatural movement."
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-heidi-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. HEIDI, the elderly silver-muzzled burgundy-collared dog at LEFT. Head and chest, looking RIGHT at Bruno, with gaze sometimes down right toward fur. No other dogs in frame. Same left wall and window background."
+  },
+  "fingerprint": "467095fa98e2aa108d57d147f5d1af66093af0b828fdca5869cfac839ca1a658",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

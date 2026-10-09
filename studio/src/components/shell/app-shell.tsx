@@ -21,7 +21,7 @@ import { useOfflinePlayback } from "@/components/shell/offline-playback-provider
 import { WorkspaceTabs } from "@/components/shell/workspace-tabs";
 import { useWorkspace } from "@/components/shell/workspace-provider";
 
-const DOCK_KEY = "mdmedia.nav.docked.v1";
+const DOCK_KEY = "mdmedia.nav.docked.v2";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
 const NAV = "nav";
 const MAIN = "main";
@@ -81,11 +81,12 @@ export function AppShell({
   const onlineScreenDisabled = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
   const offlinePlayback = useOfflinePlayback();
+  const stopOffline=offlinePlayback.stop;
   // One active transport owns both the player bar and the system media controls.
   const usingDownloads = !stream.playing && offlinePlayback.track !== null;
   useEffect(() => {
-    if (stream.playing) offlinePlayback.stop();
-  }, [stream.playing, offlinePlayback.stop]);
+    if (stream.playing) stopOffline();
+  }, [stream.playing, stopOffline]);
   useMediaSession(usingDownloads ? {
     player: offlinePlayback.player,
     title: offlinePlayback.track!.title,
@@ -108,9 +109,9 @@ export function AppShell({
     next: !offline && queue && queue.index + 1 < queue.tracks.length ? nextTrack : undefined,
   });
   const breakpoints = useResponsiveBreakpoints();
-  const hasContext = pathname.startsWith("/studio") || pathname.startsWith("/narration/");
+  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/");
   const isNarrationRoute = pathname.startsWith("/narration/");
-  const [docked, setDocked] = useState(true);
+  const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
   const [contextSheetOpen, setContextSheetOpen] = useState(false);
@@ -119,26 +120,26 @@ export function AppShell({
 
   // Close sheets upon route transition
   useEffect(() => {
-    setNavSheetOpen(false);
-    setContextSheetOpen(false);
+    queueMicrotask(()=>{setNavSheetOpen(false);setContextSheetOpen(false);});
   }, [pathname]);
 
   const busy = stream.status === "starting" || stream.status === "streaming";
-  const showPlayerBar = offlinePlayback.track !== null ||
+  const showPlayerBar = pathname!=='/studio/scene' && (offlinePlayback.track !== null ||
     (isNarrationRoute && stream.transcript.length > 0) ||
-    (stream.player !== null && stream.durationMs > 0);
+    (stream.player !== null && stream.durationMs > 0));
+  useEffect(()=>{if(pathname==='/studio/scene'){stream.player?.pause();stopOffline();}},[pathname,stream.player,stopOffline]);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(DOCK_KEY);
-    if (stored !== null) setDocked(stored === "1");
+    if (stored !== null) queueMicrotask(()=>setDocked(stored === "1"));
     const storedContext = window.localStorage.getItem(CONTEXT_DOCK_KEY);
-    if (storedContext !== null) setContextDocked(storedContext === "1");
+    if (storedContext !== null) queueMicrotask(()=>setContextDocked(storedContext === "1"));
   }, []);
 
   // When viewport resizes into medium desktop (< 1280px), enforce mutual exclusivity
   useEffect(() => {
     if (breakpoints.isMedium && !docked && !contextDocked) {
-      setDocked(true);
+      queueMicrotask(()=>setDocked(true));
       window.localStorage.setItem(DOCK_KEY, "1");
     }
   }, [breakpoints.isMedium, docked, contextDocked]);
@@ -288,7 +289,7 @@ export function AppShell({
           <a href="/downloads" className="flex-none font-medium text-primary underline underline-offset-2">Open Downloads</a>
         </div>
       ) : null}
-      <div id="workspace-page" role="tabpanel" aria-labelledby={activeTab ? `workspace-tab-${activeTab.id}` : undefined} className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+      <div id="workspace-page" role={/^\/(studio|narration)/.test(pathname)?"tabpanel":"main"} aria-labelledby={activeTab&&/^\/(studio|narration)/.test(pathname) ? `workspace-tab-${activeTab.id}` : undefined} className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled}>
         {children}
       </div>
       {showPlayerBar ? (

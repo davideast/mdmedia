@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "530bc2bc9eed853eb16f00a249083b49d103467eb7d29ddc3c7d08342373f45b",
+  "durationSeconds": 50.41666666666666,
+  "status": "needs-review",
+  "issues": [
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "hall-bruno",
+      "message": "No unique current-source timing evidence for line-0.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "hall-heidi-mastered",
+      "message": "No unique current-source timing evidence for line-1.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "groom-heidi",
+      "message": "No unique current-source timing evidence for line-2.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "groom-heidi",
+      "message": "No unique current-source timing evidence for line-3.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "alarm-repair",
+      "message": "No unique current-source timing evidence for line-4.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "alarm-repair",
+      "message": "No unique current-source timing evidence for line-5.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "alarm-repair",
+      "message": "No unique current-source timing evidence for line-6.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-bruno",
+      "message": "No unique current-source timing evidence for line-7.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-bruno",
+      "message": "No unique current-source timing evidence for line-8.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-bruno",
+      "message": "No unique current-source timing evidence for line-9.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-heidi",
+      "message": "No unique current-source timing evidence for line-10.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-heidi",
+      "message": "No unique current-source timing evidence for line-11.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-heidi",
+      "message": "No unique current-source timing evidence for line-12.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-sadie-mastered",
+      "message": "No unique current-source timing evidence for line-13.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "SPEECH_UNVERIFIED",
+      "at": "rescue-sadie-mastered",
+      "message": "No unique current-source timing evidence for line-14.",
+      "repair": "Transcribe and time the actual source utterance; bind the evidence to its file hash.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current exposition review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current transitions review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current continuity review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current speakers review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current pacing review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current motion review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current sound review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    }
+  ],
+  "resolvedIssues": []
+}

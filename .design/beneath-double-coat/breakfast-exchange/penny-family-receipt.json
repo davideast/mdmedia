@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "penny-family",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/penny-introduction/family.mp4",
+    "firstFrame": ".design/beneath-double-coat/penny-introduction/penny-breakfast-master.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. All visible characters are anatomically real Bernese Mountain Dogs. NO humans, people, hands, human bodies, clothes, extra dogs, visitors, text, captions, speech, voices, music, barking, laughing or cuts. Four canine legs per dog; no human limbs. No walking, standing up, paw gestures, touching furniture, reaching, eating or moving the cheese. All paws stay planted; only subtle canine eyes, ears, breathing and small head motion. Preserve lighting, collars, markings and every prop. Natural quiet indoor ambience. EXACTLY THREE dogs already seated as in the first frame, and all stay seated. Sadie adult green collar left; Bruno adult navy collar center-right; their small daughter Penny lavender collar near-right foreground, one-third adult size. Silent establishing family shot. Bruno gently lowers his eyes to Penny; Sadie glances from him toward her. Penny looks up left at father and gives one tiny natural head tilt. Table, one plate and single cube of cheese remain stationary and untouched. Frame stays wide and locked. No mouth articulation or dialogue. No movement of bodies or paws. Three seconds of calm affectionate attention before the daughter speaks."
+  },
+  "fingerprint": "4a84f85b2a7fd9ddb2496288460a72ff77385628cf48b368bbc5eaeaef46a411",
+  "interactionId": "v1_ChdIS0RGYXF6cEhhdUYxTWtQMnR6TjBBSRIXSEtERmFxenBIYXVGMU1rUDJ0ek4wQUk",
+  "durationSeconds": 3.029,
+  "review": "pending"
+}

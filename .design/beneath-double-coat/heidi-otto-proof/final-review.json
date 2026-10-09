@@ -1,0 +1,30 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 10.0,
+      "words": "Otto. You were meant to clear the path. Not bringing it in. Breakfast is waiting.",
+      "voiceDescription": "older female voice",
+      "visibleSpeakingDog": "none",
+      "confidence": 0.95
+    }
+  ],
+  "castTimeline": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 11.833,
+      "visibleFigures": [
+        "Bernese Mountain Dog on left (Heidi)",
+        "Bernese Mountain Dog on right (Otto)"
+      ]
+    }
+  ],
+  "humansOrExtraAnimals": [],
+  "speakerErrors": [],
+  "physicalDefects": [],
+  "continuityDefects": [],
+  "pacing": "Voiceover covers the entire clip duration naturally with appropriate pacing.",
+  "uncertainties": [],
+  "pass": true,
+  "reasons": []
+}

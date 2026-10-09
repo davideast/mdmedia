@@ -1,0 +1,22 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+type Cut={file:string;start:number;end:number;label:string};
+const [editFile,output]=process.argv.slice(2);
+const cuts:Cut[]=JSON.parse(await readFile(editFile,'utf8'));
+const args=['-hide_banner','-loglevel','error'];
+const filters:string[]=[];
+let join='',time=0;
+const timeline=[];
+cuts.forEach((cut,index)=>{
+ args.push('-i',cut.file);
+ filters.push(`[${index}:v]trim=start=${cut.start}:end=${cut.end},setpts=PTS-STARTPTS,scale=1280:720,fps=24,setsar=1[v${index}]`);
+ filters.push(`[${index}:a]atrim=start=${cut.start}:end=${cut.end},asetpts=PTS-STARTPTS,aresample=48000,apad=whole_dur=${cut.end-cut.start},atrim=end=${cut.end-cut.start}[a${index}]`);
+ join+=`[v${index}][a${index}]`;
+ timeline.push({...cut,sequenceStart:time,sequenceEnd:time+cut.end-cut.start});time+=cut.end-cut.start;
+});
+filters.push(`${join}concat=n=${cuts.length}:v=1:a=1[v][a]`);
+args.push('-filter_complex',filters.join(';'),'-map','[v]','-map','[a]','-c:v','libx264','-preset','medium','-crf','18','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k','-movflags','+faststart','-y',output);
+await promisify(execFile)('studio/node_modules/ffmpeg-static/ffmpeg',args,{maxBuffer:4*1024*1024});
+await writeFile(output.replace(/\.mp4$/,'.edit.json'),JSON.stringify({durationSeconds:time,transition:'hard cuts',timeline},null,2));
+console.log(`Rendered ${time.toFixed(2)}s: ${output}`);

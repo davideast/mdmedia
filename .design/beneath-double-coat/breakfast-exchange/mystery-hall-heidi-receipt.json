@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-hall-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-heidi.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is the elderly gray-muzzled female, burgundy collar. Low measured older WOMAN voice, dry and dignified, never male. Looks RIGHT toward Bruno. At 0.5 seconds say exactly: \"Someone should remember Sebastian.\" Finish around 3 seconds, close muzzle. At 3.5 seconds her eyes lower toward muddy pawprints to her RIGHT beyond the frame; one small curious head tilt. No walking, other words or gestures."
+  },
+  "fingerprint": "6a27d84d54589e87b4f0b24ce99fd10bc58b3831d048f50d901e8ec36618ee05",
+  "interactionId": "v1_ChdMYkxGYXV5V05zeWYxTWtQak0zdm9RTRIXTGJMRmF1eVdOc3lmMU1rUGpNM3ZvUU0",
+  "durationSeconds": 5.014,
+  "review": "pending"
+}

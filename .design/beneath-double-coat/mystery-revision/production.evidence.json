@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "reviews": [],
+  "speech": [
+    {
+      "takeId": "hall-bruno-invitation",
+      "assetHash": "7273c446c97440142049223c0f355c3c5905a8bd820d04ca0d172e8ec0992de6",
+      "lineId": "b1",
+      "start": 1.49,
+      "end": 5.67,
+      "text": "Grandmother? Come back in. Penny's negotiating for your breakfast.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-bruno-twin",
+      "assetHash": "6f84744330f84f662b54e66f5af5849f33c83f8ce25ac67f7e1eb755f975aded",
+      "lineId": "b2",
+      "start": 1.34,
+      "end": 4.29,
+      "text": "My twin got the looks. I got the sausage.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-a",
+      "assetHash": "ca3533d9dfbf1bef6adda64f157315689ae1db4bbbc60031968372db0f5b1587",
+      "lineId": "h1",
+      "start": 0.88,
+      "end": 6.16,
+      "text": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-a",
+      "assetHash": "ca3533d9dfbf1bef6adda64f157315689ae1db4bbbc60031968372db0f5b1587",
+      "lineId": "h2",
+      "start": 7.23,
+      "end": 8.59,
+      "text": "You were supposed to share it.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b3",
+      "start": 0.59,
+      "end": 1.08,
+      "text": "We did.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b4",
+      "start": 2.11,
+      "end": 3.28,
+      "text": "Then the kennel burned down.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b5",
+      "start": 5.09,
+      "end": 8.87,
+      "text": "He's dead, Grandmother. You can't spend every morning waiting.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h3",
+      "start": 0.74,
+      "end": 1.73,
+      "text": "They never found him.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h4",
+      "start": 3.67,
+      "end": 5.24,
+      "text": "You're allowed to miss him, Bruno.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h5",
+      "start": 7.18,
+      "end": 8.97,
+      "text": "Wait. That smell...",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-bruno-c",
+      "assetHash": "262c606f212a5dccd8e9f9d39900d83a725f0a471c11adc49bfcb8cfc5d9d410",
+      "lineId": "b6",
+      "start": 0.75,
+      "end": 3.93,
+      "text": "I do. That's why I can't keep looking at that.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "hall-heidi-c",
+      "assetHash": "b91666b13e7b69ddb4e2153d304e2e2a4f87aca497e87032dcc765c1db41b3c9",
+      "lineId": "h6",
+      "start": 0.71,
+      "end": 1.82,
+      "text": "From the grooming room.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "groom-heidi-a",
+      "assetHash": "28a83eb4cbc95eb44e8d687056b0138143fdebcb82758083164d9f86570e15ea",
+      "lineId": "h7",
+      "start": 0.7,
+      "end": 5.08,
+      "text": "He used to hide in here. As if I couldn't smell him.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "groom-heidi-a",
+      "assetHash": "28a83eb4cbc95eb44e8d687056b0138143fdebcb82758083164d9f86570e15ea",
+      "lineId": "h8",
+      "start": 7.26,
+      "end": 8.21,
+      "text": "Fresh fur.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "groom-heidi-b",
+      "assetHash": "01abd9f1a4823d69f8e0a13801883d9adc82fd65bf6aa930b62ed50bbda4d3f1",
+      "lineId": "h9",
+      "start": 0.7,
+      "end": 3.3,
+      "text": "No... I'm imagining it.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "groom-heidi-b",
+      "assetHash": "01abd9f1a4823d69f8e0a13801883d9adc82fd65bf6aa930b62ed50bbda4d3f1",
+      "lineId": "h10",
+      "start": 4.49,
+      "end": 6.7,
+      "text": "Bruno. Come and smell this.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-sadie",
+      "assetHash": "4c8fe345cb029884cfa5c2db31851b24ab4954829f9ba093d4429aee7afd4d5a",
+      "lineId": "s1",
+      "start": 1,
+      "end": 4.89,
+      "text": "We heard you. Um, what's happened?",
+      "speaker": "sadie",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-sadie",
+      "assetHash": "4c8fe345cb029884cfa5c2db31851b24ab4954829f9ba093d4429aee7afd4d5a",
+      "lineId": "s2",
+      "start": 5.92,
+      "end": 7.34,
+      "text": "You really think he's been here?",
+      "speaker": "sadie",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-heidi-a",
+      "assetHash": "d390a1cdb51ce23bcfa02e884ad0a650b906faed36d6547c6c481ed56e852702",
+      "lineId": "h11",
+      "start": 1.08,
+      "end": 2.77,
+      "text": "This smells like Sebastian.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-heidi-a",
+      "assetHash": "d390a1cdb51ce23bcfa02e884ad0a650b906faed36d6547c6c481ed56e852702",
+      "lineId": "h12",
+      "start": 4.2,
+      "end": 8.27,
+      "text": "I thought that too. Then I smelled it again.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-bruno-a",
+      "assetHash": "356a3ce28606844d7b53337b936b814bf2ad127c9283b109494f1e5271ab4d22",
+      "lineId": "b7",
+      "start": 0.63,
+      "end": 4.18,
+      "text": "We all shed, Grandmother. It's probably mine.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-bruno-a",
+      "assetHash": "356a3ce28606844d7b53337b936b814bf2ad127c9283b109494f1e5271ab4d22",
+      "lineId": "b8",
+      "start": 5.77,
+      "end": 8.83,
+      "text": "I wish it were him. I do.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-heidi-b",
+      "assetHash": "868db14d740f7564c763051669eb8239b23e161c9a922f7970fafa0d7da054fa",
+      "lineId": "h13",
+      "start": 0.99,
+      "end": 4.23,
+      "text": "I don't know. I... I need you to look.",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-heidi-b",
+      "assetHash": "868db14d740f7564c763051669eb8239b23e161c9a922f7970fafa0d7da054fa",
+      "lineId": "h14",
+      "start": 5.63,
+      "end": 7.09,
+      "text": "Then whose scent is this?",
+      "speaker": "heidi",
+      "confidence": "estimated"
+    },
+    {
+      "takeId": "family-bruno-b",
+      "assetHash": "7c7830876115d710434d394946f3f6659538f3d49c3083e2246b591efc086393",
+      "lineId": "b9",
+      "start": 0.68,
+      "end": 2.6,
+      "text": "But nobody survived that fire.",
+      "speaker": "bruno",
+      "confidence": "estimated"
+    }
+  ]
+}

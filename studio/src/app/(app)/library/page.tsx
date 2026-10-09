@@ -1,5 +1,7 @@
 "use client";
 
+import {UseNarrationInVideo} from "@/components/library/use-narration-in-video";
+import {LibraryNavigation,VideoLibrary} from "@/components/library/video-library";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -140,7 +142,7 @@ function LibraryNarrationCard({
           ) : null}
         </div>
 
-        <div className="library-track-tools">
+        <div className="library-track-tools"><UseNarrationInVideo id={narration.id} title={narration.title} durationMs={narration.durationMs} ready={isReady}/>
           {isDownloading ? (
             <span
               className="inline-flex size-11 items-center justify-center text-primary"
@@ -229,6 +231,7 @@ export default function LibraryPage() {
   const { user } = useAuth();
   const { stream, playTrack } = useNarration();
   const [items, setItems] = useState<Narration[]>([]);
+  const [type]=useRouteQuery("type");
   const [query, setQuery] = useRouteQuery("q");
   const [itemToDelete, setItemToDelete] = useState<Narration | null>(null);
 
@@ -269,14 +272,18 @@ export default function LibraryPage() {
     });
   };
 
+  if(type==='video')return <WorkbenchPanel title="Library" actions={<LibraryNavigation/>} bodyClassName="p-6"><VideoLibrary/></WorkbenchPanel>;
   return (
     <WorkbenchPanel
       workspacePage
       title="Library"
+      actions={<LibraryNavigation/>}
       icon={<Library size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"
     >
+      <VideoLibrary/>
+
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1">
           <Search

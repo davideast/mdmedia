@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {VideoLibrary} from "@/components/library/video-library";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { toast } from "sonner";
@@ -337,7 +338,7 @@ export default function QueuePage() {
 
   return (
     <WorkbenchPanel
-      title="Queue"
+      title="Activity"
       icon={<ListOrdered size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"
@@ -357,6 +358,7 @@ export default function QueuePage() {
         ) : null
       }
     >
+      <VideoLibrary activity/>
       {!hasJobs ? (
         <div className="col-span-full grid place-items-center gap-3 py-12 text-center">
           <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
@@ -364,7 +366,7 @@ export default function QueuePage() {
           </div>
           <div className="grid gap-1">
             <h2 className="text-[1.05rem] font-semibold text-foreground">
-              Queue is empty
+              No narration jobs
             </h2>
             <p className="max-w-sm text-[0.85rem] text-ink-muted">
               When you click &ldquo;Start Narration&rdquo; from the Studio, jobs

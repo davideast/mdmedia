@@ -1,0 +1,2708 @@
+{
+  "version": 2,
+  "id": "mystery-revision-rough",
+  "title": "Story animatic: accepted opening plus replacement ending; still images and temporary macOS voices are deliberate, not finished performances.",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human anatomy",
+      "extra dogs"
+    ],
+    "maxWordsPerSecond": 4,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "characters": [
+    {
+      "id": "heidi",
+      "description": "Elderly silver-muzzled Bernese, burgundy collar, grandmother",
+      "voice": "Low measured older female",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Adult male Bernese, navy collar, grandson",
+      "voice": "Warm male baritone",
+      "silent": false
+    },
+    {
+      "id": "sadie",
+      "description": "Adult female Bernese, green collar, wife",
+      "voice": "Controlled adult female",
+      "silent": false
+    },
+    {
+      "id": "lookalike",
+      "description": "Same face as Bruno, faded brown collar, in toolshed",
+      "voice": "Silent",
+      "silent": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "opening",
+      "description": "The accepted introduction establishes family and ends with Penny’s cheese joke."
+    },
+    {
+      "id": "hall",
+      "description": "Grandmother and grandson remember his twin differently."
+    },
+    {
+      "id": "groom",
+      "description": "Heidi investigates, doubts herself and calls family for help."
+    },
+    {
+      "id": "outside",
+      "description": "Audience alone sees a dog resembling Bruno."
+    },
+    {
+      "id": "title",
+      "description": "One unresolved question closes the short."
+    },
+    {
+      "id": "brother",
+      "description": "Sebastian is Bruno’s absent brother; grandmother remembers his breakfast trick."
+    },
+    {
+      "id": "twins",
+      "description": "Bruno and Sebastian are twins."
+    },
+    {
+      "id": "death",
+      "description": "Bruno believes Sebastian died after the kennel fire."
+    },
+    {
+      "id": "grief",
+      "description": "Bruno’s discomfort comes from missing Sebastian."
+    },
+    {
+      "id": "scent",
+      "description": "Heidi notices a scent while remembering her grandson."
+    },
+    {
+      "id": "destination",
+      "description": "The scent comes from the adjacent grooming room."
+    },
+    {
+      "id": "doubt",
+      "description": "Heidi doubts her own recognition."
+    },
+    {
+      "id": "call",
+      "description": "Heidi calls Bruno to inspect what she found."
+    },
+    {
+      "id": "claim",
+      "description": "Heidi believes the fur smells like Sebastian."
+    },
+    {
+      "id": "ordinary",
+      "description": "Bruno proposes ordinary household shedding."
+    },
+    {
+      "id": "help",
+      "description": "Heidi asks others to investigate rather than treating her suspicion as proof."
+    },
+    {
+      "id": "belief",
+      "description": "Bruno believes nobody survived the kennel fire."
+    },
+    {
+      "id": "lookalike",
+      "description": "A brown-collared dog resembling Bruno sits outside."
+    },
+    {
+      "id": "two-dogs",
+      "description": "Navy-collared Bruno remains inside; the outside dog is someone else."
+    }
+  ],
+  "initialFacts": [],
+  "scenes": [
+    {
+      "id": "opening",
+      "location": "Alpenrose estate and breakfast room",
+      "situation": "The accepted introduction establishes family and ends with Penny’s cheese joke.",
+      "purpose": "The accepted introduction establishes family and ends with Penny’s cheese joke.",
+      "orientationFact": "opening"
+    },
+    {
+      "id": "hall",
+      "location": "Hall immediately outside breakfast",
+      "situation": "Grandmother and grandson remember his twin differently.",
+      "purpose": "Grandmother and grandson remember his twin differently.",
+      "orientationFact": "hall"
+    },
+    {
+      "id": "groom",
+      "location": "Adjacent grooming room",
+      "situation": "Heidi investigates, doubts herself and calls family for help.",
+      "purpose": "Heidi investigates, doubts herself and calls family for help.",
+      "orientationFact": "groom"
+    },
+    {
+      "id": "outside",
+      "location": "Snowy estate garden and shed",
+      "situation": "Audience alone sees a dog resembling Bruno.",
+      "purpose": "Audience alone sees a dog resembling Bruno.",
+      "orientationFact": "outside"
+    },
+    {
+      "id": "title",
+      "location": "Editorial end card",
+      "situation": "One unresolved question closes the short.",
+      "purpose": "One unresolved question closes the short.",
+      "orientationFact": "title"
+    }
+  ],
+  "assets": [
+    {
+      "id": "take-accepted-opening",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/penny-introduction/breakfast-with-penny.mp4",
+      "sha256": "5604b31d1b3c85fe1b80e2fe170fd22a9fe894d7d0916da1f10ec9faee10f2cf"
+    },
+    {
+      "id": "take-hall-orientation",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+      "sha256": "bcabc9ce9ad2534ef55a057f4597ff6aba966899836b7d2c19d0c25cbaefd123"
+    },
+    {
+      "id": "take-b1",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b1.mp4",
+      "sha256": "08daf6ac04177930875e1a0007c49eefd4644ab47d720f6f2edbd55ef8fed464"
+    },
+    {
+      "id": "take-h1",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h1.mp4",
+      "sha256": "ab4078511aff3fa9c81127515e5c5525420f9b6684fcf3882dd90bfc390f423a"
+    },
+    {
+      "id": "take-b2",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b2.mp4",
+      "sha256": "5b9a98b1ae1a59c32183675c4af2eaa2c4955ece0cf864c56715202d860379b7"
+    },
+    {
+      "id": "take-h2",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h2.mp4",
+      "sha256": "7b985999e17976e42b7acf1ad30369329bbba71e3cda3858026420fb6265f152"
+    },
+    {
+      "id": "take-b3",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b3.mp4",
+      "sha256": "94373ea348f7b1b74cab6c2c252c4462f43aaee6bbdff754382d960fa0a31de1"
+    },
+    {
+      "id": "take-b4",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b4.mp4",
+      "sha256": "a19bee55ef0b821726789e6322d2bcce70f27036bde4490dda22d6ebaf71e1e2"
+    },
+    {
+      "id": "take-h3",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h3.mp4",
+      "sha256": "87f910562d4c5609d89abea457a33f3845bf0c3be53e3f615e5bfa2889e27cee"
+    },
+    {
+      "id": "take-b5",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b5.mp4",
+      "sha256": "5a099598a7a0c6b22db4d9d6eeb55d6e8a63d0d3306b3da15d536eac5e82540c"
+    },
+    {
+      "id": "take-h4",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h4.mp4",
+      "sha256": "1bd4ca4933a840ac4f38d74f257ba11562b1f946a1e695924e6215714f7d9e9a"
+    },
+    {
+      "id": "take-b6",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b6.mp4",
+      "sha256": "d9c013a65d6a7c28366520cca0987e5501e7c31799c3489a39d1e45504fde643"
+    },
+    {
+      "id": "take-h5",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h5.mp4",
+      "sha256": "f8a43fd60494d14e83bb1e497c22856ef17041d80a21eb4f887b5e8d7a663e9f"
+    },
+    {
+      "id": "take-h6",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h6.mp4",
+      "sha256": "453af45b2ab0917e12f671eafe866740c3066a8cd103c8f7fa8d2ad8932fac04"
+    },
+    {
+      "id": "take-groom-orientation",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+      "sha256": "48b818f21d2ab6f39a402fbfb11e0ca0a757675201f11bca2a242f35bc0644de"
+    },
+    {
+      "id": "take-h7",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h7.mp4",
+      "sha256": "98352e61538083783f013aac4955be9d14df210712396ad7e9dc5a58e04d76c6"
+    },
+    {
+      "id": "take-fur-observation",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/fur-insert-clean.mp4",
+      "sha256": "42c8455f385eb00fdec7e1e4ee9ff402ca160c7950d6659d5d6f898b2b6328cb"
+    },
+    {
+      "id": "take-h8",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h8.mp4",
+      "sha256": "3de04e4c90f09685f8b790bc8786079442adb947d94a63113f34a21d4370c10c"
+    },
+    {
+      "id": "take-h9",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h9.mp4",
+      "sha256": "9dab6fe0abde2190b0e15b1fe95b332b5e9066d2c9316094a2f194b3c3e01f17"
+    },
+    {
+      "id": "take-h10",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h10.mp4",
+      "sha256": "d3b35915d65f094d3e19c7b02e61ff9e57b4aba3104eb94fbc2e77beda26ec0a"
+    },
+    {
+      "id": "take-family-orientation",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+      "sha256": "700bfdba9fdc2ea870cb9217c95bfb2558f4e39faf66afffcf86d75ace8dc041"
+    },
+    {
+      "id": "take-s1",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/s1.mp4",
+      "sha256": "9b164f81c55278243824da4f01d869d91ab8262ee0d76b6f8e771433613394c1"
+    },
+    {
+      "id": "take-h11",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h11.mp4",
+      "sha256": "9035d225e24b4611a0a8edfd636bb5f5f429eefea6c1f38950d6f86a576ce2b8"
+    },
+    {
+      "id": "take-b7",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b7.mp4",
+      "sha256": "d953bf7d77b391c8399824772a247abcc7a26a2916fcae3dee20b5bb703cc93b"
+    },
+    {
+      "id": "take-h12",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h12.mp4",
+      "sha256": "aac95706941be31467ae184eb86679c90f4e831e9bbe76a812259c0f03a97c37"
+    },
+    {
+      "id": "take-s2",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/s2.mp4",
+      "sha256": "ec00ec025681caf1a74066d5a0f969f73a6b1ebdd6becaa4d65a48129275f07d"
+    },
+    {
+      "id": "take-h13",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h13.mp4",
+      "sha256": "39d209e6245013b8daddb832cbb723a99fee8bf7453a5f35c17c1506303a9cb5"
+    },
+    {
+      "id": "take-b8",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b8.mp4",
+      "sha256": "b606812266e5890cb655531e6f5fcf8c56efea73f80b54f6957b22fcfb699258"
+    },
+    {
+      "id": "take-b9",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/b9.mp4",
+      "sha256": "c98c7a35fa1b2fe1460e8450f22eb7a10be60065359c677bb379f25d65cf535c"
+    },
+    {
+      "id": "take-h14",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/scratch/h14.mp4",
+      "sha256": "9df635a993c85a8981a1f2ea060b3e8d0bb82520bb16c537d9eceebd3cad8351"
+    },
+    {
+      "id": "take-bruno-response",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+      "sha256": "6743ee44229f54bf1fe73e922280a3c1fdb21f0ec22432e7165b114b189dd738"
+    },
+    {
+      "id": "take-estate-exterior",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+      "sha256": "28b4625e7cce2d7da6abc31c558a86cf78cb405fc4521e279d68c75ffcca6ffc"
+    },
+    {
+      "id": "take-lookalike",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+      "sha256": "37af55e28fef9e3b8d9f44525e93821f93c1f070c9db31bd0f37720e05a6a7f5"
+    },
+    {
+      "id": "take-end-title",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/story-first/title.mp4",
+      "sha256": "1bdcbe09687079dcfa1df2a58f10c85d399320e1a29ff77ce164bbb3162d4864"
+    },
+    {
+      "id": "render",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-revision/story-rough.mp4",
+      "sha256": "fef2adbdc4d1b3fe371929bb8780f0d9859d831baf1ef194d0181576db0d733d"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "b1",
+      "speaker": "bruno",
+      "text": "Grandmother? Come back in. Penny's negotiating for your breakfast."
+    },
+    {
+      "id": "h1",
+      "speaker": "heidi",
+      "text": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed."
+    },
+    {
+      "id": "b2",
+      "speaker": "bruno",
+      "text": "My twin got the looks. I got the sausage."
+    },
+    {
+      "id": "h2",
+      "speaker": "heidi",
+      "text": "You were supposed to share it."
+    },
+    {
+      "id": "b3",
+      "speaker": "bruno",
+      "text": "We did."
+    },
+    {
+      "id": "b4",
+      "speaker": "bruno",
+      "text": "Then the kennel burned down."
+    },
+    {
+      "id": "h3",
+      "speaker": "heidi",
+      "text": "They never found him."
+    },
+    {
+      "id": "b5",
+      "speaker": "bruno",
+      "text": "He's dead, Grandmother. You can't spend every morning waiting."
+    },
+    {
+      "id": "h4",
+      "speaker": "heidi",
+      "text": "You're allowed to miss him, Bruno."
+    },
+    {
+      "id": "b6",
+      "speaker": "bruno",
+      "text": "I do. That's why I can't keep looking at that."
+    },
+    {
+      "id": "h5",
+      "speaker": "heidi",
+      "text": "Wait. That smell..."
+    },
+    {
+      "id": "h6",
+      "speaker": "heidi",
+      "text": "From the grooming room."
+    },
+    {
+      "id": "h7",
+      "speaker": "heidi",
+      "text": "He used to hide in here. As if I couldn't smell him."
+    },
+    {
+      "id": "h8",
+      "speaker": "heidi",
+      "text": "Fresh fur."
+    },
+    {
+      "id": "h9",
+      "speaker": "heidi",
+      "text": "No... I'm imagining it."
+    },
+    {
+      "id": "h10",
+      "speaker": "heidi",
+      "text": "Bruno. Come and smell this."
+    },
+    {
+      "id": "s1",
+      "speaker": "sadie",
+      "text": "We heard you. What's happened?"
+    },
+    {
+      "id": "h11",
+      "speaker": "heidi",
+      "text": "This smells like Sebastian."
+    },
+    {
+      "id": "b7",
+      "speaker": "bruno",
+      "text": "We all shed, Grandmother. It's probably mine."
+    },
+    {
+      "id": "h12",
+      "speaker": "heidi",
+      "text": "I thought that too. Then I smelled it again."
+    },
+    {
+      "id": "s2",
+      "speaker": "sadie",
+      "text": "You really think he's been here?"
+    },
+    {
+      "id": "h13",
+      "speaker": "heidi",
+      "text": "I don't know. I need you to look."
+    },
+    {
+      "id": "b8",
+      "speaker": "bruno",
+      "text": "I wish it were him. I do."
+    },
+    {
+      "id": "b9",
+      "speaker": "bruno",
+      "text": "But nobody survived that fire."
+    },
+    {
+      "id": "h14",
+      "speaker": "heidi",
+      "text": "Then whose scent is this?"
+    }
+  ],
+  "takes": [
+    {
+      "id": "take-accepted-opening",
+      "sceneId": "opening",
+      "setupId": "accepted-opening",
+      "method": "reuse",
+      "duration": 73.459,
+      "assetId": "take-accepted-opening",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "opening",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "opening",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Accepted opening through Penny, original audio and edit retained",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-hall-orientation",
+      "sceneId": "hall",
+      "setupId": "hall-orientation",
+      "method": "reuse",
+      "duration": 3.008,
+      "assetId": "take-hall-orientation",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Breakfast has ended. The visible breakfast doorway connects to the hall. Heidi studies a memorial; Bruno has stopped beside her.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-b1",
+      "sceneId": "hall",
+      "setupId": "b1",
+      "method": "reuse",
+      "duration": 5.625,
+      "assetId": "take-b1",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b1",
+          "start": 0.25,
+          "end": 5.375,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h1",
+      "sceneId": "hall",
+      "setupId": "h1",
+      "method": "reuse",
+      "duration": 5.542,
+      "assetId": "take-h1",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h1",
+          "start": 0.25,
+          "end": 5.292,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b2",
+      "sceneId": "hall",
+      "setupId": "b2",
+      "method": "reuse",
+      "duration": 3.792,
+      "assetId": "take-b2",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b2",
+          "start": 0.25,
+          "end": 3.542,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h2",
+      "sceneId": "hall",
+      "setupId": "h2",
+      "method": "reuse",
+      "duration": 2.5,
+      "assetId": "take-h2",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h2",
+          "start": 0.25,
+          "end": 2.25,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b3",
+      "sceneId": "hall",
+      "setupId": "b3",
+      "method": "reuse",
+      "duration": 1.25,
+      "assetId": "take-b3",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b3",
+          "start": 0.25,
+          "end": 1,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b4",
+      "sceneId": "hall",
+      "setupId": "b4",
+      "method": "reuse",
+      "duration": 2.375,
+      "assetId": "take-b4",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b4",
+          "start": 0.25,
+          "end": 2.125,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h3",
+      "sceneId": "hall",
+      "setupId": "h3",
+      "method": "reuse",
+      "duration": 1.959,
+      "assetId": "take-h3",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h3",
+          "start": 0.25,
+          "end": 1.709,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b5",
+      "sceneId": "hall",
+      "setupId": "b5",
+      "method": "reuse",
+      "duration": 4.875,
+      "assetId": "take-b5",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b5",
+          "start": 0.25,
+          "end": 4.625,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h4",
+      "sceneId": "hall",
+      "setupId": "h4",
+      "method": "reuse",
+      "duration": 2.834,
+      "assetId": "take-h4",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h4",
+          "start": 0.25,
+          "end": 2.584,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b6",
+      "sceneId": "hall",
+      "setupId": "b6",
+      "method": "reuse",
+      "duration": 4,
+      "assetId": "take-b6",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b6",
+          "start": 0.25,
+          "end": 3.75,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h5",
+      "sceneId": "hall",
+      "setupId": "h5",
+      "method": "reuse",
+      "duration": 2.25,
+      "assetId": "take-h5",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h5",
+          "start": 0.25,
+          "end": 2,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h6",
+      "sceneId": "hall",
+      "setupId": "h6",
+      "method": "reuse",
+      "duration": 2,
+      "assetId": "take-h6",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h6",
+          "start": 0.25,
+          "end": 1.75,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-groom-orientation",
+      "sceneId": "groom",
+      "setupId": "groom-orientation",
+      "method": "reuse",
+      "duration": 3.008,
+      "assetId": "take-groom-orientation",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Follow Heidi’s spoken destination into the adjacent room; open door, same grandmother and stationary fur. Brief time-passage cut, not a fabricated seamless extension.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-h7",
+      "sceneId": "groom",
+      "setupId": "h7",
+      "method": "reuse",
+      "duration": 4.084,
+      "assetId": "take-h7",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h7",
+          "start": 0.25,
+          "end": 3.8339999999999996,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-fur-observation",
+      "sceneId": "groom",
+      "setupId": "fur-observation",
+      "method": "reuse",
+      "duration": 2,
+      "assetId": "take-fur-observation",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Eyeline cut to fur. Ordinary evidence, not objective proof of identity.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-h8",
+      "sceneId": "groom",
+      "setupId": "h8",
+      "method": "reuse",
+      "duration": 1.542,
+      "assetId": "take-h8",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h8",
+          "start": 0.25,
+          "end": 1.292,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h9",
+      "sceneId": "groom",
+      "setupId": "h9",
+      "method": "reuse",
+      "duration": 2.667,
+      "assetId": "take-h9",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h9",
+          "start": 0.25,
+          "end": 2.417,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h10",
+      "sceneId": "groom",
+      "setupId": "h10",
+      "method": "reuse",
+      "duration": 2.75,
+      "assetId": "take-h10",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h10",
+          "start": 0.25,
+          "end": 2.5,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-family-orientation",
+      "sceneId": "groom",
+      "setupId": "family-orientation",
+      "method": "reuse",
+      "duration": 3.029,
+      "assetId": "take-family-orientation",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Her call motivates family arriving. They are now beside her, doorway remains open, nobody was trapped.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-s1",
+      "sceneId": "groom",
+      "setupId": "s1",
+      "method": "reuse",
+      "duration": 2.584,
+      "assetId": "take-s1",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "s1",
+          "start": 0.25,
+          "end": 2.334,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h11",
+      "sceneId": "groom",
+      "setupId": "h11",
+      "method": "reuse",
+      "duration": 2.459,
+      "assetId": "take-h11",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h11",
+          "start": 0.25,
+          "end": 2.209,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b7",
+      "sceneId": "groom",
+      "setupId": "b7",
+      "method": "reuse",
+      "duration": 4.167,
+      "assetId": "take-b7",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b7",
+          "start": 0.25,
+          "end": 3.917,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h12",
+      "sceneId": "groom",
+      "setupId": "h12",
+      "method": "reuse",
+      "duration": 3.375,
+      "assetId": "take-h12",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h12",
+          "start": 0.25,
+          "end": 3.125,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-s2",
+      "sceneId": "groom",
+      "setupId": "s2",
+      "method": "reuse",
+      "duration": 2.375,
+      "assetId": "take-s2",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "s2",
+          "start": 0.25,
+          "end": 2.125,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h13",
+      "sceneId": "groom",
+      "setupId": "h13",
+      "method": "reuse",
+      "duration": 3,
+      "assetId": "take-h13",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h13",
+          "start": 0.25,
+          "end": 2.75,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b8",
+      "sceneId": "groom",
+      "setupId": "b8",
+      "method": "reuse",
+      "duration": 2.792,
+      "assetId": "take-b8",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b8",
+          "start": 0.25,
+          "end": 2.542,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-b9",
+      "sceneId": "groom",
+      "setupId": "b9",
+      "method": "reuse",
+      "duration": 2.584,
+      "assetId": "take-b9",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "left"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "b9",
+          "start": 0.25,
+          "end": 2.334,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-h14",
+      "sceneId": "groom",
+      "setupId": "h14",
+      "method": "reuse",
+      "duration": 2.084,
+      "assetId": "take-h14",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established conversation axis",
+        "movement": "Still frame for story animatic"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "center",
+          "eyeline": "right"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Temporary voiced still for story structure review. Final native performance pending.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "h14",
+          "start": 0.25,
+          "end": 1.834,
+          "visibility": "offscreen"
+        }
+      ],
+      "sound": "Temporary scratch voice. Only named character owns the line. This animatic does not claim final voice consistency or lip synchronization."
+    },
+    {
+      "id": "take-bruno-response",
+      "sceneId": "groom",
+      "setupId": "bruno-response",
+      "method": "reuse",
+      "duration": 8,
+      "assetId": "take-bruno-response",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "groom",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Bruno cannot supply an answer; stay with his uncertainty before leaving the room.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-estate-exterior",
+      "sceneId": "outside",
+      "setupId": "estate-exterior",
+      "method": "reuse",
+      "duration": 3.008,
+      "assetId": "take-estate-exterior",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "outside",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "outside",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Same snowy morning, view from the garden shed toward the family house. The audience sees what the family cannot.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-lookalike",
+      "sceneId": "outside",
+      "setupId": "lookalike",
+      "method": "reuse",
+      "duration": 4.032,
+      "assetId": "take-lookalike",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "outside",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "outside",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Reverse angle reveals another dog with Bruno’s face and a brown collar. Silent; identity remains the cliffhanger.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    },
+    {
+      "id": "take-end-title",
+      "sceneId": "title",
+      "setupId": "end-title",
+      "method": "reuse",
+      "duration": 3,
+      "assetId": "take-end-title",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "wide",
+        "angle": "Established conversation axis",
+        "movement": "Existing accepted source"
+      },
+      "cast": [],
+      "startState": {
+        "room": "title",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "endState": {
+        "room": "title",
+        "door": "open",
+        "props": "stationary",
+        "time": "same winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "End on the one unresolved identity question.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Retained existing source audio; accepted opening contains its original dialogue."
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-accepted-opening",
+      "takeId": "take-accepted-opening",
+      "in": 0,
+      "out": 73.45833333333333,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "opening",
+          "evidence": "Accepted opening through Penny, original audio and edit retained"
+        }
+      ],
+      "transition": {
+        "type": "opening",
+        "reason": "Conversational response: undefined says accepted context",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-hall-orientation",
+      "takeId": "take-hall-orientation",
+      "in": 0,
+      "out": 2.25,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "hall",
+          "evidence": "Breakfast has ended. The visible breakfast doorway connects to the hall. Heidi studies a memorial; Bruno has stopped beside her."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Breakfast has ended. The visible breakfast doorway connects to the hall. Heidi studies a memorial; Bruno has stopped beside her.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b1",
+      "takeId": "take-b1",
+      "in": 0,
+      "out": 5.625,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says Grandmother? Come back in. Penny's negotiating for your breakfast.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h1",
+      "takeId": "take-h1",
+      "in": 0,
+      "out": 5.542,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "brother",
+          "evidence": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+          "lineId": "h1"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b2",
+      "takeId": "take-b2",
+      "in": 0,
+      "out": 3.792,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "twins",
+          "evidence": "My twin got the looks. I got the sausage.",
+          "lineId": "b2"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says My twin got the looks. I got the sausage.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h2",
+      "takeId": "take-h2",
+      "in": 0,
+      "out": 2.5,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says You were supposed to share it.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b3",
+      "takeId": "take-b3",
+      "in": 0,
+      "out": 1.25,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says We did.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b4",
+      "takeId": "take-b4",
+      "in": 0,
+      "out": 2.375,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says Then the kennel burned down.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h3",
+      "takeId": "take-h3",
+      "in": 0,
+      "out": 1.959,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says They never found him.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b5",
+      "takeId": "take-b5",
+      "in": 0,
+      "out": 4.875,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "death",
+          "evidence": "He's dead, Grandmother. You can't spend every morning waiting.",
+          "lineId": "b5"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says He's dead, Grandmother. You can't spend every morning waiting.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h4",
+      "takeId": "take-h4",
+      "in": 0,
+      "out": 2.834,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "grief",
+          "evidence": "You're allowed to miss him, Bruno.",
+          "lineId": "h4"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says You're allowed to miss him, Bruno.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b6",
+      "takeId": "take-b6",
+      "in": 0,
+      "out": 4,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says I do. That's why I can't keep looking at that.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h5",
+      "takeId": "take-h5",
+      "in": 0,
+      "out": 2.25,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "scent",
+          "evidence": "Wait. That smell...",
+          "lineId": "h5"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says Wait. That smell...",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h6",
+      "takeId": "take-h6",
+      "in": 0,
+      "out": 2,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "destination",
+          "evidence": "From the grooming room.",
+          "lineId": "h6"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says From the grooming room.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-groom-orientation",
+      "takeId": "take-groom-orientation",
+      "in": 0,
+      "out": 2,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "groom",
+          "evidence": "Follow Heidi’s spoken destination into the adjacent room; open door, same grandmother and stationary fur. Brief time-passage cut, not a fabricated seamless extension."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Follow Heidi’s spoken destination into the adjacent room; open door, same grandmother and stationary fur. Brief time-passage cut, not a fabricated seamless extension.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h7",
+      "takeId": "take-h7",
+      "in": 0,
+      "out": 4.084,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says He used to hide in here. As if I couldn't smell him.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-fur-observation",
+      "takeId": "take-fur-observation",
+      "in": 0,
+      "out": 1.5,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Eyeline cut to fur. Ordinary evidence, not objective proof of identity.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h8",
+      "takeId": "take-h8",
+      "in": 0,
+      "out": 1.542,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says Fresh fur.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h9",
+      "takeId": "take-h9",
+      "in": 0,
+      "out": 2.667,
+      "purpose": "answer",
+      "requires": [
+        "brother",
+        "death",
+        "scent"
+      ],
+      "establishes": [
+        {
+          "factId": "doubt",
+          "evidence": "No... I'm imagining it.",
+          "lineId": "h9"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says No... I'm imagining it.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-second-sniff",
+      "takeId": "take-groom-orientation",
+      "in": 0,
+      "out": 1.5,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "She looks again rather than accepting her first thought.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h10",
+      "takeId": "take-h10",
+      "in": 0,
+      "out": 2.75,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "call",
+          "evidence": "Bruno. Come and smell this.",
+          "lineId": "h10"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says Bruno. Come and smell this.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-family-orientation",
+      "takeId": "take-family-orientation",
+      "in": 0,
+      "out": 2.25,
+      "purpose": "establish",
+      "requires": [
+        "call"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Her call motivates family arriving. They are now beside her, doorway remains open, nobody was trapped.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-s1",
+      "takeId": "take-s1",
+      "in": 0,
+      "out": 2.584,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: sadie says We heard you. What's happened?",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h11",
+      "takeId": "take-h11",
+      "in": 0,
+      "out": 2.459,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "claim",
+          "evidence": "This smells like Sebastian.",
+          "lineId": "h11"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says This smells like Sebastian.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b7",
+      "takeId": "take-b7",
+      "in": 0,
+      "out": 4.167,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "ordinary",
+          "evidence": "We all shed, Grandmother. It's probably mine.",
+          "lineId": "b7"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says We all shed, Grandmother. It's probably mine.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h12",
+      "takeId": "take-h12",
+      "in": 0,
+      "out": 3.375,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says I thought that too. Then I smelled it again.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-s2",
+      "takeId": "take-s2",
+      "in": 0,
+      "out": 2.375,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: sadie says You really think he's been here?",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h13",
+      "takeId": "take-h13",
+      "in": 0,
+      "out": 3,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "help",
+          "evidence": "I don't know. I need you to look.",
+          "lineId": "h13"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says I don't know. I need you to look.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b8",
+      "takeId": "take-b8",
+      "in": 0,
+      "out": 2.792,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says I wish it were him. I do.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-b9",
+      "takeId": "take-b9",
+      "in": 0,
+      "out": 2.584,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "belief",
+          "evidence": "But nobody survived that fire.",
+          "lineId": "b9"
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: bruno says But nobody survived that fire.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-h14",
+      "takeId": "take-h14",
+      "in": 0,
+      "out": 2.084,
+      "purpose": "answer",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Conversational response: heidi says Then whose scent is this?",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-bruno-response",
+      "takeId": "take-bruno-response",
+      "in": 7.042,
+      "out": 7.958,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Bruno cannot supply an answer; stay with his uncertainty before leaving the room.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-estate-exterior",
+      "takeId": "take-estate-exterior",
+      "in": 0,
+      "out": 2.5,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "outside",
+          "evidence": "Same snowy morning, view from the garden shed toward the family house. The audience sees what the family cannot."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same snowy morning, view from the garden shed toward the family house. The audience sees what the family cannot.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-lookalike",
+      "takeId": "take-lookalike",
+      "in": 0.25,
+      "out": 3.75,
+      "purpose": "payoff",
+      "requires": [
+        "twins",
+        "belief"
+      ],
+      "establishes": [
+        {
+          "factId": "lookalike",
+          "evidence": "Reverse angle reveals another dog with Bruno’s face and a brown collar. Silent; identity remains the cliffhanger."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Reverse angle reveals another dog with Bruno’s face and a brown collar. Silent; identity remains the cliffhanger.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-bruno-still-inside",
+      "takeId": "take-bruno-response",
+      "in": 7.042,
+      "out": 7.958,
+      "purpose": "establish",
+      "requires": [
+        "lookalike"
+      ],
+      "establishes": [
+        {
+          "factId": "two-dogs",
+          "evidence": "Return to the actual navy-collared Bruno still inside. He has not teleported; two dogs exist."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Return to the actual navy-collared Bruno still inside. He has not teleported; two dogs exist.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-end-title",
+      "takeId": "take-end-title",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [],
+      "establishes": [
+        {
+          "factId": "title",
+          "evidence": "End on the one unresolved identity question."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "End on the one unresolved identity question.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    }
+  ],
+  "renderAssetId": "render"
+}

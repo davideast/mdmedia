@@ -8,6 +8,11 @@ export interface GenerateVideoOptions {
   firstFrame?: string;
   referenceImages?: string[];
   previousInteractionId?: string;
+  /** Requested generated seconds for this turn (3–10 for Omni). */
+  durationSeconds?: number;
+  /** Bounds both the interaction request and Files API polling. */
+  signal?: AbortSignal;
+  timeoutMs?: number;
 }
 
 export interface VideoGenerationResult {

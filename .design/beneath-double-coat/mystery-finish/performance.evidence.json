@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "fcb7848024dc59e9e420c5286ac53bdcfba219ac97b83f3f2199caee5e0516a2",
+      "stage": "plan",
+      "targetId": "mystery-first-performances",
+      "reviewer": "Local editorial pre-mortem and visual reference comparison",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Brother relationship is established at the collar, Sebastian named in reply, and grooming room established before recognition."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Close-ups match master screen direction. Hall to grooming uses explicit establishing cut; final edit will add accepted pawprint insert. Door alarm occurs within one performance."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Inspected all close-up references against generated master frames. Heidi retains silver muzzle and burgundy collar; Bruno navy. Returns in later edit reuse performances."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Only one dog appears in each speaking take. Bruno male baritone, Heidi older woman. No offscreen answer."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Short lines planned at natural pace. Ten-second alarm contains separate recognition, door and ventilation cues; actual footage will determine cuts."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Only seated face motion; closure is offscreen sound, rescue is later aftermath. No tools or latch interaction."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Ventilation exists before stopping; one door slam, no music or other voices. All lines owned by visible dog."
+        }
+      ]
+    }
+  ],
+  "speech": []
+}

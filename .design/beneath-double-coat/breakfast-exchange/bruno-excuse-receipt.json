@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "bruno-excuse",
+    "kind": "video",
+    "seconds": 4,
+    "output": ".design/beneath-double-coat/breakfast-exchange/bruno-excuse.mp4",
+    "firstFrame": ".design/beneath-double-coat/breakfast-exchange/bruno-breakfast-first.jpg",
+    "prompt": "Four seconds of Bruno's on-camera reply, animating this EXACT first frame cropped directly from the established breakfast shot. ONE natural adult male Bernese Mountain Dog, BRUNO, navy collar, same broad white chest and exact face, seated in front of this wooden sideboard. Sadie is OFFSCREEN to screen LEFT. Preserve face markings, collar, sideboard, light and camera. He lifts his eyes from the untouched breakfast toward Sadie to the LEFT and offers a slightly defensive but casual excuse in a warm adult male baritone, neutral English, same character voice as 'Morning, Grandmother' and 'Is Sadie still angry?': \"I went for a walk.\" Only that line, beginning about 0.3 seconds and finishing about 2.4 seconds. His LOWER JAW visibly OPENS and CLOSES with each word, natural canine muzzle articulation synchronized to his own voice, not closed-mouth voiceover. Then he holds her gaze briefly, mildly guilty. Small head movement only, settled seated posture, no body travel. Natural dog anatomy with no human lips or teeth. Quiet matching interior room tone; no music, narrator, female voice, humans, additional dog, titles, props being touched, internal cut, camera motion or room redesign."
+  },
+  "fingerprint": "2d865df596cd8dfa824c63e6c61d0431098574a628ebbe9d7264f75f0eeadeeb",
+  "interactionId": "v1_Chd4bHZGYXVhV0pkbmItOFlQb0t5MWdRURIXeGx2RmF1YVdKZG5iLThZUG9LeTFnUVE",
+  "durationSeconds": 4.011,
+  "review": "pending"
+}

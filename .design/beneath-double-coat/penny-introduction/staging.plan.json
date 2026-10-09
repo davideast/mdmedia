@@ -1,0 +1,324 @@
+{
+  "version": 2,
+  "id": "penny-staging",
+  "title": "Reveal the daughter before dialogue",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "hands",
+      "additional dogs",
+      "human bodies"
+    ],
+    "maxWordsPerSecond": 4,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "accepted-master",
+      "path": ".design/beneath-double-coat/breakfast-exchange/breakfast-establish.mp4",
+      "kind": "video",
+      "sha256": "a447bed01803ddf990ada4951c861232998bf7c6c856b8e550c0ecd84a529f81"
+    },
+    {
+      "id": "accepted-end",
+      "path": ".design/beneath-double-coat/penny-introduction/accepted-exact-end.jpg",
+      "kind": "image",
+      "sha256": "73eae9e7fe74f507eecfd73e883828e50bb691b925dc225453581e51bf52b2fe"
+    },
+    {
+      "id": "penny-reference",
+      "path": ".design/beneath-double-coat/penny-introduction/penny-identity.jpg",
+      "kind": "image",
+      "sha256": "9c7b980d50f6354c4223d2de369e29861689496dffa2f7c083d7396725c28545"
+    },
+    {
+      "id": "family-reference",
+      "path": ".design/beneath-double-coat/penny-introduction/penny-breakfast-master.jpg",
+      "kind": "image",
+      "sha256": "77305df3f38c5bc46a3e889813cd57bb3dadbf979cf311c4bb92ea12c74cf56f"
+    },
+    {
+      "id": "attention",
+      "path": ".design/beneath-double-coat/penny-introduction/attention.mp4",
+      "kind": "video"
+    },
+    {
+      "id": "family",
+      "path": ".design/beneath-double-coat/penny-introduction/family.mp4",
+      "kind": "video"
+    }
+  ],
+  "characters": [
+    {
+      "id": "sadie",
+      "description": "Adult female Bernese; green collar; narrow blaze.",
+      "voice": "Controlled medium-low female, neutral English",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Larger adult male Bernese; navy collar.",
+      "voice": "Warm male baritone, neutral English",
+      "silent": false
+    },
+    {
+      "id": "penny",
+      "description": "Young small Bernese puppy; lavender collar; daughter of Bruno and Sadie.",
+      "voice": "Bright natural young girl, neutral English",
+      "silent": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "room",
+      "description": "The audience already knows the snowy estate breakfast room and married couple."
+    },
+    {
+      "id": "attention",
+      "description": "Parents notice someone beside the table."
+    },
+    {
+      "id": "puppy-visible",
+      "description": "Small lavender-collared puppy is seated with the adults."
+    }
+  ],
+  "initialFacts": [
+    "room"
+  ],
+  "scenes": [
+    {
+      "id": "breakfast",
+      "location": "Alpenrose breakfast room, winter morning",
+      "situation": "Bruno has finished his cheese excuse; daughter is beside the table.",
+      "purpose": "Reveal Penny spatially before she speaks.",
+      "orientationFact": "room"
+    }
+  ],
+  "dialogue": [],
+  "takes": [
+    {
+      "sceneId": "breakfast",
+      "startState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "endState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated dogs blink and make small head movements; all paws stay planted.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone, no music, voices or barking.",
+      "id": "accepted-master",
+      "setupId": "couple",
+      "method": "reuse",
+      "duration": 3,
+      "assetId": "accepted-master",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "two-shot",
+        "angle": "Eye level from established side of table",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "Right, then toward daughter"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left, then down right toward daughter"
+        }
+      ]
+    },
+    {
+      "sceneId": "breakfast",
+      "startState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "endState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated dogs blink and make small head movements; all paws stay planted.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "One quiet offscreen collar tick from right, then calm room tone. No speech.",
+      "id": "attention",
+      "setupId": "couple",
+      "method": "first-frame",
+      "duration": 3,
+      "assetId": "attention",
+      "referenceAssetIds": [],
+      "firstFrame": {
+        "assetId": "accepted-end",
+        "fromTakeId": "accepted-master",
+        "at": 2.8333333333333335
+      },
+      "camera": {
+        "size": "two-shot",
+        "angle": "Eye level from established side of table",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "Right, then toward daughter"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left, then down right toward daughter"
+        }
+      ]
+    },
+    {
+      "sceneId": "breakfast",
+      "startState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "endState": {
+        "room": "Pine breakfast room; snowy window left; sideboard right",
+        "sadie": "Seated left in green collar",
+        "bruno": "Seated right in navy collar",
+        "cheese": "One untouched cube on pale green plate on table",
+        "light": "Warm winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Seated dogs blink and make small head movements; all paws stay planted.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone, no music, voices or barking.",
+      "id": "family",
+      "setupId": "family-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "family",
+      "referenceAssetIds": [
+        "family-reference",
+        "penny-reference"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Same side of table, wider/lower to reveal floor beside father",
+        "movement": "Locked camera"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "left",
+          "eyeline": "Right, then toward daughter"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left, then down right toward daughter"
+        },
+        {
+          "characterId": "penny",
+          "position": "right",
+          "eyeline": "Up left toward parents"
+        }
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "accepted-tail",
+      "takeId": "accepted-master",
+      "in": 2.375,
+      "out": 2.875,
+      "purpose": "reaction",
+      "requires": [
+        "room"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "opening",
+        "reason": "Half-second tail of already accepted breakfast, context only.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "attention",
+      "takeId": "attention",
+      "in": 0,
+      "out": 2,
+      "purpose": "establish",
+      "requires": [
+        "room"
+      ],
+      "establishes": [
+        {
+          "factId": "attention",
+          "evidence": "Both adults look down toward offscreen daughter after tiny collar tick."
+        }
+      ],
+      "transition": {
+        "type": "continuous",
+        "reason": "Same final frame of accepted source at 2.833333 seconds, carried forward without a location or composition reset.",
+        "bridge": "sound",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "reveal",
+      "takeId": "family",
+      "in": 0,
+      "out": 2,
+      "purpose": "establish",
+      "requires": [
+        "attention"
+      ],
+      "establishes": [
+        {
+          "factId": "puppy-visible",
+          "evidence": "Wider angle reveals a much smaller lavender-collared puppy already seated beside father."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Follow parental gaze into newly visible foreground beyond previous frame.",
+        "bridge": "gaze",
+        "stateExceptions": []
+      }
+    }
+  ]
+}

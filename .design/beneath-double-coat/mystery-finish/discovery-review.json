@@ -1,0 +1,111 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 4.0,
+      "endSeconds": 6.0,
+      "words": "You still eat my brother's collar.",
+      "voice": "adult male voice",
+      "visibleSpeaker": "Bruno",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 8.0,
+      "endSeconds": 10.0,
+      "words": "Someone should remember, Sebastian.",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 17.75,
+      "endSeconds": 18.25,
+      "words": "That scent...",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 19.85,
+      "endSeconds": 20.25,
+      "words": "Sebastian,",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 22.85,
+      "endSeconds": 23.25,
+      "words": "lock the door",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 24.85,
+      "endSeconds": 25.25,
+      "words": "and turned off",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 26.0,
+      "endSeconds": 26.3,
+      "words": "the air.",
+      "voice": "elderly female voice",
+      "visibleSpeaker": "Heidi",
+      "confidence": 0.95
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 2.2,
+      "characters": [
+        "Bruno",
+        "Heidi"
+      ]
+    },
+    {
+      "startSeconds": 2.2,
+      "endSeconds": 7.3,
+      "characters": [
+        "Bruno"
+      ]
+    },
+    {
+      "startSeconds": 7.3,
+      "endSeconds": 12.3,
+      "characters": [
+        "Heidi"
+      ]
+    },
+    {
+      "startSeconds": 12.3,
+      "endSeconds": 14.3,
+      "characters": []
+    },
+    {
+      "startSeconds": 14.3,
+      "endSeconds": 16.8,
+      "characters": [
+        "Heidi"
+      ]
+    },
+    {
+      "startSeconds": 16.8,
+      "endSeconds": 27.0,
+      "characters": [
+        "Heidi"
+      ]
+    }
+  ],
+  "continuityFindings": [],
+  "speakerErrors": [],
+  "unwantedFigures": [],
+  "physicalDefects": [],
+  "pacingAndAudio": [],
+  "materialFailures": [],
+  "uncertainties": [],
+  "acceptable": true
+}

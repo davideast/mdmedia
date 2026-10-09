@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "38f4005b8cd059ae9fa77fb91a70e32fb9ffe122547185e08fad26f7614388d7",
+      "stage": "plan",
+      "targetId": "mystery-reveal",
+      "reviewer": "Local editorial pre-mortem and inspected matching references",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Audience already knows Sebastian is the absent brother; the tuft has been visually established. Door open and family presence are established before speech."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Shared master establishes all three; matched close-ups answer each other. Separate source ranges reuse Bruno performance for his final denial."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Inspected rescue master and close-ups: Heidi left burgundy, Bruno middle navy, Sadie right green; tuft stationary. Same winter morning."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Exactly one visible speaker per take, two female voices separately described and male Bruno; no offscreen speaker."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Short lines, generous source handles for later trims. Final denial is two words with a reaction hold."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Seated canine faces only, no rescue machinery or handling the evidence."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Clean speech and quiet room tone; ventilation remains off. No narrator or background voices."
+        }
+      ]
+    }
+  ],
+  "speech": []
+}

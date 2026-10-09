@@ -1,0 +1,12 @@
+{
+  "references": [
+    ".design/beneath-double-coat/breakfast-opening/cast.jpg",
+    ".design/beneath-double-coat/breakfast-opening/location.jpg"
+  ],
+  "referenceFrom": {
+    "script_s04": [
+      "script_s03"
+    ]
+  },
+  "concurrency": 1
+}

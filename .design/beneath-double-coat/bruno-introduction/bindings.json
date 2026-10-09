@@ -1,0 +1,12 @@
+{
+  "references": [
+    ".design/beneath-double-coat/bruno-introduction/bruno-reference.jpg"
+  ],
+  "firstFrames": {
+    "script_bruno": ".design/beneath-double-coat/bruno-introduction/doorway-first-frame.jpg"
+  },
+  "files": {
+    "script_accepted": ".design/beneath-double-coat/heidi-otto-proof/heidi-otto-proof-v2.mp4"
+  },
+  "concurrency": 1
+}

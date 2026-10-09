@@ -1,0 +1,22 @@
+{
+  "status": "rejected",
+  "currentTake": "heidi-otto-proof-v2.mp4",
+  "review": "review-v2-pro.json",
+  "confirmedImprovements": [
+    "Only intended two-dog cast in both full-clip reviews",
+    "No cuts or room changes in simplified setup",
+    "No tools or complex object manipulation"
+  ],
+  "remainingFailures": [
+    "Initial Otto word lacks synchronized mouth movement",
+    "Remaining jaw movement approximate, not phoneme synchronized",
+    "Paws blend with snow residue",
+    "Pacing still too deliberate"
+  ],
+  "decision": "Do not expand into full episode or label production accepted. Two targeted takes completed; further identical prompt retries stopped.",
+  "checks": {
+    "tests": "20 passing video-generation and continuation tests",
+    "typecheck": "Studio and production builder passed",
+    "firstContinuationVisualSSIM": 0.983931
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "penny-sequence-penny",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/penny-introduction/penny-performance.mp4",
+    "firstFrame": ".design/beneath-double-coat/penny-introduction/penny-close.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige dog soap opera, same warm snowy-estate breakfast scene as supplied actual video frame. Exactly ONE real Bernese Mountain Dog on camera, the exact one visible in the first frame. Preserve this exact head, markings, collar, age, background and framing. A single locked close-up, no cuts or camera movement. Dog remains seated, with small natural canine jaw motion synchronized to its OWN clearly audible voice, small expressive eye/ear motion and restrained head motion. No human face, body, hands, child, person, extra animal, second dog, text or subtitles. Canine anatomy remains canine, no human lips/teeth or human facial morph. No standing, gestures or props. NO narrator, offscreen speaker, added dialogue, music, laughter, barking or sound effects. Clean natural speech with quiet continuous room tone. Neutral English accent. Silent gaps mean mouth rests closed. Both scripted lines belong to this one dog, not different characters. PENNY is the small lavender-collared female PUPPY, not an adult. Her voice is a clear natural young girl's voice with curious, matter-of-fact delivery, not squeaky or cartoonishly high. She looks slightly UP and LEFT toward her parents, never into lens. At 0.6s say exactly: \"Dad, are you in trouble?\" Finish around 2.8s. Hold a listening expression, muzzle closed, until 4.5s. Then say exactly: \"Then can I have his cheese?\" Finish by 7.2s. End with a very small hopeful glance toward the table, without moving her body. Eight seconds total."
+  },
+  "fingerprint": "6122f26a5d77f373c2cc7158dde7e57ace8f51ad9ac9f8a2fe7a5b6cb21e20cf",
+  "interactionId": "v1_ChcxNkRGYW92Y05aM0stc0FQck1ha2dRcxIXMTZERmFvdmNOWjNLLXNBUHJNYWtnUXM",
+  "durationSeconds": 8,
+  "review": "pending"
+}

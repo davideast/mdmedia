@@ -1,0 +1,54 @@
+{
+  "durationSeconds": 31,
+  "transition": "hard cuts",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "rescue-master",
+      "sequenceStart": 0,
+      "sequenceEnd": 3
+    },
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+      "start": 0,
+      "end": 8,
+      "label": "rescue-bruno",
+      "sequenceStart": 3,
+      "sequenceEnd": 11
+    },
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+      "start": 0,
+      "end": 8,
+      "label": "rescue-heidi",
+      "sequenceStart": 11,
+      "sequenceEnd": 19
+    },
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/rescue-sadie.mp4",
+      "start": 0,
+      "end": 5,
+      "label": "rescue-sadie",
+      "sequenceStart": 19,
+      "sequenceEnd": 24
+    },
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "exterior",
+      "sequenceStart": 24,
+      "sequenceEnd": 27
+    },
+    {
+      "file": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+      "start": 0,
+      "end": 4,
+      "label": "lookalike",
+      "sequenceStart": 27,
+      "sequenceEnd": 31
+    }
+  ]
+}

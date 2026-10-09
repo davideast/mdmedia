@@ -31,6 +31,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./production": {
+      "types": "./dist/production/index.d.ts",
+      "import": "./dist/production/index.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"

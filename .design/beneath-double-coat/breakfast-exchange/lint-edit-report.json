@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "e377632b8cbefa9c325473e914a891f3633e067eda12303b63b95dd85164b900",
+  "durationSeconds": 28.25,
+  "status": "ready",
+  "issues": [],
+  "resolvedIssues": [
+    {
+      "code": "SPEECH_PACING",
+      "at": "bruno-excuse",
+      "message": "Cue walk exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review"
+    }
+  ]
+}

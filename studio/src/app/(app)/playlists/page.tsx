@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNarration } from "@/components/shell/narration-provider";
+import {LibraryNavigation} from "@/components/library/video-library";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useRouteQuery, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useAuth } from "@/lib/auth-context";
@@ -249,6 +250,8 @@ export default function PlaylistsPage() {
       viewGrid
       gridVariant="wide"
     >
+      <LibraryNavigation/>
+
       {selectedPlaylist ? <Link href="/playlists" className="text-sm text-primary underline underline-offset-2">All playlists</Link> : null}
       {/* Create new playlist bar */}
       {!selectedPlaylist ? (

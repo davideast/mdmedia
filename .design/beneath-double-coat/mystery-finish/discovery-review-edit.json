@@ -1,0 +1,38 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+    "start": 0,
+    "end": 2.5,
+    "label": "hall-master"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4",
+    "start": 0,
+    "end": 5,
+    "label": "hall-bruno"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/hall-heidi.mp4",
+    "start": 0,
+    "end": 5,
+    "label": "hall-heidi"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/prints-insert.mp4",
+    "start": 0,
+    "end": 2,
+    "label": "prints-insert"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+    "start": 0,
+    "end": 2.5,
+    "label": "groom-master"
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4",
+    "start": 0,
+    "end": 10,
+    "label": "groom-heidi"
+  }
+]

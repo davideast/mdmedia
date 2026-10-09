@@ -1,0 +1,108 @@
+{
+  "takes": [
+    {
+      "id": "revision-hall-bruno-a",
+      "transcript": [
+        {
+          "start": 0.0,
+          "end": 1.0,
+          "text": "Grandmother,",
+          "voice": "mature male",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 1.1,
+          "end": 2.5,
+          "text": "my twin got back in.",
+          "voice": "mature male",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 2.6,
+          "end": 5.0,
+          "text": "Penny's negotiating for your breakfast.",
+          "voice": "mature male",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 5.1,
+          "end": 6.4,
+          "text": "But the looks I got,",
+          "voice": "mature male",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 6.5,
+          "end": 8.0,
+          "text": "the sausage...",
+          "voice": "mature male",
+          "visibleSpeaker": true
+        }
+      ],
+      "issues": [
+        {
+          "at": "8.0-9.5",
+          "observation": "Clear human laughter voiceover while dog muzzle remains completely motionless.",
+          "repair": "Remove laughter audio or animate muzzle."
+        }
+      ],
+      "usable": false
+    },
+    {
+      "id": "revision-hall-heidi-a",
+      "transcript": [
+        {
+          "start": 0.1,
+          "end": 2.0,
+          "text": "Brother Sebastian did that too.",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 2.2,
+          "end": 5.5,
+          "text": "He'd steal breakfast without leaving his bed.",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 6.8,
+          "end": 9.0,
+          "text": "You were supposed to share it.",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        }
+      ],
+      "issues": [],
+      "usable": true
+    },
+    {
+      "id": "revision-hall-heidi-b",
+      "transcript": [
+        {
+          "start": 0.1,
+          "end": 1.5,
+          "text": "They never found him.",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 1.8,
+          "end": 4.2,
+          "text": "You're allowed to miss him, Bruno.",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        },
+        {
+          "start": 6.5,
+          "end": 8.8,
+          "text": "Wait... that smell...",
+          "voice": "mature female",
+          "visibleSpeaker": true
+        }
+      ],
+      "issues": [],
+      "usable": true
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "draftId": "beneath-double-coat-heidi-otto-proof-v2__proof",
+  "record": {
+    "videoBrief": {
+      "prompt": "Imported screenplay: Heidi and Otto — Speaking proof\n\nAnimate the supplied populated frame as a speaking-animal movie shot. Exactly TWO photorealistic Bernese Mountain Dogs: HEIDI elderly silver muzzle burgundy collar LEFT foreground; OTTO stocky ochre collar RIGHT background. The spoken voice originates visibly from HEIDI: synchronize her canine jaw and muzzle to EVERY spoken word. This is ON-CAMERA CHARACTER DIALOGUE, NOT narration or voiceover. Clearly visible speech articulation while preserving canine anatomy: no human lips or teeth. Only Otto keeps his mouth closed. No humans, extra animals, figures in background, props, camera moves or cuts. Same low older female voice throughout.",
+      "targetSeconds": 10,
+      "sourceIn": 0,
+      "sourceOut": 0,
+      "sourceUsage": "reference",
+      "submittedSourceUsage": "reference",
+      "submittedSource": "",
+      "submittedRange": "0:0",
+      "continuity": "continuous",
+      "script": {
+        "title": "Heidi and Otto — 10-second speaking proof",
+        "sourceTranscript": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+        "sourceDescription": "A simple two-dog exposition exchange establishing Heidi’s authority and Otto’s groundskeeping work, ending with an invitation to breakfast.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "The muddy groundskeeper",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+            "visual": "0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.",
+            "audio": "Heidi alone speaks both sentences, on-camera synchronized performance. No voiceover or narrator. No music, only quiet continuous room ambience.",
+            "pauseSeconds": 1
+          }
+        ]
+      },
+      "submittedPrompt": "Imported screenplay: Heidi and Otto — Speaking proof\n\nAnimate the supplied populated frame as a speaking-animal movie shot. Exactly TWO photorealistic Bernese Mountain Dogs: HEIDI elderly silver muzzle burgundy collar LEFT foreground; OTTO stocky ochre collar RIGHT background. The spoken voice originates visibly from HEIDI: synchronize her canine jaw and muzzle to EVERY spoken word. This is ON-CAMERA CHARACTER DIALOGUE, NOT narration or voiceover. Clearly visible speech articulation while preserving canine anatomy: no human lips or teeth. Only Otto keeps his mouth closed. No humans, extra animals, figures in background, props, camera moves or cuts. Same low older female voice throughout.",
+      "submittedTarget": 10
+    },
+    "draft": {
+      "mode": "references",
+      "frame": "16:9",
+      "note": "Animate the supplied populated frame as a speaking-animal movie shot. Exactly TWO photorealistic Bernese Mountain Dogs: HEIDI elderly silver muzzle burgundy collar LEFT foreground; OTTO stocky ochre collar RIGHT background. The spoken voice originates visibly from HEIDI: synchronize her canine jaw and muzzle to EVERY spoken word. This is ON-CAMERA CHARACTER DIALOGUE, NOT narration or voiceover. Clearly visible speech articulation while preserving canine anatomy: no human lips or teeth. Only Otto keeps his mouth closed. No humans, extra animals, figures in background, props, camera moves or cuts. Same low older female voice throughout.\n\nOne continuous shot, with no cuts. Preserve the subject, wardrobe, setting and lighting established here: 0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.",
+      "beats": [
+        {
+          "id": "script_s01",
+          "start": 0,
+          "end": 10,
+          "text": "0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nHEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.\n\nSound direction: Heidi alone speaks both sentences, on-camera synchronized performance. No voiceover or narrator. No music, only quiet continuous room ambience.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue."
+        }
+      ]
+    },
+    "title": "Heidi and Otto — 10-second speaking proof",
+    "beatClips": {
+      "script_s01": {
+        "placement": {
+          "id": "s01",
+          "title": "The muddy groundskeeper",
+          "seconds": 10,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+          "visual": "0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.",
+          "audio": "Heidi alone speaks both sentences, on-camera synchronized performance. No voiceover or narrator. No music, only quiet continuous room ambience.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_6987f2cd0bca4d50899b623530d599bb"
+      }
+    },
+    "builtScript": {
+      "title": "Heidi and Otto — 10-second speaking proof",
+      "sourceTranscript": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+      "sourceDescription": "A simple two-dog exposition exchange establishing Heidi’s authority and Otto’s groundskeeping work, ending with an invitation to breakfast.",
+      "shots": [
+        {
+          "id": "s01",
+          "title": "The muddy groundskeeper",
+          "seconds": 10,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+          "visual": "0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.",
+          "audio": "Heidi alone speaks both sentences, on-camera synchronized performance. No voiceover or narrator. No music, only quiet continuous room ambience.",
+          "pauseSeconds": 1
+        }
+      ]
+    },
+    "view": "tracks",
+    "exportId": "v_12d9354b03654a69b4bbde6849582eae"
+  },
+  "job": {
+    "id": "v_12d9354b03654a69b4bbde6849582eae",
+    "status": "ready",
+    "model": "local-export",
+    "mode": "text",
+    "frame": "16:9",
+    "createdAt": 1791315274636,
+    "updatedAt": 1791315275528,
+    "message": "Final video ready",
+    "durationSeconds": 10.006,
+    "requestedDurationSeconds": 10.006,
+    "exportInputs": [
+      {
+        "videoId": "v_6987f2cd0bca4d50899b623530d599bb",
+        "inSeconds": 0,
+        "outSeconds": 10.006,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      }
+    ],
+    "canExtend": false
+  }
+}

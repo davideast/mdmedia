@@ -1,0 +1,194 @@
+[
+  {
+    "actualTranscript": [
+      {
+        "startSeconds": 1.4,
+        "endSeconds": 3.2,
+        "words": "You came home after midnight.",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 4.2,
+        "endSeconds": 5.7,
+        "words": "I went for a walk.",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 6.8,
+        "endSeconds": 8.8,
+        "words": "Then why do you smell like Parmesan,",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 9.9,
+        "endSeconds": 11.4,
+        "words": "and rosemary?",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 12.0,
+        "endSeconds": 13.2,
+        "words": "Sadie...",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 13.8,
+        "endSeconds": 14.7,
+        "words": "Bella.",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 16.0,
+        "endSeconds": 17.0,
+        "words": "Your ex.",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 17.3,
+        "endSeconds": 19.4,
+        "words": "She offered me a snack.",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 20.0,
+        "endSeconds": 21.8,
+        "words": "And you stayed until midnight?",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 22.2,
+        "endSeconds": 24.3,
+        "words": "It was very good cheese.",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      }
+    ],
+    "castByShot": [
+      {
+        "startSeconds": 0.0,
+        "endSeconds": 1.25,
+        "characters": [
+          "Sadie",
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 1.25,
+        "endSeconds": 4.083,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 4.083,
+        "endSeconds": 6.75,
+        "characters": [
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 6.75,
+        "endSeconds": 9.917,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 9.917,
+        "endSeconds": 11.917,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 11.917,
+        "endSeconds": 13.667,
+        "characters": [
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 13.667,
+        "endSeconds": 14.917,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 14.917,
+        "endSeconds": 15.917,
+        "characters": [
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 15.917,
+        "endSeconds": 17.083,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 17.083,
+        "endSeconds": 19.75,
+        "characters": [
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 19.75,
+        "endSeconds": 21.917,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 21.917,
+        "endSeconds": 25.5,
+        "characters": [
+          "Bruno"
+        ]
+      },
+      {
+        "startSeconds": 25.5,
+        "endSeconds": 28.167,
+        "characters": [
+          "Sadie",
+          "Bruno"
+        ]
+      }
+    ],
+    "continuityFindings": [
+      "00:09.917: Intentional jump cut on Sadie from the final frame of the accepted footage into the new performance preserves spatial continuity perfectly."
+    ],
+    "speakerErrors": [],
+    "unwantedFigures": [],
+    "physicalDefects": [],
+    "pacingAndAudio": [
+      "Dialogue flows naturally with successful comic timing.",
+      "00:14.917: The silent Bruno reaction is inserted correctly without any improper dialogue attribution."
+    ],
+    "materialFailures": [],
+    "uncertainties": [],
+    "acceptable": true
+  }
+]

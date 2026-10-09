@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-pawprints-clean",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/hall-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/prints-clean.jpg",
+    "prompt": "Photorealistic close INSERT shot of the floor in this exact pine hallway, same boards, bench leg at RIGHT and open grooming doorway in upper LEFT. The camera looks down along a small irregular trail of muddy CANINE pawprints leading from bottom foreground toward the doorway. No dogs, snouts, paws, heads, people or limbs in frame. Replace the existing repetitive stamped icons with only FOUR or FIVE subtle natural mud impressions of real large dog PAWS: each complete impression has one small triangular central pad and FOUR rounded toe pads, soft smudged edges, some partial impressions, realistic size and irregular spacing. NO fingers, thumbs, handprints, human footprints, logos, vector icons or lettering. Real wet mud on warm wooden floor. Collar and puppy photo may be softly cropped at far right but the main view is floor and open doorway. Preserve architectural context, winter morning light, photographic texture. 16:9."
+  },
+  "fingerprint": "c837c53d736d6454c4648c5ab95ecfef42da380b7a6b20e7b907a3e5430e311c",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

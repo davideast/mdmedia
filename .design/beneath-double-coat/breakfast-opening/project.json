@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-breakfast-opening",
+  "title": "Breakfast at Alpenrose — Opening",
+  "productionNotes": "Photorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.",
+  "reviewNotes": [],
+  "parts": [
+    {
+      "id": "opening",
+      "continuity": "planned",
+      "script": {
+        "title": "Breakfast at Alpenrose — 31-second opening",
+        "sourceTranscript": "HEIDI (offscreen): Otto! Breakfast.\nHEIDI (on-camera): Otto. We’ve discussed this.",
+        "sourceDescription": "The first 31 seconds of the approved 90-second breakfast exposition. Establish estate, enter through window, meet Heidi and Otto.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "The estate wakes",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "visual": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.",
+            "dialogue": "",
+            "audio": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s02",
+            "title": "A voice from inside",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "visual": "Continue exact trajectory through open casement; no cut.\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.",
+            "dialogue": "HEIDI (offscreen): Otto! Breakfast.",
+            "audio": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s03",
+            "title": "The household rules",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "visual": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.\n0–4s: Camera settles into master. Otto enters through rear doorway and crosses to window.\n4–8s: Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently.",
+            "dialogue": "",
+            "audio": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s04",
+            "title": "Heidi gets her way",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "visual": "Closer reaction angle; preserve physical positions and eyelines.\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.",
+            "dialogue": "HEIDI (on-camera): Otto. We’ve discussed this.",
+            "audio": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+            "pauseSeconds": 1
+          }
+        ]
+      }
+    }
+  ]
+}

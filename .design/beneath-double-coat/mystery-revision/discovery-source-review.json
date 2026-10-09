@@ -1,0 +1,144 @@
+{
+  "takes": [
+    {
+      "id": "revision-hall-bruno-invitation",
+      "transcript": [
+        {
+          "start": 0.8,
+          "end": 1.5,
+          "text": "Grandmother,",
+          "voice": "deep male dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 1.8,
+          "end": 2.8,
+          "text": "come back in.",
+          "voice": "deep male dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 3.8,
+          "end": 5.5,
+          "text": "He's negotiating for your breakfast.",
+          "voice": "deep male dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        }
+      ],
+      "issues": [
+        {
+          "at": "3.8-5.5",
+          "observation": "Clear voiceover with motionless muzzle.",
+          "repair": "Animate the muzzle to match the speech."
+        }
+      ],
+      "usable": false
+    },
+    {
+      "id": "revision-hall-bruno-twin",
+      "transcript": [
+        {
+          "start": 0.5,
+          "end": 1.5,
+          "text": "My twin got the looks.",
+          "voice": "deep male dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 1.8,
+          "end": 3.0,
+          "text": "I got the sausage.",
+          "voice": "deep male dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        }
+      ],
+      "issues": [],
+      "usable": true
+    },
+    {
+      "id": "revision-groom-heidi-a",
+      "transcript": [
+        {
+          "start": 0.5,
+          "end": 1.8,
+          "text": "He used to hide in here.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 2.5,
+          "end": 4.5,
+          "text": "As if I couldn't smell him.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 6.0,
+          "end": 7.5,
+          "text": "Fresh fur.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        }
+      ],
+      "issues": [
+        {
+          "at": "0.0-8.0",
+          "observation": "Extra animal part visible in the bottom right corner.",
+          "repair": "Remove or crop out the unwanted animal."
+        },
+        {
+          "at": "2.5-4.5",
+          "observation": "Voiceover plays with motionless muzzle.",
+          "repair": "Animate the muzzle during speech."
+        }
+      ],
+      "usable": false
+    },
+    {
+      "id": "revision-groom-heidi-b",
+      "transcript": [
+        {
+          "start": 0.2,
+          "end": 0.8,
+          "text": "No.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 1.2,
+          "end": 2.5,
+          "text": "I'm imagining it.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 3.5,
+          "end": 4.5,
+          "text": "Bruno!",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        },
+        {
+          "start": 5.0,
+          "end": 6.5,
+          "text": "Come and smell this.",
+          "voice": "older female dog voice",
+          "visibleSpeaker": "Bernese Mountain Dog"
+        }
+      ],
+      "issues": [
+        {
+          "at": "0.0-7.0",
+          "observation": "Extra animal visible in the bottom right.",
+          "repair": "Remove the unwanted animal element."
+        },
+        {
+          "at": "0.0-7.0",
+          "observation": "Clear voiceover with a completely motionless muzzle.",
+          "repair": "Animate the muzzle to match the dialogue."
+        }
+      ],
+      "usable": false
+    }
+  ]
+}

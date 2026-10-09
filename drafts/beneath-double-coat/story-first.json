@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-story-first",
+  "title": "Beneath the Double Coat — The Secret in the Snow",
+  "productionNotes": "A sincere, funny daytime soap opera populated entirely by photorealistic Bernese Mountain Dogs. Viewers know none of these characters. Prioritize clear screen geography, legible actions and reactions, and distinct voices. Natural heavy quadrupedal anatomy, triangular floppy ears, tricolor double coats, no human hands or human bodies. Objects move by noses, paws and mouths. No narrator. Say only each shot’s scripted dialogue, in speaker order. Hard cuts are intentional; no fades.\nHEIDI: elderly female Bernese, silver muzzle, narrow white blaze, burgundy collar. Low imperious female voice that softens with grief. OTTO: stocky shaggy male Bernese, ochre collar; earnest warm male voice; household groundskeeper. SADIE: adult female Bernese, slender white blaze, emerald collar; precise controlled female voice. HOUSEHOLD BRUNO: large adult male Bernese, broad white chest, symmetrical rust eyebrows, navy collar; smooth defensive male voice. STRANGER: visually matches household Bruno’s face and build, weathered coat, faded brown collar. The stranger never speaks in this short. Do not name or reveal the impersonation behind the household Bruno yet.\nOne Alpine estate in a single morning. Breakfast room opens onto a hallway; the memorial console sits along that hall; grooming room opens off it. Establish its door, vent and thermostat together. Snow and toolshed remain consistent outside. The only evidence props are the paired puppy photograph, empty faded collar, muddy paw prints, rake and fur. The fur is recognized by scent, never by a supernatural visual change.\nMaintain approved character and location references across each independent camera setup. Continuations extend action within the same setup. Keep reaction pauses; do not rush to fit added speech. Original sparse piano and strings stay below dialogue. Source ambience starts immediately. The thermostat change and final title use exact editorial overlays.",
+  "reviewNotes": [],
+  "parts": [
+    {
+      "id": "short",
+      "continuity": "planned",
+      "script": {
+        "title": "The Secret in the Snow — Story Cut",
+        "sourceTranscript": "HEIDI: Otto. The window.\nOTTO: It is snowing, Mrs. von Alpenrose.\n\nHEIDI: Yes. Lovely.\n\nSADIE: Bruno. You came home at two.\nBRUNO: I went for a walk.\n\nSADIE: For six hours?\nBRUNO: Sadie—\n\nSADIE: My husband smells like another dog’s Parmesan.\n\nBRUNO: Grandmother. You cannot keep waiting for him.\n\nHEIDI: Then stop telling me to put his things away.\n\nHEIDI: Sebastian? You are alive?\n\nHEIDI: Who is there?\n\nHEIDI: You would not.\n\nHEIDI: YOU MONSTER!\n\nOTTO: Mrs. von Alpenrose?\n\nSADIE: We are not finished.\nBRUNO: That was Grandmother.\n\nBRUNO: Grandmother. Are you hurt?\n\nHEIDI: Someone locked me in. After I found this.\n\nHEIDI: Sebastian’s.\nSADIE: Who is Sebastian?\nBRUNO: My brother.\n\nHEIDI: The one you said was dead.",
+        "sourceDescription": "A short adaptation of the supplied Episode One. Establishes Heidi’s household, Bruno and Sadie’s marriage, a missing relative and an attempt to silence Heidi. Ends with the brother/lookalike mystery. Later episode twists are reserved for subsequent stories.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "A house built for winter",
+            "seconds": 4,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Dawn. A wide view establishes one snowbound Alpine mansion and a small toolshed beyond its garden. Warm windows; a single open ground-floor window. End on that open window.",
+            "audio": "Wind outside; a restrained original piano motif.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s02",
+            "title": "Meet the mistress of the house",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Otto. The window.\nOTTO: It is snowing, Mrs. von Alpenrose.",
+            "visual": "Inside the open window is Heidi, an elderly Bernese resting on a marble floor. Otto, a stocky Bernese with a cleaning cloth, noses the window almost shut. Heidi lifts her head and gives him a commanding look. Frame both dogs and the window clearly.",
+            "audio": "Wind diminishes as the window closes. Distinct elderly female and earnest male voices.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s03",
+            "title": "Cold is comfort",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Yes. Lovely.",
+            "visual": "Continue the same view. Heidi noses the window open again, settles into the cold air and sighs contentedly. Otto quietly gives up. Let her satisfaction land.",
+            "audio": "Fresh wind; contented canine exhale. A tiny amused piano resolution.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s04",
+            "title": "A husband on thin ice",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Bruno. You came home at two.\nBRUNO: I went for a walk.",
+            "visual": "Breakfast room beside the hall. Sadie, in an emerald collar, waits across from Bruno in a navy collar. Bruno has his front paws on a chair and his rear paws on the floor. One cheese cube sits on a low breakfast table between them. Sadie looks at her husband, not the camera.",
+            "audio": "Quiet breakfast room. Precise female voice; smooth evasive male voice.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s05",
+            "title": "The peace offering fails",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "SADIE: For six hours?\nBRUNO: Sadie—",
+            "visual": "Continue the breakfast two-shot. Bruno nudges the cheese cube toward Sadie with his nose. She ignores the offering and leans toward his muzzle. He goes still.",
+            "audio": "Cheese plate scrapes gently; let the uncomfortable pause play.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s06",
+            "title": "A very specific suspicion",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "SADIE: My husband smells like another dog’s Parmesan.",
+            "visual": "Continue. Sadie sniffs Bruno’s muzzle, then withdraws slowly. Bruno avoids her gaze. Neither eats the cheese. Hold his guilty reaction.",
+            "audio": "Music drops away for the accusation. No comic sound effect.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s07",
+            "title": "The place kept empty",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BRUNO: Grandmother. You cannot keep waiting for him.",
+            "visual": "Hallway outside breakfast. Heidi stops at a low console holding a photograph of two nearly identical Bernese puppies and an empty faded brown collar. Bruno enters from the breakfast doorway behind her. Camera stays close enough to read the two puppies as a pair without any written labels.",
+            "audio": "The opening piano motif returns, quieter. Bruno is gentle but tense.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s08",
+            "title": "Heidi refuses to let go",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Then stop telling me to put his things away.",
+            "visual": "Continue the same hallway shot. Heidi noses the empty collar back beside the photograph. Bruno looks away and returns toward breakfast. She watches him leave, then lowers her nose toward the collar.",
+            "audio": "Soft collar buckle on wood; a brief silence after the line.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s09",
+            "title": "Something has come inside",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "",
+            "visual": "Continue with Heidi. Her nose pauses. Camera tilts to fresh muddy paw prints crossing the clean hall from the outside door toward the grooming room. Heidi notices and follows. Show the trail and destination together.",
+            "audio": "A sniff, slow paw steps. A low suspense note replaces the family motif.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s10",
+            "title": "The familiar scent",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Grooming room, reached from the same hall. Heidi follows the muddy prints to a low grooming platform. A silver rake and a tuft of black fur lie on it. In one legible view she smells the fur, stills, then turns her head toward the hallway she came from.",
+            "audio": "Ventilation hum is clearly audible. Sniffing stops suddenly.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s11",
+            "title": "Hope before danger",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Sebastian? You are alive?",
+            "visual": "Continue from Heidi’s reaction. She lifts her ears and takes one hopeful step toward the open doorway, expecting someone. Keep the fur visible behind her. There is nobody in the doorway.",
+            "audio": "Vent continues. Her voice softens with hope; no ominous sting yet.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s12",
+            "title": "Someone is listening",
+            "seconds": 4,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Who is there?",
+            "visual": "Continue. A canine shadow passes across the hallway outside. Heidi turns toward it. The door closes before she reaches it. Never reveal the dog casting the shadow.",
+            "audio": "A paw step outside, then a clear latch click.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s13",
+            "title": "The room changes",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "",
+            "visual": "Continue with Heidi pushing at the same door; it does not open. She stops when the vent above her becomes silent, then looks from the vent toward the nearby thermostat. Show this cause-and-reaction sequence without leaving the room.",
+            "audio": "Door rattles under her paw. Ventilation hum cuts out sharply. Hold the new stillness.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s14",
+            "title": "An outrage, not a medical emergency",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: You would not.",
+            "visual": "Continue. Camera follows her gaze toward the thermostat, then returns to her offended expression. The room is only mildly warmer: no collapse or injury. A readable editorial thermostat insert will show 72°F becoming 74°F; do not rely on model lettering to explain the action.",
+            "audio": "A thermostat beep. Small rising strings below her voice.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s15",
+            "title": "The alarm",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: YOU MONSTER!",
+            "visual": "Continue. Heidi plants her front paws against the locked door and scratches furiously, rear paws firmly on the floor. Her bark-like final shout carries into the hall. End with the door still closed.",
+            "audio": "Loud scratching, her theatrical shout, then a short musical sting.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s16",
+            "title": "Someone hears",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "OTTO: Mrs. von Alpenrose?",
+            "visual": "The hallway outside the same grooming door. Otto, already introduced at the window, stops cleaning when he hears Heidi. He follows the scratching to the door and noses down its large lever handle.",
+            "audio": "Scratching is muffled through the door; Otto’s concerned voice.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s17",
+            "title": "An accusation interrupted",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: We are not finished.\nBRUNO: That was Grandmother.",
+            "visual": "Return to the established breakfast two-shot. Heidi’s distant shout has interrupted Sadie. Bruno turns toward the hall and steps away from the untouched cheese; Sadie follows him.",
+            "audio": "Heidi’s shout carries faintly from the hall before their dialogue; hurried paws follow.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s18",
+            "title": "What she rescued",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BRUNO: Grandmother. Are you hurt?",
+            "visual": "Grooming doorway, now open. Otto stands to one side as Heidi emerges carrying the tuft of fur gently in her mouth. Bruno and Sadie arrive from the hall. She is indignant, not injured. She ignores the question and places the fur at Bruno’s front paws.",
+            "audio": "Paw steps stop; breathing settles. No music over Bruno’s question.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s19",
+            "title": "Bruno recognizes it too",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Someone locked me in. After I found this.",
+            "visual": "Continue in the same doorway group. Heidi indicates the fur with her nose. Bruno smells it; his confident posture collapses into stillness. Sadie notices his reaction and looks from him to Heidi.",
+            "audio": "A single sniff, then an exposed pause. Sparse low piano.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s20",
+            "title": "A family secret becomes public",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Sebastian’s.\nSADIE: Who is Sebastian?\nBRUNO: My brother.",
+            "visual": "Continue. Heidi watches Bruno as she says the name. Sadie turns toward her husband. Bruno answers her directly after a reluctant pause. Keep all three in the same frame so the relationships are unmistakable.",
+            "audio": "Music stays low. Three distinct voices with space between turns.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s21",
+            "title": "The story he told",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: The one you said was dead.",
+            "visual": "Continue. Heidi holds Bruno’s gaze. Sadie slowly turns back to Bruno. He has no answer. Hold that unanswered look for two seconds.",
+            "audio": "Let the line land in silence, followed by one low note.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s22",
+            "title": "Someone watching the house",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Exterior garden at the same morning light. Fresh paw prints lead to the toolshed established in the first shot. A large Bernese in a faded brown collar stands in its doorway, watching the mansion. Push close enough to reveal the same facial markings as the household Bruno. Match their approved face reference; this is not an unrelated dog.",
+            "audio": "Wind and a faint collar jingle. A rising suspense chord.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s23",
+            "title": "Two places at once",
+            "seconds": 4,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Hard cut back to household Bruno in the navy collar, still with Heidi and Sadie in the established grooming doorway. Match his face size and angle to the previous shot. Sadie waits for his answer. No dog moves between locations.",
+            "audio": "Hold the suspense chord, then stop it.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s24",
+            "title": "The question that remains",
+            "seconds": 3,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Editorial black title card: BENEATH THE DOUBLE COAT. Smaller line: The Secret in the Snow. Exact typography is added in editing, not generated inside a moving scene.",
+            "audio": "One mournful original piano note.",
+            "pauseSeconds": 2
+          }
+        ]
+      }
+    }
+  ]
+}

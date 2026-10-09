@@ -1,5 +1,7 @@
 "use client";
 
+import {UseNarrationInVideo} from "@/components/library/use-narration-in-video";
+import { useAuth } from "@/lib/auth-context";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { BookOpen, Check, Copy, FileText, Loader2, Pause, Play } from "lucide-react";
@@ -16,6 +18,7 @@ import { useNarrationDocument } from "@/lib/use-narration-document";
 import { useWorkspaceField } from "@/components/shell/workspace-provider";
 
 export default function NarrationPage() {
+  const { user } = useAuth();
   const params = useParams<{ id: string }>();
   const id = params.id;
   const searchParams = useSearchParams();
@@ -239,6 +242,7 @@ export default function NarrationPage() {
       }
       actions={
         <div className="flex items-center gap-1">
+          {user && document?.ownerUid === user.uid ? <UseNarrationInVideo id={id} title={displayTitle} durationMs={document.durationMs??0} ready={document.status==='ready'}/> : null}
           <Button type="button" size="sm" disabled={empty || stream.status === "error"} aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
             onClick={() => {
               if (isLive && playback.player) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }

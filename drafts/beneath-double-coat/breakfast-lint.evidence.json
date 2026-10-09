@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "e377632b8cbefa9c325473e914a891f3633e067eda12303b63b95dd85164b900",
+      "stage": "plan",
+      "targetId": "alpenrose-breakfast",
+      "reviewer": "Codex local editorial review, 2026-10-06; accepted footage and previously saved source/review evidence; no new provider review",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "The preceding accepted opening establishes that Bruno’s wife is waiting. shot-01 locates both at breakfast; late return, walk excuse, Parmesan and rosemary are established before Bella is identified as his ex in shot-09. The snack defense follows that relationship explanation."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "shot-05 starts from the actual final Sadie frame; other cuts follow speaking turns or a reaction. shot-08 covers the pause between Bella and Your ex. shot-13 returns to the previously established shared table rather than introducing a new place."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Two named close-up setups preserve green-collared Sadie looking right and navy-collared Bruno looking left. Each new character performance is generated once and reused. Source frames, inherited room state and untouched cheese are explicit."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Every line names one speaker independently of names spoken inside it. Bruno owns Sadie...; Sadie owns Bella and Your ex. Each speaking close-up lists only the intended dog."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "The plan includes the initial two-shot, readable accusations, a silent Bruno reaction and the closing shared reaction. The short I went for a walk reply exceeds the rate heuristic but is an accepted quick excuse with complete measured words and substantial edit handles."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "All planned actions are small head, eye and jaw movements or settled two-dog reactions. No broom, walking entrance, upright pose or prop manipulation is requested; excluded figures are explicit."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "The edit retains each native utterance once with quiet room ambience. It requests no music, fades or extra voices. All new source speech fragments have separately checked boundaries."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "e377632b8cbefa9c325473e914a891f3633e067eda12303b63b95dd85164b900",
+      "stage": "edit",
+      "targetId": "alpenrose-breakfast",
+      "assetHash": "753b942fba1a92aa383a0b9869d98542b11502f14959c99b5e6f1610a683ae13",
+      "reviewer": "Codex local editorial review, 2026-10-06; accepted footage and previously saved source/review evidence; no new provider review",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Local review of the accepted sequence: the opening breakfast two-shot identifies the shared space and cheese. The audible accusation/excuse exchange establishes the immediate conflict. Bella. Your ex. precedes She offered me a snack, supplying the relationship needed to understand that defense. Inherited spouse context comes from the earlier opening, not an invented line in this excerpt."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "The accepted contact sheet and exact edit ranges preserve the Sadie final-frame join and matching reverse angles. The saved bella-context-review.json specifically confirms the silent Bruno reaction between Bella and Your ex and the final shared-shot return."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "bella-context-contact.jpg and both raw performance contact sheets retain the same two dogs, collars, windows and sideboard. Returns use identical source files. The prior saved video review reports no continuity or unwanted-figure failures; this is supporting evidence, not a claim of frame-perfect synthesis."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "The saved observation transcript assigns the lines to Sadie/female and Bruno/male correctly. bella-audio-fragments.json independently confirms the seven new utterance fragments without the intended dialogue supplied. No new dog speaks as another character."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "The 28.25s edit removes the long raw pause with a brief Bruno reaction and keeps the cheese payoff and shared look. The prior edited-video review reports natural dialogue flow and comic timing. The fast walk reply remains intact at source 1.228–2.142s; its rate warning is an editorial exception, not missing speech."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "The sampled footage shows only restrained canine jaw/head motion, with no humans or tool interaction. The saved raw and edited video reviews report no physical defects. No rejected full-body entrance footage is in this excerpt."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "The exact source intervals retain all scripted words once. Source audio fragment checks and the saved assembled-video transcript support intact dialogue and correct voice ownership. The prior audio/video review reports no clipped words or audio discontinuity; no music or fade was inserted."
+        }
+      ]
+    }
+  ],
+  "speech": [
+    {
+      "takeId": "sadie-performance",
+      "assetHash": "b540fdcde2bcbec979511197d8edb1e8702b57b7e1be0a36d859c2cab271a914",
+      "lineId": "late",
+      "start": 0.714,
+      "end": 2.485,
+      "text": "You came home after midnight.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-performance",
+      "assetHash": "b540fdcde2bcbec979511197d8edb1e8702b57b7e1be0a36d859c2cab271a914",
+      "lineId": "cheese",
+      "start": 4.658,
+      "end": 6.74,
+      "text": "Then why do you smell like Parmesan?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-excuse",
+      "assetHash": "6ad87d0181eb07d157120e8c4b2f5601ef3c9c1da053a49b28818049fa2ddd82",
+      "lineId": "walk",
+      "start": 1.228,
+      "end": 2.142,
+      "text": "I went for a walk.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "herb",
+      "start": 0.49,
+      "end": 1.323,
+      "text": "And rosemary.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "bella-name",
+      "start": 3.095,
+      "end": 3.434,
+      "text": "Bella.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "bella-ex",
+      "start": 5.755,
+      "end": 6.456,
+      "text": "Your ex.",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-rosemary-performance",
+      "assetHash": "07c9d5be752a16c94c883338af7e533ec5c0947ac3e2bfbc65377935ce7ae407",
+      "lineId": "absurdity",
+      "start": 7.295,
+      "end": 8.557,
+      "text": "And you stayed until midnight?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "sadie-reply",
+      "start": 0.81,
+      "end": 1.276,
+      "text": "Sadie...",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "snack",
+      "start": 3,
+      "end": 4.276,
+      "text": "She offered me a snack.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-bella-performance",
+      "assetHash": "241bfa9e40e2a1b01a573bf3e599d672deb05efed269bdceb3c738cbe0e1b747",
+      "lineId": "payoff",
+      "start": 6.159,
+      "end": 7.62,
+      "text": "It was very good cheese.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    }
+  ]
+}

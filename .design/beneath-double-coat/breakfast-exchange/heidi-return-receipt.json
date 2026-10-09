@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "heidi-return",
+    "kind": "video",
+    "seconds": 5,
+    "output": ".design/beneath-double-coat/breakfast-exchange/heidi-return.mp4",
+    "firstFrame": ".design/beneath-double-coat/breakfast-exchange/heidi-return-first.jpg",
+    "prompt": "Return to this exact accepted camera setup in the same scene. Preserve every room detail, the closed snowy window, amber wood, lamp, burgundy cushion and the two specific dogs in the supplied first frame. HEIDI is the elderly silver-muzzled Bernese Mountain Dog LEFT foreground, burgundy collar, lying on her cushion. OTTO is the ochre-collared male RIGHT background, seated and SILENT. Bruno is OFFSCREEN beyond the right edge, not the dog on the right. Heidi addresses him without entering him into the frame. Only Heidi speaks, in the same warm mature older female voice, firm but affectionate, neutral English pronunciation: \"Bruno. Your wife's waiting in the breakfast room.\" Begin after a brief breath and finish within about four seconds. Animate her lower canine jaw and muzzle visibly opening and closing in sync with every word, with modest head/eye movement toward offscreen Bruno. Her voice must originate from her mouth. Otto listens with mouth closed and stays Otto. Natural photorealistic quadrupedal Bernese anatomy. Stable fixed camera. No human lips, humans, extra dogs, narrator, male voice, subtitles, music, changes of collar or room, standing, walking, tools or prop handling. Soft continuous indoor room tone. One uninterrupted five-second performance, no internal cut. Do not repeat previous dialogue."
+  },
+  "fingerprint": "a76ef74d6235fee39ee611327cc7cf3e058fc358724d02218ef2586a040b3828",
+  "interactionId": "v1_ChdEVnZGYXFEX0lKR1lqTWNQNWEzVmtRcxIXRFZ2RmFxRF9JSkdZak1jUDVhM1ZrUXM",
+  "durationSeconds": 5.014,
+  "review": "pending"
+}

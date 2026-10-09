@@ -1,0 +1,416 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "plan",
+      "targetId": "penny-breakfast",
+      "reviewer": "Local agent final editorial review of current plan, references and measured edit",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Independent blind transcription of ten source audio fragments confirms all five scripted lines and adult female/male/young-girl voices. One visible speaking dog per single. Unrequested offscreen Hmm in raw Penny take was removed from mastered source and excluded from timeline. Context video review checks actual speaker ownership."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Source audio-fragments.json identifies all words without intended screenplay. Waveform silence boundaries independently define speech intervals. Removed raw Penny male interjection and canned laughter in unused handles; fixed gain +5.8/+2.2/+1dB balances puppy/father/mother. No time shift, visual fades, score or new dialogue. Final video review covers resulting mix."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "accepted-master",
+      "assetHash": "a447bed01803ddf990ada4951c861232998bf7c6c856b8e550c0ecd84a529f81",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: This take is silent; source silence analysis and footage show no speaking role."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take accepted-master: Quiet room tone, no music, voices or barking."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "attention",
+      "assetHash": "c786f6be2ea68cbbb0956b430b7090e0990dbe174a1015e2ef239afbd7beca92",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take attention: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take attention: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take attention: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take attention: This take is silent; source silence analysis and footage show no speaking role."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take attention: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take attention: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take attention: Very quiet room tone. No audible collar tick was generated; parents’ visual attention motivates reveal."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "family",
+      "assetHash": "e2ab1356509076b366424e5fb43a210c87842e225b3ed5b606d00e60e48d67d8",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take family: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take family: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take family: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take family: This take is silent; source silence analysis and footage show no speaking role."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take family: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take family: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take family: Quiet room tone, no music, voices or barking."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "penny-performance",
+      "assetHash": "60a51f1ec57a5a14da8edcd0b51f0adf8e5d75b53b601a41c98f55dd61620d01",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: Independent blind transcription of ten source audio fragments confirms all five scripted lines and adult female/male/young-girl voices. One visible speaking dog per single. Unrequested offscreen Hmm in raw Penny take was removed from mastered source and excluded from timeline. Context video review checks actual speaker ownership."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take penny-performance: Original young-girl dialogue retained; unused 3.2–4.3s and 6.5–8s muted to remove unrequested offscreen male hmm and audience laughter. +5.8dB level correction. No source time shift."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "bruno-performance",
+      "assetHash": "24e7a352d117a7ca254d27e4bd9ff4ea65ae6357384e3131c32df1f37862ece0",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: Independent blind transcription of ten source audio fragments confirms all five scripted lines and adult female/male/young-girl voices. One visible speaking dog per single. Unrequested offscreen Hmm in raw Penny take was removed from mastered source and excluded from timeline. Context video review checks actual speaker ownership."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take bruno-performance: Original adult male dialogue, +2.2dB fixed gain; quiet room tone; no source time shift."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "takes",
+      "targetId": "sadie-performance",
+      "assetHash": "3e59ce6c2f53a41db268a32e0746c6264f450cf80b8c31d0f45987976f0eebb6",
+      "reviewer": "Local agent source contact-sheet/audio review, supported by final Gemini context-video observations",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: Independent blind transcription of ten source audio fragments confirms all five scripted lines and adult female/male/young-girl voices. One visible speaking dog per single. Unrequested offscreen Hmm in raw Penny take was removed from mastered source and excluded from timeline. Context video review checks actual speaker ownership."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: 20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Take sadie-performance: Original adult female dialogue, +1dB fixed gain; quiet room tone; no source time shift."
+        }
+      ]
+    },
+    {
+      "version": 1,
+      "planHash": "9b0b56d11329e838062d1721f9e87cfc066eeac8828a1a6029deab313a1902ad",
+      "stage": "edit",
+      "targetId": "penny-breakfast",
+      "assetHash": "a7f890ab837f1443592d52393e29e4482996dcf007e9ac020e0ddecb5e6a2490",
+      "reviewer": "Local agent editorial review + context-review.json Gemini video observations + independent blind audio fragments",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "evidence": "Actual sequence: 0–1.5s adult attention; 1.5–3.5s silent family master reveals the smaller lavender-collared puppy. Her Dad question identifies father, Bruno mentions mother, and Sadie addresses Penny by name before the cheese request. Existing marriage and cheese conflict are supplied by accepted prefix."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "evidence": "The new section begins at accepted full-opening 53.125s. Attention is seeded from its final visible source frame; the wider cut reveals the child. Singles follow questions/answers. Both returns use the same saved source performances; final master returns to unchanged table and family. Context video includes the preceding cheese excuse."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "Inspected actual reference frames and contact sheets of every source and final edit: same pine walls, snowy window left, sideboard right, adult green/navy collars, puppy lavender collar, one untouched cube. Adults stay left/right in master. No identity reset on returning singles; new close-ups have explicit source-frame provenance."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "evidence": "Independent blind transcription of ten source audio fragments confirms all five scripted lines and adult female/male/young-girl voices. One visible speaking dog per single. Unrequested offscreen Hmm in raw Penny take was removed from mastered source and excluded from timeline. Context video review checks actual speaker ownership."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "evidence": "20.333s follow-on with 3.5s silent orientation before dialogue. Measured utterances have frame-aligned handles. No cut crosses a word; raw waiting gaps and audience laughter are excluded. Final family reaction is 1.5s. The sequence ends breakfast rather than adding unexplained plot."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "evidence": "Source contact sheets at 2fps and edited video review show seated dogs with small jaw, head, eye and ear movement. No walking, tools, paws through props, eating, human anatomy or extra cast. This is an observational check, not a guarantee against every possible subframe artifact."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "evidence": "Source audio-fragments.json identifies all words without intended screenplay. Waveform silence boundaries independently define speech intervals. Removed raw Penny male interjection and canned laughter in unused handles; fixed gain +5.8/+2.2/+1dB balances puppy/father/mother. No time shift, visual fades, score or new dialogue. Final video review covers resulting mix."
+        }
+      ]
+    }
+  ],
+  "speech": [
+    {
+      "takeId": "penny-performance",
+      "lineId": "trouble",
+      "start": 0.971521,
+      "end": 2.92856,
+      "assetHash": "60a51f1ec57a5a14da8edcd0b51f0adf8e5d75b53b601a41c98f55dd61620d01",
+      "speaker": "penny",
+      "text": "Dad, are you in trouble?",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "penny-performance",
+      "lineId": "cheese",
+      "start": 4.5051,
+      "end": 6.215,
+      "assetHash": "60a51f1ec57a5a14da8edcd0b51f0adf8e5d75b53b601a41c98f55dd61620d01",
+      "speaker": "penny",
+      "text": "Then can I have his cheese?",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "bruno-performance",
+      "lineId": "breakfast",
+      "start": 0.745042,
+      "end": 3.5135,
+      "assetHash": "24e7a352d117a7ca254d27e4bd9ff4ea65ae6357384e3131c32df1f37862ece0",
+      "speaker": "bruno",
+      "text": "Your mother and I are discussing breakfast.",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-performance",
+      "lineId": "subject",
+      "start": 0.744062,
+      "end": 4.13675,
+      "assetHash": "3e59ce6c2f53a41db268a32e0746c6264f450cf80b8c31d0f45987976f0eebb6",
+      "speaker": "sadie",
+      "text": "Penny, your father is changing the subject.",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "sadie-performance",
+      "lineId": "enough",
+      "start": 5.26769,
+      "end": 7.47423,
+      "assetHash": "3e59ce6c2f53a41db268a32e0746c6264f450cf80b8c31d0f45987976f0eebb6",
+      "speaker": "sadie",
+      "text": "Yes. He's had quite enough.",
+      "confidence": "confirmed"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "executable": "bun --env-file=studio/.env src/bin.ts",
+  "args": [
+    "video",
+    "-i",
+    "/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/launch.md",
+    "--firstFrame",
+    "/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/ship.png",
+    "--task",
+    "image_to_video",
+    "--model",
+    "gemini-omni-1.1-flash",
+    "-o",
+    "/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/launch.mp4",
+    "--maxRetries",
+    "0"
+  ],
+  "output": "[Video Scene 1] Generating clip via Gemini Omni Flash...\n[Video Scene 1] Completed (3117.6 KB video, ID: v1_ChdSZTdEYXA3WkNkUGpfdU1QM3ZmZGtROBIXUmU3RGFwN1pDZFBqX3VNUDN2ZmRrUTg).\n[Video Pipeline] Complete! Processed 1 scene(s).\n[Video Pipeline] Total MP4 video: 3117.6 KB.\n[Success] Video clip created at: /Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/launch.mp4 (3117.6 KB)\n",
+  "exitCode": 0,
+  "elapsedSeconds": 34.829
+}

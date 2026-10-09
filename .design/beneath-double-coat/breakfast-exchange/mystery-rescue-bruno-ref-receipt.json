@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-bruno-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. BRUNO, the NAVY-collared male dog in the MIDDLE. Same wide blaze and face; head and upper chest looking LEFT at Heidi. Remove both other dogs from frame. Navy collar visible; pine wall and open doorway remain in matching background."
+  },
+  "fingerprint": "dced2ea41b23c0665d2abeaad63a16ff2b4c2396d0bd0c7e5b1cd70825dc6933",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "0",
+    "text": "You still keep my brother's collar?",
+    "voice": "Deep male",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "1",
+    "text": "Someone should remember Sebastian.",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "2",
+    "text": "That scent.",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "3",
+    "text": "Sebastian?",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "4",
+    "text": "Who locked the door?",
+    "voice": "Younger female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "5",
+    "text": "And turned off the air.",
+    "voice": "Younger female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "6",
+    "text": "You monster.",
+    "voice": "Younger female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "7",
+    "text": "Otto got the door.",
+    "voice": "Younger male",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "8",
+    "text": "Grandmother, what happened?",
+    "voice": "Younger male",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "9",
+    "text": "He is.",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "10",
+    "text": "Someone locked me in",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "11",
+    "text": "after I found this.",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "12",
+    "text": "Sebastian's fur.",
+    "voice": "Older female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "13",
+    "text": "Your brother?",
+    "voice": "Younger female",
+    "truncated": false,
+    "notes": ""
+  },
+  {
+    "id": "14",
+    "text": "You said he was dead.",
+    "voice": "Younger female",
+    "truncated": false,
+    "notes": ""
+  }
+]

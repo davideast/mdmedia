@@ -1,0 +1,16 @@
+{
+  "job": {
+    "id": "mystery-rescue-master",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      ".design/beneath-double-coat/mystery-finish/accepted-bruno.jpg",
+      ".design/beneath-double-coat/mystery-finish/accepted-sadie.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+    "prompt": "Photorealistic cinematic still, prestige soap opera starring real quadrupedal Bernese Mountain Dogs. No humans, human anatomy, clothing, extra animals, writing or subtitles. Match every reference face, collar, age, lighting and pine architecture exactly. No reaching or holding props.  Same camera and exact grooming room as reference 1. Keep elderly Heidi LEFT in burgundy collar, SAME pose and face, same low platform, tuft, silver rake, vent, window, open door. Add exactly TWO seated dogs just INSIDE the doorway on the RIGHT, behind the platform, no overlap: Bruno in NAVY collar from reference 2 sits middle-right, looking LEFT at Heidi; Sadie from reference 3 with GREEN collar and narrow white blaze sits far-right beside Bruno, looking LEFT. THREE dogs total, elderly Heidi left, Bruno middle-right, Sadie right. Keep whole dogs natural, all paws on floor. They have just reached the room. No threatening pose, no crowding, nothing moving. Preserve floor space between Heidi and the two visitors. Clear wide master for a family conversation."
+  },
+  "fingerprint": "14980d3932d7f6b92eaeaefb02c19767e0d4727e65a1c5a79bae3f8efe6417db",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

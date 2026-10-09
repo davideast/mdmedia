@@ -1,0 +1,15 @@
+{
+  "executable": "bun --env-file=studio/.env src/bin.ts",
+  "args": [
+    "image",
+    "-p",
+    "An absurdly expensive cinematic science fiction film still. A sleek silver spaceship poised for launch above a colossal launch platform on a distant desert planet, bright cyan engines, billowing orange dust, tiny human silhouettes for scale, dramatic golden sunlight, photoreal practical model detail, wide dynamic composition, no words or logos.",
+    "-o",
+    "/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/ship.png",
+    "--aspect",
+    "16:9"
+  ],
+  "output": "🎨 Generating image (gemini-3-pro-image, 16:9)...\n✅ Saved generated image to: /Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/ship.png\n",
+  "exitCode": 0,
+  "elapsedSeconds": 16.063
+}

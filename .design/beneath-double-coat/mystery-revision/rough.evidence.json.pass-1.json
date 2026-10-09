@@ -1,0 +1,503 @@
+{
+  "transcript": [
+    {
+      "time": 0,
+      "text": "Otto, you were meant to clear the path, not bring it in. Breakfast is waiting.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 10,
+      "text": "Morning, Grandmother.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 12,
+      "text": "Bruno. Your wife's waiting in the breakfast room.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 17,
+      "text": "Is Sadie still angry?",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 27,
+      "text": "You came home after midnight.",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 29,
+      "text": "I went for a walk.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 32,
+      "text": "Then why do you smell like parmesan and rosemary?",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 37,
+      "text": "Sadie...",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 39,
+      "text": "Bella. Your ex.",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 42,
+      "text": "She offered me a snack.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 44,
+      "text": "And you stayed until midnight?",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 47,
+      "text": "It was very good cheese.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 57,
+      "text": "Dad, are you in trouble?",
+      "speaker": "Penny",
+      "visible": true
+    },
+    {
+      "time": 59,
+      "text": "Your mother and I are discussing breakfast.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 102,
+      "text": "Penny, your father is changing the subject.",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 106,
+      "text": "Then can I have his cheese?",
+      "speaker": "Penny",
+      "visible": true
+    },
+    {
+      "time": 109,
+      "text": "Yes. He's had quite enough.",
+      "speaker": "Sadie",
+      "visible": true
+    },
+    {
+      "time": 116,
+      "text": "Grandmother, come back in. Penny's negotiating for your breakfast.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 121,
+      "text": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 127,
+      "text": "My twin got the looks, I got the sausage.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 131,
+      "text": "You were supposed to share it.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 133,
+      "text": "We did. Then the kennel burned down.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 136,
+      "text": "They never found him.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 139,
+      "text": "He's dead, Grandmother. You can't spend every morning waiting. You're allowed to miss him, Bruno.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 146,
+      "text": "I do. That's why I can't keep looking at that.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 150,
+      "text": "Wait. That smell... from the grooming room.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 157,
+      "text": "He used to hide in here. As if I couldn't smell him.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 202,
+      "text": "Fresh fur.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 204,
+      "text": "No... I'm imagining it.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 208,
+      "text": "Bruno, come and smell this.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 213,
+      "text": "We heard you. What's happened?",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 216,
+      "text": "This smells like Sebastian.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 218,
+      "text": "We all shed, Grandmother. It's probably mine.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 222,
+      "text": "I thought that too. Then I smelled it again.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 225,
+      "text": "You really think he's been here?",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 228,
+      "text": "I don't know. I need you to look.",
+      "speaker": "Grandmother",
+      "visible": true
+    },
+    {
+      "time": 231,
+      "text": "I wish it were him. I do. But nobody survived that fire.",
+      "speaker": "Bruno",
+      "visible": true
+    },
+    {
+      "time": 236,
+      "text": "Then whose scent is this?",
+      "speaker": "Grandmother",
+      "visible": true
+    }
+  ],
+  "shots": [
+    {
+      "time": 0,
+      "description": "Grandmother scolds Otto near a red floor cushion by a snowy window."
+    },
+    {
+      "time": 10,
+      "description": "Bruno enters the hallway."
+    },
+    {
+      "time": 12,
+      "description": "Grandmother tells Bruno his wife is waiting."
+    },
+    {
+      "time": 17,
+      "description": "Bruno asks about Sadie."
+    },
+    {
+      "time": 20,
+      "description": "Sadie and Bruno sit beside a table with a cheese cube."
+    },
+    {
+      "time": 22,
+      "description": "Sadie looks right."
+    },
+    {
+      "time": 25,
+      "description": "Sadie confronts Bruno."
+    },
+    {
+      "time": 27,
+      "description": "Sadie speaks."
+    },
+    {
+      "time": 30,
+      "description": "Bruno explains he went for a walk."
+    },
+    {
+      "time": 32,
+      "description": "Sadie asks about the cheese smell."
+    },
+    {
+      "time": 37,
+      "description": "Bruno looks."
+    },
+    {
+      "time": 39,
+      "description": "Sadie mentions Bella."
+    },
+    {
+      "time": 42,
+      "description": "Bruno explains the snack."
+    },
+    {
+      "time": 45,
+      "description": "Sadie reacts to the time."
+    },
+    {
+      "time": 47,
+      "description": "Bruno says it was good cheese."
+    },
+    {
+      "time": 50,
+      "description": "Both sit silently at the table."
+    },
+    {
+      "time": 53,
+      "description": "Both sit silently at the table."
+    },
+    {
+      "time": 55,
+      "description": "Penny, a puppy, sits near them."
+    },
+    {
+      "time": 57,
+      "description": "Penny asks if her dad is in trouble."
+    },
+    {
+      "time": 59,
+      "description": "Bruno downplays it."
+    },
+    {
+      "time": 103,
+      "description": "Sadie corrects Bruno."
+    },
+    {
+      "time": 107,
+      "description": "Penny asks for cheese."
+    },
+    {
+      "time": 109,
+      "description": "Sadie agrees."
+    },
+    {
+      "time": 112,
+      "description": "All three dogs by the table."
+    },
+    {
+      "time": 113,
+      "description": "Grandmother and Bruno face each other near a framed photo."
+    },
+    {
+      "time": 116,
+      "description": "Bruno calls to Grandmother."
+    },
+    {
+      "time": 121,
+      "description": "Grandmother talks about Sebastian."
+    },
+    {
+      "time": 127,
+      "description": "Bruno jokes about his twin."
+    },
+    {
+      "time": 131,
+      "description": "Grandmother reminds him to share."
+    },
+    {
+      "time": 133,
+      "description": "Bruno recounts the fire."
+    },
+    {
+      "time": 137,
+      "description": "Grandmother talks about Sebastian."
+    },
+    {
+      "time": 139,
+      "description": "Bruno says Sebastian is dead."
+    },
+    {
+      "time": 144,
+      "description": "Grandmother talks to Bruno."
+    },
+    {
+      "time": 147,
+      "description": "Bruno expresses his grief."
+    },
+    {
+      "time": 151,
+      "description": "Grandmother smells something."
+    },
+    {
+      "time": 154,
+      "description": "Grandmother looking at a comb and fur on a box."
+    },
+    {
+      "time": 157,
+      "description": "Grandmother mentions Sebastian hiding here."
+    },
+    {
+      "time": 201,
+      "description": "Close up of comb and fur."
+    },
+    {
+      "time": 202,
+      "description": "Grandmother realizes the fur is fresh."
+    },
+    {
+      "time": 206,
+      "description": "Grandmother calls Bruno."
+    },
+    {
+      "time": 211,
+      "description": "Bruno and Sadie arrive."
+    },
+    {
+      "time": 213,
+      "description": "Bruno asks what happened."
+    },
+    {
+      "time": 216,
+      "description": "Grandmother says it smells like Sebastian."
+    },
+    {
+      "time": 218,
+      "description": "Bruno suggests it's his."
+    },
+    {
+      "time": 222,
+      "description": "Grandmother says she smelled it again."
+    },
+    {
+      "time": 225,
+      "description": "Bruno asks if Sebastian was there."
+    },
+    {
+      "time": 228,
+      "description": "Grandmother says she needs him to look."
+    },
+    {
+      "time": 231,
+      "description": "Bruno reiterates the fire."
+    },
+    {
+      "time": 236,
+      "description": "Grandmother asks whose scent it is."
+    },
+    {
+      "time": 239,
+      "description": "View of the exterior through a door."
+    },
+    {
+      "time": 242,
+      "description": "Otto sits near a wooden door."
+    },
+    {
+      "time": 244,
+      "description": "Bruno sits near the doorway."
+    },
+    {
+      "time": 246,
+      "description": "Title card."
+    }
+  ],
+  "defects": [],
+  "audience": {
+    "retelling": "In a house with talking dogs, Bruno gets scolded by his wife Sadie for staying out late with his ex, Bella. Later, Bruno tells Grandmother that his twin brother Sebastian died in a kennel fire. Grandmother finds fresh fur that smells like Sebastian and asks whose scent it could be.",
+    "understood": [
+      {
+        "claim": "The dogs live in a house and behave like humans with familial relationships.",
+        "at": 10
+      },
+      {
+        "claim": "Bruno stayed out late eating cheese with his ex, causing tension with Sadie.",
+        "at": 47
+      },
+      {
+        "claim": "Bruno had a twin brother named Sebastian who supposedly died in a fire.",
+        "at": 139
+      }
+    ],
+    "uncertainties": [
+      {
+        "question": "Is the grooming room inside the house?",
+        "at": 150
+      }
+    ],
+    "checks": [
+      {
+        "category": "audience-understanding",
+        "verdict": "pass",
+        "at": 139,
+        "evidence": "Bruno clearly states Sebastian is dead and explains it was a kennel fire."
+      },
+      {
+        "category": "causality",
+        "verdict": "pass",
+        "at": 236,
+        "evidence": "Grandmother finds the fur, notes the smell, and calls Bruno, asking whose scent it is since he believes Sebastian is dead."
+      },
+      {
+        "category": "reactions",
+        "verdict": "uncertain",
+        "at": 236,
+        "evidence": "Bruno and Grandmother discuss the scent, but their emotional reactions are muted for such a significant discovery.",
+        "repair": "Give Bruno a stronger reaction to the possibility that his twin might be alive."
+      },
+      {
+        "category": "reveal-setup",
+        "verdict": "pass",
+        "at": 236,
+        "evidence": "The audience learns Sebastian died in a fire, making the discovery of his fresh scent a clear reveal."
+      },
+      {
+        "category": "story-density",
+        "verdict": "pass",
+        "at": 236,
+        "evidence": "The story sets up the family dynamics before moving to the mystery of Sebastian's scent."
+      }
+    ]
+  }
+}

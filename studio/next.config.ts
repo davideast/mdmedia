@@ -4,6 +4,11 @@ import { pathToFileURL } from "node:url";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['ffmpeg-static'],
+  outputFileTracingIncludes: {
+    '/api/videos/export': ['./node_modules/ffmpeg-static/**/*'],
+    '/api/video-sources': ['./node_modules/ffmpeg-static/**/*'],
+  },
   output: process.env.PYRIC_SANDBOX_FORCE === '1' ? undefined : 'standalone',
   // A staged hosted build must never replace the files used by the running server.
   distDir: process.env.MDMEDIA_DIST_DIR ?? (process.env.PYRIC_SANDBOX_FORCE === '1' ? '.next-hosted' : '.next'),

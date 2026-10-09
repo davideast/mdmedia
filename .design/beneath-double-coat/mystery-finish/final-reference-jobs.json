@@ -1,0 +1,39 @@
+[
+  {
+    "id": "mystery-rescue-bruno-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. BRUNO, the NAVY-collared male dog in the MIDDLE. Same wide blaze and face; head and upper chest looking LEFT at Heidi. Remove both other dogs from frame. Navy collar visible; pine wall and open doorway remain in matching background."
+  },
+  {
+    "id": "mystery-rescue-heidi-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. HEIDI, the elderly silver-muzzled burgundy-collared dog at LEFT. Head and chest, looking RIGHT at Bruno, with gaze sometimes down right toward fur. No other dogs in frame. Same left wall and window background."
+  },
+  {
+    "id": "mystery-rescue-sadie-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. SADIE, the GREEN-collared female dog at FAR RIGHT. Her narrower white blaze and exact face, head and upper chest, looking LEFT toward Bruno and Heidi. No other dog in frame. Same doorway behind."
+  },
+  {
+    "id": "mystery-lookalike-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/accepted-bruno.jpg",
+      ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/lookalike.jpg",
+    "prompt": "Photorealistic cinematic dog soap opera. Exactly ONE dog with the EXACT face, white blaze, head shape, eyes and coat of Bruno in reference 1. The ONLY identity variation is a worn faded BROWN leather collar instead of navy. A head-and-chest close-up of this dog seated just INSIDE the same wooden garden toolshed from reference 2, reverse angle looking into the shadowed interior from the snowy threshold. Weathered dark wooden boards behind him, open doorjamb visible on left edge, soft cold winter-morning reflected light on his face. He faces camera slightly LEFT, silently watching the estate offscreen past camera. Entire face readable, collar clearly brown, no obscuring shadow on eyes. Natural real dog anatomy, mouth closed, no humans, no human clothing/body/face, no additional dogs, no text. Same estate and morning. This is not indoors in the pine family rooms, but the weathered shed just established. Serious watchful expression, no snarling or supernatural effects. 16:9."
+  }
+]

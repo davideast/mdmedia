@@ -1,0 +1,43 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 3.2,
+      "words": "Otto. You were meant to clear the path.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "none",
+      "confidence": "high"
+    },
+    {
+      "startSeconds": 6.6,
+      "endSeconds": 10.0,
+      "words": "Not bring it in. Breakfast is waiting.",
+      "voiceDescription": "older female",
+      "visibleSpeakingDog": "none",
+      "confidence": "high"
+    }
+  ],
+  "castTimeline": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 11.833,
+      "visibleFigures": [
+        "elderly Bernese Mountain Dog on left",
+        "seated Bernese Mountain Dog on right"
+      ]
+    }
+  ],
+  "humansOrExtraAnimals": [],
+  "speakerErrors": [
+    "0.0-3.2: Voiceover track plays without the left dog articulating the words.",
+    "6.6-10.0: Voiceover track plays without the left dog articulating the words."
+  ],
+  "physicalDefects": [],
+  "continuityDefects": [],
+  "pacing": "Three-second pause between the two utterances creates dead time.",
+  "uncertainties": "Unclear if the left dog's slight, random mouth openings were an aborted attempt at lip sync.",
+  "pass": false,
+  "reasons": [
+    "Dialogue functions as a voiceover; the expected speaking dog does not articulate the words."
+  ]
+}

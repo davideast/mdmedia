@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mystery-hall-bruno",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-bruno.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. BRUNO is the navy-collared adult male. Warm adult male BARITONE, concerned but restrained. Looks LEFT toward grandmother. At 0.5 seconds say exactly: \"You still keep my brother's collar.\" Finish by 3.5 seconds, close muzzle and hold a sad, questioning look. No other words."
+  },
+  {
+    "id": "mystery-hall-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/hall-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/hall-heidi.jpg",
+    "seconds": 5,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is the elderly gray-muzzled female, burgundy collar. Low measured older WOMAN voice, dry and dignified, never male. Looks RIGHT toward Bruno. At 0.5 seconds say exactly: \"Someone should remember Sebastian.\" Finish around 3 seconds, close muzzle. At 3.5 seconds her eyes lower toward muddy pawprints to her RIGHT beyond the frame; one small curious head tilt. No walking, other words or gestures."
+  },
+  {
+    "id": "mystery-groom-heidi",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/groom-heidi.jpg",
+    "seconds": 10,
+    "prompt": "Photorealistic prestige dog soap opera. EXACTLY ONE real Bernese Mountain Dog visible, the exact face, age, markings and collar in the supplied starting frame. Locked close-up, no cuts or camera movement. Same room and lighting throughout. Dog remains seated; small natural canine jaw motion synchronized to its OWN clearly audible voice. Canine anatomy, no human lips, teeth, face, hands or body. No other dogs, human, narrator, offscreen voice, captions, music, laughter, barking or extra words. Natural English, clear speech, no exaggerated cartoon delivery. Quiet room tone. Silent gaps have CLOSED resting muzzle. HEIDI is elderly female, burgundy collar and gray muzzle. Low measured older WOMAN voice, same gentle gravel throughout. Maintain exact composition. Initially quiet steady ventilation hum. All door action is OFFSCREEN RIGHT, keep door out of frame. 0.4s: a tiny sniff, say exactly \"That scent. Sebastian?\" Finish by 2.6s. 2.9s: ONE wooden door slam and latch click OFFSCREEN RIGHT; Heidi sharply looks right without moving her body. At 3.4s ask exactly \"Who locked the door?\" Finish by 5.0s. At 5.4s the steady ventilation hum STOPS. At 5.9s, indignation rising, say exactly \"And turned off the air?\" Then at 8.0s snap loudly \"You monster!\" Finish by 9.3s. One character owns ALL lines and voice, no answer or second speaker. No injury, panting, collapse, walking, paws lifted or supernatural motion. Her outrage is a dry soap-opera joke."
+  },
+  {
+    "id": "mystery-exterior",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic locked establishing shot of this exact snowy garden between open toolshed and lit Alpine estate. Preserve every architectural detail, snow, timber door, windows and lighting. Same winter morning. EMPTY: no dogs, people, animals, silhouettes or figures anywhere, including windows. Gentle natural air ambience only, no speech or music. No camera movement or cuts. Three seconds of almost still winter atmosphere."
+  }
+]

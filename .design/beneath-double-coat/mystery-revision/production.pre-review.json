@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "1e8ac93ddbe9a5a91cceeb5d34cf58e5e8427e07b2fe9e312092a3582d5d4f16",
+  "durationSeconds": 176.51166666666663,
+  "status": "blocked",
+  "readiness": {
+    "technical": "invalid",
+    "editorial": "needs-review"
+  },
+  "issues": [
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-a",
+      "message": "Cue h2 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-bruno-b",
+      "message": "Cue b3 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-bruno-b",
+      "message": "Cue b4 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-b",
+      "message": "Cue h3 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "hall-heidi-b",
+      "message": "Cue h4 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_PACING",
+      "at": "family-sadie",
+      "message": "Cue s2 exceeds the planned speaking rate.",
+      "repair": "Give the line more time or shorten it without losing its story purpose.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-invitation",
+      "message": "Timing for b1 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-twin",
+      "message": "Timing for b2 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-a",
+      "message": "Timing for h1 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-a",
+      "message": "Timing for h2 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-b",
+      "message": "Timing for b3 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-b",
+      "message": "Timing for b4 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-b",
+      "message": "Timing for b5 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-b",
+      "message": "Timing for h3 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-b",
+      "message": "Timing for h4 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-b",
+      "message": "Timing for h5 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-bruno-c",
+      "message": "Timing for b6 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "hall-heidi-c",
+      "message": "Timing for h6 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "groom-heidi-a",
+      "message": "Timing for h7 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "groom-heidi-a",
+      "message": "Timing for h8 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "groom-heidi-b",
+      "message": "Timing for h9 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "groom-heidi-b",
+      "message": "Timing for h10 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_MISMATCH",
+      "at": "family-sadie",
+      "message": "Actual speaker or words differ for s1.",
+      "repair": "Repair the performance or explicitly revise the script before accepting it.",
+      "severity": "error",
+      "domain": "technical"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-sadie",
+      "message": "Timing for s1 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-sadie",
+      "message": "Timing for s2 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-heidi-a",
+      "message": "Timing for h11 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-heidi-a",
+      "message": "Timing for h12 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-bruno-a",
+      "message": "Timing for b7 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-bruno-a",
+      "message": "Timing for b8 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_MISMATCH",
+      "at": "family-heidi-b",
+      "message": "Actual speaker or words differ for h13.",
+      "repair": "Repair the performance or explicitly revise the script before accepting it.",
+      "severity": "error",
+      "domain": "technical"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-heidi-b",
+      "message": "Timing for h13 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-heidi-b",
+      "message": "Timing for h14 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "SPEECH_ESTIMATED",
+      "at": "family-bruno-b",
+      "message": "Timing for b9 is estimated.",
+      "repair": "Confirm source speech boundaries before treating dialogue cuts as verified.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current exposition review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current transitions review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current continuity review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current speakers review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current pacing review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current motion review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current sound review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current audience-understanding review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current causality review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current reactions review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current reveal-setup review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No current story-density review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "AUDIENCE_REVIEW_MISSING",
+      "at": "mystery-revision",
+      "message": "No saved blind audience review of this edit.",
+      "repair": "Review the video or rough sequence without its script, synopsis or inherited facts; retain the retelling and all five story checks.",
+      "severity": "review",
+      "domain": "editorial"
+    }
+  ],
+  "resolvedIssues": []
+}

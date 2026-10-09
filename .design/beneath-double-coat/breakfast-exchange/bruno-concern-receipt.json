@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "bruno-concern",
+    "kind": "video",
+    "seconds": 4,
+    "output": ".design/beneath-double-coat/breakfast-exchange/bruno-concern.mp4",
+    "firstFrame": ".design/beneath-double-coat/breakfast-exchange/bruno-return-first.jpg",
+    "prompt": "Continue the on-camera performance from this exact accepted first-frame composition: BRUNO, the same adult male Bernese Mountain Dog with navy collar, broad white chest and this exact face, framed face and chest in the wooden doorway. Keep identical crop, face markings, woodwork, light direction, open door and background. Exactly one dog visible. Heidi is OFFSCREEN to camera left; Sadie is in another room and must not appear. Bruno raises his eyes slightly toward offscreen Heidi and asks in the same warm adult male baritone as his preceding 'Morning, Grandmother' greeting, now mildly apprehensive: \"Is Sadie still angry?\" Only that line. The name Sadie is an addressee reference, never a new speaker. Speak promptly, about 0.4–2.4 seconds, with clearly visible natural lower-jaw and muzzle articulation synchronized to his own voice. Then a brief worried look toward Heidi. His head may move subtly; keep the body settled and framing fixed. Real canine anatomy, no human lips. No humans, second dog, narrator, female voice, subtitles, music, cut, zoom or room redesign. Quiet indoor room tone, no footsteps. Four seconds."
+  },
+  "fingerprint": "32f4847c8f7cb70d3b4d6eb91f710d6de25825d26a17e2b2e4f7ee0e3118c39a",
+  "interactionId": "v1_ChdLMXZGYXJmYU5JTGRqTWNQei12RDRBaxIXSzF2RmFyZmFOSUxkak1jUHotdkQ0QWs",
+  "durationSeconds": 4.011,
+  "review": "pending"
+}

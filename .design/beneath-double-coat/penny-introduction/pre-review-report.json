@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "e4f5b2b84088c724c53c452c99250b8d6e4c511e1050602454dc62f7ef79e881",
+  "durationSeconds": 20.33333333333333,
+  "status": "blocked",
+  "issues": [
+    {
+      "code": "ASSET_UNPINNED",
+      "at": "render",
+      "message": "Required source is not pinned to accepted bytes.",
+      "repair": "Record its SHA-256 in the plan so changed references invalidate previous reviews.",
+      "severity": "error"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current exposition review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current transitions review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current continuity review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current speakers review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current pacing review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current motion review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "penny-breakfast",
+      "message": "No current sound review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review"
+    }
+  ],
+  "resolvedIssues": []
+}

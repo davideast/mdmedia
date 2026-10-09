@@ -1,0 +1,268 @@
+{
+  "draftId": "beneath-double-coat-breakfast-opening__opening",
+  "record": {
+    "videoBrief": {
+      "prompt": "Imported screenplay: Breakfast at Alpenrose — Opening\n\nPhotorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.",
+      "targetSeconds": 31,
+      "sourceIn": 0,
+      "sourceOut": 0,
+      "sourceUsage": "reference",
+      "submittedSourceUsage": "reference",
+      "submittedSource": "",
+      "submittedRange": "0:0",
+      "continuity": "planned",
+      "script": {
+        "title": "Breakfast at Alpenrose — 31-second opening",
+        "sourceTranscript": "HEIDI (offscreen): Otto! Breakfast.\nHEIDI (on-camera): Otto. We’ve discussed this.",
+        "sourceDescription": "The first 31 seconds of the approved 90-second breakfast exposition. Establish estate, enter through window, meet Heidi and Otto.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "The estate wakes",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.",
+            "audio": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s02",
+            "title": "A voice from inside",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI (offscreen): Otto! Breakfast.",
+            "visual": "Continue exact trajectory through open casement; no cut.\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.",
+            "audio": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s03",
+            "title": "The household rules",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "",
+            "visual": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.\n0–4s: Camera settles into master. Otto enters through rear doorway and crosses to window.\n4–8s: Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently.",
+            "audio": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "s04",
+            "title": "Heidi gets her way",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI (on-camera): Otto. We’ve discussed this.",
+            "visual": "Closer reaction angle; preserve physical positions and eyelines.\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.",
+            "audio": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+            "pauseSeconds": 1
+          }
+        ]
+      },
+      "submittedPrompt": "Imported screenplay: Breakfast at Alpenrose — Opening\n\nPhotorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.",
+      "submittedTarget": 31
+    },
+    "draft": {
+      "mode": "references",
+      "frame": "16:9",
+      "note": "The attached cast image is identity reference only; never render labels, a lineup or contact sheet. The two-panel location image shows two angles of ONE location; render a single full-frame cinematic view, never a split screen. Only the explicitly visible characters appear. Bruno is absent from this entire opening. Match the elderly Heidi, stocky Otto, slimmer Sadie, and small Penny to their reference identities.",
+      "beats": [
+        {
+          "id": "script_s01",
+          "start": 0,
+          "end": 8,
+          "text": "Generate one camera shot lasting 8 seconds. All times below are seconds within this new segment.\n\nUse the supplied character and location references. Render a single scene, never a reference-sheet lineup. The editor places the hard cut; do not generate a transition or additional angles.\n\nSHARED RULES\nPhotorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.\n\nLOCATION\nOne snowbound Alpine estate at breakfast, shortly after dawn. Old money, warm wood, restrained luxury. Soft amber interior light contrasts with blue-white snow outside. No time or weather changes.\n\nThe breakfast room is rectangular:\n\n- **West wall / screen left in the master:** one inward-opening casement window, already open. Heidi rests on a low upholstered bench immediately beside it.\n- **North wall / rear of the master:** an open doorway into the entrance hall. Otto and Bruno enter here. The exterior front door connects to this hall, a short distance from the window.\n- **Center:** a low breakfast table. A small plate holding one cheddar cube sits at the near edge, reachable by Penny.\n- **Near-right table corner:** Bruno’s oversized chair. His front half can perch on it while his rear paws remain on the floor.\n- **Far side of the table:** Sadie, facing Bruno’s position. Penny starts on the floor beside her and crosses beneath the table toward Bruno.\n\nThe camera enters through the west window and settles into a master that shows the window at left, doorway behind the table, and Bruno’s chair at right. Subsequent angles stay on the same side of the Sadie–Bruno conversational axis. Heidi’s look toward Otto and Sadie’s look toward Bruno must match their positions.\n\n**Prop continuity:** the window starts open, closes once, then reopens and stays open. Penny’s bowl starts beside Bruno’s chair, where he displaces it; Sadie retrieves it. The cheddar cube remains on its plate until Penny takes it in the final shot. Otto leaves his snow brush outside before entering.\n\nCHARACTER IDENTITIES\nOTTO: Estate groundskeeper; trusted, familiar household staff. Stocky adult male; shaggy cheeks; ochre collar Voice: No dialogue in this opening. Earnest physical reactions. His eventual voice is a warm adult male voice, never Heidi’s.\n\nVISIBLE CAST — only these characters may appear\nOTTO: Outside on the front steps; only visible dog.\n\nOPENING STATE\nSnowbound estate at dawn; open west casement beside front entrance. Otto working outside; breakfast family inside; Bruno in hall.\n\nCAMERA\nGround-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n\nACTION\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.\n\nGENERATED DIALOGUE: None. Generate no spoken words.\n\nSOUND\nWind, snow brushing, collar, faint indoor crockery; sparse piano.\n\nENDING STATE\nStill moving toward open window. Otto at steps; brush outside; no dogs visible indoors.\n\nNever speak headings, actor names used as labels, or stage directions. An addressed name inside a quoted line never changes the speaker. Mouth movement belongs only to the active on-camera speaker. No narrator, extra lines, fades or dissolves."
+        },
+        {
+          "id": "script_s02",
+          "start": 8,
+          "end": 16,
+          "text": "The reference images are attached AGAIN to this extension: first image is the five-dog cast reference, second is the paired exterior/interior location. Preserve the exact black, white and rust BERNESE MOUNTAIN DOG coats in the reference. Heidi is an elderly long-haired tricolor Bernese with silver muzzle and burgundy collar, Sadie is a slimmer long-haired tricolor Bernese with emerald collar, Penny is ONE small long-haired tricolor Bernese puppy with lavender collar. Do not substitute short-haired brown dogs, Labradors or humans. Bruno must not appear.\n\nALL CHARACTERS ARE ACTUAL BERNESE MOUNTAIN DOGS. HEIDI IS A DOG, SADIE IS A DOG, PENNY IS A PUPPY, OTTO IS A DOG. There are ZERO human beings anywhere, including background or seated at the table. Feminine voices belong to female DOGS, not women. Show only four quadrupedal dogs.\n\nExtend the attached previous video by 8 seconds. All times below are seconds within this new segment.\n\nContinue the actual ending of s01. Preserve camera motion, voices, character identities and action. Perform only the NEW cues below; never repeat the previous dialogue or replay the beginning.\n\nSHARED RULES\nPhotorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.\n\nLOCATION\nOne snowbound Alpine estate at breakfast, shortly after dawn. Old money, warm wood, restrained luxury. Soft amber interior light contrasts with blue-white snow outside. No time or weather changes.\n\nThe breakfast room is rectangular:\n\n- **West wall / screen left in the master:** one inward-opening casement window, already open. Heidi rests on a low upholstered bench immediately beside it.\n- **North wall / rear of the master:** an open doorway into the entrance hall. Otto and Bruno enter here. The exterior front door connects to this hall, a short distance from the window.\n- **Center:** a low breakfast table. A small plate holding one cheddar cube sits at the near edge, reachable by Penny.\n- **Near-right table corner:** Bruno’s oversized chair. His front half can perch on it while his rear paws remain on the floor.\n- **Far side of the table:** Sadie, facing Bruno’s position. Penny starts on the floor beside her and crosses beneath the table toward Bruno.\n\nThe camera enters through the west window and settles into a master that shows the window at left, doorway behind the table, and Bruno’s chair at right. Subsequent angles stay on the same side of the Sadie–Bruno conversational axis. Heidi’s look toward Otto and Sadie’s look toward Bruno must match their positions.\n\n**Prop continuity:** the window starts open, closes once, then reopens and stays open. Penny’s bowl starts beside Bruno’s chair, where he displaces it; Sadie retrieves it. The cheddar cube remains on its plate until Penny takes it in the final shot. Otto leaves his snow brush outside before entering.\n\nCHARACTER IDENTITIES\nOTTO: Estate groundskeeper; trusted, familiar household staff. Stocky adult male; shaggy cheeks; ochre collar Voice: No dialogue in this opening. Earnest physical reactions. His eventual voice is a warm adult male voice, never Heidi’s.\nHEIDI: Owner of Alpenrose; Bruno’s grandmother; Penny’s great-grandmother. Elderly female; silver muzzle; narrow white blaze; burgundy collar Voice: Low, measured, imperious older female voice. Expects obedience. Affection lives beneath her authority.\nSADIE: Bruno’s wife; Penny’s mother. Adult female; slimmer build; slender white blaze; emerald collar Voice: Precise adult female voice, dry and controlled; distinct from Heidi’s lower, older voice.\nPENNY: Bruno and Sadie’s young daughter. Clearly smaller puppy; broad white forehead patch; soft lavender collar Voice: Bright young female voice. Direct and unembarrassed, without exaggerated baby talk.\n\nVISIBLE CAST — only these characters may appear\nOTTO: Outside initially; leaves through front entrance, never through window.\nHEIDI: Revealed beside window after her offscreen call ends.\nSADIE: At table, visible only after camera enters.\nPENNY: Small puppy by Sadie, visible only after camera enters.\n\nOPENING STATE\nStill moving toward open window. Otto at steps; brush outside; no dogs visible indoors.\n\nCAMERA\nContinue exact trajectory through open casement; no cut.\n\nACTION\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.\n\nGENERATED DIALOGUE — speak only these exact lines\n1–3s: HEIDI ONLY (offscreen); Call from inside, older low female voice. Says: \"Otto! Breakfast.\". All other visible characters remain silent and do not mouth these words.\n\nSOUND\nWind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.\n\nENDING STATE\nCamera just inside still moving. Heidi left; Sadie and Penny at table. Otto in hall offscreen; Bruno absent.\n\nNever speak headings, actor names used as labels, or stage directions. An addressed name inside a quoted line never changes the speaker. Mouth movement belongs only to the active on-camera speaker. No narrator, extra lines, fades or dissolves."
+        },
+        {
+          "id": "script_s03",
+          "start": 16,
+          "end": 24,
+          "text": "Extend the actual previous video by 8 seconds, no cuts. ALL four characters are photorealistic long-haired tricolor Bernese Mountain DOGS matching the attached cast. No human or extra animal. Heidi elderly burgundy collar remains on the left bench, Sadie emerald collar beyond table, one small Penny lavender collar near table. Otto ochre collar enters from hallway, already inside, NOT through the window.\n\n0–2s: camera finishes passing through the open window and settles INSIDE the room looking back obliquely at it. Otto enters from hall and steps beside the open inward-swinging casement.\n2–5s: Otto PUSHES the open casement with his muzzle toward its frame until it is COMPLETELY CLOSED. Show the panel rotate into its frame and latch. Do not hold it open or pull it farther open.\n5–6s: latch CLICKS; wind becomes muffled. Window remains fully SHUT, glass separates snowy outdoors from room.\n6–8s: Heidi slowly turns her head toward Otto, visibly disapproving. Otto looks back silently, beside the now CLOSED window. End holding this completed action.\n\nNO spoken words or narration anywhere in this segment. All mouths closed except Otto physically pushing. Continuous quiet room tone, pawsteps, hinge, distinct closing click. The crucial visible ending is the FULLY CLOSED window and Heidi reacting. Preserve previous footage; do not replay earlier dialogue."
+        },
+        {
+          "id": "script_s04",
+          "start": 24,
+          "end": 31,
+          "text": "Generate one camera shot lasting 7 seconds. All times below are seconds within this new segment.\n\nUse the supplied character and location references. Render a single scene, never a reference-sheet lineup. The editor places the hard cut; do not generate a transition or additional angles.\n\nSHARED RULES\nPhotorealistic Bernese Mountain Dogs with natural heavy quadrupedal bodies, floppy ears and tricolor coats. No humans, human hands or upright human performances.\nSincere daytime soap comedy. Introduce the household through clear actions, pauses and reactions. No mystery reveal.\nObjects move with noses, paws and mouths. Finish muzzle manipulation before dialogue.\nUse the same character identities and assigned voices throughout. Only explicitly visible characters appear; references do not authorize adding the whole cast.\nOnly the scheduled speaker talks. All other visible dogs listen silently with mouths resting closed; no speech-like panting.\nOne winter morning in the same estate; fixed geography, lighting and props. Hard editorial cuts only; no generated fades, dissolves or extra angles.\n\nLOCATION\nOne snowbound Alpine estate at breakfast, shortly after dawn. Old money, warm wood, restrained luxury. Soft amber interior light contrasts with blue-white snow outside. No time or weather changes.\n\nThe breakfast room is rectangular:\n\n- **West wall / screen left in the master:** one inward-opening casement window, already open. Heidi rests on a low upholstered bench immediately beside it.\n- **North wall / rear of the master:** an open doorway into the entrance hall. Otto and Bruno enter here. The exterior front door connects to this hall, a short distance from the window.\n- **Center:** a low breakfast table. A small plate holding one cheddar cube sits at the near edge, reachable by Penny.\n- **Near-right table corner:** Bruno’s oversized chair. His front half can perch on it while his rear paws remain on the floor.\n- **Far side of the table:** Sadie, facing Bruno’s position. Penny starts on the floor beside her and crosses beneath the table toward Bruno.\n\nThe camera enters through the west window and settles into a master that shows the window at left, doorway behind the table, and Bruno’s chair at right. Subsequent angles stay on the same side of the Sadie–Bruno conversational axis. Heidi’s look toward Otto and Sadie’s look toward Bruno must match their positions.\n\n**Prop continuity:** the window starts open, closes once, then reopens and stays open. Penny’s bowl starts beside Bruno’s chair, where he displaces it; Sadie retrieves it. The cheddar cube remains on its plate until Penny takes it in the final shot. Otto leaves his snow brush outside before entering.\n\nCHARACTER IDENTITIES\nHEIDI: Owner of Alpenrose; Bruno’s grandmother; Penny’s great-grandmother. Elderly female; silver muzzle; narrow white blaze; burgundy collar Voice: Low, measured, imperious older female voice. Expects obedience. Affection lives beneath her authority.\nOTTO: Estate groundskeeper; trusted, familiar household staff. Stocky adult male; shaggy cheeks; ochre collar Voice: No dialogue in this opening. Earnest physical reactions. His eventual voice is a warm adult male voice, never Heidi’s.\n\nVISIBLE CAST — only these characters may appear\nHEIDI: Foreground right in closer angle, beside window.\nOTTO: Background left beside latch.\n\nOPENING STATE\nWindow closed; Otto at latch; Heidi begins looking at him. Sadie and Penny at table; Bruno absent.\n\nCAMERA\nCloser reaction angle; preserve physical positions and eyelines.\n\nACTION\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.\n\nGENERATED DIALOGUE — speak only these exact lines\n1–4s: HEIDI ONLY (on-camera); Measured, quietly imperious. Says: \"Otto. We’ve discussed this.\". All other visible characters remain silent and do not mouth these words.\n\nSOUND\nWindow opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.\n\nENDING STATE\nWindow reopened and stays open; Heidi relaxed; Otto clear of entry. Bruno approaching in hall.\n\nNever speak headings, actor names used as labels, or stage directions. An addressed name inside a quoted line never changes the speaker. Mouth movement belongs only to the active on-camera speaker. No narrator, extra lines, fades or dissolves."
+        }
+      ]
+    },
+    "title": "Breakfast at Alpenrose — 31-second opening",
+    "beatClips": {
+      "script_s01": {
+        "placement": {
+          "id": "s01",
+          "title": "The estate wakes",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "",
+          "visual": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.",
+          "audio": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_5be818ed84d342db9ed49578b2ac4158"
+      },
+      "script_s02": {
+        "placement": {
+          "id": "s02",
+          "title": "A voice from inside",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "HEIDI (offscreen): Otto! Breakfast.",
+          "visual": "Continue exact trajectory through open casement; no cut.\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.",
+          "audio": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "continue",
+        "transition": "cut",
+        "videoId": "v_8d55368f6da940a9a29b36939e3b151b"
+      },
+      "script_s03": {
+        "placement": {
+          "id": "s03",
+          "title": "The household rules",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "",
+          "visual": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.\n0–4s: Camera settles into master. Otto enters through rear doorway and crosses to window.\n4–8s: Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently.",
+          "audio": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "continue",
+        "transition": "cut",
+        "videoId": "v_fa2b3b44d27f4a6196633ed2aa4c9904"
+      },
+      "script_s04": {
+        "placement": {
+          "id": "s04",
+          "title": "Heidi gets her way",
+          "seconds": 7,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI (on-camera): Otto. We’ve discussed this.",
+          "visual": "Closer reaction angle; preserve physical positions and eyelines.\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.",
+          "audio": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_f58e1a10a9754a0f866dea70469ee912"
+      }
+    },
+    "builtScript": {
+      "title": "Breakfast at Alpenrose — 31-second opening",
+      "sourceTranscript": "HEIDI (offscreen): Otto! Breakfast.\nHEIDI (on-camera): Otto. We’ve discussed this.",
+      "sourceDescription": "The first 31 seconds of the approved 90-second breakfast exposition. Establish estate, enter through window, meet Heidi and Otto.",
+      "shots": [
+        {
+          "id": "s01",
+          "title": "The estate wakes",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "",
+          "visual": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.",
+          "audio": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+          "pauseSeconds": 1
+        },
+        {
+          "id": "s02",
+          "title": "A voice from inside",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "HEIDI (offscreen): Otto! Breakfast.",
+          "visual": "Continue exact trajectory through open casement; no cut.\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.",
+          "audio": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+          "pauseSeconds": 1
+        },
+        {
+          "id": "s03",
+          "title": "The household rules",
+          "seconds": 8,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "",
+          "visual": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.\n0–4s: Camera settles into master. Otto enters through rear doorway and crosses to window.\n4–8s: Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently.",
+          "audio": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+          "pauseSeconds": 1
+        },
+        {
+          "id": "s04",
+          "title": "Heidi gets her way",
+          "seconds": 7,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI (on-camera): Otto. We’ve discussed this.",
+          "visual": "Closer reaction angle; preserve physical positions and eyelines.\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.",
+          "audio": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+          "pauseSeconds": 1
+        }
+      ]
+    },
+    "view": "tracks",
+    "exportId": "v_54ffebea04014af28968af982359b5f2"
+  },
+  "export": {
+    "id": "v_54ffebea04014af28968af982359b5f2",
+    "status": "ready",
+    "model": "local-export",
+    "mode": "text",
+    "frame": "16:9",
+    "createdAt": 1791313986217,
+    "updatedAt": 1791313989266,
+    "message": "Final video ready",
+    "durationSeconds": 31.019,
+    "requestedDurationSeconds": 31.019,
+    "exportInputs": [
+      {
+        "videoId": "v_fa2b3b44d27f4a6196633ed2aa4c9904",
+        "inSeconds": 0,
+        "outSeconds": 8,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      },
+      {
+        "videoId": "v_fa2b3b44d27f4a6196633ed2aa4c9904",
+        "inSeconds": 8,
+        "outSeconds": 16,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      },
+      {
+        "videoId": "v_fa2b3b44d27f4a6196633ed2aa4c9904",
+        "inSeconds": 16,
+        "outSeconds": 24,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      },
+      {
+        "videoId": "v_f58e1a10a9754a0f866dea70469ee912",
+        "inSeconds": 0,
+        "outSeconds": 7.019,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      }
+    ],
+    "canExtend": false
+  },
+  "notes": "Rejected initial human/breed-drift takes. Forwarded cast/location images on continuations. Regenerated s03 for complete window closure."
+}

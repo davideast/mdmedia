@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-family-bruno-b",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/family-bruno-b.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/RB-source-frame.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. NAVY-collared adult male Bruno, same broad white blaze. Warm low male baritone, restrained and conversational, same voice as earlier. Eyes LEFT toward Heidi. Concerned tenderness; belief his twin died is painful, not dismissive anger.\nAt 0.5s say EXACTLY: \"But nobody survived that fire.\" Finish the complete last word by 3.4s, then close muzzle and silently listen. Total 8s. Final silent listening handle after the final phrase. From 3.5s to 8s a sustained silent, quietly shaken listening reaction with mouth fully CLOSED and eye contact maintained. Only tiny breathing and one blink. This final handle is essential for the closing edit."
+  },
+  "fingerprint": "811426b6968ff3f5922c04339967ca98d078049d25671cb77529108d7134ef8b",
+  "interactionId": "v1_ChcwTTNGYXZha0VMcVExTWtQamN6RmlRVRIXME0zRmF2YWtFTHFRMU1rUGpjekZpUVU",
+  "durationSeconds": 8,
+  "review": "pending"
+}

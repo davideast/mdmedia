@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-bruno-introduction",
+  "title": "Breakfast — Bruno arrives",
+  "productionNotes": "For the newly generated shot: animate the supplied doorway frame. Exactly ONE actual long-haired tricolor BERNESE MOUNTAIN DOG, BRUNO. Navy collar, broad white chest, adult male, same face as reference. No humans, no additional dog or puppy, no background figures, reflections or portraits. Heidi and Otto remain outside the framing. Fixed camera in the established wooden room, daylight from left. Do not redesign the room, open or close doors, or move furniture. Bruno speaks in a warm adult male baritone; the voice visibly originates from his synchronized canine muzzle. No narrator or female voice. Names in the line identify the addressee, not another speaker. No cuts, fades or dissolves inside this shot. The essential action is VISIBLE SPEAKING: Bruno must move his lower jaw while the greeting is audible. A closed-mouth dog with voiceover is not the requested performance.",
+  "reviewNotes": [],
+  "parts": [
+    {
+      "id": "sequence",
+      "continuity": "planned",
+      "script": {
+        "title": "Breakfast — accepted opening and Bruno",
+        "sourceTranscript": "HEIDI: Otto. You were meant to clear the path. Not bring it in. Breakfast is waiting.\nBRUNO: Morning, Grandmother.",
+        "sourceDescription": "Keep the accepted Heidi–Otto video intact, followed by a referenced hard cut to Bruno at the same room doorway.",
+        "shots": [
+          {
+            "id": "accepted",
+            "title": "Heidi and Otto — accepted scene",
+            "seconds": 10,
+            "source": "screencast",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Previously accepted Heidi–Otto scene, used intact.",
+            "audio": "Preserve the accepted audio.",
+            "pauseSeconds": 1
+          },
+          {
+            "id": "bruno",
+            "title": "Bruno greets Grandmother",
+            "seconds": 4,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BRUNO: Morning, Grandmother.",
+            "visual": "Animate Bruno delivering a short spoken greeting ON CAMERA. His visible LOWER JAW OPENS AND CLOSES through the words, with gentle natural muzzle and cheek movement synchronized to his own voice. This is a talking dog performance. Keep real canine anatomy and teeth; no human lips. First half-second: brief glance toward Grandmother offscreen left. Then Bruno visibly opens his jaw to say \"Morning,\" closes briefly at the comma, and articulates \"Grandmother\" with further jaw movement, finishing by about 2.5 seconds. Then his mouth settles closed and he gives a small expectant head tilt. Camera and doorway stay fixed; his four paws remain in place. Animate the head and jaw rather than freezing the reference photograph. Only Bruno is visible.",
+            "audio": "At 0–0.5s two soft canine paw taps and faint collar jingle; then calm room ambience. Only the specified male greeting. No music or other voices.",
+            "pauseSeconds": 1
+          }
+        ]
+      }
+    }
+  ]
+}

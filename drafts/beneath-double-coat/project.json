@@ -1,0 +1,753 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-episode-one",
+  "title": "Beneath the Double Coat — The Secret in the Snow",
+  "productionNotes": "Prestige daytime soap opera performed by photorealistic Bernese Mountain Dogs. Every character, including veterinarian and groundskeeper, is a dog. Absolute dramatic sincerity; humor comes from canine instincts interrupting melodrama. Real quadrupedal anatomy, paws and weight. Restrained speaking muzzle animation, expressive ears and posture; no human hands or upright bodies. Objects are moved with noses, mouths and paws.\nAlpenrose Estate: Alpine mansion, snow outside, dark carved wood, Persian rugs, warm lamps and marble floors. Hard cuts for new angles or locations; continuous movement within connected shots. No automatic fades. Preserve identities, collar colors, voices and room geography across cuts. Only the named characters appear.\nHEIDI: elderly female, silver muzzle, narrow blaze, burgundy collar; low imperious voice. SEBASTIAN, initially called BRUNO: large male, symmetrical rust eyebrows, broad white chest, immaculate coat, navy collar, no ear scar; smooth defensive voice. REAL BRUNO: nearly identical male, weathered coat, faded brown collar, four-stitch scar on LEFT ear; warm gravelly voice. SADIE: slender blaze, emerald collar; precise, controlled female voice. MAPLE: rounded rust eyebrows, teal collar and stethoscope; clipped professional female voice. OTTO: stocky shaggy male, ochre collar; earnest breathless voice. PENNY: small fluffy puppy, lavender collar, innocent voice. MYSTERY DOG: massive Bernese with silver tag, face obscured.\nUse the scripted dialogue exactly, with no narrator except the labeled flashback voiceover. Original mournful piano, trembling strings and restrained organ, always below speech. Room tone from first frame, paw steps and collar jingles. Dramatic stings followed by silence for comic reactions. No laugh track. Readable title and evidence inserts will require editorial overlays if generation cannot reproduce their text.\nThis is a condensed adaptation of the supplied episode. Keep its reveals, not the exact runtime of the full screenplay. Explicit ages and elapsed years are omitted pending a chronology decision. References and voice performances must be approved before full production.",
+  "reviewNotes": [
+    "This is the condensed adaptation, not a verbatim production of the full original screenplay. Review the pacing and omitted lines before production.",
+    "Chronology needs a decision: the original lists Bruno as five, an eight-year impersonation, and a father dead for twelve years. This adaptation omits explicit ages and elapsed years.",
+    "Approve character references and voice performances before producing the full cast. Descriptions alone do not guarantee identity or voice consistency across cuts.",
+    "Dialogue and sound are preserved in the script, but the current generation compiler still suppresses spoken dialogue and does not forward planned sound. Resolve this before generating these shots.",
+    "Readable evidence and titles (thermostat, photograph, bowl) need editorial overlays if generated text is inaccurate.",
+    "No video, narration, music or sound effects have been generated. This import only creates a reviewable plan and timeline."
+  ],
+  "parts": [
+    {
+      "id": "part-one",
+      "continuity": "planned",
+      "script": {
+        "title": "Part One — The Fur",
+        "sourceTranscript": "HEIDI (offscreen): No... it cannot be.\n\nHEIDI: After all these years... You are alive.\n\nHEIDI: Who is there?\n\nHEIDI: You would not.\n\nHEIDI: YOU MONSTER!\n\nSADIE: You came home at two.\nBRUNO: I went for a walk.\nSADIE: For six hours?\n\nSADIE: Parmesan.\nBRUNO: Sadie—\nSADIE: There is no Parmesan in this house.\n\nSADIE: And rosemary. You saw Bella.\nBRUNO: Nothing happened.\n\nSADIE: Then why do you smell like imported cheese?\nOTTO: It is Heidi.\n\nOTTO: Someone locked her in the grooming room. And turned off the air conditioning.\n\nSADIE: Bruno?\nBRUNO: That fur belongs to a dead dog.\n\nBRUNO: Grandmother.\nHEIDI: You always were clingy.\nMAPLE: You need rest.\n\nHEIDI: You know whose fur it was. Your brother’s.\nBRUNO: You should rest.\n\nSADIE: You have a brother?\nBRUNO: Had.\nHEIDI: Apparently not. Sebastian.\n\nHEIDI: You know that name.\nMAPLE: I have another appointment.\n\nSADIE: With who?\nMAPLE: A Labradoodle with seasonal allergies.\nHEIDI: Follow her.\n\nMAPLE: Heidi found the fur. You have to leave.\nSTRANGER: I am done running.\n\nMAPLE: Bruno believes you are dead.\n\nSADIE: Sebastian?\nSTRANGER: No.\nSADIE: Who are you?\nSTRANGER: I am Bruno.",
+        "sourceDescription": "Condensed adaptation of the user-supplied Episode One, The Secret in the Snow. All footage is planned; none generated.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "Muddy footprints",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI (offscreen): No... it cannot be.",
+            "visual": "Dawn aerial of snowy Alpenrose Estate, then a low view of muddy paw prints on immaculate front steps. No dogs visible.",
+            "audio": "Cold wind, distant bark, a low piano note.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s02",
+            "title": "The discovery",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: After all these years... You are alive.",
+            "visual": "Grooming room. Heidi sniffs black fur beside a silver undercoat rake on a low platform. Her ears rise.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s03",
+            "title": "Locked in",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Who is there?",
+            "visual": "A shadow crosses the hall. Heidi turns. Door closes; she rushes to paw it.",
+            "audio": "Door latch clicks. Ventilation hum abruptly stops.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s04",
+            "title": "The thermostat",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You would not.",
+            "visual": "Close insert of digital thermostat rising from 72°F to 73°F; cut to Heidi staring, horrified.",
+            "audio": "Silence where the vent had been. Rising strings.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s05",
+            "title": "You monster",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: YOU MONSTER!",
+            "visual": "Thermostat reaches 74°F. Heidi throws her front paws against the door. End black.",
+            "audio": "Paw impacts, dramatic sting, abrupt silence.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s06",
+            "title": "Title",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Black title card: BENEATH THE DOUBLE COAT. Macro insert of a strand of drool falling in slow motion.",
+            "audio": "One mournful piano note.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s07",
+            "title": "Breakfast accusation",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: You came home at two.\nBRUNO: I went for a walk.\nSADIE: For six hours?",
+            "visual": "Breakfast room. Household Bruno has front paws on a chair, back paws on floor. Sadie opposite; final cheddar cube between them.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s08",
+            "title": "Parmesan",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Parmesan.\nBRUNO: Sadie—\nSADIE: There is no Parmesan in this house.",
+            "visual": "Sadie sniffs Bruno’s muzzle. His eyes flick toward the cheddar. Her ears freeze.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s09",
+            "title": "Rosemary",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: And rosemary. You saw Bella.\nBRUNO: Nothing happened.",
+            "visual": "Sadie circles Bruno and sniffs again. His ears twitch involuntarily.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s10",
+            "title": "Imported cheese",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Then why do you smell like imported cheese?\nOTTO: It is Heidi.",
+            "visual": "Close on Sadie, then Bruno trying to look innocent. Otto bursts through doorway.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s11",
+            "title": "Air conditioning",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "OTTO: Someone locked her in the grooming room. And turned off the air conditioning.",
+            "visual": "Otto breathless in doorway. Sadie and Bruno turn toward him.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s12",
+            "title": "A dead dog",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Bruno?\nBRUNO: That fur belongs to a dead dog.",
+            "visual": "Otto deposits folded cloth with black fur on a low table. Bruno sniffs, then recoils.",
+            "audio": "Dramatic sting; hard cut to black.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s13",
+            "title": "Cooling room",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BRUNO: Grandmother.\nHEIDI: You always were clingy.\nMAPLE: You need rest.",
+            "visual": "Heidi on cool marble with ice packs and three fans. Maple examines her; Bruno presses close.",
+            "audio": "Fans roar softly beneath clear dialogue.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s14",
+            "title": "The brother",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You know whose fur it was. Your brother’s.\nBRUNO: You should rest.",
+            "visual": "Heidi fixes Bruno with a penetrating look.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s15",
+            "title": "Sebastian",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: You have a brother?\nBRUNO: Had.\nHEIDI: Apparently not. Sebastian.",
+            "visual": "Sadie appears in doorway. Bruno avoids her gaze. Heidi stays still.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s16",
+            "title": "Maple reacts",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You know that name.\nMAPLE: I have another appointment.",
+            "visual": "Maple’s stethoscope slips and clatters. Everyone turns toward her.",
+            "audio": "Metal clatter, silence, then restrained tension.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s17",
+            "title": "Seasonal allergies",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: With who?\nMAPLE: A Labradoodle with seasonal allergies.\nHEIDI: Follow her.",
+            "visual": "Maple edges toward door, Sadie watches; Heidi follows Maple with her eyes.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s18",
+            "title": "Poor stealth",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Snowy garden. Sadie barely fits behind hedge while tailing Maple. Branch snaps; squirrel distracts Maple.",
+            "audio": "Branch snap, paw steps, playful low strings.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s19",
+            "title": "Secret knock",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Maple taps toolshed door three times, twice, then scratches. She slips inside; Sadie approaches window.",
+            "audio": "Distinct coded taps and scratch, door creak.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s20",
+            "title": "Done running",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MAPLE: Heidi found the fur. You have to leave.\nSTRANGER: I am done running.",
+            "visual": "Inside shed. Maple faces a large Bernese whose back is turned.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s21",
+            "title": "Not alone",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MAPLE: Bruno believes you are dead.",
+            "visual": "Through window, Sadie watches. Stranger’s ears perk. She ducks and sneezes explosively.",
+            "audio": "Muted dialogue through glass, enormous sneeze.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s22",
+            "title": "I am Bruno",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Sebastian?\nSTRANGER: No.\nSADIE: Who are you?\nSTRANGER: I am Bruno.",
+            "visual": "Shed door opens. Stranger resembles Bruno but scar remains hidden by angle. Sadie looks up.",
+            "audio": "Slow rising strings, cut to black.",
+            "pauseSeconds": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "part-two",
+      "continuity": "planned",
+      "script": {
+        "title": "Part Two — The Wrong Dog",
+        "sourceTranscript": "HEIDI: Sit.\n\nHEIDI: Interesting. Come here.\nBRUNO: Why?\nHEIDI: Because no one tells me no anymore.\n\nHEIDI: Where is the scar?\nBRUNO: What scar?\n\nHEIDI: The dishwasher. Beef gravy. Four stitches.\nBRUNO: Scars fade.\nHEIDI: Not that one.\n\nHEIDI: Who are you?\nBRUNO: You should have stayed in the grooming room.\n\nPENNY: Dad?\nBRUNO: Penny.\n\nPENNY: Why did you lock Great-Grandma in the hot room? I found this under your bed.\n\nREAL BRUNO: The dishwasher. Beef gravy.\nSADIE: Then who have I been married to?\n\nMAPLE: Sebastian.\nSADIE: You said he was dead.\nREAL BRUNO: There was no kennel fire.\n\nSADIE: Then what happened?\nREAL BRUNO: A dryer.\n\nREAL BRUNO (voiceover): He loved it. I hated it.\n\nREAL BRUNO (voiceover): I ran. He took my collar.\n\nSADIE: A collar does not make someone another dog. What about their microchips?\n\nMAPLE: There was a clerical error.\nSADIE: You switched the dogs?\nMAPLE: I was an intern.\n\nSADIE: YOU SWITCHED THE DOGS?\nMAPLE: I PANICKED!\n\nREAL BRUNO: Sebastian knew. He never corrected them.\nSADIE: He stole your life.\n\nSADIE: He stole mine too.\nMAPLE: There is something else.\n\nMAPLE: Penny is not Sebastian’s daughter.\nSADIE: What are you saying?\n\nSADIE: No.\n\nSADIE: Penny!",
+        "sourceDescription": "Condensed adaptation of the user-supplied Episode One, The Secret in the Snow. All footage is planned; none generated.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "Sit",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Sit.",
+            "visual": "Library. Heidi on orthopedic bed watches household Bruno pacing Persian rug.",
+            "audio": "Paw steps stop; quiet library ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s02",
+            "title": "An obedient impostor",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Interesting. Come here.\nBRUNO: Why?\nHEIDI: Because no one tells me no anymore.",
+            "visual": "Bruno sits immediately. Heidi studies his ears and markings.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s03",
+            "title": "Missing scar",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Where is the scar?\nBRUNO: What scar?",
+            "visual": "Heidi sniffs Bruno’s left ear. Close detail shows no scar.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s04",
+            "title": "The dishwasher",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: The dishwasher. Beef gravy. Four stitches.\nBRUNO: Scars fade.\nHEIDI: Not that one.",
+            "visual": "Heidi examines ear. Bruno begins backing away.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s05",
+            "title": "The threat",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Who are you?\nBRUNO: You should have stayed in the grooming room.",
+            "visual": "Bruno’s friendly expression hardens. He advances while Heidi stands her ground.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s06",
+            "title": "Tennis ball",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "PENNY: Dad?\nBRUNO: Penny.",
+            "visual": "Ball rolls between both dogs and squeaks once. They instinctively stare down. Penny in doorway.",
+            "audio": "One squeak interrupts the score.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s07",
+            "title": "The remote",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "PENNY: Why did you lock Great-Grandma in the hot room? I found this under your bed.",
+            "visual": "Penny drops a smart thermostat remote at Heidi’s paws. Bruno freezes.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s08",
+            "title": "Four stitches",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "REAL BRUNO: The dishwasher. Beef gravy.\nSADIE: Then who have I been married to?",
+            "visual": "Back in shed, Real Bruno turns his head to reveal four-stitch LEFT ear scar. Sadie recoils.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s09",
+            "title": "Sebastian",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MAPLE: Sebastian.\nSADIE: You said he was dead.\nREAL BRUNO: There was no kennel fire.",
+            "visual": "Maple lowers her head. Real Bruno watches Sadie.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s10",
+            "title": "A dryer",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Then what happened?\nREAL BRUNO: A dryer.",
+            "visual": "Sadie waits for an explanation. Real Bruno looks haunted.",
+            "audio": "Silence after dryer; no comic sound effect.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s11",
+            "title": "The grooming flashback",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "REAL BRUNO (voiceover): He loved it. I hated it.",
+            "visual": "Two young Bernese in grooming salon. One luxuriates in high-velocity dryer wind; the other looks deeply offended.",
+            "audio": "Dryer howl under voiceover.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s12",
+            "title": "Stolen collar",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "REAL BRUNO (voiceover): I ran. He took my collar.",
+            "visual": "Young dogs tumble harmlessly; young Bruno runs through gate. Sebastian noses into abandoned navy collar.",
+            "audio": "Paw scrabble and gate rattle.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s13",
+            "title": "Microchips",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: A collar does not make someone another dog. What about their microchips?",
+            "visual": "Return to shed, same adult dogs. Sadie stares at Maple.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s14",
+            "title": "Clerical error",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MAPLE: There was a clerical error.\nSADIE: You switched the dogs?\nMAPLE: I was an intern.",
+            "visual": "Maple avoids Sadie’s eyes and edges back.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s15",
+            "title": "I panicked",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: YOU SWITCHED THE DOGS?\nMAPLE: I PANICKED!",
+            "visual": "Close alternating reactions; Sadie incredulous, Maple ashamed, Bruno solemn.",
+            "audio": "Score stops for an appalled silence.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s16",
+            "title": "He knew",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "REAL BRUNO: Sebastian knew. He never corrected them.\nSADIE: He stole your life.",
+            "visual": "Real Bruno steps toward Sadie.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s17",
+            "title": "Mine too",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: He stole mine too.\nMAPLE: There is something else.",
+            "visual": "Sadie turns toward mansion with controlled fury. Maple blocks door.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s18",
+            "title": "Penny’s father",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MAPLE: Penny is not Sebastian’s daughter.\nSADIE: What are you saying?",
+            "visual": "Maple looks from Sadie to Real Bruno, who turns away.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s19",
+            "title": "The implication",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: No.",
+            "visual": "Sadie follows Maple’s gaze to Real Bruno. All three remain still.",
+            "audio": "Low strings and a long reaction pause.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s20",
+            "title": "Penny",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Penny!",
+            "visual": "Barks from mansion interrupt. Sadie races out followed by Maple and Real Bruno.",
+            "audio": "Puppy bark, Heidi’s bark, crash, running paw steps.",
+            "pauseSeconds": 1.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "part-three",
+      "continuity": "planned",
+      "script": {
+        "title": "Part Three — Some Secrets Shed Forever",
+        "sourceTranscript": "HEIDI: You always were jealous.\nSEBASTIAN: You loved him more.\n\nSEBASTIAN: I did not mean to do that.\n\nHEIDI: You cried over a houseplant.\nSEBASTIAN: It was a very nice houseplant.\n\nHEIDI: You could have come home as yourself.\nSADIE: Instead, you came home as my husband.\n\nREAL BRUNO: Hello, brother.\nPENNY: Why are there two Dads?\n\nSEBASTIAN: I was going to tell them. After the holidays.\nSADIE: WHICH HOLIDAYS?\nSEBASTIAN: I had not decided!\n\nBOTH BROTHERS: Rotisserie chicken.\nSADIE: Are you serious?\n\nSADIE: Who is that?\nHEIDI: That is impossible.\n\nPENNY: But there are three puppies.\nHEIDI: There were only two.\n\nSEBASTIAN: That is yours.\nREAL BRUNO: No.\n\nHEIDI: I know that bark.\nREAL BRUNO: Whose is it?\n\nHEIDI: Your father’s.\nREAL BRUNO: My father is dead.\n\nHEIDI: I know. I buried him.\n\nSADIE: One of you is Penny’s father.\n\nHEIDI: The collar was here!\nMAPLE: These are not his hips.\n\nOTTO: Then whose hips are they?\nPENNY: I can explain.\n\nSADIE (offscreen): He is inside the house.\n\nMYSTERY DOG: Ask Heidi why there is one grave... but two headstones.",
+        "sourceDescription": "Condensed adaptation of the user-supplied Episode One, The Secret in the Snow. All footage is planned; none generated.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "Jealous",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You always were jealous.\nSEBASTIAN: You loved him more.",
+            "visual": "Library. Sebastian blocks exit; Penny behind Heidi.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s02",
+            "title": "The ottoman",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SEBASTIAN: I did not mean to do that.",
+            "visual": "Sebastian slaps ottoman with paw; it tips. Immediately concerned, he noses it upright.",
+            "audio": "Soft furniture thump and guilty silence.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s03",
+            "title": "The houseplant",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You cried over a houseplant.\nSEBASTIAN: It was a very nice houseplant.",
+            "visual": "Heidi softens as Sebastian fusses over ottoman.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s04",
+            "title": "As yourself",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: You could have come home as yourself.\nSADIE: Instead, you came home as my husband.",
+            "visual": "Heidi watches Sebastian. Sadie enters with Real Bruno behind her.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s05",
+            "title": "Two dads",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "REAL BRUNO: Hello, brother.\nPENNY: Why are there two Dads?",
+            "visual": "Both brothers in frame; navy collar versus faded brown collar and left-ear scar. Penny looks between them.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s06",
+            "title": "After the holidays",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SEBASTIAN: I was going to tell them. After the holidays.\nSADIE: WHICH HOLIDAYS?\nSEBASTIAN: I had not decided!",
+            "visual": "Sebastian backs away as Sadie advances.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s07",
+            "title": "Chicken",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "BOTH BROTHERS: Rotisserie chicken.\nSADIE: Are you serious?",
+            "visual": "Brothers circle tensely, then stop together and sniff. Sprint toward hall.",
+            "audio": "Music swells then drops out; rapid paw steps.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s08",
+            "title": "The envelope",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Kitchen. Chicken on low serving surface beside envelope. Bruno mouths envelope and drops it. Family enters. Otto noses photograph out.",
+            "audio": "Kitchen room tone, paper rustle.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s09",
+            "title": "Three puppies",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: Who is that?\nHEIDI: That is impossible.",
+            "visual": "Insert photo: exactly three Bernese puppies. Sadie and Heidi look down.",
+            "audio": "Low mystery chord.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s10",
+            "title": "Forgotten",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "PENNY: But there are three puppies.\nHEIDI: There were only two.",
+            "visual": "Insert photo reverse: YOU FORGOT ONE OF US. Penny counts faces, Heidi stares.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s11",
+            "title": "The watcher",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Through window, massive shadowy Bernese in snow, silver tag glints. It turns away. Real Bruno bolts out.",
+            "audio": "Thunder, distant wind, collar jingle.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s12",
+            "title": "Vanishing tracks",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Bruno follows paw prints that stop abruptly. Digs twice and uncovers old bowl. Sebastian joins.",
+            "audio": "Snow crunch, paws scrape metal.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s13",
+            "title": "Born first",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SEBASTIAN: That is yours.\nREAL BRUNO: No.",
+            "visual": "Insert BRUNO on bowl. Bruno noses it over; underneath reads BORN FIRST.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s14",
+            "title": "Familiar bark",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: I know that bark.\nREAL BRUNO: Whose is it?",
+            "visual": "Brown eyes catch light in dark trees. A familiar bark. Heidi emerges and falters; Sadie steadies her.",
+            "audio": "Distant low bark, wind; score subsides.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s15",
+            "title": "Your father",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Your father’s.\nREAL BRUNO: My father is dead.",
+            "visual": "Close on Heidi, then Real Bruno’s stunned reaction.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s16",
+            "title": "I buried him",
+            "seconds": 8,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: I know. I buried him.",
+            "visual": "Hold Heidi’s gaze, snow drifting across her silver muzzle. End black.",
+            "audio": "Long silence; bark sounds again, closer.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s17",
+            "title": "Next time — DNA",
+            "seconds": 6,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE: One of you is Penny’s father.",
+            "visual": "NEXT TIME title, hard cut to Sadie over DNA report.",
+            "audio": "Fast teaser score begins.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s18",
+            "title": "The collar",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: The collar was here!\nMAPLE: These are not his hips.",
+            "visual": "Heidi digs frantically beneath old hydrangea; hard cut to Maple studying glowing X-ray.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s19",
+            "title": "Whose hips",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "OTTO: Then whose hips are they?\nPENNY: I can explain.",
+            "visual": "Otto stares at X-ray, then Penny amid spilled shredded mozzarella, muzzle covered in cheese.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s20",
+            "title": "Fur and heat",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "SADIE (offscreen): He is inside the house.",
+            "visual": "Sebastian noses closet open; sealed bags of fur tumble out. Cut to thermostat reading 78°F.",
+            "audio": "Falling bags, short yelp, ominous sting.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s21",
+            "title": "Two headstones",
+            "seconds": 9,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "MYSTERY DOG: Ask Heidi why there is one grave... but two headstones.",
+            "visual": "Shadowy Bernese at garden edge; face remains hidden.",
+            "audio": "Low original soap-opera score beneath dialogue; continuous room ambience.",
+            "pauseSeconds": 1.5
+          },
+          {
+            "id": "s22",
+            "title": "Tomorrow",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "",
+            "visual": "Black title card: BENEATH THE DOUBLE COAT. Tomorrow. Because some secrets shed forever.",
+            "audio": "Final mournful piano cadence.",
+            "pauseSeconds": 1.5
+          }
+        ]
+      }
+    }
+  ]
+}

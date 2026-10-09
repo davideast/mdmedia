@@ -1,0 +1,115 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 2.0,
+      "words": "Auto got the door,",
+      "voice": "Male voice, neutral tone, moderate pitch",
+      "visibleSpeaker": "None visible (wide shot with three Bernese Mountain Dogs)",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 5.0,
+      "endSeconds": 7.0,
+      "words": "grandmother, what happened?",
+      "voice": "Male voice, neutral tone, moderate pitch",
+      "visibleSpeaker": "None visible (close-up on Bernese Mountain Dog with blue collar)",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 11.0,
+      "endSeconds": 14.0,
+      "words": "Someone locked me in, after I found this,",
+      "voice": "Female voice, elderly tone, lower pitch",
+      "visibleSpeaker": "None visible (close-up on Bernese Mountain Dog with burgundy collar)",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 16.0,
+      "endSeconds": 18.0,
+      "words": "Sebastian's fur.",
+      "voice": "Female voice, elderly tone, lower pitch",
+      "visibleSpeaker": "None visible (close-up on Bernese Mountain Dog with burgundy collar)",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 19.0,
+      "endSeconds": 22.0,
+      "words": "brother? You said he was dead.",
+      "voice": "Female voice, higher pitch, questioning tone",
+      "visibleSpeaker": "None visible (close-up on Bernese Mountain Dog with green collar)",
+      "confidence": 0.95
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 2.75,
+      "characters": [
+        "Heidi (burgundy collar)",
+        "Bruno (navy collar)",
+        "Sadie (green collar)"
+      ]
+    },
+    {
+      "startSeconds": 3.0,
+      "endSeconds": 10.75,
+      "characters": [
+        "Bruno (navy collar)"
+      ]
+    },
+    {
+      "startSeconds": 11.0,
+      "endSeconds": 18.75,
+      "characters": [
+        "Heidi (burgundy collar)"
+      ]
+    },
+    {
+      "startSeconds": 19.0,
+      "endSeconds": 23.75,
+      "characters": [
+        "Sadie (green collar)"
+      ]
+    },
+    {
+      "startSeconds": 24.0,
+      "endSeconds": 26.75,
+      "characters": []
+    },
+    {
+      "startSeconds": 27.0,
+      "endSeconds": 30.75,
+      "characters": [
+        "Unidentified lookalike dog (brown collar)"
+      ]
+    }
+  ],
+  "continuityFindings": [
+    {
+      "timestamp": "00:27.0",
+      "observation": "A new dog appears in the shed with a brown collar, bearing a strong visual resemblance to Bruno but established in the prompt notes as a deliberate story cliffhanger lookalike."
+    }
+  ],
+  "speakerErrors": [
+    {
+      "timestamp": "00:00.0",
+      "observation": "Voiceover plays with no corresponding jaw movement from any of the dogs in the wide shot."
+    },
+    {
+      "timestamp": "00:05.0",
+      "observation": "Bruno (navy collar) is shown in close-up while speaking lines, but with minimal and somewhat unnatural articulation."
+    }
+  ],
+  "unwantedFigures": [],
+  "physicalDefects": [],
+  "pacingAndAudio": [],
+  "materialFailures": [],
+  "uncertainties": [
+    {
+      "timestamp": "00:27.0",
+      "observation": "Exact identity of the dog in the shed cannot be definitively verified purely from visual evidence without prompt context, though it matches Bruno's facial markings."
+    }
+  ],
+  "acceptable": true
+}

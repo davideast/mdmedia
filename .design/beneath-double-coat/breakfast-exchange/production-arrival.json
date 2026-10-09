@@ -1,0 +1,143 @@
+{
+  "title": "Beneath the Double Coat — Breakfast",
+  "finalVideo": "breakfast-exchange-arrival.mp4",
+  "durationSeconds": 36.166666666666664,
+  "acceptedOpeningSeconds": 12.25,
+  "generatedPerformanceIds": [
+    "heidi-return",
+    "bruno-concern",
+    "breakfast-establish",
+    "sadie-performance",
+    "bruno-excuse",
+    "breakfast-arrival"
+  ],
+  "referenceProvenance": {
+    "heidi-return-first.jpg": {
+      "source": "../heidi-otto-proof/heidi-otto-proof-v2.mp4",
+      "frameAt": 9
+    },
+    "bruno-return-first.jpg": {
+      "source": "../bruno-introduction/breakfast-bruno-final.mp4",
+      "frameAt": 12
+    },
+    "sadie-first.jpg": {
+      "source": "breakfast-establish.mp4",
+      "frameAt": 1.5,
+      "crop": {
+        "width": 640,
+        "height": 360,
+        "x": 80,
+        "y": 105
+      }
+    },
+    "bruno-breakfast-first.jpg": {
+      "source": "breakfast-establish.mp4",
+      "frameAt": 1.5,
+      "crop": {
+        "width": 640,
+        "height": 360,
+        "x": 640,
+        "y": 65
+      }
+    },
+    "sadie-waiting-frame.jpg": {
+      "source": "breakfast-master.jpg",
+      "edit": "Remove Bruno only, preserve Sadie and the established set."
+    },
+    "breakfast-arrival.mp4": {
+      "firstFrame": "sadie-waiting-frame.jpg",
+      "referenceFrame": "breakfast-master.jpg"
+    },
+    "breakfast-arrival-settled.jpg": {
+      "source": "breakfast-arrival.mp4",
+      "frameAt": 7.5
+    }
+  },
+  "dialogue": [
+    {
+      "speaker": "Heidi",
+      "words": "Bruno. Your wife's waiting in the breakfast room."
+    },
+    {
+      "speaker": "Bruno",
+      "words": "Is Sadie still angry?"
+    },
+    {
+      "speaker": "Sadie",
+      "words": "You came home after midnight."
+    },
+    {
+      "speaker": "Bruno",
+      "words": "I went for a walk."
+    },
+    {
+      "speaker": "Sadie",
+      "words": "Then why do you smell like Parmesan?"
+    }
+  ],
+  "returnStrategy": "The Heidi and Bruno doorway return first frames are taken directly from accepted footage. Both breakfast close-ups are crops of the same establishing video. Both Sadie appearances use different ranges of one source performance.",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/bruno-introduction/breakfast-bruno-final.mp4",
+      "start": 0,
+      "end": 12.25,
+      "label": "Accepted Heidi–Otto opening and Bruno greeting",
+      "sequenceStart": 0,
+      "sequenceEnd": 12.25
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/heidi-return.mp4",
+      "start": 0,
+      "end": 4.75,
+      "label": "Heidi sends Bruno to breakfast",
+      "sequenceStart": 12.25,
+      "sequenceEnd": 17
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/bruno-concern.mp4",
+      "start": 0,
+      "end": 3,
+      "label": "Bruno asks about Sadie",
+      "sequenceStart": 17,
+      "sequenceEnd": 20
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/breakfast-arrival.mp4",
+      "start": 0,
+      "end": 8,
+      "label": "Sadie waits at the untouched breakfast; Bruno arrives and settles opposite her",
+      "sequenceStart": 20,
+      "sequenceEnd": 28
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+      "start": 0.375,
+      "end": 3,
+      "label": "Sadie: You came home after midnight",
+      "sequenceStart": 28,
+      "sequenceEnd": 30.625
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/bruno-excuse.mp4",
+      "start": 0.8333333333333334,
+      "end": 3,
+      "label": "Bruno: I went for a walk",
+      "sequenceStart": 30.625,
+      "sequenceEnd": 32.791666666666664
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/sadie-performance.mp4",
+      "start": 4.375,
+      "end": 7.75,
+      "label": "Same Sadie take: Then why do you smell like Parmesan?",
+      "sequenceStart": 32.791666666666664,
+      "sequenceEnd": 36.166666666666664
+    }
+  ],
+  "reviewFile": "arrival-review.json",
+  "status": "superseded",
+  "version": 2,
+  "replaces": "breakfast-exchange-final.mp4",
+  "change": "Replace the brief shot of the already-seated couple with one eight-second introduction: Sadie waiting alone, Bruno entering from the right and settling opposite her, then shared silence before dialogue.",
+  "reason": "Uncut arrival/sitting had body distortion. Use breakfast-exchange-exposition.mp4, which excludes that motion and bridges it with Sadie’s reaction."
+}

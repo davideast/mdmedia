@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-hall-heidi-c",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/hall-heidi-c.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/HH-source-frame.jpg",
+    "seconds": 4,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. BURGUNDY-collared elderly female Heidi with silver muzzle. Low measured older WOMAN voice, warm, dry and dignified. Eyes RIGHT toward Bruno. Memory warms her, then concern and one faint scent catch her attention.\nAt 0.6s say EXACTLY: \"From the grooming room.\" Finish the complete last word by 2.8s, then close muzzle and silently listen. Total 4s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "a8fb091b4e92bf20845a799ba56677ff5c288e4d67172d7f4d904a4eae757a18",
+  "interactionId": "v1_Chdxc3ZGYW9IakJNU2U5TW9QamQzWWlBVRIXcXN2RmFvSGpCTVNlOU1vUGpkM1lpQVU",
+  "durationSeconds": 4.011,
+  "review": "pending"
+}

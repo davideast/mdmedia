@@ -1,0 +1,68 @@
+{
+  "reason": "Human appeared during s02 continuation",
+  "clips": {
+    "script_s01": {
+      "placement": {
+        "id": "s01",
+        "title": "The estate wakes",
+        "seconds": 8,
+        "source": "generated",
+        "connection": "cut",
+        "dialogue": "",
+        "visual": "Ground-floor wide approach toward open west window, establishing snowbound estate and nearby entrance.\n0–5s: Otto noses a wide snow brush across the steps while camera approaches the open window.\n5–8s: Otto steps backward leaving muddy paw prints on his clean patch. Notices, pauses, then resumes. Remain silent.",
+        "audio": "Wind, snow brushing, collar, faint indoor crockery; sparse piano.",
+        "pauseSeconds": 1
+      },
+      "generationMode": "new",
+      "transition": "cut",
+      "videoId": "v_5be818ed84d342db9ed49578b2ac4158"
+    },
+    "script_s02": {
+      "placement": {
+        "id": "s02",
+        "title": "A voice from inside",
+        "seconds": 8,
+        "source": "generated",
+        "connection": "continue",
+        "dialogue": "HEIDI (offscreen): Otto! Breakfast.",
+        "visual": "Continue exact trajectory through open casement; no cut.\n0–1s: Maintain camera approach speed and height.\n1–3s: Offscreen Heidi calls. Otto silently raises his head and looks toward window; mouth closed.\n3–8s: Otto leaves brush and walks to front entrance, exiting frame. Camera passes through open casement and reveals silent Heidi; no collision with glass.",
+        "audio": "Wind moves into interior ambience; Heidi native offscreen call; Otto’s paws travel toward entrance.",
+        "pauseSeconds": 1
+      },
+      "generationMode": "continue",
+      "transition": "cut",
+      "videoId": "v_93d0fe1bcfb449c992151d0c7f75868e"
+    },
+    "script_s03": {
+      "placement": {
+        "id": "s03",
+        "title": "The household rules",
+        "seconds": 8,
+        "source": "generated",
+        "connection": "continue",
+        "dialogue": "",
+        "visual": "Continue to room master: window left, rear doorway, table center, Bruno’s chair right.\n0–4s: Camera settles into master. Otto enters through rear doorway and crosses to window.\n4–8s: Otto noses window shut; latch clicks at 23.5. Heidi turns her eyes toward him; others attend breakfast silently.",
+        "audio": "Room ambience, paws, window hinge and latch at 23.5s; wind muffles.",
+        "pauseSeconds": 1
+      },
+      "generationMode": "continue",
+      "transition": "cut",
+      "videoId": "v_1e0896b54ed64ac7a90b7301d40fc214"
+    },
+    "script_s04": {
+      "placement": {
+        "id": "s04",
+        "title": "Heidi gets her way",
+        "seconds": 7,
+        "source": "generated",
+        "connection": "cut",
+        "dialogue": "HEIDI (on-camera): Otto. We’ve discussed this.",
+        "visual": "Closer reaction angle; preserve physical positions and eyelines.\n0–1s: Heidi completes look at Otto; he freezes.\n1–4s: Heidi alone speaks; Otto listens with mouth closed.\n4–7s: Otto silently noses window open; Heidi relaxes. Hear Bruno approaching during final half-second.",
+        "audio": "Window opens and wind returns. At 30.5s begin offscreen Bruno paws and collar leading into next shot.",
+        "pauseSeconds": 1
+      },
+      "generationMode": "new",
+      "transition": "cut"
+    }
+  }
+}

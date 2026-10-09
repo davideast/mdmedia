@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-groom-heidi-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/groom-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/groom-heidi.jpg",
+    "prompt": "Create a matching cinematic close-up from the supplied ACTUAL video frame. Photorealistic natural Bernese dog anatomy, no human face or body, no text. Same scene, same instant, same pine background, morning light, collar, age and exact face. Do NOT redesign the room or dog. HEIDI, elderly burgundy-collared gray-muzzled dog on LEFT. Exactly ONE visible dog, head and shoulders. Keep exact face and gray muzzle. Looking down RIGHT toward tuft just below frame. No second animal. Tight enough that the open doorway is OFFSCREEN to the right, with no door visible anywhere. Background is the same left wood paneling beside window; vent may be high out of frame."
+  },
+  "fingerprint": "d07db996d82c739117f0213c53396b644fe2e9803afb715be734648b35551bc8",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

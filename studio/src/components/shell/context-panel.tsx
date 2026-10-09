@@ -9,6 +9,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { ComposerSettings } from "@/components/studio/composer-settings";
+import { SceneGenerationSettings } from "@/components/scene/scene-generation-settings";
 import { NarrationSettings } from "@/components/narration/narration-settings";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -61,8 +62,9 @@ export function ContextPanel({
 }) {
   const pathname = usePathname();
   const isStudio = pathname.startsWith("/studio");
+  const isScene = pathname === "/studio/scene";
   const isNarration = pathname.startsWith("/narration/");
-  const sectionLabel = isStudio ? "Voice" : "Sharing";
+  const sectionLabel = isScene ? "Generation" : isStudio ? "Voice" : "Sharing";
   const SectionIcon = isStudio ? SlidersHorizontal : Info;
 
   if (docked) {
@@ -117,6 +119,7 @@ export function ContextPanel({
       </Tooltip>
     );
 
+  if (isScene) return <SceneGenerationSettings actions={collapseAction} />;
   if (isStudio) return <ComposerSettings actions={collapseAction} />;
 
   if (isNarration) {

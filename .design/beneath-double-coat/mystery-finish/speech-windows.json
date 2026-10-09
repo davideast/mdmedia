@@ -1,0 +1,122 @@
+[
+  {
+    "takeId": "hall-bruno",
+    "lineId": "line-0",
+    "start": 1.8,
+    "end": 3.85,
+    "text": "You still keep my brother's collar.",
+    "speaker": "bruno"
+  },
+  {
+    "takeId": "hall-heidi-mastered",
+    "lineId": "line-1",
+    "start": 0.5,
+    "end": 3.2,
+    "text": "Someone should remember Sebastian.",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "groom-heidi",
+    "lineId": "line-2",
+    "start": 0.9,
+    "end": 2.2,
+    "text": "That scent.",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "groom-heidi",
+    "lineId": "line-3",
+    "start": 3.1,
+    "end": 4.2,
+    "text": "Sebastian?",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "alarm-repair",
+    "lineId": "line-4",
+    "start": 0,
+    "end": 2.6,
+    "text": "Who locked the door?",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "alarm-repair",
+    "lineId": "line-5",
+    "start": 2.9,
+    "end": 4.55,
+    "text": "And turned off the air?",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "alarm-repair",
+    "lineId": "line-6",
+    "start": 5.3,
+    "end": 6.85,
+    "text": "You monster!",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "rescue-bruno",
+    "lineId": "line-7",
+    "start": 0.9,
+    "end": 2.25,
+    "text": "Otto got the door.",
+    "speaker": "bruno"
+  },
+  {
+    "takeId": "rescue-bruno",
+    "lineId": "line-8",
+    "start": 2.6,
+    "end": 4.7,
+    "text": "Grandmother, what happened?",
+    "speaker": "bruno"
+  },
+  {
+    "takeId": "rescue-bruno",
+    "lineId": "line-9",
+    "start": 5.9,
+    "end": 6.85,
+    "text": "He is.",
+    "speaker": "bruno"
+  },
+  {
+    "takeId": "rescue-heidi",
+    "lineId": "line-10",
+    "start": 0.5,
+    "end": 2.2,
+    "text": "Someone locked me in.",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "rescue-heidi",
+    "lineId": "line-11",
+    "start": 2.45,
+    "end": 4,
+    "text": "After I found this.",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "rescue-heidi",
+    "lineId": "line-12",
+    "start": 5.55,
+    "end": 7.15,
+    "text": "Sebastian's fur.",
+    "speaker": "heidi"
+  },
+  {
+    "takeId": "rescue-sadie-mastered",
+    "lineId": "line-13",
+    "start": 0.5,
+    "end": 1.45,
+    "text": "Your brother?",
+    "speaker": "sadie"
+  },
+  {
+    "takeId": "rescue-sadie-mastered",
+    "lineId": "line-14",
+    "start": 2.85,
+    "end": 4.25,
+    "text": "You said he was dead.",
+    "speaker": "sadie"
+  }
+]

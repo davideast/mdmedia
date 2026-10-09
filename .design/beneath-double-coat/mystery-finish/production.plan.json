@@ -1,0 +1,1521 @@
+{
+  "version": 2,
+  "id": "mystery-finish",
+  "title": "The Secret in the Snow — mystery and cliffhanger",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human anatomy",
+      "extra dogs"
+    ],
+    "maxWordsPerSecond": 4,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "hall-master",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.mp4",
+      "sha256": "bcabc9ce9ad2534ef55a057f4597ff6aba966899836b7d2c19d0c25cbaefd123"
+    },
+    {
+      "id": "hall-master-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+      "sha256": "1b0bdc7c8466e150aba4df7dbe1c607d3c54806faefc04c91e6c23dbf5414f83"
+    },
+    {
+      "id": "hall-bruno",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-bruno.mp4",
+      "sha256": "310bf8d52aa47f5001f08a72265d63ec0241c773b58cb2787c5b1cbbbe1c3595"
+    },
+    {
+      "id": "hall-bruno-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-bruno.jpg",
+      "sha256": "2ed9375a420ad14cb98ab8429be0f67b3625d9a1a87dbfeec9738d52f0effbd0"
+    },
+    {
+      "id": "hall-heidi-mastered",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-heidi-mastered.mp4",
+      "sha256": "c5b3a614be157f9d06e61273515a91ffd1d35d0d564870d51fd65f6c3442bcc0"
+    },
+    {
+      "id": "hall-heidi-mastered-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-heidi.jpg",
+      "sha256": "62c9bbd6b5299ff09ff5a68ddf2bf268dd7c91e49e33f1629b92decf5b0073b2"
+    },
+    {
+      "id": "prints-insert",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/prints-clean.mp4",
+      "sha256": "3c6c3a52a06e13812a45ae8f39a0e9ecfc92fcb828c269d9263e057799aa5e91"
+    },
+    {
+      "id": "groom-master",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+      "sha256": "48b818f21d2ab6f39a402fbfb11e0ca0a757675201f11bca2a242f35bc0644de"
+    },
+    {
+      "id": "groom-master-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      "sha256": "c6079282da3ad42dbbe82eb47f5243112a0c781dbd2f97903119629e2d403ebf"
+    },
+    {
+      "id": "groom-heidi",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-heidi.mp4",
+      "sha256": "e87ba881cbc93b755e42d3ed6ed41aa17f5c4e651b6910ef96744d30339b4779"
+    },
+    {
+      "id": "groom-heidi-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-heidi.jpg",
+      "sha256": "3579ac678cf9be38150e0acbfbcc6c5d3ce9d6e1a9704d4524f7cd1076cfb94f"
+    },
+    {
+      "id": "alarm-repair",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/alarm-repair.mp4",
+      "sha256": "4901cd509d6850634b4be761daf9f5e248ac4e7889717efa42b7cde15a417927"
+    },
+    {
+      "id": "alarm-repair-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/alarm-first.jpg",
+      "sha256": "4b86e4c57a6490a34da27abcb0c0e8c208953191cf3cca929b3e9753b7a5c799"
+    },
+    {
+      "id": "rescue-master",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4",
+      "sha256": "700bfdba9fdc2ea870cb9217c95bfb2558f4e39faf66afffcf86d75ace8dc041"
+    },
+    {
+      "id": "rescue-master-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+      "sha256": "f4b6a9227c520824386fa769e5092a36581a85f9aeb4ce949f539563a6a6b5ee"
+    },
+    {
+      "id": "rescue-bruno",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-bruno.mp4",
+      "sha256": "6743ee44229f54bf1fe73e922280a3c1fdb21f0ec22432e7165b114b189dd738"
+    },
+    {
+      "id": "rescue-bruno-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-bruno.jpg",
+      "sha256": "289e9c0a4ba38fc8e81de41eab9191adbf23bbff6283c26d6db3e202269a151f"
+    },
+    {
+      "id": "rescue-heidi",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-heidi.mp4",
+      "sha256": "07f85b3f3b1d3d24da264ad3fc6336e860ff95dba71179308be4275296e6f26c"
+    },
+    {
+      "id": "rescue-heidi-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-heidi.jpg",
+      "sha256": "57e4285fc39e469c0cd678c549cbfc452266a0a66450b6d24525fbbe08fdbbfe"
+    },
+    {
+      "id": "fur-insert-mastered",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/fur-insert-clean.mp4",
+      "sha256": "42c8455f385eb00fdec7e1e4ee9ff402ca160c7950d6659d5d6f898b2b6328cb"
+    },
+    {
+      "id": "rescue-sadie-mastered",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-sadie-mastered.mp4",
+      "sha256": "0ec2f310eb5a2914563bcca609d749e4435c41aa1871e32ddac0b5689aa603b6"
+    },
+    {
+      "id": "rescue-sadie-mastered-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+      "sha256": "823c32e8e50ebcb6c8fa32c00fb15e93ec3c5d6572333cb32a09cdedcad19c1a"
+    },
+    {
+      "id": "exterior",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+      "sha256": "28b4625e7cce2d7da6abc31c558a86cf78cb405fc4521e279d68c75ffcca6ffc"
+    },
+    {
+      "id": "exterior-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg",
+      "sha256": "e08e4595219ef93e3222d09fc10b3b8ee72a3d0ed68d49ca5412ba11bdf9b68a"
+    },
+    {
+      "id": "lookalike",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/lookalike.mp4",
+      "sha256": "37af55e28fef9e3b8d9f44525e93821f93c1f070c9db31bd0f37720e05a6a7f5"
+    },
+    {
+      "id": "lookalike-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/lookalike.jpg",
+      "sha256": "11fdc12186dd79d4627b2ed62e1de92c2b41b3097316ee2ae403c9fbd35f1747"
+    },
+    {
+      "id": "title",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/story-first/title.mp4",
+      "sha256": "1bdcbe09687079dcfa1df2a58f10c85d399320e1a29ff77ce164bbb3162d4864"
+    },
+    {
+      "id": "render",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/mystery-sequence.mp4",
+      "sha256": "3c74018b69103fdc4e6227df2b84fde71a74ebaa881a8c193532b44bb209362b"
+    }
+  ],
+  "characters": [
+    {
+      "id": "heidi",
+      "description": "Elderly silver-muzzled Bernese, burgundy collar, grandmother",
+      "voice": "Low measured older female",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Adult male Bernese, navy collar, grandson",
+      "voice": "Warm male baritone",
+      "silent": false
+    },
+    {
+      "id": "sadie",
+      "description": "Adult female Bernese, green collar, wife",
+      "voice": "Controlled adult female",
+      "silent": false
+    },
+    {
+      "id": "lookalike",
+      "description": "Same face as Bruno, faded brown collar, in toolshed",
+      "voice": "Silent",
+      "silent": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "family",
+      "description": "Heidi is grandmother, Bruno and Sadie married; family breakfast finished."
+    },
+    {
+      "id": "hall",
+      "description": "The adjacent hall contains a memorial collar and photograph; prints lead to grooming room."
+    },
+    {
+      "id": "brother",
+      "description": "The collar belonged to Bruno's absent brother."
+    },
+    {
+      "id": "sebastian",
+      "description": "His brother is named Sebastian."
+    },
+    {
+      "id": "prints",
+      "description": "Fresh muddy prints lead into the adjacent grooming room."
+    },
+    {
+      "id": "groom",
+      "description": "Heidi is beside fur on low grooming platform, with vent and open door established."
+    },
+    {
+      "id": "recognition",
+      "description": "Heidi recognizes Sebastian's scent."
+    },
+    {
+      "id": "trapped",
+      "description": "Heidi hears the door close and ventilation stop; she calls out."
+    },
+    {
+      "id": "rescue",
+      "description": "Same room, door now open, Bruno and Sadie have arrived."
+    },
+    {
+      "id": "otto-helped",
+      "description": "Otto got the door open offscreen."
+    },
+    {
+      "id": "fur",
+      "description": "Heidi identifies the fur as Sebastian's."
+    },
+    {
+      "id": "dead",
+      "description": "Bruno claims his brother is dead."
+    },
+    {
+      "id": "outside",
+      "description": "Nearby snowy toolshed has a view of estate windows."
+    },
+    {
+      "id": "lookalike",
+      "description": "A silent brown-collared dog resembling Bruno watches from the shed."
+    },
+    {
+      "id": "contradiction",
+      "description": "Navy-collared Bruno is still inside; two similar dogs occupy separate places."
+    },
+    {
+      "id": "end",
+      "description": "End title."
+    }
+  ],
+  "initialFacts": [
+    "family"
+  ],
+  "scenes": [
+    {
+      "id": "hall",
+      "location": "Hall adjoining breakfast room",
+      "situation": "After family breakfast",
+      "purpose": "Establish absent brother and follow clue",
+      "orientationFact": "hall"
+    },
+    {
+      "id": "groom",
+      "location": "Grooming room adjoining hall",
+      "situation": "Heidi discovers fur, then family responds to her alarm",
+      "purpose": "Recognition, danger, evidence, denial",
+      "orientationFact": "groom"
+    },
+    {
+      "id": "exterior",
+      "location": "Toolshed and snowy garden beside estate",
+      "situation": "Same morning, someone watches house",
+      "purpose": "Spatially clear lookalike cliffhanger",
+      "orientationFact": "outside"
+    },
+    {
+      "id": "title",
+      "location": "Editorial end card",
+      "situation": "End of current short",
+      "purpose": "End title",
+      "orientationFact": "end"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "line-0",
+      "speaker": "bruno",
+      "text": "You still keep my brother's collar."
+    },
+    {
+      "id": "line-1",
+      "speaker": "heidi",
+      "text": "Someone should remember Sebastian."
+    },
+    {
+      "id": "line-2",
+      "speaker": "heidi",
+      "text": "That scent."
+    },
+    {
+      "id": "line-3",
+      "speaker": "heidi",
+      "text": "Sebastian?"
+    },
+    {
+      "id": "line-4",
+      "speaker": "heidi",
+      "text": "Who locked the door?"
+    },
+    {
+      "id": "line-5",
+      "speaker": "heidi",
+      "text": "And turned off the air?"
+    },
+    {
+      "id": "line-6",
+      "speaker": "heidi",
+      "text": "You monster!"
+    },
+    {
+      "id": "line-7",
+      "speaker": "bruno",
+      "text": "Otto got the door."
+    },
+    {
+      "id": "line-8",
+      "speaker": "bruno",
+      "text": "Grandmother, what happened?"
+    },
+    {
+      "id": "line-9",
+      "speaker": "bruno",
+      "text": "He is."
+    },
+    {
+      "id": "line-10",
+      "speaker": "heidi",
+      "text": "Someone locked me in."
+    },
+    {
+      "id": "line-11",
+      "speaker": "heidi",
+      "text": "After I found this."
+    },
+    {
+      "id": "line-12",
+      "speaker": "heidi",
+      "text": "Sebastian's fur."
+    },
+    {
+      "id": "line-13",
+      "speaker": "sadie",
+      "text": "Your brother?"
+    },
+    {
+      "id": "line-14",
+      "speaker": "sadie",
+      "text": "You said he was dead."
+    }
+  ],
+  "takes": [
+    {
+      "id": "hall-master",
+      "sceneId": "hall",
+      "setupId": "hall-master",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "hall-master",
+      "referenceAssetIds": [
+        "hall-master-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "hall-bruno",
+      "sceneId": "hall",
+      "setupId": "hall-bruno",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "hall-bruno",
+      "referenceAssetIds": [
+        "hall-bruno-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-0",
+          "start": 1.8,
+          "end": 3.85,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "hall-heidi-mastered",
+      "sceneId": "hall",
+      "setupId": "hall-heidi-mastered",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "hall-heidi-mastered",
+      "referenceAssetIds": [
+        "hall-heidi-mastered-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno, then down to prints"
+        }
+      ],
+      "startState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-1",
+          "start": 0.5,
+          "end": 3.2,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "prints-insert",
+      "sceneId": "hall",
+      "setupId": "prints-insert",
+      "method": "reuse",
+      "duration": 2,
+      "assetId": "prints-insert",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "insert",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [],
+      "startState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "hall",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Stationary establishing image or editorial insert",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "groom-master",
+      "sceneId": "groom",
+      "setupId": "groom-master",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "groom-master",
+      "referenceAssetIds": [
+        "groom-master-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Down right toward fur"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "groom-heidi",
+      "sceneId": "groom",
+      "setupId": "groom-heidi",
+      "method": "generate",
+      "duration": 10,
+      "assetId": "groom-heidi",
+      "referenceAssetIds": [
+        "groom-heidi-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward offscreen doorway"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "closed"
+      },
+      "stateChanges": [
+        {
+          "key": "door",
+          "reason": "Door slam/latch audible during recognition; closure offscreen."
+        }
+      ],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-2",
+          "start": 0.9,
+          "end": 2.2,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-3",
+          "start": 3.1,
+          "end": 4.2,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "alarm-repair",
+      "sceneId": "groom",
+      "setupId": "groom-heidi",
+      "method": "first-frame",
+      "duration": 8,
+      "assetId": "alarm-repair",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward offscreen doorway"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "closed"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "closed"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-4",
+          "start": 0,
+          "end": 2.6,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-5",
+          "start": 2.9,
+          "end": 4.55,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-6",
+          "start": 5.3,
+          "end": 6.85,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan.",
+      "firstFrame": {
+        "assetId": "alarm-repair-ref",
+        "fromTakeId": "groom-heidi",
+        "at": 4.208333333333333
+      }
+    },
+    {
+      "id": "rescue-master",
+      "sceneId": "groom",
+      "setupId": "rescue-master",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "rescue-master",
+      "referenceAssetIds": [
+        "rescue-master-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        },
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "Left toward Heidi"
+        },
+        {
+          "characterId": "sadie",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "rescue-bruno",
+      "sceneId": "groom",
+      "setupId": "rescue-bruno",
+      "method": "generate",
+      "duration": 8,
+      "assetId": "rescue-bruno",
+      "referenceAssetIds": [
+        "rescue-bruno-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-7",
+          "start": 0.9,
+          "end": 2.25,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-8",
+          "start": 2.6,
+          "end": 4.7,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-9",
+          "start": 5.9,
+          "end": 6.85,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "rescue-heidi",
+      "sceneId": "groom",
+      "setupId": "rescue-heidi",
+      "method": "generate",
+      "duration": 8,
+      "assetId": "rescue-heidi",
+      "referenceAssetIds": [
+        "rescue-heidi-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-10",
+          "start": 0.5,
+          "end": 2.2,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-11",
+          "start": 2.45,
+          "end": 4,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-12",
+          "start": 5.55,
+          "end": 7.15,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "fur-insert-mastered",
+      "sceneId": "groom",
+      "setupId": "fur-insert-mastered",
+      "method": "reuse",
+      "duration": 2,
+      "assetId": "fur-insert-mastered",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "insert",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "rescue-sadie-mastered",
+      "sceneId": "groom",
+      "setupId": "rescue-sadie-mastered",
+      "method": "generate",
+      "duration": 5,
+      "assetId": "rescue-sadie-mastered",
+      "referenceAssetIds": [
+        "rescue-sadie-mastered-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "sadie",
+          "position": "right",
+          "eyeline": "Left toward Bruno"
+        }
+      ],
+      "startState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "endState": {
+        "room": "groom",
+        "time": "Winter morning",
+        "door": "open"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [
+        {
+          "lineId": "line-13",
+          "start": 0.5,
+          "end": 1.45,
+          "visibility": "on-camera"
+        },
+        {
+          "lineId": "line-14",
+          "start": 2.85,
+          "end": 4.25,
+          "visibility": "on-camera"
+        }
+      ],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "exterior",
+      "sceneId": "exterior",
+      "setupId": "exterior",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "exterior",
+      "referenceAssetIds": [
+        "exterior-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [],
+      "startState": {
+        "room": "exterior",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "exterior",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Stationary establishing image or editorial insert",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "lookalike",
+      "sceneId": "exterior",
+      "setupId": "lookalike",
+      "method": "generate",
+      "duration": 4,
+      "assetId": "lookalike",
+      "referenceAssetIds": [
+        "lookalike-ref"
+      ],
+      "camera": {
+        "size": "close-up",
+        "angle": "Established master side of axis",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "lookalike",
+          "position": "center",
+          "eyeline": "Left toward estate beyond camera"
+        }
+      ],
+      "startState": {
+        "room": "exterior",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "exterior",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Natural canine face motion, seated body and stationary props",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    },
+    {
+      "id": "title",
+      "sceneId": "title",
+      "setupId": "title",
+      "method": "reuse",
+      "duration": 3,
+      "assetId": "title",
+      "referenceAssetIds": [],
+      "camera": {
+        "size": "insert",
+        "angle": "Editorial card",
+        "movement": "Locked"
+      },
+      "cast": [],
+      "startState": {
+        "room": "title",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "room": "title",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Stationary establishing image or editorial insert",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Source dialogue and room tone; no background music. Fur insert muted to avoid restoring pre-shutdown fan."
+    }
+  ],
+  "shots": [
+    {
+      "id": "shot-01",
+      "takeId": "hall-master",
+      "in": 0,
+      "out": 2.25,
+      "purpose": "establish",
+      "requires": [
+        "family"
+      ],
+      "establishes": [
+        {
+          "factId": "hall",
+          "evidence": "After breakfast, hall master shows adjacent room and family memorial."
+        }
+      ],
+      "transition": {
+        "type": "opening",
+        "reason": "After breakfast, hall master shows adjacent room and family memorial.",
+        "bridge": "time-passage",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-02",
+      "takeId": "hall-bruno",
+      "in": 1.25,
+      "out": 4.208333333333333,
+      "purpose": "question",
+      "requires": [
+        "hall"
+      ],
+      "establishes": [
+        {
+          "factId": "brother",
+          "evidence": "Close-up identifies memorial collar."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Close-up identifies memorial collar.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-03",
+      "takeId": "hall-heidi-mastered",
+      "in": 0.3333333333333333,
+      "out": 3.75,
+      "purpose": "answer",
+      "requires": [
+        "brother"
+      ],
+      "establishes": [
+        {
+          "factId": "sebastian",
+          "evidence": "Heidi names absent brother, then notices prints."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Heidi names absent brother, then notices prints.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-04",
+      "takeId": "prints-insert",
+      "in": 0,
+      "out": 1.5,
+      "purpose": "establish",
+      "requires": [
+        "hall"
+      ],
+      "establishes": [
+        {
+          "factId": "prints",
+          "evidence": "Follow Heidi's gaze to prints beside collar leading through doorway."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Follow Heidi's gaze to prints beside collar leading through doorway.",
+        "bridge": "gaze",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-05",
+      "takeId": "groom-master",
+      "in": 0,
+      "out": 1.5,
+      "purpose": "establish",
+      "requires": [
+        "prints"
+      ],
+      "establishes": [
+        {
+          "factId": "groom",
+          "evidence": "Adjacent grooming room, dog and clue oriented before speech."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Adjacent grooming room, dog and clue oriented before speech.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-06",
+      "takeId": "groom-heidi",
+      "in": 0.5,
+      "out": 4.25,
+      "purpose": "escalation",
+      "requires": [
+        "groom",
+        "sebastian"
+      ],
+      "establishes": [
+        {
+          "factId": "recognition",
+          "evidence": "Closer view of Heidi recognizing scent; offscreen latch is heard."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Closer view of Heidi recognizing scent; offscreen latch is heard.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-07",
+      "takeId": "alarm-repair",
+      "in": 0,
+      "out": 7.083333333333333,
+      "purpose": "escalation",
+      "requires": [
+        "recognition"
+      ],
+      "establishes": [
+        {
+          "factId": "trapped",
+          "evidence": "Exact preceding frame continues her alarm with complete dialogue."
+        }
+      ],
+      "transition": {
+        "type": "continuous",
+        "reason": "Exact preceding frame continues her alarm with complete dialogue.",
+        "bridge": "sound",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-08",
+      "takeId": "rescue-master",
+      "in": 0,
+      "out": 1.75,
+      "purpose": "establish",
+      "requires": [
+        "trapped"
+      ],
+      "establishes": [
+        {
+          "factId": "rescue",
+          "evidence": "Same room and open door after brief offscreen rescue; family has arrived."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Same room and open door after brief offscreen rescue; family has arrived.",
+        "bridge": "time-passage",
+        "stateExceptions": [
+          {
+            "key": "door",
+            "reason": "Time passage after offscreen rescue, explained by Bruno."
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot-09",
+      "takeId": "rescue-bruno",
+      "in": 0.7916666666666666,
+      "out": 4.875,
+      "purpose": "question",
+      "requires": [
+        "rescue"
+      ],
+      "establishes": [
+        {
+          "factId": "otto-helped",
+          "evidence": "Bruno explains who opened door and asks what happened."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Bruno explains who opened door and asks what happened.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-10",
+      "takeId": "rescue-heidi",
+      "in": 0.3333333333333333,
+      "out": 4.166666666666667,
+      "purpose": "answer",
+      "requires": [
+        "otto-helped"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Heidi explains connection between clue and being trapped.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-11",
+      "takeId": "fur-insert-mastered",
+      "in": 0,
+      "out": 1.1666666666666667,
+      "purpose": "reaction",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Evidence insert retains same tuft, rake and platform.",
+        "bridge": "gaze",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-12",
+      "takeId": "rescue-heidi",
+      "in": 5.333333333333333,
+      "out": 7.333333333333333,
+      "purpose": "answer",
+      "requires": [
+        "sebastian"
+      ],
+      "establishes": [
+        {
+          "factId": "fur",
+          "evidence": "Heidi identifies Sebastian's fur."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Heidi identifies Sebastian's fur.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-13",
+      "takeId": "rescue-sadie-mastered",
+      "in": 0.3333333333333333,
+      "out": 1.5,
+      "purpose": "question",
+      "requires": [
+        "fur",
+        "brother"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Sadie questions husband.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-14",
+      "takeId": "rescue-bruno",
+      "in": 4.916666666666667,
+      "out": 5.5,
+      "purpose": "reaction",
+      "requires": [
+        "brother"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Reuse silent Bruno performance interval, no new take.",
+        "bridge": "reaction",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-15",
+      "takeId": "rescue-sadie-mastered",
+      "in": 2.5833333333333335,
+      "out": 4.291666666666667,
+      "purpose": "escalation",
+      "requires": [
+        "brother"
+      ],
+      "establishes": [
+        {
+          "factId": "dead",
+          "evidence": "Sadie states previous claim of death."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Sadie states previous claim of death.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-16",
+      "takeId": "rescue-bruno",
+      "in": 5.833333333333333,
+      "out": 7,
+      "purpose": "answer",
+      "requires": [
+        "dead"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "Bruno insists his brother is dead.",
+        "bridge": "dialogue",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-17",
+      "takeId": "exterior",
+      "in": 0,
+      "out": 2.25,
+      "purpose": "establish",
+      "requires": [
+        "dead"
+      ],
+      "establishes": [
+        {
+          "factId": "outside",
+          "evidence": "Garden view from shed back to estate establishes new location."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Garden view from shed back to estate establishes new location.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-18",
+      "takeId": "lookalike",
+      "in": 0.25,
+      "out": 3.25,
+      "purpose": "payoff",
+      "requires": [
+        "outside",
+        "dead"
+      ],
+      "establishes": [
+        {
+          "factId": "lookalike",
+          "evidence": "Reverse angle reveals brown-collared lookalike at shed threshold."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Reverse angle reveals brown-collared lookalike at shed threshold.",
+        "bridge": "same-space",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-19",
+      "takeId": "rescue-bruno",
+      "in": 7.041666666666667,
+      "out": 7.958333333333333,
+      "purpose": "reaction",
+      "requires": [
+        "lookalike"
+      ],
+      "establishes": [
+        {
+          "factId": "contradiction",
+          "evidence": "Return to actual earlier Bruno performance, navy collar, still inside."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Return to actual earlier Bruno performance, navy collar, still inside.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "shot-20",
+      "takeId": "title",
+      "in": 0,
+      "out": 3,
+      "purpose": "payoff",
+      "requires": [
+        "contradiction"
+      ],
+      "establishes": [
+        {
+          "factId": "end",
+          "evidence": "Editorial end title."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "Editorial end title.",
+        "bridge": "time-passage",
+        "stateExceptions": []
+      }
+    }
+  ],
+  "renderAssetId": "render"
+}

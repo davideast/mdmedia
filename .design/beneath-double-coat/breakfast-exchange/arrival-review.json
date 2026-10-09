@@ -1,0 +1,131 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 5.0,
+      "words": "Otto, you were meant to clear the path. Not bring it in.",
+      "voice": "Older female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 5.0,
+      "endSeconds": 9.5,
+      "words": "Breakfast is waiting.",
+      "voice": "Younger male",
+      "visibleSpeaker": "Otto",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 9.5,
+      "endSeconds": 11.5,
+      "words": "Morning, Grandmother.",
+      "voice": "Deep male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 11.5,
+      "endSeconds": 16.5,
+      "words": "Bruno. Your wife's waiting in the breakfast room.",
+      "voice": "Older female",
+      "visibleSpeaker": "Heidi",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 16.5,
+      "endSeconds": 19.5,
+      "words": "Is Sadie still angry?",
+      "voice": "Deep male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 27.5,
+      "endSeconds": 30.0,
+      "words": "You came home after midnight.",
+      "voice": "Female",
+      "visibleSpeaker": "Sadie",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 30.0,
+      "endSeconds": 32.5,
+      "words": "I went for a walk.",
+      "voice": "Deep male",
+      "visibleSpeaker": "Bruno",
+      "confidence": "High"
+    },
+    {
+      "startSeconds": 32.5,
+      "endSeconds": 35.5,
+      "words": "Then why do you smell like Parmesan?",
+      "voice": "Female",
+      "visibleSpeaker": "Sadie",
+      "confidence": "High"
+    }
+  ],
+  "castByShot": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 9.8,
+      "characters": ["Heidi", "Otto"]
+    },
+    {
+      "startSeconds": 9.8,
+      "endSeconds": 11.5,
+      "characters": ["Bruno"]
+    },
+    {
+      "startSeconds": 11.5,
+      "endSeconds": 16.5,
+      "characters": ["Heidi", "Otto"]
+    },
+    {
+      "startSeconds": 16.5,
+      "endSeconds": 19.8,
+      "characters": ["Bruno"]
+    },
+    {
+      "startSeconds": 19.8,
+      "endSeconds": 27.5,
+      "characters": ["Sadie", "Bruno"]
+    },
+    {
+      "startSeconds": 27.5,
+      "endSeconds": 30.5,
+      "characters": ["Sadie"]
+    },
+    {
+      "startSeconds": 30.5,
+      "endSeconds": 32.5,
+      "characters": ["Bruno"]
+    },
+    {
+      "startSeconds": 32.5,
+      "endSeconds": 36.0,
+      "characters": ["Sadie"]
+    }
+  ],
+  "continuityFindings": [
+    "Room layout, snowy window, and wooden sideboard remain consistent in the new wide shot.",
+    "Collar colors (green for Sadie, navy for Bruno) correctly match the close-ups."
+  ],
+  "speakerErrors": [],
+  "unwantedFigures": [],
+  "physicalDefects": [
+    "0:22-0:26: Bruno's hindquarters drag and stretch unnaturally as he walks in. His torso morphs severely as he compresses into a sitting position."
+  ],
+  "pacingAndAudio": [
+    "The 7-second visual intro effectively establishes the setting and tension.",
+    "Footstep audio aligns with the approach.",
+    "Dialogue is intact and properly ordered."
+  ],
+  "materialFailures": [
+    "Severe structural morphing of Bruno during his entrance and sit down violates the requirement for natural motion."
+  ],
+  "uncertainties": [
+    "Dog lip-sync is inherently loose, but acceptable given the constraints."
+  ],
+  "acceptable": false
+}

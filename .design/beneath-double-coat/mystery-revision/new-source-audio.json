@@ -1,0 +1,78 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/hall-bruno-invitation.mp4",
+    "transcript": "Grandmother, come back in. Penny's negotiating for your breakfast.",
+    "voice": "male",
+    "otherSounds": [
+      "laughter"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/hall-bruno-twin.mp4",
+    "transcript": "My twin got the looks. I got the sausage.",
+    "voice": "Male",
+    "otherSounds": [
+      "Dog bark",
+      "Audience laughter"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/groom-heidi-a.mp4",
+    "transcript": "He used to hide in here, as if I couldn't smell him. Fresh fir.",
+    "voice": "female",
+    "otherSounds": [],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/groom-heidi-b.mp4",
+    "transcript": "No, I'm imagining it. Bruno! Come and smell this.",
+    "voice": "female",
+    "otherSounds": [
+      "barking"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/family-sadie.mp4",
+    "transcript": "[bark] We heard you. Um, what's happened? You really think he's been here?",
+    "voice": "female",
+    "otherSounds": [
+      "bark"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/family-heidi-a.mp4",
+    "transcript": "This smells like Sebastian. I thought that too. Then I smelled it again.",
+    "voice": "female",
+    "otherSounds": [],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/family-heidi-b.mp4",
+    "transcript": "I don't know. I I need you to look. Then whose scent is this?",
+    "voice": "female",
+    "otherSounds": [
+      "audience laughter"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/family-bruno-a.mp4",
+    "transcript": "We all shed, grandmother. It's probably mine. I wish it were him. I do.",
+    "voice": "male",
+    "otherSounds": [],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/family-bruno-b.mp4",
+    "transcript": "But nobody survived that fire that fire.",
+    "voice": "Male",
+    "otherSounds": [
+      "Dog bark"
+    ],
+    "uncertainWords": []
+  }
+]

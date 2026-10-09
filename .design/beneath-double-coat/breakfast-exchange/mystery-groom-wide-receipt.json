@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-groom-wide",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/groom-master.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic prestige dog soap opera. Animate exactly the supplied composition as one locked wide shot. Preserve exact faces, ages, collars, positions, furniture and lighting. No humans, hands, human anatomy, human clothing, additional dogs, words, captions, speaking, barking, music or cuts. All dogs remain seated, paws planted, no reaching or walking, only gentle breathing, blinks and tiny natural eye movements. Gentle constant ventilation hum; no voices or music. Exactly ONE dog: elderly burgundy-collared Heidi LEFT looks down toward the black tuft on the platform. She makes one very small nose sniff, not a large head movement. The silver rake and fur stay on the platform. Door stays open. Mouth closed. Ventilation continues evenly."
+  },
+  "fingerprint": "f18b4c1951fbb176d67a30647fc5de5bdb9027a66424f952ef7e2d1543b6d58e",
+  "interactionId": "v1_ChZYN0hGYXNkRjk5Yi00d19WMlBTaERREhZYN0hGYXNkRjk5Yi00d19WMlBTaERR",
+  "durationSeconds": 3.008,
+  "review": "pending"
+}

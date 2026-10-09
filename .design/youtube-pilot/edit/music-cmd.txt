@@ -1,0 +1,5 @@
+$ bun --env-file=studio/.env src/bin.ts music -p "Instrumental cinematic spaceship launch
+score. Immediate massive orchestral brass hit and deep percussion, then driving heroic
+strings, rising tension, triumphant brass payoff. Exaggerated blockbuster trailer energy
+with a playful swagger. No vocals. Thirty seconds." --clip -o
+/Users/davideast/repos/davideast/mdmedia/.design/youtube-pilot/score.mp3 --maxRetries 0

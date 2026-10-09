@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-rescue-sadie-ref",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/rescue-actual.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/rescue-sadie.jpg",
+    "prompt": "Photorealistic cinematic close-up derived from this ACTUAL video frame. Preserve exact identity, age, collar, lighting and room geometry. Exactly ONE real Bernese Mountain Dog, no humans, hands, human anatomy, captions or extra dogs. Match the established side of the conversation axis. SADIE, the GREEN-collared female dog at FAR RIGHT. Her narrower white blaze and exact face, head and upper chest, looking LEFT toward Bruno and Heidi. No other dog in frame. Same doorway behind."
+  },
+  "fingerprint": "1d5cbf954a19cf32852a732b1f57bcd8e8cee5c17cc36aba6e0d64cb9ec35e7a",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

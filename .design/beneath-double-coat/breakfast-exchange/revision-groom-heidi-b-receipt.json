@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-groom-heidi-b",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/groom-heidi-b.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/GH-source-frame.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. BURGUNDY-collared elderly female Heidi with silver muzzle. Low measured older WOMAN voice, warm, dry and dignified. Eyes down RIGHT toward stationary fur below frame. One tiny sniff; uncertain recognition, not fear or an alarm. Door stays OPEN offscreen; no slams or changes to ventilation.\nAt 0.5s say EXACTLY: \"No... I'm imagining it.\" Finish the complete last word by 3.1s, then close muzzle and silently listen.\nAt 4.4s say EXACTLY: \"Bruno. Come and smell this.\" Finish the complete last word by 7s, then close muzzle and silently listen. Total 8s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "ad0215e71c52e5b381ef5eded2f2cf1628130adc9d941c387480d641d41daedb",
+  "interactionId": "v1_ChdCODNGYXFYZkNlREctc0FQcXF5SnlRSRIXQjgzRmFxWGZDZURHLXNBUHFxeUp5UUk",
+  "durationSeconds": 8,
+  "review": "pending"
+}

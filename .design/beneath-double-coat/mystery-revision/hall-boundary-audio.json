@@ -1,0 +1,27 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/heidi-line-end.mp4",
+    "transcript": "steal breakfast without leaving his bed",
+    "voice": "unknown",
+    "otherSounds": [],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/heidi-share.mp4",
+    "transcript": "You were supposed to share it.",
+    "voice": "female",
+    "otherSounds": [
+      "laughter"
+    ],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/bruno-grief-clean.mp4",
+    "transcript": "I do. That's why I can't keep looking at that.",
+    "voice": "male",
+    "otherSounds": [
+      "barking"
+    ],
+    "uncertainWords": []
+  }
+]

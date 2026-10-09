@@ -1,0 +1,310 @@
+{
+  "version": 2,
+  "id": "mystery-staging",
+  "title": "Establish the missing brother and grooming-room geography",
+  "constraints": {
+    "forbiddenVisible": [
+      "humans",
+      "human anatomy",
+      "extra dogs"
+    ],
+    "maxWordsPerSecond": 3.5,
+    "minTakeSeconds": 3,
+    "maxTakeSeconds": 10
+  },
+  "assets": [
+    {
+      "id": "hall-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.jpg",
+      "sha256": "1b0bdc7c8466e150aba4df7dbe1c607d3c54806faefc04c91e6c23dbf5414f83"
+    },
+    {
+      "id": "hall",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/hall-master.mp4"
+    },
+    {
+      "id": "groom-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.jpg",
+      "sha256": "c6079282da3ad42dbbe82eb47f5243112a0c781dbd2f97903119629e2d403ebf"
+    },
+    {
+      "id": "groom",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/groom-master.mp4"
+    },
+    {
+      "id": "rescue-ref",
+      "kind": "image",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.jpg",
+      "sha256": "f4b6a9227c520824386fa769e5092a36581a85f9aeb4ce949f539563a6a6b5ee"
+    },
+    {
+      "id": "rescue",
+      "kind": "video",
+      "path": ".design/beneath-double-coat/mystery-finish/rescue-master.mp4"
+    }
+  ],
+  "characters": [
+    {
+      "id": "heidi",
+      "description": "Elderly silver-muzzled burgundy-collared Bernese",
+      "voice": "Low measured older woman",
+      "silent": false
+    },
+    {
+      "id": "bruno",
+      "description": "Navy-collared large Bernese",
+      "voice": "Warm male baritone",
+      "silent": false
+    },
+    {
+      "id": "sadie",
+      "description": "Green-collared slimmer female Bernese, narrow white blaze",
+      "voice": "Controlled medium-low woman",
+      "silent": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "breakfast",
+      "description": "The established family has finished breakfast."
+    },
+    {
+      "id": "hall",
+      "description": "The adjacent hall holds a brother memorial and leads to grooming room."
+    },
+    {
+      "id": "groom",
+      "description": "Heidi is beside a tuft in the grooming room; door open and vent running."
+    }
+  ],
+  "initialFacts": [
+    "breakfast"
+  ],
+  "scenes": [
+    {
+      "id": "hall",
+      "location": "hall in snowy Alpenrose estate",
+      "situation": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "hall"
+    },
+    {
+      "id": "groom",
+      "location": "groom in snowy Alpenrose estate",
+      "situation": "After the planned pawprint insert, establish the adjoining room before dialogue.",
+      "purpose": "Establish geography before speech.",
+      "orientationFact": "groom"
+    }
+  ],
+  "dialogue": [],
+  "takes": [
+    {
+      "id": "hall",
+      "sceneId": "hall",
+      "setupId": "hall-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "hall",
+      "referenceAssetIds": [
+        "hall-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno and collar"
+        },
+        {
+          "characterId": "bruno",
+          "position": "right",
+          "eyeline": "Left toward Heidi and collar"
+        }
+      ],
+      "startState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "hall as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone; no voices or music."
+    },
+    {
+      "id": "groom",
+      "sceneId": "groom",
+      "setupId": "groom-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "groom",
+      "referenceAssetIds": [
+        "groom-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Down right toward fur"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Gentle constant ventilation hum; no voices or music."
+    },
+    {
+      "id": "rescue",
+      "sceneId": "groom",
+      "setupId": "rescue-wide",
+      "method": "generate",
+      "duration": 3,
+      "assetId": "rescue",
+      "referenceAssetIds": [
+        "rescue-ref"
+      ],
+      "camera": {
+        "size": "wide",
+        "angle": "Eye level as reference",
+        "movement": "Locked"
+      },
+      "cast": [
+        {
+          "characterId": "heidi",
+          "position": "left",
+          "eyeline": "Right toward Bruno"
+        },
+        {
+          "characterId": "bruno",
+          "position": "center",
+          "eyeline": "Left toward Heidi"
+        },
+        {
+          "characterId": "sadie",
+          "position": "right",
+          "eyeline": "Left toward Heidi"
+        }
+      ],
+      "startState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "endState": {
+        "setting": "groom as pinned reference",
+        "cast": "Seated, planted paws, reference collars unchanged",
+        "time": "Winter morning"
+      },
+      "stateChanges": [],
+      "actions": [
+        {
+          "description": "Subtle blinking and breathing; seated bodies remain still.",
+          "risk": "low"
+        }
+      ],
+      "dialogue": [],
+      "sound": "Quiet room tone, ventilation off, no voices."
+    }
+  ],
+  "shots": [
+    {
+      "id": "hall",
+      "takeId": "hall",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "breakfast"
+      ],
+      "establishes": [
+        {
+          "factId": "hall",
+          "evidence": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno."
+        }
+      ],
+      "transition": {
+        "type": "opening",
+        "reason": "After breakfast, a wider adjacent hallway with the familiar room visible behind Bruno.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "groom",
+      "takeId": "groom",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "breakfast"
+      ],
+      "establishes": [
+        {
+          "factId": "groom",
+          "evidence": "After the planned pawprint insert, establish the adjoining room before dialogue."
+        }
+      ],
+      "transition": {
+        "type": "cut",
+        "reason": "After the planned pawprint insert, establish the adjoining room before dialogue.",
+        "bridge": "establishing",
+        "stateExceptions": []
+      }
+    },
+    {
+      "id": "rescue",
+      "takeId": "rescue",
+      "in": 0,
+      "out": 3,
+      "purpose": "establish",
+      "requires": [
+        "groom"
+      ],
+      "establishes": [],
+      "transition": {
+        "type": "cut",
+        "reason": "After the planned alarm and offscreen rescue, family has reached same open doorway. Separate master for new positions.",
+        "bridge": "time-passage",
+        "stateExceptions": []
+      }
+    }
+  ]
+}

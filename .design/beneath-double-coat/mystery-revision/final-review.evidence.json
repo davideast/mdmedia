@@ -1,0 +1,420 @@
+{
+  "version": 1,
+  "reviews": [
+    {
+      "version": 1,
+      "planHash": "d63d34050910751ce441491bb9b62468c2485df2b4706c8c89735f771040d998",
+      "stage": "edit",
+      "targetId": "mystery-revision",
+      "assetHash": "1697b9e6dfb2afeaf60f841097e3019ffd8a7e79d020b10e9490eb4ca6cb8647",
+      "reviewer": "gemini-3.1-pro-preview; timestamps normalized from MMSS with raw response retained",
+      "checks": [
+        {
+          "category": "speakers",
+          "verdict": "fail",
+          "evidence": "At 132s, the line 'We heard you. What's happened?' is assigned to Sadie in the plan but the transcript identifies the speaker as Bruno, indicating either the wrong voice was used or the wrong dog is seen speaking.",
+          "shotId": "shot-s1",
+          "at": 132,
+          "repair": "Ensure Sadie is the character on camera and uses her assigned female voice for this line."
+        },
+        {
+          "category": "speakers",
+          "verdict": "fail",
+          "evidence": "At 148s, the line 'You really think he's been here?' is intended for Sadie but logged as Bruno in the independent transcript, suggesting a voice or visual mismatch.",
+          "shotId": "shot-s2",
+          "at": 148,
+          "repair": "Use Sadie's correct female voice and ensure her mouth moves for this line."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "evidence": "The transition to the estate exterior and the lookalike dog establishes the outside location clearly before showing the identical-looking dog in the snow.",
+          "shotId": "shot-estate-exterior",
+          "at": 164
+        }
+      ],
+      "audience": {
+        "retelling": "Talking dogs discuss breakfast and infidelity before a grandmother dog discovers fresh fur that smells like her allegedly dead grandson.",
+        "understood": [
+          {
+            "claim": "Bruno is married to Sadie and they have a puppy.",
+            "at": 54
+          }
+        ],
+        "uncertainties": [
+          {
+            "question": "Is the dog in the barn at the end Sebastian?",
+            "at": 167
+          }
+        ],
+        "checks": [
+          {
+            "category": "audience-understanding",
+            "verdict": "pass",
+            "at": 24,
+            "evidence": "Relationships are established quickly through dialogue."
+          },
+          {
+            "category": "causality",
+            "verdict": "pass",
+            "at": 111,
+            "evidence": "The grandmother follows a scent to the grooming room."
+          },
+          {
+            "category": "reactions",
+            "verdict": "pass",
+            "at": 130,
+            "evidence": "Bruno and Sadie respond to the grandmother calling."
+          },
+          {
+            "category": "reveal-setup",
+            "verdict": "pass",
+            "at": 91,
+            "evidence": "Sebastian is established as dead before the scent is found."
+          },
+          {
+            "category": "story-density",
+            "verdict": "pass",
+            "at": 170,
+            "evidence": "Plots move at a moderate pace without excessive filler."
+          }
+        ]
+      },
+      "observations": "{\"transcript\":[{\"speaker\":\"Grandmother\",\"words\":\"Otto, you were meant to clear the path. Not bring it in. Breakfast is waiting.\",\"at\":0},{\"speaker\":\"Bruno\",\"words\":\"Morning, Grandmother.\",\"at\":9},{\"speaker\":\"Grandmother\",\"words\":\"Bruno. Your wife's waiting in the breakfast room.\",\"at\":12},{\"speaker\":\"Bruno\",\"words\":\"Is Sadie still angry?\",\"at\":16},{\"speaker\":\"Sadie\",\"words\":\"You came home after midnight.\",\"at\":26},{\"speaker\":\"Bruno\",\"words\":\"I went for a walk.\",\"at\":29},{\"speaker\":\"Sadie\",\"words\":\"Then why do you smell like parmesan? And rosemary?\",\"at\":31},{\"speaker\":\"Bruno\",\"words\":\"Sadie.\",\"at\":36},{\"speaker\":\"Sadie\",\"words\":\"Bella.\",\"at\":38},{\"speaker\":\"Sadie\",\"words\":\"Your ex.\",\"at\":40},{\"speaker\":\"Bruno\",\"words\":\"She offered me a snack.\",\"at\":41},{\"speaker\":\"Sadie\",\"words\":\"And you stayed until midnight?\",\"at\":44},{\"speaker\":\"Bruno\",\"words\":\"It was very good cheese.\",\"at\":46},{\"speaker\":\"Penny\",\"words\":\"Dad, are you in trouble?\",\"at\":56},{\"speaker\":\"Bruno\",\"words\":\"Your mother and I are discussing breakfast.\",\"at\":58},{\"speaker\":\"Sadie\",\"words\":\"Penny, your father is changing the subject.\",\"at\":62},{\"speaker\":\"Penny\",\"words\":\"Then can I have his cheese?\",\"at\":66},{\"speaker\":\"Sadie\",\"words\":\"Yes. He's had quite enough.\",\"at\":68},{\"speaker\":\"Bruno\",\"words\":\"Grandmother? Come back in. Penny's negotiating for your breakfast.\",\"at\":75},{\"speaker\":\"Grandmother\",\"words\":\"Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.\",\"at\":79},{\"speaker\":\"Bruno\",\"words\":\"My twin got the looks, I got the sausage.\",\"at\":85},{\"speaker\":\"Grandmother\",\"words\":\"You were supposed to share it.\",\"at\":89},{\"speaker\":\"Bruno\",\"words\":\"We did. Then the kennel burned down. They never found him. He's dead, Grandmother. You can't spend every morning waiting.\",\"at\":91},{\"speaker\":\"Grandmother\",\"words\":\"You're allowed to miss him, Bruno.\",\"at\":101},{\"speaker\":\"Bruno\",\"words\":\"I do. That's why I can't keep looking at that.\",\"at\":103},{\"speaker\":\"Grandmother\",\"words\":\"Wait. That smell. From the grooming room.\",\"at\":107},{\"speaker\":\"Grandmother\",\"words\":\"He used to hide in here. As if I couldn't smell him. Fresh fur. No, I'm imagining it. Bruno. Come and smell this.\",\"at\":113},{\"speaker\":\"Bruno\",\"words\":\"We heard you. What's happened?\",\"at\":132},{\"speaker\":\"Grandmother\",\"words\":\"This smells like Sebastian.\",\"at\":136},{\"speaker\":\"Bruno\",\"words\":\"We all shed, Grandmother. It's probably mine.\",\"at\":139},{\"speaker\":\"Grandmother\",\"words\":\"I thought that too. Then I smelled it again.\",\"at\":143},{\"speaker\":\"Bruno\",\"words\":\"You really think he's been here?\",\"at\":148},{\"speaker\":\"Grandmother\",\"words\":\"I don't know. I need you to look.\",\"at\":150},{\"speaker\":\"Bruno\",\"words\":\"I wish it were him. I do. But nobody survived that fire.\",\"at\":154},{\"speaker\":\"Grandmother\",\"words\":\"Then whose scent is this?\",\"at\":160},{\"speaker\":\"Title\",\"words\":\"BENEATH THE DOUBLE COAT: The Secret in the Snow\",\"at\":173}],\"shots\":[{\"description\":\"Grandmother and Bruno sitting in a wooden room.\",\"at\":0},{\"description\":\"Bruno in a hallway.\",\"at\":9},{\"description\":\"Sadie sitting by a table with cheese.\",\"at\":19},{\"description\":\"Bruno joins Sadie at the table.\",\"at\":24},{\"description\":\"Penny the puppy appears.\",\"at\":54},{\"description\":\"Grandmother and Bruno in a hallway with a picture frame.\",\"at\":73},{\"description\":\"Grandmother in the grooming room looking at fur.\",\"at\":111},{\"description\":\"Bruno and Sadie join Grandmother.\",\"at\":130},{\"description\":\"View of a snow-covered exterior and a house from a barn.\",\"at\":164},{\"description\":\"A dog sitting in the barn.\",\"at\":167},{\"description\":\"Title card.\",\"at\":173}],\"defects\":[],\"audience\":{\"retelling\":\"Talking dogs discuss breakfast and infidelity before a grandmother dog discovers fresh fur that smells like her allegedly dead grandson.\",\"understood\":[{\"claim\":\"Bruno is married to Sadie and they have a puppy.\",\"at\":54}],\"uncertainties\":[{\"question\":\"Is the dog in the barn at the end Sebastian?\",\"at\":167}],\"checks\":[{\"category\":\"audience-understanding\",\"verdict\":\"pass\",\"at\":24,\"evidence\":\"Relationships are established quickly through dialogue.\"},{\"category\":\"causality\",\"verdict\":\"pass\",\"at\":111,\"evidence\":\"The grandmother follows a scent to the grooming room.\"},{\"category\":\"reactions\",\"verdict\":\"pass\",\"at\":130,\"evidence\":\"Bruno and Sadie respond to the grandmother calling.\"},{\"category\":\"reveal-setup\",\"verdict\":\"pass\",\"at\":91,\"evidence\":\"Sebastian is established as dead before the scent is found.\"},{\"category\":\"story-density\",\"verdict\":\"pass\",\"at\":170,\"evidence\":\"Plots move at a moderate pace without excessive filler.\"}]}}"
+    },
+    {
+      "version": 1,
+      "planHash": "d63d34050910751ce441491bb9b62468c2485df2b4706c8c89735f771040d998",
+      "stage": "edit",
+      "targetId": "mystery-revision",
+      "assetHash": "1697b9e6dfb2afeaf60f841097e3019ffd8a7e79d020b10e9490eb4ca6cb8647",
+      "reviewer": "gemini-3.5-flash-lite full film technical and editorial quality check",
+      "checks": [
+        {
+          "category": "exposition",
+          "verdict": "pass",
+          "at": 0,
+          "evidence": "The opening scene clearly establishes the dogs, their relationships, and the premise of breakfast waiting and questioning past whereabouts."
+        },
+        {
+          "category": "transitions",
+          "verdict": "pass",
+          "at": 19.5,
+          "evidence": "Cuts between hallway, rooms, and multi-dog shots maintain spatial geography and clear motivation."
+        },
+        {
+          "category": "continuity",
+          "verdict": "pass",
+          "at": 1.13,
+          "evidence": "Dog appearances, collars, and room settings remain consistent across cuts throughout the video."
+        },
+        {
+          "category": "speakers",
+          "verdict": "pass",
+          "at": 1,
+          "evidence": "Dialogue matches the visible talking dog on screen with consistent voices and gender matching throughout."
+        },
+        {
+          "category": "pacing",
+          "verdict": "pass",
+          "at": 2,
+          "evidence": "Dialogue delivery is natural with appropriate pauses and clear timing between conversational turns."
+        },
+        {
+          "category": "motion",
+          "verdict": "pass",
+          "at": 10,
+          "evidence": "Dog movements and facial articulations are consistent with the established photoreal talking animal style without anatomical distortions."
+        },
+        {
+          "category": "sound",
+          "verdict": "pass",
+          "at": 1,
+          "evidence": "Audio is clear, dialogue is audible, and voice consistency is maintained with no abrupt audio clipping."
+        },
+        {
+          "category": "audience-understanding",
+          "verdict": "pass",
+          "at": 24,
+          "evidence": "Relationships are established quickly through dialogue."
+        },
+        {
+          "category": "causality",
+          "verdict": "pass",
+          "at": 111,
+          "evidence": "The grandmother follows a scent to the grooming room."
+        },
+        {
+          "category": "reactions",
+          "verdict": "pass",
+          "at": 130,
+          "evidence": "Bruno and Sadie respond to the grandmother calling."
+        },
+        {
+          "category": "reveal-setup",
+          "verdict": "pass",
+          "at": 91,
+          "evidence": "Sebastian is established as dead before the scent is found."
+        },
+        {
+          "category": "story-density",
+          "verdict": "pass",
+          "at": 170,
+          "evidence": "Plots move at a moderate pace without excessive filler."
+        }
+      ]
+    }
+  ],
+  "speech": [
+    {
+      "takeId": "hall-bruno-invitation",
+      "assetHash": "7273c446c97440142049223c0f355c3c5905a8bd820d04ca0d172e8ec0992de6",
+      "lineId": "b1",
+      "start": 1.49,
+      "end": 5.67,
+      "text": "Grandmother? Come back in. Penny's negotiating for your breakfast.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-bruno-twin",
+      "assetHash": "6f84744330f84f662b54e66f5af5849f33c83f8ce25ac67f7e1eb755f975aded",
+      "lineId": "b2",
+      "start": 1.34,
+      "end": 4.29,
+      "text": "My twin got the looks. I got the sausage.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-a",
+      "assetHash": "ca3533d9dfbf1bef6adda64f157315689ae1db4bbbc60031968372db0f5b1587",
+      "lineId": "h1",
+      "start": 0.88,
+      "end": 6.16,
+      "text": "Your brother Sebastian did that too. He'd steal breakfast without leaving his bed.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-a",
+      "assetHash": "ca3533d9dfbf1bef6adda64f157315689ae1db4bbbc60031968372db0f5b1587",
+      "lineId": "h2",
+      "start": 7.23,
+      "end": 8.59,
+      "text": "You were supposed to share it.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b3",
+      "start": 0.59,
+      "end": 1.08,
+      "text": "We did.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b4",
+      "start": 2.11,
+      "end": 3.28,
+      "text": "Then the kennel burned down.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-bruno-b",
+      "assetHash": "53a8c20f930948a869a3d6ea1b935f664d1626a3e408cdf68cdb1f3304860eb7",
+      "lineId": "b5",
+      "start": 5.09,
+      "end": 8.87,
+      "text": "He's dead, Grandmother. You can't spend every morning waiting.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h3",
+      "start": 0.74,
+      "end": 1.73,
+      "text": "They never found him.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h4",
+      "start": 3.67,
+      "end": 5.24,
+      "text": "You're allowed to miss him, Bruno.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-b",
+      "assetHash": "1db8579d42fc6c42c9c8d89b29ddd441795a3ed97f0fef15a7db8ef88d44b9f7",
+      "lineId": "h5",
+      "start": 7.18,
+      "end": 8.97,
+      "text": "Wait. That smell...",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-bruno-c",
+      "assetHash": "262c606f212a5dccd8e9f9d39900d83a725f0a471c11adc49bfcb8cfc5d9d410",
+      "lineId": "b6",
+      "start": 0.75,
+      "end": 3.93,
+      "text": "I do. That's why I can't keep looking at that.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "hall-heidi-c",
+      "assetHash": "b91666b13e7b69ddb4e2153d304e2e2a4f87aca497e87032dcc765c1db41b3c9",
+      "lineId": "h6",
+      "start": 0.71,
+      "end": 1.82,
+      "text": "From the grooming room.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi-a",
+      "assetHash": "28a83eb4cbc95eb44e8d687056b0138143fdebcb82758083164d9f86570e15ea",
+      "lineId": "h7",
+      "start": 0.7,
+      "end": 5.08,
+      "text": "He used to hide in here. As if I couldn't smell him.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi-a",
+      "assetHash": "28a83eb4cbc95eb44e8d687056b0138143fdebcb82758083164d9f86570e15ea",
+      "lineId": "h8",
+      "start": 7.26,
+      "end": 8.21,
+      "text": "Fresh fur.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi-b",
+      "assetHash": "01abd9f1a4823d69f8e0a13801883d9adc82fd65bf6aa930b62ed50bbda4d3f1",
+      "lineId": "h9",
+      "start": 0.7,
+      "end": 3.3,
+      "text": "No... I'm imagining it.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "groom-heidi-b",
+      "assetHash": "01abd9f1a4823d69f8e0a13801883d9adc82fd65bf6aa930b62ed50bbda4d3f1",
+      "lineId": "h10",
+      "start": 4.49,
+      "end": 6.7,
+      "text": "Bruno. Come and smell this.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-sadie",
+      "assetHash": "4c8fe345cb029884cfa5c2db31851b24ab4954829f9ba093d4429aee7afd4d5a",
+      "lineId": "s1",
+      "start": 1,
+      "end": 4.89,
+      "text": "We heard you. Um, what's happened?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-sadie",
+      "assetHash": "4c8fe345cb029884cfa5c2db31851b24ab4954829f9ba093d4429aee7afd4d5a",
+      "lineId": "s2",
+      "start": 5.92,
+      "end": 7.34,
+      "text": "You really think he's been here?",
+      "speaker": "sadie",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-heidi-a",
+      "assetHash": "d390a1cdb51ce23bcfa02e884ad0a650b906faed36d6547c6c481ed56e852702",
+      "lineId": "h11",
+      "start": 1.08,
+      "end": 2.77,
+      "text": "This smells like Sebastian.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-heidi-a",
+      "assetHash": "d390a1cdb51ce23bcfa02e884ad0a650b906faed36d6547c6c481ed56e852702",
+      "lineId": "h12",
+      "start": 4.2,
+      "end": 8.27,
+      "text": "I thought that too. Then I smelled it again.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-bruno-a",
+      "assetHash": "356a3ce28606844d7b53337b936b814bf2ad127c9283b109494f1e5271ab4d22",
+      "lineId": "b7",
+      "start": 0.63,
+      "end": 4.18,
+      "text": "We all shed, Grandmother. It's probably mine.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-bruno-a",
+      "assetHash": "356a3ce28606844d7b53337b936b814bf2ad127c9283b109494f1e5271ab4d22",
+      "lineId": "b8",
+      "start": 5.77,
+      "end": 8.83,
+      "text": "I wish it were him. I do.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-heidi-b",
+      "assetHash": "868db14d740f7564c763051669eb8239b23e161c9a922f7970fafa0d7da054fa",
+      "lineId": "h13",
+      "start": 0.99,
+      "end": 4.23,
+      "text": "I don't know. I... I need you to look.",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-heidi-b",
+      "assetHash": "868db14d740f7564c763051669eb8239b23e161c9a922f7970fafa0d7da054fa",
+      "lineId": "h14",
+      "start": 5.63,
+      "end": 7.09,
+      "text": "Then whose scent is this?",
+      "speaker": "heidi",
+      "confidence": "confirmed"
+    },
+    {
+      "takeId": "family-bruno-b",
+      "assetHash": "7c7830876115d710434d394946f3f6659538f3d49c3083e2246b591efc086393",
+      "lineId": "b9",
+      "start": 0.68,
+      "end": 2.6,
+      "text": "But nobody survived that fire.",
+      "speaker": "bruno",
+      "confidence": "confirmed"
+    }
+  ]
+}

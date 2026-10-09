@@ -1,0 +1,111 @@
+{
+  "transcript": [
+    {
+      "start": "00:00",
+      "end": "00:02",
+      "phrase": "This came out of my terminal."
+    },
+    {
+      "start": "00:03",
+      "end": "00:06",
+      "phrase": "Apparently, it has a bigger budget than I do."
+    },
+    {
+      "start": "00:07",
+      "end": "00:07",
+      "phrase": "Start"
+    },
+    {
+      "start": "00:08",
+      "end": "00:08",
+      "phrase": "with"
+    },
+    {
+      "start": "00:08",
+      "end": "00:08",
+      "phrase": "one"
+    },
+    {
+      "start": "00:08",
+      "end": "00:09",
+      "phrase": "image."
+    },
+    {
+      "start": "00:10",
+      "end": "00:11",
+      "phrase": "Make it move."
+    },
+    {
+      "start": "00:14",
+      "end": "00:16",
+      "phrase": "Then give it a wildly unnecessary soundtrack."
+    },
+    {
+      "start": "00:20",
+      "end": "00:21",
+      "phrase": "Wrong engine. That's better."
+    },
+    {
+      "start": "00:26",
+      "end": "00:28",
+      "phrase": "Three commands. Here's how they fit together."
+    }
+  ],
+  "cut_off_words": [],
+  "visual_sequence_description": [
+    {
+      "timestamp": "00:00 - 00:02",
+      "description": "Cinematic spaceship flying over a dusty desert landscape with text overlay 'MADE IN A TERMINAL'."
+    },
+    {
+      "timestamp": "00:02 - 00:06",
+      "description": "Presenter speaking in front of a bookshelf with a microphone and laptop."
+    },
+    {
+      "timestamp": "00:06 - 00:09",
+      "description": "CLI terminal output showing image generation command and result."
+    },
+    {
+      "timestamp": "00:09 - 00:11",
+      "description": "CLI terminal output showing video generation command."
+    },
+    {
+      "timestamp": "00:11 - 00:14",
+      "description": "Spaceship taking off from a concrete launch pad in the desert."
+    },
+    {
+      "timestamp": "00:14 - 00:16",
+      "description": "CLI terminal output showing music generation command and success message."
+    },
+    {
+      "timestamp": "00:16 - 00:19",
+      "description": "Spaceship flying upwards with cinematic music playing and text 'A VERY REASONABLE BUDGET'."
+    },
+    {
+      "timestamp": "00:19 - 00:21",
+      "description": "Presenter speaking again."
+    },
+    {
+      "timestamp": "00:21 - 00:25",
+      "description": "Spaceship in flight switching back to previous scene or engine state."
+    },
+    {
+      "timestamp": "00:25 - 00:27",
+      "description": "CLI terminal output showing three commands summary."
+    },
+    {
+      "timestamp": "00:27 - 00:30",
+      "description": "Presenter speaking with bottom banner 'IMAGE -> VIDEO -> MUSIC'."
+    }
+  ],
+  "lip_sync_match": true,
+  "terminal_text_readable": true,
+  "music_masks_dialogue": false,
+  "wrong_engine_joke_timing": "Audible and correctly timed to the cut between spaceship scenes.",
+  "black_frames_or_frozen_images": false,
+  "editing_weaknesses": [
+    "Abrupt audio jump-cuts between the presenter's voice and the loud orchestral soundtrack create jarring acoustic contrast.",
+    "The terminal code screens are displayed for very brief durations, forcing viewers to pause or strain to read multi-line JSON or CLI arguments.",
+    "The transition between the second spaceship clip and the presenter at 00:20 cuts off the musical peak rather than letting it resolve naturally."
+  ]
+}

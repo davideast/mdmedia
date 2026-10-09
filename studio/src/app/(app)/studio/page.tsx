@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { AudioLines, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ function HistoryRow({ narration }: { narration: Narration }) {
 
 export default function StudioPage() {
   const router = useRouter();
+  const search=useSearchParams();
   const { user, profile } = useAuth();
   const { draft, setDraft, generationQueue } = useNarration();
   const { state: workspace, store, draftId, replaceCurrent, storageUnavailable } = useWorkspace();
@@ -74,7 +75,7 @@ export default function StudioPage() {
         verbalizeDiagrams: draft.verbalizeDiagrams,
       });
       store.clearDraft(draftId);
-      replaceCurrent(`/narration/${queued.narrationId}`, markdownToSynthesize.split("\n")[0].replace(/^#+\s*/, "").slice(0, 80));
+      replaceCurrent(`/narration/${queued.narrationId}${search.get('video')?`?video=${encodeURIComponent(search.get('video')!)}&at=${encodeURIComponent(search.get('at')||'0')}`:''}`, markdownToSynthesize.split("\n")[0].replace(/^#+\s*/, "").slice(0, 80));
       toast.success("Narration queued for processing", {
         action: {
           label: "View Queue",
@@ -93,6 +94,7 @@ export default function StudioPage() {
       workspacePage
       title={draft.markdown.trim().split("\n")[0].replace(/^#+\s*/, "").slice(0, 80) || "New narration"}
       icon={<AudioLines size={13} strokeWidth={2} />}
+      actions={search.get('video')?<Link className="text-xs underline" href={`/studio/scene?draft=${encodeURIComponent(search.get('video')!)}`}>Return to video</Link>:null}
       bodyClassName="gap-0 p-0"
     >
       <div className="grid min-h-0 min-w-0 flex-1 grid-rows-[1fr_auto] gap-5 p-4 sm:p-6">

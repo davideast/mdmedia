@@ -1,0 +1,17 @@
+{
+  "job": {
+    "id": "breakfast-arrival",
+    "kind": "video",
+    "seconds": 8,
+    "output": ".design/beneath-double-coat/breakfast-exchange/breakfast-arrival.mp4",
+    "firstFrame": ".design/beneath-double-coat/breakfast-exchange/sadie-waiting-frame.jpg",
+    "images": [
+      ".design/beneath-double-coat/breakfast-exchange/breakfast-master.jpg"
+    ],
+    "prompt": "An EIGHT-SECOND continuous visual introduction to breakfast BEFORE anyone speaks. Image 1 is the exact STARTING composition: SADIE alone LEFT at the low table; the place on the RIGHT is EMPTY. Image 2 is the continuity reference for BRUNO's identity and the room's FINAL two-dog arrangement. Same room, exact same camera and furniture throughout. SADIE is the slimmer adult female Bernese with emerald GREEN collar, narrow white blaze. BRUNO is the larger adult male Bernese with NAVY collar, broad white chest and the exact face from Image 2. Only these two dogs inhabit this shot.\nSTORY AND TIMING: 0–2.5 seconds: hold Sadie ALONE in the established wide frame. Quiet breakfast has been waiting. The cheese on the plate remains untouched. She briefly lowers her eyes toward the food and empty opposite place, then looks toward the RIGHT edge as approaching canine pawsteps become audible. Let the viewer register her patient irritation and the empty place. 2.5–6 seconds: Bruno enters naturally from just OUTSIDE the RIGHT edge, along the CLEAR FLOOR TO THE RIGHT OF THE TABLE. He takes only two or three ordinary, unhurried quadrupedal steps, no prop contact, and settles into his seated position opposite Sadie as shown in Image 2. His entrance is continuous, never a pop-in, dissolve or teleport. Sadie stays seated and follows him with a small head movement. 6–8 seconds: both now sit as in Image 2, Sadie LEFT facing RIGHT, Bruno RIGHT facing LEFT. They meet eyes in a short awkward silence. Bruno looks mildly guilty; Sadie looks unimpressed. Hold this shared geography before dialogue will begin in the next edited shot.\nPHYSICAL CONSTRAINTS: real natural four-legged Bernese Mountain Dogs with thick long tricolor coats. No human posture, hands, human faces, clothing, leash, people or other animals. Bruno travels only through the free right-side floor area; he must never intersect the table, its legs, plate or sideboard. Table, cheese, plate, closed snowy window, timber panels and sideboard remain perfectly fixed. Exactly one Sadie throughout and one Bruno entering once. Preserve faces, markings, collars, proportions and lighting from the supplied images. Fixed camera, no cuts, zooms, pans, transitions or shot changes. No text or captions.\nAUDIO: quiet continuous indoor ambience, soft natural approaching pawsteps from the right and a faint collar jingle during the entrance. NO spoken words, narrator, dialogue, barking or music. Both mouths stay naturally at rest. This must be a readable human-free scene of a wife waiting for her late husband at breakfast, with time to observe the place and situation."
+  },
+  "fingerprint": "fc1a25c6b71e6c326169937c739d92cfaf3184ef22f1cce895fde2fe26661a58",
+  "interactionId": "v1_ChdkR0RGYXV6MkFvTEdqTWNQd2R1WTRRbxIXZEdERmF1ejJBb0xHak1jUHdkdVk0UW8",
+  "durationSeconds": 8,
+  "review": "pending"
+}

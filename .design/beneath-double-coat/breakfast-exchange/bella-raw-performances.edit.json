@@ -1,0 +1,22 @@
+{
+  "durationSeconds": 20,
+  "transition": "hard cuts",
+  "timeline": [
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/sadie-rosemary-performance.mp4",
+      "start": 0,
+      "end": 10,
+      "label": "Sadie raw performance",
+      "sequenceStart": 0,
+      "sequenceEnd": 10
+    },
+    {
+      "file": ".design/beneath-double-coat/breakfast-exchange/bruno-bella-performance.mp4",
+      "start": 0,
+      "end": 10,
+      "label": "Bruno raw performance",
+      "sequenceStart": 10,
+      "sequenceEnd": 20
+    }
+  ]
+}

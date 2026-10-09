@@ -1,0 +1,38 @@
+{
+  "actualTranscript": [
+    {
+      "startSeconds": 1.0,
+      "endSeconds": 3.0,
+      "words": "Otto. You were meant to clear the",
+      "voiceDescription": "female voice",
+      "visibleSpeakingDog": "Heidi",
+      "confidence": 0.95
+    },
+    {
+      "startSeconds": 3.0,
+      "endSeconds": 4.0,
+      "words": "path.",
+      "voiceDescription": "female voice",
+      "visibleSpeakingDog": "Heidi",
+      "confidence": 0.95
+    }
+  ],
+  "castTimeline": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 6.833,
+      "visibleFigures": [
+        "Heidi",
+        "Otto"
+      ]
+    }
+  ],
+  "humansOrExtraAnimals": [],
+  "speakerErrors": [],
+  "physicalDefects": [],
+  "continuityDefects": [],
+  "pacing": "Normal delivery, pauses at punctuation, clip ends before the second sentence.",
+  "uncertainties": [],
+  "pass": true,
+  "reasons": []
+}

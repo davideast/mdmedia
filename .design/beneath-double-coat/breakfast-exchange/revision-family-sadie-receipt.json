@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "revision-family-sadie",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-revision/family-sadie.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-revision/RS-source-frame.jpg",
+    "seconds": 8,
+    "prompt": "Photorealistic prestige daytime soap starring real quadrupedal Bernese Mountain Dogs. EXACTLY ONE visible dog, the exact face, age, markings and collar in the starting frame. Same camera angle, set, scale, light and eyeline throughout. Locked close-up, no cuts, no camera movement. Dog remains seated on the floor, body still; only small natural canine jaw articulation synchronized to its OWN audible voice, blinks and subtle eye movement. Mouth CLOSED while listening. Natural canine muzzle and teeth. NO human, human anatomy, hands, human lips, human body, costumes, additional dog, unseen speaker, narrator, captions, subtitles, barking, music, laughter or extra words. Quiet steady indoor room tone. Brisk intelligible natural conversation, not singing or monologue. Do not fill the silent editing gaps with speech or exaggerated motion. GREEN-collared adult female Sadie, same narrower white blaze. Controlled medium-low adult WOMAN voice, crisp natural English and gentle concern. Eyes LEFT toward grandmother and husband. Listens before asking a careful question.\nAt 0.5s say EXACTLY: \"We heard you. What's happened?\" Finish the complete last word by 3s, then close muzzle and silently listen.\nAt 4.2s say EXACTLY: \"You really think he's been here?\" Finish the complete last word by 7.4s, then close muzzle and silently listen. Total 8s. Final silent listening handle after the final phrase."
+  },
+  "fingerprint": "44468681c2ccbf7b9b5fea6b707b4e806dc5095c4bec0249d7f52c2f64ae3f61",
+  "interactionId": "v1_ChdxODNGYXRiTE50clBfdU1QMHRxQ3dBWRIXcTgzRmF0YkxOdHJQX3VNUDB0cUN3QVk",
+  "durationSeconds": 8,
+  "review": "pending"
+}

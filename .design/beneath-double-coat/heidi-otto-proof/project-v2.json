@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "id": "beneath-double-coat-heidi-otto-proof-v2",
+  "title": "Heidi and Otto — Speaking proof",
+  "productionNotes": "Animate the supplied populated frame as a speaking-animal movie shot. Exactly TWO photorealistic Bernese Mountain Dogs: HEIDI elderly silver muzzle burgundy collar LEFT foreground; OTTO stocky ochre collar RIGHT background. The spoken voice originates visibly from HEIDI: synchronize her canine jaw and muzzle to EVERY spoken word. This is ON-CAMERA CHARACTER DIALOGUE, NOT narration or voiceover. Clearly visible speech articulation while preserving canine anatomy: no human lips or teeth. Only Otto keeps his mouth closed. No humans, extra animals, figures in background, props, camera moves or cuts. Same low older female voice throughout.",
+  "reviewNotes": [],
+  "parts": [
+    {
+      "id": "proof",
+      "continuity": "continuous",
+      "script": {
+        "title": "Heidi and Otto — 10-second speaking proof",
+        "sourceTranscript": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+        "sourceDescription": "A simple two-dog exposition exchange establishing Heidi’s authority and Otto’s groundskeeping work, ending with an invitation to breakfast.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "The muddy groundskeeper",
+            "seconds": 10,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+            "visual": "0–0.3s: Heidi turns eyes toward Otto. 0.3–3.6s: Heidi says the first sentence with clearly synchronized jaw and muzzle articulation. Her mouth opens and closes with each word; Otto listens with closed mouth. 3.6–4.3s: brief beat; Otto glances downward with eyes only; Heidi takes a breath. 4.3–7.7s: Heidi says second sentence, same voice and synchronized mouth. Her tone softens at Breakfast. 7.7–10s: both mouths close; brief shared look. Otto lifts eyes back to Heidi; no moving bodies or standing. Do not add a long pause between sentences.",
+            "audio": "Heidi alone speaks both sentences, on-camera synchronized performance. No voiceover or narrator. No music, only quiet continuous room ambience.",
+            "pauseSeconds": 1
+          }
+        ]
+      }
+    }
+  ]
+}

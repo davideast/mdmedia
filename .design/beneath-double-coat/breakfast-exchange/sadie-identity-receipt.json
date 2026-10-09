@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "sadie-identity",
+    "kind": "image",
+    "output": ".design/beneath-double-coat/breakfast-exchange/sadie-identity.jpg",
+    "images": [
+      ".design/beneath-double-coat/breakfast-opening/cast.jpg"
+    ],
+    "prompt": "Create a single photorealistic character reference portrait of SADIE ONLY, the adult female Bernese Mountain Dog FOURTH FROM THE LEFT (second from right) in the supplied cast sheet, wearing an EMERALD GREEN leather collar. Preserve that precise slim adult build, face, narrow white blaze, rust eyebrows, long tricolor coat and floppy ears. A relaxed three-quarter portrait, head and chest clearly visible, neutral gray background. Same character, not a new dog. No other dogs, puppy, human, label, text, collage or objects. One natural real Bernese Mountain Dog. Landscape 16:9."
+  },
+  "fingerprint": "889e5226822f6561c3128c21dfa562efe0119c52c2e76d1178dacc8166e96d72",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

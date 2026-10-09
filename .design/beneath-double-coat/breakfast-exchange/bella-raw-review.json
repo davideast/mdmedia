@@ -1,0 +1,78 @@
+[
+  {
+    "actualTranscript": [
+      {
+        "startSeconds": 0.0,
+        "endSeconds": 1.0,
+        "words": "And rosemary.",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 2.7,
+        "endSeconds": 4.0,
+        "words": "Bella. Your ex.",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 5.9,
+        "endSeconds": 7.6,
+        "words": "And you stayed until midnight?",
+        "voice": "female",
+        "visibleSpeaker": "Sadie",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 10.2,
+        "endSeconds": 11.0,
+        "words": "Sadie...",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 12.5,
+        "endSeconds": 14.1,
+        "words": "She offered me a snack.",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      },
+      {
+        "startSeconds": 15.7,
+        "endSeconds": 17.6,
+        "words": "It was very good cheese.",
+        "voice": "male",
+        "visibleSpeaker": "Bruno",
+        "confidence": "high"
+      }
+    ],
+    "castByShot": [
+      {
+        "startSeconds": 0.0,
+        "endSeconds": 10.0,
+        "characters": [
+          "Sadie"
+        ]
+      },
+      {
+        "startSeconds": 10.0,
+        "endSeconds": 20.0,
+        "characters": [
+          "Bruno"
+        ]
+      }
+    ],
+    "continuityFindings": [],
+    "speakerErrors": [],
+    "unwantedFigures": [],
+    "physicalDefects": [],
+    "pacingAndAudio": [],
+    "materialFailures": [],
+    "uncertainties": [],
+    "acceptable": true
+  }
+]

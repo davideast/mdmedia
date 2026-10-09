@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-exterior",
+    "kind": "video",
+    "output": ".design/beneath-double-coat/mystery-finish/exterior.mp4",
+    "firstFrame": ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg",
+    "seconds": 3,
+    "prompt": "Photorealistic locked establishing shot of this exact snowy garden between open toolshed and lit Alpine estate. Preserve every architectural detail, snow, timber door, windows and lighting. Same winter morning. EMPTY: no dogs, people, animals, silhouettes or figures anywhere, including windows. Gentle natural air ambience only, no speech or music. No camera movement or cuts. Three seconds of almost still winter atmosphere."
+  },
+  "fingerprint": "ebbbf6618c59002f7f9ec44d29e3584629a277874fcf35d93b6bf74bf9521e14",
+  "interactionId": "v1_ChdNTExGYXNfbUhieXVqTWNQeUplRDBRSRIXTUxMRmFzX21IYnl1ak1jUHlKZUQwUUk",
+  "durationSeconds": 3.008,
+  "review": "pending"
+}

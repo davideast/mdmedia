@@ -1,0 +1,25 @@
+[
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/bruno-fire-first.mp4",
+    "transcript": "but nobody survived",
+    "voice": "Male, deep, clear",
+    "otherSounds": [],
+    "uncertainWords": []
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/bruno-fire-tail.mp4",
+    "transcript": "that fir that fire",
+    "voice": "unknown",
+    "otherSounds": [],
+    "uncertainWords": [
+      "fir"
+    ]
+  },
+  {
+    "file": ".design/beneath-double-coat/mystery-revision/sadie-first.mp4",
+    "transcript": "We heard you. Um. What's happened?",
+    "voice": "female",
+    "otherSounds": [],
+    "uncertainWords": []
+  }
+]

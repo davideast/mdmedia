@@ -1,0 +1,14 @@
+{
+  "job": {
+    "id": "mystery-exterior-clean",
+    "kind": "image",
+    "images": [
+      ".design/beneath-double-coat/mystery-finish/exterior-master.jpg"
+    ],
+    "output": ".design/beneath-double-coat/mystery-finish/exterior-clean.jpg",
+    "prompt": "Preserve this exact photographic composition, architecture, doorjamb, snow, light and perspective. Remove BOTH dogs visible inside the house windows. Those lit rooms are empty, no silhouette or animal, no people, no creature anywhere. Remove the small wheelbarrow outside. Otherwise change nothing. Empty cinematic view from open shed toward snowy estate, 16:9."
+  },
+  "fingerprint": "c691eb93ec905daa6e5d84cddffad1e77da2af158d85c930eb4b09671290dfbc",
+  "mimeType": "image/jpeg",
+  "review": "pending"
+}

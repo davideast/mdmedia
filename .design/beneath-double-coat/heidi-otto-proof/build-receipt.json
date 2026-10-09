@@ -1,0 +1,163 @@
+{
+  "draftId": "beneath-double-coat-heidi-otto-proof__proof",
+  "record": {
+    "videoBrief": {
+      "prompt": "Imported screenplay: Heidi and Otto — Breakfast proof\n\nExactly TWO actual long-haired tricolor Bernese Mountain DOGS in the supplied first frame. HEIDI: elderly dog, silver muzzle, burgundy collar, screen LEFT on cushion. OTTO: stocky dog, ochre collar, screen RIGHT on floor. Preserve this exact populated composition. No humans, extra animals, reflected figures, tools or moving furniture. Static dog-eye-level camera, closed snowy window. Minimal ordinary canine head/eye movements only; paws stay grounded. Heidi alone has a low, measured older female voice. Otto is SILENT with mouth closed. Names inside dialogue are addresses, not speaker changes. Only quoted dialogue is spoken. No music, narrator or added lines; quiet steady room ambience. No cuts, fades or dissolves.",
+      "targetSeconds": 12,
+      "sourceIn": 0,
+      "sourceOut": 0,
+      "sourceUsage": "reference",
+      "submittedSourceUsage": "reference",
+      "submittedSource": "",
+      "submittedRange": "0:0",
+      "continuity": "continuous",
+      "script": {
+        "title": "Heidi and Otto — 12 seconds",
+        "sourceTranscript": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+        "sourceDescription": "A simple two-dog exposition exchange establishing Heidi’s authority and Otto’s groundskeeping work, ending with an invitation to breakfast.",
+        "shots": [
+          {
+            "id": "s01",
+            "title": "The reprimand",
+            "seconds": 7,
+            "source": "generated",
+            "connection": "cut",
+            "dialogue": "HEIDI: Otto. You were meant to clear the path.",
+            "visual": "0–0.7s: Heidi looks from Otto’s muddy paws to his face. 0.7–4.2s: Heidi alone speaks the quoted line, naturally and dryly. Otto remains silent and does not mouth any words. 4.2–7s: Otto looks down at his muddy paws, then sheepishly back at Heidi. Heidi waits. No dog changes position; end on the shared look.",
+            "audio": "Only Heidi speaks. No other voice; steady quiet room tone.",
+            "pauseSeconds": 2
+          },
+          {
+            "id": "s02",
+            "title": "The welcome",
+            "seconds": 5,
+            "source": "generated",
+            "connection": "continue",
+            "dialogue": "HEIDI: Not bring it in. Breakfast is waiting.",
+            "visual": "Continue exact previous composition and motion without replay. Local 0–0.4s: Heidi softens slightly. 0.4–3.8s: Heidi alone speaks the new line, same low older female voice. Otto listens with mouth closed. 3.8–5s: Otto lifts gaze reassured; brief shared look. Neither dog stands or moves location. End before any new action.",
+            "audio": "Only Heidi speaks; no repeat of the previous line. Same quiet room tone.",
+            "pauseSeconds": 1
+          }
+        ]
+      },
+      "submittedPrompt": "Imported screenplay: Heidi and Otto — Breakfast proof\n\nExactly TWO actual long-haired tricolor Bernese Mountain DOGS in the supplied first frame. HEIDI: elderly dog, silver muzzle, burgundy collar, screen LEFT on cushion. OTTO: stocky dog, ochre collar, screen RIGHT on floor. Preserve this exact populated composition. No humans, extra animals, reflected figures, tools or moving furniture. Static dog-eye-level camera, closed snowy window. Minimal ordinary canine head/eye movements only; paws stay grounded. Heidi alone has a low, measured older female voice. Otto is SILENT with mouth closed. Names inside dialogue are addresses, not speaker changes. Only quoted dialogue is spoken. No music, narrator or added lines; quiet steady room ambience. No cuts, fades or dissolves.",
+      "submittedTarget": 12
+    },
+    "draft": {
+      "mode": "references",
+      "frame": "16:9",
+      "note": "Exactly TWO actual long-haired tricolor Bernese Mountain DOGS in the supplied first frame. HEIDI: elderly dog, silver muzzle, burgundy collar, screen LEFT on cushion. OTTO: stocky dog, ochre collar, screen RIGHT on floor. Preserve this exact populated composition. No humans, extra animals, reflected figures, tools or moving furniture. Static dog-eye-level camera, closed snowy window. Minimal ordinary canine head/eye movements only; paws stay grounded. Heidi alone has a low, measured older female voice. Otto is SILENT with mouth closed. Names inside dialogue are addresses, not speaker changes. Only quoted dialogue is spoken. No music, narrator or added lines; quiet steady room ambience. No cuts, fades or dissolves.\n\nOne continuous shot, with no cuts. Preserve the subject, wardrobe, setting and lighting established here: 0–0.7s: Heidi looks from Otto’s muddy paws to his face. 0.7–4.2s: Heidi alone speaks the quoted line, naturally and dryly. Otto remains silent and does not mouth any words. 4.2–7s: Otto looks down at his muddy paws, then sheepishly back at Heidi. Heidi waits. No dog changes position; end on the shared look.",
+      "beats": [
+        {
+          "id": "script_s01",
+          "start": 0,
+          "end": 7,
+          "text": "0–0.7s: Heidi looks from Otto’s muddy paws to his face. 0.7–4.2s: Heidi alone speaks the quoted line, naturally and dryly. Otto remains silent and does not mouth any words. 4.2–7s: Otto looks down at his muddy paws, then sheepishly back at Heidi. Heidi waits. No dog changes position; end on the shared look.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nHEIDI: Otto. You were meant to clear the path.\n\nSound direction: Only Heidi speaks. No other voice; steady quiet room tone.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue."
+        },
+        {
+          "id": "script_s02",
+          "start": 7,
+          "end": 12,
+          "text": "Continue exact previous composition and motion without replay. Local 0–0.4s: Heidi softens slightly. 0.4–3.8s: Heidi alone speaks the new line, same low older female voice. Otto listens with mouth closed. 3.8–5s: Otto lifts gaze reassured; brief shared look. Neither dog stands or moves location. End before any new action.\n\nSpoken dialogue, performed by the named characters exactly as written. Speaker labels and performance directions are not spoken. Preserve each speaker's voice, and do not add a narrator or repeat earlier lines:\nHEIDI: Not bring it in. Breakfast is waiting.\n\nSound direction: Only Heidi speaks; no repeat of the previous line. Same quiet room tone.\nInclude this sound in the generated video's audio. Keep music and effects below dialogue."
+        }
+      ]
+    },
+    "title": "Heidi and Otto — 12 seconds",
+    "beatClips": {
+      "script_s01": {
+        "placement": {
+          "id": "s01",
+          "title": "The reprimand",
+          "seconds": 7,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI: Otto. You were meant to clear the path.",
+          "visual": "0–0.7s: Heidi looks from Otto’s muddy paws to his face. 0.7–4.2s: Heidi alone speaks the quoted line, naturally and dryly. Otto remains silent and does not mouth any words. 4.2–7s: Otto looks down at his muddy paws, then sheepishly back at Heidi. Heidi waits. No dog changes position; end on the shared look.",
+          "audio": "Only Heidi speaks. No other voice; steady quiet room tone.",
+          "pauseSeconds": 2
+        },
+        "generationMode": "new",
+        "transition": "cut",
+        "videoId": "v_0f8500ad08574fb1b75a5b596b3182a0"
+      },
+      "script_s02": {
+        "placement": {
+          "id": "s02",
+          "title": "The welcome",
+          "seconds": 5,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "HEIDI: Not bring it in. Breakfast is waiting.",
+          "visual": "Continue exact previous composition and motion without replay. Local 0–0.4s: Heidi softens slightly. 0.4–3.8s: Heidi alone speaks the new line, same low older female voice. Otto listens with mouth closed. 3.8–5s: Otto lifts gaze reassured; brief shared look. Neither dog stands or moves location. End before any new action.",
+          "audio": "Only Heidi speaks; no repeat of the previous line. Same quiet room tone.",
+          "pauseSeconds": 1
+        },
+        "generationMode": "continue",
+        "transition": "cut",
+        "videoId": "v_687e36a045f4440ebcfb93ad961fb3ed"
+      }
+    },
+    "builtScript": {
+      "title": "Heidi and Otto — 12 seconds",
+      "sourceTranscript": "HEIDI: Otto. You were meant to clear the path.\nHEIDI: Not bring it in. Breakfast is waiting.",
+      "sourceDescription": "A simple two-dog exposition exchange establishing Heidi’s authority and Otto’s groundskeeping work, ending with an invitation to breakfast.",
+      "shots": [
+        {
+          "id": "s01",
+          "title": "The reprimand",
+          "seconds": 7,
+          "source": "generated",
+          "connection": "cut",
+          "dialogue": "HEIDI: Otto. You were meant to clear the path.",
+          "visual": "0–0.7s: Heidi looks from Otto’s muddy paws to his face. 0.7–4.2s: Heidi alone speaks the quoted line, naturally and dryly. Otto remains silent and does not mouth any words. 4.2–7s: Otto looks down at his muddy paws, then sheepishly back at Heidi. Heidi waits. No dog changes position; end on the shared look.",
+          "audio": "Only Heidi speaks. No other voice; steady quiet room tone.",
+          "pauseSeconds": 2
+        },
+        {
+          "id": "s02",
+          "title": "The welcome",
+          "seconds": 5,
+          "source": "generated",
+          "connection": "continue",
+          "dialogue": "HEIDI: Not bring it in. Breakfast is waiting.",
+          "visual": "Continue exact previous composition and motion without replay. Local 0–0.4s: Heidi softens slightly. 0.4–3.8s: Heidi alone speaks the new line, same low older female voice. Otto listens with mouth closed. 3.8–5s: Otto lifts gaze reassured; brief shared look. Neither dog stands or moves location. End before any new action.",
+          "audio": "Only Heidi speaks; no repeat of the previous line. Same quiet room tone.",
+          "pauseSeconds": 1
+        }
+      ]
+    },
+    "view": "tracks",
+    "exportId": "v_396474ea08564626ac28185efaeb330b"
+  },
+  "job": {
+    "id": "v_396474ea08564626ac28185efaeb330b",
+    "status": "ready",
+    "model": "local-export",
+    "mode": "text",
+    "frame": "16:9",
+    "createdAt": 1791315033283,
+    "updatedAt": 1791315034367,
+    "message": "Final video ready",
+    "durationSeconds": 12.011,
+    "requestedDurationSeconds": 12.011000000000001,
+    "exportInputs": [
+      {
+        "videoId": "v_687e36a045f4440ebcfb93ad961fb3ed",
+        "inSeconds": 0,
+        "outSeconds": 7.019,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      },
+      {
+        "videoId": "v_687e36a045f4440ebcfb93ad961fb3ed",
+        "inSeconds": 7.019,
+        "outSeconds": 12.011,
+        "muted": false,
+        "transition": "cut",
+        "transitionSeconds": 0
+      }
+    ],
+    "canExtend": false
+  }
+}

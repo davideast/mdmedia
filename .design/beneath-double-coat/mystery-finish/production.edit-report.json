@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "stage": "edit",
+  "planHash": "bcfca3654482c83fef04bc9493176b8a10642925b80dc3af3441603842e951e4",
+  "durationSeconds": 49.08333333333333,
+  "status": "blocked",
+  "readiness": {
+    "technical": "valid",
+    "editorial": "blocked"
+  },
+  "issues": [
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current audience-understanding review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current causality review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current reactions review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current reveal-setup review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No current story-density review for edit.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "AUDIENCE_REVIEW_MISSING",
+      "at": "mystery-finish",
+      "message": "No saved blind audience review of this edit.",
+      "repair": "Review the video or rough sequence without its script, synopsis or inherited facts; retain the retelling and all five story checks.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "EDITORIAL_FEEDBACK",
+      "at": "847d951a-7e7d-44d9-af4b-565c2b60abd9",
+      "message": "user: The story speeds up to the point where it completely falls apart.",
+      "repair": "Rebuild the ending around motivated scenes: establish Sebastian and the family stakes, then discovery, response, and an earned reveal.",
+      "severity": "error",
+      "domain": "editorial"
+    }
+  ],
+  "resolvedIssues": []
+}

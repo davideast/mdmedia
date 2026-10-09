@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "stage": "plan",
+  "planHash": "20e5150262c318fa5943db2f5cd6d72752157f8bdeb9999a5f9dddab406ec0e4",
+  "durationSeconds": 169.25533333333334,
+  "status": "needs-review",
+  "readiness": {
+    "technical": "valid",
+    "editorial": "needs-review"
+  },
+  "issues": [
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current exposition review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current transitions review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current continuity review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current speakers review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current pacing review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current motion review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current sound review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current audience-understanding review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current causality review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current reactions review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current reveal-setup review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    },
+    {
+      "code": "REVIEW_MISSING",
+      "at": "mystery-revision-rough",
+      "message": "No current story-density review for plan.",
+      "repair": "Review this plan or media and record evidence tied to the current plan and file hashes.",
+      "severity": "review",
+      "domain": "editorial"
+    }
+  ],
+  "resolvedIssues": []
+}
