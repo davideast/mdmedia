@@ -7,6 +7,7 @@
  */
 
 import { parseNarrationRequest, type NarrationRequest } from './narration-request';
+import { parsePlaylistPosition, type PlaylistPosition } from './playlist-ops';
 import {
   DELIVERY_PRESETS,
   INSTRUCTION_PRESETS,
@@ -42,15 +43,28 @@ export interface NarrationApiBody {
   structureMarkdown?: boolean;
   verbalizeDiagrams?: boolean;
   visibility?: Visibility;
+  /** A playlist id or exact title to add the narration to as soon as it starts. */
+  playlist?: string;
+  playlistPosition?: PlaylistPosition;
+  /** Create `playlist` if no playlist has that title. */
+  createPlaylist?: boolean;
+}
+
+/** Where a new narration goes once it starts. */
+export interface NarrationPlacement {
+  playlist: string;
+  position: PlaylistPosition;
+  create: boolean;
 }
 
 const FIELDS = new Set<string>([
   'markdown', 'id', 'voice', 'model', 'delivery', 'deliveryPreset', 'speed', 'rewriteForNarration',
   'instructions', 'instructionsPreset', 'structureMarkdown', 'verbalizeDiagrams', 'visibility',
+  'playlist', 'playlistPosition', 'createPlaylist',
 ]);
 
 export type ResolveResult =
-  | { ok: true; request: NarrationRequest }
+  | { ok: true; request: NarrationRequest; placement: NarrationPlacement | null }
   | { ok: false; status: 400 | 403; code: string; message: string };
 
 const invalid = (code: string, message: string): ResolveResult => ({ ok: false, status: 400, code, message });
@@ -144,6 +158,19 @@ export function resolveNarrationBody(body: unknown, settings: UserSettings, { re
     return { ok: false, status: 403, code: 'visibility_not_allowed', message: 'API keys create private narrations. Share it from the studio afterwards.' };
   }
 
+  if (raw.playlist !== undefined && (typeof raw.playlist !== 'string' || !raw.playlist.trim() || raw.playlist.length > 200)) {
+    return invalid('invalid_playlist', 'playlist must be a playlist id or title.');
+  }
+  const position = parsePlaylistPosition(raw.playlistPosition);
+  if (typeof position === 'object' && 'error' in position) return invalid('invalid_playlist_position', position.error);
+  if (raw.createPlaylist !== undefined && typeof raw.createPlaylist !== 'boolean') return invalid('invalid_field', 'createPlaylist must be true or false.');
+  if (raw.playlist === undefined && (position !== undefined || raw.createPlaylist !== undefined)) {
+    return invalid('missing_playlist', 'playlistPosition and createPlaylist need a playlist.');
+  }
+  const placement: NarrationPlacement | null = typeof raw.playlist === 'string'
+    ? { playlist: raw.playlist.trim(), position: position ?? 'end', create: raw.createPlaylist === true }
+    : null;
+
   const delivery = resolveText('delivery', raw.delivery, raw.deliveryPreset,
     [...DELIVERY_PRESETS, ...settings.deliveryPresets], settings.defaultPromptStyle);
   if (typeof delivery !== 'string') return delivery.error;
@@ -167,7 +194,7 @@ export function resolveNarrationBody(body: unknown, settings: UserSettings, { re
     visibility: effectiveVisibility,
   });
   if (!request) return invalid('invalid_body', 'That narration request is not valid.');
-  return { ok: true, request };
+  return { ok: true, request, placement };
 }
 
 /** A narration as `/api/v1` reports it: status, outcome, and where to listen. */

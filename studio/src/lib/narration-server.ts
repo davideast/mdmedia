@@ -814,6 +814,17 @@ export async function loadReadableNarration(
   return allowed ? narration : null;
 }
 
+/** The caller's own narrations, newest first (at most 500). */
+export async function listOwnNarrations(uid: string): Promise<Narration[]> {
+  const snapshot = await adminDb()
+    .collection("narrations")
+    .where("ownerUid", "==", uid)
+    .orderBy("createdAt", "desc")
+    .limit(500)
+    .get();
+  return snapshot.docs.map((doc) => ({ ...(doc.data() as Narration), id: doc.id }));
+}
+
 /**
  * Reads an object's raw bytes directly from Cloud Storage (`adminBucket()`).
  */

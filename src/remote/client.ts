@@ -54,7 +54,33 @@ export interface CreatedNarration {
   id: string;
   status: 'streaming';
   visibility: string;
+  /** Present when the request named a playlist; `position` counts from 1. */
+  playlist?: { id: string; title: string; position: number } | { error: { code: string; message: string } };
   links: { web: string; self: string };
+}
+
+export type PlaylistPosition = 'start' | 'end' | { before: string } | { after: string };
+
+export type PlaylistOp =
+  | { add: string[]; at?: PlaylistPosition }
+  | { remove: string[] }
+  | { move: string; to: PlaylistPosition };
+
+export interface PlaylistSummary {
+  id: string;
+  title: string;
+  description: string;
+  itemCount: number;
+  durationMs: number;
+  counts: { ready: number; streaming: number; error: number; missing: number };
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface PlaylistDetail extends PlaylistSummary {
+  items: Array<{ id: string; title: string; status: string; durationMs: number; createdAt: number | null }>;
+  /** Adds of items already there and removes of items not there. */
+  unchanged?: string[];
 }
 
 export class StudioClient {
@@ -106,6 +132,52 @@ export class StudioClient {
 
   createNarration(body: Record<string, unknown>): Promise<CreatedNarration> {
     return this.request('POST', '/api/v1/narrations', body);
+  }
+
+  narrations(query: { q?: string; status?: string; limit?: number } = {}): Promise<{ narrations: NarrationResource[] }> {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) if (value !== undefined) params.set(key, String(value));
+    return this.request('GET', `/api/v1/narrations${params.size ? `?${params}` : ''}`);
+  }
+
+  playlists(): Promise<{ playlists: PlaylistSummary[] }> {
+    return this.request('GET', '/api/v1/playlists');
+  }
+
+  playlist(id: string): Promise<PlaylistDetail> {
+    return this.request('GET', `/api/v1/playlists/${encodeURIComponent(id)}`);
+  }
+
+  createPlaylist(body: { title: string; description?: string; narrationIds?: string[] }): Promise<PlaylistDetail> {
+    return this.request('POST', '/api/v1/playlists', body);
+  }
+
+  updatePlaylist(id: string, patch: { title?: string; description?: string }): Promise<PlaylistDetail> {
+    return this.request('PATCH', `/api/v1/playlists/${encodeURIComponent(id)}`, patch);
+  }
+
+  editPlaylist(id: string, ops: PlaylistOp[]): Promise<PlaylistDetail> {
+    return this.request('POST', `/api/v1/playlists/${encodeURIComponent(id)}/items`, { ops });
+  }
+
+  reorderPlaylist(id: string, order: string[]): Promise<PlaylistDetail> {
+    return this.request('PUT', `/api/v1/playlists/${encodeURIComponent(id)}/items`, { order });
+  }
+
+  deletePlaylist(id: string): Promise<void> {
+    return this.request('DELETE', `/api/v1/playlists/${encodeURIComponent(id)}`);
+  }
+
+  /** A playlist id from an id or an exact title (ignoring case). */
+  async resolvePlaylist(idOrTitle: string): Promise<PlaylistSummary> {
+    const { playlists } = await this.playlists();
+    const byId = playlists.find((playlist) => playlist.id === idOrTitle);
+    if (byId) return byId;
+    const wanted = idOrTitle.trim().toLowerCase();
+    const matches = playlists.filter((playlist) => playlist.title.trim().toLowerCase() === wanted);
+    if (matches.length > 1) throw new StudioApiError(409, 'playlist_ambiguous', `${matches.length} playlists are titled "${idOrTitle}". Use the id: ${matches.map((playlist) => playlist.id).join(', ')}.`);
+    if (!matches[0]) throw new StudioApiError(404, 'playlist_not_found', `No playlist with the id or title "${idOrTitle}".`);
+    return matches[0];
   }
 
   narration(id: string): Promise<NarrationResource> {

@@ -3,7 +3,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { defineCommand } from 'citty';
-import { StudioApiError, StudioClient, type NarrationResource } from '../remote/client.js';
+import {
+  StudioApiError,
+  StudioClient,
+  type NarrationResource,
+  type PlaylistDetail,
+  type PlaylistPosition,
+  type PlaylistSummary,
+} from '../remote/client.js';
 import {
   DEFAULT_STUDIO_URL,
   credentialsPath,
@@ -133,6 +140,44 @@ async function readInput(input: string | undefined, text: string | undefined): P
   return fs.promises.readFile(input, 'utf8');
 }
 
+type PositionArgs = { start?: boolean; end?: boolean; before?: string; after?: string };
+
+/** `--start`, `--end`, `--before <id>`, or `--after <id>`; at most one. */
+function positionFrom(args: PositionArgs, fallback: PlaylistPosition | null): PlaylistPosition | undefined {
+  const given = [args.start && 'start', args.end && 'end', args.before && 'before', args.after && 'after'].filter(Boolean);
+  if (given.length > 1) throw new Error('Pass only one of --start, --end, --before, --after.');
+  if (args.start) return 'start';
+  if (args.end) return 'end';
+  if (args.before) return { before: args.before };
+  if (args.after) return { after: args.after };
+  return fallback ?? undefined;
+}
+
+function placementNote(playlist: { id: string; title: string; position: number } | { error: { message: string } } | undefined): string {
+  if (!playlist) return '';
+  if ('error' in playlist) return `\nNot added to the playlist: ${playlist.error.message}`;
+  return `\nAdded to "${playlist.title}" at position ${playlist.position}.`;
+}
+
+const minutes = (ms: number) => (ms < 60_000 ? `${Math.round(ms / 1000)}s` : `${Math.round(ms / 60_000)} min`);
+
+function playlistLine(playlist: PlaylistSummary): string {
+  const pending = playlist.counts.streaming ? `, ${playlist.counts.streaming} generating` : '';
+  const failed = playlist.counts.error ? `, ${playlist.counts.error} failed` : '';
+  return `${playlist.id}  ${playlist.title} — ${playlist.itemCount} items, ${minutes(playlist.durationMs)}${pending}${failed}`;
+}
+
+function printPlaylist(playlist: PlaylistDetail, json: boolean | undefined): void {
+  if (json) { console.log(JSON.stringify(playlist, null, 2)); return; }
+  console.log(playlistLine(playlist));
+  if (playlist.description) console.log(playlist.description);
+  playlist.items.forEach((item, index) => {
+    const state = item.status === 'ready' ? minutes(item.durationMs) : item.status;
+    console.log(`${String(index + 1).padStart(3)}. ${item.id}  ${item.title || '(untitled)'} — ${state}`);
+  });
+  if (playlist.unchanged?.length) console.log(`Unchanged (already there, or not there to remove): ${playlist.unchanged.join(', ')}`);
+}
+
 const narrate = defineCommand({
   meta: { name: 'narrate', description: 'Create a private narration in your studio' },
   args: {
@@ -149,6 +194,11 @@ const narrate = defineCommand({
     structure: { type: 'boolean', description: 'Clean document structure' },
     verbalizeDiagrams: { type: 'boolean', description: 'Describe diagrams aloud' },
     id: { type: 'string', description: 'Your own narration id, so a retry cannot create a duplicate' },
+    playlist: { type: 'string', alias: 'p', description: 'Add it to this playlist (id or exact title) as soon as it starts' },
+    createPlaylist: { type: 'boolean', description: 'Create --playlist if no playlist has that title' },
+    start: { type: 'boolean', description: 'Put it at the start of --playlist (default: the end)' },
+    before: { type: 'string', description: 'Put it before this narration id in --playlist' },
+    after: { type: 'string', description: 'Put it after this narration id in --playlist' },
     wait: { type: 'boolean', description: 'Wait until the narration is ready' },
     output: { type: 'string', alias: 'o', description: 'Save the finished audio here (implies --wait)' },
     timeout: { type: 'string', description: 'Seconds to wait (default 900)' },
@@ -171,21 +221,24 @@ const narrate = defineCommand({
       set('structureMarkdown', args.structure);
       set('verbalizeDiagrams', args.verbalizeDiagrams);
       set('id', args.id);
+      set('playlist', args.playlist);
+      set('playlistPosition', positionFrom(args, null));
+      if (args.createPlaylist) body.createPlaylist = true;
 
       const created = await client.createNarration(body);
       if (!args.wait && !args.output) {
         if (args.json) console.log(JSON.stringify(created, null, 2));
-        else console.log(`Narration started: ${created.links.web}`);
+        else console.log(`Narration started: ${created.links.web}${placementNote(created.playlist)}`);
         return;
       }
-      if (!args.json) console.error(`Generating ${created.links.web} …`);
+      if (!args.json) console.error(`Generating ${created.links.web} …${placementNote(created.playlist)}`);
       const finished = await client.waitForNarration(created.id, { timeoutMs: Number(args.timeout ?? 900) * 1000 });
       let saved: string | undefined;
       if (args.output && finished.status === 'ready') {
         saved = path.resolve(args.output);
         await fs.promises.writeFile(saved, await client.audio(created.id));
       }
-      if (args.json) console.log(JSON.stringify({ ...finished, ...(saved ? { savedTo: saved } : {}) }, null, 2));
+      if (args.json) console.log(JSON.stringify({ ...finished, ...(created.playlist ? { playlist: created.playlist } : {}), ...(saved ? { savedTo: saved } : {}) }, null, 2));
       else console.log(`${finished.title || created.id}: ${describe(finished)} — ${finished.links.web}${saved ? `\nSaved ${saved}` : ''}`);
       if (finished.status === 'error') process.exitCode = 1;
     });
@@ -207,6 +260,161 @@ const status = defineCommand({
   },
 });
 
+const narrations = defineCommand({
+  meta: { name: 'narrations', description: 'List your narrations, newest first' },
+  args: {
+    q: { type: 'string', description: 'Only titles containing this text' },
+    status: { type: 'string', description: 'ready, streaming, or error' },
+    limit: { type: 'string', description: 'How many (default 50)' },
+    json: { type: 'boolean', description: 'Print JSON' },
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const result = await connectedClient().narrations({ q: args.q, status: args.status, limit: args.limit === undefined ? undefined : Number(args.limit) });
+      if (args.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      for (const narration of result.narrations) console.log(`${narration.id}  ${narration.title || '(untitled)'} — ${describe(narration)}`);
+    });
+  },
+});
+
+const playlistArg = { type: 'positional', required: true, description: 'Playlist id or exact title' } as const;
+const jsonArg = { type: 'boolean', description: 'Print JSON' } as const;
+const positionArgs = {
+  start: { type: 'boolean', description: 'At the start' },
+  end: { type: 'boolean', description: 'At the end (default)' },
+  before: { type: 'string', description: 'Before this narration id' },
+  after: { type: 'string', description: 'After this narration id' },
+} as const;
+
+/** Narration ids after the playlist positional. */
+function idsAfterPlaylist(rest: string[]): string[] {
+  const ids = rest.slice(1);
+  if (ids.length === 0) throw new Error('Name at least one narration id.');
+  return ids;
+}
+
+/** Runs `edit` against the playlist named by id or title, then prints the result. */
+function playlistAction(json: boolean | undefined, idOrTitle: string, edit: (client: StudioClient, id: string) => Promise<PlaylistDetail>) {
+  return guarded(json, async () => {
+    const client = connectedClient();
+    const { id } = await client.resolvePlaylist(idOrTitle);
+    printPlaylist(await edit(client, id), json);
+  });
+}
+
+const playlistList = defineCommand({
+  meta: { name: 'list', description: 'Your playlists, most recently changed first' },
+  args: { json: jsonArg },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const { playlists } = await connectedClient().playlists();
+      if (args.json) console.log(JSON.stringify({ playlists }, null, 2));
+      else if (playlists.length === 0) console.log('No playlists yet.');
+      else for (const playlist of playlists) console.log(playlistLine(playlist));
+    });
+  },
+});
+
+const playlistShow = defineCommand({
+  meta: { name: 'show', description: 'A playlist and its items in order' },
+  args: { playlist: playlistArg, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => client.playlist(id)),
+});
+
+const playlistCreate = defineCommand({
+  meta: { name: 'create', description: 'Create a playlist, optionally with narrations in it' },
+  args: {
+    title: { type: 'positional', required: true, description: 'Title' },
+    description: { type: 'string', description: 'Description' },
+    json: jsonArg,
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const narrationIds = args._.slice(1);
+      printPlaylist(await connectedClient().createPlaylist({
+        title: args.title,
+        ...(args.description === undefined ? {} : { description: args.description }),
+        ...(narrationIds.length ? { narrationIds } : {}),
+      }), args.json);
+    });
+  },
+});
+
+const playlistAdd = defineCommand({
+  meta: { name: 'add', description: 'Add narrations: add <playlist> <id…> [--start | --before <id> | --after <id>]' },
+  args: { playlist: playlistArg, ...positionArgs, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => {
+    const at = positionFrom(args, null);
+    return client.editPlaylist(id, [{ add: idsAfterPlaylist(args._), ...(at ? { at } : {}) }]);
+  }),
+});
+
+const playlistRemove = defineCommand({
+  meta: { name: 'remove', description: 'Remove narrations: remove <playlist> <id…>' },
+  args: { playlist: playlistArg, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => client.editPlaylist(id, [{ remove: idsAfterPlaylist(args._) }])),
+});
+
+const playlistMove = defineCommand({
+  meta: { name: 'move', description: 'Move one narration: move <playlist> <id> --start | --end | --before <id> | --after <id>' },
+  args: { playlist: playlistArg, ...positionArgs, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => {
+    const [narrationId, ...extra] = idsAfterPlaylist(args._);
+    if (extra.length) throw new Error('move takes one narration id.');
+    const to = positionFrom(args, null);
+    if (!to) throw new Error('Say where: --start, --end, --before <id>, or --after <id>.');
+    return client.editPlaylist(id, [{ move: narrationId!, to }]);
+  }),
+});
+
+const playlistOrder = defineCommand({
+  meta: { name: 'order', description: 'Set the full order: order <playlist> <id…> (exactly the items already there)' },
+  args: { playlist: playlistArg, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => client.reorderPlaylist(id, idsAfterPlaylist(args._))),
+});
+
+const playlistRename = defineCommand({
+  meta: { name: 'rename', description: 'Rename: rename <playlist> <new title>' },
+  args: { playlist: playlistArg, title: { type: 'positional', required: true, description: 'New title' }, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => client.updatePlaylist(id, { title: args.title })),
+});
+
+const playlistDescribe = defineCommand({
+  meta: { name: 'describe', description: 'Set the description: describe <playlist> <text>' },
+  args: { playlist: playlistArg, text: { type: 'positional', required: true, description: 'Description' }, json: jsonArg },
+  run: ({ args }) => playlistAction(args.json, args.playlist, (client, id) => client.updatePlaylist(id, { description: args.text })),
+});
+
+const playlistDelete = defineCommand({
+  meta: { name: 'delete', description: 'Delete a playlist. Its narrations are kept.' },
+  args: { playlist: playlistArg, json: jsonArg },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const client = connectedClient();
+      const playlist = await client.resolvePlaylist(args.playlist);
+      await client.deletePlaylist(playlist.id);
+      if (args.json) console.log(JSON.stringify({ deleted: playlist.id }));
+      else console.log(`Deleted "${playlist.title}". Its narrations are still in your library.`);
+    });
+  },
+});
+
+const playlist = defineCommand({
+  meta: { name: 'playlist', description: 'Create and arrange playlists' },
+  subCommands: {
+    list: playlistList,
+    show: playlistShow,
+    create: playlistCreate,
+    add: playlistAdd,
+    remove: playlistRemove,
+    move: playlistMove,
+    order: playlistOrder,
+    rename: playlistRename,
+    describe: playlistDescribe,
+    delete: playlistDelete,
+  },
+});
+
 const installSkill = defineCommand({
   meta: { name: 'install-skill', description: 'Teach coding agents to narrate through your studio when you ask' },
   args: {
@@ -224,5 +432,5 @@ const installSkill = defineCommand({
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, status, 'install-skill': installSkill },
+  subCommands: { login, logout, options, narrate, status, narrations, playlist, 'install-skill': installSkill },
 });

@@ -88,7 +88,8 @@ function ConnectApproval() {
             <ul className="grid list-disc gap-1 pl-5 text-[0.85rem] text-ink-muted">
               <li>It can create narrations as you, always private, using your voices and Settings.</li>
               <li>It can read the narrations you can read and download their audio.</li>
-              <li>It cannot delete, share, or publish anything, or change your Settings.</li>
+              <li>It can create, edit, and delete your playlists. Deleting a playlist never deletes its narrations.</li>
+              <li>It cannot delete, share, or publish narrations, or change your Settings.</li>
             </ul>
             <div className="flex gap-2">
               <Button type="button" onClick={() => void decide(true)}>Allow</Button>

@@ -63,3 +63,20 @@ describe('studio client', () => {
     await expect(client.narration('abcdefghij')).rejects.toMatchObject({ code: 'not_logged_in' });
   });
 });
+
+describe('playlist lookup', () => {
+  const listing = { playlists: [
+    { id: 'p1', title: 'Commute' }, { id: 'p2', title: 'Deep dives' }, { id: 'p3', title: 'deep dives' },
+  ] };
+  const client = new StudioClient('http://localhost:3000', KEY, (async () => Response.json(listing)) as unknown as typeof fetch);
+
+  it('finds a playlist by id or by title, ignoring case', async () => {
+    expect((await client.resolvePlaylist('p1')).id).toBe('p1');
+    expect((await client.resolvePlaylist('commute')).id).toBe('p1');
+  });
+
+  it('refuses a title two playlists share, and names their ids', async () => {
+    await expect(client.resolvePlaylist('Deep Dives')).rejects.toMatchObject({ code: 'playlist_ambiguous' });
+    await expect(client.resolvePlaylist('Nope')).rejects.toMatchObject({ code: 'playlist_not_found' });
+  });
+});

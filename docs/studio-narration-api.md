@@ -16,7 +16,7 @@ Every request carries `Authorization: Bearer <credential>`:
   disables their keys.
 
 API keys carry scopes `narrations:create`, `narrations:read`, `options:read`,
-and are restricted further:
+`playlists:manage`, and are restricted further:
 
 - Narrations they create are always `private`; asking for `shared` or `public`
   is `403 visibility_not_allowed`.
@@ -30,8 +30,16 @@ Errors are `{ "error": { "code", "message" } }`.
 | Method | Path | Who | |
 | --- | --- | --- | --- |
 | `POST` | `/api/v1/narrations` | session, key | Start a narration. `202` with `{ id, status: "streaming", visibility, links }`. |
+| `GET` | `/api/v1/narrations` | session, key | Your narrations, newest first. `?q=` (title contains), `?status=`, `?limit=` (default 50). |
 | `GET` | `/api/v1/narrations/{id}` | session, key | Status: `streaming`, `ready`, or `error`, with title, voice, duration, error, and `links.web` / `links.audio`. |
 | `GET` | `/api/v1/narrations/{id}/audio` | session, key | WAV. `409 not_ready` while generating. |
+| `GET` | `/api/v1/playlists` | session, key | Your playlists with item count, total duration, and ready / streaming / error / missing counts. |
+| `POST` | `/api/v1/playlists` | session, key | `{ title, description?, narrationIds? }` |
+| `GET` | `/api/v1/playlists/{id}` | session, key | The playlist and its items in order. |
+| `PATCH` | `/api/v1/playlists/{id}` | session, key | `{ title?, description? }` |
+| `DELETE` | `/api/v1/playlists/{id}` | session, key | Deletes the playlist, never its narrations. |
+| `POST` | `/api/v1/playlists/{id}/items` | session, key | `{ ops }`: add, remove, move; one transaction (below). |
+| `PUT` | `/api/v1/playlists/{id}/items` | session, key | `{ order }`: exactly the items already there, in a new order. |
 | `GET` | `/api/v1/options` | session, key | Voices (Gemini and the ElevenLabs voices this person may use), models, allowed visibility, presets, defaults, limits. |
 | `GET` | `/api/v1/keys` | session | Connected apps. |
 | `DELETE` | `/api/v1/keys/{id}` | session; key for `current` | Revoke. A key can only revoke itself. |
@@ -60,6 +68,42 @@ Unknown fields are rejected.
 | `instructions` / `instructionsPreset` | Rewrite instructions, or a preset. Not both. |
 | `structureMarkdown`, `verbalizeDiagrams` | Document cleanup options. |
 | `visibility` | `private` (only value allowed for keys), `shared`, `public`. |
+| `playlist` | Playlist id or exact title (case-insensitive). The narration joins it as soon as it starts. |
+| `playlistPosition` | `"start"`, `"end"` (default), `{ "before": id }`, or `{ "after": id }`. |
+| `createPlaylist` | Create `playlist` by that title if none matches. |
+
+The playlist is checked before any audio is made: a missing playlist, an
+ambiguous title, a full playlist, or an anchor not in it fails the request.
+The `202` response then includes `playlist: { id, title, position }`
+(`position` counts from 1). If generation later fails, the item stays in the
+playlist with status `error`; retrying with the same `id` fills the same slot.
+
+## Playlist edits
+
+```json
+POST /api/v1/playlists/{id}/items
+{ "ops": [
+  { "add": ["n1", "n2"], "at": { "after": "n9" } },
+  { "remove": ["n4"] },
+  { "move": "n7", "to": "start" }
+] }
+```
+
+- Ops apply in order, inside one Firestore transaction, to the playlist as it
+  is at that moment. Items and positions are named by narration id, so an edit
+  can never be based on a stale copy, and the app and an agent cannot
+  overwrite each other.
+- All or nothing: an unknown narration (`narration_not_found`), an anchor not
+  in the playlist (`anchor_not_found`, `not_in_playlist`), or more than 100
+  items (`playlist_full`) changes nothing. Errors list the offending `ids`.
+- Adding an item already there, or removing one that is not, is a no-op
+  reported in `unchanged`, so retries are harmless.
+- Every write returns the playlist with its resulting order.
+- A full reorder (`PUT … { order }`) must list exactly the current items, once
+  each; otherwise `409 invalid_order`, and the client re-reads and retries.
+
+The app uses the same rule: adding and removing are atomic array changes, and
+moving a track is a transaction against the current order.
 
 ## Connecting a client (device flow)
 
@@ -89,6 +133,9 @@ for `AGENTS.md`. It tells agents to:
 
 - narrate only when the user asks, and only what they pointed at;
 - run `mdmedia studio narrate -i file.md --json` and reply with `links.web`;
+- add to a playlist with `--playlist`, and arrange playlists with
+  `mdmedia studio playlist list|show|create|add|remove|move|order|rename|describe|delete`,
+  looking at a playlist before changing it;
 - pass only options the user asked for (`mdmedia studio options --json` lists them);
 - never share or publish, never run `login` approval themselves, and never
   read the credentials file or `MDMEDIA_API_KEY`;

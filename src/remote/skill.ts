@@ -7,7 +7,7 @@ export const NARRATE_SKILL_NAME = 'mdmedia-narrate';
 
 export const NARRATE_SKILL = `---
 name: ${NARRATE_SKILL_NAME}
-description: Turn text or markdown into a narrated audio recording in the user's mdmedia studio. Use when the user asks to narrate something, read it aloud, make an audio version, or "make this listenable" — a file, a doc, notes, or an answer you wrote.
+description: Turn text or markdown into a narrated audio recording in the user's mdmedia studio, and organize narrations into playlists. Use when the user asks to narrate something, read it aloud, make an audio version, "make this listenable", or to create, fill, reorder, or tidy their playlists.
 ---
 
 # Narrate with mdmedia
@@ -41,6 +41,45 @@ point you at.
 3. Reply with the \`links.web\` URL from the output. Generation takes a while;
    the page shows progress. Add \`--wait\` only when the user wants to know it
    finished, and \`--output file.wav\` only when they want the audio file.
+
+## Playlists
+
+Add a new narration to a playlist as it is created:
+
+\`\`\`sh
+mdmedia studio narrate -i file.md --playlist "Commute" --json
+\`\`\`
+
+\`--playlist\` takes an id or exact title. Add \`--create-playlist\` only when
+the user wants a new playlist, and \`--start\`, \`--before <id>\`, or
+\`--after <id>\` to place it (default: the end).
+
+To arrange existing playlists, look before you change anything:
+
+\`\`\`sh
+mdmedia studio playlist list --json
+mdmedia studio playlist show "Commute" --json      # items in order, with ids
+mdmedia studio narrations --q "pyric" --json        # find narration ids
+\`\`\`
+
+Then edit by narration id; positions are relative to other ids, never indexes:
+
+\`\`\`sh
+mdmedia studio playlist create "Title" [<id>…] [--description "…"]
+mdmedia studio playlist add <playlist> <id>… [--start | --before <id> | --after <id>]
+mdmedia studio playlist remove <playlist> <id>…
+mdmedia studio playlist move <playlist> <id> --start | --end | --before <id> | --after <id>
+mdmedia studio playlist order <playlist> <id>…    # every item, once, in the new order
+mdmedia studio playlist rename <playlist> "New title"
+mdmedia studio playlist describe <playlist> "Description"
+mdmedia studio playlist delete <playlist>          # keeps the narrations
+\`\`\`
+
+Every edit prints the resulting order; check it matches what the user asked
+for. If an edit fails because the playlist changed (\`invalid_order\`), show
+it again and redo the edit against what is there now. Before a sweeping
+reorganization (deleting playlists, removing many items), say what you will
+change and wait for the user to agree.
 
 ## Boundaries
 

@@ -53,3 +53,23 @@ export function requireUser(caller: Caller | null): Response | null {
   if (caller.kind !== 'user') return apiError(403, 'session_required', 'Manage connected apps from the studio while signed in.');
   return null;
 }
+
+/** Authenticates and checks one scope; returns the caller or the error response to send. */
+export async function authorize(request: Request, scope: ApiKeyScope): Promise<Caller | Response> {
+  const caller = await authenticate(request);
+  if (!caller) return unauthorized();
+  if (!hasScope(caller, scope)) return forbiddenScope(scope);
+  return caller;
+}
+
+/** Reads a JSON object body, or returns the error response to send. */
+export async function readJsonObject(request: Request): Promise<Record<string, unknown> | Response> {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return apiError(400, 'invalid_json', 'The request body must be JSON.');
+  }
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) return apiError(400, 'invalid_body', 'Send a JSON object.');
+  return body as Record<string, unknown>;
+}
