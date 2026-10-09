@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { auth } from './firebase';
-import { deleteNarration, generateNarrationId } from './narrations';
+import { deleteNarration, expectNarration, generateNarrationId } from './narrations';
 import {
   DEFAULT_TTS_MODEL,
   type NarrationErrorCategory,
@@ -160,6 +160,7 @@ export function useGenerationQueue(): GenerationQueueState {
     }): Promise<{ jobId: string; narrationId: string }> => {
       const jobId = `job_${Math.random().toString(36).slice(2, 9)}_${Date.now()}`;
       const narrationId = generateNarrationId();
+      expectNarration(narrationId);
       const controller = new AbortController();
       controllersRef.current.set(jobId, controller);
 

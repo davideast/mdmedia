@@ -4,7 +4,7 @@ import { retryDeniedListener } from '../../studio/src/lib/retry-denied-listener'
 const denied = { code: 'permission-denied' };
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-function harness(options = { retries: 3, delayMs: 10 }) {
+function harness(options: Parameters<typeof retryDeniedListener>[2] = { retries: 3, delayMs: 10 }) {
   const errorHandlers: Array<(error: unknown) => void> = [];
   let detached = 0;
   const gaveUp: unknown[] = [];
@@ -49,5 +49,25 @@ describe('listener attached before the server creates the document', () => {
     await wait(30);
     expect(h.errorHandlers).toHaveLength(1);
     expect(h.detached()).toBe(1);
+  });
+
+  it('reports a denial at once when the document is not awaiting creation', async () => {
+    const h = harness({ retries: 3, delayMs: 5, shouldRetry: () => false });
+    h.errorHandlers[0](denied);
+    await wait(20);
+    expect(h.errorHandlers).toHaveLength(1);
+    expect(h.gaveUp).toEqual([denied]);
+  });
+
+  it('stops retrying once the creation window closes', async () => {
+    let awaiting = true;
+    const h = harness({ retries: 5, delayMs: 5, shouldRetry: () => awaiting });
+    h.errorHandlers[0](denied);
+    await wait(20);
+    awaiting = false;
+    h.errorHandlers[1](denied);
+    await wait(20);
+    expect(h.errorHandlers).toHaveLength(2);
+    expect(h.gaveUp).toEqual([denied]);
   });
 });

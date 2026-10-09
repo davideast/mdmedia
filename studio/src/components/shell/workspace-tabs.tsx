@@ -8,7 +8,8 @@ import { useNarration } from "./narration-provider";
 import { useOfflinePlayback } from "./offline-playback-provider";
 import { useConnectivity } from "@/lib/connectivity";
 import type { WorkspaceTab } from "@/lib/workspace";
-import { watchNarration } from "@/lib/narrations";
+import { watchMyNarrations } from "@/lib/narrations";
+import { useAuth } from "@/lib/auth-context";
 import type { Narration } from "@/lib/types";
 
 function itemIcon(href: string) {
@@ -28,6 +29,7 @@ export function WorkspaceTabs() {
   const { state, activeTab, store, selectTab, closeTab, newDraft, storageUnavailable } = useWorkspace();
   const { stream, queue, generationQueue } = useNarration();
   const downloads = useOfflinePlayback();
+  const uid = useAuth().user?.uid ?? null;
   const offline = useConnectivity() === "offline";
   const seenJobs = useRef(new Set<string>());
   const focusAfterClose = useRef(false);
@@ -36,17 +38,30 @@ export function WorkspaceTabs() {
   const watchedIds = JSON.stringify(state.tabs.map((tab) => new URL(tab.href, "https://workspace.local").pathname)
     .filter((path) => path.startsWith("/narration/")).map((path) => path.split("/")[2]).sort());
 
+  // One shared query of the person's own narrations keeps every narration tab's
+  // status and title current. A listener per tab grew with the tab count and
+  // replayed denials for tabs whose narration had since been deleted.
   useEffect(() => {
-    if (offline || watchedIds === "[]") return;
+    if (offline || !uid || watchedIds === "[]") return;
+    const ids = new Set(JSON.parse(watchedIds) as string[]);
     let active = true;
-    const stops = (JSON.parse(watchedIds) as string[]).map((id) => watchNarration(id, (narration) => {
-      if (!active || !narration) return;
-      setServerStatus((previous) => previous[id] === narration.status ? previous : { ...previous, [id]: narration.status });
-      const tab = store.getSnapshot().tabs.find((item) => item.key === `/narration/${id}`);
-      if (tab && narration.title) store.updateTab(tab.id, { title: narration.title });
-    }));
-    return () => { active = false; stops.forEach((stop) => stop()); };
-  }, [offline, watchedIds, store]);
+    const stop = watchMyNarrations(uid, (narrations) => {
+      if (!active) return;
+      const tabs = store.getSnapshot().tabs;
+      setServerStatus((previous) => {
+        const next: Record<string, Narration["status"]> = {};
+        for (const narration of narrations) if (ids.has(narration.id)) next[narration.id] = narration.status;
+        const keys = Object.keys(next);
+        return keys.length === Object.keys(previous).length && keys.every((id) => previous[id] === next[id]) ? previous : next;
+      });
+      for (const narration of narrations) {
+        if (!ids.has(narration.id) || !narration.title) continue;
+        const tab = tabs.find((item) => item.key === `/narration/${narration.id}`);
+        if (tab && tab.title !== narration.title) store.updateTab(tab.id, { title: narration.title });
+      }
+    });
+    return () => { active = false; stop(); };
+  }, [offline, uid, watchedIds, store]);
 
   useEffect(() => {
     for (const job of generationQueue.jobs) {
