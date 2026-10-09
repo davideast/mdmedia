@@ -94,7 +94,7 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
     });
 
     it("QueuePage uses viewGrid and does not use px-8 py-8 or mx-auto centering wrappers", () => {
-      expect(queuePage).toContain("<WorkbenchPanel\n      title=\"Queue\"\n      icon={<ListOrdered size={13} strokeWidth={2} />}\n      viewGrid");
+      expect(queuePage).toContain("<WorkbenchPanel\n      title=\"Activity\"\n      icon={<ListOrdered size={13} strokeWidth={2} />}\n      viewGrid");
       expect(queuePage).not.toContain('bodyClassName="px-8 py-8"');
       expect(queuePage).toContain('viewGrid\n      gridVariant="wide"');
       expect(queuePage).not.toContain("mx-auto grid w-full max-w-[68ch]");

@@ -18,10 +18,8 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 import { useMediaSession } from "@/lib/use-media-session";
 import { useConnectivity } from "@/lib/connectivity";
 import { useOfflinePlayback } from "@/components/shell/offline-playback-provider";
-import { WorkspaceTabs } from "@/components/shell/workspace-tabs";
-import { useWorkspace } from "@/components/shell/workspace-provider";
 
-const DOCK_KEY = "mdmedia.nav.docked.v1";
+const DOCK_KEY = "mdmedia.nav.docked.v2";
 const CONTEXT_DOCK_KEY = "mdmedia.context.docked.v1";
 const NAV = "nav";
 const MAIN = "main";
@@ -76,7 +74,6 @@ export function AppShell({
   context?: ReactNode;
 }) {
   const pathname = usePathname();
-  const { activeTab } = useWorkspace();
   const offline = useConnectivity() === 'offline';
   const onlineScreenDisabled = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
@@ -110,7 +107,7 @@ export function AppShell({
   const breakpoints = useResponsiveBreakpoints();
   const hasContext = pathname.startsWith("/studio") || pathname.startsWith("/narration/");
   const isNarrationRoute = pathname.startsWith("/narration/");
-  const [docked, setDocked] = useState(true);
+  const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
   const [contextSheetOpen, setContextSheetOpen] = useState(false);
@@ -138,8 +135,8 @@ export function AppShell({
   // When viewport resizes into medium desktop (< 1280px), enforce mutual exclusivity
   useEffect(() => {
     if (breakpoints.isMedium && !docked && !contextDocked) {
-      setDocked(true);
-      window.localStorage.setItem(DOCK_KEY, "1");
+      setContextDocked(true);
+      window.localStorage.setItem(CONTEXT_DOCK_KEY, "1");
     }
   }, [breakpoints.isMedium, docked, contextDocked]);
 
@@ -288,7 +285,7 @@ export function AppShell({
           <a href="/downloads" className="flex-none font-medium text-primary underline underline-offset-2">Open Downloads</a>
         </div>
       ) : null}
-      <div id="workspace-page" role="tabpanel" aria-labelledby={activeTab ? `workspace-tab-${activeTab.id}` : undefined} className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+      <div id="workspace-page" aria-label="Workspace" className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
         {children}
       </div>
       {showPlayerBar ? (
@@ -345,7 +342,6 @@ export function AppShell({
         ) : null}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <WorkspaceTabs />
         <div className="flex min-h-0 min-w-0 flex-1">
         {showLeftResizable || showRightResizable ? (
           <ResizablePanelGroup

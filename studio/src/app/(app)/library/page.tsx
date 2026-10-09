@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -28,10 +28,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
-import { useRouteQuery } from "@/components/shell/workspace-provider";
+import { useRouteQuery, useWorkspaceField } from "@/components/shell/workspace-provider";
+import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
-import { deleteNarration, watchMyNarrations } from "@/lib/narrations";
+import { deleteNarration, toNarration, watchMyNarrations } from "@/lib/narrations";
 import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
+import type { LibraryCursor, LibraryRecord } from "@/lib/library-page";
 import type { Narration } from "@/lib/types";
 
 const READABLE_VISIBILITY: Record<Narration["visibility"], string> = {
@@ -229,23 +231,64 @@ export default function LibraryPage() {
   const { user } = useAuth();
   const { stream, playTrack } = useNarration();
   const [items, setItems] = useState<Narration[]>([]);
-  const [query, setQuery] = useRouteQuery("q");
+  const [query] = useRouteQuery("q");
+  const [cursor] = useRouteQuery("cursor");
+  const [back, setBack] = useWorkspaceField("libraryPageHistory", "");
+  const [nextCursor, setNextCursor] = useState<LibraryCursor | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [retry, setRetry] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const lastPage = useRef(`${query}:${cursor}`);
+  const setView = (q: string, next: string, previous: string[]) => {
+    const url = new URL(window.location.href);
+    setBack(JSON.stringify({ query: q, cursor: next, previous }));
+    for (const [key, value] of [["q", q], ["cursor", next]]) {
+      if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
+    }
+    window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+  };
+  let previous: string[] = [];
+  try { const saved = JSON.parse(back || '{}'); const parsed = saved.query === query && saved.cursor === cursor ? saved.previous : []; if (Array.isArray(parsed)) previous = parsed.filter((value): value is string => typeof value === 'string'); } catch { /* Direct links need no back stack. */ }
+
   const [itemToDelete, setItemToDelete] = useState<Narration | null>(null);
 
   useEffect(() => {
-    if (user === null) return;
-    return watchMyNarrations(user.uid, setItems);
+    if (!user) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setLoading(true); setLoadError("");
+      void (async () => {
+        try {
+          const token = await auth().currentUser?.getIdToken();
+          if (!token) throw new Error("Please sign in to browse your library.");
+          const params = new URLSearchParams({ q: query, cursor });
+          const response = await fetch(`/api/library?${params}`, { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal });
+          if (!response.ok) throw new Error('Could not load your library. Try again.');
+          const page = await response.json() as { items: LibraryRecord[]; nextCursor: LibraryCursor | null };
+          if (controller.signal.aborted) return;
+          setItems(page.items.map((item) => toNarration({ id: item.id, data: () => item.data })));
+          setNextCursor(page.nextCursor);
+          const key = `${query}:${cursor}`;
+          if (lastPage.current !== key && scrollRef.current) scrollRef.current.scrollTop = 0;
+          lastPage.current = key;
+        } catch (error) {
+          if (!controller.signal.aborted) setLoadError(error instanceof Error ? error.message : 'Could not load library.');
+        } finally { if (!controller.signal.aborted) setLoading(false); }
+      })();
+    }, 180);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [user, query, cursor, retry]);
+  useEffect(() => {
+    if (!user) return;
+    let signature: string | null = null;
+    return watchMyNarrations(user.uid, (items) => {
+      const next = JSON.stringify(items.map((item) => [item.id, item.updatedAt, item.status, item.title]));
+      if (signature !== null && signature !== next) setRetry((value) => value + 1);
+      signature = next;
+    });
   }, [user]);
-
-  const filtered = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (needle.length === 0) return items;
-    return items.filter(
-      (item) =>
-        item.title.toLowerCase().includes(needle) ||
-        item.transcript.toLowerCase().includes(needle),
-    );
-  }, [items, query]);
+  const filtered = items;
 
   const totalParagraphs = useMemo(() => {
     return filtered.reduce((sum, item) => {
@@ -262,6 +305,7 @@ export default function LibraryPage() {
       stream.cancel();
     }
     setItemToDelete(null);
+    setItems((items) => items.filter((item) => item.id !== narrationId));
     toast.success("Narration deleted.");
     void deleteNarration(narrationId).catch((err) => {
       console.error("Failed to delete narration:", err);
@@ -273,6 +317,7 @@ export default function LibraryPage() {
     <WorkbenchPanel
       workspacePage
       title="Library"
+      scrollRef={scrollRef}
       icon={<Library size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"
@@ -286,8 +331,9 @@ export default function LibraryPage() {
           />
           <Input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search your narrations…"
+            onChange={(event) => setView(event.target.value.slice(0, 200), "", [])}
+            aria-label="Search Library"
+            placeholder="Search titles, transcripts, or IDs…"
             className="h-10 rounded-full pl-9"
           />
         </div>
@@ -296,8 +342,8 @@ export default function LibraryPage() {
         </Button>
       </div>
 
-      {filtered.length === 0 ? (
-        items.length === 0 ? (
+      {loading ? <p role="status" className="py-8 text-center text-sm text-ink-muted">Loading library…</p> : loadError ? <div role="alert" className="py-6 text-sm"><p>{loadError}</p><Button variant="outline" onClick={() => setRetry((value) => value + 1)}>Retry</Button></div> : filtered.length === 0 ? (
+        !query && !cursor ? (
           <div className="col-span-full grid place-items-center gap-3 py-12 text-center">
             <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40 text-ink-muted">
               <Library size={24} strokeWidth={1.5} />
@@ -316,14 +362,14 @@ export default function LibraryPage() {
           </div>
         ) : (
           <p className="t-lead text-center">
-            No narration matches &ldquo;{query}&rdquo;.
+            {nextCursor ? "No matches in this batch. Continue searching older work below." : `No narrations match “${query}”${cursor ? " in the remaining library" : ""}.`}
           </p>
         )
       ) : (
         <section className="grid gap-3">
           <div className="flex min-w-0 flex-wrap items-center justify-between gap-1">
             <h2 className="t-label">
-              Narrations ({filtered.length})
+              Narrations · {filtered.length} on this page
             </h2>
             <span className="t-meta text-ink-faint">
               {totalParagraphs} {totalParagraphs === 1 ? "paragraph" : "paragraphs"} total
@@ -344,6 +390,12 @@ export default function LibraryPage() {
           </div>
         </section>
       )}
+
+      {!loading && !loadError && (cursor || nextCursor) ? <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button variant="outline" disabled={!cursor} onClick={() => setView(query, previous.at(-1) ?? "", previous.slice(0, -1))}>Previous</Button>
+        <span className="text-xs text-ink-muted">Up to 50 narrations per page</span>
+        <Button variant="outline" disabled={!nextCursor} onClick={() => setView(query, JSON.stringify(nextCursor), [...previous, cursor])}>{query ? 'Continue search' : 'Older narrations'}</Button>
+      </div> : null}
 
       <Dialog
         open={itemToDelete !== null}

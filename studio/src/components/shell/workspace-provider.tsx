@@ -10,18 +10,17 @@ import { EMPTY_WORKSPACE, WorkspaceStore, workspaceRoute, type WorkspaceSnapshot
 interface WorkspaceContextValue {
   store: WorkspaceStore;
   state: WorkspaceSnapshot;
-  activeTab: WorkspaceTab | undefined;
+  activeView: WorkspaceTab | undefined;
   draftId: string;
   storageUnavailable: boolean;
-  selectTab: (tab: WorkspaceTab) => void;
-  closeTab: (id: string) => void;
+  openView: (tab: WorkspaceTab) => void;
   newDraft: () => void;
   replaceCurrent: (href: string, title?: string) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
-/** One normal Next route is active. Inactive tabs retain data, never mounted page trees. */
+/** One normal Next route is active. Other views retain data, never mounted page trees. */
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const router = useRouter();
@@ -74,7 +73,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { if (ready) store.visit(href + window.location.hash); }, [href, ready, store]);
 
-  const selectTab = useCallback((tab: WorkspaceTab) => {
+  const openView = useCallback((tab: WorkspaceTab) => {
     // Existing routes, links, redirects, and browser history all use the same router.
     const url = new URL(tab.href, window.location.origin);
     if (offline && url.pathname !== "/downloads") return;
@@ -83,18 +82,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     else if (offline) window.location.assign(tab.href);
     else router.push(tab.href, { scroll: false });
   }, [router, offline]);
-  const closeTab = useCallback((id: string) => {
-    const active = store.getSnapshot().activeId === id;
-    const next = store.close(id);
-    store.flush();
-    if (active && next) {
-      const target = offline ? store.getSnapshot().tabs.find((tab) => new URL(tab.href, window.location.origin).pathname === "/downloads")?.href ?? "/downloads" : next;
-      store.visit(target);
-      if (new URL(target, window.location.origin).pathname === window.location.pathname) window.history.replaceState(null, "", target);
-      else if (offline) window.location.assign(target);
-      else router.replace(target, { scroll: false });
-    }
-  }, [router, store, offline]);
   const newDraft = useCallback(() => router.push(`/studio?draft=${crypto.randomUUID()}`), [router]);
   const replaceCurrent = useCallback((next: string, title?: string) => {
     const id = store.getSnapshot().activeId;
@@ -103,10 +90,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [router, store]);
 
   const route = workspaceRoute(href);
-  const activeTab = state.tabs.find((tab) => tab.key === route?.key);
-  const value = useMemo(() => ({ store, state, activeTab, draftId: route?.draftId ?? "default",
-    storageUnavailable, selectTab, closeTab, newDraft, replaceCurrent }),
-    [store, state, activeTab, route?.draftId, storageUnavailable, selectTab, closeTab, newDraft, replaceCurrent]);
+  const activeView = state.tabs.find((tab) => tab.key === route?.key);
+  const value = useMemo(() => ({ store, state, activeView, draftId: route?.draftId ?? "default",
+    storageUnavailable, openView, newDraft, replaceCurrent }),
+    [store, state, activeView, route?.draftId, storageUnavailable, openView, newDraft, replaceCurrent]);
 
   if (!ready) return <div className="grid h-dvh place-items-center"><Loader2 size={20} className="animate-spin" /><span className="sr-only">Restoring workspace</span></div>;
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
@@ -132,13 +119,13 @@ export function useRouteQuery(name: string): [string, (value: string) => void] {
   return [value, setValue];
 }
 
-/** Unfinished form edits belong to their route tab, rather than its mounted component. */
+/** Unfinished form edits belong to their route, rather than its mounted component. */
 type Widen<T> = T extends string ? string : T extends boolean ? boolean : T extends number ? number : T;
 export function useWorkspaceField<T extends string | boolean | number | null>(name: string, initial: T): [Widen<T>, (value: Widen<T>) => void] {
-  const { activeTab, store } = useWorkspace();
-  const stored = activeTab?.fields[name];
+  const { activeView, store } = useWorkspace();
+  const stored = activeView?.fields[name];
   const compatible = stored !== undefined && (typeof stored === typeof initial || initial === null && (stored === null || typeof stored === "string"));
   const value = (compatible ? stored : initial) as Widen<T>;
-  const setValue = useCallback((next: Widen<T>) => { if (activeTab) store.setField(activeTab.id, name, next); }, [activeTab, store, name]);
+  const setValue = useCallback((next: Widen<T>) => { if (activeView) store.setField(activeView.id, name, next); }, [activeView, store, name]);
   return [value, setValue];
 }
