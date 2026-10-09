@@ -1,4 +1,5 @@
 import { apiError } from "@/lib/api-auth";
+import { apiOrigin } from "@/lib/api-origin";
 import { startDeviceAuthorization } from "@/lib/api-keys";
 import { createRateLimiter } from "@/lib/rate-limit";
 
@@ -15,7 +16,7 @@ export async function POST(request: Request): Promise<Response> {
   let body: { clientName?: unknown } = {};
   try { body = await request.json(); } catch { /* A name is optional. */ }
   const started = await startDeviceAuthorization(body?.clientName);
-  const origin = new URL(request.url).origin;
+  const origin = apiOrigin(request);
   return Response.json({
     ...started,
     verificationUri: `${origin}/connect`,

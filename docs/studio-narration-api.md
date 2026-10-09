@@ -4,6 +4,14 @@
 follow it, and download the audio. Coding agents use it through the `mdmedia
 studio` CLI, which holds a key the user approved in the browser.
 
+When hosting behind a reverse proxy, set `MDMEDIA_PUBLIC_ORIGIN` in the Studio
+server environment to its public origin (for example,
+`https://<device>.<tailnet>.ts.net:3443`). API approval and narration links use
+that origin instead of the internal Next.js address. Without it, links use the
+request URL's origin. Run `npm --prefix studio run check:narration-api -- <url>`
+after deployment to check authentication boundaries and the device flow without
+approving a client or generating audio.
+
 ## Authentication
 
 Every request carries `Authorization: Bearer <credential>`:

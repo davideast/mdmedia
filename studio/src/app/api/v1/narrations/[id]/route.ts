@@ -1,4 +1,5 @@
 import { apiError, authenticate, forbiddenScope, hasScope, unauthorized } from "@/lib/api-auth";
+import { apiOrigin } from "@/lib/api-origin";
 import { toNarrationResource } from "@/lib/narration-api";
 import { loadReadableNarration } from "@/lib/narration-server";
 
@@ -12,7 +13,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const narration = /^[A-Za-z0-9_-]{1,128}$/.test(id) ? await loadReadableNarration(id, caller.uid) : null;
   if (!narration) return apiError(404, "not_found", "No narration with that id is available to you.");
-  return Response.json(toNarrationResource({ ...narration, id }, new URL(request.url).origin), {
+  return Response.json(toNarrationResource({ ...narration, id }, apiOrigin(request)), {
     headers: { "Cache-Control": "no-store" },
   });
 }

@@ -16,6 +16,7 @@
     "preview:hosted": "cp .next-hosted-staged/sw.js public/sw-preview.js && PYRIC_SANDBOX_FORCE=1 PYRIC_SANDBOX=remote:http://127.0.0.1:3473 MDMEDIA_DIST_DIR=.next-hosted-staged next start --hostname 127.0.0.1 --port 3100",
     "release:hosted": "node scripts/release-hosted.mjs",
     "check:hosted-connection": "node scripts/check-hosted-connection.mjs",
+    "check:narration-api": "node scripts/check-narration-api.mjs",
     "start": "next start",
     "lint": "eslint",
     "check:cqrs": "ast-grep scan -c checks/sgconfig.yml",

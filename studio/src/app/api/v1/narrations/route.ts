@@ -1,4 +1,5 @@
 import { apiError, authenticate, authorize, forbiddenScope, hasScope, unauthorized } from "@/lib/api-auth";
+import { apiOrigin } from "@/lib/api-origin";
 import { resolveNarrationBody, toNarrationResource } from "@/lib/narration-api";
 import { activeStreamCount, listOwnNarrations } from "@/lib/narration-server";
 import { startNarration } from "@/lib/narration-start";
@@ -31,7 +32,7 @@ export async function GET(request: Request): Promise<Response> {
   const narrations = (await listOwnNarrations(caller.uid))
     .filter((narration) => (!q || narration.title.toLowerCase().includes(q)) && (!status || narration.status === status))
     .slice(0, limit);
-  const origin = new URL(request.url).origin;
+  const origin = apiOrigin(request);
   return Response.json(
     { narrations: narrations.map((narration) => toNarrationResource(narration, origin)) },
     { headers: { "Cache-Control": "no-store" } },
@@ -98,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  const origin = new URL(request.url).origin;
+  const origin = apiOrigin(request);
   return Response.json({
     id: started.id,
     status: "streaming",
