@@ -18,6 +18,54 @@ Open [http://localhost:3000](http://localhost:3000). The hosted sandbox listens 
 
 Set `GEMINI_API_KEY` in `studio/.env` for narration synthesis. The browser Firebase settings in `.env.local.example` are needed when connecting to the real Firebase project. Set `MDMEDIA_ALLOWED_DEV_ORIGINS` to a comma-separated list of Tailscale hostnames when using the development server through Tailscale.
 
+If you don't need unpublished Pyric changes, the exact tarballs referenced by
+`package.json` are also available from npm. Instead of packing a local checkout:
+
+```bash
+mkdir -p .pyric-local
+npm pack @pyric/cli@0.1.0-alpha.24 pyric@0.1.0-alpha.24 pyric-admin@0.1.0-alpha.24 create-pyric@0.1.0-alpha.24 --pack-destination .pyric-local --ignore-scripts
+```
+
+### Tailscale on Windows with mirrored WSL networking
+
+Use different Windows HTTPS ports and Linux backend ports to avoid conflicting
+listeners. Put these settings in `studio/.env.local`, replacing the hostname:
+
+```dotenv
+PORT=3001
+MDMEDIA_PYRIC_PORT=3474
+NEXT_PUBLIC_PYRIC_BRIDGE_PORT=3444
+MDMEDIA_ALLOWED_DEV_ORIGINS=<device>.<tailnet>.ts.net
+MDMEDIA_PUBLIC_ORIGIN=https://<device>.<tailnet>.ts.net:3443
+```
+
+From the repository root, start Studio and configure Windows Tailscale:
+
+```bash
+npm run studio:bg
+"/mnt/c/Program Files/Tailscale/tailscale.exe" serve --bg --https=3443 http://127.0.0.1:3001
+"/mnt/c/Program Files/Tailscale/tailscale.exe" serve --bg --https=3444 http://127.0.0.1:3474
+```
+
+Open `http://localhost:3001` locally or
+`https://<device>.<tailnet>.ts.net:3443` from a tailnet device. The background
+runner reads `.env.local` and passes the allowed hostname to Pyric. Local
+WebSockets use port 3474; remote browsers use HTTPS WebSockets on port 3444.
+Run `npm run studio:status`, `npm run studio:logs`, or `npm run studio:stop`
+from the root; restart with `npm --prefix studio run dev:restart`. Background
+processes last for the current WSL session; Tailscale's proxy configuration
+persists. To remove these proxies, run the Windows Tailscale executable with
+`serve --https=3443 off` and `serve --https=3444 off`.
+
+Check the backend with
+`npm --prefix studio run check:hosted-connection -- http://localhost:3001`.
+If WSL cannot resolve or reach its own Windows tailnet address, run the HTTPS
+check with Windows Node, which uses Windows tailnet DNS:
+
+```bash
+"/mnt/c/Program Files/nodejs/node.exe" "$(wslpath -w "$PWD/studio/scripts/check-hosted-connection.mjs")" https://<device>.<tailnet>.ts.net:3443
+```
+
 ### Run at login on a Mac
 
 The LaunchAgents run the hosted Pyric sandbox and a compiled Next.js production server under `launchd`, bound to `127.0.0.1`, and configure private Tailscale HTTPS proxies on ports `3000` and `3473`. Tailscale must be signed in with HTTPS enabled for the tailnet. Generate the agents for this checkout and hostname so machine paths do not enter the repository:

@@ -14,6 +14,17 @@ if (fs.existsSync(bridgeUrlPath)) {
     fs.writeFileSync(bridgeUrlPath, content, 'utf8');
     console.log('[patch] Patched bridge-url.js to preserve bridge port under Next.js');
   }
+  // Mirrored WSL reserves Windows listener ports. Its public Tailscale port
+  // can differ from the Linux backend port; localhost still uses the latter.
+  const hostTarget = 'const hostTarget = shouldPreserveRawPort ? `${locUrl.hostname}:${rawUrl.port}` : locUrl.host;';
+  const publicPortTarget = `const isLoopback = ['localhost', '127.0.0.1', '[::1]'].includes(locUrl.hostname);
+        const bridgePort = isLoopback ? rawUrl.port : (process.env.NEXT_PUBLIC_PYRIC_BRIDGE_PORT || rawUrl.port);
+        const hostTarget = shouldPreserveRawPort ? \`\${locUrl.hostname}:\${bridgePort}\` : locUrl.host;`;
+  if (content.includes(hostTarget)) {
+    content = content.replace(hostTarget, publicPortTarget);
+    fs.writeFileSync(bridgeUrlPath, content, 'utf8');
+    console.log('[patch] Support a separate public Pyric bridge port');
+  }
 }
 
 // Hosted namespace routes use their own Host/Origin guard. The CLI passes

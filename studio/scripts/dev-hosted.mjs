@@ -18,9 +18,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const STUDIO_DIR = path.resolve(__dirname, '..');
+// Next loads this file itself, but Pyric needs the allowed hosts before Next starts.
+const localEnv = path.join(STUDIO_DIR, '.env.local');
+if (fs.existsSync(localEnv)) process.loadEnvFile(localEnv);
+
 const PID_FILE = path.join(STUDIO_DIR, '.dev.pid');
 const LOG_FILE = path.join(STUDIO_DIR, '.dev.log');
 const PORT = process.env.PORT || '3000';
+const PYRIC_PORT = process.env.MDMEDIA_PYRIC_PORT || '3473';
 
 function killPortListeners(port) {
   try {
@@ -78,6 +83,13 @@ async function sleep(ms) {
 }
 
 async function start() {
+  try {
+    execSync('systemctl --user is-active --quiet mdmedia-studio.service', { stdio: 'ignore' });
+    console.error('[studio-dev] Production service is running. Stop it with npm --prefix studio run service:stop before starting development.');
+    process.exitCode = 1;
+    return;
+  } catch { /* No active production service on this machine. */ }
+
   const existingPid = getRunningPid();
   if (existingPid) {
     console.log(`[studio-dev] Server is already running in background.`);
@@ -92,7 +104,7 @@ async function start() {
 
   // Clean any orphaned processes listening on ports
   killPortListeners(PORT);
-  killPortListeners(3473);
+  killPortListeners(PYRIC_PORT);
 
   const logFd = fs.openSync(LOG_FILE, 'a');
   const timestamp = new Date().toISOString();
@@ -103,7 +115,12 @@ async function start() {
   const child = spawn(
     process.execPath,
     [path.join(STUDIO_DIR, 'node_modules', '@pyric', 'cli', 'dist', 'cli', 'index.js'),
-      'sandbox', '--hosted', '--', 'next', 'dev', '--port', PORT],
+      'sandbox', '--hosted', '--no-open',
+      '--port', PYRIC_PORT,
+      ...(process.env.MDMEDIA_ALLOWED_DEV_ORIGINS
+        ? ['--allowed-host', process.env.MDMEDIA_ALLOWED_DEV_ORIGINS]
+        : []),
+      '--', 'next', 'dev', '--hostname', '127.0.0.1', '--port', PORT],
     {
       cwd: STUDIO_DIR,
       detached: true,
@@ -195,7 +212,7 @@ async function stop() {
   } catch {}
 
   killPortListeners(PORT);
-  killPortListeners(3473);
+  killPortListeners(PYRIC_PORT);
 
   console.log(`[studio-dev] Server stopped successfully.`);
 }

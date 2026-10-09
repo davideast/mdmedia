@@ -136,6 +136,7 @@ export default async function buildConfig(): Promise<NextConfig> {
     ...nextConfig,
     env: {
       ...nextConfig.env,
+      NEXT_PUBLIC_PYRIC_BRIDGE_PORT: process.env.NEXT_PUBLIC_PYRIC_BRIDGE_PORT ?? '',
       NEXT_PUBLIC_PYRIC_PROJECT_KEY: process.env.PYRIC_PROJECT_KEY ?? __dirname,
       NEXT_PUBLIC_PYRIC_BRIDGE_URL: bridgeUrl.toString(),
     },
