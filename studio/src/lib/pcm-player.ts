@@ -58,6 +58,40 @@ function extractPcm(wav: Uint8Array): Uint8Array {
   return wav.subarray(WAV_HEADER_BYTES);
 }
 
+/**
+ * The one audio element every finished narration plays through. Mobile
+ * browsers only let an element start without a tap once a tap has started it,
+ * so reusing it is what lets a playlist advance from the lock screen.
+ */
+let sharedAudio: HTMLAudioElement | null = null;
+let sharedAudioOwner: StreamingPcmPlayer | null = null;
+
+function sharedAudioElement(): HTMLAudioElement {
+  if (!sharedAudio) {
+    sharedAudio = document.createElement("audio");
+    sharedAudio.preload = "auto";
+    sharedAudio.style.display = "none";
+  }
+  if (!sharedAudio.isConnected) document.body.appendChild(sharedAudio);
+  return sharedAudio;
+}
+
+/**
+ * Call synchronously inside a tap or click that starts playback. Plays a
+ * moment of silence on the shared element when no narration owns it, which
+ * unlocks it for later programmatic play (the next playlist track).
+ */
+export function unlockPlaybackAudio(): void {
+  if (typeof document === "undefined" || sharedAudioOwner !== null) return;
+  const audio = sharedAudioElement();
+  if (!audio.paused) return;
+  const silence = wrapPcmAsWav(new Uint8Array(SAMPLE_RATE / 10 * 2));
+  let binary = "";
+  for (const byte of silence) binary += String.fromCharCode(byte);
+  audio.src = `data:audio/wav;base64,${btoa(binary)}`;
+  void audio.play().catch(() => undefined);
+}
+
 export class StreamingPcmPlayer {
   private samples: Float32Array<ArrayBuffer> = new Float32Array(INITIAL_CAPACITY);
   private sampleCount = 0;
@@ -70,6 +104,7 @@ export class StreamingPcmPlayer {
   private nativeAudio: HTMLAudioElement | null = null;
   private nativeUrl: string | null = null;
   private nativeActive = false;
+  private nativeListeners: AbortController | null = null;
   private handoffToken = 0;
 
   private scheduledSamples = 0;
@@ -87,6 +122,7 @@ export class StreamingPcmPlayer {
   private frame: number | null = null;
   private starveTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly subscribers = new Set<Subscriber>();
+  private readonly endedListeners = new Set<() => void>();
 
   /** Appends 16-bit little-endian mono PCM, extending the track in place. */
   append(pcm: Uint8Array): void {
@@ -259,6 +295,14 @@ export class StreamingPcmPlayer {
     };
   }
 
+  /** Runs when playback reaches the end of the recording, inside the media event. */
+  onEnded(callback: () => void): () => void {
+    this.endedListeners.add(callback);
+    return () => {
+      this.endedListeners.delete(callback);
+    };
+  }
+
   /** Replaces or incrementally extends the buffer with a WAV recording. */
   async loadWavUrl(url: string, options?: { final?: boolean }): Promise<void> {
     const response = await fetch(url);
@@ -308,6 +352,7 @@ export class StreamingPcmPlayer {
     this.clearStarveTimer();
     this.disposeNativeAudio();
     this.subscribers.clear();
+    this.endedListeners.clear();
     const context = this.context;
     this.context = null;
     this.gain = null;
@@ -327,36 +372,39 @@ export class StreamingPcmPlayer {
     if (this.nativeAudio || typeof document === "undefined" ||
         typeof URL.createObjectURL !== "function") return;
 
-    const audio = document.createElement("audio");
+    const audio = sharedAudioElement();
+    if (sharedAudioOwner && sharedAudioOwner !== this) sharedAudioOwner.disposeNativeAudio();
+    sharedAudioOwner = this;
+    const listeners = new AbortController();
+    this.nativeListeners = listeners;
+    const { signal } = listeners;
     const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "audio/wav" }));
+    audio.pause();
     audio.src = url;
-    audio.preload = "auto";
     audio.playbackRate = this.rateValue;
     audio.volume = this.volumeValue;
-    audio.style.display = "none";
-    document.body.appendChild(audio);
     audio.addEventListener("playing", () => {
       if (!this.nativeActive || this.destroyed) return;
       this.isPlaying = true;
       this.startFrameLoop();
       this.notify();
-    });
+    }, { signal });
     audio.addEventListener("pause", () => {
       if (!this.nativeActive || this.destroyed || audio.ended) return;
       this.pausedMs = audio.currentTime * 1000;
       this.isPlaying = false;
       this.stopFrameLoop();
       this.notify();
-    });
+    }, { signal });
     audio.addEventListener("ended", () => {
       if (this.nativeActive && !this.destroyed) this.finish();
-    });
+    }, { signal });
     audio.addEventListener("timeupdate", () => {
       if (this.nativeActive && !this.destroyed) this.notify();
-    });
+    }, { signal });
     audio.addEventListener("seeked", () => {
       if (this.nativeActive && !this.destroyed) this.notify();
-    });
+    }, { signal });
     this.nativeAudio = audio;
     this.nativeUrl = url;
     if (this.isPlaying) this.handoffToNative(audio);
@@ -420,11 +468,14 @@ export class StreamingPcmPlayer {
     const audio = this.nativeAudio;
     this.nativeAudio = null;
     this.nativeActive = false;
-    if (audio) {
+    this.nativeListeners?.abort();
+    this.nativeListeners = null;
+    // The shared element outlives this player so the next track can reuse it.
+    if (audio && sharedAudioOwner === this) {
+      sharedAudioOwner = null;
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
-      audio.remove();
     }
     if (this.nativeUrl) URL.revokeObjectURL(this.nativeUrl);
     this.nativeUrl = null;
@@ -553,6 +604,7 @@ export class StreamingPcmPlayer {
     if (!this.nativeActive) this.activateNative();
     this.stopFrameLoop();
     this.notify();
+    for (const listener of [...this.endedListeners]) listener();
   }
 
   private stopSources(): void {

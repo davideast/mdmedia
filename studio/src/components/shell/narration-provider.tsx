@@ -10,7 +10,8 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import { useNarrationStream } from "@/lib/use-narration-stream";
+import { prefetchNarration, useNarrationStream } from "@/lib/use-narration-stream";
+import { unlockPlaybackAudio } from "@/lib/pcm-player";
 import type { NarrationStreamState } from "@/lib/use-narration-stream";
 import {
   DEFAULT_HEADING_INSTRUCTIONS,
@@ -105,7 +106,6 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     }
     return "adapted";
   });
-  const wasPlayingRef = useRef(false);
   const lastStreamIdRef = useRef(stream.id);
 
   const setDocumentView = useCallback(
@@ -207,6 +207,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
         index: safeIndex,
       });
       void stream.loadExisting(target.id, { autoPlay: true });
+      unlockPlaybackAudio();
     },
     [stream],
   );
@@ -215,6 +216,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     (narration: Narration) => {
       setQueue(null);
       void stream.loadExisting(narration.id, { autoPlay: true });
+      unlockPlaybackAudio();
     },
     [stream],
   );
@@ -222,6 +224,7 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   const playNarration = useCallback((id: string, startAtMs?: number) => {
     setQueue(null);
     void stream.loadExisting(id, { autoPlay: true, startAtMs });
+    unlockPlaybackAudio();
   }, [stream]);
 
   const nextTrack = useCallback(() => {
@@ -252,21 +255,21 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
     void stream.loadExisting(target.id, { autoPlay: true });
   }, [queue, stream]);
 
-  // Auto-advance to the next track in the playlist when playback reaches the end.
+  // Advance from inside the player's ended event. Position-driven effects stop
+  // updating on a locked phone, and the next track must start while the page
+  // is still allowed to run.
+  const advanceRef = useRef<() => void>(() => {});
+  advanceRef.current = () => {
+    if (queue !== null && queue.index + 1 < queue.tracks.length) nextTrack();
+  };
+  useEffect(() => stream.player?.onEnded(() => advanceRef.current()), [stream.player]);
+
+  // Fetch the following track while this one plays so advancing is immediate.
+  const upcoming = queue && queue.tracks[queue.index]?.id === stream.id ? queue.tracks[queue.index + 1] : undefined;
+  const upcomingId = upcoming && upcoming.status === "ready" && stream.status === "ready" ? upcoming.id : null;
   useEffect(() => {
-    const justEnded =
-      wasPlayingRef.current &&
-      !stream.playing &&
-      stream.status === "ready" &&
-      stream.durationMs > 0 &&
-      stream.positionMs >= stream.durationMs - 150;
-
-    wasPlayingRef.current = stream.playing;
-
-    if (justEnded && queue !== null && queue.index + 1 < queue.tracks.length) {
-      nextTrack();
-    }
-  }, [stream.playing, stream.status, stream.durationMs, stream.positionMs, queue, nextTrack]);
+    if (upcomingId) prefetchNarration(upcomingId);
+  }, [upcomingId]);
 
   const value = useMemo(
     () => ({

@@ -121,6 +121,51 @@ async function readMessage(response: Response, fallback: string): Promise<string
   }
 }
 
+interface Recording {
+  audioBlob: Blob;
+  timings: NarrationTimingsFile;
+}
+
+/** Finished recordings fetched ahead of a playlist reaching them, newest last. */
+const prefetchedRecordings = new Map<string, Promise<Recording | null>>();
+const MAX_PREFETCHED = 2;
+
+async function fetchRecording(id: string, headers: Record<string, string>): Promise<Recording | null> {
+  const [audioResponse, timingsResponse] = await Promise.all([
+    fetch(`/api/narrations/${id}/audio?raw=1`, { headers }),
+    fetch(`/api/narrations/${id}/timings?raw=1`, { headers }),
+  ]);
+  if (!audioResponse.ok || !timingsResponse.ok) return null;
+  const [audioBlob, timings] = await Promise.all([
+    audioResponse.blob(),
+    timingsResponse.json() as Promise<NarrationTimingsFile>,
+  ]);
+  return { audioBlob, timings };
+}
+
+/**
+ * Downloads a finished narration so a playlist can switch to it without a
+ * network wait. On a locked phone that wait is silence, and silence lets the
+ * browser suspend the page before the next track starts.
+ */
+export function prefetchNarration(id: string): void {
+  if (prefetchedRecordings.has(id)) return;
+  const recording = currentIdToken()
+    .then((token) => fetchRecording(id, token ? { Authorization: `Bearer ${token}` } : {}))
+    .catch(() => null);
+  prefetchedRecordings.set(id, recording);
+  void recording.then((result) => { if (!result) prefetchedRecordings.delete(id); });
+  while (prefetchedRecordings.size > MAX_PREFETCHED) {
+    prefetchedRecordings.delete(prefetchedRecordings.keys().next().value!);
+  }
+}
+
+function takePrefetched(id: string): Promise<Recording | null> | undefined {
+  const recording = prefetchedRecordings.get(id);
+  prefetchedRecordings.delete(id);
+  return recording;
+}
+
 export function useNarrationStream(): NarrationStreamState {
   const [id, setId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
@@ -442,30 +487,48 @@ export function useNarrationStream(): NarrationStreamState {
       let lastDurationMs = -1;
       let autoPlayed = false;
       let loadChain = Promise.resolve();
+      const prefetched = takePrefetched(narrationId);
+      let finalPulled = false;
+      const pullFinal = () => {
+        if (finalPulled) return;
+        finalPulled = true;
+        loadChain = loadChain
+          .then(() => pullCheckpoint(true))
+          .then((ok) => {
+            if (ok && session === loadSessionRef.current) setStatus('ready');
+          });
+      };
 
       const pullCheckpoint = async (isFinal: boolean): Promise<boolean> => {
         if (session !== loadSessionRef.current) return false;
         try {
-          const [audioResponse, timingsResponse] = await Promise.all([
-            fetch(`/api/narrations/${narrationId}/audio?raw=1`, { headers }),
-            fetch(`/api/narrations/${narrationId}/timings?raw=1`, { headers }),
-          ]);
+          const recording = isFinal ? await prefetched : null;
+          let audioBlob: Blob;
+          let timingsFile: NarrationTimingsFile;
+          if (recording) {
+            ({ audioBlob, timings: timingsFile } = recording);
+          } else {
+            const [audioResponse, timingsResponse] = await Promise.all([
+              fetch(`/api/narrations/${narrationId}/audio?raw=1`, { headers }),
+              fetch(`/api/narrations/${narrationId}/timings?raw=1`, { headers }),
+            ]);
 
-          if (session !== loadSessionRef.current) return false;
+            if (session !== loadSessionRef.current) return false;
 
-          if (!audioResponse.ok || !timingsResponse.ok) {
-            if (isFinal) {
-              const failing = audioResponse.ok ? timingsResponse : audioResponse;
-              setStatus('error');
-              setErrorMessage(await readMessage(failing, LOAD_FAILURE));
+            if (!audioResponse.ok || !timingsResponse.ok) {
+              if (isFinal) {
+                const failing = audioResponse.ok ? timingsResponse : audioResponse;
+                setStatus('error');
+                setErrorMessage(await readMessage(failing, LOAD_FAILURE));
+              }
+              return false;
             }
-            return false;
-          }
 
-          const [audioBlob, timingsFile] = await Promise.all([
-            audioResponse.blob(),
-            timingsResponse.json() as Promise<NarrationTimingsFile>,
-          ]);
+            [audioBlob, timingsFile] = await Promise.all([
+              audioResponse.blob(),
+              timingsResponse.json() as Promise<NarrationTimingsFile>,
+            ]);
+          }
 
           if (session !== loadSessionRef.current) return false;
 
@@ -563,13 +626,13 @@ export function useNarrationStream(): NarrationStreamState {
 
         if (narration.status === 'ready' || isStaleStreaming) {
           stopDocWatch();
-          loadChain = loadChain
-            .then(() => pullCheckpoint(true))
-            .then((ok) => {
-              if (ok && session === loadSessionRef.current) setStatus('ready');
-            });
+          pullFinal();
         }
       });
+      // A prefetched recording is already final: start it without waiting for
+      // the document listener's first snapshot. The listener still fills in
+      // the document fields.
+      if (prefetched) pullFinal();
     },
     [ensurePlayer, resetPlayer],
   );
