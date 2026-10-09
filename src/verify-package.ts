@@ -148,7 +148,18 @@ async function verifyPackagingAndConsumerHarness() {
     'CLI subcommand (mdmedia audio --help) resolves flags cleanly'
   );
 
-  // 5. Test Programmatic ESM Runtime Resolution across all 13 subpath exports
+  const imagePlanOutput = execSync(
+    'node ./node_modules/.bin/mdmedia image --provider openai --prompt "Package validation" --output check.png --dry-run',
+    { cwd: SANDBOX_DIR, encoding: 'utf-8', env: childEnv }
+  );
+  const imagePlan = JSON.parse(imagePlanOutput);
+  assert(
+    imagePlan.dryRun === true && imagePlan.model === 'gpt-image-2.5-flare' && imagePlan.size === '1536x864' &&
+      !fs.existsSync(resolve(SANDBOX_DIR, 'check.png')),
+    'Packaged image CLI validates GPT Image 2.5 without generation or output writes'
+  );
+
+  // 5. Test Programmatic ESM Runtime Resolution across core public subpath exports
   console.log('\n--- 5. Testing Programmatic ESM Runtime Resolution ---');
   const esmTestScript = `
 import * as root from 'mdmedia';
@@ -156,6 +167,7 @@ import * as audio from 'mdmedia/audio';
 import * as video from 'mdmedia/video';
 import * as music from 'mdmedia/music';
 import * as sfx from 'mdmedia/sfx';
+import * as image from 'mdmedia/image';
 import * as chunker from 'mdmedia/chunker';
 import * as pipeline from 'mdmedia/pipeline';
 import * as tts from 'mdmedia/tts';
@@ -172,6 +184,7 @@ if (!audio.getActiveWordAtPosition) throw new Error('Missing getActiveWordAtPosi
 if (!video.GeminiOmniVideoProvider) throw new Error('Missing GeminiOmniVideoProvider in mdmedia/video');
 if (!music.LyriaMusicProvider) throw new Error('Missing LyriaMusicProvider in mdmedia/music');
 if (!sfx.ElevenLabsSoundEffectsProvider) throw new Error('Missing ElevenLabsSoundEffectsProvider in mdmedia/sfx');
+if (!root.runImageGeneration || !image.createImageProvider || !image.RetroDiffusionImageProvider) throw new Error('Missing image workflow/providers in package exports');
 if (!chunker.prepareDocumentChunks) throw new Error('Missing prepareDocumentChunks in mdmedia/chunker');
 if (!chunker.mapChunkToMarkdown) throw new Error('Missing mapChunkToMarkdown in mdmedia/chunker');
 if (!pipeline.UniversalEventBus) throw new Error('Missing UniversalEventBus in mdmedia/pipeline');
@@ -183,11 +196,11 @@ if (!storage.AudioLibrary) throw new Error('Missing AudioLibrary in mdmedia/stor
 if (!narration.GeminiNarrationAdapter) throw new Error('Missing GeminiNarrationAdapter in mdmedia/narration');
 if (!markdown.GeminiMarkdownStructureAdapter) throw new Error('Missing GeminiMarkdownStructureAdapter in mdmedia/markdown');
 
-console.log('[ESM Runtime Test] All named exports across all 13 subpaths resolved cleanly!');
+console.log('[ESM Runtime Test] Named exports across core public subpaths resolved cleanly!');
 `;
   await writeFile(resolve(SANDBOX_DIR, 'consumer.mjs'), esmTestScript);
   execSync('node consumer.mjs', { cwd: SANDBOX_DIR, stdio: 'inherit', env: childEnv });
-  assert(true, 'All 13 ESM subpath imports resolve at runtime without errors');
+  assert(true, 'Core ESM subpath imports resolve at runtime without errors');
 
   // 6. Test TypeScript Consumer Declaration Compilation (.d.ts)
   console.log('\n--- 6. Testing TypeScript Type Declaration (.d.ts) Compilation ---');
@@ -214,6 +227,7 @@ import type { VoiceName, DocumentChunk, IFileReader, PipelineEventMap, Synthesis
 import type { GenerateVideoOptions } from 'mdmedia/video';
 import type { GenerateMusicOptions } from 'mdmedia/music';
 import type { GenerateSoundEffectOptions } from 'mdmedia/sfx';
+import type { RunImageGenerationArgs, ImageRequest, ImageResult, IImageProvider } from 'mdmedia/image';
 import type { WordTiming, ChunkTiming } from 'mdmedia/storage';
 import type { WordHighlight } from 'mdmedia/audio';
 import type { INarrationAdapter } from 'mdmedia/narration';
@@ -232,6 +246,10 @@ const voice: VoiceName = 'Puck';
 const opts: GenerateVideoOptions = { aspectRatio: '16:9' };
 const musicOpts: GenerateMusicOptions = { outputFormat: 'mp3' };
 const sfxOpts: GenerateSoundEffectOptions = { durationSeconds: 2, loop: true };
+const imageOpts: RunImageGenerationArgs = { provider: 'openai', prompt: 'Fox', output: 'fox.png', dryRun: true };
+let imageRequest: ImageRequest | null = null;
+let imageResult: ImageResult | null = null;
+let imageProvider: IImageProvider | null = null;
 const bus = new UniversalEventBus();
 let runArgs: RunAudioSynthesisArgs | null = null;
 let word: WordTiming | null = null;
@@ -253,6 +271,10 @@ export {
   opts,
   musicOpts,
   sfxOpts,
+  imageOpts,
+  imageRequest,
+  imageResult,
+  imageProvider,
   bus,
   runArgs,
   word,
@@ -273,7 +295,7 @@ export {
   const tscBin = resolve(process.cwd(), 'node_modules/.bin/tsc');
   const tscCmd = fs.existsSync(tscBin) ? `"${tscBin}"` : 'tsc';
   execSync(`${tscCmd} -p tsconfig.json`, { cwd: SANDBOX_DIR, stdio: 'inherit', env: childEnv });
-  assert(true, 'TypeScript compilation against all 13 mdmedia subpath declarations succeeded with 0 errors');
+  assert(true, 'TypeScript compilation against core mdmedia subpath declarations succeeded with 0 errors');
 
   // Cleanup
   await rm(SANDBOX_DIR, { recursive: true, force: true });

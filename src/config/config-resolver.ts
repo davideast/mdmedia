@@ -11,6 +11,8 @@ import { DEFAULT_ELEVENLABS_SFX_MODEL } from '../sfx/elevenlabs-sfx-provider.js'
 import { resolveTTSSelection } from '../tts/provider-registry.js';
 import { normalizeTTSProviderName } from '../tts/provider-name.js';
 import { elevenLabsApiKeyFromEnv } from '../elevenlabs/request-error.js';
+import { resolveImageSelection } from '../image/selection.js';
+import type { ImageSelection, ImageSettings } from '../image/types.js';
 
 export interface ResolvedAudioConfig {
   readonly provider: string;
@@ -56,6 +58,7 @@ export interface ResolvedConfig {
   readonly video: ResolvedVideoConfig;
   readonly music: ResolvedMusicConfig;
   readonly sfx: ResolvedSoundEffectsConfig;
+  readonly image: ImageSelection;
   readonly narration: ResolvedNarrationConfig;
   readonly maxChars: number;
   readonly maxRetries: number;
@@ -89,6 +92,7 @@ export interface CLIArgs {
   maxChars?: number;
   maxRetries?: number;
   apiKey?: string;
+  image?: ImageSettings;
 }
 
 export function resolveConfig(
@@ -102,6 +106,12 @@ export function resolveConfig(
   const musicConfig: MusicConfig = fileConfig.music ?? {};
   const sfxConfig: SoundEffectsConfig = fileConfig.sfx ?? {};
   const narrationConfig: NarrationConfig = fileConfig.narration ?? {};
+  const image = resolveImageSelection({
+    requested: { ...cliArgs.image, apiKey: cliArgs.image?.apiKey ?? (mode === 'image' ? cliArgs.apiKey : undefined) },
+    configured: fileConfig.image,
+    legacyApiKey: fileConfig.apiKey,
+    env,
+  });
 
   const audioSelection = resolveTTSSelection({
     requested: {
@@ -161,11 +171,14 @@ export function resolveConfig(
     video: resolvedVideo,
     music: resolvedMusic,
     sfx: resolvedSfx,
+    image,
     narration: resolvedNarration,
     maxChars: cliArgs.maxChars ?? fileConfig.maxChars ?? 400,
     maxRetries: cliArgs.maxRetries ?? fileConfig.maxRetries ?? 3,
     apiKey:
-      mode === 'audio'
+      mode === 'image'
+        ? image.apiKey
+        : mode === 'audio'
         ? audioSelection.apiKey
         : mode === 'sfx'
           ? // The top-level apiKey is a Gemini key; never send it to ElevenLabs.
