@@ -14,18 +14,21 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useWorkspace, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { PresetList } from "@/components/studio/preset-list";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
+import { ONE_OFF, selectedPresetId } from "@/lib/presets";
 import {
   DEFAULT_SETTINGS,
+  DELIVERY_PRESETS,
+  INSTRUCTION_PRESETS,
   HIGHLIGHT_COLORS,
   settingsDefaultVoice,
   TTS_MODELS,
   type HighlightColorId,
+  type TextPreset,
   type TTSModelName,
   type UserSettings,
   type Visibility,
@@ -67,22 +70,53 @@ function Row({
   );
 }
 
+/** Chooses which preset new narrations start with. */
+function DefaultPresetSelect({
+  id,
+  presets,
+  text,
+  onChange,
+}: {
+  id: string;
+  presets: readonly TextPreset[];
+  text: string;
+  onChange: (text: string) => void;
+}) {
+  const selected = selectedPresetId(presets, text, undefined);
+  return (
+    <Select
+      value={selected}
+      onValueChange={(value) => {
+        const preset = presets.find((item) => item.id === value);
+        if (preset) onChange(preset.text);
+      }}
+    >
+      <SelectTrigger id={id} className="w-full">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {presets.map((preset) => (
+          <SelectItem key={preset.id} value={preset.id}>{preset.name}</SelectItem>
+        ))}
+        {selected === ONE_OFF ? <SelectItem value={ONE_OFF} disabled>Current text (not a preset)</SelectItem> : null}
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function SettingsPage() {
-  const { store, activeTab } = useWorkspace();
   const { profile, defaultReader, updateSettings, signOutUser } = useAuth();
   const { highlightColor, setHighlightColor } = useNarration();
   const { theme, setTheme } = useTheme();
-  const [editedDelivery, setEditedDelivery] = useWorkspaceField<string | null>("delivery", null);
 
   const settings: UserSettings = profile?.settings ?? DEFAULT_SETTINGS;
+  const deliveryPresets = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
+  const instructionPresets = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];
 
   const save = (patch: Partial<UserSettings>) => {
     try {
       void updateSettings(patch, {
-        onSaved: () => {
-          if (activeTab && patch.defaultPromptStyle !== undefined) store.acknowledgeField(activeTab.id, "delivery", patch.defaultPromptStyle);
-        },
-        onError: () => toast.error("That setting did not save. Your edit is kept on this device."),
+        onError: () => toast.error("That setting did not save. Try again."),
       });
     } catch {
       toast.error("That setting did not save. Try again.");
@@ -195,19 +229,12 @@ export default function SettingsPage() {
           {defaultReader.provider !== "elevenlabs" ? (
             <>
               <Separator />
-              <Row label="Delivery" hint="How the reader should sound." htmlFor="default-style">
-                <Textarea
+              <Row label="Delivery" hint="How the reader should sound by default." htmlFor="default-style">
+                <DefaultPresetSelect
                   id="default-style"
-                  key={`${profile?.uid ?? "defaults"}:${settings.defaultPromptStyle}`}
-                  value={editedDelivery ?? settings.defaultPromptStyle}
-                  onChange={(event) => setEditedDelivery(event.target.value)}
-                  rows={3}
-                  className="resize-none"
-                  onBlur={(event) => {
-                    if (event.target.value !== settings.defaultPromptStyle) {
-                      save({ defaultPromptStyle: event.target.value });
-                    }
-                  }}
+                  presets={deliveryPresets}
+                  text={settings.defaultPromptStyle}
+                  onChange={(text) => save({ defaultPromptStyle: text })}
                 />
               </Row>
             </>
@@ -226,6 +253,67 @@ export default function SettingsPage() {
                 checked={settings.rewriteForNarration}
                 onCheckedChange={(checked) => save({ rewriteForNarration: checked })}
               />
+            </div>
+          </Row>
+
+          <Separator />
+
+          <Row label="Custom instructions" hint="What the rewrite starts with." htmlFor="default-instructions">
+            <DefaultPresetSelect
+              id="default-instructions"
+              presets={instructionPresets}
+              text={settings.defaultRewriteInstructions}
+              onChange={(text) => save({ defaultRewriteInstructions: text })}
+            />
+          </Row>
+
+          <Separator />
+
+          <Row
+            label="Clean document structure"
+            hint="Format headings, fences, tables, and Mermaid charts."
+            htmlFor="default-structure"
+          >
+            <div className="justify-self-end">
+              <Switch
+                id="default-structure"
+                checked={settings.structureMarkdown}
+                onCheckedChange={(checked) => save({ structureMarkdown: checked })}
+              />
+            </div>
+          </Row>
+
+          <Separator />
+
+          <Row
+            label="Verbalize diagrams"
+            hint="Translate Mermaid and ASCII diagrams into spoken descriptions."
+            htmlFor="default-verbalize"
+          >
+            <div className="justify-self-end">
+              <Switch
+                id="default-verbalize"
+                checked={settings.verbalizeDiagrams}
+                onCheckedChange={(checked) => save({ verbalizeDiagrams: checked })}
+              />
+            </div>
+          </Row>
+
+          <Separator />
+
+          <Row label="Delivery presets" hint="Saved from the composer. Narrations keep their text if a preset is deleted." htmlFor="delivery-presets">
+            <div id="delivery-presets" className="min-w-0">
+              <PresetList label="Delivery" presets={settings.deliveryPresets}
+                onDelete={(id) => save({ deliveryPresets: settings.deliveryPresets.filter((preset) => preset.id !== id) })} />
+            </div>
+          </Row>
+
+          <Separator />
+
+          <Row label="Instruction presets" hint="Saved from the composer." htmlFor="instruction-presets">
+            <div id="instruction-presets" className="min-w-0">
+              <PresetList label="Instruction" presets={settings.instructionPresets}
+                onDelete={(id) => save({ instructionPresets: settings.instructionPresets.filter((preset) => preset.id !== id) })} />
             </div>
           </Row>
 

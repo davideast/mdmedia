@@ -14,7 +14,6 @@ import { prefetchNarration, useNarrationStream } from "@/lib/use-narration-strea
 import { unlockPlaybackAudio } from "@/lib/pcm-player";
 import type { NarrationStreamState } from "@/lib/use-narration-stream";
 import {
-  DEFAULT_HEADING_INSTRUCTIONS,
   DEFAULT_HIGHLIGHT_COLOR,
   DEFAULT_SETTINGS,
   HIGHLIGHT_COLORS,
@@ -44,6 +43,10 @@ export interface Draft {
   visibility: Visibility;
   speed?: number;
   verbalizeDiagrams?: boolean;
+  /** The delivery preset the composer chose, or "one-off" for text used once. */
+  deliveryPreset?: string;
+  /** The instructions preset the composer chose, or "one-off" for text used once. */
+  instructionPreset?: string;
 }
 
 export interface PlaylistQueueState {
@@ -178,11 +181,14 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
       voice: defaultReader,
       promptStyle: settings.defaultPromptStyle,
       rewriteForNarration: settings.rewriteForNarration,
-      rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,
+      rewriteInstructions: settings.defaultRewriteInstructions,
       visibility: settings.defaultVisibility,
       speed: 1.0,
-      verbalizeDiagrams: false,
       ...overrides,
+      // Document cleanup is a global preference, not a per-draft choice. Older
+      // drafts may still carry their own values; settings win.
+      structureMarkdown: settings.structureMarkdown,
+      verbalizeDiagrams: settings.verbalizeDiagrams,
     }),
     [settings, defaultReader, overrides],
   );

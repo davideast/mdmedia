@@ -9,14 +9,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
+import { PresetField } from "@/components/studio/preset-field";
 import { VoicePicker } from "@/components/studio/voice-picker";
+import { useAuth } from "@/lib/auth-context";
+import { addPreset } from "@/lib/presets";
 import {
-  DEFAULT_HEADING_INSTRUCTIONS,
+  DEFAULT_SETTINGS,
+  DELIVERY_PRESETS,
+  INSTRUCTION_PRESETS,
   type Visibility,
 } from "@/lib/types";
+import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 
 const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string; hint: string }> = [
@@ -30,6 +35,10 @@ import type { ReactNode } from "react";
 /** Voice and delivery controls for the composer. */
 export function ComposerSettings({ actions }: { actions?: ReactNode }) {
   const { draft, setDraft } = useNarration();
+  const { profile, updateSettings } = useAuth();
+  const settings = profile?.settings ?? DEFAULT_SETTINGS;
+  const deliveryPresets = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
+  const instructionPresets = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];
 
   return (
     <WorkbenchPanel
@@ -66,52 +75,17 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
       </div>
 
       {draft.voice.provider === "gemini" ? (
-        <div className="grid gap-2">
-          <Label htmlFor="style" className="t-label">
-            Delivery
-          </Label>
-          <Textarea
-            id="style"
-            value={draft.promptStyle}
-            onChange={(event) => setDraft({ promptStyle: event.target.value })}
-            rows={3}
-            className="resize-none"
-            placeholder="Warm, unhurried narration."
-          />
-        </div>
+        <PresetField
+          id="style"
+          label="Delivery"
+          presets={deliveryPresets}
+          text={draft.promptStyle}
+          choice={draft.deliveryPreset}
+          onChange={({ text, choice }) => setDraft({ promptStyle: text, deliveryPreset: choice })}
+          onSave={(preset) => void updateSettings({ deliveryPresets: addPreset(settings.deliveryPresets, preset) })}
+          placeholder="Warm, unhurried narration."
+        />
       ) : null}
-
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="grid min-w-0 gap-0.5">
-          <Label htmlFor="structure" className="t-card-title cursor-pointer font-normal">
-            Clean document structure
-          </Label>
-          <span className="text-[0.78rem] text-ink-muted">
-            Format headings, fences, tables, and Mermaid charts.
-          </span>
-        </div>
-        <Switch
-          id="structure"
-          checked={draft.structureMarkdown ?? false}
-          onCheckedChange={(checked) => setDraft({ structureMarkdown: checked })}
-        />
-      </div>
-
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="grid min-w-0 gap-0.5">
-          <Label htmlFor="verbalize-diagrams" className="t-card-title cursor-pointer font-normal">
-            Verbalize diagrams
-          </Label>
-          <span className="text-[0.78rem] text-ink-muted">
-            Translate Mermaid and ASCII diagrams into spoken descriptions.
-          </span>
-        </div>
-        <Switch
-          id="verbalize-diagrams"
-          checked={draft.verbalizeDiagrams ?? false}
-          onCheckedChange={(checked) => setDraft({ verbalizeDiagrams: checked })}
-        />
-      </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <Label htmlFor="rewrite" className="t-card-title cursor-pointer font-normal">
@@ -125,20 +99,24 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
       </div>
 
       {draft.rewriteForNarration ? (
-        <div className="grid gap-2">
-          <Label htmlFor="rewrite-instructions" className="t-label">
-            Custom instructions
-          </Label>
-          <Textarea
-            id="rewrite-instructions"
-            value={draft.rewriteInstructions ?? DEFAULT_HEADING_INSTRUCTIONS}
-            onChange={(event) => setDraft({ rewriteInstructions: event.target.value })}
-            rows={5}
-            className="resize-none font-mono text-[0.75rem] leading-relaxed"
-            placeholder="Custom instructions for adapting markdown..."
-          />
-        </div>
+        <PresetField
+          id="rewrite-instructions"
+          label="Custom instructions"
+          presets={instructionPresets}
+          text={draft.rewriteInstructions ?? settings.defaultRewriteInstructions}
+          choice={draft.instructionPreset}
+          onChange={({ text, choice }) => setDraft({ rewriteInstructions: text, instructionPreset: choice })}
+          onSave={(preset) => void updateSettings({ instructionPresets: addPreset(settings.instructionPresets, preset) })}
+          rows={5}
+          textareaClassName="font-mono text-[0.75rem] leading-relaxed"
+          placeholder="Custom instructions for adapting markdown..."
+        />
       ) : null}
+
+      <p className="t-meta">
+        Document structure and diagram narration are set in{" "}
+        <Link href="/settings" className="underline underline-offset-2 hover:text-foreground">Settings</Link>.
+      </p>
 
       <div className="grid gap-2">
         <Label htmlFor="visibility" className="t-label">

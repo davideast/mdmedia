@@ -248,6 +248,30 @@ export const DEFAULT_HEADING_INSTRUCTIONS = `Document Headings & Section Structu
 - If the source document lacks headings or only has raw prose/notes, synthesize descriptive # and ## section headings at natural topic boundaries so the reader view is well-structured and scannable.
 - Place each heading on its own line separated by blank lines (\\n\\n), without trailing periods on the heading line.`;
 
+/** A named, reusable block of text: a delivery style or rewrite instructions. */
+export interface TextPreset {
+  id: string;
+  name: string;
+  text: string;
+}
+
+export const MAX_SAVED_PRESETS = 20;
+export const MAX_PRESET_NAME = 60;
+export const MAX_PRESET_TEXT = 4000;
+
+/** Delivery styles every reader starts with. Saved presets are listed after these. */
+export const DELIVERY_PRESETS: readonly TextPreset[] = [
+  { id: "builtin:warm", name: "Warm and unhurried", text: "Warm, unhurried narration." },
+  { id: "builtin:conversational", name: "Conversational", text: "Friendly and conversational, like explaining an idea to a curious colleague." },
+  { id: "builtin:crisp", name: "Crisp and clear", text: "Crisp, clear, and confident, at a measured pace." },
+  { id: "builtin:documentary", name: "Documentary", text: "Calm, rich documentary narration with thoughtful pauses between ideas." },
+];
+
+/** Rewrite instructions every reader starts with. */
+export const INSTRUCTION_PRESETS: readonly TextPreset[] = [
+  { id: "builtin:headings", name: "Headings and sections", text: DEFAULT_HEADING_INSTRUCTIONS },
+];
+
 export interface UserSettings {
   defaultVoice: VoiceName;
   /** New preference shape; legacy provider/id fields remain readable during migration. */
@@ -266,6 +290,16 @@ export interface UserSettings {
   defaultVisibility: Visibility;
   /** Predefined accessible inline highlight color preset. */
   highlightColor: HighlightColorId;
+  /** Delivery styles saved by this person, listed after {@link DELIVERY_PRESETS}. */
+  deliveryPresets: TextPreset[];
+  /** Rewrite instructions saved by this person, listed after {@link INSTRUCTION_PRESETS}. */
+  instructionPresets: TextPreset[];
+  /** Rewrite instructions new narrations start with. */
+  defaultRewriteInstructions: string;
+  /** Format headings, fences, tables, and Mermaid charts during adaptation. */
+  structureMarkdown: boolean;
+  /** Describe Mermaid and ASCII diagrams aloud instead of skipping them. */
+  verbalizeDiagrams: boolean;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -278,6 +312,11 @@ export const DEFAULT_SETTINGS: UserSettings = {
   autoPlay: true,
   defaultVisibility: "private",
   highlightColor: DEFAULT_HIGHLIGHT_COLOR,
+  deliveryPresets: [],
+  instructionPresets: [],
+  defaultRewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS,
+  structureMarkdown: false,
+  verbalizeDiagrams: false,
 };
 
 /** Read current and legacy settings through one migration path. */
