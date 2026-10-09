@@ -17,8 +17,10 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase';
+import { migrateDeliveryPresets, readSavedPresets } from '@/lib/presets';
 import {
   DEFAULT_SETTINGS,
+  DELIVERY_PRESETS,
   isVoiceRef,
   readDefaultVoiceRef,
   HIGHLIGHT_COLORS,
@@ -65,6 +67,12 @@ function toSettings(value: unknown): UserSettings {
     autoPlay: typeof raw.autoPlay === 'boolean' ? raw.autoPlay : DEFAULT_SETTINGS.autoPlay,
     defaultVisibility: raw.defaultVisibility ?? DEFAULT_SETTINGS.defaultVisibility,
     highlightColor: validHighlight,
+    deliveryPresets: migrateDeliveryPresets(
+      raw.deliveryPresets, asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle), DELIVERY_PRESETS),
+    instructionPresets: readSavedPresets(raw.instructionPresets),
+    defaultRewriteInstructions: asString(raw.defaultRewriteInstructions, DEFAULT_SETTINGS.defaultRewriteInstructions),
+    structureMarkdown: typeof raw.structureMarkdown === 'boolean' ? raw.structureMarkdown : DEFAULT_SETTINGS.structureMarkdown,
+    verbalizeDiagrams: typeof raw.verbalizeDiagrams === 'boolean' ? raw.verbalizeDiagrams : DEFAULT_SETTINGS.verbalizeDiagrams,
   };
 }
 

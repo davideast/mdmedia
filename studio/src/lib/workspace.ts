@@ -51,7 +51,7 @@ function readDraft(value: unknown): Partial<Draft> {
   if (!value || typeof value !== 'object') return {};
   const raw = value as Record<string, unknown>;
   const draft: Partial<Draft> = {};
-  for (const field of ['markdown', 'promptStyle', 'rewriteInstructions'] as const) {
+  for (const field of ['markdown', 'promptStyle', 'rewriteInstructions', 'deliveryPreset', 'instructionPreset'] as const) {
     if (typeof raw[field] === 'string') draft[field] = raw[field];
   }
   for (const field of ['rewriteForNarration', 'structureMarkdown', 'verbalizeDiagrams'] as const) {

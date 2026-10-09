@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { DEFAULT_HEADING_INSTRUCTIONS } from "../../studio/src/lib/types";
+import { DEFAULT_HEADING_INSTRUCTIONS, DEFAULT_SETTINGS, INSTRUCTION_PRESETS } from "../../studio/src/lib/types";
 import { HEADING_GENERATION_NARRATION_PROMPT } from "../../src/narration/system-instructions";
 import { parseNarrationRequest } from "../../studio/src/lib/narration-request";
 
@@ -38,16 +38,17 @@ describe("Composer Custom Instructions for Audio Adaptation", () => {
   });
 
   describe("Composer Settings Panel (Right Panel UI)", () => {
-    it("initializes draft rewriteInstructions with DEFAULT_HEADING_INSTRUCTIONS as default text in NarrationProvider", () => {
-      expect(narrationProvider).toContain("rewriteInstructions: DEFAULT_HEADING_INSTRUCTIONS");
+    it("initializes draft rewriteInstructions from the default instructions setting, which starts as DEFAULT_HEADING_INSTRUCTIONS", () => {
+      expect(DEFAULT_SETTINGS.defaultRewriteInstructions).toBe(DEFAULT_HEADING_INSTRUCTIONS);
+      expect(narrationProvider).toContain("rewriteInstructions: settings.defaultRewriteInstructions");
     });
 
-    it("renders Custom instructions textarea with pre-filled default text when rewriteForNarration is true", () => {
+    it("offers the heading instructions as a built-in preset in the Custom instructions picker", () => {
+      expect(INSTRUCTION_PRESETS[0].text).toBe(DEFAULT_HEADING_INSTRUCTIONS);
       expect(composerSettings).toContain("draft.rewriteForNarration ?");
-      expect(composerSettings).toContain("Custom instructions");
+      expect(composerSettings).toContain('label="Custom instructions"');
       expect(composerSettings).toContain('id="rewrite-instructions"');
-      expect(composerSettings).toContain("value={draft.rewriteInstructions ?? DEFAULT_HEADING_INSTRUCTIONS}");
-      expect(composerSettings).toContain("setDraft({ rewriteInstructions: event.target.value })");
+      expect(composerSettings).toContain("setDraft({ rewriteInstructions: text, instructionPreset: choice })");
     });
 
     it("wires rewriteInstructions into studio submission payload", () => {
