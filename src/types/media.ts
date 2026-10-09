@@ -1,4 +1,4 @@
-export type MediaType = 'audio' | 'video' | 'music' | 'render';
+export type MediaType = 'audio' | 'video' | 'music' | 'sfx' | 'render';
 
 export type AspectRatio = '16:9' | '9:16';
 

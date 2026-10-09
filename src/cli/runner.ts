@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import { GoogleGenAI } from '@google/genai';
 import { ChunkQueueAudioPlayer, LiveAudioPlayerSink, WavFileStreamSink } from '../audio/index.js';
 import {
@@ -191,9 +192,28 @@ export async function writeVideoSceneOutputs(
   return writtenPaths;
 }
 
+/**
+ * Image paths written in a storyboard (`<FIRST_FRAME>`, `<IMAGE_REF_N>`) are relative to the
+ * storyboard file, not to wherever the command runs. Absolute paths are left alone.
+ */
+export function resolveStoryboardPaths<
+  T extends { firstFrame?: string; referenceImages: string[] },
+>(scenes: T[], storyboardPath: string): T[] {
+  const base = path.dirname(path.resolve(storyboardPath));
+  const at = (p: string) => (path.isAbsolute(p) ? p : path.resolve(base, p));
+  return scenes.map((scene) => ({
+    ...scene,
+    ...(scene.firstFrame ? { firstFrame: at(scene.firstFrame) } : {}),
+    referenceImages: scene.referenceImages.map(at),
+  }));
+}
+
 export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<void> {
   const fileReader = new NodeFileReader();
-  const scenes = await prepareStoryboardScenes(fileReader, args.input);
+  const scenes = resolveStoryboardPaths(
+    await prepareStoryboardScenes(fileReader, args.input),
+    args.input
+  );
 
   if (scenes.length === 0) {
     console.warn(`[Warning] No video storyboard scenes found in ${args.input}`);
@@ -277,4 +297,77 @@ export async function runMusicGeneration(args: RunMusicGenerationArgs): Promise<
   if (result.lyrics) {
     console.log(`\n[Lyrics]\n${result.lyrics}`);
   }
+}
+
+export interface RunSoundEffectGenerationArgs {
+  prompt?: string;
+  input?: string;
+  output: string;
+  provider?: string;
+  model?: string;
+  /** Explicit format; when omitted it is inferred from the output path. */
+  outputFormat?: 'mp3' | 'wav';
+  /** Used when neither outputFormat nor the output extension decides. */
+  defaultOutputFormat?: 'mp3' | 'wav';
+  durationSeconds?: number;
+  promptInfluence?: number;
+  loop?: boolean;
+  apiKey?: string;
+  maxRetries?: number;
+  verbose?: boolean;
+}
+
+/** Precedence: explicit --format, then a .wav/.mp3 output extension, then the configured default. */
+export function inferSoundEffectOutputFormat(
+  output: string,
+  requested?: 'mp3' | 'wav',
+  fallback: 'mp3' | 'wav' = 'mp3'
+): 'mp3' | 'wav' {
+  if (requested) return requested;
+  const ext = output.toLowerCase().match(/\.(mp3|wav)$/)?.[1];
+  return (ext as 'mp3' | 'wav' | undefined) ?? fallback;
+}
+
+export async function runSoundEffectGeneration(args: RunSoundEffectGenerationArgs): Promise<void> {
+  let prompt = args.prompt || '';
+  if (!prompt && args.input) {
+    const fileReader = new NodeFileReader();
+    prompt = (await fileReader.readText(args.input)).trim();
+  }
+  if (!prompt) {
+    throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
+  }
+
+  const { createSoundEffectsProvider } = await import('../sfx/provider-registry.js');
+  const { SoundEffectsPipeline } = await import('../pipeline/sound-effects-pipeline.js');
+  const { NodeMusicFileWriter } = await import('../music/music-file-writer.js');
+
+  const sfxProvider = createSoundEffectsProvider(args.provider, {
+    apiKey: args.apiKey,
+    maxRetries: args.maxRetries,
+    model: args.model,
+  });
+
+  const eventBus = new UniversalEventBus();
+  const progressLogger = new ProgressLogger(args.verbose);
+  progressLogger.attach(eventBus);
+
+  const pipeline = new SoundEffectsPipeline(sfxProvider, eventBus);
+  const result = await pipeline.generate(prompt, {
+    model: args.model,
+    outputFormat: inferSoundEffectOutputFormat(
+      args.output,
+      args.outputFormat,
+      args.defaultOutputFormat
+    ),
+    durationSeconds: args.durationSeconds,
+    promptInfluence: args.promptInfluence,
+    loop: args.loop,
+  });
+
+  // The music writer is format-agnostic: it creates parent directories and writes the bytes.
+  await new NodeMusicFileWriter().writeMusicFile(args.output, result.audioBytes);
+
+  const sizeKb = (result.audioBytes.byteLength / 1024).toFixed(1);
+  console.log(`[Success] Sound effect created at: ${args.output} (${sizeKb} KB)`);
 }

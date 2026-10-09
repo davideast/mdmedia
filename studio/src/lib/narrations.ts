@@ -185,7 +185,7 @@ export function watchNarration(id: string, cb: (narration: Narration | null) => 
             (snapshot) => {
               onData(snapshot.exists() ? toNarration(snapshot) : null);
             },
-            (error) => reportError(error),
+            reportError,
           ),
         (error) => {
           reportError?.(error);

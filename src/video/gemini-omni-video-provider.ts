@@ -51,6 +51,13 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
     const inputs: Array<{ type: string; data?: string; mime_type?: string; text?: string }> = [];
 
     // Attach first frame image if specified
+    // A missing image would otherwise be skipped silently, and the clip generated without it.
+    for (const imagePath of [options.firstFrame, ...(options.referenceImages ?? [])]) {
+      if (imagePath && !fs.existsSync(imagePath)) {
+        throw new Error(`Reference image not found: ${imagePath}`);
+      }
+    }
+
     if (options.firstFrame) {
       const fileBytes = await readFile(options.firstFrame);
       inputs.push({

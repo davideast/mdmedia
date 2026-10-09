@@ -6,7 +6,13 @@ import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { runAudioSynthesis, runNarrationAdaptation, runVideoGeneration, runMusicGeneration } from './runner.js';
+import {
+  runAudioSynthesis,
+  runNarrationAdaptation,
+  runVideoGeneration,
+  runMusicGeneration,
+  runSoundEffectGeneration,
+} from './runner.js';
 import { resolveTTSSelection } from '../tts/provider-registry.js';
 import { ElevenLabsVoiceCatalog } from '../tts/elevenlabs-voices.js';
 
@@ -313,6 +319,19 @@ export const adaptCommand = defineCommand({
   },
 });
 
+/** The image request's config: aspect ratio, and the output size when one is asked for. */
+export function imageGenerationConfig(
+  aspectRatio: string,
+  size?: string,
+): { aspectRatio: string; imageSize?: '1K' | '2K' | '4K' } {
+  if (size === undefined || size === '') return { aspectRatio };
+  const imageSize = size.toUpperCase();
+  if (imageSize !== '1K' && imageSize !== '2K' && imageSize !== '4K') {
+    throw new Error(`--size must be 1K, 2K or 4K (got ${size})`);
+  }
+  return { aspectRatio, imageSize };
+}
+
 export const imageCommand = defineCommand({
   meta: {
     name: 'image',
@@ -352,6 +371,10 @@ export const imageCommand = defineCommand({
       description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
       default: '16:9',
     },
+    size: {
+      type: 'string',
+      description: 'Output resolution: 1K, 2K or 4K (defaults to the model choice, 1K)',
+    },
     apiKey: {
       type: 'string',
       alias: 'k',
@@ -378,8 +401,13 @@ export const imageCommand = defineCommand({
       throw new Error('GEMINI_API_KEY environment variable is required.');
     }
 
+    const imageConfig = imageGenerationConfig(args.aspectRatio, args.size);
+
     const contents: any[] = [];
-    if (args.ref && fs.existsSync(args.ref)) {
+    if (args.ref && !fs.existsSync(args.ref)) {
+      throw new Error(`Reference image not found: ${args.ref}`);
+    }
+    if (args.ref) {
       let refPath = args.ref;
       let ext = path.extname(refPath).toLowerCase();
       let tmpPng: string | undefined;
@@ -408,13 +436,13 @@ export const imageCommand = defineCommand({
     contents.push({ text: promptText });
 
     const ai = new GoogleGenAI({ apiKey });
-    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
+    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.size ? `, ${args.size}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
     const res = await ai.models.generateContent({
       model: args.model,
       contents: contents.length === 1 ? contents[0].text : contents,
       config: {
         responseModalities: ['IMAGE'],
-        imageConfig: { aspectRatio: args.aspectRatio },
+        imageConfig,
       },
     });
 
@@ -521,6 +549,112 @@ export const musicCommand = defineCommand({
   },
 });
 
+function parseOptionalNumber(value: string | undefined, flag: string): number | undefined {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  if (!value.trim() || !Number.isFinite(parsed)) {
+    throw new Error(`${flag} must be a number (got "${value}").`);
+  }
+  return parsed;
+}
+
+export const sfxCommand = defineCommand({
+  meta: {
+    name: 'sfx',
+    description: 'Generate sound effects from text prompts via ElevenLabs',
+  },
+  args: {
+    prompt: {
+      type: 'string',
+      alias: 'p',
+      description: 'Text prompt describing the sound effect',
+    },
+    input: {
+      type: 'string',
+      alias: 'i',
+      description: 'Path to a text or markdown file containing the prompt',
+    },
+    output: {
+      type: 'string',
+      alias: 'o',
+      description: 'Path for output audio file (.mp3 or .wav)',
+      default: 'sfx.mp3',
+    },
+    duration: {
+      type: 'string',
+      alias: 'd',
+      description: 'Length in seconds, 0.5 to 30 (defaults to model choice)',
+    },
+    influence: {
+      type: 'string',
+      description: 'How closely to follow the prompt, 0 to 1 (default 0.3)',
+    },
+    loop: {
+      type: 'boolean',
+      description: 'Generate a seamlessly looping sound effect',
+    },
+    format: {
+      type: 'string',
+      alias: 'f',
+      description: 'Output format (mp3 or wav; defaults to the output file extension)',
+    },
+    model: {
+      type: 'string',
+      alias: 'm',
+      description: 'ElevenLabs sound effects model (defaults to eleven_text_to_sound_v2)',
+    },
+    apiKey: {
+      type: 'string',
+      alias: 'k',
+      description: 'ElevenLabs API key (defaults to ELEVENLABS_API_KEY)',
+    },
+    maxRetries: {
+      type: 'string',
+      description: 'Max retry attempts for API calls',
+    },
+    verbose: {
+      type: 'boolean',
+      description: 'Enable verbose logging',
+      default: false,
+    },
+  },
+  async run({ args }) {
+    if (args.format !== undefined && args.format !== 'mp3' && args.format !== 'wav') {
+      throw new Error(`--format must be "mp3" or "wav" (got "${args.format}").`);
+    }
+    const fileConfig = await loadConfigFile(process.cwd());
+    const resolved = resolveConfig(
+      {
+        mode: 'sfx',
+        sfxModel: args.model,
+        sfxOutputFormat: args.format as 'mp3' | 'wav' | undefined,
+        durationSeconds: parseOptionalNumber(args.duration, '--duration'),
+        promptInfluence: parseOptionalNumber(args.influence, '--influence'),
+        loop: args.loop,
+        apiKey: args.apiKey,
+        maxRetries: parseOptionalNumber(args.maxRetries, '--max-retries'),
+      },
+      fileConfig
+    );
+
+    await runSoundEffectGeneration({
+      prompt: args.prompt,
+      input: args.input,
+      output: args.output,
+      provider: resolved.sfx.provider,
+      model: resolved.sfx.model,
+      outputFormat: args.format as 'mp3' | 'wav' | undefined,
+      defaultOutputFormat: resolved.sfx.outputFormat,
+      durationSeconds: resolved.sfx.durationSeconds,
+      promptInfluence: resolved.sfx.promptInfluence,
+      loop: resolved.sfx.loop,
+      apiKey: resolved.apiKey,
+      maxRetries: resolved.maxRetries,
+      verbose: args.verbose,
+    });
+  },
+});
+
 const SUBCOMMANDS = {
   production: productionCommand,
   project: projectCommand,
@@ -529,6 +663,7 @@ const SUBCOMMANDS = {
   video: videoCommand,
   image: imageCommand,
   music: musicCommand,
+  sfx: sfxCommand,
   adapt: adaptCommand,
 } as const;
 
@@ -580,7 +715,7 @@ export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: pkgVersion,
-    description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, and music with Lyria',
+    description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, music with Lyria, and sound effects with ElevenLabs',
   },
   subCommands: SUBCOMMANDS,
 });

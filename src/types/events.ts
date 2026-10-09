@@ -53,6 +53,15 @@ export interface MusicPipelineCompletedEvent {
   totalBytesGenerated: number;
 }
 
+export interface SoundEffectStartedEvent {
+  prompt: string;
+}
+
+export interface SoundEffectCompletedEvent {
+  audioBytes: Uint8Array;
+  mimeType: string;
+}
+
 export type PipelineEventMap = {
   'pipeline:start': PipelineStartedEvent;
   'chunk:start': ChunkStartedEvent;
@@ -66,5 +75,7 @@ export type PipelineEventMap = {
   'music:start': MusicGenerationStartedEvent;
   'music:complete': MusicGenerationCompletedEvent;
   'music:pipeline:complete': MusicPipelineCompletedEvent;
+  'sfx:start': SoundEffectStartedEvent;
+  'sfx:complete': SoundEffectCompletedEvent;
 };
 

@@ -68,6 +68,19 @@ export class ProgressLogger {
       })
     );
 
+    // Sound effects events
+    unsubs.push(
+      eventBus.on('sfx:start', ({ prompt }) => {
+        console.log(`[Sound Effect] Generating "${prompt.slice(0, 60)}${prompt.length > 60 ? '...' : ''}" via ElevenLabs...`);
+      })
+    );
+
+    unsubs.push(
+      eventBus.on('sfx:complete', ({ audioBytes, mimeType }) => {
+        console.log(`[Sound Effect] Completed (${(audioBytes.byteLength / 1024).toFixed(1)} KB ${mimeType}).`);
+      })
+    );
+
     unsubs.push(
       eventBus.on('pipeline:error', ({ error }) => {
         console.error(`[Media Pipeline Error] ${error.message}`);
