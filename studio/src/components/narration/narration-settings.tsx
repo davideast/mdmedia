@@ -63,7 +63,7 @@ export function NarrationSettings({
   canEdit: boolean;
   actions?: React.ReactNode;
 }) {
-  const { store, activeTab } = useWorkspace();
+  const { store, activeView } = useWorkspace();
   const router = useRouter();
   const { user } = useAuth();
   const { stream, highlightColor, setHighlightColor, documentView, setDocumentView } =
@@ -165,7 +165,7 @@ export function NarrationSettings({
         };
         commit("shared", [...narration.sharedWith, resolved.uid], nextLabels);
       }
-      if (activeTab) store.acknowledgeField(activeTab.id, "invitee", invitee);
+      if (activeView) store.acknowledgeField(activeView.id, "invitee", invitee);
     } catch {
       toast.error("Could not verify that email address. Try again.");
     }

@@ -1,5 +1,6 @@
 "use client";
 
+import { PinWorkButton } from "./work-navigation";
 import { cn } from "cn";
 import { useEffect, useImperativeHandle, useRef, type ReactNode } from "react";
 import { PanelLeft, PanelRight } from "lucide-react";
@@ -46,7 +47,7 @@ export function WorkbenchPanel({
 }) {
   const shell = useOptionalShell();
   const workspace = useOptionalWorkspace();
-  const tabId = workspacePage ? workspace?.activeTab?.id : undefined;
+  const tabId = workspacePage ? workspace?.activeView?.id : undefined;
   const store = workspace?.store;
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const restored = useRef(false);
@@ -121,6 +122,7 @@ export function WorkbenchPanel({
               </h2>
             </div>
             <div className="flex flex-none items-center gap-1">
+              {workspacePage && workspace ? <PinWorkButton /> : null}
               {actions}
               {shell?.showContextToggle ? (
                 <button

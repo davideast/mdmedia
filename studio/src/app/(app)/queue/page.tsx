@@ -337,7 +337,7 @@ export default function QueuePage() {
 
   return (
     <WorkbenchPanel
-      title="Queue"
+      title="Activity"
       icon={<ListOrdered size={13} strokeWidth={2} />}
       viewGrid
       gridVariant="wide"

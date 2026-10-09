@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
-  AudioLines,
+  FileText,
+  Plus,
   Download,
   Library,
   ListMusic,
@@ -22,6 +23,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useAuth } from "@/lib/auth-context";
 import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
+import { FindWork, SidebarWork } from "./work-navigation";
+import { useWorkspace } from "./workspace-provider";
 import { useConnectivity } from "@/lib/connectivity";
 
 interface NavItem {
@@ -33,8 +36,8 @@ interface NavItem {
 }
 
 const NAV: readonly NavItem[] = [
-  { href: "/studio", label: "Studio", icon: AudioLines },
-  { href: "/queue", label: "Queue", icon: ListOrdered },
+  { href: "/drafts", label: "Drafts", icon: FileText, prefix: "/studio" },
+  { href: "/queue", label: "Activity", icon: ListOrdered },
   { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
   { href: "/playlists", label: "Playlists", icon: ListMusic },
   { href: "/downloads", label: "Downloads", icon: Download },
@@ -51,8 +54,8 @@ function isActive(pathname: string, item: NavItem): boolean {
 /**
  * The dockable navigation rail.
  *
- * Docked is the default: a 56px icon rail with tooltips and no text, per the
- * brief. Undocking widens it to 248px and reveals the labels. The control is a
+ * The expanded sidebar exposes navigation and saved work. Collapsing it
+ * keeps a 56px icon rail; expanding restores the saved width. The control is a
  * single icon — it carries no label of its own.
  */
 export function NavRail({
@@ -65,6 +68,7 @@ export function NavRail({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const { state, newDraft } = useWorkspace();
   const { user } = useAuth();
   const { generationQueue } = useNarration();
   const { resolvedTheme, setTheme } = useTheme();
@@ -112,7 +116,13 @@ export function NavRail({
         </Tooltip>
       </div>
 
-      <ul className={cn("flex min-h-0 flex-col gap-1 overflow-y-auto py-2", docked ? "px-2" : "px-3")}>
+      <div className={cn("min-h-0 overflow-y-auto pb-4", docked ? "px-2" : "px-3")} >
+      <div className="py-2"><FindWork compact={docked} onNavigate={onNavigate} /></div>
+      <button type="button" disabled={offline} onClick={() => { newDraft(); onNavigate?.(); }} aria-label="Create narration" title="Create narration"
+        className={cn("mb-2 flex h-9 w-full items-center rounded-md disabled:opacity-40", docked ? "justify-center text-ink-muted hover:bg-sidebar-accent" : "gap-2 bg-primary px-3 text-sm font-medium text-primary-foreground")}>
+        <Plus size={16} />{!docked && 'Create narration'}
+      </button>
+      <ul className={cn("flex flex-col gap-1 py-2")}>
         {NAV.map((item) => {
           const active = isActive(pathname, item);
           const Icon = item.icon;
@@ -156,7 +166,7 @@ export function NavRail({
           const itemControl = disabled ? (
             <div aria-disabled="true" title={`${item.label} requires Studio connection`}>{link}</div>
           ) : (
-            <Link href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined}>{link}</Link>
+            <Link href={state.tabs.find((view) => view.key === item.href)?.href ?? item.href} onClick={onNavigate} aria-current={active ? "page" : undefined}>{link}</Link>
           );
 
           const tooltipLabel =
@@ -176,6 +186,8 @@ export function NavRail({
           );
         })}
       </ul>
+      {!docked && <SidebarWork onNavigate={onNavigate} />}
+      </div>
 
       <div
         className={cn(
