@@ -66,6 +66,53 @@ check with Windows Node, which uses Windows tailnet DNS:
 "/mnt/c/Program Files/nodejs/node.exe" "$(wslpath -w "$PWD/studio/scripts/check-hosted-connection.mjs")" https://<device>.<tailnet>.ts.net:3443
 ```
 
+### Persistent production serving on Windows and WSL
+
+The production service runs the hosted Pyric sandbox and compiled Next.js app
+under `systemd --user`, with automatic restarts and journal logs. It uses the
+same `.env.local`, internal ports, tailnet HTTPS proxies, and persistent sandbox
+data as the WSL development setup above. Its scripts require Node 22.15+ and
+systemd enabled in WSL. Enable user lingering with `loginctl enable-linger "$USER"`
+if it is not already enabled.
+
+From the repository root, build and inspect a separate candidate:
+
+```bash
+npm --prefix studio run service:build
+npm --prefix studio run service:preview
+```
+
+In another terminal, run
+`node studio/scripts/check-hosted-assets.mjs http://127.0.0.1:3100` and inspect
+`http://localhost:3100/studio`. Stop the preview with Ctrl-C before releasing.
+Install the user service once, then release:
+
+```bash
+npm --prefix studio run service:install
+npm --prefix studio run service:release
+```
+
+The first release stops the background development server. Every release stops
+the production host, backs up the closed sandbox database under `.pyric/backups/`,
+swaps in the staged build and matching offline worker, and checks pages, assets,
+and browser SDK attachment. It restores the previous server if startup or checks
+fail. Previous production builds remain in `.next-hosted-previous-*`. Do not
+rebuild `.next-hosted` while its server is running.
+
+Manage production from the repository root:
+
+```bash
+npm --prefix studio run service:status
+npm --prefix studio run service:logs
+npm --prefix studio run service:restart
+npm --prefix studio run service:stop
+```
+
+For subsequent updates, pull changes, rebuild affected dependencies when needed,
+then repeat `service:build`, preview, and `service:release`. A source pull alone
+does not update the compiled production server. `studio:bg` refuses to start a
+development server while the production service is active.
+
 ### Run at login on a Mac
 
 The LaunchAgents run the hosted Pyric sandbox and a compiled Next.js production server under `launchd`, bound to `127.0.0.1`, and configure private Tailscale HTTPS proxies on ports `3000` and `3473`. Tailscale must be signed in with HTTPS enabled for the tailnet. Generate the agents for this checkout and hostname so machine paths do not enter the repository:
