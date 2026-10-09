@@ -99,6 +99,23 @@ and browser SDK attachment. It restores the previous server if startup or checks
 fail. Previous production builds remain in `.next-hosted-previous-*`. Do not
 rebuild `.next-hosted` while its server is running.
 
+Install the Windows sign-in task from an elevated WSL session:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/studio/scripts/install-windows-startup.ps1")" -LinuxStudioPath "$PWD/studio" -Distribution Ubuntu -LinuxUser "$USER"
+powershell.exe -NoProfile -Command 'Start-ScheduledTask -TaskName MdmediaStudioWSL'
+"/mnt/c/Program Files/Tailscale/tailscale.exe" set --unattended=true
+```
+
+The task runs at standard Windows privileges when the distro owner signs in.
+It starts the user service and holds a foreground WSL process open; systemd
+services alone do not keep WSL active. The launcher is copied into
+`%LOCALAPPDATA%\MdmediaStudio`, so Windows can find it before WSL starts. Its
+Windows log is `startup.log` in that directory; the Linux keepalive log is
+`studio/.pyric/windows-startup.log`. This configuration starts at **Windows
+sign-in**, rather than before sign-in after a reboot. Password-free S4U tasks
+failed to launch this machine's WSL distribution. Keep Windows awake for access.
+
 Manage production from the repository root:
 
 ```bash
@@ -112,6 +129,16 @@ For subsequent updates, pull changes, rebuild affected dependencies when needed,
 then repeat `service:build`, preview, and `service:release`. A source pull alone
 does not update the compiled production server. `studio:bg` refuses to start a
 development server while the production service is active.
+
+To remove automatic startup, stop and unregister the Windows task:
+
+```powershell
+Stop-ScheduledTask -TaskName MdmediaStudioWSL
+Unregister-ScheduledTask -TaskName MdmediaStudioWSL -Confirm:$false
+```
+
+Then run `systemctl --user disable --now mdmedia-studio.service` in WSL. Disable
+the two Tailscale HTTPS proxies separately if you also want to remove sharing.
 
 ### Run at login on a Mac
 
