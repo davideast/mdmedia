@@ -1,5 +1,6 @@
 import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
+import type { ImageSettings } from '../image/types.js';
 
 export interface AudioConfig {
   readonly provider?: string;
@@ -47,6 +48,7 @@ export interface MdMediaConfig {
   readonly video?: VideoConfig;
   readonly music?: MusicConfig;
   readonly sfx?: SoundEffectsConfig;
+  readonly image?: ImageSettings;
   readonly narration?: NarrationConfig;
   readonly maxChars?: number;
   readonly maxRetries?: number;

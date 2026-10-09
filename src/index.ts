@@ -2,6 +2,7 @@ export * from './audio/index.js';
 export * from './video/index.js';
 export * from './music/index.js';
 export * from './sfx/index.js';
+export * from './image/index.js';
 export * from './chunker/index.js';
 export * from './pipeline/index.js';
 export * from './tts/index.js';

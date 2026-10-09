@@ -1,4 +1,7 @@
 import { defineCommand } from 'citty';
+import { imageCommand } from './image-command.js';
+export { imageCommand } from './image-command.js';
+export { imageGenerationConfig } from '../image/selection.js';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
@@ -317,145 +320,6 @@ export const adaptCommand = defineCommand({
   },
 });
 
-/** The image request's config: aspect ratio, and the output size when one is asked for. */
-export function imageGenerationConfig(
-  aspectRatio: string,
-  size?: string,
-): { aspectRatio: string; imageSize?: '1K' | '2K' | '4K' } {
-  if (size === undefined || size === '') return { aspectRatio };
-  const imageSize = size.toUpperCase();
-  if (imageSize !== '1K' && imageSize !== '2K' && imageSize !== '4K') {
-    throw new Error(`--size must be 1K, 2K or 4K (got ${size})`);
-  }
-  return { aspectRatio, imageSize };
-}
-
-export const imageCommand = defineCommand({
-  meta: {
-    name: 'image',
-    description: 'Generate high-fidelity art & UI images from prompts via Gemini 3.1 Flash Image',
-  },
-  args: {
-    prompt: {
-      type: 'string',
-      alias: 'p',
-      description: 'Text prompt for image generation',
-    },
-    input: {
-      type: 'string',
-      alias: 'i',
-      description: 'Optional path to input prompt/markdown file',
-    },
-    ref: {
-      type: 'string',
-      alias: 'r',
-      description: 'Optional reference image path for exact artistic style/tone matching',
-    },
-    output: {
-      type: 'string',
-      alias: 'o',
-      description: 'Output image file path (.jpg or .png)',
-      required: true,
-    },
-    model: {
-      type: 'string',
-      alias: 'm',
-      description: 'Gemini image model name (Nano Banana Pro 2)',
-      default: 'gemini-3-pro-image',
-    },
-    aspectRatio: {
-      type: 'string',
-      alias: ['a', 'aspect'],
-      description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
-      default: '16:9',
-    },
-    size: {
-      type: 'string',
-      description: 'Output resolution: 1K, 2K or 4K (defaults to the model choice, 1K)',
-    },
-    apiKey: {
-      type: 'string',
-      alias: 'k',
-      description: 'Gemini API Key',
-    },
-  },
-  async run({ args }) {
-    const fs = await import('node:fs');
-    const { execFileSync } = await import('node:child_process');
-    const { GoogleGenAI } = await import('@google/genai');
-
-    let promptText = args.prompt || '';
-    if (!promptText && args.input) {
-      promptText = fs.readFileSync(args.input, 'utf8').trim();
-    }
-    if (!promptText) {
-      throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
-    }
-
-    const fileConfig = await loadConfigFile(process.cwd());
-    const resolved = resolveConfig({ apiKey: args.apiKey }, fileConfig);
-    const apiKey = resolved.apiKey;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is required.');
-    }
-
-    const imageConfig = imageGenerationConfig(args.aspectRatio, args.size);
-
-    const contents: any[] = [];
-    if (args.ref && !fs.existsSync(args.ref)) {
-      throw new Error(`Reference image not found: ${args.ref}`);
-    }
-    if (args.ref) {
-      let refPath = args.ref;
-      let ext = path.extname(refPath).toLowerCase();
-      let tmpPng: string | undefined;
-      if (ext === '.avif') {
-        const os = await import('node:os');
-        if (process.platform !== 'darwin') {
-          throw new Error('AVIF reference image conversion requires macOS (sips). Convert the image to PNG or JPEG first.');
-        }
-        tmpPng = path.join(os.tmpdir(), `mdmedia_ref_${Date.now()}.png`);
-        execFileSync('sips', ['-s', 'format', 'png', refPath, '--out', tmpPng]);
-        refPath = tmpPng;
-        ext = '.png';
-      }
-      const mimeType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
-      const refBytes = fs.readFileSync(refPath);
-      contents.push({
-        inlineData: {
-          data: refBytes.toString('base64'),
-          mimeType,
-        },
-      });
-      if (tmpPng) {
-        try { fs.unlinkSync(tmpPng); } catch {}
-      }
-    }
-    contents.push({ text: promptText });
-
-    const ai = new GoogleGenAI({ apiKey });
-    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.size ? `, ${args.size}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
-    const res = await ai.models.generateContent({
-      model: args.model,
-      contents: contents.length === 1 ? contents[0].text : contents,
-      config: {
-        responseModalities: ['IMAGE'],
-        imageConfig,
-      },
-    });
-
-    const part = res.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-    if (!part?.inlineData?.data) {
-      throw new Error('No image data returned from Gemini model.');
-    }
-
-    const outPath = path.resolve(process.cwd(), args.output);
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, Buffer.from(part.inlineData.data, 'base64'));
-    console.log(`✅ Saved generated image to: ${outPath}`);
-  },
-});
-
 export const musicCommand = defineCommand({
   meta: {
     name: 'music',
@@ -711,7 +575,7 @@ export const mainCommand = defineCommand({
   meta: {
     name: 'mdmedia',
     version: pkgVersion,
-    description: 'Transform markdown into audio with Gemini or ElevenLabs, video with Gemini, music with Lyria, and sound effects with ElevenLabs',
+    description: 'Transform markdown into audio, video, images, music and sound effects with selectable generation providers',
   },
   subCommands: SUBCOMMANDS,
 });
