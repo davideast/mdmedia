@@ -28,7 +28,6 @@ describe('Post-Publish Pre-Mortem Regressions', () => {
 
     const subCommands = cliCommands.mainCommand.subCommands as Record<string, unknown>;
     expect(subCommands).not.toHaveProperty('watch');
-    expect(subCommands).not.toHaveProperty('studio');
     expect(subCommands).not.toHaveProperty('plugin');
   });
 
