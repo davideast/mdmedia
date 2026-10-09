@@ -259,9 +259,11 @@ export function NarrationProvider({ children }: { children: ReactNode }) {
   // updating on a locked phone, and the next track must start while the page
   // is still allowed to run.
   const advanceRef = useRef<() => void>(() => {});
-  advanceRef.current = () => {
-    if (queue !== null && queue.index + 1 < queue.tracks.length) nextTrack();
-  };
+  useEffect(() => {
+    advanceRef.current = () => {
+      if (queue !== null && queue.index + 1 < queue.tracks.length) nextTrack();
+    };
+  }, [queue, nextTrack]);
   useEffect(() => stream.player?.onEnded(() => advanceRef.current()), [stream.player]);
 
   // Fetch the following track while this one plays so advancing is immediate.

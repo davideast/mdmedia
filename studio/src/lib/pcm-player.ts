@@ -64,7 +64,8 @@ function extractPcm(wav: Uint8Array): Uint8Array {
  * so reusing it is what lets a playlist advance from the lock screen.
  */
 let sharedAudio: HTMLAudioElement | null = null;
-let sharedAudioOwner: StreamingPcmPlayer | null = null;
+/** Releases the shared element from the player currently using it. */
+let releaseSharedAudio: (() => void) | null = null;
 
 function sharedAudioElement(): HTMLAudioElement {
   if (!sharedAudio) {
@@ -82,7 +83,7 @@ function sharedAudioElement(): HTMLAudioElement {
  * unlocks it for later programmatic play (the next playlist track).
  */
 export function unlockPlaybackAudio(): void {
-  if (typeof document === "undefined" || sharedAudioOwner !== null) return;
+  if (typeof document === "undefined" || releaseSharedAudio !== null) return;
   const audio = sharedAudioElement();
   if (!audio.paused) return;
   const silence = wrapPcmAsWav(new Uint8Array(SAMPLE_RATE / 10 * 2));
@@ -105,6 +106,7 @@ export class StreamingPcmPlayer {
   private nativeUrl: string | null = null;
   private nativeActive = false;
   private nativeListeners: AbortController | null = null;
+  private sharedClaim: (() => void) | null = null;
   private handoffToken = 0;
 
   private scheduledSamples = 0;
@@ -373,8 +375,10 @@ export class StreamingPcmPlayer {
         typeof URL.createObjectURL !== "function") return;
 
     const audio = sharedAudioElement();
-    if (sharedAudioOwner && sharedAudioOwner !== this) sharedAudioOwner.disposeNativeAudio();
-    sharedAudioOwner = this;
+    releaseSharedAudio?.();
+    const claim = () => this.disposeNativeAudio();
+    releaseSharedAudio = claim;
+    this.sharedClaim = claim;
     const listeners = new AbortController();
     this.nativeListeners = listeners;
     const { signal } = listeners;
@@ -471,8 +475,10 @@ export class StreamingPcmPlayer {
     this.nativeListeners?.abort();
     this.nativeListeners = null;
     // The shared element outlives this player so the next track can reuse it.
-    if (audio && sharedAudioOwner === this) {
-      sharedAudioOwner = null;
+    const owned = this.sharedClaim !== null && releaseSharedAudio === this.sharedClaim;
+    this.sharedClaim = null;
+    if (audio && owned) {
+      releaseSharedAudio = null;
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
