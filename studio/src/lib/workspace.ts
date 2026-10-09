@@ -28,7 +28,7 @@ const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
   '/studio': 'Draft', '/library': 'Library', '/queue': 'Queue',
-  '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings',
+  '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
 
 /** URLs identify views. A tab's key identifies the item even when its view/query changes. */

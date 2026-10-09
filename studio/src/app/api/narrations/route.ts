@@ -1,13 +1,6 @@
-import { ElevenLabsVoiceCatalog } from "mdmedia/tts";
 import { verifyIdToken } from "@/lib/firebase-admin";
-import { getAuthorizedVoice } from "@/lib/voice-access";
-import {
-  claimNarrationId,
-  createNarrationStream,
-  NarrationOwnershipError,
-  newNarrationId,
-  parseNarrationRequest,
-} from "@/lib/narration-server";
+import { parseNarrationRequest } from "@/lib/narration-server";
+import { startNarration } from "@/lib/narration-start";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -61,61 +54,12 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  if (parsed.voiceProvider === "elevenlabs") {
-    let accessible;
-    try {
-      accessible = await getAuthorizedVoice(uid, parsed.voiceId);
-    } catch (error) {
-      console.error("[narrations] voice access lookup failed:", error);
-      return Response.json({ message: "Could not verify voice access." }, { status: 503, headers: cors });
-    }
-    if (!accessible) {
-      return Response.json({ message: "You do not have access to that voice." }, { status: 403, headers: cors });
-    }
-    const apiKey = process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY;
-    if (!apiKey) {
-      return Response.json(
-        { message: "ElevenLabs narration is unavailable." },
-        { status: 503, headers: cors },
-      );
-    }
-    try {
-      const voice = await new ElevenLabsVoiceCatalog(apiKey).get(parsed.voiceId);
-      parsed.voice = accessible.name || voice.name;
-    } catch {
-      return Response.json(
-        { message: "That ElevenLabs voice is unavailable. Choose another voice." },
-        { status: 400, headers: cors },
-      );
-    }
+  const started = await startNarration({ uid, request: parsed, signal: request.signal });
+  if (!started.ok) {
+    return Response.json({ message: started.message }, { status: started.status, headers: cors });
   }
 
-  const conflict = () =>
-    Response.json(
-      { message: "That narration id is already in use." },
-      { status: 409, headers: cors },
-    );
-
-  const id = parsed.id ?? newNarrationId();
-  if (!(await claimNarrationId(id, uid))) {
-    return conflict();
-  }
-
-  let stream: ReadableStream<Uint8Array>;
-  try {
-    stream = createNarrationStream({
-      uid,
-      id,
-      request: parsed,
-      signal: request.signal,
-    });
-  } catch (error) {
-    // Another user holds a live stream on this id.
-    if (error instanceof NarrationOwnershipError) return conflict();
-    throw error;
-  }
-
-  return new Response(stream, {
+  return new Response(started.stream, {
     status: 200,
     headers: {
       ...cors,

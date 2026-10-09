@@ -17,15 +17,9 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase';
-import { migrateDeliveryPresets, readSavedPresets } from '@/lib/presets';
+import { readSettings } from '@/lib/settings';
 import {
   DEFAULT_SETTINGS,
-  DELIVERY_PRESETS,
-  isVoiceRef,
-  readDefaultVoiceRef,
-  HIGHLIGHT_COLORS,
-  TTS_MODELS,
-  type HighlightColorId,
   type UserProfile,
   type UserSettings,
 } from '@/lib/types';
@@ -38,53 +32,6 @@ function asNumber(value: unknown, fallback = 0): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-function toSettings(value: unknown): UserSettings {
-  const raw = (value ?? {}) as Partial<UserSettings>;
-  const defaultVoiceRef = readDefaultVoiceRef(raw);
-  const pinnedVoiceRefs = Array.isArray(raw.pinnedVoiceRefs)
-    ? raw.pinnedVoiceRefs.filter(isVoiceRef).filter((ref, index, refs) =>
-      refs.findIndex((other) => other.provider === ref.provider && other.id === ref.id) === index).slice(0, 20)
-    : [];
-  const preferredGeminiModel = raw.defaultGeminiModel;
-  const validHighlight = HIGHLIGHT_COLORS.some((c) => c.id === raw.highlightColor)
-    ? (raw.highlightColor as HighlightColorId)
-    : DEFAULT_SETTINGS.highlightColor;
-  return {
-    defaultVoice: defaultVoiceRef.provider === 'gemini'
-      ? defaultVoiceRef.id : asString(raw.defaultVoice, defaultVoiceRef.id),
-    defaultVoiceRef,
-    defaultVoiceProvider: defaultVoiceRef.provider,
-    defaultVoiceId: defaultVoiceRef.id,
-    pinnedVoiceRefs,
-    defaultGeminiModel: preferredGeminiModel && TTS_MODELS.includes(preferredGeminiModel)
-      ? preferredGeminiModel
-      : DEFAULT_SETTINGS.defaultGeminiModel,
-    defaultPromptStyle: asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle),
-    rewriteForNarration:
-      typeof raw.rewriteForNarration === 'boolean'
-        ? raw.rewriteForNarration
-        : DEFAULT_SETTINGS.rewriteForNarration,
-    autoPlay: typeof raw.autoPlay === 'boolean' ? raw.autoPlay : DEFAULT_SETTINGS.autoPlay,
-    defaultVisibility: raw.defaultVisibility ?? DEFAULT_SETTINGS.defaultVisibility,
-    highlightColor: validHighlight,
-    deliveryPresets: migrateDeliveryPresets(
-      raw.deliveryPresets, asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle), DELIVERY_PRESETS),
-    instructionPresets: readSavedPresets(raw.instructionPresets),
-    defaultRewriteInstructions: asString(raw.defaultRewriteInstructions, DEFAULT_SETTINGS.defaultRewriteInstructions),
-    structureMarkdown: typeof raw.structureMarkdown === 'boolean' ? raw.structureMarkdown : DEFAULT_SETTINGS.structureMarkdown,
-    verbalizeDiagrams: typeof raw.verbalizeDiagrams === 'boolean' ? raw.verbalizeDiagrams : DEFAULT_SETTINGS.verbalizeDiagrams,
-  };
-}
-
-/**
- * Shape a raw snapshot into a {@link UserProfile}.
- *
- * Applied explicitly rather than through `withConverter`, matching
- * `narrations.ts`. Document references do support converters under every
- * implementation we run against today, but keeping one reference kind on a
- * different mechanism from the others is how you end up with a capability gap
- * that only shows up at runtime.
- */
 export function toUserProfile(snapshot: {
   id: string;
   data: () => DocumentData | undefined;
@@ -98,7 +45,7 @@ export function toUserProfile(snapshot: {
     bio: asString(data.bio),
     createdAt: asNumber(data.createdAt),
     updatedAt: asNumber(data.updatedAt),
-    settings: toSettings(data.settings),
+    settings: readSettings(data.settings),
   };
 }
 

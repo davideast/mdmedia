@@ -50,6 +50,17 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Connected-app API keys and pending device approvals. Server-only: the
+    // Admin SDK issues, verifies, and revokes them for a verified caller, and
+    // only a hash of each key is stored. No client may read or write them.
+    match /apiKeys/{keyId} {
+      allow read, write: if false;
+    }
+
+    match /deviceAuthorizations/{deviceId} {
+      allow read, write: if false;
+    }
+
     match /narrations/{narrationId} {
 
       // Reads are authorized per document. For a query (`list`), Firestore

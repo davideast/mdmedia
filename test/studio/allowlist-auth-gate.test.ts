@@ -75,8 +75,8 @@ describe('Allowlist Account Creation & Access Gate', () => {
     it('requires verified email and allowlist/{email} existence before returning decoded.uid', () => {
       expect(adminSource).toContain('const email = decoded.email?.trim().toLowerCase();');
       expect(adminSource).toContain('decoded.email_verified !== true');
-      expect(adminSource).toContain("adminDb().collection('allowlist').doc(email).get()");
-      expect(adminSource).toContain('if (!allowlistDoc.exists) return null;');
+      expect(adminSource).toContain("adminDb().collection('allowlist').doc(email.trim().toLowerCase()).get()");
+      expect(adminSource).toContain('if (!(await isAllowlisted(email))) return null;');
     });
   });
 

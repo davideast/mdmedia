@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { ConnectedApps } from "@/components/studio/connected-apps";
 import { PresetList } from "@/components/studio/preset-list";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
@@ -349,6 +350,14 @@ export default function SettingsPage() {
             </Select>
           </Row>
         </div>
+
+        <Separator />
+
+        <Row label="Connected apps" hint="Command-line tools and coding agents that can create private narrations for you." htmlFor="connected-apps">
+          <div id="connected-apps" className="min-w-0">
+            <ConnectedApps />
+          </div>
+        </Row>
 
         <div>
           <Button

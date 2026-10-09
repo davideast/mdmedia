@@ -186,6 +186,13 @@ interface ActiveStream {
 
 const activeStreams = new Map<string, ActiveStream>();
 
+/** Generations this person has running in this server process. */
+export function activeStreamCount(uid: string): number {
+  let count = 0;
+  for (const stream of activeStreams.values()) if (stream.uid === uid) count += 1;
+  return count;
+}
+
 /**
  * Cancels and deletes an entire narration and its associated data (Firestore document,
  * playlist references, and Storage assets) atomically in a transaction.
