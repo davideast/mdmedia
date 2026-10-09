@@ -172,8 +172,30 @@ export function watchMyNarrations(uid: string, cb: (narrations: Narration[]) => 
   );
 }
 
-// The synthesis route creates a narration with the Admin SDK moments after the
-// client learns its id; a listener attached in that gap is refused by Rules.
+/** How long a requested narration may take to appear before a denial is final. */
+const CREATION_WINDOW_MS = 2 * 60_000;
+const awaitingCreation = new Map<string, number>();
+
+/**
+ * Marks an id the client just requested synthesis for. The synthesis route
+ * creates the document with the Admin SDK moments after the client learns its
+ * id, and a listener attached in that gap is refused by Rules.
+ */
+export function expectNarration(id: string): void {
+  awaitingCreation.set(id, Date.now());
+}
+
+function isAwaitingCreation(id: string): boolean {
+  const requestedAt = awaitingCreation.get(id);
+  if (requestedAt === undefined) return false;
+  if (Date.now() - requestedAt <= CREATION_WINDOW_MS) return true;
+  awaitingCreation.delete(id);
+  return false;
+}
+
+// Only a narration that is still being created re-attaches after a denial. Any
+// other denial is final: the document was deleted or is not shared with this
+// user, and retrying cannot change the Rules decision.
 export function watchNarration(id: string, cb: (narration: Narration | null) => void): Unsubscribe {
   return multicastSubscribe<Narration | null>(
     `narration:${id}`,
@@ -183,6 +205,7 @@ export function watchNarration(id: string, cb: (narration: Narration | null) => 
           onSnapshot(
             narrationRef(id),
             (snapshot) => {
+              if (snapshot.exists()) awaitingCreation.delete(id);
               onData(snapshot.exists() ? toNarration(snapshot) : null);
             },
             reportError,
@@ -191,6 +214,7 @@ export function watchNarration(id: string, cb: (narration: Narration | null) => 
           onError?.(error);
           if ((error as { code?: string } | null)?.code === 'permission-denied') onData(null);
         },
+        { shouldRetry: () => isAwaitingCreation(id) },
       );
     },
     cb,
