@@ -23,6 +23,15 @@ export async function GET(request: Request): Promise<Response> {
   if (!caller) return unauthorized();
   if (!hasScope(caller, "options:read")) return forbiddenScope("options:read");
 
+  const media = new URL(request.url).searchParams.get('media');
+  if (media === 'image') {
+    const { imageDefaults, configuredImageModel } = await import('@/lib/image-server');
+    const { IMAGE_RATIOS, IMAGE_RESOLUTIONS, MAX_REFERENCE_BYTES, MAX_IMAGE_PROMPT } = await import('@/lib/image-request');
+    return Response.json({ type: 'image', available: Boolean(process.env.GEMINI_API_KEY), provider: 'gemini', model: configuredImageModel(),
+      defaults: await imageDefaults(caller.uid), capabilities: { aspectRatios: IMAGE_RATIOS, resolutions: IMAGE_RESOLUTIONS, adaptation: true, referenceImages: 1 },
+      limits: { promptChars: MAX_IMAGE_PROMPT, referenceBytes: MAX_REFERENCE_BYTES }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+  }
+  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration and image.');
   const settings = await loadUserSettings(caller.uid);
   const delivery = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructions = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];

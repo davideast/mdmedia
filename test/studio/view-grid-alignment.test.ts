@@ -13,8 +13,9 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
 
   const globalsCss = readFileSync(globalsCssPath, "utf8");
   const workbenchPanel = readFileSync(workbenchPanelPath, "utf8");
-  const libraryPage = readFileSync(libraryPagePath, "utf8");
-  const queuePage = readFileSync(queuePagePath, "utf8");
+  const directory = readFileSync(resolve(import.meta.dir, "../../studio/src/components/media/media-directory.tsx"), "utf8");
+  const libraryPage = directory + readFileSync(libraryPagePath, "utf8") + readFileSync(resolve(import.meta.dir, "../../studio/src/components/media/narration-library-entry.tsx"), "utf8");
+  const queuePage = directory + readFileSync(queuePagePath, "utf8") + readFileSync(resolve(import.meta.dir, "../../studio/src/components/media/local-narration-activity.tsx"), "utf8");
   const narrationPage = readFileSync(narrationPagePath, "utf8");
   const settingsPage = readFileSync(settingsPagePath, "utf8");
   const playlistsPage = readFileSync(playlistsPagePath, "utf8");
@@ -72,13 +73,14 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
 
   describe("View and item alignment across pages (zero nudging)", () => {
     it("LibraryPage uses viewGrid and does not use px-8 py-8 or mx-auto centering wrappers", () => {
-      expect(libraryPage).toContain('viewGrid\n      gridVariant="wide"');
+      expect(libraryPage).toContain('viewGrid gridVariant="wide"');
       expect(libraryPage).not.toContain('bodyClassName="px-8 py-8"');
       expect(libraryPage).not.toContain("mx-auto grid w-full max-w-[68ch]");
     });
 
-    it("LibraryPage computes real totalParagraphs and does not reference undefined chunksCount", () => {
-      expect(libraryPage).toContain("totalParagraphs");
+    it("Library uses paginated mixed media and does not reference undefined chunksCount", () => {
+      expect(libraryPage).toContain("Media type");
+      expect(libraryPage).toContain("page?.nextCursor");
       expect(libraryPage).not.toContain("chunksCount");
     });
 
@@ -94,9 +96,9 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
     });
 
     it("QueuePage uses viewGrid and does not use px-8 py-8 or mx-auto centering wrappers", () => {
-      expect(queuePage).toContain("<WorkbenchPanel\n      title=\"Activity\"\n      icon={<ListOrdered size={13} strokeWidth={2} />}\n      viewGrid");
+      expect(queuePage).toContain('kind === \'library\' ? \'Library\' : \'Activity\'');
       expect(queuePage).not.toContain('bodyClassName="px-8 py-8"');
-      expect(queuePage).toContain('viewGrid\n      gridVariant="wide"');
+      expect(queuePage).toContain('viewGrid gridVariant="wide"');
       expect(queuePage).not.toContain("mx-auto grid w-full max-w-[68ch]");
     });
 
@@ -118,9 +120,9 @@ describe("Modern CSS Grid & Named Alignment Track Architecture (intrinsic-ui-cra
     });
 
     it("SettingsPage and PlaylistsPage use viewGrid with gridVariant='wide' without outer padding wrappers", () => {
-      expect(settingsPage).toContain('viewGrid\n      gridVariant="wide"');
+      expect(settingsPage).toMatch(/viewGrid\s+gridVariant="wide"/);
       expect(settingsPage).not.toContain("mx-auto grid w-full max-w-[52rem] gap-8 p-8");
-      expect(playlistsPage).toContain('viewGrid\n      gridVariant="wide"');
+      expect(playlistsPage).toMatch(/viewGrid\s+gridVariant="wide"/);
       expect(playlistsPage).not.toContain("grid gap-6 p-6 pb-28");
     });
   });

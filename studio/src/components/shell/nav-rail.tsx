@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   FileText,
-  Plus,
   Download,
   Library,
   ListMusic,
@@ -23,6 +22,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useAuth } from "@/lib/auth-context";
 import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
+import { useActiveImageCount } from "@/components/media/media-activity-provider";
+import { CreateMenu } from "./create-menu";
 import { FindWork, SidebarWork } from "./work-navigation";
 import { useWorkspace } from "./workspace-provider";
 import { useConnectivity } from "@/lib/connectivity";
@@ -47,6 +48,7 @@ const NAV: readonly NavItem[] = [
 function isActive(pathname: string, item: NavItem): boolean {
   if (pathname === item.href) return true;
   if (pathname.startsWith(`${item.href}/`)) return true;
+  if (item.href === "/library" && pathname.startsWith("/image/")) return true;
   if (item.prefix !== undefined && pathname.startsWith(item.prefix)) return true;
   return false;
 }
@@ -68,13 +70,13 @@ export function NavRail({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const { state, newDraft } = useWorkspace();
+  const { state } = useWorkspace();
   const { user } = useAuth();
   const { generationQueue } = useNarration();
   const { resolvedTheme, setTheme } = useTheme();
   const offline = useConnectivity() === 'offline';
   const isDark = resolvedTheme === "dark";
-  const activeCount = generationQueue.activeCount;
+  const activeCount = generationQueue.activeCount + useActiveImageCount();
 
   return (
     <nav
@@ -118,10 +120,7 @@ export function NavRail({
 
       <div className={cn("min-h-0 overflow-y-auto pb-4", docked ? "px-2" : "px-3")} >
       <div className="py-2"><FindWork compact={docked} onNavigate={onNavigate} /></div>
-      <button type="button" disabled={offline} onClick={() => { newDraft(); onNavigate?.(); }} aria-label="Create narration" title="Create narration"
-        className={cn("mb-2 flex h-9 w-full items-center rounded-md disabled:opacity-40", docked ? "justify-center text-ink-muted hover:bg-sidebar-accent" : "gap-2 bg-primary px-3 text-sm font-medium text-primary-foreground")}>
-        <Plus size={16} />{!docked && 'Create narration'}
-      </button>
+      <div className="mb-2"><CreateMenu compact={docked} onNavigate={onNavigate} /></div>
       <ul className={cn("flex flex-col gap-1 py-2")}>
         {NAV.map((item) => {
           const active = isActive(pathname, item);

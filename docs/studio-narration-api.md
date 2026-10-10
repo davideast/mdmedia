@@ -12,6 +12,10 @@ request URL's origin. Run `npm --prefix studio run check:narration-api -- <url>`
 after deployment to check authentication boundaries and the device flow without
 approving a client or generating audio.
 
+The additive [media API](studio-media-api.md) covers Gemini images, shared
+Library and Activity reads, generation versions, and authenticated image assets.
+Existing narration endpoints and options retain this contract.
+
 ## Authentication
 
 Every request carries `Authorization: Bearer <credential>`:

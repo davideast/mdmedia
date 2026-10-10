@@ -32,6 +32,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./image": {
+      "types": "./dist/image/index.d.ts",
+      "import": "./dist/image/index.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -136,6 +140,7 @@
     "radix-ui": "^1.6.7",
     "react": "^19.2.8",
     "react-resizable-panels": "^4.13.1",
+    "sharp": "0.35.4",
     "sonner": "^2.0.8",
     "typescript": "^5.9.3"
   }

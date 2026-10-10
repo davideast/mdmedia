@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AudioLines, Clock, Loader2 } from "lucide-react";
+import { AudioLines, Clock } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { MediaComposer } from "@/components/media/media-composer";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useWorkspace } from "@/components/shell/workspace-provider";
@@ -95,35 +94,21 @@ export default function StudioPage() {
       icon={<AudioLines size={13} strokeWidth={2} />}
       bodyClassName="gap-0 p-0"
     >
-      <div className="grid min-h-0 min-w-0 flex-1 grid-rows-[1fr_auto] gap-5 p-4 sm:p-6">
-        <div className="grid min-h-0 grid-rows-[auto_1fr] gap-3">
-          <h1 className="t-h2">Paste something worth hearing</h1>
-          <Textarea
-            value={draft.markdown}
-            onChange={(event) => setDraft({ markdown: event.target.value })}
-            placeholder="Paste or write here. Markdown is fine."
-            spellCheck={false}
-            className="h-full min-h-[14rem] resize-none rounded-lg p-4 text-[0.95rem] leading-[1.68]"
-          />
-        </div>
-
-        <div className="grid min-w-0 grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
-          <p className="t-meta">
+      <MediaComposer
+        heading="Paste something worth hearing"
+        label="Narration text"
+        value={draft.markdown}
+        onChange={markdown => setDraft({ markdown })}
+        placeholder="Paste or write here. Markdown is fine."
+        onSubmit={() => void create()}
+        actionLabel="Start Narration"
+        actionDisabled={tooShort || submitting}
+        busy={submitting}
+        footer={<p className="t-meta">
             {tooShort ? "A paragraph or two is enough to start." : `${draft.voice.name} (${VOICE_PROVIDER_LABEL[draft.voice.provider]}) will read this.`}
             {draft.markdown && !storageUnavailable ? <span className="ml-2">Saved on this device.</span> : null}
-          </p>
-          <Button
-            type="button"
-            size="lg"
-            onClick={create}
-            disabled={tooShort || submitting}
-            className="h-10 w-full gap-2 rounded-full px-6 sm:w-auto"
-          >
-            {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
-            Start Narration
-          </Button>
-        </div>
-      </div>
+          </p>}
+      />
 
       {Object.entries(workspace.drafts).some(([id, saved]) => id !== draftId && saved.markdown?.trim()) ? (
         <section className="grid gap-2 border-t border-border p-4 sm:p-6">

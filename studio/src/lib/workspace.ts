@@ -1,3 +1,4 @@
+import type { ImageDraft } from './media-types';
 import type { Draft } from '../components/shell/narration-provider';
 
 export interface WorkspaceTab {
@@ -16,6 +17,7 @@ export interface WorkspaceSnapshot {
   tabs: WorkspaceTab[];
   activeId: string | null;
   drafts: Record<string, Partial<Draft>>;
+  imageDrafts?: Record<string, ImageDraft>;
 }
 
 export interface WorkspaceStorage {
@@ -29,7 +31,7 @@ export interface WorkspaceStorage {
 const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
-  '/studio': 'Draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
+  '/studio': 'Draft', '/studio/image': 'Image draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
   '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
 
@@ -40,12 +42,12 @@ export function workspaceRoute(href: string): { href: string; key: string; title
   const url = new URL(href, ORIGIN);
   if (url.origin !== ORIGIN || url.pathname === '/' || /^\/(api|_next)(\/|$)/.test(url.pathname)) return null;
   const path = url.pathname.replace(/\/$/, '');
-  const draftId = path === '/studio' ? url.searchParams.get('draft') || 'default' : undefined;
+  const draftId = (path === '/studio' || path === '/studio/image') ? url.searchParams.get('draft') || 'default' : undefined;
   const entity = draftId ?? url.searchParams.get('playlist') ?? url.searchParams.get('track');
   return {
     href: `${path}${url.search}${url.hash}`,
     key: entity ? `${path}:${entity}` : path,
-    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
+    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
     draftId,
   };
 }
@@ -96,7 +98,16 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
       if (saved.drafts && typeof saved.drafts === 'object') {
         for (const [id, draft] of Object.entries(saved.drafts)) drafts[id] = readDraft(draft);
       }
-      return { version: 1, tabs, drafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
+      const imageDrafts: Record<string, ImageDraft> = Object.create(null);
+      for (const [id, value] of Object.entries(saved.imageDrafts ?? {})) {
+        if (!value || typeof value !== 'object') continue;
+        const draft = value as Record<string, unknown>;
+        imageDrafts[id] = { kind: 'image', prompt: typeof draft.prompt === 'string' ? draft.prompt : '',
+          aspectRatio: typeof draft.aspectRatio === 'string' ? draft.aspectRatio : '16:9', resolution: typeof draft.resolution === 'string' ? draft.resolution : '',
+          adapt: draft.adapt === true, instructions: typeof draft.instructions === 'string' ? draft.instructions : '',
+          referenceAssetId: typeof draft.referenceAssetId === 'string' ? draft.referenceAssetId : null };
+      }
+      return { version: 1, tabs, drafts, imageDrafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
   } catch { return EMPTY_WORKSPACE; }
 }
 
@@ -120,6 +131,12 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     if (!Object.hasOwn(local.drafts, id)) delete drafts[id];
     else drafts[id] = mergeRecord(base.drafts[id], local.drafts[id], remote.drafts[id]);
   }
+  const imageDrafts = { ...remote.imageDrafts };
+  for (const id of new Set([...Object.keys(base.imageDrafts ?? {}), ...Object.keys(local.imageDrafts ?? {})])) {
+    if (equal(base.imageDrafts?.[id], local.imageDrafts?.[id])) continue;
+    if (!Object.hasOwn(local.imageDrafts ?? {}, id)) delete imageDrafts[id];
+    else imageDrafts[id] = mergeRecord(base.imageDrafts?.[id], local.imageDrafts![id], remote.imageDrafts?.[id]);
+  }
   const tabs = new Map(remote.tabs.map((tab) => [tab.id, tab]));
   const remoteKeys = new Map(remote.tabs.map((tab) => [tab.key, tab]));
   const baseIds = new Map(base.tabs.map((tab) => [tab.id, tab]));
@@ -142,7 +159,7 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     if (seen.has(tab.key)) return false;
     seen.add(tab.key); return true;
   });
-  return { version: 1, drafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
+  return { version: 1, drafts, imageDrafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
 }
 
 /** Account-scoped, serializable workspace. No players, requests, or React trees live here. */
@@ -238,6 +255,14 @@ export class WorkspaceStore {
 
   setDraft(id: string, patch: Partial<Draft>): void {
     this.change({ ...this.snapshot, drafts: { ...this.snapshot.drafts, [id]: { ...this.snapshot.drafts[id], ...patch } } });
+  }
+
+  setImageDraft(id: string, draft: ImageDraft): void {
+    this.change({ ...this.snapshot, imageDrafts: { ...this.snapshot.imageDrafts, [id]: draft } });
+  }
+  clearImageDraft(id: string): void {
+    const imageDrafts = { ...this.snapshot.imageDrafts }; delete imageDrafts[id];
+    this.change({ ...this.snapshot, imageDrafts });
   }
 
   clearDraft(id: string): void {

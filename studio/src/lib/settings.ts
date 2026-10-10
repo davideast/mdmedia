@@ -1,3 +1,4 @@
+import { readImageDefaults } from './image-request';
 /**
  * Normalizes the `settings` map stored on `users/{uid}`. Pure, so the browser
  * and the server read preferences through one migration path.
@@ -31,6 +32,7 @@ export function readSettings(value: unknown): UserSettings {
     ? (raw.highlightColor as HighlightColorId)
     : DEFAULT_SETTINGS.highlightColor;
   return {
+    imageDefaults: readImageDefaults(raw.imageDefaults),
     defaultVoice: defaultVoiceRef.provider === 'gemini'
       ? defaultVoiceRef.id : asString(raw.defaultVoice, defaultVoiceRef.id),
     defaultVoiceRef,

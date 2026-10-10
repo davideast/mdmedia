@@ -353,7 +353,7 @@ export default function SettingsPage() {
 
         <Separator />
 
-        <Row label="Connected apps" hint="Command-line tools and coding agents that can create private narrations for you." htmlFor="connected-apps">
+        <Row label="Connected apps" hint="Command-line tools and coding agents with approved access to your private media." htmlFor="connected-apps">
           <div id="connected-apps" className="min-w-0">
             <ConnectedApps />
           </div>

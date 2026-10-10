@@ -1,8 +1,9 @@
+import type { MediaType } from './media-types';
 import { workspaceRoute, type WorkspaceSnapshot } from './workspace';
 
 export const WORK_PAGE_SIZE = 50;
 export const FIND_LIMIT = 20;
-export type WorkItem = { key: string; href: string; title: string; detail: string; search: string; pinned: boolean; visitedAt: number; viewId?: string; draftId?: string };
+export type WorkItem = { key: string; href: string; title: string; detail: string; search: string; pinned: boolean; visitedAt: number; type?: MediaType; viewId?: string; draftId?: string };
 
 /** Drafts are independent of the route cache: even a previously closed draft is discoverable. */
 export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
@@ -11,8 +12,9 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
     const route = workspaceRoute(view.href);
     if (!route || !isWorkRoute(view.href)) continue;
     const id = route.draftId ?? view.key.split('/').pop()!.split(':').pop()!;
-    const kind = route.draftId ? 'Draft' : view.key.startsWith('/narration/') ? 'Narration' : 'Playlist';
-    items.set(view.key, { key: view.key, href: view.href, title: view.title, detail: `${kind} · ${id}`,
+    const type = view.key.startsWith('/image/') || view.key.startsWith('/studio/image:') ? 'image' : view.key.startsWith('/narration/') || view.key.startsWith('/studio:') ? 'narration' : undefined;
+    const kind = route.draftId ? (type === 'image' ? 'Image draft' : 'Draft') : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
+    items.set(view.key, { type, key: view.key, href: view.href, title: view.title, detail: `${kind} · ${id}`,
       search: `${view.title} ${id}`, pinned: view.pinned === true, visitedAt: view.visitedAt ?? 0, viewId: view.id, draftId: route.draftId });
   }
   for (const [id, draft] of Object.entries(state.drafts)) {
@@ -21,7 +23,14 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
     const previous = items.get(key);
     const title = draft.markdown?.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 200) || 'Untitled draft';
     items.set(key, { ...previous, key, href: previous?.href ?? `/studio?draft=${encodeURIComponent(id)}`, title,
-      detail: `Draft · ${id}`, search: `${title} ${draft.markdown ?? ''} ${draft.voice?.name ?? ''} ${id}`,
+      type: 'narration', detail: `Draft · ${id}`, search: `${title} ${draft.markdown ?? ''} ${draft.voice?.name ?? ''} ${id}`,
+      pinned: previous?.pinned ?? false, visitedAt: previous?.visitedAt ?? 0, draftId: id });
+  }
+  for (const [id, draft] of Object.entries(state.imageDrafts ?? {})) {
+    const key = `/studio/image:${id}`; const previous = items.get(key);
+    const title = draft.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 200) || 'Untitled image';
+    items.set(key, { ...previous, key, href: previous?.href ?? `/studio/image?draft=${encodeURIComponent(id)}`, title,
+      type: 'image', detail: `Image draft · ${id}`, search: `${title} ${draft.prompt} ${id}`,
       pinned: previous?.pinned ?? false, visitedAt: previous?.visitedAt ?? 0, draftId: id });
   }
   return [...items.values()].sort((a, b) => b.visitedAt - a.visitedAt || a.key.localeCompare(b.key));
@@ -29,7 +38,7 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
 
 export function isWorkRoute(href: string): boolean {
   const route = workspaceRoute(href);
-  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/playlists:'));
+  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/playlists:'));
 }
 
 export function matchesWork(text: string, query: string): boolean {

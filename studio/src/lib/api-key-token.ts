@@ -11,7 +11,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 export const API_KEY_PREFIX = 'mdm_';
 
 /** What an API key may do. Browser sessions implicitly have every scope. */
-export const API_KEY_SCOPES = ['narrations:create', 'narrations:read', 'options:read', 'playlists:manage'] as const;
+export const API_KEY_SCOPES = ['narrations:create', 'narrations:read', 'options:read', 'playlists:manage', 'images:create', 'images:read'] as const;
 export type ApiKeyScope = (typeof API_KEY_SCOPES)[number];
 
 const KEY_ID = /^[A-Za-z0-9]{16}$/;

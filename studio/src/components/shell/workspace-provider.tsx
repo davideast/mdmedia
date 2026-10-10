@@ -15,6 +15,7 @@ interface WorkspaceContextValue {
   storageUnavailable: boolean;
   openView: (tab: WorkspaceTab) => void;
   newDraft: () => void;
+  newMediaDraft: (type: 'narration' | 'image') => void;
   replaceCurrent: (href: string, title?: string) => void;
 }
 
@@ -82,6 +83,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     else if (offline) window.location.assign(tab.href);
     else router.push(tab.href, { scroll: false });
   }, [router, offline]);
+  const newMediaDraft = useCallback((type: 'narration' | 'image') => router.push(`${type === 'image' ? '/studio/image' : '/studio'}?draft=${crypto.randomUUID()}`), [router]);
   const newDraft = useCallback(() => router.push(`/studio?draft=${crypto.randomUUID()}`), [router]);
   const replaceCurrent = useCallback((next: string, title?: string) => {
     const id = store.getSnapshot().activeId;
@@ -92,8 +94,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const route = workspaceRoute(href);
   const activeView = state.tabs.find((tab) => tab.key === route?.key);
   const value = useMemo(() => ({ store, state, activeView, draftId: route?.draftId ?? "default",
-    storageUnavailable, openView, newDraft, replaceCurrent }),
-    [store, state, activeView, route?.draftId, storageUnavailable, openView, newDraft, replaceCurrent]);
+    storageUnavailable, openView, newDraft, newMediaDraft, replaceCurrent }),
+    [store, state, activeView, route?.draftId, storageUnavailable, openView, newDraft, newMediaDraft, replaceCurrent]);
 
   if (!ready) return <div className="grid h-dvh place-items-center"><Loader2 size={20} className="animate-spin" /><span className="sr-only">Restoring workspace</span></div>;
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;

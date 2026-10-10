@@ -117,7 +117,7 @@ describe('Narration Deletion Logic', () => {
       'utf8',
     );
     const queuePageSource = readFileSync(
-      resolve(import.meta.dir, '../../studio/src/app/(app)/queue/page.tsx'),
+      resolve(import.meta.dir, '../../studio/src/components/media/media-directory.tsx'),
       'utf8',
     );
 
@@ -162,7 +162,7 @@ describe('Narration Deletion Logic', () => {
       'utf8',
     );
     const libraryPageSource = readFileSync(
-      resolve(import.meta.dir, '../../studio/src/app/(app)/library/page.tsx'),
+      resolve(import.meta.dir, '../../studio/src/components/media/narration-library-entry.tsx'),
       'utf8',
     );
     const settingsSource = readFileSync(
@@ -189,14 +189,14 @@ describe('Narration Deletion Logic', () => {
       expect(deleteNarrationBody).toMatch(/fetch\(`\/api\/narrations\/\$\{id\}`,\s*\{\s*method:\s*['"]DELETE['"]/);
     });
 
-    it('library/page.tsx closes delete dialog immediately upon confirmation instead of blocking with spinner', () => {
+    it('NarrationLibraryEntry closes delete dialog immediately upon confirmation instead of blocking with spinner', () => {
       const confirmDeleteBody = libraryPageSource.slice(
         libraryPageSource.indexOf('const handleConfirmDelete ='),
         libraryPageSource.indexOf('return (', libraryPageSource.indexOf('const handleConfirmDelete =')),
       );
 
-      expect(confirmDeleteBody).toContain('setItemToDelete(null)');
-      const setItemPos = confirmDeleteBody.indexOf('setItemToDelete(null)');
+      expect(confirmDeleteBody).toContain('setConfirmDelete(false)');
+      const setItemPos = confirmDeleteBody.indexOf('setConfirmDelete(false)');
       const deleteNarrationPos = confirmDeleteBody.indexOf('deleteNarration(');
       expect(setItemPos).toBeLessThan(deleteNarrationPos);
     });
