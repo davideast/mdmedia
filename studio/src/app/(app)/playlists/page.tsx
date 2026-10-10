@@ -299,14 +299,14 @@ export default function PlaylistsPage() {
                     isActivePlaylist ? "border-border-strong" : "border-border",
                   )}
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                     <div className="flex min-w-0 flex-1 items-start gap-3.5">
                       <button
                         type="button"
                         onClick={() => handlePlayPlaylist(playlist, tracks, 0)}
                         disabled={tracks.length === 0}
                         aria-label={isPlayingPlaylist ? `Pause ${playlist.title}` : `Play ${playlist.title}`}
-                        className="inline-flex size-10 flex-none items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+                        className="inline-flex size-12 flex-none items-center justify-center rounded-full bg-primary sm:size-10 text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
                       >
                         {isPlayingPlaylist ? (
                           <Pause size={15} strokeWidth={2.2} fill="currentColor" />
@@ -315,7 +315,7 @@ export default function PlaylistsPage() {
                         )}
                       </button>
 
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0 flex-1 self-center">
                         {isEditing ? (
                           <div className="grid max-w-xl gap-2">
                             <Input
@@ -350,7 +350,7 @@ export default function PlaylistsPage() {
                           </div>
                         ) : (
                           <>
-                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                            <div className="grid min-w-0 gap-1">
                               <h2 className="t-card-title min-w-0 [overflow-wrap:anywhere]"><Link href={`/playlists?playlist=${encodeURIComponent(playlist.id)}`} className="hover:text-primary">{playlist.title}</Link></h2>
                               <span className="inline-flex flex-wrap items-center gap-x-2.5 t-mono tabular-nums text-ink-faint">
                                 <span>{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
@@ -366,7 +366,7 @@ export default function PlaylistsPage() {
                     </div>
 
                     {!isEditing ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center justify-end gap-1 border-t border-border pt-3 sm:border-0 sm:pt-0">
                         <Button
                           type="button"
                           variant="ghost"
@@ -375,7 +375,7 @@ export default function PlaylistsPage() {
                           disabled={!online || tracks.length === 0 || !!downloadProgress[playlist.id]}
                           aria-label={`${downloaded[playlist.id] ? 'Update' : 'Download'} ${playlist.title} for offline listening`}
                           title={downloadProgress[playlist.id] || (downloaded[playlist.id] ? 'Update downloaded playlist' : 'Download playlist')}
-                          className="size-9 sm:size-6"
+                          className="size-11 sm:size-6"
                         >
                           {downloadProgress[playlist.id] ? <Loader2 size={13} className="animate-spin" /> : downloaded[playlist.id] && downloaded[playlist.id] >= playlist.updatedAt ? <Check size={13} /> : <Download size={13} />}
                         </Button>
@@ -385,7 +385,7 @@ export default function PlaylistsPage() {
                           size="icon-xs"
                           onClick={() => startEdit(playlist)}
                           aria-label={`Edit ${playlist.title}`}
-                          className="size-9 sm:size-6"
+                          className="size-11 sm:size-6"
                         >
                           <Pencil size={13} strokeWidth={2} />
                         </Button>
@@ -395,7 +395,7 @@ export default function PlaylistsPage() {
                           size="icon-xs"
                           onClick={() => handleDelete(playlist)}
                           aria-label={`Delete ${playlist.title}`}
-                          className="size-9 sm:size-6"
+                          className="size-11 sm:size-6"
                         >
                           <Trash2 size={13} strokeWidth={2} />
                         </Button>
@@ -418,7 +418,7 @@ export default function PlaylistsPage() {
                             onDrop={(event) => onDrop(event, playlist, idx)}
                             onDragEnd={onDragEnd}
                             className={cn(
-                              "group flex min-w-0 flex-col items-stretch gap-2 px-3 py-2 text-[0.83rem] transition-colors select-none sm:flex-row sm:items-center sm:justify-between",
+                              "group flex min-w-0 flex-col items-stretch gap-1 px-3 py-3 text-[0.83rem] transition-colors select-none sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:py-2",
                               isTrackActive ? "bg-accent/70" : "hover:bg-muted/60",
                               dragState?.playlistId === playlist.id &&
                                 dragState.fromIndex === idx &&
@@ -431,7 +431,7 @@ export default function PlaylistsPage() {
                           >
                             <div className="flex min-w-0 flex-1 items-center gap-2">
                               <span
-                                className="cursor-grab active:cursor-grabbing p-0.5 text-ink-faint transition-colors hover:text-foreground"
+                                className="hidden cursor-grab active:cursor-grabbing p-0.5 text-ink-faint sm:inline-flex transition-colors hover:text-foreground"
                                 title="Drag to reorder"
                               >
                                 <GripVertical size={13} strokeWidth={2} />
@@ -441,7 +441,7 @@ export default function PlaylistsPage() {
                                 type="button"
                                 onClick={() => handlePlayPlaylist(playlist, tracks, idx)}
                                 aria-label={isTrackPlaying ? `Pause ${track.title}` : `Play ${track.title}`}
-                                className="inline-flex size-10 flex-none items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-accent hover:text-foreground sm:size-6"
+                                className="inline-flex size-11 flex-none items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-accent hover:text-foreground sm:size-6"
                               >
                                 {isTrackPlaying ? (
                                   <AudioLines size={13} strokeWidth={2.2} className="text-foreground" />
@@ -457,8 +457,8 @@ export default function PlaylistsPage() {
                               </Link>
                             </div>
 
-                            <div className="flex min-w-0 items-center justify-end gap-3 sm:flex-none">
-                              <div className="playlist-reorder-controls flex items-center gap-0.5 transition-opacity">
+                            <div className="flex min-w-0 items-center gap-3 pl-[3.25rem] sm:flex-none sm:justify-end sm:pl-0">
+                              <div className="playlist-reorder-controls order-2 ml-auto flex items-center gap-1 transition-opacity sm:order-none sm:ml-0 sm:gap-0.5">
                                 <button
                                   type="button"
                                   disabled={idx === 0}
@@ -468,7 +468,7 @@ export default function PlaylistsPage() {
                                   }}
                                   aria-label="Move track up"
                                   title="Move track up"
-                                  className="inline-flex size-10 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
+                                  className="inline-flex size-11 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
                                 >
                                   <ChevronUp size={12} strokeWidth={2.2} />
                                 </button>
@@ -481,7 +481,7 @@ export default function PlaylistsPage() {
                                   }}
                                   aria-label="Move track down"
                                   title="Move track down"
-                                  className="inline-flex size-10 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
+                                  className="inline-flex size-11 items-center justify-center rounded text-ink-faint transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-20 sm:size-6"
                                 >
                                   <ChevronDown size={12} strokeWidth={2.2} />
                                 </button>
@@ -490,14 +490,14 @@ export default function PlaylistsPage() {
                               <span className="t-mono hidden text-ink-muted sm:inline">
                                 {track.voice}
                               </span>
-                              <span className="t-mono tabular-nums text-ink-faint">
+                              <span className="t-mono order-1 tabular-nums text-ink-faint sm:order-none">
                                 {formatDuration(track.durationMs)}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleToggleTrack(playlist, track.id)}
                                 aria-label={`Remove ${track.title} from ${playlist.title}`}
-                                className="inline-flex size-10 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-muted hover:text-foreground sm:size-6"
+                                className="order-3 inline-flex size-11 items-center justify-center rounded-md text-ink-faint sm:order-none transition-colors hover:bg-muted hover:text-foreground sm:size-6"
                               >
                                 <X size={13} strokeWidth={2} />
                               </button>
