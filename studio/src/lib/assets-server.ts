@@ -5,7 +5,7 @@ import type { AssetResource } from './media-types';
 
 export interface StoredAsset {
   id: string; ownerUid: string; purpose: 'reference' | 'output';
-  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video'; durationMs?: number;
+  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'music'; durationMs?: number;
   path: string; thumbnailPath: string; mimeType: string;
   width: number; height: number; byteLength: number; createdAt: number;
 }
@@ -21,7 +21,7 @@ export async function inspectImage(bytes: Uint8Array) {
     return { mimeType, width: metadata.width, height: metadata.height, thumbnail };
   } catch { throw new MediaError(400, 'invalid_image', 'Use a valid still PNG, JPEG, or WebP image.'); }
 }
-export async function saveImageAsset(uid: string, bytes: Uint8Array, purpose: StoredAsset['purpose'], generationId: string | null = null, itemId: string | null = null, mediaType: 'image' | 'video' = 'image'): Promise<StoredAsset> {
+export async function saveImageAsset(uid: string, bytes: Uint8Array, purpose: StoredAsset['purpose'], generationId: string | null = null, itemId: string | null = null, mediaType: 'image' | 'video' | 'music' = 'image'): Promise<StoredAsset> {
   if (purpose === 'reference' && bytes.length > MAX_REFERENCE_BYTES) throw new MediaError(413, 'reference_too_large', 'Reference images must be at most 10 MiB.');
   const info = await inspectImage(bytes);
   // A deterministic output ID makes recovery finish storage rather than generate again.

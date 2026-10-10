@@ -39,7 +39,15 @@ export async function GET(request: Request): Promise<Response> {
       defaults: await videoDefaults(caller.uid), capabilities: { aspectRatios: ['16:9', '9:16'], resolutions: VIDEO_RESOLUTIONS, adaptation: true, referenceImages: 1, continuation: true, regenerateLatest: true, audio: true },
       limits: { promptChars: 32000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_VIDEO_BYTES, clipSeconds: { min: 3, max: 10 }, sequenceSeconds: null }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
-  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, and video.');
+  if (media === 'music') {
+    const { musicDefaults, configuredMusicModel } = await import('@/lib/music-server');
+    const { videoToolsAvailable } = await import('@/lib/video-assets-server');
+    const { MAX_MUSIC_BYTES, MAX_MUSIC_PROMPT } = await import('@/lib/music-request');
+    return Response.json({ type: 'music', available: Boolean(process.env.GEMINI_API_KEY) && await videoToolsAvailable(), provider: 'lyria', model: configuredMusicModel(),
+      defaults: await musicDefaults(caller.uid), capabilities: { modes: ['song', 'clip'], formats: ['mp3', 'wav'], vocals: ['auto', 'vocals', 'instrumental'], customLyrics: true, adaptation: true, referenceImages: 1, continuation: false },
+      limits: { promptChars: MAX_MUSIC_PROMPT, lyricsChars: 8000, instructionChars: 4000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_MUSIC_BYTES, clipSeconds: 30, songSeconds: null }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+  }
+  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, and music.');
   const settings = await loadUserSettings(caller.uid);
   const delivery = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructions = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];

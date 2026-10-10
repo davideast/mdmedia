@@ -20,6 +20,11 @@ export const GET = (request: Request, context: { params: Promise<{ id: string }>
   const { validMediaId, MediaError } = await import('@/lib/image-request');
   const data = validMediaId(id) ? (await adminDb().collection('mediaGenerations').doc(id).get()).data() : null;
   if (!data || data.ownerUid !== caller.uid) throw new MediaError(404, 'not_found', 'That generation is not available to you.');
+  if (data.type === 'music') {
+    if (!hasScope(caller, 'music:read')) return forbiddenScope('music:read');
+    const { generationResource, loadMusicGeneration, startMusicWorker } = await import('@/lib/music-server');
+    startMusicWorker(); return mediaJson(await generationResource(await loadMusicGeneration(caller.uid, id), apiOrigin(request)));
+  }
   if (data.type === 'video') {
     if (!hasScope(caller, 'videos:read')) return forbiddenScope('videos:read');
     const { videoGenerationResource, loadVideoGeneration, startVideoWorker } = await import('@/lib/video-server');

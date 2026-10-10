@@ -11,7 +11,7 @@ export function MediaActivityProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController(); let timer: ReturnType<typeof setTimeout>;
     const load = async () => {
       try {
-        const pages = await Promise.all(['queued', 'generating'].map(status => studioJson<{ items: unknown[] }>(`/api/v1/generations?type=image&status=${status}`, { signal: controller.signal })));
+        const pages = await Promise.all(['image', 'video', 'music'].flatMap(type => ['queued', 'generating'].map(status => studioJson<{ items: unknown[] }>(`/api/v1/generations?type=${type}&status=${status}`, { signal: controller.signal }))));
         if (!controller.signal.aborted) setCount(pages.reduce((sum, page) => sum + page.items.length, 0));
       } catch { /* Directory and editor show actionable errors; background counts do not interrupt work. */ }
       if (!controller.signal.aborted) timer = setTimeout(load, 5000);

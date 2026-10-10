@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { AudioLines, ImageIcon, Video, Loader2, Library, ListOrdered, X } from 'lucide-react';
+import { AudioLines, ImageIcon, Video, Music2, Loader2, Library, ListOrdered, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import { LocalNarrationActivity } from './local-narration-activity';
 type Cursor = { createdAt: number; id: string };
 type Row = MediaSummary & { itemId?: string; phase?: string };
 type Page = { items: Row[]; nextCursor: Cursor | null; indexing: boolean };
-const labels: Record<string, string> = { queued: 'Queued', starting: 'Starting', preparing: 'Preparing visual prompt', generating: 'Generating', saving: 'Saving result', ready: 'Ready', error: 'Failed', interrupted: 'Interrupted' };
+const labels: Record<string, string> = { queued: 'Queued', starting: 'Starting', preparing: 'Preparing prompt', generating: 'Generating', saving: 'Saving result', ready: 'Ready', error: 'Failed', interrupted: 'Interrupted' };
 export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
   const [query] = useRouteQuery('q');
   const [type] = useRouteQuery('type');
@@ -71,7 +71,7 @@ export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
     {kind === 'activity' && <LocalNarrationActivity type={type} />}
     {loading ? <p role="status" className="py-6 text-center text-sm text-ink-muted">Loading {title.toLowerCase()}…</p> : error ? <div role="alert" className="grid gap-2 text-sm text-destructive"><p>{error}</p><Button variant="outline" onClick={() => setRetry(value => value + 1)}>Retry</Button></div> : page?.indexing ? <p role="status" className="py-6 text-sm text-ink-muted">Preparing your existing Library for all media…</p> : <div className="grid gap-3" aria-label={`${title} items`}>
       {rows.map(row => kind === 'library' && row.type === 'narration' ? <NarrationLibraryEntry key={`narration_${row.id}`} id={row.id} onDeleted={() => setRetry(value => value + 1)} /> : <div key={`${row.type}_${row.id}`} className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card/60 p-3 hover:bg-card"><Link href={row.href} className="flex min-w-0 flex-1 items-center gap-4">
-        {row.thumbnailAssetId && kind === 'library' ? <AssetImage id={row.thumbnailAssetId} thumbnail alt={row.title} className="h-20 w-28 shrink-0 rounded-md" /> : row.type === 'video' ? <Video size={22} className="shrink-0 text-ink-muted" /> : row.type === 'image' ? <ImageIcon size={22} className="shrink-0 text-ink-muted" /> : <AudioLines size={22} className="shrink-0 text-ink-muted" />}
+        {row.thumbnailAssetId && kind === 'library' ? <AssetImage id={row.thumbnailAssetId} thumbnail alt={row.title} className="h-20 w-28 shrink-0 rounded-md" /> : row.type === 'music' ? <Music2 size={22} className="shrink-0 text-ink-muted" /> : row.type === 'video' ? <Video size={22} className="shrink-0 text-ink-muted" /> : row.type === 'image' ? <ImageIcon size={22} className="shrink-0 text-ink-muted" /> : <AudioLines size={22} className="shrink-0 text-ink-muted" />}
         <div className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{row.title}</span><span className="mt-1 block text-xs text-ink-muted">{MEDIA_TYPES.find(item => item.type === row.type)?.label} · {labels[row.phase ?? row.status] ?? row.status} · {new Date(row.createdAt).toLocaleString()}</span></div>
         {['queued', 'generating'].includes(row.status) && <Loader2 size={16} className="shrink-0 animate-spin text-primary" />}
       </Link>{kind === 'activity' && row.type === 'narration' && row.status === 'generating' && <Button variant="ghost" size="icon" title="Cancel generation" aria-label={`Cancel ${row.title}`} onClick={() => void handleCancelOrphan(row.itemId ?? row.id)}><X size={16} /></Button>}</div>)}

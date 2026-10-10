@@ -4,7 +4,7 @@ export const MEDIA_TYPES: Array<{ type: MediaType; label: string; composer: stri
   { type: 'narration', label: 'Narration', composer: '/studio', available: true },
   { type: 'image', label: 'Image', composer: '/studio/image', available: true },
   { type: 'video', label: 'Video', composer: '/studio/video', available: true },
-  { type: 'music', label: 'Music', composer: '/studio/music', available: false },
+  { type: 'music', label: 'Music', composer: '/studio/music', available: true },
 ];
 export type GenerationStatus = 'queued' | 'generating' | 'ready' | 'error' | 'interrupted';
 export interface MediaSummary {
@@ -69,7 +69,7 @@ export interface ImageResource extends MediaSummary {
 }
 
 export interface ImageGenerationResource extends GenerationBase { type: 'image'; request: ImageRequest }
-export type GenerationResource = ImageGenerationResource | VideoGenerationResource;
+export type GenerationResource = ImageGenerationResource | VideoGenerationResource | MusicGenerationResource;
 export interface VideoRequest {
   prompt: string;
   adaptation: { enabled: boolean; instructions: string };
@@ -90,5 +90,24 @@ export interface VideoResource extends MediaSummary {
   latestGeneration: VideoGenerationResource; result: VideoGenerationResource | null;
   clips: VideoClip[];
   canContinue: boolean;
+  links: { self: string; web: string; generations: string };
+}
+
+export interface MusicRequest {
+  prompt: string;
+  adaptation: { enabled: boolean; instructions: string };
+  output: { mode: 'song' | 'clip'; format: 'mp3' | 'wav' };
+  vocals: 'auto' | 'vocals' | 'instrumental';
+  lyrics: string;
+  referenceAssetId: string | null;
+}
+export interface MusicDraft extends MusicRequest { kind: 'music' }
+export interface MusicGenerationResource extends GenerationBase {
+  type: 'music'; request: MusicRequest; lyrics: string | null; waveform: number[]; durationSeconds: number | null;
+}
+export interface MusicResource extends MediaSummary {
+  type: 'music'; visibility: 'private'; request: MusicRequest;
+  latestGenerationId: string; latestSuccessfulGenerationId: string | null;
+  latestGeneration: MusicGenerationResource; result: MusicGenerationResource | null;
   links: { self: string; web: string; generations: string };
 }

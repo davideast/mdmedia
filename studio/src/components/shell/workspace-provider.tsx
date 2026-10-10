@@ -15,7 +15,7 @@ interface WorkspaceContextValue {
   storageUnavailable: boolean;
   openView: (tab: WorkspaceTab) => void;
   newDraft: () => void;
-  newMediaDraft: (type: 'narration' | 'image' | 'video') => void;
+  newMediaDraft: (type: 'narration' | 'image' | 'video' | 'music') => void;
   replaceCurrent: (href: string, title?: string) => void;
 }
 
@@ -83,7 +83,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     else if (offline) window.location.assign(tab.href);
     else router.push(tab.href, { scroll: false });
   }, [router, offline]);
-  const newMediaDraft = useCallback((type: 'narration' | 'image' | 'video') => router.push(`${type === 'narration' ? '/studio' : `/studio/${type}`}?draft=${crypto.randomUUID()}`), [router]);
+  const newMediaDraft = useCallback((type: 'narration' | 'image' | 'video' | 'music') => router.push(`${type === 'narration' ? '/studio' : `/studio/${type}`}?draft=${crypto.randomUUID()}`), [router]);
   const newDraft = useCallback(() => router.push(`/studio?draft=${crypto.randomUUID()}`), [router]);
   const replaceCurrent = useCallback((next: string, title?: string) => {
     const id = store.getSnapshot().activeId;
