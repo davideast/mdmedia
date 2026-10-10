@@ -2,6 +2,7 @@ import { authorize } from '@/lib/api-auth';
 import { loadOwnedAsset } from '@/lib/assets-server';
 import { MediaError } from '@/lib/image-request';
 import { videoClipContent } from '@/lib/video-assets-server';
+import { adminBucket } from '@/lib/firebase-admin';
 import { loadVideoGeneration, loadVideoItem, videoClips } from '@/lib/video-server';
 import { mediaApi } from '@/lib/media-api-server';
 export const runtime = 'nodejs';
@@ -15,7 +16,11 @@ export const GET = (request: Request, context: { params: Promise<{ id: string; i
   const clip = (await videoClips(caller.uid, generation, '')).find(clip => String(clip.index) === index);
   if (!clip) throw new MediaError(404, 'not_found', 'That clip is not available.');
   const thumbnail = url.searchParams.get('thumbnail') === '1';
-  const bytes = await videoClipContent(await loadOwnedAsset(caller.uid, generation.assetId), clip.index, clip.startSeconds, clip.endSeconds, thumbnail);
+  const clipGeneration = await loadVideoGeneration(caller.uid, clip.generationId);
+  const savedClip = clipGeneration.clipAssetId ? await loadOwnedAsset(caller.uid, clipGeneration.clipAssetId) : null;
+  const bytes = savedClip
+    ? (await adminBucket().file(thumbnail ? savedClip.thumbnailPath : savedClip.path).download())[0]
+    : await videoClipContent(await loadOwnedAsset(caller.uid, generation.assetId), clip.index, clip.startSeconds, clip.endSeconds, thumbnail);
   return new Response(new Uint8Array(bytes), { headers: { 'Content-Type': thumbnail ? 'image/webp' : 'video/mp4', 'Cache-Control': 'private, max-age=3600', 'X-Content-Type-Options': 'nosniff',
     ...(!thumbnail ? { 'Content-Disposition': `attachment; filename="clip-${clip.index}.mp4"` } : {}) } });
 });

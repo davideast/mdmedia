@@ -28,13 +28,13 @@ async function transform(bytes: Uint8Array, args: string[], output: string): Pro
     return result;
   } finally { await rm(directory, { recursive: true, force: true }); }
 }
-export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationId: string, itemId: string): Promise<StoredAsset> {
+export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationId: string, itemId: string, kind: 'sequence' | 'clip' = 'sequence'): Promise<StoredAsset> {
   const durationSeconds = readMp4Duration(bytes);
   if (!bytes.length || bytes.length > MAX_VIDEO_BYTES || !durationSeconds || durationSeconds > 40.25) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid video.');
   const frame = await transform(bytes, ['-frames:v', '1'], 'poster.png');
   const metadata = await sharp(frame).metadata();
   const thumbnail = await sharp(frame).resize({ width: 480, height: 480, fit: 'inside', withoutEnlargement: true }).webp().toBuffer();
-  const id = `video_${generationId}`;
+  const id = `video_${generationId}${kind === 'clip' ? '_clip' : ''}`;
   const path = `media/${uid}/${id}/original`; const thumbnailPath = `media/${uid}/${id}/thumbnail.webp`;
   // Storage first: deterministic paths permit recovery after either write or the DB checkpoint.
   await adminBucket().file(path).save(Buffer.from(bytes), { resumable: false, contentType: 'video/mp4' });
@@ -43,6 +43,24 @@ export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationI
     mimeType: 'video/mp4', width: metadata.width!, height: metadata.height!, durationMs: Math.round(durationSeconds * 1000), byteLength: bytes.length, createdAt: Date.now() };
   await adminDb().collection('mediaAssets').doc(id).set(asset);
   return asset;
+}
+/** Local processing only. The provider receives a short clip, never this assembled movie. */
+export async function extractVideoSegment(bytes: Uint8Array, start: number, duration: number): Promise<Buffer> {
+  if (!Number.isFinite(start) || start < 0 || !Number.isFinite(duration) || duration < 2.75 || duration > 10.25) throw new MediaError(502, 'invalid_video', 'The returned clip has an invalid duration.');
+  return transform(bytes, ['-ss', String(start), '-t', String(duration), '-map', '0:v:0', '-map', '0:a?', '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-c:a', 'aac', '-movflags', '+faststart'], 'clip.mp4');
+}
+export async function appendVideoClip(previous: Uint8Array, clip: Uint8Array): Promise<Buffer> {
+  if (!await videoToolsAvailable() || !ffmpeg) throw new MediaError(503, 'video_tools_unavailable', 'Video processing is unavailable on this Studio.');
+  const directory = await mkdtemp(join(tmpdir(), 'mdmedia-assemble-'));
+  try {
+    await writeFile(join(directory, 'previous.mp4'), previous);
+    await writeFile(join(directory, 'clip.mp4'), clip);
+    await writeFile(join(directory, 'inputs.txt'), "file 'previous.mp4'\nfile 'clip.mp4'\n");
+    await execute(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-nostdin', '-y', '-threads', '2', '-f', 'concat', '-safe', '1', '-i', join(directory, 'inputs.txt'), '-map', '0:v:0', '-map', '0:a?', '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-c:a', 'aac', '-movflags', '+faststart', join(directory, 'sequence.mp4')], { timeout: 180_000, maxBuffer: 1024 * 1024 });
+    const result = await readFile(join(directory, 'sequence.mp4'));
+    if (result.length > MAX_VIDEO_BYTES) throw new MediaError(502, 'output_too_large', 'The assembled video is too large.');
+    return result;
+  } finally { await rm(directory, { recursive: true, force: true }); }
 }
 /** Extract from the selected complete version. No model invocation, no concatenation. */
 export async function videoClipContent(asset: StoredAsset, index: number, start: number, end: number, thumbnail: boolean): Promise<Buffer> {

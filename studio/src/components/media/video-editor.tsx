@@ -24,7 +24,7 @@ type Options = { available: boolean; defaults: VideoRequest };
 type Submission = { key: string; body: VideoRequest & { action?: 'continue' | 'regenerate_latest'; fromGenerationId?: string } };
 const fromDraft = (draft: VideoDraft): VideoRequest => ({ prompt: draft.prompt, adaptation: draft.adaptation, output: draft.output, referenceAssetId: draft.referenceAssetId, referenceRole: draft.referenceRole });
 const seconds = (duration: number) => `${Math.round(duration * 10) / 10}s`;
-const phaseLabel = (phase: string) => ({ queued: 'Waiting…', starting: 'Starting…', preparing: 'Preparing…', generating: 'Generating video…', downloading: 'Downloading…', saving: 'Saving…', recovering: 'Recovering…' }[phase] ?? phase);
+const phaseLabel = (phase: string) => ({ queued: 'Waiting…', starting: 'Starting…', preparing: 'Preparing…', generating: 'Generating video…', downloading: 'Downloading…', saving: 'Saving…', assembling: 'Saving…', recovering: 'Recovering…' }[phase] ?? phase);
 export function VideoEditor({ id }: { id?: string }) {
   const { state, store, draftId, activeView, replaceCurrent } = useWorkspace();
   const { updateSettings } = useAuth(); const router = useRouter();
@@ -54,7 +54,7 @@ export function VideoEditor({ id }: { id?: string }) {
   const poster = usePrivateMedia(asset ? `/api/v1/assets/${asset.id}/content?thumbnail=1` : null);
   const regenerating = mode === 'regenerate_latest' || (failedAttempt?.action === 'regenerate_latest' && mode !== 'continue_after_failure') || Boolean(id && video && !video.result && failedAttempt);
   const parentDuration = regenerating ? video?.clips.at(-1)?.startSeconds ?? 0 : video?.result?.durationSeconds ?? 0;
-  const remaining = Math.floor(40 - parentDuration + 0.001); const maxDuration = Math.min(10, remaining);
+  const remaining = Math.floor(40 - parentDuration + 0.25); const maxDuration = Math.min(10, remaining);
   function update(patch: Partial<VideoRequest>) {
     const next = { ...requestRef.current, ...patch };
     if (id) setEdit(JSON.stringify(next)); else store.setVideoDraft(draftId, { ...next, kind: 'video' });

@@ -18,8 +18,9 @@ export interface GenerateVideoOptions {
   onInteraction?: (interactionId: string) => Promise<void>;
 }
 
-export interface VideoContinuationSource { interactionId: string; durationSeconds: number }
-export type ContinueVideoOptions = Omit<GenerateVideoOptions, 'previousInteractionId' | 'firstFrame'>;
+/** Only the latest generated clip, never the assembled sequence or its conversation history. */
+export interface VideoContinuationSource { videoBytes: Uint8Array; durationSeconds: number }
+export type ContinueVideoOptions = Omit<GenerateVideoOptions, 'previousInteractionId' | 'firstFrame' | 'task'>;
 
 export interface VideoGenerationResult {
   interactionId: string;

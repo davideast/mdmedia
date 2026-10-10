@@ -1,7 +1,8 @@
 # Studio video sequences
 
 Studio creates one clip at a time with Gemini Omni. A saved Video is one Library
-item and one complete playable movie. Continue appends a clip; Regenerate latest
+item and one locally assembled playable movie. Each generation saves a short clip.
+Continue extends only the latest clip; Studio appends its new tail locally; Regenerate latest
 replaces the last addition using its original parent. Previous full versions
 remain available in History. There is no timeline, compulsory project hierarchy,
 or separate navigation for sequences.
@@ -86,19 +87,25 @@ provider interaction IDs, model overrides, storage paths, or uploaded videos.
 History has 50 attempts per page and uses the same stable cursor format as the
 shared catalog. Each video attempt includes its action, immutable source/options,
 prepared prompt, parent/replaced generation IDs, clip number, measured complete
-duration, and public asset resources. Provider receipts and storage paths stay
+duration, `clipDurationSeconds`, and public asset resources. Provider receipts and storage paths stay
 private. Item `clips` contains numbered ranges into the current complete movie;
 old versions can be downloaded independently from History.
 
 ## Engine and persistence
 
 `mdmedia/video` exposes `GeminiOmniVideoProvider.continueVideoClip(prompt,
-{ interactionId, durationSeconds }, options)` and `retrieveVideoClip(id, options)`.
-Legacy generate/edit remain explicit operations: passing `previousInteractionId`
-alone does not turn an edit into an extension. Continuation asks for a complete
-movie with the new tail and preserves the real interaction using `store: true`.
-Explicit engine callers can still request `task: "extend"`; Studio uses Omni's
-prompt-first multi-turn form.
+{ videoBytes, durationSeconds }, options)` and `retrieveVideoClip(id, options)`.
+Continuation requires only the latest generated 3–10-second clip. The provider
+sends that clip as explicit model conversation history, followed by the new
+prompt, without chaining older interactions. This avoids Omni selecting the
+original clip again when several generated videos exist in the history.
+Generate/edit still support `previousInteractionId` independently.
+
+Omni returns the source clip plus its continuation. Studio trims the source
+portion locally, saves the new short clip independently, and appends it to the
+previous sequence with ffmpeg. Neither the assembled movie nor the earlier clips
+are sent for generation. No model call generates the whole sequence. The real
+receipt is saved with `store: true` for safe retrieval after a crash.
 
 The provider checkpoints a real receipt before downloading, normalizes inline,
 Files URI, and REST-step video outputs, applies abort/deadline and output limits,
@@ -117,17 +124,23 @@ image jobs in the shared generation collection.
 Queued jobs resume after restart. Expired leases recover deterministic stored
 output or retrieve the existing receipt; they never create a second interaction.
 A crash before any receipt is saved becomes interrupted with an unknown provider
-outcome. A known expired parent returns `continuation_unavailable` and disables
-continuation from that result. Studio keeps the saved movie and does not silently
-reupload it as a different provider operation.
+outcome. Once the new clip is stored, recovery only assembles local files; it
+needs neither another paid generation nor a provider read. Expired conversation
+receipts do not disable continuation from locally stored clips.
 
-Omni returns cumulative movies. Studio stores that output directly and validates
-its measured duration against parent plus requested clip, with a 0.5-second
-container/timing tolerance and a 40.25-second absolute ceiling. Requested total
-capacity is 40 seconds; fewer than three whole seconds remaining disables Continue.
-It never blindly concatenates cumulative results. Clip downloads extract the
-selected version's range locally with bundled ffmpeg, preserve audio, and cache
-it; two concurrent cache misses are allowed and identical requests share work.
+Generations store both the independent clip and the assembled version.
+`durationSeconds` remains the complete playable sequence duration;
+`clipDurationSeconds` is just that generation's new clip. History and regeneration
+preserve the original parent and previous versions. Older cumulative generations
+remain readable; their final clip is extracted locally when first continued.
+Clip downloads use independent clip assets when present, with local extraction
+as the fallback for older versions. Both preserve audio.
+
+Requested total capacity remains 40 seconds, with a 40.25-second container timing
+tolerance. Fewer than three whole seconds remaining disables Continue. Source
+clips are limited to 10.25 measured seconds; provider responses must match source
+clip plus requested addition within 0.5 seconds. Two concurrent legacy extraction
+cache misses are allowed, and identical requests share work.
 
 Limits: 32,000 prompt characters, 4,000 instruction characters, 10 MiB per
 reference, 200 MiB per complete video. `ffmpeg-static` is a Studio runtime
@@ -147,9 +160,11 @@ The video lifecycle fixture uses a transactional test store, the actual engine,
 real MP4 decoding/posters/extraction, and a fake Gemini client. It covers
 concurrent idempotency, stale source rejection, original-parent regeneration,
 failed-result retention, ownership/scopes, output validation, receipt recovery
-without another paid create, expired context, and cached audio-bearing clips.
+without another paid create, recovery from a saved clip with no provider reads,
+legacy migration, 10/20/30/40-second local assembly, and audio-bearing clips.
 Engine tests cover create/edit/continue payloads, SDK retry prevention,
-normalization, cancellation, duration, missing receipts, and sequence limits.
+normalization, cancellation, source-clip limits, missing receipts, and repeated
+continuations without cumulative context.
 
 ```sh
 bun test src/video test/studio/video-request.test.ts test/studio/video-server.test.ts
@@ -169,24 +184,16 @@ the same package version; a cached worker must not outlive its engine update.
 
 Verified locally on 2026-10-09:
 
-- 547 tests passed, 12 optional live music tests skipped, zero failures. Root and
-  Studio TypeScript, production build, targeted ESLint, local rules replay, and
-  package/consumer verification passed.
-- The CQRS scanner reports only the existing client transaction in
-  `studio/src/lib/playlists.ts:166`; no new video findings. Hosted Google Rules
-  Test API verification was not rerun; its earlier automatic-approval rejection
-  remains unchanged.
-- Real engine proof: a 3.029-second initial video and a complete 6.016-second
-  continuation, both with decodable AAC audio and matching visual action.
-- Real Studio browser/API proof: 3.008 → 6.016 seconds, original-result retention
-  while busy, saved player after refresh/restart, full and individual clip
-  downloads, clip seeking, history preview, regeneration prompt/cancel, rename,
-  stale-source rejection, old-key idempotent replay, Library/Activity, and
-  1440/390/320 px layouts. The extracted second clip contains decodable video
-  and audio. Image and narration composers still load after service restart.
-- Released build `OdBp_rXKQeeOz8pgzl90U` through the existing local service's
-  backup/rollback script. The service remains enabled and active; saved media
-  survives the switch. Provider credentials and receipts were not published.
-- Windows Tailscale Serve still proxies HTTPS port 3443 to the local service on
-  3001. The public video screen returns 200, unauthenticated video API reads
-  return 401, and authenticated video/clip downloads passed through that proxy.
+- 547 tests passed and 12 optional live music tests skipped. Three hosted readiness
+  tests required localhost networking and passed when rerun with it enabled.
+- Root and Studio TypeScript, targeted ESLint, and the staged production build
+  passed. Staging browser checks loaded saved video, clips, image, and narration.
+- Real Omni proof used only the latest 10-second clip from a saved 20-second
+  sequence. The response contained that clip and the requested new 10-second
+  scene. The live item was recovered without another create call: 30.042-second
+  assembled playback, three clips, and a separate 10-second audio-bearing download.
+  Earlier results and failed attempts remain in History.
+- Provider credentials and private receipts stay on the server. Tailscale Serve
+  continues to proxy HTTPS port 3443 to the local Studio service on port 3001.
+- Released build `FjW3mJUDKO6S_NCpAJR8u` using the local service backup and
+  rollback workflow; the saved 30-second result passed the live browser check.

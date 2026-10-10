@@ -10,11 +10,15 @@ type VideoOutput = { uri?: string; data?: string };
 type Interaction = { id?: string; output_video?: VideoOutput; steps?: Array<{ type?: string; content?: Array<VideoOutput & { type?: string }> }> };
 const MAX_BYTES = 200 * 1024 * 1024;
 
-/** Omni owns the entire returned movie. Continuation is an explicit operation, never concatenation. */
+/** Omni extends one short clip. The caller trims its context and assembles the sequence locally. */
 export class GeminiOmniVideoProvider implements IVideoProvider {
   constructor(private readonly client: GoogleGenAI, private readonly maxRetries = 3, private readonly defaultModel = 'gemini-omni-flash-preview') {}
 
   async generateVideoClip(prompt: string, options: GenerateVideoOptions = {}): Promise<VideoGenerationResult> {
+    return this.generate(prompt, options);
+  }
+
+  private async generate(prompt: string, options: GenerateVideoOptions, sourceVideo?: Uint8Array): Promise<VideoGenerationResult> {
     return this.withDeadline(options, async signal => {
       if (options.durationSeconds !== undefined && (!Number.isInteger(options.durationSeconds) || options.durationSeconds < 3 || options.durationSeconds > 10)) throw new Error('Video duration must be an integer from 3 to 10 seconds');
       const inputs: Array<{ type: 'image'; data: string; mime_type: string } | { type: 'text'; text: string }> = [];
@@ -29,12 +33,16 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
       inputs.push({ type: 'text', text: prompt });
       const payload = {
         model: options.model ?? this.defaultModel, store: true,
-        input: inputs.length === 1 ? prompt : inputs,
+        // Explicit model history keeps native generated-video context without accumulating older clips.
+        input: sourceVideo ? [
+          { type: 'model_output' as const, content: [{ type: 'video' as const, mime_type: 'video/mp4', data: Buffer.from(sourceVideo).toString('base64') }] },
+          { type: 'user_input' as const, content: inputs },
+        ] : inputs.length === 1 ? prompt : inputs,
         response_format: { type: 'video' as const, ...(options.aspectRatio && options.task !== 'extend' ? { aspect_ratio: options.aspectRatio } : {}),
           delivery: options.delivery ?? 'uri', ...(options.durationSeconds ? { duration: `${options.durationSeconds}s` } : {}),
           ...(options.resolution ? { resolution: options.resolution } : {}) },
-        ...(options.task ? { generation_config: { video_config: { task: options.task } } } : {}),
-        ...(options.previousInteractionId ? { previous_interaction_id: options.previousInteractionId } : {}),
+        ...(!sourceVideo && options.task ? { generation_config: { video_config: { task: options.task } } } : {}),
+        ...(!sourceVideo && options.previousInteractionId ? { previous_interaction_id: options.previousInteractionId } : {}),
       };
       signal.throwIfAborted();
       // A timed-out create may already have been accepted. Neither SDK nor wrapper may repeat it.
@@ -46,16 +54,16 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
   }
 
   async continueVideoClip(prompt: string, source: VideoContinuationSource, options: ContinueVideoOptions = {}): Promise<VideoGenerationResult> {
-    if (!source.interactionId || !Number.isFinite(source.durationSeconds) || source.durationSeconds <= 0) throw new Error('Continuation requires a stored interaction and measured duration');
-    const remaining = Math.floor(40 - source.durationSeconds + 0.001);
-    if (remaining < 3) throw new Error('This video has reached its continuation limit');
+    const measured = readMp4Duration(source.videoBytes);
+    if (!measured || measured < 2.75 || measured > 10.25 || !Number.isFinite(source.durationSeconds) || Math.abs(measured - source.durationSeconds) > 0.25) throw new Error('Continuation requires only the latest clip, measured at 3–10 seconds');
+    if (source.videoBytes.length > (options.maxBytes ?? MAX_BYTES)) throw new Error('Source clip exceeds the size limit');
     if (options.reference?.role === 'first_frame') throw new Error('A continuation accepts a reference image, not a new first frame');
-    const durationSeconds = Math.min(options.durationSeconds ?? 10, remaining);
-    const result = await this.generateVideoClip(
-      `Continue the previous video by appending ${durationSeconds} seconds at its end. Return the complete previous video followed by the new continuation, with a natural visual and audio transition.\n\n${prompt}`,
-      { ...options, durationSeconds, previousInteractionId: source.interactionId }
+    const durationSeconds = options.durationSeconds ?? 10;
+    const result = await this.generate(
+      `Extend this video by ${durationSeconds} seconds.\n\n${prompt}`,
+      { ...options, durationSeconds }, source.videoBytes
     );
-    this.validateContinuation(result, source.durationSeconds, durationSeconds);
+    this.validateContinuation(result, measured, durationSeconds);
     return result;
   }
 

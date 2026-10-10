@@ -82,7 +82,7 @@ export type VideoAction = 'initial' | 'continue' | 'regenerate_latest';
 export interface VideoClip { index: number; generationId: string; startSeconds: number; endSeconds: number; thumbnail: string; content: string }
 export interface VideoGenerationResource extends GenerationBase {
   type: 'video'; request: VideoRequest; action: VideoAction; parentGenerationId: string | null;
-  replacesGenerationId: string | null; clipNumber: number; durationSeconds: number | null;
+  replacesGenerationId: string | null; clipNumber: number; durationSeconds: number | null; clipDurationSeconds: number | null;
 }
 export interface VideoResource extends MediaSummary {
   type: 'video'; visibility: 'private'; request: VideoRequest;

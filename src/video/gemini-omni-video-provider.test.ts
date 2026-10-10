@@ -126,12 +126,14 @@ describe('Explicit Omni continuation and recovery', () => {
     const client = { interactions: { create: async (body: unknown) => {
       payload = body; return { id: 'real-receipt', steps: [{ type: 'model_output', content: [{ type: 'video', data: movie(9).toString('base64') }] }] };
     } } } as unknown as GoogleGenAI;
-    const result = await new GeminiOmniVideoProvider(client).continueVideoClip('The train passes a station', { interactionId: 'parent', durationSeconds: 6 }, {
+    const result = await new GeminiOmniVideoProvider(client).continueVideoClip('The train passes a station', { videoBytes: movie(6), durationSeconds: 6 }, {
       durationSeconds: 3, resolution: '720p', onInteraction: async id => { checkpoint = id; },
     });
     expect(checkpoint).toBe('real-receipt'); expect(result.durationSeconds).toBe(9);
-    expect(payload.store).toBe(true); expect(payload.previous_interaction_id).toBe('parent');
-    expect(payload.input).toContain('Return the complete previous video'); expect(payload.input).toContain('The train passes a station');
+    expect(payload.store).toBe(true); expect(payload.previous_interaction_id).toBeUndefined();
+    expect(payload.input[0]).toMatchObject({type: 'model_output', content: [{type: 'video', data: movie(6).toString('base64')}]});
+    expect(payload.input[1].content[0].text).toContain('Extend this video by 3 seconds');
+    expect(payload.input[1].content[0].text).toContain('The train passes a station');
     expect(payload.response_format).toMatchObject({ type: 'video', duration: '3s', resolution: '720p' });
     expect(payload.generation_config).toBeUndefined();
   });
@@ -149,17 +151,28 @@ describe('Explicit Omni continuation and recovery', () => {
   });
   it('rejects a tail-only result and a missing provider receipt', async () => {
     const client = { interactions: { create: async () => ({ id: 'tail', output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
-    await expect(new GeminiOmniVideoProvider(client).continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 6 })).rejects.toThrow('complete longer video');
+    await expect(new GeminiOmniVideoProvider(client).continueVideoClip('Next', { videoBytes: movie(6), durationSeconds: 6 })).rejects.toThrow('complete longer video');
     const missing = { interactions: { create: async () => ({ output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
     await expect(new GeminiOmniVideoProvider(missing).generateVideoClip('Next')).rejects.toThrow('no interaction ID');
   });
-  it('clamps near the sequence limit and refuses less than three seconds of room', async () => {
-    let payload: any; let calls = 0;
-    const client = { interactions: { create: async (body: unknown) => { payload = body; calls++; return { id: 'end', output_video: { data: movie(40).toString('base64') } }; } } } as unknown as GoogleGenAI;
+  it('extends only the latest short clip, independently of the assembled sequence duration', async () => {
+    const payloads: any[] = [];
+    const client = { interactions: { create: async (body: any) => {
+      payloads.push(body);
+      // Reproduces Omni choosing the first video if the full history is chained.
+      const source = body.previous_interaction_id ? 10 : Buffer.from(body.input[0].content[0].data, 'base64').readUInt32BE(32) / 1000;
+      return { id: `turn-${payloads.length}`, output_video: { data: movie(source + 10).toString('base64') } };
+    } } } as unknown as GoogleGenAI;
     const provider = new GeminiOmniVideoProvider(client);
-    await provider.continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 36 });
-    expect(payload.response_format.duration).toBe('4s');
-    await expect(provider.continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 38 })).rejects.toThrow('limit'); expect(calls).toBe(1);
+    // The saved sequence can be 20s or 30s; only its final 10s enters either request.
+    for (const _total of [20, 30]) {
+      const result = await provider.continueVideoClip('The scene continues', { videoBytes: movie(10), durationSeconds: 10 }, { durationSeconds: 10 });
+      expect(result.durationSeconds).toBe(20);
+    }
+    expect(payloads).toHaveLength(2);
+    expect(payloads.every(p => p.previous_interaction_id === undefined)).toBe(true);
+    await expect(provider.continueVideoClip('Next', { videoBytes: movie(20), durationSeconds: 20 })).rejects.toThrow('latest clip');
+    expect(payloads).toHaveLength(2);
   });
   it('honors cancellation and the output cap before delivering any bytes', async () => {
     let calls = 0;

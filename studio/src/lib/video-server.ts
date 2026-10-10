@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { GeminiOmniVideoProvider, type VideoGenerationResult } from 'mdmedia/video';
+import { GeminiOmniVideoProvider, readMp4Duration, type VideoGenerationResult } from 'mdmedia/video';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
 import { parseVideoRequest, readVideoDefaults, videoActionBody, MAX_VIDEO_BYTES } from './video-request';
-import { saveVideoAsset, videoToolsAvailable } from './video-assets-server';
+import { appendVideoClip, extractVideoSegment, saveVideoAsset, videoClipContent, videoToolsAvailable } from './video-assets-server';
 import type { GenerationStatus, MediaSummary, VideoAction, VideoClip, VideoGenerationResource, VideoRequest, VideoResource } from './media-types';
 
 interface VideoItem extends MediaSummary {
@@ -16,6 +16,7 @@ export interface VideoGeneration {
   id: string; ownerUid: string; itemId: string; type: 'video'; title: string;
   request: VideoRequest; action: VideoAction; parentGenerationId: string | null; replacesGenerationId: string | null;
   clipNumber: number; durationSeconds: number | null; parentDurationSeconds: number;
+  assemblyMode?: 'clips'; clipAssetId?: string | null; clipDurationSeconds?: number | null; parentClipDurationSeconds?: number | null;
   provider: 'gemini'; model: string; adaptationModel: string;
   status: GenerationStatus; phase: string; preparedPrompt: string | null;
   assetId: string | null; interactionId: string | null; parentInteractionId: string | null;
@@ -77,10 +78,9 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
       if (previous.latestSuccessfulGenerationId && (request.output.aspectRatio !== source.request.output.aspectRatio || request.output.resolution !== source.request.output.resolution)) throw new MediaError(409, 'locked_output', 'Shape and resolution are fixed after the first clip.');
     } else request = parseVideoRequest(body, defaults);
     if (parent) {
-      if (parent.status !== 'ready' || parent.ownerUid !== uid || parent.itemId !== itemId || parent.type !== 'video' || !parent.interactionId || !parent.durationSeconds) throw new MediaError(409, 'continuation_unavailable', 'The saved continuation context is unavailable. Your video is preserved.');
-      const remaining = Math.floor(40 - parent.durationSeconds + 0.001);
+      if (parent.status !== 'ready' || parent.ownerUid !== uid || parent.itemId !== itemId || parent.type !== 'video' || !parent.assetId || !parent.durationSeconds) throw new MediaError(409, 'continuation_unavailable', 'The saved continuation context is unavailable. Your video is preserved.');
+      const remaining = Math.floor(40 - parent.durationSeconds + 0.25);
       if (remaining < 3) throw new MediaError(409, 'sequence_limit', 'This video has reached its 40-second limit.');
-      if (previous?.continuationUnavailableFor === parent.id) throw new MediaError(409, 'continuation_unavailable', 'Gemini’s saved continuation context has expired. Your video is preserved.');
       if (request.referenceAssetId && request.referenceRole === 'first_frame') throw new MediaError(400, 'invalid_reference_role', 'Continuations accept a reference image.');
       request = { ...request, referenceRole: 'reference', output: { ...request.output, durationSeconds: Math.min(request.output.durationSeconds, remaining) } };
     }
@@ -99,9 +99,10 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
     const title = previous?.title ?? request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 100);
     const job: VideoGeneration = { id: generationId, ownerUid: uid, itemId, type: 'video', title, request, action,
       parentGenerationId: parent?.id ?? null, replacesGenerationId: action === 'regenerate_latest' ? source?.id ?? null : null,
-      parentDurationSeconds: parent?.durationSeconds ?? 0, parentInteractionId: parent?.interactionId ?? null, clipNumber: (parent?.clipNumber ?? 0) + 1,
+      parentDurationSeconds: parent?.durationSeconds ?? 0, parentInteractionId: null, clipNumber: (parent?.clipNumber ?? 0) + 1,
       provider: 'gemini', model: source?.model ?? configuredVideoModel(), adaptationModel: process.env.MDMEDIA_VIDEO_ADAPTATION_MODEL || 'gemini-3.5-flash-lite',
       status: 'queued', phase: 'queued', preparedPrompt: null, interactionId: null, assetId: null, durationSeconds: null,
+      assemblyMode: 'clips', clipAssetId: null, clipDurationSeconds: null, parentClipDurationSeconds: null,
       createdAt: now, updatedAt: now, leaseUntil: 0, leaseToken: null, error: null };
     const item: VideoItem = { id: itemId, type: 'video', ownerUid: uid, title, status: 'queued', visibility: 'private', request,
       createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/video/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
@@ -119,7 +120,7 @@ export async function videoGenerationResource(job: VideoGeneration, origin: stri
   const asset = job.assetId ? await loadOwnedAsset(job.ownerUid, job.assetId) : null;
   return { id: job.id, itemId: job.itemId, type: 'video', title: job.title, status: job.status, phase: job.phase, createdAt: job.createdAt, updatedAt: job.updatedAt,
     request: job.request, preparedPrompt: job.preparedPrompt, provider: job.provider, model: job.model, action: job.action,
-    parentGenerationId: job.parentGenerationId, replacesGenerationId: job.replacesGenerationId, clipNumber: job.clipNumber, durationSeconds: job.durationSeconds,
+    parentGenerationId: job.parentGenerationId, replacesGenerationId: job.replacesGenerationId, clipNumber: job.clipNumber, durationSeconds: job.durationSeconds, clipDurationSeconds: job.clipDurationSeconds ?? (job.durationSeconds ? job.durationSeconds - job.parentDurationSeconds : null),
     assets: asset ? [assetResource(asset, origin)] : [], error: job.error, links: { self: `${origin}/api/v1/generations/${job.id}`, web: `${origin}/video/${job.itemId}` } };
 }
 export async function videoClips(uid: string, tip: VideoGeneration, origin: string): Promise<VideoClip[]> {
@@ -142,7 +143,7 @@ export async function videoResource(uid: string, id: string, origin: string): Pr
   return { id: item.id, type: 'video', title: item.title, status: item.status, visibility: 'private', createdAt: item.createdAt, updatedAt: item.updatedAt,
     href: item.href, thumbnailAssetId: item.thumbnailAssetId, durationMs: item.durationMs, request: item.request,
     latestGenerationId: latest.id, latestSuccessfulGenerationId: result?.id ?? null, latestGeneration: await videoGenerationResource(latest, origin),
-    result: result ? await videoGenerationResource(result, origin) : null, canContinue: Boolean(result && result.durationSeconds && Math.floor(40 - result.durationSeconds + 0.001) >= 3 && item.continuationUnavailableFor !== result.id), clips: result ? await videoClips(uid, result, origin) : [],
+    result: result ? await videoGenerationResource(result, origin) : null, canContinue: Boolean(result && result.durationSeconds && Math.floor(40 - result.durationSeconds + 0.25) >= 3), clips: result ? await videoClips(uid, result, origin) : [],
     links: { self: `${origin}/api/v1/videos/${id}`, web: `${origin}/video/${id}`, generations: `${origin}/api/v1/videos/${id}/generations` } };
 }
 async function checkpoint(job: VideoGeneration, token: string, patch: Partial<VideoGeneration>) {
@@ -172,21 +173,63 @@ function validateOutput(job: VideoGeneration, output: VideoGenerationResult) {
       (job.parentGenerationId && (output.durationSeconds <= job.parentDurationSeconds + 0.25 || Math.abs(output.durationSeconds - job.parentDurationSeconds - job.request.output.durationSeconds) > 0.5))) throw new MediaError(502, 'invalid_video', 'Gemini did not return a complete longer video. Your previous result is preserved.');
   if (!job.parentGenerationId && (output.durationSeconds > 10.25 || Math.abs(output.durationSeconds - job.request.output.durationSeconds) > 0.5)) throw new MediaError(502, 'invalid_video', 'Gemini returned a clip outside the supported duration.');
 }
+/** Old cumulative generations remain readable; their final clip is extracted locally on first use. */
+async function latestClip(job: VideoGeneration): Promise<Uint8Array> {
+  if (job.clipAssetId) {
+    const asset = await loadOwnedAsset(job.ownerUid, job.clipAssetId);
+    return new Uint8Array((await adminBucket().file(asset.path).download())[0]);
+  }
+  const asset = await loadOwnedAsset(job.ownerUid, job.assetId!);
+  return videoClipContent(asset, job.clipNumber, job.parentDurationSeconds, job.durationSeconds!, false);
+}
+async function assembleClip(job: VideoGeneration, token: string, clip: StoredAsset): Promise<StoredAsset> {
+  const clipBytes = new Uint8Array((await adminBucket().file(clip.path).download())[0]);
+  await checkpoint(job, token, { clipAssetId: clip.id, clipDurationSeconds: clip.durationMs! / 1000, phase: 'assembling' });
+  if (!job.parentGenerationId) return clip;
+  const parent = await loadVideoGeneration(job.ownerUid, job.parentGenerationId);
+  if (parent.itemId !== job.itemId || parent.status !== 'ready') throw new MediaError(409, 'invalid_sequence', 'The source sequence is unavailable.');
+  const parentAsset = await loadOwnedAsset(job.ownerUid, parent.assetId!);
+  const previous = new Uint8Array((await adminBucket().file(parentAsset.path).download())[0]);
+  const bytes = await appendVideoClip(previous, clipBytes);
+  const duration = readMp4Duration(bytes);
+  if (!duration || Math.abs(duration - job.parentDurationSeconds - clip.durationMs! / 1000) > 0.5 || duration > 40.25) throw new MediaError(502, 'invalid_sequence', 'Could not assemble this video. Your clips are preserved.');
+  return saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId);
+}
+async function persistOutput(job: VideoGeneration, token: string, output: VideoGenerationResult): Promise<StoredAsset> {
+  if (job.assemblyMode !== 'clips') {
+    validateOutput(job, output);
+    return saveVideoAsset(job.ownerUid, output.videoBytes, job.id, job.itemId);
+  }
+  const contextDuration = job.parentGenerationId ? job.parentClipDurationSeconds : 0;
+  if (contextDuration == null || !output.durationSeconds || Math.abs(output.durationSeconds - contextDuration - job.request.output.durationSeconds) > 0.5) throw new MediaError(502, 'invalid_video', 'Gemini did not return the requested continuation. Your previous video is preserved.');
+  const bytes = job.parentGenerationId ? await extractVideoSegment(output.videoBytes, contextDuration, job.request.output.durationSeconds) : output.videoBytes;
+  const clipDuration = readMp4Duration(bytes);
+  if (!clipDuration || clipDuration < 2.75 || clipDuration > 10.25 || Math.abs(clipDuration - job.request.output.durationSeconds) > 0.25) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid clip. Your previous video is preserved.');
+  const clip = await saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId, job.parentGenerationId ? 'clip' : 'sequence');
+  return assembleClip(job, token, clip);
+}
 async function recover(job: VideoGeneration, token: string, provider: GeminiOmniVideoProvider) {
   let asset: StoredAsset | null = null;
   try { asset = await loadOwnedAsset(job.ownerUid, `video_${job.id}`); } catch { /* deterministic storage recovery */ }
   if (!asset) {
-    let bytes: Uint8Array | null = null;
-    try { bytes = new Uint8Array((await adminBucket().file(`media/${job.ownerUid}/video_${job.id}/original`).download())[0]); } catch { /* Receipt is the only safe remote fallback. */ }
-    if (bytes) {
-      const { readMp4Duration } = await import('mdmedia/video');
-      validateOutput(job, { interactionId: job.interactionId ?? '', videoBytes: bytes, durationSeconds: readMp4Duration(bytes) });
-      asset = await saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId);
-    } else if (job.interactionId) {
-      const output = await provider.retrieveVideoClip(job.interactionId, { timeoutMs: 120_000, maxBytes: MAX_VIDEO_BYTES });
-      validateOutput(job, output); asset = await saveVideoAsset(job.ownerUid, output.videoBytes, job.id, job.itemId);
+    if (job.assemblyMode === 'clips' && job.parentGenerationId) {
+      let clip: StoredAsset | null = null;
+      try { clip = await loadOwnedAsset(job.ownerUid, `video_${job.id}_clip`); } catch { /* receipt fallback */ }
+      if (clip) asset = await assembleClip(job, token, clip);
     }
-  }
+    if (!asset) {
+      let bytes: Uint8Array | null = null;
+      try { bytes = new Uint8Array((await adminBucket().file(`media/${job.ownerUid}/video_${job.id}/original`).download())[0]); } catch { /* receipt fallback */ }
+      if (bytes) {
+        validateOutput(job, { interactionId: job.interactionId ?? '', videoBytes: bytes, durationSeconds: readMp4Duration(bytes) });
+        asset = await saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId);
+        if (job.assemblyMode === 'clips' && !job.parentGenerationId) await checkpoint(job, token, { clipAssetId: asset.id, clipDurationSeconds: asset.durationMs! / 1000 });
+      } else if (job.interactionId) {
+        const output = await provider.retrieveVideoClip(job.interactionId, { timeoutMs: 120_000, maxBytes: MAX_VIDEO_BYTES });
+        asset = await persistOutput(job, token, output);
+      }
+    }
+  } else if (job.assemblyMode === 'clips' && !job.parentGenerationId) await checkpoint(job, token, { clipAssetId: asset.id, clipDurationSeconds: asset.durationMs! / 1000 });
   await finish(job, token, asset, asset ? 'ready' : 'interrupted', asset ? null : { code: 'generation_interrupted', message: 'The provider outcome is unknown. Your previous video is preserved. Regenerating starts a new request.' });
 }
 async function run(job: VideoGeneration, token: string, recovery: boolean) {
@@ -207,24 +250,29 @@ async function run(job: VideoGeneration, token: string, recovery: boolean) {
     const reference = job.request.referenceAssetId ? await loadOwnedAsset(job.ownerUid, job.request.referenceAssetId) : null;
     const referenceBytes = reference ? new Uint8Array((await adminBucket().file(reference.path).download())[0]) : null;
     await checkpoint(job, token, { phase: 'generating', preparedPrompt: prompt });
+    const sourceClip = job.parentGenerationId ? await latestClip(await loadVideoGeneration(job.ownerUid, job.parentGenerationId)) : null;
+    if (sourceClip) {
+      job.parentClipDurationSeconds = readMp4Duration(sourceClip);
+      await checkpoint(job, token, { parentClipDurationSeconds: job.parentClipDurationSeconds });
+    }
     const options = { model: job.model, ...job.request.output, maxBytes: MAX_VIDEO_BYTES,
       ...(reference && referenceBytes ? { reference: { bytes: referenceBytes, mimeType: reference.mimeType, role: job.request.referenceRole } } : {}),
-      // First frame and reference jobs remain prompt-first, matching Omni's multi-turn guidance.
+      // Initial references use their role; continuation carries only the latest clip as model history.
       ...(!job.parentGenerationId && reference ? { task: job.request.referenceRole === 'first_frame' ? 'image_to_video' as const : 'reference_to_video' as const } : {}),
       async onInteraction(interactionId: string) { await checkpoint(job, token, { interactionId, phase: 'downloading' }); job.interactionId = interactionId; },
     };
     submitted = true;
     const output = job.parentGenerationId
-      ? await provider.continueVideoClip(prompt, { interactionId: job.parentInteractionId!, durationSeconds: job.parentDurationSeconds }, options)
+      ? await provider.continueVideoClip(prompt, { videoBytes: sourceClip!, durationSeconds: job.parentClipDurationSeconds! }, options)
       : await provider.generateVideoClip(prompt, options);
-    validateOutput(job, output); await checkpoint(job, token, { phase: 'saving' });
-    const asset = await saveVideoAsset(job.ownerUid, output.videoBytes, job.id, job.itemId); await finish(job, token, asset, 'ready', null);
+    await checkpoint(job, token, { phase: 'saving' });
+    const asset = await persistOutput(job, token, output); await finish(job, token, asset, 'ready', null);
   } catch (error) {
     const status = Number((error as { status?: number; statusCode?: number; code?: number }).status ?? (error as { statusCode?: number }).statusCode ?? (error as { code?: number }).code);
     console.warn('[video] Attempt failed', { id: job.id, exception: error instanceof Error ? error.name : 'unknown', status: Number.isFinite(status) ? status : null, receiptSaved: Boolean(job.interactionId) });
     if (error instanceof MediaError) await finish(job, token, null, 'error', { code: error.code, message: error.message });
-    else if (job.parentGenerationId && (status === 404 || status === 410)) await finish(job, token, null, 'error', { code: 'continuation_unavailable', message: 'Gemini’s saved continuation context has expired. Your video is preserved.' });
-    else if ([400, 401, 403, 422, 429].includes(status)) await finish(job, token, null, 'error', { code: 'provider_rejected', message: 'Gemini could not accept this request. Check the prompt or try again later. Your previous video is preserved.' });
+    else if (job.assemblyMode !== 'clips' && job.parentGenerationId && (status === 404 || status === 410)) await finish(job, token, null, 'error', { code: 'continuation_unavailable', message: 'Gemini’s saved continuation context has expired. Your video is preserved.' });
+    else if ([400, 401, 403, 404, 410, 422, 429].includes(status)) await finish(job, token, null, 'error', { code: 'provider_rejected', message: 'Gemini could not accept this request. Check the prompt or try again later. Your previous video is preserved.' });
     else if (!submitted) await finish(job, token, null, 'error', { code: 'preparation_failed', message: 'Could not prepare this request. Your source and previous video are preserved.' });
     else if (!recovery && job.interactionId && provider) {
       try { await recover(job, token, provider); }
