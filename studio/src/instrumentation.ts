@@ -94,5 +94,7 @@ export async function register(): Promise<void> {
     startImageWorker();
     const { startVideoWorker } = await import('./lib/video-server');
     startVideoWorker();
+    const { startMusicWorker } = await import('./lib/music-server');
+    startMusicWorker();
   }
 }

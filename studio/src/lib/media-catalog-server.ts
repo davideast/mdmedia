@@ -36,6 +36,7 @@ export const allowedMediaTypes = (caller: Caller): MediaType[] => [
   ...(hasScope(caller, 'narrations:read') ? ['narration' as const] : []),
   ...(hasScope(caller, 'images:read') ? ['image' as const] : []),
   ...(hasScope(caller, 'videos:read') ? ['video' as const] : []),
+  ...(hasScope(caller, 'music:read') ? ['music' as const] : []),
 ];
 export interface MediaCursor { createdAt: number; id: string }
 export function parseMediaQuery(url: URL, allowed: MediaType[]) {
@@ -107,9 +108,9 @@ export async function listGenerations(caller: Caller, url: URL) {
       const summary = narrationSummary(data.itemId, source.data()!);
       data = { ...data, ...summary, id: data.id, phase: summary.status };
     }
-    if (data.type === 'video') {
-      const source = (await adminDb().collection('mediaItems').doc(`video_${data.itemId}`).get()).data();
-      if (!source || source.ownerUid !== caller.uid || source.type !== 'video') return null;
+    if (data.type === 'video' || data.type === 'music') {
+      const source = (await adminDb().collection('mediaItems').doc(`${data.type}_${data.itemId}`).get()).data();
+      if (!source || source.ownerUid !== caller.uid || source.type !== data.type) return null;
       data = { ...data, title: source.title };
     }
     return { id: data.id, itemId: data.itemId, type: data.type, title: data.title, status: data.status, phase: data.phase,

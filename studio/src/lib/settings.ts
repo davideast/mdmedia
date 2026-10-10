@@ -1,3 +1,4 @@
+import { readMusicDefaults } from './music-request';
 import { readVideoDefaults } from './video-request';
 import { readImageDefaults } from './image-request';
 /**
@@ -34,6 +35,7 @@ export function readSettings(value: unknown): UserSettings {
     : DEFAULT_SETTINGS.highlightColor;
   return {
     imageDefaults: readImageDefaults(raw.imageDefaults),
+    musicDefaults: readMusicDefaults(raw.musicDefaults),
     videoDefaults: readVideoDefaults(raw.videoDefaults),
     defaultVoice: defaultVoiceRef.provider === 'gemini'
       ? defaultVoiceRef.id : asString(raw.defaultVoice, defaultVoiceRef.id),
