@@ -61,6 +61,14 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /mediaItems/{id} { allow read, write: if false; }
+    match /mediaGenerations/{id} { allow read, write: if false; }
+    match /mediaActivity/{id} { allow read, write: if false; }
+    match /mediaAssets/{id} { allow read, write: if false; }
+    match /mediaRequests/{id} { allow read, write: if false; }
+    match /mediaQuotas/{id} { allow read, write: if false; }
+    match /mediaCatalogMigrations/{id} { allow read, write: if false; }
+
     match /narrations/{narrationId} {
 
       // Reads are authorized per document. For a query (`list`), Firestore

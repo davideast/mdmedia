@@ -6,10 +6,11 @@
  * the module-resolution hook it installs has to be in place before the first
  * `firebase-admin` import is resolved.
  *
- * Everything here is inert unless `pyric sandbox` is driving the process.
+ * Sandbox resolution hooks run only under Pyric. The durable image worker runs
+ * in every Node server runtime, and remains inert during production builds.
  */
 
-export async function register(): Promise<void> {
+async function registerSandboxHooks(): Promise<void> {
   // `PYRIC_SANDBOX` is set only by `pyric sandbox`. A plain `next dev`, a
   // `next build`, and every deployed server skip this entirely.
   if (!process.env.PYRIC_SANDBOX) return;
@@ -83,4 +84,13 @@ export async function register(): Promise<void> {
       return nextResolve(`${match[1]}${match[2] ?? ''}`, context);
     },
   });
+}
+
+export async function register(): Promise<void> {
+  if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+  await registerSandboxHooks();
+  if (process.env.NEXT_PHASE !== 'phase-production-build') {
+    const { startImageWorker } = await import('./lib/image-server');
+    startImageWorker();
+  }
 }

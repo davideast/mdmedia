@@ -86,8 +86,8 @@ function ConnectApproval() {
             </p>
             <p className="t-meta">Only continue if you just started this from your own terminal and the code matches.</p>
             <ul className="grid list-disc gap-1 pl-5 text-[0.85rem] text-ink-muted">
-              <li>It can create narrations as you, always private, using your voices and Settings.</li>
-              <li>It can read the narrations you can read and download their audio.</li>
+              <li>It can create private narrations and images as you, using your Settings.</li>
+              <li>It can read permitted narrations and your private images, download results, and upload reference images.</li>
               <li>It can create, edit, and delete your playlists. Deleting a playlist never deletes its narrations.</li>
               <li>It cannot delete, share, or publish narrations, or change your Settings.</li>
             </ul>

@@ -44,7 +44,7 @@ function memoryDirectory(beforeRead?: (name: string) => Promise<void>) {
 
 describe("User-Selected Downloads (intrinsic-ui-craft)", () => {
   const useNarrationStreamPath = resolve(import.meta.dir, "../../studio/src/lib/use-narration-stream.ts");
-  const libraryPagePath = resolve(import.meta.dir, "../../studio/src/app/(app)/library/page.tsx");
+  const libraryPagePath = resolve(import.meta.dir, "../../studio/src/components/media/narration-library-entry.tsx");
   const narrationSettingsPath = resolve(import.meta.dir, "../../studio/src/components/narration/narration-settings.tsx");
   const narrationsPath = resolve(import.meta.dir, "../../studio/src/lib/narrations.ts");
 

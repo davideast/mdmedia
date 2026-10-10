@@ -1,3 +1,4 @@
+import { syncNarrationCatalog } from './media-catalog-server';
 /**
  * Server-side narration synthesis.
  *
@@ -257,6 +258,7 @@ export async function purgeNarrationData(
     console.error(`[narration] storage cleanup failed for ${id}:`, err);
   }
 
+  await syncNarrationCatalog(id);
   return { deleted: true };
 }
 
@@ -326,6 +328,7 @@ export function createNarrationStream({
         if (error.actionableHint) updateData.errorActionableHint = error.actionableHint;
       }
       await docRef.update(updateData);
+      await syncNarrationCatalog(id);
     } catch {
       // The stream is already terminating; a failed status write must not mask it.
     }
@@ -408,6 +411,7 @@ export function createNarrationStream({
         tx.set(docRef, initialNarration);
       });
       docWritten = true;
+      await syncNarrationCatalog(id);
 
       if (cancelled) {
         await purgeDocumentAndStorage();
@@ -616,6 +620,7 @@ export function createNarrationStream({
           updatedAt: Date.now(),
         });
 
+        await syncNarrationCatalog(id);
         return durationMs;
       };
 
