@@ -80,30 +80,15 @@ describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
     expect(pollCount).toBeGreaterThanOrEqual(2);
   });
 
-  it('retries on transient failure with exponential backoff', async () => {
+  it('never repeats a potentially accepted paid request, including SDK retries', async () => {
     let attempts = 0;
-    const mockAi = {
-      interactions: {
-        create: async () => {
-          attempts++;
-          if (attempts === 1) {
-            throw new Error('429 Resource exhausted');
-          }
-          return {
-            id: 'interaction_retry_success',
-            output_video: {
-              data: Buffer.from('retry-video-data').toString('base64'),
-            },
-          };
-        },
-      },
-    } as unknown as GoogleGenAI;
-
-    const provider = new GeminiOmniVideoProvider(mockAi, 2);
-    const result = await provider.generateVideoClip('Retry test scene');
-
-    expect(attempts).toBe(2);
-    expect(result.interactionId).toBe('interaction_retry_success');
+    let retryOptions: any;
+    const client = { interactions: { create: async (_payload: unknown, options: unknown) => {
+      attempts++; retryOptions = options; throw new Error('429 Resource exhausted');
+    } } } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(client, 3).generateVideoClip('Scene')).rejects.toThrow('429');
+    expect(attempts).toBe(1);
+    expect(retryOptions.maxRetries).toBe(0);
   });
 
   it('refuses a reference image that does not exist, rather than generating without it', async () => {
@@ -129,3 +114,77 @@ describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
   });
 });
 
+
+function movie(duration: number) {
+  const bytes = Buffer.alloc(36); bytes.writeUInt32BE(36, 0); bytes.write('moov', 4);
+  bytes.writeUInt32BE(28, 8); bytes.write('mvhd', 12);
+  bytes.writeUInt32BE(1000, 28); bytes.writeUInt32BE(duration * 1000, 32); return bytes;
+}
+describe('Explicit Omni continuation and recovery', () => {
+  it('requests a stored complete extension, checkpoints its receipt and measures the movie', async () => {
+    let payload: any; let checkpoint = '';
+    const client = { interactions: { create: async (body: unknown) => {
+      payload = body; return { id: 'real-receipt', steps: [{ type: 'model_output', content: [{ type: 'video', data: movie(9).toString('base64') }] }] };
+    } } } as unknown as GoogleGenAI;
+    const result = await new GeminiOmniVideoProvider(client).continueVideoClip('The train passes a station', { interactionId: 'parent', durationSeconds: 6 }, {
+      durationSeconds: 3, resolution: '720p', onInteraction: async id => { checkpoint = id; },
+    });
+    expect(checkpoint).toBe('real-receipt'); expect(result.durationSeconds).toBe(9);
+    expect(payload.store).toBe(true); expect(payload.previous_interaction_id).toBe('parent');
+    expect(payload.input).toContain('Return the complete previous video'); expect(payload.input).toContain('The train passes a station');
+    expect(payload.response_format).toMatchObject({ type: 'video', duration: '3s', resolution: '720p' });
+    expect(payload.generation_config).toBeUndefined();
+  });
+  it('keeps edit semantics separate from continuation', async () => {
+    let payload: any;
+    const client = { interactions: { create: async (body: unknown) => { payload = body; return { id: 'edit', output_video: { data: movie(3).toString('base64') } }; } } } as unknown as GoogleGenAI;
+    await new GeminiOmniVideoProvider(client).generateVideoClip('Change the lighting', { task: 'edit', previousInteractionId: 'parent' });
+    expect(payload.input).toBe('Change the lighting'); expect(payload.generation_config.video_config.task).toBe('edit');
+  });
+  it('retrieves an existing receipt without creating another interaction', async () => {
+    let creates = 0; let gets = 0;
+    const client = { interactions: { create: async () => { creates++; }, get: async (id: string) => { gets++; expect(id).toBe('saved'); return { output_video: { data: movie(6).toString('base64') } }; } } } as unknown as GoogleGenAI;
+    const result = await new GeminiOmniVideoProvider(client).retrieveVideoClip('saved');
+    expect(result.interactionId).toBe('saved'); expect(result.durationSeconds).toBe(6); expect(creates).toBe(0); expect(gets).toBe(1);
+  });
+  it('rejects a tail-only result and a missing provider receipt', async () => {
+    const client = { interactions: { create: async () => ({ id: 'tail', output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(client).continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 6 })).rejects.toThrow('complete longer video');
+    const missing = { interactions: { create: async () => ({ output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(missing).generateVideoClip('Next')).rejects.toThrow('no interaction ID');
+  });
+  it('clamps near the sequence limit and refuses less than three seconds of room', async () => {
+    let payload: any; let calls = 0;
+    const client = { interactions: { create: async (body: unknown) => { payload = body; calls++; return { id: 'end', output_video: { data: movie(40).toString('base64') } }; } } } as unknown as GoogleGenAI;
+    const provider = new GeminiOmniVideoProvider(client);
+    await provider.continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 36 });
+    expect(payload.response_format.duration).toBe('4s');
+    await expect(provider.continueVideoClip('Next', { interactionId: 'parent', durationSeconds: 38 })).rejects.toThrow('limit'); expect(calls).toBe(1);
+  });
+  it('honors cancellation and the output cap before delivering any bytes', async () => {
+    let calls = 0;
+    const client = { interactions: { create: async () => { calls++; return { id: 'bytes', output_video: { data: movie(3).toString('base64') } }; } } } as unknown as GoogleGenAI;
+    const provider = new GeminiOmniVideoProvider(client); const controller = new AbortController(); controller.abort(new Error('cancelled'));
+    await expect(provider.generateVideoClip('Next', { signal: controller.signal })).rejects.toThrow('cancelled'); expect(calls).toBe(0);
+    await expect(provider.generateVideoClip('Next', { maxBytes: 8 })).rejects.toThrow('size limit');
+  });
+  it('normalizes a REST URI and saves the receipt before a download fails', async () => {
+    const events: string[] = [];
+    const client = { interactions: { create: async () => ({ id: 'receipt', steps: [{ content: [{ type: 'video', uri: 'https://generativelanguage.googleapis.com/v1beta/files/real_file' }] }] }) }, files: {
+      get: async () => ({ state: 'ACTIVE' }), download: async () => { events.push('download'); throw new Error('disk failed'); },
+    } } as unknown as GoogleGenAI;
+    await expect(new GeminiOmniVideoProvider(client, 0).generateVideoClip('Next', { onInteraction: async () => { events.push('checkpoint'); } })).rejects.toThrow('disk failed');
+    expect(events).toEqual(['checkpoint', 'download']);
+  });
+});
+
+it('disables retries in the real SDK transport, even on a retryable HTTP response', async () => {
+  const { GoogleGenAI } = await import('@google/genai');
+  const original = globalThis.fetch; let requests = 0;
+  globalThis.fetch = Object.assign(async () => { requests++; return new Response(JSON.stringify({ error: { code: 503, message: 'unavailable' } }), { status: 503, headers: { 'Content-Type': 'application/json' } }); }, { preconnect: original.preconnect });
+  try {
+    const provider = new GeminiOmniVideoProvider(new GoogleGenAI({ apiKey: 'test-only' }), 3);
+    await expect(provider.generateVideoClip('Test transport', { timeoutMs: 1000 })).rejects.toThrow();
+    expect(requests).toBe(1);
+  } finally { globalThis.fetch = original; }
+});

@@ -192,7 +192,7 @@ export const videoCommand = defineCommand({
     task: {
       type: 'string',
       alias: 't',
-      description: 'Video task ("text_to_video", "image_to_video", "reference_to_video", "edit")',
+      description: 'Video task ("text_to_video", "image_to_video", "reference_to_video", "edit", "extend")',
     },
     delivery: {
       type: 'string',
