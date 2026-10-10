@@ -1,9 +1,12 @@
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['ffmpeg-static'],
+  outputFileTracingIncludes: { '/api/v1/**/*': ['./node_modules/ffmpeg-static/ffmpeg'], '/instrumentation': ['./node_modules/ffmpeg-static/ffmpeg'] },
   output: process.env.PYRIC_SANDBOX_FORCE === '1' ? undefined : 'standalone',
   // A staged hosted build must never replace the files used by the running server.
   distDir: process.env.MDMEDIA_DIST_DIR ?? (process.env.PYRIC_SANDBOX_FORCE === '1' ? '.next-hosted' : '.next'),
@@ -68,7 +71,28 @@ function findPyricCliDir(): string | null {
   return null;
 }
 
+/** Local file dependencies retain their package version across engine rebuilds.
+ * Webpack treats node_modules as immutable, so include installed engine bytes
+ * in the filesystem-cache version rather than serving a stale paid-job worker. */
+function engineCacheVersion(): string {
+  const hash = createHash('sha256');
+  const walk = (directory: string) => {
+    if (!fs.existsSync(directory)) return;
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const filename = path.join(directory, entry.name);
+      if (entry.isDirectory()) walk(filename);
+      else if (entry.name.endsWith('.js')) hash.update(filename).update(fs.readFileSync(filename));
+    }
+  };
+  walk(path.join(__dirname, 'node_modules/mdmedia/dist'));
+  return hash.digest('hex');
+}
+function versionEngineCache(config: { cache?: boolean | { version?: string } }, revision: string) {
+  if (config.cache && typeof config.cache === 'object') config.cache.version = `${config.cache.version ?? ''}:mdmedia-${revision}`;
+}
+
 export default async function buildConfig(): Promise<NextConfig> {
+  const engineRevision = engineCacheVersion();
   // Pyric explicitly supports a compiled local sandbox with PYRIC_SANDBOX_FORCE=1.
   // A regular production build still uses the real Firebase SDK.
   const usesRealFirebase =
@@ -96,6 +120,7 @@ export default async function buildConfig(): Promise<NextConfig> {
             "pyric-sdk-init": noopAbsolute,
           };
         }
+        versionEngineCache(webpackConfig, engineRevision);
         return webpackConfig;
       },
     } as NextConfig;
@@ -209,6 +234,7 @@ export default async function buildConfig(): Promise<NextConfig> {
       result.resolve = result.resolve ?? {};
       result.resolve.alias = { ...(result.resolve.alias ?? {}), "pyric-sdk-init": initEntry };
     }
+    versionEngineCache(result, engineRevision);
     return result;
   };
 

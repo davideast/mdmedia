@@ -274,6 +274,7 @@ export const INSTRUCTION_PRESETS: readonly TextPreset[] = [
 
 export interface UserSettings {
   imageDefaults?: import('./media-types').ImageRequest;
+  videoDefaults?: import('./media-types').VideoRequest;
   defaultVoice: VoiceName;
   /** New preference shape; legacy provider/id fields remain readable during migration. */
   defaultVoiceRef?: VoiceRef;

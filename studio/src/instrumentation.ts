@@ -92,5 +92,7 @@ export async function register(): Promise<void> {
   if (process.env.NEXT_PHASE !== 'phase-production-build') {
     const { startImageWorker } = await import('./lib/image-server');
     startImageWorker();
+    const { startVideoWorker } = await import('./lib/video-server');
+    startVideoWorker();
   }
 }

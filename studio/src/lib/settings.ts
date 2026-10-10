@@ -1,3 +1,4 @@
+import { readVideoDefaults } from './video-request';
 import { readImageDefaults } from './image-request';
 /**
  * Normalizes the `settings` map stored on `users/{uid}`. Pure, so the browser
@@ -33,6 +34,7 @@ export function readSettings(value: unknown): UserSettings {
     : DEFAULT_SETTINGS.highlightColor;
   return {
     imageDefaults: readImageDefaults(raw.imageDefaults),
+    videoDefaults: readVideoDefaults(raw.videoDefaults),
     defaultVoice: defaultVoiceRef.provider === 'gemini'
       ? defaultVoiceRef.id : asString(raw.defaultVoice, defaultVoiceRef.id),
     defaultVoiceRef,

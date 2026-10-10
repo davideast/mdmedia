@@ -31,7 +31,15 @@ export async function GET(request: Request): Promise<Response> {
       defaults: await imageDefaults(caller.uid), capabilities: { aspectRatios: IMAGE_RATIOS, resolutions: IMAGE_RESOLUTIONS, adaptation: true, referenceImages: 1 },
       limits: { promptChars: MAX_IMAGE_PROMPT, referenceBytes: MAX_REFERENCE_BYTES }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
-  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration and image.');
+  if (media === 'video') {
+    const { videoDefaults, configuredVideoModel } = await import('@/lib/video-server');
+    const { videoToolsAvailable } = await import('@/lib/video-assets-server');
+    const { VIDEO_RESOLUTIONS, MAX_VIDEO_BYTES } = await import('@/lib/video-request');
+    return Response.json({ type: 'video', available: Boolean(process.env.GEMINI_API_KEY) && await videoToolsAvailable(), provider: 'gemini', model: configuredVideoModel(),
+      defaults: await videoDefaults(caller.uid), capabilities: { aspectRatios: ['16:9', '9:16'], resolutions: VIDEO_RESOLUTIONS, adaptation: true, referenceImages: 1, continuation: true, regenerateLatest: true, audio: true },
+      limits: { promptChars: 32000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_VIDEO_BYTES, clipSeconds: { min: 3, max: 10 }, sequenceSeconds: 40 }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+  }
+  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, and video.');
   const settings = await loadUserSettings(caller.uid);
   const delivery = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructions = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];

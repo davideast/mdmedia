@@ -3,7 +3,7 @@ export type MediaType = 'narration' | 'image' | 'video' | 'music';
 export const MEDIA_TYPES: Array<{ type: MediaType; label: string; composer: string; available: boolean }> = [
   { type: 'narration', label: 'Narration', composer: '/studio', available: true },
   { type: 'image', label: 'Image', composer: '/studio/image', available: true },
-  { type: 'video', label: 'Video', composer: '/studio/video', available: false },
+  { type: 'video', label: 'Video', composer: '/studio/video', available: true },
   { type: 'music', label: 'Music', composer: '/studio/music', available: false },
 ];
 export type GenerationStatus = 'queued' | 'generating' | 'ready' | 'error' | 'interrupted';
@@ -35,6 +35,7 @@ export interface ImageRequest {
   referenceAssetId: string | null;
 }
 export interface AssetResource {
+  durationMs?: number;
   id: string;
   mimeType: string;
   width: number;
@@ -42,16 +43,14 @@ export interface AssetResource {
   byteLength: number;
   links: { content: string; thumbnail: string };
 }
-export interface GenerationResource {
+interface GenerationBase {
   id: string;
   itemId: string;
-  type: MediaType;
   title: string;
   status: GenerationStatus;
   phase: string;
   createdAt: number;
   updatedAt: number;
-  request: ImageRequest;
   preparedPrompt: string | null;
   provider: string;
   model: string;
@@ -64,7 +63,32 @@ export interface ImageResource extends MediaSummary {
   request: ImageRequest;
   latestGenerationId: string;
   latestSuccessfulGenerationId: string | null;
-  latestGeneration: GenerationResource | null;
-  result: GenerationResource | null;
+  latestGeneration: ImageGenerationResource | null;
+  result: ImageGenerationResource | null;
+  links: { self: string; web: string; generations: string };
+}
+
+export interface ImageGenerationResource extends GenerationBase { type: 'image'; request: ImageRequest }
+export type GenerationResource = ImageGenerationResource | VideoGenerationResource;
+export interface VideoRequest {
+  prompt: string;
+  adaptation: { enabled: boolean; instructions: string };
+  output: { aspectRatio: '16:9' | '9:16'; resolution: '360p' | '720p' | '1080p' | '4k'; durationSeconds: number };
+  referenceAssetId: string | null;
+  referenceRole: 'first_frame' | 'reference';
+}
+export interface VideoDraft extends VideoRequest { kind: 'video' }
+export type VideoAction = 'initial' | 'continue' | 'regenerate_latest';
+export interface VideoClip { index: number; generationId: string; startSeconds: number; endSeconds: number; thumbnail: string; content: string }
+export interface VideoGenerationResource extends GenerationBase {
+  type: 'video'; request: VideoRequest; action: VideoAction; parentGenerationId: string | null;
+  replacesGenerationId: string | null; clipNumber: number; durationSeconds: number | null;
+}
+export interface VideoResource extends MediaSummary {
+  type: 'video'; visibility: 'private'; request: VideoRequest;
+  latestGenerationId: string; latestSuccessfulGenerationId: string | null;
+  latestGeneration: VideoGenerationResource; result: VideoGenerationResource | null;
+  clips: VideoClip[];
+  canContinue: boolean;
   links: { self: string; web: string; generations: string };
 }

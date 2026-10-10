@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { AudioLines, ImageIcon, Loader2, Library, ListOrdered, X } from 'lucide-react';
+import { AudioLines, ImageIcon, Video, Loader2, Library, ListOrdered, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,11 +71,11 @@ export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
     {kind === 'activity' && <LocalNarrationActivity type={type} />}
     {loading ? <p role="status" className="py-6 text-center text-sm text-ink-muted">Loading {title.toLowerCase()}…</p> : error ? <div role="alert" className="grid gap-2 text-sm text-destructive"><p>{error}</p><Button variant="outline" onClick={() => setRetry(value => value + 1)}>Retry</Button></div> : page?.indexing ? <p role="status" className="py-6 text-sm text-ink-muted">Preparing your existing Library for all media…</p> : <div className="grid gap-3" aria-label={`${title} items`}>
       {rows.map(row => kind === 'library' && row.type === 'narration' ? <NarrationLibraryEntry key={`narration_${row.id}`} id={row.id} onDeleted={() => setRetry(value => value + 1)} /> : <div key={`${row.type}_${row.id}`} className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card/60 p-3 hover:bg-card"><Link href={row.href} className="flex min-w-0 flex-1 items-center gap-4">
-        {row.thumbnailAssetId && kind === 'library' ? <AssetImage id={row.thumbnailAssetId} thumbnail alt={row.title} className="h-20 w-28 shrink-0 rounded-md" /> : row.type === 'image' ? <ImageIcon size={22} className="shrink-0 text-ink-muted" /> : <AudioLines size={22} className="shrink-0 text-ink-muted" />}
+        {row.thumbnailAssetId && kind === 'library' ? <AssetImage id={row.thumbnailAssetId} thumbnail alt={row.title} className="h-20 w-28 shrink-0 rounded-md" /> : row.type === 'video' ? <Video size={22} className="shrink-0 text-ink-muted" /> : row.type === 'image' ? <ImageIcon size={22} className="shrink-0 text-ink-muted" /> : <AudioLines size={22} className="shrink-0 text-ink-muted" />}
         <div className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{row.title}</span><span className="mt-1 block text-xs text-ink-muted">{MEDIA_TYPES.find(item => item.type === row.type)?.label} · {labels[row.phase ?? row.status] ?? row.status} · {new Date(row.createdAt).toLocaleString()}</span></div>
         {['queued', 'generating'].includes(row.status) && <Loader2 size={16} className="shrink-0 animate-spin text-primary" />}
       </Link>{kind === 'activity' && row.type === 'narration' && row.status === 'generating' && <Button variant="ghost" size="icon" title="Cancel generation" aria-label={`Cancel ${row.title}`} onClick={() => void handleCancelOrphan(row.itemId ?? row.id)}><X size={16} /></Button>}</div>)}
-      {!rows.length && <p className="py-8 text-center text-sm text-ink-muted">{query ? 'No matches in this batch. Continue to older work if available.' : kind === 'library' ? 'Your saved narrations and images appear here.' : 'Generation attempts appear here across all media.'}</p>}
+      {!rows.length && <p className="py-8 text-center text-sm text-ink-muted">{query ? 'No matches in this batch. Continue to older work if available.' : kind === 'library' ? 'Your saved work appears here.' : 'Generation attempts appear here across all media.'}</p>}
     </div>}
     {!loading && !error && !page?.indexing && (cursor || page?.nextCursor) && <div className="flex items-center justify-between gap-2"><Button variant="outline" disabled={!cursor} onClick={() => navigate(query, type, previous.at(-1) ?? '', previous.slice(0, -1))}>Previous</Button><span className="text-xs text-ink-muted">Up to 50 items per page</span><Button variant="outline" disabled={!page?.nextCursor} onClick={() => navigate(query, type, JSON.stringify(page?.nextCursor), [...previous, cursor])}>{query ? 'Continue search' : 'Older work'}</Button></div>}
   </WorkbenchPanel>;

@@ -48,7 +48,7 @@ const NAV: readonly NavItem[] = [
 function isActive(pathname: string, item: NavItem): boolean {
   if (pathname === item.href) return true;
   if (pathname.startsWith(`${item.href}/`)) return true;
-  if (item.href === "/library" && pathname.startsWith("/image/")) return true;
+  if (item.href === "/library" && (pathname.startsWith("/image/") || pathname.startsWith("/video/"))) return true;
   if (item.prefix !== undefined && pathname.startsWith(item.prefix)) return true;
   return false;
 }

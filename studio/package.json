@@ -39,13 +39,14 @@
     "allowlist": "node scripts/allowlist.mjs",
     "voices": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/voices.mjs",
     "voices:scrub-legacy": "node scripts/scrub-private-voice-ids.mjs",
-    "vendor:mdmedia": "npm --prefix .. run build && mkdir -p vendor && npm pack .. --pack-destination ./vendor",
+    "vendor:mdmedia": "node scripts/vendor-mdmedia.mjs",
     "deploy:preflight": "node scripts/deploy-preflight.mjs",
     "postinstall": "node scripts/patch-pyric-bridge-port.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "cn": "^0.3.0",
+    "ffmpeg-static": "5.3.0",
     "firebase": "^12.19.0",
     "firebase-admin": "^14.4.0",
     "lucide-react": "^1.47.0",

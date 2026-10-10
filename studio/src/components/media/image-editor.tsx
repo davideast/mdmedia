@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { useWorkspace, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { DEFAULT_IMAGE_REQUEST, MAX_IMAGE_PROMPT, MAX_REFERENCE_BYTES } from '@/lib/image-request';
-import type { ImageDraft, ImageRequest, ImageResource, GenerationResource } from '@/lib/media-types';
+import type { ImageDraft, ImageRequest, ImageResource, ImageGenerationResource } from '@/lib/media-types';
 import { MediaClientError, studioJson } from '@/lib/media-client';
 import { AssetImage, downloadAsset } from './asset-image';
 import { MediaComposer, MediaIconAction } from './media-composer';
@@ -34,9 +34,9 @@ export function ImageEditor({ id }: { id?: string }) {
   const [optionsOpen, setOptionsOpen] = useWorkspaceField('imageOptionsOpen', false);
   const [edit, setEdit] = useWorkspaceField('imageEdit', '');
   const [pending, setPending] = useWorkspaceField('imageSubmission', '');
-  const [versions, setVersions] = useState<GenerationResource[] | null>(null);
+  const [versions, setVersions] = useState<ImageGenerationResource[] | null>(null);
   const [versionCursor, setVersionCursor] = useState<{ createdAt: number; id: string } | null>(null);
-  const [selected, setSelected] = useState<GenerationResource | null>(null);
+  const [selected, setSelected] = useState<ImageGenerationResource | null>(null);
   const [rename, setRename] = useState('');
   const [viewerOpen, setViewerOpen] = useState(false);
   const [actualSize, setActualSize] = useState(false);
@@ -82,7 +82,7 @@ export function ImageEditor({ id }: { id?: string }) {
     try {
       submission = pending ? JSON.parse(pending) : { key: crypto.randomUUID(), body: request };
       setPending(JSON.stringify(submission));
-      const accepted = await studioJson<{ id: string; generation: GenerationResource }>(id ? `/api/v1/images/${id}/generations` : '/api/v1/images', {
+      const accepted = await studioJson<{ id: string; generation: ImageGenerationResource }>(id ? `/api/v1/images/${id}/generations` : '/api/v1/images', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': submission.key }, body: JSON.stringify(submission.body),
       });
       setPending(''); setSelected(null); setVersions(null);
@@ -108,7 +108,7 @@ export function ImageEditor({ id }: { id?: string }) {
   async function history(older = false) {
     try {
       const suffix = older && versionCursor ? `?cursor=${encodeURIComponent(JSON.stringify(versionCursor))}` : '';
-      const page = await studioJson<{ items: GenerationResource[]; nextCursor: typeof versionCursor }>(`/api/v1/images/${id}/generations${suffix}`);
+      const page = await studioJson<{ items: ImageGenerationResource[]; nextCursor: typeof versionCursor }>(`/api/v1/images/${id}/generations${suffix}`);
       setVersions(previous => older ? [...(previous ?? []), ...page.items] : page.items); setVersionCursor(page.nextCursor);
     } catch (e) { setError((e as Error).message); }
   }

@@ -1,8 +1,8 @@
 # Studio media API and image UI
 
-Studio supports Narration and Gemini Image. Create, Drafts, Library, Activity,
-Pinned, Recent, and Find work serve both. Video and Music are registered media
-types but remain unavailable until their editors and handlers exist.
+Studio supports Narration, Gemini Image, and [Gemini Video sequences](studio-video-api.md).
+Create, Drafts, Library, Activity, Pinned, Recent, and Find work serve all three.
+Music remains unavailable until its editor and handlers exist.
 
 The existing [narration API](studio-narration-api.md) remains compatible. Its
 `streaming` status, WAV endpoint, playlists, visibility, and request options
@@ -180,7 +180,7 @@ A pending submission retains its key and body across refresh and provides Retry
 submission, so a lost HTTP response does not create a second paid request.
 Pinned, Recent, Find work, and Drafts recognize images independently of narration.
 
-Video/Music can add medium-specific endpoints and editors, then register their
+Music can add medium-specific endpoints and editors, then register its
 available type in shared navigation. The catalog, attempt statuses, asset
 records, and item links already have a media discriminator. This release does
 not require a generic editor or a compulsory project hierarchy.

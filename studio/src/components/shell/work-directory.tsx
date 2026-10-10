@@ -27,7 +27,7 @@ export function WorkDirectory({ kind }: { kind: 'drafts' | 'pinned' | 'recent' }
   return <WorkbenchPanel workspacePage title={title} viewGrid gridVariant="wide">
     <div className="flex min-w-0 flex-wrap gap-2">
       <Input aria-label={`Search ${title.toLowerCase()}`} className="min-w-0 flex-1" placeholder={`Search ${title.toLowerCase()}…`} value={query} onChange={(event) => update(event.target.value, 1)} />
-      <select aria-label="Media type" value={type} onChange={event => { setType(event.target.value); update(query, 1); }} className="rounded-md border border-input bg-background px-3 text-sm"><option value="">All media</option><option value="narration">Narration</option><option value="image">Image</option></select>
+      <select aria-label="Media type" value={type} onChange={event => { setType(event.target.value); update(query, 1); }} className="rounded-md border border-input bg-background px-3 text-sm"><option value="">All media</option><option value="narration">Narration</option><option value="image">Image</option><option value="video">Video</option></select>
       {kind === 'drafts' && <CreateMenu />}
     </div>
     <p className="text-sm text-ink-muted">{result.count} {title.toLowerCase()} · {kind === 'recent' ? 'Last 50 opened documents' : 'Saved on this device for your account'}</p>
@@ -44,7 +44,7 @@ export function WorkDirectory({ kind }: { kind: 'drafts' | 'pinned' | 'recent' }
           {item.pinned ? <PinOff size={16} /> : <Pin size={16} />}
         </button>
       </div>)}
-      {!result.count && <p className="py-8 text-center text-sm text-ink-muted">{query ? 'No matching documents.' : kind === 'drafts' ? 'Choose Create to start a narration or image draft. It is saved as you write.' : kind === 'pinned' ? 'Pin documents from their header to keep them close.' : 'Documents you open will appear here.'}</p>}
+      {!result.count && <p className="py-8 text-center text-sm text-ink-muted">{query ? 'No matching documents.' : kind === 'drafts' ? 'Choose Create to start a draft.' : kind === 'pinned' ? 'Pin documents from their header to keep them close.' : 'Documents you open will appear here.'}</p>}
     </div>
     {result.pages > 1 && <div className="flex flex-wrap items-center justify-between gap-2">
       <Button variant="outline" disabled={result.page <= 1} onClick={() => update(query, result.page - 1)}>Previous</Button>

@@ -35,6 +35,7 @@ export async function backfillNarrationCatalog(uid: string): Promise<boolean> {
 export const allowedMediaTypes = (caller: Caller): MediaType[] => [
   ...(hasScope(caller, 'narrations:read') ? ['narration' as const] : []),
   ...(hasScope(caller, 'images:read') ? ['image' as const] : []),
+  ...(hasScope(caller, 'videos:read') ? ['video' as const] : []),
 ];
 export interface MediaCursor { createdAt: number; id: string }
 export function parseMediaQuery(url: URL, allowed: MediaType[]) {
@@ -105,6 +106,11 @@ export async function listGenerations(caller: Caller, url: URL) {
       if (!source.exists || source.data()?.ownerUid !== caller.uid) return null;
       const summary = narrationSummary(data.itemId, source.data()!);
       data = { ...data, ...summary, id: data.id, phase: summary.status };
+    }
+    if (data.type === 'video') {
+      const source = (await adminDb().collection('mediaItems').doc(`video_${data.itemId}`).get()).data();
+      if (!source || source.ownerUid !== caller.uid || source.type !== 'video') return null;
+      data = { ...data, title: source.title };
     }
     return { id: data.id, itemId: data.itemId, type: data.type, title: data.title, status: data.status, phase: data.phase,
       createdAt: data.createdAt, updatedAt: data.updatedAt, href: data.href };

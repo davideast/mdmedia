@@ -5,7 +5,7 @@ import { adminBucket, adminDb } from './firebase-admin';
 import { assetResource, loadOwnedAsset, saveImageAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId, readImageDefaults } from './image-request';
 import { decideIdempotentReplay, executeImageJob } from './image-jobs';
-import type { GenerationResource, GenerationStatus, ImageRequest, ImageResource, MediaSummary } from './media-types';
+import type { ImageGenerationResource, GenerationStatus, ImageRequest, ImageResource, MediaSummary } from './media-types';
 
 interface ImageItem extends MediaSummary {
   ownerUid: string; visibility: 'private'; request: ImageRequest;
@@ -38,7 +38,7 @@ export async function loadImageItem(uid: string, id: string): Promise<ImageItem>
 export async function loadImageGeneration(uid: string, id: string): Promise<ImageGeneration> {
   const snapshot = validMediaId(id) ? await generationRef(id).get() : null;
   const generation = snapshot?.data() as ImageGeneration | undefined;
-  if (!generation || generation.ownerUid !== uid) throw new MediaError(404, 'not_found', 'That generation is not available to you.');
+  if (!generation || generation.type !== 'image' || generation.ownerUid !== uid) throw new MediaError(404, 'not_found', 'That generation is not available to you.');
   return generation;
 }
 
@@ -66,7 +66,7 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
     if (previous && ['queued', 'generating'].includes(previous.status)) throw new MediaError(409, 'generation_in_progress', 'This image already has a generation in progress.');
     if (request.referenceAssetId) {
       const reference = await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId));
-      if (!reference.exists || reference.data()?.ownerUid !== uid) throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+      if (!reference.exists || reference.data()?.ownerUid !== uid || !String(reference.data()?.mimeType).startsWith('image/') || reference.data()?.mediaType === 'video') throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
     }
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};
@@ -98,7 +98,7 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
   return accepted;
 }
 
-export async function generationResource(generation: ImageGeneration, origin: string): Promise<GenerationResource> {
+export async function generationResource(generation: ImageGeneration, origin: string): Promise<ImageGenerationResource> {
   const asset = generation.assetId ? await loadOwnedAsset(generation.ownerUid, generation.assetId) : null;
   return { id: generation.id, itemId: generation.itemId, type: 'image', title: generation.title, status: generation.status,
     phase: generation.phase, createdAt: generation.createdAt, updatedAt: generation.updatedAt, request: generation.request,
@@ -139,7 +139,7 @@ async function runJob(id: string) {
   const job = await adminDb().runTransaction(async tx => {
     const snapshot = await tx.get(generationRef(id));
     const data = snapshot.data() as ImageGeneration | undefined;
-    if (!data || data.status !== 'queued') return null;
+    if (!data || data.type !== 'image' || data.status !== 'queued') return null;
     tx.update(generationRef(id), { status: 'generating', phase: 'starting', leaseToken: token, leaseUntil: Date.now() + 90_000, updatedAt: Date.now() });
     tx.update(itemRef(data.itemId), { status: 'generating', updatedAt: Date.now() });
     tx.update(adminDb().collection('mediaActivity').doc(id), { status: 'generating', phase: 'starting', updatedAt: Date.now() });
@@ -211,13 +211,13 @@ export async function processImageJobs() {
   if (worker.ticking) return;
   worker.ticking = true;
   try {
-    const stale = await adminDb().collection('mediaGenerations').where('status', '==', 'generating').where('leaseUntil', '<', Date.now()).limit(10).get();
+    const stale = await adminDb().collection('mediaGenerations').where('type', '==', 'image').where('status', '==', 'generating').where('leaseUntil', '<', Date.now()).limit(10).get();
     for (const snapshot of stale.docs) {
       const job = snapshot.data() as ImageGeneration;
       const recoveryToken = randomUUID();
       const claimed = await adminDb().runTransaction(async tx => {
         const current = await tx.get(generationRef(job.id));
-        if (current.data()?.status !== 'generating' || Number(current.data()?.leaseUntil) >= Date.now()) return false;
+        if (current.data()?.type !== 'image' || current.data()?.status !== 'generating' || Number(current.data()?.leaseUntil) >= Date.now()) return false;
         tx.update(generationRef(job.id), { leaseToken: recoveryToken, leaseUntil: Date.now() + 90_000 });
         return true;
       });
@@ -225,7 +225,7 @@ export async function processImageJobs() {
     }
     const room = Math.max(0, 3 - worker.running.size);
     if (!room) return;
-    const queued = await adminDb().collection('mediaGenerations').where('status', '==', 'queued').orderBy('createdAt', 'asc').limit(room).get();
+    const queued = await adminDb().collection('mediaGenerations').where('type', '==', 'image').where('status', '==', 'queued').orderBy('createdAt', 'asc').limit(room).get();
     for (const snapshot of queued.docs) {
       if (worker.running.has(snapshot.id)) continue;
       worker.running.add(snapshot.id);
