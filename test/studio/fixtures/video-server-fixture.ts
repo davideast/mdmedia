@@ -138,14 +138,11 @@ assert.equal((await settled(expired.generationId)).error!.code, 'provider_reject
 assert.equal((await server.videoResource(uid, first.itemId, '')).result!.id, replacement.id);
 assert.equal((await server.videoResource(uid, first.itemId, '')).canContinue, true);
 fail = 'none';
-// Shape/resolution, foreign references and the sequence cap are validated before paid work.
+// Shape/resolution and foreign references are validated before paid work.
 await assert.rejects(server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id, output: { ...request.output, aspectRatio: '9:16' } }, 'shape-key-12345', first.itemId, 'key'), { code: 'locked_output' });
 documents.set('mediaAssets/foreign', { ownerUid: 'other', mediaType: 'video', purpose: 'reference', mimeType: 'image/png' });
 await assert.rejects(server.submitVideo(uid, { ...request, referenceAssetId: 'foreign' }, 'foreign-key-123', null, 'key'), { code: 'reference_not_found' });
 const original = documents.get(`mediaGenerations/${replacement.id}`)!;
-documents.set(`mediaGenerations/${replacement.id}`, { ...original, durationSeconds: 38 });
-await assert.rejects(server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id }, 'limit-key-12345', first.itemId, 'key'), { code: 'sequence_limit' });
-documents.set(`mediaGenerations/${replacement.id}`, original);
 // A receipt survived a process crash: retrieval succeeds without another paid create.
 const callsBefore = providerCalls; const getsBefore = retrievalCalls;
 const recoverId = 'recover-job'; const recoverItem = 'recover-item';
@@ -190,11 +187,11 @@ const png = await sharp({ create: { width: 8, height: 8, channels: 3, background
 const upload = await uploadRoute.POST(new Request('https://studio.test/api/v1/assets?media=video', { method: 'POST', headers: { Authorization: 'Bearer test-session' }, body: png }));
 assert.equal(upload.status, 201); assert.equal(documents.get(`mediaAssets/${(await upload.json()).id}`)!.mediaType, 'video');
 assert(!JSON.stringify(await server.videoResource(uid, first.itemId, '')).includes('SECRET'));
-// Reproduce the reported boundary: 10 -> 20 -> 30 -> 40 seconds using only a 10s source each time.
+// Cross the former sequence limit while every provider request still uses only a 10s source.
 const longRequest = { ...request, adaptation: { enabled: false, instructions: '' }, output: { ...request.output, durationSeconds: 10 } };
 let long = await server.submitVideo(uid, longRequest, 'long-initial-123', null, 'key');
 let longJob = await settled(long.generationId);
-for (const target of [20, 30, 40]) {
+for (const target of [20, 30, 40, 50, 60]) {
   long = await server.submitVideo(uid, { ...longRequest, action: 'continue', fromGenerationId: longJob.id }, `long-continue-${target}`, long.itemId, 'key');
   longJob = await settled(long.generationId);
   assert.equal(longJob.status, 'ready'); assert(Math.abs(longJob.durationSeconds! - target) < 0.2);
@@ -202,8 +199,36 @@ for (const target of [20, 30, 40]) {
   const source = payloads.at(-1).input[0].content[0];
   assert.equal(readMp4Duration(Buffer.from(source.data, 'base64')), 10);
 }
-assert.equal((await server.videoResource(uid, long.itemId, '')).clips.length, 4);
-assert.equal((await server.videoResource(uid, long.itemId, '')).canContinue, false);
+assert.equal((await server.videoResource(uid, long.itemId, '')).clips.length, 6);
+assert.equal((await server.videoResource(uid, long.itemId, '')).canContinue, true);
+const longAsset = await loadOwnedAsset(uid, longJob.assetId!);
+const lateClip = await videoClipContent(longAsset, 6, 50, 60, false);
+assert(Math.abs(readMp4Duration(lateClip)! - 10) < 0.1); assert(lateClip.includes(Buffer.from('soun')));
+await assert.rejects(videoClipContent(longAsset, 7, 60, 70, false), { code: 'invalid_clip' });
+// Saved histories can exceed fourteen clips, while cycles remain invalid.
+for (let i = 1; i <= 16; i++) documents.set(`mediaGenerations/history-${i}`, {
+  ...longJob, id: `history-${i}`, itemId: 'many-clips', clipNumber: i,
+  parentGenerationId: i === 1 ? null : `history-${i - 1}`, parentDurationSeconds: (i - 1) * 3, durationSeconds: i * 3,
+});
+const historyTip = await server.loadVideoGeneration(uid, 'history-16');
+const manyClips = await server.videoClips(uid, historyTip, '');
+assert.equal(manyClips.length, 16); assert.equal(manyClips.at(-1)!.endSeconds, 48);
+documents.set('mediaGenerations/history-1', { ...documents.get('mediaGenerations/history-1'), parentGenerationId: 'history-16' });
+await assert.rejects(server.videoClips(uid, historyTip, ''), { code: 'invalid_sequence' });
+const optionsRoute = await import('../../../studio/src/app/api/v1/options/route');
+const videoOptionsResponse = await optionsRoute.GET(http('/api/v1/options?media=video', 'test-session'));
+assert.equal(videoOptionsResponse.status, 200);
+const videoOptions = await videoOptionsResponse.json();
+assert.equal(videoOptions.limits.sequenceSeconds, null);
+assert.deepEqual(videoOptions.limits.clipSeconds, { min: 3, max: 10 });
+// Regeneration beyond 40s replaces only the last clip, using its original parent.
+const replacedLongId = longJob.id;
+long = await server.submitVideo(uid, { ...longRequest, action: 'regenerate_latest', fromGenerationId: longJob.id }, 'long-regenerate-123', long.itemId, 'key');
+longJob = await settled(long.generationId);
+assert.equal(longJob.status, 'ready'); assert(Math.abs(longJob.durationSeconds! - 60) < 0.2);
+assert.equal(longJob.replacesGenerationId, replacedLongId);
+assert.equal(longJob.parentDurationSeconds, documents.get(`mediaGenerations/${replacedLongId}`)!.parentDurationSeconds);
+assert.equal((await server.videoResource(uid, long.itemId, '')).clips.length, 6);
 // Restart after storing the new clip must assemble locally without even a provider GET.
 const recoveryJob = { ...longJob, id: 'clip-recovery', assetId: null, status: 'generating', phase: 'assembling', leaseUntil: 1, leaseToken: 'old' };
 documents.set('mediaGenerations/clip-recovery', recoveryJob);
@@ -227,4 +252,4 @@ const migratedJob = await settled(migrated.generationId);
 assert.equal(migratedJob.status, 'ready'); assert(Math.abs(migratedJob.durationSeconds! - 30) < 0.25);
 assert(migratedJob.parentClipDurationSeconds! <= 10.25);
 assert.equal((await server.videoResource(uid, legacyId, '')).clips.length, 3);
-console.log(JSON.stringify({ passed: true, providerCalls, retrievalCalls, assertions: 'concurrent idempotency, tip CAS, regeneration parent, history, scoped assets, receipt and clip recovery without paid retries, latest clip context, 10/20/30/40s local assembly, legacy migration, clip extraction' }));
+console.log(JSON.stringify({ passed: true, providerCalls, retrievalCalls, assertions: 'concurrent idempotency, tip CAS, regeneration parent, history, scoped assets, receipt and clip recovery without paid retries, latest clip context, 60s local assembly, sixteen-clip history, legacy migration, clip extraction' }));

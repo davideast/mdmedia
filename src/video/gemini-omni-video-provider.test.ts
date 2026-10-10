@@ -151,7 +151,7 @@ describe('Explicit Omni continuation and recovery', () => {
   });
   it('rejects a tail-only result and a missing provider receipt', async () => {
     const client = { interactions: { create: async () => ({ id: 'tail', output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
-    await expect(new GeminiOmniVideoProvider(client).continueVideoClip('Next', { videoBytes: movie(6), durationSeconds: 6 })).rejects.toThrow('complete longer video');
+    await expect(new GeminiOmniVideoProvider(client).continueVideoClip('Next', { videoBytes: movie(6), durationSeconds: 6 })).rejects.toThrow('requested continuation duration');
     const missing = { interactions: { create: async () => ({ output_video: { data: movie(3).toString('base64') } }) } } as unknown as GoogleGenAI;
     await expect(new GeminiOmniVideoProvider(missing).generateVideoClip('Next')).rejects.toThrow('no interaction ID');
   });

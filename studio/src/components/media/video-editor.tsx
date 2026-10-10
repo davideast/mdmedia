@@ -54,7 +54,6 @@ export function VideoEditor({ id }: { id?: string }) {
   const poster = usePrivateMedia(asset ? `/api/v1/assets/${asset.id}/content?thumbnail=1` : null);
   const regenerating = mode === 'regenerate_latest' || (failedAttempt?.action === 'regenerate_latest' && mode !== 'continue_after_failure') || Boolean(id && video && !video.result && failedAttempt);
   const parentDuration = regenerating ? video?.clips.at(-1)?.startSeconds ?? 0 : video?.result?.durationSeconds ?? 0;
-  const remaining = Math.floor(40 - parentDuration + 0.25); const maxDuration = Math.min(10, remaining);
   function update(patch: Partial<VideoRequest>) {
     const next = { ...requestRef.current, ...patch };
     if (id) setEdit(JSON.stringify(next)); else store.setVideoDraft(draftId, { ...next, kind: 'video' });
@@ -81,7 +80,7 @@ export function VideoEditor({ id }: { id?: string }) {
     submissionRef.current = true; setSubmitting(true); setError('');
     const viewId = activeView?.id;
     try {
-      const body = { ...request, output: { ...request.output, durationSeconds: Math.min(request.output.durationSeconds, maxDuration) },
+      const body = { ...request,
         ...(id && video ? { action: regenerating ? 'regenerate_latest' as const : 'continue' as const, fromGenerationId: video.latestSuccessfulGenerationId ?? video.latestGenerationId } : {}) };
       const submission: Submission = pending ? JSON.parse(pending) : { key: crypto.randomUUID(), body };
       setPending(JSON.stringify(submission));
@@ -139,7 +138,7 @@ export function VideoEditor({ id }: { id?: string }) {
       <div className="flex items-center gap-1">
         <MediaIconAction label="Download video" onClick={() => void downloadPrivateMedia(`/api/v1/assets/${asset.id}/content?download=1`, `${title}.mp4`).catch(report)}><Download size={16} /></MediaIconAction>
         <MediaIconAction label="Fullscreen" disabled={!media.url} onClick={() => { const player = playerRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null; if (player?.requestFullscreen) void player.requestFullscreen().catch(report); else player?.webkitEnterFullscreen?.(); }}><Expand size={16} /></MediaIconAction>
-        <span className="text-xs text-ink-muted">{seconds(result?.durationSeconds ?? 0)} / 40s</span>
+        <span className="text-xs text-ink-muted">{seconds(result?.durationSeconds ?? 0)}</span>
         {selected && <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setSelected(null)}>Back to latest</Button>}
       </div>
     </div>}
@@ -147,12 +146,11 @@ export function VideoEditor({ id }: { id?: string }) {
     {!selected && <MediaComposer heading={regenerating && video ? 'Regenerate latest clip' : asset ? 'What happens next?' : 'Describe a video'} label="Video prompt" placeholder="Describe or paste here. Markdown is fine."
       value={request.prompt} maxLength={32000} disabled={busy || Boolean(pending)} onChange={prompt => update({ prompt })} onSubmit={() => void generate()}
       actionLabel={pending && !submitting ? 'Retry submission' : busy ? 'Generating…' : regenerating ? 'Regenerate clip' : video?.result ? 'Continue video' : 'Generate video'}
-      actionDisabled={busy || (!pending && !request.prompt.trim()) || options?.available === false || Boolean(id && !video) || maxDuration < 3 || Boolean(video?.result && !regenerating && !video.canContinue)}
+      actionDisabled={busy || (!pending && !request.prompt.trim()) || options?.available === false || Boolean(id && !video) || Boolean(video?.result && !regenerating && !video.canContinue)}
       busy={busy} grow={!asset} footer={<div className="flex items-center gap-1">
         <MediaIconAction label="Import Markdown" disabled={busy || Boolean(pending)} onClick={() => importRef.current?.click()}><Upload size={16} /></MediaIconAction>
         <MediaIconAction label="Attach reference" disabled={busy || Boolean(pending)} onClick={() => referenceRef.current?.click()}>{uploading ? <Loader2 size={16} className="animate-spin" /> : <Paperclip size={16} />}</MediaIconAction>
         {regenerating && Boolean(video?.result) && <MediaIconAction label="Cancel regeneration" disabled={busy || Boolean(pending)} onClick={() => { setMode('continue_after_failure'); setEdit(JSON.stringify({ ...base, prompt: '', referenceAssetId: null, referenceRole: 'reference' })); }}><X size={16} /></MediaIconAction>}
-        {maxDuration < 3 && <span className="text-xs text-ink-muted">Sequence complete</span>}
       </div>}>
       {request.referenceAssetId && <div className="flex items-center gap-2"><AssetImage id={request.referenceAssetId} thumbnail alt="Reference" className="h-16 w-20 rounded" /><MediaIconAction label="Remove reference" disabled={busy || Boolean(pending)} onClick={() => update({ referenceAssetId: null })}><X size={16} /></MediaIconAction></div>}
     </MediaComposer>}
@@ -172,7 +170,7 @@ export function VideoEditor({ id }: { id?: string }) {
       </div>)}</div> : drawer === 'history' ? <div className="grid gap-2">{versions.map(version => <button key={version.id} disabled={version.status !== 'ready'} className="flex items-center gap-3 rounded-md border border-border p-3 text-left text-sm disabled:opacity-50" onClick={() => { setSelected(version); setDrawer(''); }}>
         {version.assets[0] && <AssetImage id={version.assets[0].id} thumbnail alt="Previous video" className="h-14 w-20 rounded" />}<span>{new Date(version.createdAt).toLocaleString()}<span className="block text-xs text-ink-muted">{version.status === 'ready' ? seconds(version.durationSeconds ?? 0) : version.status}</span></span>
       </button>)}{cursor && <Button variant="outline" onClick={() => void history(true)}>Older attempts</Button>}</div> : <fieldset disabled={busy || Boolean(pending) || Boolean(selected)} className="grid gap-6 disabled:opacity-60">
-        <label className="grid gap-2 text-sm font-medium">Clip length<select aria-label="Clip length" className="rounded-md border border-input bg-background p-2" disabled={maxDuration < 3} value={Math.min(request.output.durationSeconds, Math.max(3, maxDuration))} onChange={event => update({ output: { ...request.output, durationSeconds: Number(event.target.value) } })}>{Array.from({ length: Math.max(1, maxDuration - 2) }, (_, i) => i + 3).map(value => <option key={value} value={value}>{value}s</option>)}</select></label>
+        <label className="grid gap-2 text-sm font-medium">Clip length<select aria-label="Clip length" className="rounded-md border border-input bg-background p-2" value={request.output.durationSeconds} onChange={event => update({ output: { ...request.output, durationSeconds: Number(event.target.value) } })}>{Array.from({ length: 8 }, (_, i) => i + 3).map(value => <option key={value} value={value}>{value}s</option>)}</select></label>
         <label className="grid gap-2 text-sm font-medium">Shape<select aria-label="Video shape" disabled={Boolean(video?.result)} className="rounded-md border border-input bg-background p-2" value={request.output.aspectRatio} onChange={event => update({ output: { ...request.output, aspectRatio: event.target.value as VideoRequest['output']['aspectRatio'] } })}><option value="16:9">Landscape</option><option value="9:16">Portrait</option></select></label>
         <label className="grid gap-2 text-sm font-medium">Resolution<select aria-label="Video resolution" disabled={Boolean(video?.result)} className="rounded-md border border-input bg-background p-2" value={request.output.resolution} onChange={event => update({ output: { ...request.output, resolution: event.target.value as VideoRequest['output']['resolution'] } })}>{VIDEO_RESOLUTIONS.map(value => <option key={value} value={value}>{value}</option>)}</select></label>
         <label className="flex items-center gap-2 text-sm font-medium"><input type="checkbox" checked={request.adaptation.enabled} onChange={event => update({ adaptation: { ...request.adaptation, enabled: event.target.checked } })} />Adapt notes for video</label>

@@ -37,7 +37,7 @@ export async function GET(request: Request): Promise<Response> {
     const { VIDEO_RESOLUTIONS, MAX_VIDEO_BYTES } = await import('@/lib/video-request');
     return Response.json({ type: 'video', available: Boolean(process.env.GEMINI_API_KEY) && await videoToolsAvailable(), provider: 'gemini', model: configuredVideoModel(),
       defaults: await videoDefaults(caller.uid), capabilities: { aspectRatios: ['16:9', '9:16'], resolutions: VIDEO_RESOLUTIONS, adaptation: true, referenceImages: 1, continuation: true, regenerateLatest: true, audio: true },
-      limits: { promptChars: 32000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_VIDEO_BYTES, clipSeconds: { min: 3, max: 10 }, sequenceSeconds: 40 }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+      limits: { promptChars: 32000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_VIDEO_BYTES, clipSeconds: { min: 3, max: 10 }, sequenceSeconds: null }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
   if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, and video.');
   const settings = await loadUserSettings(caller.uid);

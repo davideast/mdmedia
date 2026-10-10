@@ -79,10 +79,8 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
     } else request = parseVideoRequest(body, defaults);
     if (parent) {
       if (parent.status !== 'ready' || parent.ownerUid !== uid || parent.itemId !== itemId || parent.type !== 'video' || !parent.assetId || !parent.durationSeconds) throw new MediaError(409, 'continuation_unavailable', 'The saved continuation context is unavailable. Your video is preserved.');
-      const remaining = Math.floor(40 - parent.durationSeconds + 0.25);
-      if (remaining < 3) throw new MediaError(409, 'sequence_limit', 'This video has reached its 40-second limit.');
       if (request.referenceAssetId && request.referenceRole === 'first_frame') throw new MediaError(400, 'invalid_reference_role', 'Continuations accept a reference image.');
-      request = { ...request, referenceRole: 'reference', output: { ...request.output, durationSeconds: Math.min(request.output.durationSeconds, remaining) } };
+      request = { ...request, referenceRole: 'reference' };
     }
     if (request.referenceAssetId) {
       const reference = (await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId))).data() as StoredAsset | undefined;
@@ -127,11 +125,11 @@ export async function videoClips(uid: string, tip: VideoGeneration, origin: stri
   const versions: VideoGeneration[] = []; let next: VideoGeneration | null = tip;
   const seen = new Set<string>();
   while (next) {
-    if (seen.has(next.id) || versions.length >= 14 || next.status !== 'ready' || next.itemId !== tip.itemId) throw new MediaError(409, 'invalid_sequence', 'The clip sequence is unavailable.');
-    versions.unshift(next); seen.add(next.id);
+    if (seen.has(next.id) || next.status !== 'ready' || next.itemId !== tip.itemId) throw new MediaError(409, 'invalid_sequence', 'The clip sequence is unavailable.');
+    versions.push(next); seen.add(next.id);
     next = next.parentGenerationId ? await loadVideoGeneration(uid, next.parentGenerationId) : null;
   }
-  return versions.map((job, i) => {
+  return versions.reverse().map((job, i) => {
     const content = `${origin}/api/v1/videos/${tip.itemId}/clips/${i + 1}/content?generationId=${tip.id}`;
     return { index: i + 1, generationId: job.id, startSeconds: i ? versions[i - 1].durationSeconds! : 0, endSeconds: job.durationSeconds!, content, thumbnail: `${content}&thumbnail=1` };
   });
@@ -143,7 +141,7 @@ export async function videoResource(uid: string, id: string, origin: string): Pr
   return { id: item.id, type: 'video', title: item.title, status: item.status, visibility: 'private', createdAt: item.createdAt, updatedAt: item.updatedAt,
     href: item.href, thumbnailAssetId: item.thumbnailAssetId, durationMs: item.durationMs, request: item.request,
     latestGenerationId: latest.id, latestSuccessfulGenerationId: result?.id ?? null, latestGeneration: await videoGenerationResource(latest, origin),
-    result: result ? await videoGenerationResource(result, origin) : null, canContinue: Boolean(result && result.durationSeconds && Math.floor(40 - result.durationSeconds + 0.25) >= 3), clips: result ? await videoClips(uid, result, origin) : [],
+    result: result ? await videoGenerationResource(result, origin) : null, canContinue: Boolean(result?.status === 'ready' && result.assetId && result.durationSeconds), clips: result ? await videoClips(uid, result, origin) : [],
     links: { self: `${origin}/api/v1/videos/${id}`, web: `${origin}/video/${id}`, generations: `${origin}/api/v1/videos/${id}/generations` } };
 }
 async function checkpoint(job: VideoGeneration, token: string, patch: Partial<VideoGeneration>) {
@@ -169,7 +167,7 @@ async function finish(job: VideoGeneration, token: string, asset: StoredAsset | 
   });
 }
 function validateOutput(job: VideoGeneration, output: VideoGenerationResult) {
-  if (!output.durationSeconds || output.durationSeconds < 2.75 || output.durationSeconds > 40.25 ||
+  if (!output.durationSeconds || output.durationSeconds < 2.75 ||
       (job.parentGenerationId && (output.durationSeconds <= job.parentDurationSeconds + 0.25 || Math.abs(output.durationSeconds - job.parentDurationSeconds - job.request.output.durationSeconds) > 0.5))) throw new MediaError(502, 'invalid_video', 'Gemini did not return a complete longer video. Your previous result is preserved.');
   if (!job.parentGenerationId && (output.durationSeconds > 10.25 || Math.abs(output.durationSeconds - job.request.output.durationSeconds) > 0.5)) throw new MediaError(502, 'invalid_video', 'Gemini returned a clip outside the supported duration.');
 }
@@ -192,7 +190,7 @@ async function assembleClip(job: VideoGeneration, token: string, clip: StoredAss
   const previous = new Uint8Array((await adminBucket().file(parentAsset.path).download())[0]);
   const bytes = await appendVideoClip(previous, clipBytes);
   const duration = readMp4Duration(bytes);
-  if (!duration || Math.abs(duration - job.parentDurationSeconds - clip.durationMs! / 1000) > 0.5 || duration > 40.25) throw new MediaError(502, 'invalid_sequence', 'Could not assemble this video. Your clips are preserved.');
+  if (!duration || Math.abs(duration - job.parentDurationSeconds - clip.durationMs! / 1000) > 0.5) throw new MediaError(502, 'invalid_sequence', 'Could not assemble this video. Your clips are preserved.');
   return saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId);
 }
 async function persistOutput(job: VideoGeneration, token: string, output: VideoGenerationResult): Promise<StoredAsset> {

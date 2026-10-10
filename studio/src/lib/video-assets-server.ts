@@ -30,7 +30,7 @@ async function transform(bytes: Uint8Array, args: string[], output: string): Pro
 }
 export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationId: string, itemId: string, kind: 'sequence' | 'clip' = 'sequence'): Promise<StoredAsset> {
   const durationSeconds = readMp4Duration(bytes);
-  if (!bytes.length || bytes.length > MAX_VIDEO_BYTES || !durationSeconds || durationSeconds > 40.25) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid video.');
+  if (!bytes.length || bytes.length > MAX_VIDEO_BYTES || !durationSeconds || (kind === 'clip' && (durationSeconds < 2.75 || durationSeconds > 10.25))) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid video.');
   const frame = await transform(bytes, ['-frames:v', '1'], 'poster.png');
   const metadata = await sharp(frame).metadata();
   const thumbnail = await sharp(frame).resize({ width: 480, height: 480, fit: 'inside', withoutEnlargement: true }).webp().toBuffer();
@@ -64,7 +64,7 @@ export async function appendVideoClip(previous: Uint8Array, clip: Uint8Array): P
 }
 /** Extract from the selected complete version. No model invocation, no concatenation. */
 export async function videoClipContent(asset: StoredAsset, index: number, start: number, end: number, thumbnail: boolean): Promise<Buffer> {
-  if (!Number.isInteger(index) || index < 1 || !Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start || end > 40.25) throw new MediaError(400, 'invalid_clip', 'Choose an available clip.');
+  if (!Number.isInteger(index) || index < 1 || !Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start || (!asset.durationMs || end > asset.durationMs / 1000 + 0.25)) throw new MediaError(400, 'invalid_clip', 'Choose an available clip.');
   const path = `media/${asset.ownerUid}/${asset.id}/clips/${index}.${thumbnail ? 'webp' : 'mp4'}`;
   try { return (await adminBucket().file(path).download())[0]; } catch { /* A cache miss is a local operation. */ }
   const pending = transforms.get(path); if (pending) return pending;

@@ -61,7 +61,7 @@ underscores, or hyphens. They return `202` with
 `{ id, type: "video", generation, links, replayed }`. Poll the generation or item.
 The stable item has separate `latestGeneration` and `result` pointers; a failed
 attempt never hides or replaces the last successful video. `canContinue` reflects
-the measured remaining duration and any known expired continuation context.
+the availability of a saved successful result, independently of total duration.
 
 Continue explicitly names the current successful result:
 
@@ -81,7 +81,7 @@ submission, or changed shape/resolution returns `409`.
 
 For existing videos, omitted options resolve from the source generation;
 references default to none. Prompt is always explicit. The server resolves the
-provider context and clamps duration to remaining capacity. Clients never send
+latest clip context; each requested addition is 3–10 seconds. Clients never send
 provider interaction IDs, model overrides, storage paths, or uploaded videos.
 
 History has 50 attempts per page and uses the same stable cursor format as the
@@ -136,9 +136,9 @@ remain readable; their final clip is extracted locally when first continued.
 Clip downloads use independent clip assets when present, with local extraction
 as the fallback for older versions. Both preserve audio.
 
-Requested total capacity remains 40 seconds, with a 40.25-second container timing
-tolerance. Fewer than three whole seconds remaining disables Continue. Source
-clips are limited to 10.25 measured seconds; provider responses must match source
+There is no total sequence duration or clip-count limit. Options report
+`limits.sequenceSeconds: null`; the UI shows elapsed duration and keeps Continue
+available after 40 seconds. Source clips are limited to 10.25 measured seconds; provider responses must match source
 clip plus requested addition within 0.5 seconds. Two concurrent legacy extraction
 cache misses are allowed, and identical requests share work.
 
@@ -161,7 +161,8 @@ real MP4 decoding/posters/extraction, and a fake Gemini client. It covers
 concurrent idempotency, stale source rejection, original-parent regeneration,
 failed-result retention, ownership/scopes, output validation, receipt recovery
 without another paid create, recovery from a saved clip with no provider reads,
-legacy migration, 10/20/30/40-second local assembly, and audio-bearing clips.
+legacy migration, local assembly through 60 seconds, histories with sixteen clips,
+cycle rejection, downloads past 40 seconds, and audio-bearing clips.
 Engine tests cover create/edit/continue payloads, SDK retry prevention,
 normalization, cancellation, source-clip limits, missing receipts, and repeated
 continuations without cumulative context.

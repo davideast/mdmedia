@@ -77,7 +77,7 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
   }
 
   private validateContinuation(result: VideoGenerationResult, parentDuration: number, addedDuration: number) {
-    if (!result.durationSeconds || result.durationSeconds <= parentDuration + 0.25 || Math.abs(result.durationSeconds - parentDuration - addedDuration) > 0.5 || result.durationSeconds > 40.25) throw new Error('Omni did not return a complete longer video within the 40-second limit');
+    if (!result.durationSeconds || result.durationSeconds <= parentDuration + 0.25 || Math.abs(result.durationSeconds - parentDuration - addedDuration) > 0.5) throw new Error('Omni did not return the requested continuation duration');
   }
 
   private async output(interaction: Interaction, options: GenerateVideoOptions, signal: AbortSignal): Promise<VideoGenerationResult> {
