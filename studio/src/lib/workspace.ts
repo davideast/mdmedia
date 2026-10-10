@@ -1,5 +1,6 @@
+import { parseMusicRequest } from './music-request';
 import { parseVideoRequest } from './video-request';
-import type { ImageDraft, VideoDraft } from './media-types';
+import type { ImageDraft, VideoDraft, MusicDraft } from './media-types';
 import type { Draft } from '../components/shell/narration-provider';
 
 export interface WorkspaceTab {
@@ -19,6 +20,7 @@ export interface WorkspaceSnapshot {
   activeId: string | null;
   drafts: Record<string, Partial<Draft>>;
   imageDrafts?: Record<string, ImageDraft>;
+  musicDrafts?: Record<string, MusicDraft>;
   videoDrafts?: Record<string, VideoDraft>;
 }
 
@@ -33,7 +35,7 @@ export interface WorkspaceStorage {
 const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
-  '/studio': 'Draft', '/studio/image': 'Image draft', '/studio/video': 'Video draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
+  '/studio': 'Draft', '/studio/image': 'Image draft', '/studio/video': 'Video draft', '/studio/music': 'Music draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
   '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
 
@@ -44,12 +46,12 @@ export function workspaceRoute(href: string): { href: string; key: string; title
   const url = new URL(href, ORIGIN);
   if (url.origin !== ORIGIN || url.pathname === '/' || /^\/(api|_next)(\/|$)/.test(url.pathname)) return null;
   const path = url.pathname.replace(/\/$/, '');
-  const draftId = (path === '/studio' || path === '/studio/image' || path === '/studio/video') ? url.searchParams.get('draft') || 'default' : undefined;
+  const draftId = (path === '/studio' || path === '/studio/image' || path === '/studio/video' || path === '/studio/music') ? url.searchParams.get('draft') || 'default' : undefined;
   const entity = draftId ?? url.searchParams.get('playlist') ?? url.searchParams.get('track');
   return {
     href: `${path}${url.search}${url.hash}`,
     key: entity ? `${path}:${entity}` : path,
-    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/video/') ? 'Video' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
+    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/video/') ? 'Video' : path.startsWith('/music/') ? 'Music' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
     draftId,
   };
 }
@@ -116,7 +118,14 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
         if (kind !== 'video') continue;
         try { videoDrafts[id] = { kind: 'video', ...parseVideoRequest({ ...draft, prompt: draft.prompt || 'defaults' }), prompt: draft.prompt || '' }; } catch { /* Ignore malformed saved options. */ }
       }
-      return { version: 1, tabs, drafts, imageDrafts, videoDrafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
+      const musicDrafts: Record<string, MusicDraft> = Object.create(null);
+      for (const [id, value] of Object.entries(saved.musicDrafts ?? {})) {
+        if (!value || typeof value !== 'object') continue;
+        const { kind, ...draft } = value as MusicDraft;
+        if (kind !== 'music') continue;
+        try { musicDrafts[id] = { kind: 'music', ...parseMusicRequest({ ...draft, prompt: draft.prompt || 'defaults' }), prompt: draft.prompt || '' }; } catch { /* Ignore malformed saved options. */ }
+      }
+      return { version: 1, tabs, drafts, imageDrafts, videoDrafts, musicDrafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
   } catch { return EMPTY_WORKSPACE; }
 }
 
@@ -152,6 +161,12 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     if (!Object.hasOwn(local.videoDrafts ?? {}, id)) delete videoDrafts[id];
     else videoDrafts[id] = mergeRecord(base.videoDrafts?.[id], local.videoDrafts![id], remote.videoDrafts?.[id]);
   }
+  const musicDrafts = { ...remote.musicDrafts };
+  for (const id of new Set([...Object.keys(base.musicDrafts ?? {}), ...Object.keys(local.musicDrafts ?? {})])) {
+    if (equal(base.musicDrafts?.[id], local.musicDrafts?.[id])) continue;
+    if (!Object.hasOwn(local.musicDrafts ?? {}, id)) delete musicDrafts[id];
+    else musicDrafts[id] = mergeRecord(base.musicDrafts?.[id], local.musicDrafts![id], remote.musicDrafts?.[id]);
+  }
   const tabs = new Map(remote.tabs.map((tab) => [tab.id, tab]));
   const remoteKeys = new Map(remote.tabs.map((tab) => [tab.key, tab]));
   const baseIds = new Map(base.tabs.map((tab) => [tab.id, tab]));
@@ -174,7 +189,7 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     if (seen.has(tab.key)) return false;
     seen.add(tab.key); return true;
   });
-  return { version: 1, drafts, imageDrafts, videoDrafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
+  return { version: 1, drafts, imageDrafts, videoDrafts, musicDrafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
 }
 
 /** Account-scoped, serializable workspace. No players, requests, or React trees live here. */
@@ -286,6 +301,14 @@ export class WorkspaceStore {
   clearVideoDraft(id: string): void {
     const videoDrafts = { ...this.snapshot.videoDrafts }; delete videoDrafts[id];
     this.change({ ...this.snapshot, videoDrafts });
+  }
+
+  setMusicDraft(id: string, draft: MusicDraft): void {
+    this.change({ ...this.snapshot, musicDrafts: { ...this.snapshot.musicDrafts, [id]: draft } });
+  }
+  clearMusicDraft(id: string): void {
+    const musicDrafts = { ...this.snapshot.musicDrafts }; delete musicDrafts[id];
+    this.change({ ...this.snapshot, musicDrafts });
   }
 
   clearDraft(id: string): void {

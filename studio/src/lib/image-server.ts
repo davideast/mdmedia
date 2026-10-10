@@ -66,7 +66,7 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
     if (previous && ['queued', 'generating'].includes(previous.status)) throw new MediaError(409, 'generation_in_progress', 'This image already has a generation in progress.');
     if (request.referenceAssetId) {
       const reference = await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId));
-      if (!reference.exists || reference.data()?.ownerUid !== uid || !String(reference.data()?.mimeType).startsWith('image/') || reference.data()?.mediaType === 'video') throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+      if (!reference.exists || reference.data()?.ownerUid !== uid || !String(reference.data()?.mimeType).startsWith('image/') || ['video', 'music'].includes(String(reference.data()?.mediaType))) throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
     }
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};

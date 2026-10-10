@@ -223,6 +223,32 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "mediaGenerations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ownerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "itemId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": [
@@ -254,6 +280,16 @@
     {
       "collectionGroup": "mediaItems",
       "fieldPath": "sourcePreview",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "mediaAssets",
+      "fieldPath": "waveform",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "mediaGenerations",
+      "fieldPath": "lyrics",
       "indexes": []
     }
   ]

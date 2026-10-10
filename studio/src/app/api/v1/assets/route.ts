@@ -6,8 +6,8 @@ import { mediaApi, mediaJson } from '@/lib/media-api-server';
 export const runtime = 'nodejs';
 export const POST = (request: Request) => mediaApi(async () => {
   const media = new URL(request.url).searchParams.get('media') ?? 'image';
-  if (media !== 'image' && media !== 'video') throw new MediaError(400, 'invalid_type', 'Choose image or video.');
-  const caller = await authorize(request, media === 'video' ? 'videos:create' : 'images:create'); if (caller instanceof Response) return caller;
+  if (media !== 'image' && media !== 'video' && media !== 'music') throw new MediaError(400, 'invalid_type', 'Choose image, video, or music.');
+  const caller = await authorize(request, media === 'music' ? 'music:create' : media === 'video' ? 'videos:create' : 'images:create'); if (caller instanceof Response) return caller;
   if (Number(request.headers.get('content-length')) > MAX_REFERENCE_BYTES) throw new MediaError(413, 'reference_too_large', 'Reference images must be at most 10 MiB.');
   // Raw image bytes avoid base64 inflation and unbounded multipart parsing.
   const reader = request.body?.getReader(); if (!reader) throw new MediaError(400, 'missing_image', 'Upload an image.');
