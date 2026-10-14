@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 describe('Narration ID Ownership & Stream Guarding', () => {
   const routeSource = readFileSync(
-    resolve(import.meta.dir, '../../studio/src/app/api/narrations/route.ts'),
+    resolve(import.meta.dir, '../../studio/src/lib/narration-start.ts'),
     'utf8',
   );
   const serverSource = readFileSync(
@@ -12,16 +12,16 @@ describe('Narration ID Ownership & Stream Guarding', () => {
     'utf8',
   );
 
-  it('route.ts calls claimNarrationId before creating a narration stream and returns 409', () => {
-    const claimAt = routeSource.indexOf('if (!(await claimNarrationId(id, uid)))');
+  it('startNarration calls claimNarrationId before creating a narration stream and returns 409', () => {
+    const claimAt = routeSource.indexOf('if (!(await claimNarrationId(id, uid))) return conflict;');
     const streamAt = routeSource.indexOf('createNarrationStream({');
     expect(claimAt).toBeGreaterThan(-1);
     expect(streamAt).toBeGreaterThan(claimAt);
-    expect(routeSource).toContain('status: 409');
+    expect(routeSource).toContain('fail(409, "id_in_use"');
   });
 
-  it('route.ts maps a foreign live-stream NarrationOwnershipError to 409, not 500', () => {
-    expect(routeSource).toContain('if (error instanceof NarrationOwnershipError) return conflict();');
+  it('startNarration maps a foreign live-stream NarrationOwnershipError to 409, not 500', () => {
+    expect(routeSource).toContain('if (error instanceof NarrationOwnershipError) return conflict;');
     expect(serverSource).toContain('export class NarrationOwnershipError extends Error');
     expect(serverSource).not.toContain('throw new Error("Forbidden: narration id belongs to another user.")');
   });

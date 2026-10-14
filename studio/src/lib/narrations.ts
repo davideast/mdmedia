@@ -256,13 +256,20 @@ export function updateVisibility(
   });
 }
 
+function refreshNarrationCatalog(id: string): void {
+  void (async () => {
+    const token = await auth().currentUser?.getIdToken();
+    if (token) await fetch('/api/v1/media/sync', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+  })().catch(() => {});
+}
+
 export function updateNarrationTitle(id: string, title: string): void {
   const trimmed = title.trim().slice(0, 200);
   if (trimmed.length === 0) return;
   void updateDoc(doc(db(), 'narrations', id), {
     title: trimmed,
     updatedAt: Date.now(),
-  }).catch((err) => {
+  }).then(() => refreshNarrationCatalog(id)).catch((err) => {
     console.error(`[narrations] failed to update narration title for ${id}:`, err);
   });
   void (async () => {

@@ -1,4 +1,5 @@
 import { defineCommand } from 'citty';
+import { studioCommand } from './studio-command.js';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
@@ -191,7 +192,7 @@ export const videoCommand = defineCommand({
     task: {
       type: 'string',
       alias: 't',
-      description: 'Video task ("text_to_video", "image_to_video", "reference_to_video", "edit")',
+      description: 'Video task ("text_to_video", "image_to_video", "reference_to_video", "edit", "extend")',
     },
     delivery: {
       type: 'string',
@@ -661,6 +662,7 @@ const SUBCOMMANDS = {
   music: musicCommand,
   sfx: sfxCommand,
   adapt: adaptCommand,
+  studio: studioCommand,
 } as const;
 
 /**

@@ -1,3 +1,6 @@
+import { parseMusicRequest } from './music-request';
+import { parseVideoRequest } from './video-request';
+import type { ImageDraft, VideoDraft, MusicDraft } from './media-types';
 import type { Draft } from '../components/shell/narration-provider';
 
 export interface WorkspaceTab {
@@ -6,6 +9,8 @@ export interface WorkspaceTab {
   href: string;
   title: string;
   scrollTop: number;
+  pinned?: boolean;
+  visitedAt?: number;
   fields: Record<string, string | boolean | number | null>;
 }
 
@@ -14,6 +19,9 @@ export interface WorkspaceSnapshot {
   tabs: WorkspaceTab[];
   activeId: string | null;
   drafts: Record<string, Partial<Draft>>;
+  imageDrafts?: Record<string, ImageDraft>;
+  musicDrafts?: Record<string, MusicDraft>;
+  videoDrafts?: Record<string, VideoDraft>;
 }
 
 export interface WorkspaceStorage {
@@ -27,22 +35,23 @@ export interface WorkspaceStorage {
 const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
-  '/studio': 'Draft', '/library': 'Library', '/queue': 'Queue',
-  '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings',
+  '/studio': 'Draft', '/studio/image': 'Image draft', '/studio/video': 'Video draft', '/studio/music': 'Music draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
+  '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
 
-/** URLs identify views. A tab's key identifies the item even when its view/query changes. */
+/** Persisted v1 `tabs` are a cache of route state, not open UI tabs. Keep the schema
+ * compatible so upgrading navigation never discards drafts or unfinished edits. */
 export function workspaceRoute(href: string): { href: string; key: string; title: string; draftId?: string } | null {
   if (!href.startsWith('/') || href.startsWith('//') || href.includes('\\')) return null;
   const url = new URL(href, ORIGIN);
   if (url.origin !== ORIGIN || url.pathname === '/' || /^\/(api|_next)(\/|$)/.test(url.pathname)) return null;
   const path = url.pathname.replace(/\/$/, '');
-  const draftId = path === '/studio' ? url.searchParams.get('draft') || 'default' : undefined;
+  const draftId = (path === '/studio' || path === '/studio/image' || path === '/studio/video' || path === '/studio/music') ? url.searchParams.get('draft') || 'default' : undefined;
   const entity = draftId ?? url.searchParams.get('playlist') ?? url.searchParams.get('track');
   return {
     href: `${path}${url.search}${url.hash}`,
     key: entity ? `${path}:${entity}` : path,
-    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
+    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/video/') ? 'Video' : path.startsWith('/music/') ? 'Music' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
     draftId,
   };
 }
@@ -74,12 +83,17 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
       const saved = raw ? JSON.parse(raw) : null;
       if (saved?.version !== 1 || !Array.isArray(saved.tabs)) return EMPTY_WORKSPACE;
       const tabs: WorkspaceTab[] = [];
+      const keys = new Set<string>();
+      const ids = new Set<string>();
       for (const tab of saved.tabs) {
         if (typeof tab?.href !== 'string' || typeof tab.id !== 'string') continue;
         const route = workspaceRoute(tab.href);
-        if (!route || tabs.some((item) => item.key === route.key || item.id === tab.id)) continue;
+        if (!route || keys.has(route.key) || ids.has(tab.id)) continue;
+        keys.add(route.key); ids.add(tab.id);
         tabs.push({ id: tab.id, key: route.key, href: route.href,
           title: typeof tab.title === 'string' ? tab.title.slice(0, 200) : route.title,
+          pinned: tab.pinned === true,
+          visitedAt: typeof tab.visitedAt === 'number' && Number.isFinite(tab.visitedAt) ? Math.max(0, tab.visitedAt) : 0,
           scrollTop: typeof tab.scrollTop === 'number' && Number.isFinite(tab.scrollTop) ? Math.max(0, tab.scrollTop) : 0,
           fields: Object.fromEntries(Object.entries(tab.fields && typeof tab.fields === 'object' ? tab.fields : {})
             .filter(([, value]) => value === null || typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number' && Number.isFinite(value))) as WorkspaceTab['fields'] });
@@ -88,7 +102,30 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
       if (saved.drafts && typeof saved.drafts === 'object') {
         for (const [id, draft] of Object.entries(saved.drafts)) drafts[id] = readDraft(draft);
       }
-      return { version: 1, tabs, drafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
+      const imageDrafts: Record<string, ImageDraft> = Object.create(null);
+      for (const [id, value] of Object.entries(saved.imageDrafts ?? {})) {
+        if (!value || typeof value !== 'object') continue;
+        const draft = value as Record<string, unknown>;
+        imageDrafts[id] = { kind: 'image', prompt: typeof draft.prompt === 'string' ? draft.prompt : '',
+          aspectRatio: typeof draft.aspectRatio === 'string' ? draft.aspectRatio : '16:9', resolution: typeof draft.resolution === 'string' ? draft.resolution : '',
+          adapt: draft.adapt === true, instructions: typeof draft.instructions === 'string' ? draft.instructions : '',
+          referenceAssetId: typeof draft.referenceAssetId === 'string' ? draft.referenceAssetId : null };
+      }
+      const videoDrafts: Record<string, VideoDraft> = Object.create(null);
+      for (const [id, value] of Object.entries(saved.videoDrafts ?? {})) {
+        if (!value || typeof value !== 'object') continue;
+        const { kind, ...draft } = value as VideoDraft;
+        if (kind !== 'video') continue;
+        try { videoDrafts[id] = { kind: 'video', ...parseVideoRequest({ ...draft, prompt: draft.prompt || 'defaults' }), prompt: draft.prompt || '' }; } catch { /* Ignore malformed saved options. */ }
+      }
+      const musicDrafts: Record<string, MusicDraft> = Object.create(null);
+      for (const [id, value] of Object.entries(saved.musicDrafts ?? {})) {
+        if (!value || typeof value !== 'object') continue;
+        const { kind, ...draft } = value as MusicDraft;
+        if (kind !== 'music') continue;
+        try { musicDrafts[id] = { kind: 'music', ...parseMusicRequest({ ...draft, prompt: draft.prompt || 'defaults' }), prompt: draft.prompt || '' }; } catch { /* Ignore malformed saved options. */ }
+      }
+      return { version: 1, tabs, drafts, imageDrafts, videoDrafts, musicDrafts, activeId: tabs.some((tab) => tab.id === saved.activeId) ? saved.activeId : null };
   } catch { return EMPTY_WORKSPACE; }
 }
 
@@ -112,21 +149,47 @@ function mergeWorkspace(base: WorkspaceSnapshot, local: WorkspaceSnapshot, remot
     if (!Object.hasOwn(local.drafts, id)) delete drafts[id];
     else drafts[id] = mergeRecord(base.drafts[id], local.drafts[id], remote.drafts[id]);
   }
+  const imageDrafts = { ...remote.imageDrafts };
+  for (const id of new Set([...Object.keys(base.imageDrafts ?? {}), ...Object.keys(local.imageDrafts ?? {})])) {
+    if (equal(base.imageDrafts?.[id], local.imageDrafts?.[id])) continue;
+    if (!Object.hasOwn(local.imageDrafts ?? {}, id)) delete imageDrafts[id];
+    else imageDrafts[id] = mergeRecord(base.imageDrafts?.[id], local.imageDrafts![id], remote.imageDrafts?.[id]);
+  }
+  const videoDrafts = { ...remote.videoDrafts };
+  for (const id of new Set([...Object.keys(base.videoDrafts ?? {}), ...Object.keys(local.videoDrafts ?? {})])) {
+    if (equal(base.videoDrafts?.[id], local.videoDrafts?.[id])) continue;
+    if (!Object.hasOwn(local.videoDrafts ?? {}, id)) delete videoDrafts[id];
+    else videoDrafts[id] = mergeRecord(base.videoDrafts?.[id], local.videoDrafts![id], remote.videoDrafts?.[id]);
+  }
+  const musicDrafts = { ...remote.musicDrafts };
+  for (const id of new Set([...Object.keys(base.musicDrafts ?? {}), ...Object.keys(local.musicDrafts ?? {})])) {
+    if (equal(base.musicDrafts?.[id], local.musicDrafts?.[id])) continue;
+    if (!Object.hasOwn(local.musicDrafts ?? {}, id)) delete musicDrafts[id];
+    else musicDrafts[id] = mergeRecord(base.musicDrafts?.[id], local.musicDrafts![id], remote.musicDrafts?.[id]);
+  }
   const tabs = new Map(remote.tabs.map((tab) => [tab.id, tab]));
+  const remoteKeys = new Map(remote.tabs.map((tab) => [tab.key, tab]));
+  const baseIds = new Map(base.tabs.map((tab) => [tab.id, tab]));
+  const localIds = new Set(local.tabs.map((tab) => tab.id));
   for (const previous of base.tabs) {
-    if (!local.tabs.some((tab) => tab.id === previous.id)) tabs.delete(previous.id);
+    // Eviction must not discard a pin or edit just saved by another window.
+    if (!localIds.has(previous.id) && equal(previous, tabs.get(previous.id))) tabs.delete(previous.id);
   }
   for (const tab of local.tabs) {
-    const previous = base.tabs.find((item) => item.id === tab.id);
+    const previous = baseIds.get(tab.id);
     if (equal(previous, tab)) continue;
-    const saved = tabs.get(tab.id) ?? remote.tabs.find((item) => item.key === tab.key);
+    const saved = tabs.get(tab.id) ?? remoteKeys.get(tab.key);
     const merged = mergeRecord(previous, tab, saved);
     merged.fields = mergeRecord(previous?.fields, tab.fields, saved?.fields);
     if (saved && saved.id !== tab.id) tabs.delete(saved.id);
     tabs.set(tab.id, merged);
   }
-  const uniqueTabs = [...tabs.values()].filter((tab, index, items) => items.findIndex((item) => item.key === tab.key) === index);
-  return { version: 1, drafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
+  const seen = new Set<string>();
+  const uniqueTabs = [...tabs.values()].filter((tab) => {
+    if (seen.has(tab.key)) return false;
+    seen.add(tab.key); return true;
+  });
+  return { version: 1, drafts, imageDrafts, videoDrafts, musicDrafts, tabs: uniqueTabs, activeId: uniqueTabs.some((tab) => tab.id === local.activeId) ? local.activeId : null };
 }
 
 /** Account-scoped, serializable workspace. No players, requests, or React trees live here. */
@@ -175,7 +238,8 @@ export class WorkspaceStore {
     if (!route) return null;
     const existing = this.snapshot.tabs.find((tab) => tab.key === route.key);
     if (existing && existing.href === route.href && this.snapshot.activeId === existing.id) return existing;
-    const tab = existing ? { ...existing, href: route.href } : { id: crypto.randomUUID(), key: route.key, href: route.href, title: route.title, scrollTop: 0, fields: {} };
+    const visitedAt = existing && this.snapshot.activeId === existing.id ? existing.visitedAt : Date.now();
+    const tab = existing ? { ...existing, href: route.href, visitedAt } : { visitedAt, id: crypto.randomUUID(), key: route.key, href: route.href, title: route.title, scrollTop: 0, fields: {} };
     this.change({ ...this.snapshot, activeId: tab.id,
       tabs: existing ? this.snapshot.tabs.map((item) => item.id === tab.id ? tab : item) : [...this.snapshot.tabs, tab] });
     return tab;
@@ -199,10 +263,15 @@ export class WorkspaceStore {
       .map((tab) => tab.id === id ? { ...tab, key: route.key, href: route.href, title: title || route.title, scrollTop: 0 } : tab) });
   }
 
-  updateTab(id: string, patch: Partial<Pick<WorkspaceTab, 'title' | 'scrollTop'>>): void {
+  updateTab(id: string, patch: Partial<Pick<WorkspaceTab, 'title' | 'scrollTop' | 'pinned'>>): void {
     const tab = this.snapshot.tabs.find((item) => item.id === id);
     if (!tab || Object.entries(patch).every(([key, value]) => tab[key as keyof WorkspaceTab] === value)) return;
     this.change({ ...this.snapshot, tabs: this.snapshot.tabs.map((item) => item.id === id ? { ...item, ...patch } : item) });
+  }
+
+  togglePin(id: string): void {
+    const view = this.snapshot.tabs.find((item) => item.id === id);
+    if (view) this.updateTab(id, { pinned: !view.pinned });
   }
 
   close(id: string): string | null {
@@ -216,6 +285,30 @@ export class WorkspaceStore {
 
   setDraft(id: string, patch: Partial<Draft>): void {
     this.change({ ...this.snapshot, drafts: { ...this.snapshot.drafts, [id]: { ...this.snapshot.drafts[id], ...patch } } });
+  }
+
+  setImageDraft(id: string, draft: ImageDraft): void {
+    this.change({ ...this.snapshot, imageDrafts: { ...this.snapshot.imageDrafts, [id]: draft } });
+  }
+  clearImageDraft(id: string): void {
+    const imageDrafts = { ...this.snapshot.imageDrafts }; delete imageDrafts[id];
+    this.change({ ...this.snapshot, imageDrafts });
+  }
+
+  setVideoDraft(id: string, draft: VideoDraft): void {
+    this.change({ ...this.snapshot, videoDrafts: { ...this.snapshot.videoDrafts, [id]: draft } });
+  }
+  clearVideoDraft(id: string): void {
+    const videoDrafts = { ...this.snapshot.videoDrafts }; delete videoDrafts[id];
+    this.change({ ...this.snapshot, videoDrafts });
+  }
+
+  setMusicDraft(id: string, draft: MusicDraft): void {
+    this.change({ ...this.snapshot, musicDrafts: { ...this.snapshot.musicDrafts, [id]: draft } });
+  }
+  clearMusicDraft(id: string): void {
+    const musicDrafts = { ...this.snapshot.musicDrafts }; delete musicDrafts[id];
+    this.change({ ...this.snapshot, musicDrafts });
   }
 
   clearDraft(id: string): void {
@@ -298,7 +391,10 @@ export class WorkspaceStore {
   dispose(): void { this.flush(); this.listeners.clear(); }
   private emit(): void { for (const listener of this.listeners) listener(); }
   private change(snapshot: WorkspaceSnapshot): void {
-    this.snapshot = snapshot;
+    const recentIds = new Set(snapshot.tabs.filter((view) => !view.pinned)
+      .sort((a, b) => (b.visitedAt ?? 0) - (a.visitedAt ?? 0)).slice(0, 100).map((view) => view.id));
+    this.snapshot = { ...snapshot, tabs: snapshot.tabs.filter((view) => view.id === snapshot.activeId || view.pinned || recentIds.has(view.id)
+      || Object.values(view.fields).some((value) => value !== null && value !== '')) };
     this.emit();
     clearTimeout(this.timer);
     this.timer = setTimeout(this.flush, 250);

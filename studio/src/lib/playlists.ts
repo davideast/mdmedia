@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -8,6 +10,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -111,7 +114,6 @@ export function updatePlaylist(
   patch: {
     title?: string;
     description?: string;
-    narrationIds?: string[];
   },
 ): void {
   const payload: Record<string, unknown> = {
@@ -125,9 +127,6 @@ export function updatePlaylist(
   if (patch.description !== undefined) {
     payload.description = patch.description.trim();
   }
-  if (patch.narrationIds !== undefined) {
-    payload.narrationIds = patch.narrationIds.slice(0, MAX_PLAYLIST_ITEMS);
-  }
   void updateDoc(playlistRef(id), payload).catch((err) => {
     console.error(`[playlists] failed to update playlist ${id}:`, err);
   });
@@ -135,25 +134,45 @@ export function updatePlaylist(
 
 /**
  * Adds or removes `narrationId` on `playlist`. Returns `true` if added,
- * `false` if removed.
+ * `false` if removed. The write is an atomic array change, so it never
+ * overwrites an edit an agent made to the same playlist in the meantime.
  */
 export function toggleNarrationInPlaylist(
   playlist: Playlist,
   narrationId: string,
 ): boolean {
   const exists = playlist.narrationIds.includes(narrationId);
-  const nextIds = exists
-    ? playlist.narrationIds.filter((id) => id !== narrationId)
-    : [...playlist.narrationIds, narrationId].slice(0, MAX_PLAYLIST_ITEMS);
-  updatePlaylist(playlist.id, { narrationIds: nextIds });
+  if (!exists && playlist.narrationIds.length >= MAX_PLAYLIST_ITEMS) {
+    throw new Error(`A playlist holds at most ${MAX_PLAYLIST_ITEMS} items.`);
+  }
+  void updateDoc(playlistRef(playlist.id), {
+    narrationIds: exists ? arrayRemove(narrationId) : arrayUnion(narrationId),
+    updatedAt: Date.now(),
+  }).catch((err) => {
+    console.error(`[playlists] failed to update playlist ${playlist.id}:`, err);
+  });
   return !exists;
 }
 
-export function reorderPlaylistTracks(
+/**
+ * Moves one track to `toIndex`, applied to the playlist as it is when the
+ * write lands, so tracks added or removed elsewhere are kept.
+ */
+export async function moveTrackInPlaylist(
   playlistId: string,
-  narrationIds: string[],
-): void {
-  updatePlaylist(playlistId, { narrationIds });
+  narrationId: string,
+  toIndex: number,
+): Promise<void> {
+  await runTransaction(db(), async (tx) => {
+    const ref = playlistRef(playlistId);
+    const snapshot = await tx.get(ref);
+    if (!snapshot.exists()) return;
+    const current = toPlaylist({ id: snapshot.id, data: () => snapshot.data() }).narrationIds;
+    if (!current.includes(narrationId)) return;
+    const next = current.filter((id) => id !== narrationId);
+    next.splice(Math.min(Math.max(toIndex, 0), next.length), 0, narrationId);
+    tx.update(ref, { narrationIds: next, updatedAt: Date.now() });
+  });
 }
 
 export function deletePlaylist(id: string): void {

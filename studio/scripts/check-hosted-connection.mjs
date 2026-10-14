@@ -1,6 +1,10 @@
 import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+
+const localEnv = new URL('../.env.local', import.meta.url);
+if (existsSync(localEnv)) process.loadEnvFile(localEnv);
 
 const cli = new URL('../node_modules/@pyric/cli/', import.meta.url);
 const require = createRequire(new URL('package.json', cli));
@@ -9,7 +13,7 @@ const { getHostedFirestore } = await import(new URL('dist/serve/worker/client/we
 const { toPageOriginWsUrl } = await import(new URL('dist/serve/entries/bridge-url.js', cli));
 
 /** Exercise Pyric's browser transport, including its five-second attach deadline. */
-export async function checkHostedConnection(pageUrl = 'http://localhost:3000') {
+export async function checkHostedConnection(pageUrl = `http://localhost:${process.env.PORT || '3000'}`) {
   const page = new URL(pageUrl);
   const response = await fetch(new URL('/__pyric/init.json', page), {
     cache: 'no-store', signal: AbortSignal.timeout(5_000),

@@ -50,12 +50,24 @@ export const adminAuth = (): Auth => getAuth(adminApp());
  */
 export const adminBucket = (): Bucket => getStorage(adminApp()).bucket();
 
+/** The signed-in, allowlisted person behind a browser ID token. */
+export interface VerifiedUser {
+  uid: string;
+  email: string;
+}
+
+/** Whether an email is on the allowlist. Every credential is checked against it on every use. */
+export async function isAllowlisted(email: string): Promise<boolean> {
+  const allowlistDoc = await adminDb().collection('allowlist').doc(email.trim().toLowerCase()).get();
+  return allowlistDoc.exists;
+}
+
 /**
- * Resolve the caller's uid from an `Authorization: Bearer <idToken>` header.
+ * Resolve the caller from an `Authorization: Bearer <idToken>` header.
  * Returns `null` for a missing, malformed, expired, revoked, or non-allowlisted
  * token; callers translate that into a plain "please sign in" response.
  */
-export async function verifyIdToken(authorizationHeader: string | null): Promise<string | null> {
+export async function verifyUser(authorizationHeader: string | null): Promise<VerifiedUser | null> {
   if (!authorizationHeader) return null;
 
   const [scheme, token] = authorizationHeader.split(' ');
@@ -68,10 +80,9 @@ export async function verifyIdToken(authorizationHeader: string | null): Promise
       return null;
     }
 
-    const allowlistDoc = await adminDb().collection('allowlist').doc(email).get();
-    if (!allowlistDoc.exists) return null;
+    if (!(await isAllowlisted(email))) return null;
 
-    return decoded.uid;
+    return { uid: decoded.uid, email };
   } catch (error) {
     // A silent 401 is undebuggable. Say why in development; stay quiet in
     // production, where a rejected token is an expected, uninteresting event.
@@ -80,4 +91,9 @@ export async function verifyIdToken(authorizationHeader: string | null): Promise
     }
     return null;
   }
+}
+
+/** The uid behind a browser ID token; see {@link verifyUser}. */
+export async function verifyIdToken(authorizationHeader: string | null): Promise<string | null> {
+  return (await verifyUser(authorizationHeader))?.uid ?? null;
 }

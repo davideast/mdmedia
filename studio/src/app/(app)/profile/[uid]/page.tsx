@@ -30,7 +30,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export default function ProfilePage() {
-  const { store, activeTab } = useWorkspace();
+  const { store, activeView } = useWorkspace();
   const params = useParams<{ uid: string }>();
   const { user, profile, updateProfile } = useAuth();
   const [items, setItems] = useState<Narration[]>([]);
@@ -56,7 +56,7 @@ export default function ProfilePage() {
   const minutes = Math.round(totalMs / 60_000);
 
   const commit = (patch: { displayName?: string; bio?: string }) => {
-    const tabId = activeTab?.id;
+    const tabId = activeView?.id;
     void updateProfile(patch, {
       onSaved: () => {
         if (!tabId) return;

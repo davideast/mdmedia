@@ -18,6 +18,128 @@ Open [http://localhost:3000](http://localhost:3000). The hosted sandbox listens 
 
 Set `GEMINI_API_KEY` in `studio/.env` for narration synthesis. The browser Firebase settings in `.env.local.example` are needed when connecting to the real Firebase project. Set `MDMEDIA_ALLOWED_DEV_ORIGINS` to a comma-separated list of Tailscale hostnames when using the development server through Tailscale.
 
+If you don't need unpublished Pyric changes, the exact tarballs referenced by
+`package.json` are also available from npm. Instead of packing a local checkout:
+
+```bash
+mkdir -p .pyric-local
+npm pack @pyric/cli@0.1.0-alpha.24 pyric@0.1.0-alpha.24 pyric-admin@0.1.0-alpha.24 create-pyric@0.1.0-alpha.24 --pack-destination .pyric-local --ignore-scripts
+```
+
+### Tailscale on Windows with mirrored WSL networking
+
+Use different Windows HTTPS ports and Linux backend ports to avoid conflicting
+listeners. Put these settings in `studio/.env.local`, replacing the hostname:
+
+```dotenv
+PORT=3001
+MDMEDIA_PYRIC_PORT=3474
+NEXT_PUBLIC_PYRIC_BRIDGE_PORT=3444
+MDMEDIA_ALLOWED_DEV_ORIGINS=<device>.<tailnet>.ts.net
+MDMEDIA_PUBLIC_ORIGIN=https://<device>.<tailnet>.ts.net:3443
+```
+
+From the repository root, start Studio and configure Windows Tailscale:
+
+```bash
+npm run studio:bg
+"/mnt/c/Program Files/Tailscale/tailscale.exe" serve --bg --https=3443 http://127.0.0.1:3001
+"/mnt/c/Program Files/Tailscale/tailscale.exe" serve --bg --https=3444 http://127.0.0.1:3474
+```
+
+Open `http://localhost:3001` locally or
+`https://<device>.<tailnet>.ts.net:3443` from a tailnet device. The background
+runner reads `.env.local` and passes the allowed hostname to Pyric. Local
+WebSockets use port 3474; remote browsers use HTTPS WebSockets on port 3444.
+Run `npm run studio:status`, `npm run studio:logs`, or `npm run studio:stop`
+from the root; restart with `npm --prefix studio run dev:restart`. Background
+processes last for the current WSL session; Tailscale's proxy configuration
+persists. To remove these proxies, run the Windows Tailscale executable with
+`serve --https=3443 off` and `serve --https=3444 off`.
+
+Check the backend with
+`npm --prefix studio run check:hosted-connection -- http://localhost:3001`.
+If WSL cannot resolve or reach its own Windows tailnet address, run the HTTPS
+check with Windows Node, which uses Windows tailnet DNS:
+
+```bash
+"/mnt/c/Program Files/nodejs/node.exe" "$(wslpath -w "$PWD/studio/scripts/check-hosted-connection.mjs")" https://<device>.<tailnet>.ts.net:3443
+```
+
+### Persistent production serving on Windows and WSL
+
+The production service runs the hosted Pyric sandbox and compiled Next.js app
+under `systemd --user`, with automatic restarts and journal logs. It uses the
+same `.env.local`, internal ports, tailnet HTTPS proxies, and persistent sandbox
+data as the WSL development setup above. Its scripts require Node 22.15+ and
+systemd enabled in WSL. Enable user lingering with `loginctl enable-linger "$USER"`
+if it is not already enabled.
+
+From the repository root, build and inspect a separate candidate:
+
+```bash
+npm --prefix studio run service:build
+npm --prefix studio run service:preview
+```
+
+In another terminal, run
+`node studio/scripts/check-hosted-assets.mjs http://127.0.0.1:3100` and inspect
+`http://localhost:3100/studio`. Stop the preview with Ctrl-C before releasing.
+Install the user service once, then release:
+
+```bash
+npm --prefix studio run service:install
+npm --prefix studio run service:release
+```
+
+The first release stops the background development server. Every release stops
+the production host, backs up the closed sandbox database under `.pyric/backups/`,
+swaps in the staged build and matching offline worker, and checks pages, assets,
+and browser SDK attachment. It restores the previous server if startup or checks
+fail. Previous production builds remain in `.next-hosted-previous-*`. Do not
+rebuild `.next-hosted` while its server is running.
+
+Install the Windows sign-in task from an elevated WSL session:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/studio/scripts/install-windows-startup.ps1")" -LinuxStudioPath "$PWD/studio" -Distribution Ubuntu -LinuxUser "$USER"
+powershell.exe -NoProfile -Command 'Start-ScheduledTask -TaskName MdmediaStudioWSL'
+"/mnt/c/Program Files/Tailscale/tailscale.exe" set --unattended=true
+```
+
+The task runs at standard Windows privileges when the distro owner signs in.
+It starts the user service and holds a foreground WSL process open; systemd
+services alone do not keep WSL active. The launcher is copied into
+`%LOCALAPPDATA%\MdmediaStudio`, so Windows can find it before WSL starts. Its
+Windows log is `startup.log` in that directory; the Linux keepalive log is
+`studio/.pyric/windows-startup.log`. This configuration starts at **Windows
+sign-in**, rather than before sign-in after a reboot. Password-free S4U tasks
+failed to launch this machine's WSL distribution. Keep Windows awake for access.
+
+Manage production from the repository root:
+
+```bash
+npm --prefix studio run service:status
+npm --prefix studio run service:logs
+npm --prefix studio run service:restart
+npm --prefix studio run service:stop
+```
+
+For subsequent updates, pull changes, rebuild affected dependencies when needed,
+then repeat `service:build`, preview, and `service:release`. A source pull alone
+does not update the compiled production server. `studio:bg` refuses to start a
+development server while the production service is active.
+
+To remove automatic startup, stop and unregister the Windows task:
+
+```powershell
+Stop-ScheduledTask -TaskName MdmediaStudioWSL
+Unregister-ScheduledTask -TaskName MdmediaStudioWSL -Confirm:$false
+```
+
+Then run `systemctl --user disable --now mdmedia-studio.service` in WSL. Disable
+the two Tailscale HTTPS proxies separately if you also want to remove sharing.
+
 ### Run at login on a Mac
 
 The LaunchAgents run the hosted Pyric sandbox and a compiled Next.js production server under `launchd`, bound to `127.0.0.1`, and configure private Tailscale HTTPS proxies on ports `3000` and `3473`. Tailscale must be signed in with HTTPS enabled for the tailnet. Generate the agents for this checkout and hostname so machine paths do not enter the repository:

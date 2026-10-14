@@ -6,6 +6,11 @@ export interface GenerateMusicOptions {
   model?: MusicModel;
   outputFormat?: MusicOutputFormat;
   referenceImages?: string[];
+  reference?: { bytes: Uint8Array; mimeType: string };
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  maxBytes?: number;
+  onInteraction?: (id: string) => void | Promise<void>;
 }
 
 export interface MusicGenerationResult {

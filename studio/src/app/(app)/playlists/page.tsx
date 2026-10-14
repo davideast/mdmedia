@@ -30,7 +30,7 @@ import { watchMyNarrations } from "@/lib/narrations";
 import {
   createPlaylist,
   deletePlaylist,
-  reorderPlaylistTracks,
+  moveTrackInPlaylist,
   toggleNarrationInPlaylist,
   updatePlaylist,
   watchMyPlaylists,
@@ -150,27 +150,11 @@ export default function PlaylistsPage() {
 
   const handleReorderTracks = (playlist: Playlist, fromIndex: number, toIndex: number) => {
     if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return;
-    const currentIds = [...playlist.narrationIds];
-    const [movedId] = currentIds.splice(fromIndex, 1);
+    const movedId = playlist.narrationIds[fromIndex];
     if (!movedId) return;
-    currentIds.splice(toIndex, 0, movedId);
-
-    // If this playlist is currently queued and playing, update the active queue tracks too
-    if (queue?.playlistId === playlist.id) {
-      const updatedTracks = currentIds
-        .map((id) => narrationMap.get(id))
-        .filter((item): item is Narration => item !== undefined);
-      const activeTrackIndex = updatedTracks.findIndex((t) => t.id === stream.id);
-      if (activeTrackIndex >= 0) {
-        // Retain current track position in the reordered queue
-      }
-    }
-
-    try {
-      reorderPlaylistTracks(playlist.id, currentIds);
-    } catch {
+    moveTrackInPlaylist(playlist.id, movedId, toIndex).catch(() => {
       toast.error("Could not reorder tracks.");
-    }
+    });
   };
 
   const handleMoveTrack = (playlist: Playlist, index: number, direction: "up" | "down") => {

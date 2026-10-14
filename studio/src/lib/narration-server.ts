@@ -1,3 +1,4 @@
+import { syncNarrationCatalog } from './media-catalog-server';
 /**
  * Server-side narration synthesis.
  *
@@ -186,6 +187,13 @@ interface ActiveStream {
 
 const activeStreams = new Map<string, ActiveStream>();
 
+/** Generations this person has running in this server process. */
+export function activeStreamCount(uid: string): number {
+  let count = 0;
+  for (const stream of activeStreams.values()) if (stream.uid === uid) count += 1;
+  return count;
+}
+
 /**
  * Cancels and deletes an entire narration and its associated data (Firestore document,
  * playlist references, and Storage assets) atomically in a transaction.
@@ -250,6 +258,7 @@ export async function purgeNarrationData(
     console.error(`[narration] storage cleanup failed for ${id}:`, err);
   }
 
+  await syncNarrationCatalog(id);
   return { deleted: true };
 }
 
@@ -319,6 +328,7 @@ export function createNarrationStream({
         if (error.actionableHint) updateData.errorActionableHint = error.actionableHint;
       }
       await docRef.update(updateData);
+      await syncNarrationCatalog(id);
     } catch {
       // The stream is already terminating; a failed status write must not mask it.
     }
@@ -401,6 +411,7 @@ export function createNarrationStream({
         tx.set(docRef, initialNarration);
       });
       docWritten = true;
+      await syncNarrationCatalog(id);
 
       if (cancelled) {
         await purgeDocumentAndStorage();
@@ -609,6 +620,7 @@ export function createNarrationStream({
           updatedAt: Date.now(),
         });
 
+        await syncNarrationCatalog(id);
         return durationMs;
       };
 
@@ -805,6 +817,17 @@ export async function loadReadableNarration(
     (narration.visibility === "shared" && (narration.sharedWith ?? []).includes(uid));
 
   return allowed ? narration : null;
+}
+
+/** The caller's own narrations, newest first (at most 500). */
+export async function listOwnNarrations(uid: string): Promise<Narration[]> {
+  const snapshot = await adminDb()
+    .collection("narrations")
+    .where("ownerUid", "==", uid)
+    .orderBy("createdAt", "desc")
+    .limit(500)
+    .get();
+  return snapshot.docs.map((doc) => ({ ...(doc.data() as Narration), id: doc.id }));
 }
 
 /**
