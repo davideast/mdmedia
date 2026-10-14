@@ -7,6 +7,7 @@ import {
   type ImageRequestBody,
   type MusicRequestBody,
   type ReferenceMediaType,
+  type SfxRequestBody,
   type StudioClient,
   type StudioMediaBodies,
   type StudioMediaResource,
@@ -262,6 +263,36 @@ export const musicCommand = defineCommand({
       const lyrics = args.lyrics === undefined ? undefined : await fs.promises.readFile(args.lyrics, 'utf8');
       const body = musicBody(await readPrompt(args.input, args.prompt), args, lyrics);
       await runMediaCommand(connectedClient(), 'music', body, args);
+    });
+  },
+});
+
+export function sfxBody(prompt: string, args: { duration?: string; influence?: string; loop?: boolean; format?: string }): SfxRequestBody {
+  const body: SfxRequestBody = { prompt: checkPrompt(prompt, 4000) };
+  const durationSeconds = numberIn('--duration', args.duration, 0.5, 30);
+  const format = oneOf('--format', args.format, AUDIO_FORMATS);
+  if (durationSeconds !== undefined || format || args.loop !== undefined) {
+    body.output = { ...(format ? { format } : {}), ...(durationSeconds === undefined ? {} : { durationSeconds }), ...(args.loop === undefined ? {} : { loop: args.loop }) };
+  }
+  const promptInfluence = numberIn('--influence', args.influence, 0, 1);
+  if (promptInfluence !== undefined) body.promptInfluence = promptInfluence;
+  return body;
+}
+
+export const sfxCommand = defineCommand({
+  meta: { name: 'sfx', description: 'Create a private sound effect in your studio' },
+  args: {
+    ...promptArgs,
+    duration: { type: 'string', alias: 'd', description: 'Length in seconds, 0.5 to 30 (default: the model chooses)' },
+    influence: { type: 'string', description: 'How closely to follow the prompt, 0 to 1 (default 0.3)' },
+    loop: { type: 'boolean', description: 'Make it loop seamlessly' },
+    format: { type: 'string', alias: 'f', description: 'mp3 or wav (default mp3)' },
+    ...runArgs,
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const body = sfxBody(await readPrompt(args.input, args.prompt), args);
+      await runMediaCommand(connectedClient(), 'sfx', body, args);
     });
   },
 });
