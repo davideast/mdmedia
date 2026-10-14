@@ -37,11 +37,12 @@ export const allowedMediaTypes = (caller: Caller): MediaType[] => [
   ...(hasScope(caller, 'images:read') ? ['image' as const] : []),
   ...(hasScope(caller, 'videos:read') ? ['video' as const] : []),
   ...(hasScope(caller, 'music:read') ? ['music' as const] : []),
+  ...(hasScope(caller, 'sfx:read') ? ['sfx' as const] : []),
 ];
 export interface MediaCursor { createdAt: number; id: string }
 export function parseMediaQuery(url: URL, allowed: MediaType[]) {
   const type = url.searchParams.get('type');
-  if (type && !['narration', 'image', 'video', 'music'].includes(type)) throw new MediaError(400, 'invalid_type', 'Unknown media type.');
+  if (type && !['narration', 'image', 'video', 'music', 'sfx'].includes(type)) throw new MediaError(400, 'invalid_type', 'Unknown media type.');
   if (type && !allowed.includes(type as MediaType)) throw new MediaError(403, 'insufficient_scope', 'This connection cannot read that media type.');
   const q = url.searchParams.get('q')?.trim() ?? '';
   if (q.length > 200) throw new MediaError(400, 'invalid_query', 'Search is limited to 200 characters.');
@@ -108,7 +109,7 @@ export async function listGenerations(caller: Caller, url: URL) {
       const summary = narrationSummary(data.itemId, source.data()!);
       data = { ...data, ...summary, id: data.id, phase: summary.status };
     }
-    if (data.type === 'video' || data.type === 'music') {
+    if (data.type === 'video' || data.type === 'music' || data.type === 'sfx') {
       const source = (await adminDb().collection('mediaItems').doc(`${data.type}_${data.itemId}`).get()).data();
       if (!source || source.ownerUid !== caller.uid || source.type !== data.type) return null;
       data = { ...data, title: source.title };

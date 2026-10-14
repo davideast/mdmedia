@@ -1,10 +1,11 @@
 /** Shared navigation vocabulary. Editors and generation options remain medium-specific. */
-export type MediaType = 'narration' | 'image' | 'video' | 'music';
+export type MediaType = 'narration' | 'image' | 'video' | 'music' | 'sfx';
 export const MEDIA_TYPES: Array<{ type: MediaType; label: string; composer: string; available: boolean }> = [
   { type: 'narration', label: 'Narration', composer: '/studio', available: true },
   { type: 'image', label: 'Image', composer: '/studio/image', available: true },
   { type: 'video', label: 'Video', composer: '/studio/video', available: true },
   { type: 'music', label: 'Music', composer: '/studio/music', available: true },
+  { type: 'sfx', label: 'Sound effect', composer: '/studio/sfx', available: false },
 ];
 export type GenerationStatus = 'queued' | 'generating' | 'ready' | 'error' | 'interrupted';
 export interface MediaSummary {
@@ -69,7 +70,7 @@ export interface ImageResource extends MediaSummary {
 }
 
 export interface ImageGenerationResource extends GenerationBase { type: 'image'; request: ImageRequest }
-export type GenerationResource = ImageGenerationResource | VideoGenerationResource | MusicGenerationResource;
+export type GenerationResource = ImageGenerationResource | VideoGenerationResource | MusicGenerationResource | SfxGenerationResource;
 export interface VideoRequest {
   prompt: string;
   adaptation: { enabled: boolean; instructions: string };
@@ -109,5 +110,21 @@ export interface MusicResource extends MediaSummary {
   type: 'music'; visibility: 'private'; request: MusicRequest;
   latestGenerationId: string; latestSuccessfulGenerationId: string | null;
   latestGeneration: MusicGenerationResource; result: MusicGenerationResource | null;
+  links: { self: string; web: string; generations: string };
+}
+
+/** API only: sound effects have no composer or web page yet. */
+export interface SfxRequest {
+  prompt: string;
+  output: { format: 'mp3' | 'wav'; durationSeconds: number | null; loop: boolean };
+  promptInfluence: number;
+}
+export interface SfxGenerationResource extends GenerationBase {
+  type: 'sfx'; request: SfxRequest; provider: 'elevenlabs'; waveform: number[]; durationSeconds: number | null;
+}
+export interface SfxResource extends MediaSummary {
+  type: 'sfx'; visibility: 'private'; request: SfxRequest;
+  latestGenerationId: string; latestSuccessfulGenerationId: string | null;
+  latestGeneration: SfxGenerationResource; result: SfxGenerationResource | null;
   links: { self: string; web: string; generations: string };
 }
