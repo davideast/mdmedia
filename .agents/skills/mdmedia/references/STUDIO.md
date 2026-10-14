@@ -74,6 +74,11 @@ out (`--timeout`, default 900 seconds) is not a failure; check later with:
 mdmedia studio status <id> --type image|video|music|sfx --json
 ```
 
+If a command fails after the item was created (a lost connection, a download
+or save error), the error includes the item's `id`. Check on it with `status`
+instead of running the command again: a second run starts, and pays for, a
+second generation.
+
 ## Narrate into a playlist
 
 ```sh
