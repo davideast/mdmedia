@@ -243,6 +243,9 @@ export interface PollOptions<T> {
 /** Failures that can pass on their own: the studio unreachable, restarting, or busy. */
 const transient = (error: unknown) => error instanceof StudioApiError && (error.status === 0 || error.status === 429 || error.status >= 500);
 
+/** Failures after which a request may or may not have taken effect; 503 is the studio's own answer. */
+const lostAnswer = (error: unknown) => error instanceof StudioApiError && [0, 500, 502, 504].includes(error.status);
+
 /**
  * Reads until `done` or `timeoutMs` passes, then returns the last value read.
  * Generation continues on the server, so a read that fails transiently is
@@ -388,9 +391,21 @@ export class StudioClient {
     return new Uint8Array(await response.arrayBuffer());
   }
 
-  /** Starts a media item. Each call sends a fresh Idempotency-Key unless the caller passes one to retry with. */
-  createMedia<T extends StudioMediaType>(type: T, body: StudioMediaBodies[T], idempotencyKey: string = randomUUID()): Promise<CreatedMedia<T>> {
-    return this.request('POST', `/api/v1/${MEDIA_ROUTES[type]}`, body, true, { 'Idempotency-Key': idempotencyKey });
+  /**
+   * Starts a media item. Each call sends a fresh Idempotency-Key unless the caller
+   * passes one. A create whose answer was lost is retried with the same key, so the
+   * studio replays the first attempt instead of starting, and charging for, another.
+   */
+  async createMedia<T extends StudioMediaType>(type: T, body: StudioMediaBodies[T], idempotencyKey: string = randomUUID(), retryDelaysMs: readonly number[] = [1000, 4000]): Promise<CreatedMedia<T>> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.request<CreatedMedia<T>>('POST', `/api/v1/${MEDIA_ROUTES[type]}`, body, true, { 'Idempotency-Key': idempotencyKey });
+      } catch (error) {
+        const delay = retryDelaysMs[attempt];
+        if (delay === undefined || !lostAnswer(error)) throw error;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
   }
 
   createImage(body: ImageRequestBody, idempotencyKey?: string): Promise<CreatedMedia<'image'>> {
