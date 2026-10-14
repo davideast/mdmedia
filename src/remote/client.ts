@@ -435,15 +435,17 @@ export class StudioClient {
   }
 
   /**
-   * Downloads an asset link from a resource. Only its path is used, resolved
-   * against this studio, so the key never follows a link to another host.
+   * Opens an asset link from a resource as a stream, so a large video never has
+   * to fit in memory. Only its path is used, resolved against this studio, so
+   * the key never follows a link to another host.
    */
-  async downloadAsset(link: string): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  async downloadAsset(link: string): Promise<{ body: ReadableStream<Uint8Array>; mimeType: string }> {
     let url: URL | null = null;
     try { url = new URL(link, this.base); } catch { /* Not a URL. */ }
     if (!url?.pathname.startsWith('/api/v1/')) throw new StudioApiError(400, 'invalid_asset_link', 'That is not a studio asset link.');
     const response = await this.send('GET', `${url.pathname}${url.search}`, { headers: { Accept: '*/*' } });
-    return { bytes: new Uint8Array(await response.arrayBuffer()), mimeType: response.headers.get('content-type') ?? 'application/octet-stream' };
+    if (!response.body) throw new StudioApiError(502, 'empty_asset', 'The studio sent an empty file.');
+    return { body: response.body, mimeType: response.headers.get('content-type') ?? 'application/octet-stream' };
   }
 
   /** Polls until the item's latest attempt finishes or `timeoutMs` passes. */

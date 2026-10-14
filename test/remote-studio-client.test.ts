@@ -162,7 +162,7 @@ describe('studio media', () => {
   it('downloads an asset from this studio only, whatever origin the link names', async () => {
     const { calls, client } = recording(() => new Response(new Uint8Array([1, 2, 3]), { headers: { 'Content-Type': 'audio/mpeg' } }));
     const download = await client.downloadAsset('https://studio.tail1234.ts.net/api/v1/assets/a1/content?download=1');
-    expect([...download.bytes]).toEqual([1, 2, 3]);
+    expect([...new Uint8Array(await new Response(download.body).arrayBuffer())]).toEqual([1, 2, 3]);
     expect(download.mimeType).toBe('audio/mpeg');
     expect(calls[0]!.url).toBe('http://localhost:3000/api/v1/assets/a1/content?download=1');
     await expect(client.downloadAsset('https://elsewhere.example/steal')).rejects.toMatchObject({ code: 'invalid_asset_link' });

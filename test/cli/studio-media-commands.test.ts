@@ -259,6 +259,22 @@ describe('studio media flow', () => {
     expect(process.exitCode).toBe(0);
   });
 
+  it('rejects an --output that cannot be written before creating anything', async () => {
+    const dir = tempDir();
+    const { calls, client } = fakeStudio('image');
+    await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { output: path.join(dir, 'missing', 'out.png') })).rejects.toThrow('does not exist or cannot be written');
+    await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { output: dir })).rejects.toThrow('is a folder');
+    expect(calls).toHaveLength(0);
+  });
+
+  it('leaves no file behind when the download fails', async () => {
+    const output = path.join(tempDir(), 'out.png');
+    const { client } = fakeStudio('image');
+    spyOn(client, 'downloadAsset').mockResolvedValue({ body: new ReadableStream({ pull(controller) { controller.error(new Error('connection reset')); } }), mimeType: 'image/png' });
+    await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { output })).rejects.toThrow('connection reset');
+    expect(fs.readdirSync(path.dirname(output))).toEqual([]);
+  });
+
   it('rejects a bad --timeout before creating anything', async () => {
     const { calls, client } = fakeStudio('image');
     await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { wait: true, timeout: 'soon' })).rejects.toThrow('--timeout must be a number at least 1');
