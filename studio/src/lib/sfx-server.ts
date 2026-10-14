@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { DEFAULT_ELEVENLABS_SFX_MODEL, ElevenLabsSoundEffectsProvider } from 'mdmedia/sfx';
 import { videoToolsAvailable } from './video-assets-server';
-import { saveSfxAsset, type SfxAsset } from './sfx-assets-server';
+import { saveSfxAsset, sfxOriginalPath, storeSfxOriginal, type SfxAsset } from './sfx-assets-server';
 import { readSfxDefaults } from './sfx-request';
 import { adminBucket, adminDb } from './firebase-admin';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
@@ -163,12 +163,15 @@ async function runJob(id: string) {
     // No retries: a synchronous create has no receipt, so a repeated call could pay twice.
     const result = await new ElevenLabsSoundEffectsProvider(elevenLabsKey(), 0, job.model).generate(prompt, { outputFormat: output.format, promptInfluence, loop: output.loop,
       ...(output.durationSeconds === null ? {} : { durationSeconds: output.durationSeconds }) });
+    // Store the paid audio before anything else can fail; recovery decodes from this copy.
+    await storeSfxOriginal(job.ownerUid, result.audioBytes, job.id, output.format);
     await checkpoint(job, token, { phase: 'saving' });
     const asset = await saveSfxAsset(job.ownerUid, result.audioBytes, job.id, job.itemId, output.format);
     await finishGeneration(job, token, asset, null, 'ready');
   } catch (error) {
     const status = Number((error as { status?: number }).status);
-    if (!submitted || [400, 401, 403, 404, 422, 429].includes(status)) {
+    if (error instanceof MediaError) await finishGeneration(job, token, null, { code: error.code, message: error.message }, 'error').catch(() => {});
+    else if (!submitted || [400, 401, 403, 404, 422, 429].includes(status)) {
       await finishGeneration(job, token, null, { code: submitted ? 'provider_rejected' : 'preparation_failed', message: submitted ? 'ElevenLabs could not accept this request. Your previous sound effect is preserved.' : 'Could not prepare this sound effect request. Your prompt is preserved.' }, 'error').catch(() => {});
     } else await recoverJob(job, token).catch(() => {});
   } finally { clearInterval(heartbeat); }
@@ -183,15 +186,16 @@ async function checkpoint(job: SfxGeneration, token: string, patch: Partial<SfxG
 }
 /** Finish from saved output only. Without a receipt an unknown outcome is never regenerated automatically. */
 async function recoverJob(job: SfxGeneration, token: string) {
-  let asset: StoredAsset | null = null;
+  let asset: StoredAsset | null = null, failure: SfxGeneration['error'] = null;
   try { asset = await loadOwnedAsset(job.ownerUid, `sfx_${job.id}`); } catch { /* Try durable storage, never a new paid create. */ }
-  if (!asset) {
-    try {
-      const [bytes] = await adminBucket().file(`media/${job.ownerUid}/sfx_${job.id}/original`).download();
-      asset = await saveSfxAsset(job.ownerUid, new Uint8Array(bytes), job.id, job.itemId, job.request.output.format);
-    } catch { /* Unknown outcome is explicit and requires user retry. */ }
+  const original = asset ? null : await adminBucket().file(sfxOriginalPath(job.ownerUid, job.id)).download().then(([bytes]) => new Uint8Array(bytes), () => null);
+  // Stored audio that still cannot be processed ends the attempt as an error instead of being retried in a loop.
+  if (original) {
+    try { asset = await saveSfxAsset(job.ownerUid, original, job.id, job.itemId, job.request.output.format); }
+    catch { failure = { code: 'invalid_sfx', message: 'ElevenLabs returned audio that could not be decoded. Your previous sound effect is preserved.' }; }
   }
-  await finishGeneration(job, token, asset, asset ? null : { code: 'generation_interrupted', message: 'This attempt did not complete. Generating again starts a new request; your previous sound effect is preserved.' }, asset ? 'ready' : 'interrupted');
+  // Without stored audio the outcome is unknown, so it is explicit and requires a user retry.
+  await finishGeneration(job, token, asset, asset ? null : failure ?? { code: 'generation_interrupted', message: 'This attempt did not complete. Generating again starts a new request; your previous sound effect is preserved.' }, asset ? 'ready' : failure ? 'error' : 'interrupted');
 }
 
 type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
