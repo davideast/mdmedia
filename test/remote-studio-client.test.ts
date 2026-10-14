@@ -118,6 +118,31 @@ describe('studio media', () => {
     expect(calls.map((call) => call.headers.get('idempotency-key'))).toEqual(['retry-key-123', 'retry-key-123']);
   });
 
+  it('retries a create whose answer was lost with the same Idempotency-Key', async () => {
+    const answers = [
+      () => { throw new TypeError('fetch failed'); },
+      () => Response.json({ error: { code: 'http_502', message: 'Bad gateway' } }, { status: 502 }),
+      () => Response.json({ id: 'item1', replayed: true }, { status: 202 }),
+    ];
+    const { calls, client } = recording(() => answers.shift()!());
+    expect((await client.createMedia('video', { prompt: 'A train' }, undefined, [1, 1])).replayed).toBe(true);
+    const keys = calls.map((call) => call.headers.get('idempotency-key'));
+    expect(keys).toHaveLength(3);
+    expect(new Set(keys).size).toBe(1);
+  });
+
+  it('does not retry a create the studio answered', async () => {
+    const { calls, client } = recording(() => Response.json({ error: { code: 'provider_unavailable', message: 'Not configured.' } }, { status: 503 }));
+    await expect(client.createMedia('sfx', { prompt: 'A door' }, undefined, [1, 1])).rejects.toMatchObject({ code: 'provider_unavailable' });
+    expect(calls).toHaveLength(1);
+  });
+
+  it('gives up after its retries', async () => {
+    const { calls, client } = recording(() => { throw new TypeError('fetch failed'); });
+    await expect(client.createMedia('image', { prompt: 'x' }, undefined, [1])).rejects.toMatchObject({ code: 'unreachable' });
+    expect(calls).toHaveLength(2);
+  });
+
   it('reads an item by type and id', async () => {
     const { calls, client } = recording(() => Response.json(item('ready')));
     expect((await client.media('video', 'a/b')).id).toBe('item1');
