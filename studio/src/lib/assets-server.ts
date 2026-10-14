@@ -5,7 +5,7 @@ import type { AssetResource } from './media-types';
 
 export interface StoredAsset {
   id: string; ownerUid: string; purpose: 'reference' | 'output';
-  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'music'; durationMs?: number;
+  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'music' | 'sfx'; durationMs?: number;
   path: string; thumbnailPath: string; mimeType: string;
   width: number; height: number; byteLength: number; createdAt: number;
 }

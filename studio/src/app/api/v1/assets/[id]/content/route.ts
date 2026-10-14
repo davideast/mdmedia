@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 export const GET = (request: Request, context: { params: Promise<{ id: string }> }) => mediaApi(async () => {
   const caller = await authenticate(request); if (!caller) return unauthorized();
   const asset = await loadOwnedAsset(caller.uid, (await context.params).id);
-  const scope = asset.mediaType === 'music' ? 'music:read' : asset.mediaType === 'video' ? 'videos:read' : 'images:read';
+  const scope = asset.mediaType === 'sfx' ? 'sfx:read' : asset.mediaType === 'music' ? 'music:read' : asset.mediaType === 'video' ? 'videos:read' : 'images:read';
   if (!hasScope(caller, scope)) return forbiddenScope(scope);
   const thumbnail = new URL(request.url).searchParams.get('thumbnail') === '1';
   const [bytes] = await adminBucket().file(thumbnail ? asset.thumbnailPath : asset.path).download();
