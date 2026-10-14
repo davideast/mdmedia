@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { StudioApiError, StudioClient } from '../../src/remote/client.js';
-import { imageBody, readReference, runMediaCommand, videoBody } from '../../src/cli/studio-media-commands.js';
+import { imageBody, musicBody, readReference, runMediaCommand, videoBody } from '../../src/cli/studio-media-commands.js';
 import { guarded } from '../../src/cli/studio-support.js';
 
 const KEY = 'mdm_ABCDEFGHIJKLMNOP_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG';
@@ -111,6 +111,39 @@ describe('studio video arguments', () => {
     ]);
     expect(JSON.parse(String(calls[1]!.body))).toEqual({ prompt: 'A train', referenceRole: 'first_frame', referenceAssetId: 'ref1' });
     expect(fs.existsSync(output)).toBe(true);
+  });
+});
+
+describe('studio music arguments', () => {
+  it('sends only the prompt when nothing else is set', () => {
+    expect(musicBody('A waltz', {})).toEqual({ prompt: 'A waltz' });
+  });
+
+  it('maps clip mode, format, vocals, lyrics, and adaptation', () => {
+    expect(musicBody('A waltz', { clip: true, format: 'WAV', vocals: 'vocals', adapt: true }, 'La la la')).toEqual({
+      prompt: 'A waltz',
+      output: { mode: 'clip', format: 'wav' },
+      vocals: 'vocals',
+      lyrics: 'La la la',
+      adaptation: { enabled: true },
+    });
+    expect(musicBody('x', { clip: false })).toEqual({ prompt: 'x', output: { mode: 'song' } });
+  });
+
+  it('rejects bad values before any request is made', () => {
+    expect(() => musicBody('x', { format: 'ogg' })).toThrow('--format must be one of mp3, wav (got "ogg")');
+    expect(() => musicBody('x', { vocals: 'choir' })).toThrow('--vocals must be one of auto, vocals, instrumental');
+    expect(() => musicBody('x', { vocals: 'instrumental' }, 'Words')).toThrow('--lyrics cannot be used with --vocals instrumental.');
+    expect(() => musicBody('x', {}, 'y'.repeat(8001))).toThrow('--lyrics is limited to 8,000 characters.');
+  });
+
+  it('uploads a music-scoped reference', async () => {
+    const reference = path.join(tempDir(), 'cover.png');
+    fs.writeFileSync(reference, new Uint8Array([1]));
+    const { calls, client } = fakeStudio('music');
+    await runMediaCommand(client, 'music', musicBody('A waltz', {}), { reference });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['POST /api/v1/assets?media=music', 'POST /api/v1/music']);
+    expect(logs).toEqual(['Music started: http://localhost:3000/music/item1']);
   });
 });
 

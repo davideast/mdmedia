@@ -5,6 +5,7 @@ import {
   isFinished,
   mediaStatus,
   type ImageRequestBody,
+  type MusicRequestBody,
   type ReferenceMediaType,
   type StudioClient,
   type StudioMediaBodies,
@@ -222,6 +223,45 @@ export const videoCommand = defineCommand({
     await guarded(args.json, async () => {
       const body = videoBody(await readPrompt(args.input, args.prompt), args);
       await runMediaCommand(connectedClient(), 'video', body, args);
+    });
+  },
+});
+
+const AUDIO_FORMATS = ['mp3', 'wav'] as const;
+
+export function musicBody(prompt: string, args: { clip?: boolean; format?: string; vocals?: string; adapt?: boolean; instructions?: string }, lyrics?: string): MusicRequestBody {
+  const body: MusicRequestBody = { prompt: checkPrompt(prompt, 32_000) };
+  const format = oneOf('--format', args.format, AUDIO_FORMATS);
+  if (args.clip !== undefined || format) body.output = { ...(args.clip === undefined ? {} : { mode: args.clip ? 'clip' : 'song' }), ...(format ? { format } : {}) };
+  const vocals = oneOf('--vocals', args.vocals, ['auto', 'vocals', 'instrumental'] as const);
+  if (vocals) body.vocals = vocals;
+  if (lyrics !== undefined) {
+    if (lyrics.length > 8000) throw new Error('--lyrics is limited to 8,000 characters.');
+    if (vocals === 'instrumental' && lyrics.trim()) throw new Error('--lyrics cannot be used with --vocals instrumental.');
+    body.lyrics = lyrics;
+  }
+  const adaptation = adaptationFrom(args);
+  if (adaptation) body.adaptation = adaptation;
+  return body;
+}
+
+export const musicCommand = defineCommand({
+  meta: { name: 'music', description: 'Create private music in your studio' },
+  args: {
+    ...promptArgs,
+    clip: { type: 'boolean', description: 'A 30-second clip instead of a full song (--no-clip for a song)' },
+    format: { type: 'string', alias: 'f', description: 'mp3 or wav (default: your studio default, mp3 unless changed)' },
+    vocals: { type: 'string', description: 'auto, vocals, or instrumental (default: your studio default, auto unless changed)' },
+    lyrics: { type: 'string', description: 'File with lyrics to sing' },
+    ...referenceArg,
+    ...adaptArgs,
+    ...runArgs,
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const lyrics = args.lyrics === undefined ? undefined : await fs.promises.readFile(args.lyrics, 'utf8');
+      const body = musicBody(await readPrompt(args.input, args.prompt), args, lyrics);
+      await runMediaCommand(connectedClient(), 'music', body, args);
     });
   },
 });
