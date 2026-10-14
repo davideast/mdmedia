@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { StudioApiError, StudioClient, type StudioMediaType } from '../remote/client.js';
 import { readCredentials } from '../remote/credentials.js';
 
@@ -36,4 +37,20 @@ export async function guarded(json: boolean | undefined, run: () => Promise<void
     else console.error(`mdmedia studio: ${message}`);
     process.exitCode = 1;
   }
+}
+
+/**
+ * Text from an inline flag, `--input <file>` (`-` for stdin), or piped stdin.
+ * `inline` names the flag and what the text is, for the messages.
+ */
+export async function readSource(input: string | undefined, text: string | undefined, inline: { flag: string; what: string }): Promise<string> {
+  if (text !== undefined && input !== undefined) throw new Error(`Pass either --input or ${inline.flag}, not both.`);
+  if (text !== undefined) return text;
+  if (input === '-' || (input === undefined && !process.stdin.isTTY)) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+    return Buffer.concat(chunks).toString('utf8');
+  }
+  if (input === undefined) throw new Error(`Pass --input <file>, ${inline.flag} "…", or pipe ${inline.what} on stdin.`);
+  return fs.promises.readFile(input, 'utf8');
 }

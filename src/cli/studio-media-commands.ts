@@ -14,7 +14,7 @@ import {
   type StudioMediaType,
   type VideoRequestBody,
 } from '../remote/client.js';
-import { StartedMediaError, connectedClient, guarded } from './studio-support.js';
+import { StartedMediaError, connectedClient, guarded, readSource } from './studio-support.js';
 
 const LABELS: Record<StudioMediaType, string> = { image: 'Image', video: 'Video', music: 'Music', sfx: 'Sound effect' };
 const REFERENCE_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
@@ -24,17 +24,7 @@ const MAX_INSTRUCTIONS = 4000;
 export const IMAGE_ASPECTS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'] as const;
 
 /** The prompt from `--prompt`, `--input <file>` (`-` for stdin), or piped stdin. */
-export async function readPrompt(input: string | undefined, prompt: string | undefined): Promise<string> {
-  if (prompt !== undefined && input !== undefined) throw new Error('Pass either --input or --prompt, not both.');
-  if (prompt !== undefined) return prompt;
-  if (input === '-' || (input === undefined && !process.stdin.isTTY)) {
-    const chunks: Buffer[] = [];
-    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
-    return Buffer.concat(chunks).toString('utf8');
-  }
-  if (input === undefined) throw new Error('Pass --prompt "…", --input <file>, or pipe the prompt on stdin.');
-  return fs.promises.readFile(input, 'utf8');
-}
+export const readPrompt = (input: string | undefined, prompt: string | undefined) => readSource(input, prompt, { flag: '--prompt', what: 'the prompt' });
 
 export function checkPrompt(prompt: string, max: number): string {
   if (!prompt.trim()) throw new Error('The prompt is empty.');
