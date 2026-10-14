@@ -22,7 +22,7 @@ export interface SfxGeneration {
   error: { code: string; message: string } | null;
 }
 export const configuredSfxModel = () => process.env.MDMEDIA_SFX_MODEL?.trim() || DEFAULT_ELEVENLABS_SFX_MODEL;
-export const elevenLabsKey = () => process.env.ELEVENLABS_API_KEY || process.env.ELEVEN_LABS_KEY || '';
+export const elevenLabsKey = () => process.env.ELEVENLABS_API_KEY ?? process.env.ELEVEN_LABS_KEY ?? '';
 const titleFor = (prompt: string) => prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 100) || 'Untitled sound effect';
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const itemRef = (id: string) => adminDb().collection('mediaItems').doc(`sfx_${id}`);
@@ -158,10 +158,14 @@ async function runJob(id: string) {
   let submitted = false;
   try {
     const { prompt, output, promptInfluence } = job.request;
+    // Built before submission, so a key removed after acceptance is a configuration error rather than an unknown outcome.
+    // No retries: a synchronous create has no receipt, so a repeated call could pay twice.
+    let provider: ElevenLabsSoundEffectsProvider;
+    try { provider = new ElevenLabsSoundEffectsProvider(elevenLabsKey(), 0, job.model); }
+    catch { throw new MediaError(503, 'provider_unavailable', 'ElevenLabs sound effects are not configured on this Studio. Your prompt is preserved.'); }
     await checkpoint(job, token, { phase: 'generating', preparedPrompt: prompt });
     submitted = true;
-    // No retries: a synchronous create has no receipt, so a repeated call could pay twice.
-    const result = await new ElevenLabsSoundEffectsProvider(elevenLabsKey(), 0, job.model).generate(prompt, { outputFormat: output.format, promptInfluence, loop: output.loop,
+    const result = await provider.generate(prompt, { outputFormat: output.format, promptInfluence, loop: output.loop,
       ...(output.durationSeconds === null ? {} : { durationSeconds: output.durationSeconds }) });
     // Store the paid audio before anything else can fail; recovery decodes from this copy.
     await storeSfxOriginal(job.ownerUid, result.audioBytes, job.id, output.format);
@@ -169,11 +173,13 @@ async function runJob(id: string) {
     const asset = await saveSfxAsset(job.ownerUid, result.audioBytes, job.id, job.itemId, output.format);
     await finishGeneration(job, token, asset, null, 'ready');
   } catch (error) {
-    const status = Number((error as { status?: number }).status);
-    if (error instanceof MediaError) await finishGeneration(job, token, null, { code: error.code, message: error.message }, 'error').catch(() => {});
-    else if (!submitted || [400, 401, 403, 404, 422, 429].includes(status)) {
-      await finishGeneration(job, token, null, { code: submitted ? 'provider_rejected' : 'preparation_failed', message: submitted ? 'ElevenLabs could not accept this request. Your previous sound effect is preserved.' : 'Could not prepare this sound effect request. Your prompt is preserved.' }, 'error').catch(() => {});
-    } else await recoverJob(job, token).catch(() => {});
+    // Every ElevenLabs 4xx is a refusal; 5xx and network failures are unknown outcomes that are never called again.
+    const status = error instanceof Error && error.name === 'ElevenLabsRequestError' ? Number((error as Error & { status?: unknown }).status) : NaN;
+    const failure = error instanceof MediaError ? { code: error.code, message: error.message }
+      : !submitted ? { code: 'preparation_failed', message: 'Could not prepare this sound effect request. Your prompt is preserved.' }
+      : status >= 400 && status < 500 ? { code: 'provider_rejected', message: 'ElevenLabs could not accept this request. Your previous sound effect is preserved.' } : null;
+    if (failure) await finishGeneration(job, token, null, failure, 'error').catch(() => {});
+    else await recoverJob(job, token).catch(() => {});
   } finally { clearInterval(heartbeat); }
 }
 async function checkpoint(job: SfxGeneration, token: string, patch: Partial<SfxGeneration>) {
