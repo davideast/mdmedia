@@ -380,14 +380,7 @@ export class StudioClient {
   }
 
   async audio(id: string): Promise<Uint8Array> {
-    if (!this.apiKey) throw new StudioApiError(401, 'not_logged_in', 'Not connected to a studio. Run `mdmedia studio login`.');
-    const response = await this.fetchImpl(new URL(`/api/v1/narrations/${encodeURIComponent(id)}/audio`, this.base), {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
-      throw new StudioApiError(response.status, body?.error?.code ?? `http_${response.status}`, body?.error?.message ?? 'Could not download the audio.');
-    }
+    const response = await this.send('GET', `/api/v1/narrations/${encodeURIComponent(id)}/audio`, { headers: { Accept: '*/*' } });
     return new Uint8Array(await response.arrayBuffer());
   }
 

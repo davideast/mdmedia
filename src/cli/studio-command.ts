@@ -20,7 +20,7 @@ import {
 } from '../remote/credentials.js';
 import { installSkill, skillSourceDir } from '../remote/skill.js';
 import { describeMedia, imageCommand, musicCommand, oneOf, sfxCommand, videoCommand } from './studio-media-commands.js';
-import { connectedClient, guarded } from './studio-support.js';
+import { connectedClient, guarded, readSource } from './studio-support.js';
 
 function openInBrowser(url: string): void {
   const command = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'cmd' : 'xdg-open';
@@ -111,18 +111,6 @@ const options = defineCommand({
   },
 });
 
-async function readInput(input: string | undefined, text: string | undefined): Promise<string> {
-  if (text !== undefined && input !== undefined) throw new Error('Pass either --input or --text, not both.');
-  if (text !== undefined) return text;
-  if (input === '-' || (input === undefined && !process.stdin.isTTY)) {
-    const chunks: Buffer[] = [];
-    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
-    return Buffer.concat(chunks).toString('utf8');
-  }
-  if (input === undefined) throw new Error('Pass --input <file>, --text "…", or pipe markdown on stdin.');
-  return fs.promises.readFile(input, 'utf8');
-}
-
 type PositionArgs = { start?: boolean; end?: boolean; before?: string; after?: string };
 
 /** `--start`, `--end`, `--before <id>`, or `--after <id>`; at most one. */
@@ -190,7 +178,7 @@ const narrate = defineCommand({
   async run({ args }) {
     await guarded(args.json, async () => {
       const client = connectedClient();
-      const markdown = await readInput(args.input, args.text);
+      const markdown = await readSource(args.input, args.text, { flag: '--text', what: 'markdown' });
       const body: Record<string, unknown> = { markdown };
       const set = (key: string, value: unknown) => { if (value !== undefined) body[key] = value; };
       set('voice', args.voice);
