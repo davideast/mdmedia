@@ -240,6 +240,6 @@ await assert.rejects(listMedia(musicCaller, new URL('https://studio.test/api/v1/
 const options = await optionsRoute.GET(http('/api/v1/options?media=sfx')); assert.equal(options.status, 200);
 const described = await options.json();
 assert.deepEqual({ ...described, defaults: undefined }, { type: 'sfx', available: true, provider: 'elevenlabs', model: 'eleven_text_to_sound_v2', defaults: undefined,
-  capabilities: { formats: ['mp3', 'wav'], durationSeconds: { min: 0.5, max: 30 }, promptInfluence: { min: 0, max: 1 }, loop: true }, limits: { promptCharacters: 4000 }, visibility: ['private'] });
+  capabilities: { formats: ['mp3', 'wav'], durationSeconds: { min: 0.5, max: 30 }, promptInfluence: { min: 0, max: 1 }, loop: true }, limits: { promptChars: 4000 }, visibility: ['private'] });
 assert.deepEqual(described.defaults, { prompt: '', output: { format: 'mp3', durationSeconds: null, loop: false }, promptInfluence: 0.3 });
 console.log(JSON.stringify({ passed: true, providerCalls }));

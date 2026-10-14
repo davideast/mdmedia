@@ -53,7 +53,7 @@ export async function GET(request: Request): Promise<Response> {
     const { MAX_SFX_PROMPT, SFX_DURATION } = await import('@/lib/sfx-request');
     return Response.json({ type: 'sfx', available: Boolean(elevenLabsKey()) && await videoToolsAvailable(), provider: 'elevenlabs', model: configuredSfxModel(),
       defaults: await sfxDefaults(caller.uid), capabilities: { formats: ['mp3', 'wav'], durationSeconds: SFX_DURATION, promptInfluence: { min: 0, max: 1 }, loop: true },
-      limits: { promptCharacters: MAX_SFX_PROMPT }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+      limits: { promptChars: MAX_SFX_PROMPT }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
   if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, music, and sfx.');
   const settings = await loadUserSettings(caller.uid);
