@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { StudioApiError, StudioClient } from '../../src/remote/client.js';
-import { imageBody, readReference, runMediaCommand } from '../../src/cli/studio-media-commands.js';
+import { imageBody, readReference, runMediaCommand, videoBody } from '../../src/cli/studio-media-commands.js';
 import { guarded } from '../../src/cli/studio-support.js';
 
 const KEY = 'mdm_ABCDEFGHIJKLMNOP_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG';
@@ -73,6 +73,44 @@ describe('studio image arguments', () => {
     expect(() => imageBody('  ', {})).toThrow('The prompt is empty.');
     expect(() => imageBody('x'.repeat(32_001), {})).toThrow('the limit is 32,000');
     expect(() => imageBody('x', { instructions: 'y'.repeat(4001) })).toThrow('--instructions is limited to 4,000 characters.');
+  });
+});
+
+describe('studio video arguments', () => {
+  it('sends only the prompt when nothing else is set', () => {
+    expect(videoBody('A train', {})).toEqual({ prompt: 'A train' });
+  });
+
+  it('maps shape, resolution, duration, first frame, and adaptation', () => {
+    expect(videoBody('A train', { aspect: '9:16', resolution: '4K', duration: '5', reference: 'ref.png', firstFrame: true, instructions: 'Slow' })).toEqual({
+      prompt: 'A train',
+      output: { aspectRatio: '9:16', resolution: '4k', durationSeconds: 5 },
+      referenceRole: 'first_frame',
+      adaptation: { enabled: true, instructions: 'Slow' },
+    });
+    expect(videoBody('x', { duration: '3' })).toEqual({ prompt: 'x', output: { durationSeconds: 3 } });
+  });
+
+  it('rejects bad values before any request is made', () => {
+    expect(() => videoBody('x', { aspect: '1:1' })).toThrow('--aspect must be one of 16:9, 9:16 (got "1:1")');
+    expect(() => videoBody('x', { resolution: '2K' })).toThrow('--resolution must be one of 360p, 720p, 1080p, 4k');
+    expect(() => videoBody('x', { duration: '11' })).toThrow('--duration must be a whole number 3 to 10 (got "11")');
+    expect(() => videoBody('x', { duration: '4.5' })).toThrow('--duration must be a whole number 3 to 10');
+    expect(() => videoBody('x', { firstFrame: true })).toThrow('--first-frame needs --reference <image>.');
+  });
+
+  it('uploads a video-scoped reference and saves the assembled movie', async () => {
+    const dir = tempDir();
+    const reference = path.join(dir, 'start.webp');
+    const output = path.join(dir, 'train.mp4');
+    fs.writeFileSync(reference, new Uint8Array([1]));
+    const { calls, client } = fakeStudio('video');
+    await runMediaCommand(client, 'video', videoBody('A train', { reference, firstFrame: true }), { reference, output });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'POST /api/v1/assets?media=video', 'POST /api/v1/videos', 'GET /api/v1/videos/item1', 'GET /api/v1/assets/out1/content',
+    ]);
+    expect(JSON.parse(String(calls[1]!.body))).toEqual({ prompt: 'A train', referenceRole: 'first_frame', referenceAssetId: 'ref1' });
+    expect(fs.existsSync(output)).toBe(true);
   });
 });
 
