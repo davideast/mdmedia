@@ -3,7 +3,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { StudioApiError, StudioClient } from '../../src/remote/client.js';
-import { imageBody, musicBody, readReference, runMediaCommand, videoBody } from '../../src/cli/studio-media-commands.js';
+import { runCommand } from 'citty';
+import { imageBody, musicBody, readReference, runMediaCommand, sfxBody, videoBody } from '../../src/cli/studio-media-commands.js';
+import { studioCommand } from '../../src/cli/studio-command.js';
 import { guarded } from '../../src/cli/studio-support.js';
 
 const KEY = 'mdm_ABCDEFGHIJKLMNOP_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG';
@@ -144,6 +146,77 @@ describe('studio music arguments', () => {
     await runMediaCommand(client, 'music', musicBody('A waltz', {}), { reference });
     expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['POST /api/v1/assets?media=music', 'POST /api/v1/music']);
     expect(logs).toEqual(['Music started: http://localhost:3000/music/item1']);
+  });
+});
+
+describe('studio sfx arguments', () => {
+  it('sends only the prompt when nothing else is set', () => {
+    expect(sfxBody('A door creaks', {})).toEqual({ prompt: 'A door creaks' });
+  });
+
+  it('maps duration, influence, loop, and format', () => {
+    expect(sfxBody('A door creaks', { duration: '2.5', influence: '0', loop: true, format: 'wav' })).toEqual({
+      prompt: 'A door creaks',
+      output: { format: 'wav', durationSeconds: 2.5, loop: true },
+      promptInfluence: 0,
+    });
+    expect(sfxBody('x', { loop: false })).toEqual({ prompt: 'x', output: { loop: false } });
+  });
+
+  it('rejects bad values before any request is made', () => {
+    expect(() => sfxBody('x', { duration: '0.4' })).toThrow('--duration must be a number 0.5 to 30 (got "0.4")');
+    expect(() => sfxBody('x', { duration: '31' })).toThrow('--duration must be a number 0.5 to 30');
+    expect(() => sfxBody('x', { influence: '1.5' })).toThrow('--influence must be a number 0 to 1 (got "1.5")');
+    expect(() => sfxBody('x', { influence: '' })).toThrow('--influence must be a number 0 to 1');
+    expect(() => sfxBody('x', { format: 'flac' })).toThrow('--format must be one of mp3, wav');
+    expect(() => sfxBody('x'.repeat(4001), {})).toThrow('the limit is 4,000');
+  });
+});
+
+describe('studio commands end to end', () => {
+  const saved = { key: process.env.MDMEDIA_API_KEY, url: process.env.MDMEDIA_STUDIO_URL };
+  let calls: Call[] = [];
+  let fetchSpy: { mockRestore(): void } | null = null;
+  beforeEach(() => {
+    process.env.MDMEDIA_API_KEY = KEY;
+    process.env.MDMEDIA_STUDIO_URL = 'http://localhost:3000';
+    const studio = fakeStudio('sfx');
+    calls = studio.calls;
+    // The commands build their own client, which uses the global fetch.
+    const stub = (studio.client as unknown as { fetchImpl: typeof fetch }).fetchImpl;
+    fetchSpy = spyOn(globalThis, 'fetch').mockImplementation(stub as typeof fetch);
+  });
+  afterEach(() => {
+    fetchSpy?.mockRestore();
+    if (saved.key === undefined) delete process.env.MDMEDIA_API_KEY; else process.env.MDMEDIA_API_KEY = saved.key;
+    if (saved.url === undefined) delete process.env.MDMEDIA_STUDIO_URL; else process.env.MDMEDIA_STUDIO_URL = saved.url;
+  });
+
+  it('studio sfx maps its flags to the request', async () => {
+    await runCommand(studioCommand, { rawArgs: ['sfx', '-p', 'A door creaks', '-d', '2', '--influence', '0.6', '--loop', '-f', 'wav'] });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['POST /api/v1/sfx']);
+    expect(calls[0]!.headers.get('idempotency-key')).toMatch(/^[A-Za-z0-9_-]{10,128}$/);
+    expect(JSON.parse(String(calls[0]!.body))).toEqual({ prompt: 'A door creaks', output: { format: 'wav', durationSeconds: 2, loop: true }, promptInfluence: 0.6 });
+    expect(logs).toEqual(['Sound effect started: http://localhost:3000/sfx/item1']);
+  });
+
+  it('studio sfx reports a bad flag as one JSON error without calling the studio', async () => {
+    await runCommand(studioCommand, { rawArgs: ['sfx', '-p', 'x', '--influence', '2', '--json'] });
+    expect(calls).toHaveLength(0);
+    expect(JSON.parse(logs[0]!)).toEqual({ error: { code: 'error', message: '--influence must be a number 0 to 1 (got "2").' } });
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('studio status --type reads that medium', async () => {
+    await runCommand(studioCommand, { rawArgs: ['status', 'item1', '--type', 'sfx'] });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['GET /api/v1/sfx/item1']);
+    expect(logs).toEqual(['A lighthouse: ready — http://localhost:3000/sfx/item1']);
+  });
+
+  it('studio status refuses an unknown --type', async () => {
+    await runCommand(studioCommand, { rawArgs: ['status', 'item1', '--type', 'podcast', '--json'] });
+    expect(calls).toHaveLength(0);
+    expect(JSON.parse(logs[0]!).error.message).toBe('--type must be one of narration, image, video, music, sfx (got "podcast").');
   });
 });
 

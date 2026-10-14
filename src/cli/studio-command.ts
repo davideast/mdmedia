@@ -19,7 +19,7 @@ import {
   writeCredentials,
 } from '../remote/credentials.js';
 import { installSkill, skillSourceDir } from '../remote/skill.js';
-import { imageCommand, musicCommand, videoCommand } from './studio-media-commands.js';
+import { describeMedia, imageCommand, musicCommand, oneOf, sfxCommand, videoCommand } from './studio-media-commands.js';
 import { connectedClient, guarded } from './studio-support.js';
 
 function openInBrowser(url: string): void {
@@ -229,13 +229,21 @@ const narrate = defineCommand({
 });
 
 const status = defineCommand({
-  meta: { name: 'status', description: 'Show a narration\'s progress' },
+  meta: { name: 'status', description: 'Show a narration\'s or other item\'s progress' },
   args: {
-    id: { type: 'positional', required: true, description: 'Narration id' },
+    id: { type: 'positional', required: true, description: 'Item id' },
+    type: { type: 'string', description: 'narration, image, video, music, or sfx (default narration)' },
     json: { type: 'boolean', description: 'Print JSON' },
   },
   async run({ args }) {
     await guarded(args.json, async () => {
+      const type = oneOf('--type', args.type, ['narration', 'image', 'video', 'music', 'sfx'] as const) ?? 'narration';
+      if (type !== 'narration') {
+        const item = await connectedClient().media(type, args.id);
+        if (args.json) console.log(JSON.stringify(item, null, 2));
+        else console.log(`${item.title || item.id}: ${describeMedia(item)} — ${item.links.web}`);
+        return;
+      }
       const narration = await connectedClient().narration(args.id);
       if (args.json) console.log(JSON.stringify(narration, null, 2));
       else console.log(`${narration.title || narration.id}: ${describe(narration)} — ${narration.links.web}`);
@@ -413,5 +421,5 @@ const installSkillCommand = defineCommand({
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations, images, video, music, and sound effects in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, status, narrations, playlist, 'install-skill': installSkillCommand },
+  subCommands: { login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, sfx: sfxCommand, status, narrations, playlist, 'install-skill': installSkillCommand },
 });
