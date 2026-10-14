@@ -234,6 +234,37 @@ export function mediaStatus(resource: StudioMediaResource): GenerationStatus {
 
 export const isFinished = (status: GenerationStatus) => status !== 'queued' && status !== 'generating';
 
+export interface PollOptions<T> {
+  timeoutMs?: number;
+  intervalMs?: number;
+  onProgress?: (value: T) => void;
+}
+
+/** Failures that can pass on their own: the studio unreachable, restarting, or busy. */
+const transient = (error: unknown) => error instanceof StudioApiError && (error.status === 0 || error.status === 429 || error.status >= 500);
+
+/**
+ * Reads until `done` or `timeoutMs` passes, then returns the last value read.
+ * Generation continues on the server, so a read that fails transiently is
+ * retried until the deadline; only a deadline with nothing read throws it.
+ */
+async function poll<T>(read: () => Promise<T>, done: (value: T) => boolean, { timeoutMs = 15 * 60_000, intervalMs = 3000, onProgress }: PollOptions<T>): Promise<T> {
+  const deadline = Date.now() + timeoutMs;
+  let last: { value: T } | null = null;
+  for (;;) {
+    const late = Date.now() + intervalMs > deadline;
+    try {
+      last = { value: await read() };
+      onProgress?.(last.value);
+      if (done(last.value) || late) return last.value;
+    } catch (error) {
+      if (!transient(error) || (late && !last)) throw error;
+      if (late && last) return last.value;
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+}
+
 export class StudioClient {
   private readonly base: URL;
 
@@ -401,17 +432,8 @@ export class StudioClient {
   }
 
   /** Polls until the item's latest attempt finishes or `timeoutMs` passes. */
-  async waitForMedia<T extends StudioMediaType>(type: T, id: string, { timeoutMs = 15 * 60_000, intervalMs = 3000, onProgress }: {
-    timeoutMs?: number; intervalMs?: number; onProgress?: (resource: StudioMediaResources[T]) => void;
-  } = {}): Promise<StudioMediaResources[T]> {
-    const deadline = Date.now() + timeoutMs;
-    for (;;) {
-      const resource = await this.media(type, id);
-      onProgress?.(resource);
-      if (isFinished(mediaStatus(resource))) return resource;
-      if (Date.now() + intervalMs > deadline) return resource;
-      await new Promise((resolve) => setTimeout(resolve, intervalMs));
-    }
+  waitForMedia<T extends StudioMediaType>(type: T, id: string, options: PollOptions<StudioMediaResources[T]> = {}): Promise<StudioMediaResources[T]> {
+    return poll(() => this.media(type, id), (resource) => isFinished(mediaStatus(resource)), options);
   }
 
   revokeSelf(): Promise<void> {
@@ -419,16 +441,7 @@ export class StudioClient {
   }
 
   /** Polls until the narration finishes or `timeoutMs` passes. */
-  async waitForNarration(id: string, { timeoutMs = 15 * 60_000, intervalMs = 3000, onProgress }: {
-    timeoutMs?: number; intervalMs?: number; onProgress?: (narration: NarrationResource) => void;
-  } = {}): Promise<NarrationResource> {
-    const deadline = Date.now() + timeoutMs;
-    for (;;) {
-      const narration = await this.narration(id);
-      onProgress?.(narration);
-      if (narration.status !== 'streaming') return narration;
-      if (Date.now() + intervalMs > deadline) return narration;
-      await new Promise((resolve) => setTimeout(resolve, intervalMs));
-    }
+  waitForNarration(id: string, options: PollOptions<NarrationResource> = {}): Promise<NarrationResource> {
+    return poll(() => this.narration(id), (narration) => narration.status !== 'streaming', options);
   }
 }

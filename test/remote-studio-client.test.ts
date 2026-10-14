@@ -161,6 +161,30 @@ describe('studio media', () => {
     expect(calls).toHaveLength(3);
   });
 
+  it('keeps waiting through reads that fail transiently', async () => {
+    const answers = [
+      () => Response.json(item('generating')),
+      () => { throw new TypeError('fetch failed'); },
+      () => Response.json({ error: { code: 'http_502', message: 'Bad gateway' } }, { status: 502 }),
+      () => Response.json(item('ready')),
+    ];
+    const { calls, client } = recording(() => answers.shift()!());
+    const finished = await client.waitForMedia('video', 'item1', { intervalMs: 1 });
+    expect(finished.latestGeneration?.status).toBe('ready');
+    expect(calls).toHaveLength(4);
+  });
+
+  it('stops at once on a failure that will not pass', async () => {
+    const { calls, client } = recording(() => Response.json({ error: { code: 'not_found', message: 'Gone.' } }, { status: 404 }));
+    await expect(client.waitForMedia('music', 'item1', { intervalMs: 1 })).rejects.toMatchObject({ code: 'not_found' });
+    expect(calls).toHaveLength(1);
+  });
+
+  it('throws the last failure when the deadline passes with nothing read', async () => {
+    const { client } = recording(() => { throw new TypeError('fetch failed'); });
+    await expect(client.waitForNarration('n1', { intervalMs: 5, timeoutMs: 20 })).rejects.toMatchObject({ code: 'unreachable' });
+  });
+
   it('stops waiting at the timeout and returns the unfinished item', async () => {
     const { client } = recording(() => Response.json(item('generating')));
     const unfinished = await client.waitForMedia('sfx', 'item1', { intervalMs: 5, timeoutMs: 1 });
