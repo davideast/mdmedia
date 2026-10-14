@@ -75,9 +75,41 @@ export function adaptationFrom(args: { adapt?: boolean; instructions?: string })
 export async function readReference(file: string): Promise<{ bytes: Uint8Array; mimeType: string }> {
   const mimeType = REFERENCE_TYPES[path.extname(file).toLowerCase()];
   if (!mimeType) throw new Error('--reference must be a .png, .jpg, .jpeg, or .webp image.');
-  const bytes = await fs.promises.readFile(file);
-  if (bytes.length > MAX_REFERENCE_BYTES) throw new Error('--reference must be at most 10 MiB.');
-  return { bytes, mimeType };
+  if ((await fs.promises.stat(file)).size > MAX_REFERENCE_BYTES) throw new Error('--reference must be at most 10 MiB.');
+  return { bytes: await fs.promises.readFile(file), mimeType };
+}
+
+/** The `--output` path, checked before anything is generated: a file in a folder that exists and can be written. */
+export async function checkOutput(file: string): Promise<string> {
+  const resolved = path.resolve(file);
+  if ((await fs.promises.stat(resolved).catch(() => null))?.isDirectory()) throw new Error(`--output ${file} is a folder; name a file.`);
+  try {
+    await fs.promises.access(path.dirname(resolved), fs.constants.W_OK);
+  } catch {
+    throw new Error(`--output: ${path.dirname(resolved)} does not exist or cannot be written.`);
+  }
+  return resolved;
+}
+
+/**
+ * Streams to `file` through a temporary file, so a failed download leaves nothing behind.
+ * A plain read loop, since Bun's `pipeline(Readable.fromWeb(…))` never settles when the stream errors.
+ */
+async function saveStream(body: ReadableStream<Uint8Array>, file: string): Promise<void> {
+  const partial = `${file}.partial`;
+  try {
+    const handle = await fs.promises.open(partial, 'w');
+    try {
+      const reader = body.getReader();
+      for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) await handle.write(chunk.value);
+    } finally {
+      await handle.close();
+    }
+    await fs.promises.rename(partial, file);
+  } catch (error) {
+    await fs.promises.rm(partial, { force: true });
+    throw error;
+  }
 }
 
 /** "ready (12s)", "failed: …", or the status it is still in. */
@@ -110,6 +142,7 @@ async function withReference<T extends StudioMediaType>(client: StudioClient, ty
  */
 export async function runMediaCommand<T extends StudioMediaType>(client: StudioClient, type: T, body: StudioMediaBodies[T], options: MediaRunOptions): Promise<void> {
   const timeoutMs = (numberIn('--timeout', options.timeout, 1, Infinity) ?? 900) * 1000;
+  const output = options.output === undefined ? undefined : await checkOutput(options.output);
   const created = await client.createMedia(type, await withReference(client, type, body, options.reference));
   if (!options.wait && !options.output) {
     if (options.json) console.log(JSON.stringify(created, null, 2));
@@ -118,7 +151,7 @@ export async function runMediaCommand<T extends StudioMediaType>(client: StudioC
   }
   if (!options.json) console.error(`Generating ${created.links.web} …`);
   try {
-    await finishMedia(client, type, created.id, options, timeoutMs);
+    await finishMedia(client, type, created.id, { ...options, output }, timeoutMs);
   } catch (error) {
     throw new StartedMediaError(error, { id: created.id, type, links: created.links });
   }
@@ -140,8 +173,8 @@ async function finishMedia<T extends StudioMediaType>(client: StudioClient, type
   if (options.output && status === 'ready') {
     const asset = finished.result?.assets[0];
     if (!asset) throw new Error('The studio finished without a file to save.');
-    saved = path.resolve(options.output);
-    await fs.promises.writeFile(saved, (await client.downloadAsset(asset.links.content)).bytes);
+    await saveStream((await client.downloadAsset(asset.links.content)).body, options.output);
+    saved = options.output;
   }
   if (options.json) console.log(JSON.stringify({ ...finished, ...(saved ? { savedTo: saved } : {}) }, null, 2));
   else {
