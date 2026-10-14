@@ -50,10 +50,13 @@ ffmpeg, create returns `503 provider_unavailable` and options report
 `available: false`. `MDMEDIA_SFX_MODEL` overrides the default
 `eleven_text_to_sound_v2`.
 
-A 4xx from ElevenLabs ends the attempt as `error` with `provider_rejected`. A
-server error or a restart mid-attempt ends it as `interrupted` unless the output
-was already saved; Studio never calls the paid API again on its own. Previous
-results are preserved either way.
+A 4xx from ElevenLabs ends the attempt as `error` with `provider_rejected`.
+Studio stores the audio as soon as ElevenLabs returns it, so a failed decode or
+a restart after that point finishes from the stored copy; audio that still
+cannot be decoded ends as `error` with `invalid_sfx`. A server error, or a
+restart before the audio arrives, ends the attempt as `interrupted`; Studio
+never calls the paid API again on its own. Previous results are preserved
+either way.
 
 ## Verification
 

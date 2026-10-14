@@ -6,6 +6,8 @@ import ffmpeg from 'ffmpeg-static';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 
 const documents = new Map<string, Record<string, any>>();
 const files = new Map<string, Buffer>();
@@ -53,17 +55,23 @@ try {
 } finally { await rm(directory, { recursive: true, force: true }); }
 let providerCalls = 0;
 let hold: Promise<void> | null = null, release!: () => void;
-let failure: number | null = null;
+let failure: number | null = null, respond: Buffer | null = null;
 const calls: Array<{ url: URL; key: string | null; body: any }> = [];
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
   const url = new URL(String(input)); assert(url.pathname.endsWith('/v1/sound-generation'));
   providerCalls++; calls.push({ url, key: new Headers(init?.headers).get('xi-api-key'), body: JSON.parse(String(init?.body)) }); if (hold) await hold;
   if (failure) return new Response('SECRET rejected prompt', { status: failure });
-  return new Response(url.searchParams.get('output_format')?.startsWith('pcm_') ? pcm : mp3, { status: 200 });
+  return new Response(respond ?? (url.searchParams.get('output_format')?.startsWith('pcm_') ? pcm : mp3), { status: 200 });
 }) as typeof fetch;
 mock.module('../../../studio/src/lib/firebase-admin', () => ({ adminDb: () => db, adminBucket: () => bucket, isAllowlisted: async () => true,
   verifyUser: async (header: string) => header === 'Bearer test-session' ? { uid: 'owner', email: 'owner@example.test' } : null,
   verifyIdToken: async () => null, adminAuth: () => ({}) }));
+// Studio's own sharp, so a thumbnail can fail once after ElevenLabs has been paid.
+const realSharp = sharp; let sharpFailures = 0;
+mock.module(Bun.resolveSync('sharp', fileURLToPath(new URL('../../../studio/src/lib/', import.meta.url))), () => ({ default: (input: Buffer) => {
+  if (sharpFailures > 0) { sharpFailures--; throw new Error('Thumbnail failed'); }
+  return realSharp(input);
+} }));
 process.env.ELEVENLABS_API_KEY = 'test-eleven-placeholder';
 const server = await import('../../../studio/src/lib/sfx-server');
 const { parseSfxRequest } = await import('../../../studio/src/lib/sfx-request');
@@ -118,6 +126,17 @@ failure = 500; const before500 = providerCalls;
 const broken = await server.submitSfx(uid, request, 'sfx-key-server-error', first.itemId, 'key');
 const interrupted = await settled(broken.generationId); assert.equal(interrupted.status, 'interrupted'); assert.equal(interrupted.error.code, 'generation_interrupted');
 assert.equal(providerCalls, before500 + 1); failure = null;
+// Paid audio is stored before decoding, so a failed thumbnail finishes from storage without another call.
+sharpFailures = 1; const beforeThumbnail = providerCalls;
+const thumbnailFailed = await server.submitSfx(uid, request, 'sfx-key-thumbnail', null, 'key');
+const thumbnailed = await settled(thumbnailFailed.generationId); assert.equal(thumbnailed.status, 'ready'); assert.equal(sharpFailures, 0);
+assert.equal(providerCalls, beforeThumbnail + 1); assert(files.get(`media/${uid}/sfx_${thumbnailFailed.generationId}/original`)!.equals(mp3));
+assert(Math.abs((await server.sfxResource(uid, thumbnailFailed.itemId, '')).result!.durationSeconds! - 2) < 0.1);
+// Audio that cannot be decoded, even from storage, ends as an error rather than an unknown outcome.
+respond = Buffer.from('not audio');
+const undecodable = await server.submitSfx(uid, request, 'sfx-key-undecodable', null, 'key');
+const garbled = await settled(undecodable.generationId); assert.equal(garbled.status, 'error'); assert.equal(garbled.error.code, 'invalid_sfx');
+assert.equal(providerCalls, beforeThumbnail + 2); respond = null;
 // Recovery finishes from saved output and never makes a new paid call.
 const before = providerCalls;
 const abandoned = { ...initial, id: 'recover', itemId: 'recover-item', status: 'generating', phase: 'generating', assetId: null, leaseToken: 'old', leaseUntil: 1 };
@@ -129,6 +148,10 @@ assert.equal((await server.sfxResource(uid, 'recover-item', '')).result!.id, 're
 const unknown = { ...abandoned, id: 'unknown' };
 documents.set('mediaGenerations/unknown', unknown); documents.set('mediaActivity/unknown', unknown);
 assert.equal((await settled('unknown')).status, 'interrupted'); assert.equal(providerCalls, before);
+const garbage = { ...abandoned, id: 'garbage' };
+documents.set('mediaGenerations/garbage', garbage); documents.set('mediaActivity/garbage', garbage);
+files.set(`media/${uid}/sfx_garbage/original`, Buffer.from('not audio'));
+const unreadable = await settled('garbage'); assert.equal(unreadable.status, 'error'); assert.equal(unreadable.error.code, 'invalid_sfx'); assert.equal(providerCalls, before);
 const stored = { ...abandoned, id: 'stored' };
 documents.set('mediaGenerations/stored', stored); documents.set('mediaActivity/stored', stored);
 documents.set('mediaAssets/sfx_stored', { ...documents.get(`mediaAssets/${initial.assetId}`), id: 'sfx_stored' });
