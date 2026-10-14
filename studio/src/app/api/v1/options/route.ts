@@ -47,7 +47,15 @@ export async function GET(request: Request): Promise<Response> {
       defaults: await musicDefaults(caller.uid), capabilities: { modes: ['song', 'clip'], formats: ['mp3', 'wav'], vocals: ['auto', 'vocals', 'instrumental'], customLyrics: true, adaptation: true, referenceImages: 1, continuation: false },
       limits: { promptChars: MAX_MUSIC_PROMPT, lyricsChars: 8000, instructionChars: 4000, referenceBytes: 10 * 1024 * 1024, outputBytes: MAX_MUSIC_BYTES, clipSeconds: 30, songSeconds: null }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
-  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, and music.');
+  if (media === 'sfx') {
+    const { sfxDefaults, configuredSfxModel, elevenLabsKey } = await import('@/lib/sfx-server');
+    const { videoToolsAvailable } = await import('@/lib/video-assets-server');
+    const { MAX_SFX_PROMPT, SFX_DURATION } = await import('@/lib/sfx-request');
+    return Response.json({ type: 'sfx', available: Boolean(elevenLabsKey()) && await videoToolsAvailable(), provider: 'elevenlabs', model: configuredSfxModel(),
+      defaults: await sfxDefaults(caller.uid), capabilities: { formats: ['mp3', 'wav'], durationSeconds: SFX_DURATION, promptInfluence: { min: 0, max: 1 }, loop: true },
+      limits: { promptCharacters: MAX_SFX_PROMPT }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+  }
+  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, music, and sfx.');
   const settings = await loadUserSettings(caller.uid);
   const delivery = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructions = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];
