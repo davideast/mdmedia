@@ -10,6 +10,7 @@ import {
   type StudioMediaBodies,
   type StudioMediaResource,
   type StudioMediaType,
+  type VideoRequestBody,
 } from '../remote/client.js';
 import { connectedClient, guarded } from './studio-support.js';
 
@@ -184,6 +185,43 @@ export const imageCommand = defineCommand({
     await guarded(args.json, async () => {
       const body = imageBody(await readPrompt(args.input, args.prompt), args);
       await runMediaCommand(connectedClient(), 'image', body, args);
+    });
+  },
+});
+
+export function videoBody(prompt: string, args: {
+  aspect?: string; resolution?: string; duration?: string; reference?: string; firstFrame?: boolean; adapt?: boolean; instructions?: string;
+}): VideoRequestBody {
+  const body: VideoRequestBody = { prompt: checkPrompt(prompt, 32_000) };
+  const aspectRatio = oneOf('--aspect', args.aspect, ['16:9', '9:16'] as const);
+  const resolution = oneOf('--resolution', args.resolution, ['360p', '720p', '1080p', '4k'] as const);
+  const durationSeconds = numberIn('--duration', args.duration, 3, 10, true);
+  if (aspectRatio || resolution || durationSeconds !== undefined) {
+    body.output = { ...(aspectRatio ? { aspectRatio } : {}), ...(resolution ? { resolution } : {}), ...(durationSeconds === undefined ? {} : { durationSeconds }) };
+  }
+  if (args.firstFrame && args.reference === undefined) throw new Error('--first-frame needs --reference <image>.');
+  if (args.firstFrame !== undefined) body.referenceRole = args.firstFrame ? 'first_frame' : 'reference';
+  const adaptation = adaptationFrom(args);
+  if (adaptation) body.adaptation = adaptation;
+  return body;
+}
+
+export const videoCommand = defineCommand({
+  meta: { name: 'video', description: 'Create a private video clip in your studio' },
+  args: {
+    ...promptArgs,
+    aspect: { type: 'string', description: '16:9 or 9:16 (default: your studio default, 16:9 unless changed)' },
+    resolution: { type: 'string', description: '360p, 720p, 1080p, or 4k (default: your studio default, 720p unless changed)' },
+    duration: { type: 'string', description: 'Clip length, 3 to 10 whole seconds (default: your studio default, 10 unless changed)' },
+    ...referenceArg,
+    firstFrame: { type: 'boolean', description: 'Use --reference as the first frame instead of a style/subject reference' },
+    ...adaptArgs,
+    ...runArgs,
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const body = videoBody(await readPrompt(args.input, args.prompt), args);
+      await runMediaCommand(connectedClient(), 'video', body, args);
     });
   },
 });

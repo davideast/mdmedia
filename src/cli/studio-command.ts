@@ -19,7 +19,7 @@ import {
   writeCredentials,
 } from '../remote/credentials.js';
 import { installSkill, skillSourceDir } from '../remote/skill.js';
-import { imageCommand } from './studio-media-commands.js';
+import { imageCommand, videoCommand } from './studio-media-commands.js';
 import { connectedClient, guarded } from './studio-support.js';
 
 function openInBrowser(url: string): void {
@@ -413,5 +413,5 @@ const installSkillCommand = defineCommand({
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations, images, video, music, and sound effects in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, image: imageCommand, status, narrations, playlist, 'install-skill': installSkillCommand },
+  subCommands: { login, logout, options, narrate, image: imageCommand, video: videoCommand, status, narrations, playlist, 'install-skill': installSkillCommand },
 });
