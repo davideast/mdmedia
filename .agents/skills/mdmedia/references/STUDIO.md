@@ -1,13 +1,14 @@
-# Studio: narrations and playlists
+# Studio: narrations, media, and playlists
 
 The CLI is connected to the user's studio with a key they approved. You run
-`mdmedia studio …`; the CLI holds the key. Narrations made this way are
-always private.
+`mdmedia studio …`; the CLI holds the key. Everything made this way is
+private.
 
 If a command reports `not_logged_in` or `unauthenticated`, tell the user to
 run `mdmedia studio login` themselves; they approve it in their browser. If it
-reports `insufficient_scope` for playlists, the key predates playlist access,
-and the user should run `mdmedia studio login` again.
+reports `insufficient_scope`, the key predates that kind of access (playlists,
+images, video, music, or sound effects), and the user should run
+`mdmedia studio login` again.
 
 ## Narrate
 
@@ -34,6 +35,44 @@ and the user should run `mdmedia studio login` again.
    want the audio file.
 
 Use `mdmedia studio status <id> --json` to check on a narration later.
+
+## Generate images, video, music, and sound effects
+
+Each takes the prompt as `-p "…"`, `-i file.md`, or stdin, and prints the item's
+web link. Pass only the options the user asked for.
+
+```sh
+mdmedia studio image -p "<prompt>" --json
+mdmedia studio video -p "<prompt>" --json
+mdmedia studio music -p "<prompt>" --json
+mdmedia studio sfx   -p "<prompt>" --json
+```
+
+Options, only when asked:
+
+- `image`: `--aspect` (1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9),
+  `--resolution` (1K, 2K, 4K), `--reference <image>`.
+- `video`: `--aspect` (16:9, 9:16), `--resolution` (360p, 720p, 1080p, 4k),
+  `--duration` (3–10 whole seconds), `--reference <image>`, plus `--first-frame`
+  to start the clip from that image.
+- `music`: `--clip` for a 30-second clip instead of a full song,
+  `--format mp3|wav`, `--vocals auto|vocals|instrumental`, `--lyrics <file>`,
+  `--reference <image>`. Lyrics can't be combined with `--vocals instrumental`.
+- `sfx`: `--duration` (0.5–30 seconds), `--influence` (0–1, how literally to
+  follow the prompt), `--loop`, `--format mp3|wav`.
+- `image`, `video`, `music`: `--adapt` to rewrite notes into a prompt first,
+  `--instructions "<text>"` to steer that rewrite.
+
+`mdmedia studio options --json` lists narration options only.
+
+Reply with the web link. Generation continues on the server and can take
+minutes. Add `--wait` only if the user wants to know it finished, and
+`-o <file>` only if they want the file; `-o` implies `--wait`. A wait that times
+out (`--timeout`, default 900 seconds) is not a failure; check later with:
+
+```sh
+mdmedia studio status <id> --type image|video|music|sfx --json
+```
 
 ## Narrate into a playlist
 

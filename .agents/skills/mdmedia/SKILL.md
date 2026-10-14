@@ -8,11 +8,13 @@ compatibility: Requires the mdmedia CLI on PATH. Studio commands need a studio c
 
 | The user wants | Branch | Read |
 | --- | --- | --- |
-| A narration to listen to in their studio, or playlist changes | **studio** | [STUDIO.md](references/STUDIO.md) |
+| A narration, image, video, music, or sound effect saved in their studio, or playlist changes | **studio** | [STUDIO.md](references/STUDIO.md) |
 | A media file on disk: `.wav`, `.mp4`, `.png`, `.mp3`, a narration script | **files** | [FILES.md](references/FILES.md) |
 
-"Narrate this" with no file named means **studio**: the user listens there. Use
-**files** for audio only when they ask for a file, a path, or offline output.
+"Narrate this" with no file named means **studio**: the user listens there.
+For images, video, music, and sound effects, use **studio** when they mention
+their studio or Library, and **files** when they want a file or path and don't.
+If it's unclear which they want, ask.
 
 ## Rules for every branch
 
