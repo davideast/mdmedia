@@ -8,40 +8,46 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import type { SfxGeneration } from '../../../studio/src/lib/sfx-server';
 
-const documents = new Map<string, Record<string, any>>();
+type Data = Record<string, unknown>;
+interface Snapshot { ref: Ref; id: string; exists: boolean; data(): Data | undefined }
+interface Transaction { get(ref: Ref): Promise<Snapshot>; set(ref: Ref, data: Data): void; update(ref: Ref, data: Data): void }
+const documents = new Map<string, Data>();
 const files = new Map<string, Buffer>();
 let sequence = 0;
 let transactionTail = Promise.resolve();
 class Ref {
   constructor(readonly path: string) {}
   get id() { return this.path.split('/').at(-1)!; }
-  async get() { const data = documents.get(this.path); return { ref: this, id: this.id, exists: !!data, data: () => data ? structuredClone(data) : undefined }; }
-  async set(data: Record<string, any>) { documents.set(this.path, structuredClone(data)); }
-  async update(patch: Record<string, any>) { assert(documents.has(this.path), `Missing ${this.path}`); documents.set(this.path, { ...documents.get(this.path), ...structuredClone(patch) }); }
+  async get(): Promise<Snapshot> { const data = documents.get(this.path); return { ref: this, id: this.id, exists: !!data, data: () => data ? structuredClone(data) : undefined }; }
+  async set(data: Data) { documents.set(this.path, structuredClone(data)); }
+  async update(patch: Data) { assert(documents.has(this.path), `Missing ${this.path}`); documents.set(this.path, { ...documents.get(this.path), ...structuredClone(patch) }); }
   async delete() { documents.delete(this.path); }
 }
 class Query {
-  constructor(readonly collection: string, readonly filters: Array<[string, string, any]> = [], readonly orders: Array<[string, string]> = [], readonly cap = Infinity, readonly after: any[] = []) {}
+  constructor(readonly collection: string, readonly filters: Array<[string, string, unknown]> = [], readonly orders: Array<[string, string]> = [], readonly cap = Infinity, readonly after: unknown[] = []) {}
   doc(id = `test${++sequence}`) { return new Ref(`${this.collection}/${id}`); }
-  where(field: string, op: string, value: any) { return new Query(this.collection, [...this.filters, [field, op, value]], this.orders, this.cap, this.after); }
+  where(field: string, op: string, value: unknown) { return new Query(this.collection, [...this.filters, [field, op, value]], this.orders, this.cap, this.after); }
   orderBy(field: string, direction = 'asc') { return new Query(this.collection, this.filters, [...this.orders, [field, direction]], this.cap, this.after); }
   limit(cap: number) { return new Query(this.collection, this.filters, this.orders, cap, this.after); }
-  startAfter(...after: any[]) { return new Query(this.collection, this.filters, this.orders, this.cap, after); }
+  startAfter(...after: unknown[]) { return new Query(this.collection, this.filters, this.orders, this.cap, after); }
   async get() {
-    const value = (entry: [string, any], field: string) => field === '__name__' ? entry[0].split('/').at(-1) : entry[1][field];
+    const value = (entry: [string, Data], field: string): unknown => field === '__name__' ? entry[0].split('/').at(-1) : entry[1][field];
+    // Fields compared in queries are numbers or strings, as in Firestore.
+    const before = (a: unknown, b: unknown) => (a as number | string) < (b as number | string);
     let entries = [...documents.entries()].filter(([path]) => path.startsWith(`${this.collection}/`) && path.split('/').length === 2);
-    entries = entries.filter(entry => this.filters.every(([field, op, expected]) => op === '==' ? value(entry, field) === expected : op === 'in' ? expected.includes(value(entry, field)) : op === '<' ? value(entry, field) < expected : false));
-    const compare = (entry: [string, any], other: any[]) => { for (let i = 0; i < this.orders.length; i++) { const [field, direction] = this.orders[i]; const actual = value(entry, field); if (actual !== other[i]) return (actual < other[i] ? -1 : 1) * (direction === 'desc' ? -1 : 1); } return 0; };
+    entries = entries.filter(entry => this.filters.every(([field, op, expected]) => op === '==' ? value(entry, field) === expected : op === 'in' ? (expected as unknown[]).includes(value(entry, field)) : op === '<' ? before(value(entry, field), expected) : false));
+    const compare = (entry: [string, Data], other: unknown[]) => { for (let i = 0; i < this.orders.length; i++) { const [field, direction] = this.orders[i]; const actual = value(entry, field); if (actual !== other[i]) return (before(actual, other[i]) ? -1 : 1) * (direction === 'desc' ? -1 : 1); } return 0; };
     entries.sort((a, b) => compare(a, this.orders.map(([field]) => value(b, field))));
     if (this.after.length) entries = entries.filter(entry => compare(entry, this.after) > 0);
     return { empty: entries.length === 0, docs: entries.slice(0, this.cap).map(([path]) => { const ref = new Ref(path); return { id: ref.id, data: () => structuredClone(documents.get(path)) }; }) };
   }
 }
-const db = { collection: (name: string) => new Query(name), async runTransaction(run: (tx: any) => Promise<any>) {
+const db = { collection: (name: string) => new Query(name), async runTransaction<T>(run: (tx: Transaction) => Promise<T>): Promise<T> {
   const previous = transactionTail; let release!: () => void; transactionTail = new Promise(resolve => { release = resolve; }); await previous;
   const writes: (() => Promise<void>)[] = []; let writing = false;
-  try { const result = await run({ get: (ref: Ref) => { assert(!writing, 'Read after write in transaction'); return ref.get(); }, set: (ref: Ref, data: any) => { writing = true; writes.push(() => ref.set(data)); }, update: (ref: Ref, data: any) => { writing = true; writes.push(() => ref.update(data)); } }); for (const write of writes) await write(); return result; }
+  try { const result = await run({ get: (ref: Ref) => { assert(!writing, 'Read after write in transaction'); return ref.get(); }, set: (ref: Ref, data: Data) => { writing = true; writes.push(() => ref.set(data)); }, update: (ref: Ref, data: Data) => { writing = true; writes.push(() => ref.update(data)); } }); for (const write of writes) await write(); return result; }
   finally { release(); }
 } };
 const bucket = { file(path: string) { return { async save(bytes: Buffer) { files.set(path, Buffer.from(bytes)); }, async download() { assert(files.has(path), 'Missing storage object'); return [files.get(path)]; } }; } };
@@ -56,12 +62,12 @@ try {
 let providerCalls = 0;
 let hold: Promise<void> | null = null, release!: () => void;
 let failure: number | null = null, respond: Buffer | null = null;
-const calls: Array<{ url: URL; key: string | null; body: any }> = [];
+const calls: Array<{ url: URL; key: string | null; body: unknown }> = [];
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
   const url = new URL(String(input)); assert(url.pathname.endsWith('/v1/sound-generation'));
   providerCalls++; calls.push({ url, key: new Headers(init?.headers).get('xi-api-key'), body: JSON.parse(String(init?.body)) }); if (hold) await hold;
   if (failure) return new Response('SECRET rejected prompt', { status: failure });
-  return new Response(respond ?? (url.searchParams.get('output_format')?.startsWith('pcm_') ? pcm : mp3), { status: 200 });
+  return new Response(new Uint8Array(respond ?? (url.searchParams.get('output_format')?.startsWith('pcm_') ? pcm : mp3)), { status: 200 });
 }) as typeof fetch;
 mock.module('../../../studio/src/lib/firebase-admin', () => ({ adminDb: () => db, adminBucket: () => bucket, isAllowlisted: async () => true,
   verifyUser: async (header: string) => header === 'Bearer test-session' ? { uid: 'owner', email: 'owner@example.test' } : null,
@@ -78,7 +84,7 @@ const { parseSfxRequest } = await import('../../../studio/src/lib/sfx-request');
 const { listMedia, listGenerations } = await import('../../../studio/src/lib/media-catalog-server');
 const uid = 'owner';
 const request = parseSfxRequest({ prompt: 'Heavy wooden door creaks open' });
-async function waitFor(id: string, predicate: (job: any) => boolean) {
+async function waitFor(id: string, predicate: (job: SfxGeneration) => boolean) {
   for (let i = 0; i < 1500; i++) { await server.processSfxJobs(); const job = await server.loadSfxGeneration(uid, id); if (predicate(job)) return job; await new Promise(resolve => setTimeout(resolve, 5)); }
   throw new Error(`Timed out waiting for ${id}`);
 }
@@ -104,7 +110,7 @@ assert.equal(ready.result!.provider, 'elevenlabs'); assert.equal(ready.result!.m
 assert.equal(ready.result!.preparedPrompt, 'Heavy wooden door creaks open'); assert.equal(ready.result!.links.web, 'https://studio.test/library');
 assert(Math.abs(ready.result!.durationSeconds! - 2) < 0.1); assert.equal(ready.result!.waveform.length, 256);
 assert(ready.result!.waveform.some(p => p > 0)); assert.equal(ready.result!.assets[0].mimeType, 'audio/mpeg');
-assert.equal(ready.result!.assets[0].id, `sfx_${first.generationId}`); assert(ready.durationMs > 1900);
+assert.equal(ready.result!.assets[0].id, `sfx_${first.generationId}`); assert(ready.durationMs! > 1900);
 const replayed = await server.submitSfx(uid, request, 'sfx-key-initial', null, 'key');
 assert.equal(replayed.generationId, first.generationId); assert(replayed.replayed); assert.equal(providerCalls, 1);
 const publicJson = JSON.stringify(ready); for (const secret of ['test-eleven', 'ownerUid', 'storage', 'leaseToken']) assert(!publicJson.includes(secret));
@@ -118,17 +124,17 @@ const next = await server.sfxResource(uid, first.itemId, ''); assert.equal(next.
 assert.equal(next.request.output.format, 'wav');
 failure = 400;
 const failed = await server.submitSfx(uid, request, 'sfx-key-failed', first.itemId, 'key');
-const rejected = await settled(failed.generationId); assert.equal(rejected.status, 'error'); assert.equal(rejected.error.code, 'provider_rejected');
+const rejected = await settled(failed.generationId); assert.equal(rejected.status, 'error'); assert.equal(rejected.error?.code, 'provider_rejected');
 assert.equal((await server.sfxResource(uid, first.itemId, '')).result!.id, wav.generationId);
 assert(!JSON.stringify(await server.sfxResource(uid, first.itemId, '')).includes('SECRET'));
 // Every ElevenLabs 4xx is a refusal, including ones outside the common set such as 402 for exhausted credit.
 failure = 402;
 const unpaid = await server.submitSfx(uid, request, 'sfx-key-unpaid', null, 'key');
-const refused = await settled(unpaid.generationId); assert.equal(refused.status, 'error'); assert.equal(refused.error.code, 'provider_rejected');
+const refused = await settled(unpaid.generationId); assert.equal(refused.status, 'error'); assert.equal(refused.error?.code, 'provider_rejected');
 // A server failure has no receipt to retrieve: one call, no retry, explicit interruption.
 failure = 500; const before500 = providerCalls;
 const broken = await server.submitSfx(uid, request, 'sfx-key-server-error', first.itemId, 'key');
-const interrupted = await settled(broken.generationId); assert.equal(interrupted.status, 'interrupted'); assert.equal(interrupted.error.code, 'generation_interrupted');
+const interrupted = await settled(broken.generationId); assert.equal(interrupted.status, 'interrupted'); assert.equal(interrupted.error?.code, 'generation_interrupted');
 assert.equal(providerCalls, before500 + 1); failure = null;
 // Paid audio is stored before decoding, so a failed thumbnail finishes from storage without another call.
 sharpFailures = 1; const beforeThumbnail = providerCalls;
@@ -139,7 +145,7 @@ assert(Math.abs((await server.sfxResource(uid, thumbnailFailed.itemId, '')).resu
 // Audio that cannot be decoded, even from storage, ends as an error rather than an unknown outcome.
 respond = Buffer.from('not audio');
 const undecodable = await server.submitSfx(uid, request, 'sfx-key-undecodable', null, 'key');
-const garbled = await settled(undecodable.generationId); assert.equal(garbled.status, 'error'); assert.equal(garbled.error.code, 'invalid_sfx');
+const garbled = await settled(undecodable.generationId); assert.equal(garbled.status, 'error'); assert.equal(garbled.error?.code, 'invalid_sfx');
 assert.equal(providerCalls, beforeThumbnail + 2); respond = null;
 // Recovery finishes from saved output and never makes a new paid call.
 const before = providerCalls;
@@ -155,7 +161,7 @@ assert.equal((await settled('unknown')).status, 'interrupted'); assert.equal(pro
 const garbage = { ...abandoned, id: 'garbage' };
 documents.set('mediaGenerations/garbage', garbage); documents.set('mediaActivity/garbage', garbage);
 files.set(`media/${uid}/sfx_garbage/original`, Buffer.from('not audio'));
-const unreadable = await settled('garbage'); assert.equal(unreadable.status, 'error'); assert.equal(unreadable.error.code, 'invalid_sfx'); assert.equal(providerCalls, before);
+const unreadable = await settled('garbage'); assert.equal(unreadable.status, 'error'); assert.equal(unreadable.error?.code, 'invalid_sfx'); assert.equal(providerCalls, before);
 const stored = { ...abandoned, id: 'stored' };
 documents.set('mediaGenerations/stored', stored); documents.set('mediaActivity/stored', stored);
 documents.set('mediaAssets/sfx_stored', { ...documents.get(`mediaAssets/${initial.assetId}`), id: 'sfx_stored' });
@@ -174,7 +180,7 @@ const beforeUnconfigured = providerCalls;
 const unconfigured = { ...initial, id: 'unconfigured', itemId: 'unconfigured-item', status: 'queued', phase: 'queued', assetId: null, leaseToken: null, leaseUntil: 0 };
 documents.set('mediaGenerations/unconfigured', unconfigured); documents.set('mediaActivity/unconfigured', unconfigured);
 documents.set('mediaItems/sfx_unconfigured-item', { ...documents.get(`mediaItems/sfx_${first.itemId}`), id: 'unconfigured-item', status: 'queued', latestGenerationId: 'unconfigured', latestSuccessfulGenerationId: null });
-const unavailable = await settled('unconfigured'); assert.equal(unavailable.status, 'error'); assert.equal(unavailable.error.code, 'provider_unavailable');
+const unavailable = await settled('unconfigured'); assert.equal(unavailable.status, 'error'); assert.equal(unavailable.error?.code, 'provider_unavailable');
 assert.equal(providerCalls, beforeUnconfigured); assert.equal(documents.get('mediaItems/sfx_unconfigured-item')!.status, 'error');
 process.env.ELEVEN_LABS_KEY = 'test-eleven-legacy';
 const legacy = await server.submitSfx(uid, request, 'legacy-sfx-key-1234', null, 'key');
@@ -232,8 +238,8 @@ assert.equal((await itemRoute.PATCH(http(`/api/v1/sfx/${first.itemId}`, sfxKey.t
 const caller = { kind: 'apiKey' as const, uid, keyId: sfxKey.keyId, scopes: ['sfx:read' as const] };
 assert((await listMedia(caller, new URL('https://studio.test/api/v1/media'))).items.every(j => j.type === 'sfx'));
 const activity = await listGenerations(caller, new URL('https://studio.test/api/v1/generations'));
-assert(activity.items.length && activity.items.every(j => j.type === 'sfx'));
-assert.equal(activity.items.find(j => j.itemId === first.itemId)!.title, 'Door acceptance');
+assert(activity.items.length && activity.items.every(j => j?.type === 'sfx'));
+assert.equal(activity.items.find(j => j?.itemId === first.itemId)!.title, 'Door acceptance');
 const musicCaller = { kind: 'apiKey' as const, uid, keyId: musicKey.keyId, scopes: ['music:read' as const] };
 assert(!(await listMedia(musicCaller, new URL('https://studio.test/api/v1/media'))).items.some(j => j.type === 'sfx'));
 await assert.rejects(listMedia(musicCaller, new URL('https://studio.test/api/v1/media?type=sfx')), { code: 'insufficient_scope' });
