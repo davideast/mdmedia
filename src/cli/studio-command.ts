@@ -19,12 +19,8 @@ import {
   writeCredentials,
 } from '../remote/credentials.js';
 import { installSkill, skillSourceDir } from '../remote/skill.js';
-
-function connectedClient(): StudioClient {
-  const credentials = readCredentials();
-  if (!credentials) throw new StudioApiError(401, 'not_logged_in', 'Not connected to a studio. Run `mdmedia studio login`.');
-  return new StudioClient(credentials.url, credentials.apiKey);
-}
+import { imageCommand } from './studio-media-commands.js';
+import { connectedClient, guarded } from './studio-support.js';
 
 function openInBrowser(url: string): void {
   const command = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'cmd' : 'xdg-open';
@@ -33,19 +29,6 @@ function openInBrowser(url: string): void {
     spawn(command, args, { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
   } catch {
     // The URL is printed too.
-  }
-}
-
-/** Errors print as one line; `--json` callers get `{ error: { code, message } }` on stdout. */
-async function guarded(json: boolean | undefined, run: () => Promise<void>): Promise<void> {
-  try {
-    await run();
-  } catch (error) {
-    const code = error instanceof StudioApiError ? error.code : 'error';
-    const message = error instanceof Error ? error.message : String(error);
-    if (json) console.log(JSON.stringify({ error: { code, message } }));
-    else console.error(`mdmedia studio: ${message}`);
-    process.exitCode = 1;
   }
 }
 
@@ -429,6 +412,6 @@ const installSkillCommand = defineCommand({
 });
 
 export const studioCommand = defineCommand({
-  meta: { name: 'studio', description: 'Create narrations in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, status, narrations, playlist, 'install-skill': installSkillCommand },
+  meta: { name: 'studio', description: 'Create narrations, images, video, music, and sound effects in your mdmedia studio from the terminal or a coding agent' },
+  subCommands: { login, logout, options, narrate, image: imageCommand, status, narrations, playlist, 'install-skill': installSkillCommand },
 });
