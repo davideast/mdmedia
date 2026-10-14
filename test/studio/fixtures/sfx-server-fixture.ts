@@ -72,7 +72,7 @@ mock.module(Bun.resolveSync('sharp', fileURLToPath(new URL('../../../studio/src/
   if (sharpFailures > 0) { sharpFailures--; throw new Error('Thumbnail failed'); }
   return realSharp(input);
 } }));
-process.env.ELEVENLABS_API_KEY = 'test-eleven-placeholder';
+process.env.ELEVENLABS_API_KEY = 'test-eleven-placeholder'; delete process.env.ELEVEN_LABS_KEY;
 const server = await import('../../../studio/src/lib/sfx-server');
 const { parseSfxRequest } = await import('../../../studio/src/lib/sfx-request');
 const { listMedia, listGenerations } = await import('../../../studio/src/lib/media-catalog-server');
@@ -121,6 +121,10 @@ const failed = await server.submitSfx(uid, request, 'sfx-key-failed', first.item
 const rejected = await settled(failed.generationId); assert.equal(rejected.status, 'error'); assert.equal(rejected.error.code, 'provider_rejected');
 assert.equal((await server.sfxResource(uid, first.itemId, '')).result!.id, wav.generationId);
 assert(!JSON.stringify(await server.sfxResource(uid, first.itemId, '')).includes('SECRET'));
+// Every ElevenLabs 4xx is a refusal, including ones outside the common set such as 402 for exhausted credit.
+failure = 402;
+const unpaid = await server.submitSfx(uid, request, 'sfx-key-unpaid', null, 'key');
+const refused = await settled(unpaid.generationId); assert.equal(refused.status, 'error'); assert.equal(refused.error.code, 'provider_rejected');
 // A server failure has no receipt to retrieve: one call, no retry, explicit interruption.
 failure = 500; const before500 = providerCalls;
 const broken = await server.submitSfx(uid, request, 'sfx-key-server-error', first.itemId, 'key');
@@ -165,6 +169,13 @@ await assert.rejects(server.submitSfx(uid, request, 'rate-sfx-key-12345', null, 
 documents.set('mediaQuotas/sfx_owner', quota);
 delete process.env.ELEVENLABS_API_KEY;
 await assert.rejects(server.submitSfx(uid, request, 'unconfigured-sfx-key', null, 'key'), { code: 'provider_unavailable' });
+// A key removed after acceptance fails the queued attempt as unavailable, not as an unknown outcome.
+const beforeUnconfigured = providerCalls;
+const unconfigured = { ...initial, id: 'unconfigured', itemId: 'unconfigured-item', status: 'queued', phase: 'queued', assetId: null, leaseToken: null, leaseUntil: 0 };
+documents.set('mediaGenerations/unconfigured', unconfigured); documents.set('mediaActivity/unconfigured', unconfigured);
+documents.set('mediaItems/sfx_unconfigured-item', { ...documents.get(`mediaItems/sfx_${first.itemId}`), id: 'unconfigured-item', status: 'queued', latestGenerationId: 'unconfigured', latestSuccessfulGenerationId: null });
+const unavailable = await settled('unconfigured'); assert.equal(unavailable.status, 'error'); assert.equal(unavailable.error.code, 'provider_unavailable');
+assert.equal(providerCalls, beforeUnconfigured); assert.equal(documents.get('mediaItems/sfx_unconfigured-item')!.status, 'error');
 process.env.ELEVEN_LABS_KEY = 'test-eleven-legacy';
 const legacy = await server.submitSfx(uid, request, 'legacy-sfx-key-1234', null, 'key');
 assert.equal((await settled(legacy.generationId)).status, 'ready'); assert.equal(calls.at(-1)!.key, 'test-eleven-legacy');

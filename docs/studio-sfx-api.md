@@ -47,8 +47,9 @@ fields return `unknown_fields`; invalid values return `invalid_prompt`,
 A user may have three attempts in progress (`429 too_many_in_progress`) and an
 API key may start 30 per hour (`429 rate_limited`). Without an ElevenLabs key or
 ffmpeg, create returns `503 provider_unavailable` and options report
-`available: false`. `MDMEDIA_SFX_MODEL` overrides the default
-`eleven_text_to_sound_v2`.
+`available: false`; an accepted attempt that starts after the key is removed
+ends as `error` with `provider_unavailable`. `MDMEDIA_SFX_MODEL` overrides the
+default `eleven_text_to_sound_v2`.
 
 A 4xx from ElevenLabs ends the attempt as `error` with `provider_rejected`.
 Studio stores the audio as soon as ElevenLabs returns it, so a failed decode or
