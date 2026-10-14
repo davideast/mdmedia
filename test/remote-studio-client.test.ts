@@ -80,3 +80,90 @@ describe('playlist lookup', () => {
     await expect(client.resolvePlaylist('Nope')).rejects.toMatchObject({ code: 'playlist_not_found' });
   });
 });
+
+describe('studio media', () => {
+  type Call = { url: string; method: string; headers: Headers; body: RequestInit['body'] };
+  const recording = (respond: (call: Call) => Response) => {
+    const calls: Call[] = [];
+    const fetchStub = (async (url: URL, init: RequestInit) => {
+      const call = { url: String(url), method: init.method ?? 'GET', headers: new Headers(init.headers), body: init.body };
+      calls.push(call);
+      return respond(call);
+    }) as unknown as typeof fetch;
+    return { calls, client: new StudioClient('http://localhost:3000', KEY, fetchStub) };
+  };
+  const generation = (status: string) => ({ id: 'gen1', itemId: 'item1', type: 'image', status, phase: status, assets: [], error: null });
+  const item = (status: string) => ({ id: 'item1', type: 'image', status, latestGeneration: generation(status), result: null, links: { web: 'http://localhost:3000/image/item1' } });
+
+  it('creates each medium at its route with a fresh Idempotency-Key', async () => {
+    const { calls, client } = recording(() => Response.json({ id: 'item1', generation: generation('queued'), links: {}, replayed: false }, { status: 202 }));
+    await client.createImage({ prompt: 'A lighthouse', output: { aspectRatio: '1:1' } });
+    await client.createVideo({ prompt: 'A train' });
+    await client.createMusic({ prompt: 'A waltz' });
+    await client.createSfx({ prompt: 'A door creaks', promptInfluence: 0.5 });
+    expect(calls.map((call) => `${call.method} ${new URL(call.url).pathname}`)).toEqual([
+      'POST /api/v1/images', 'POST /api/v1/videos', 'POST /api/v1/music', 'POST /api/v1/sfx',
+    ]);
+    expect(JSON.parse(String(calls[0]!.body))).toEqual({ prompt: 'A lighthouse', output: { aspectRatio: '1:1' } });
+    const keys = calls.map((call) => call.headers.get('idempotency-key'));
+    for (const key of keys) expect(key).toMatch(/^[A-Za-z0-9_-]{10,128}$/);
+    expect(new Set(keys).size).toBe(4);
+    expect(calls[0]!.headers.get('content-type')).toBe('application/json');
+  });
+
+  it('reuses an Idempotency-Key the caller passes, so a retry cannot start a second attempt', async () => {
+    const { calls, client } = recording(() => Response.json({ id: 'item1', replayed: true }, { status: 202 }));
+    await client.createMusic({ prompt: 'A waltz' }, 'retry-key-123');
+    await client.createMusic({ prompt: 'A waltz' }, 'retry-key-123');
+    expect(calls.map((call) => call.headers.get('idempotency-key'))).toEqual(['retry-key-123', 'retry-key-123']);
+  });
+
+  it('reads an item by type and id', async () => {
+    const { calls, client } = recording(() => Response.json(item('ready')));
+    expect((await client.media('video', 'a/b')).id).toBe('item1');
+    expect(new URL(calls[0]!.url).pathname).toBe('/api/v1/videos/a%2Fb');
+  });
+
+  it('uploads a reference as raw bytes for the medium that uses it', async () => {
+    const { calls, client } = recording(() => Response.json({ id: 'ref1', mimeType: 'image/png' }, { status: 201 }));
+    const asset = await client.uploadReference('music', new Uint8Array([137, 80, 78, 71]), 'image/png');
+    expect(asset.id).toBe('ref1');
+    expect(calls[0]!.url).toBe('http://localhost:3000/api/v1/assets?media=music');
+    expect(calls[0]!.headers.get('content-type')).toBe('image/png');
+    expect(calls[0]!.headers.get('authorization')).toBe(`Bearer ${KEY}`);
+    expect([...(calls[0]!.body as Uint8Array)]).toEqual([137, 80, 78, 71]);
+  });
+
+  it('downloads an asset from this studio only, whatever origin the link names', async () => {
+    const { calls, client } = recording(() => new Response(new Uint8Array([1, 2, 3]), { headers: { 'Content-Type': 'audio/mpeg' } }));
+    const download = await client.downloadAsset('https://studio.tail1234.ts.net/api/v1/assets/a1/content?download=1');
+    expect([...download.bytes]).toEqual([1, 2, 3]);
+    expect(download.mimeType).toBe('audio/mpeg');
+    expect(calls[0]!.url).toBe('http://localhost:3000/api/v1/assets/a1/content?download=1');
+    await expect(client.downloadAsset('https://elsewhere.example/steal')).rejects.toMatchObject({ code: 'invalid_asset_link' });
+    expect(calls).toHaveLength(1);
+  });
+
+  it('keeps the key out of download errors', async () => {
+    const { client } = recording(() => Response.json({ error: { code: 'insufficient_scope', message: 'This API key cannot music read.' } }, { status: 403 }));
+    const error = await client.downloadAsset('/api/v1/assets/a1/content').catch((caught) => caught);
+    expect(error).toMatchObject({ code: 'insufficient_scope', status: 403 });
+    expect(JSON.stringify({ message: error.message, stack: error.stack })).not.toContain(KEY.slice(4));
+  });
+
+  it('waits until the latest attempt finishes, reporting each poll', async () => {
+    const states = ['queued', 'generating', 'ready'];
+    const { calls, client } = recording(() => Response.json(item(states.shift() ?? 'ready')));
+    const seen: string[] = [];
+    const finished = await client.waitForMedia('image', 'item1', { intervalMs: 1, onProgress: (resource) => seen.push(resource.latestGeneration!.status) });
+    expect(finished.latestGeneration?.status).toBe('ready');
+    expect(seen).toEqual(['queued', 'generating', 'ready']);
+    expect(calls).toHaveLength(3);
+  });
+
+  it('stops waiting at the timeout and returns the unfinished item', async () => {
+    const { client } = recording(() => Response.json(item('generating')));
+    const unfinished = await client.waitForMedia('sfx', 'item1', { intervalMs: 5, timeoutMs: 1 });
+    expect(unfinished.status).toBe('generating');
+  });
+});
