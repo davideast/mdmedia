@@ -266,6 +266,27 @@ describe('studio media flow', () => {
   });
 });
 
+describe('studio media failures after creation', () => {
+  /** A studio that creates the item, then answers every read with `failure`. */
+  const failingStudio = (failure: Response) => new StudioClient('http://localhost:3000', KEY, (async (_url: URL, init: RequestInit) => init.method === 'POST'
+    ? Response.json({ id: 'item1', type: 'image', generation: {}, links: { self: '', web: 'http://localhost:3000/image/item1', generations: '' }, replayed: false }, { status: 202 })
+    : failure.clone()) as unknown as typeof fetch);
+
+  it('name the created item in JSON, so a retry checks on it instead of paying again', async () => {
+    const client = failingStudio(Response.json({ error: { code: 'not_found', message: 'That image is not available to you.' } }, { status: 404 }));
+    await guarded(true, () => runMediaCommand(client, 'image', { prompt: 'A lighthouse' }, { wait: true, json: true }));
+    const printed = JSON.parse(logs[0]!);
+    expect(printed).toMatchObject({ id: 'item1', type: 'image', links: { web: 'http://localhost:3000/image/item1' }, error: { code: 'not_found' } });
+    expect(printed.error.message).toContain('mdmedia studio status item1 --type image');
+    expect(process.exitCode).toBe(1);
+  });
+
+  it('leave failures before creation unchanged', async () => {
+    await guarded(true, () => runMediaCommand(failingStudio(new Response(null)), 'image', { prompt: 'x' }, { wait: true, timeout: 'soon' }));
+    expect(JSON.parse(logs[0]!)).toEqual({ error: { code: 'error', message: '--timeout must be a number at least 1 (got "soon").' } });
+  });
+});
+
 describe('studio errors', () => {
   it('tell the user to log in again when the key lacks a scope', async () => {
     await guarded(true, async () => { throw new StudioApiError(403, 'insufficient_scope', 'This API key cannot images create.'); });

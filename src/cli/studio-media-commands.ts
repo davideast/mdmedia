@@ -14,7 +14,7 @@ import {
   type StudioMediaType,
   type VideoRequestBody,
 } from '../remote/client.js';
-import { connectedClient, guarded } from './studio-support.js';
+import { StartedMediaError, connectedClient, guarded } from './studio-support.js';
 
 const LABELS: Record<StudioMediaType, string> = { image: 'Image', video: 'Video', music: 'Music', sfx: 'Sound effect' };
 const REFERENCE_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
@@ -117,8 +117,17 @@ export async function runMediaCommand<T extends StudioMediaType>(client: StudioC
     return;
   }
   if (!options.json) console.error(`Generating ${created.links.web} …`);
+  try {
+    await finishMedia(client, type, created.id, options, timeoutMs);
+  } catch (error) {
+    throw new StartedMediaError(error, { id: created.id, type, links: created.links });
+  }
+}
+
+/** Waits for a created item, saves its file with `--output`, and prints the outcome. */
+async function finishMedia<T extends StudioMediaType>(client: StudioClient, type: T, id: string, options: MediaRunOptions, timeoutMs: number): Promise<void> {
   let phase = '';
-  const finished = await client.waitForMedia(type, created.id, {
+  const finished = await client.waitForMedia(type, id, {
     timeoutMs,
     onProgress: (resource) => {
       const next = resource.latestGeneration?.phase ?? '';
