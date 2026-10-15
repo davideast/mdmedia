@@ -323,8 +323,8 @@ export function imageGenerationConfig(
   aspectRatio: string,
   size?: string,
 ): { aspectRatio: string; imageSize?: '1K' | '2K' | '4K' } {
-  if (size === undefined || size === '') return { aspectRatio };
-  const imageSize = size.toUpperCase();
+  if (size === undefined || size.trim() === '') return { aspectRatio };
+  const imageSize = size.trim().toUpperCase();
   if (imageSize !== '1K' && imageSize !== '2K' && imageSize !== '4K') {
     throw new Error(`--size must be 1K, 2K or 4K (got ${size})`);
   }
@@ -372,6 +372,7 @@ export const imageCommand = defineCommand({
     },
     size: {
       type: 'string',
+      alias: ['s', 'image-size', 'imageSize', 'resolution'],
       description: 'Output resolution: 1K, 2K or 4K (defaults to the model choice, 1K)',
     },
     apiKey: {
@@ -435,7 +436,7 @@ export const imageCommand = defineCommand({
     contents.push({ text: promptText });
 
     const ai = new GoogleGenAI({ apiKey });
-    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${args.size ? `, ${args.size}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
+    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${imageConfig.imageSize ? `, ${imageConfig.imageSize}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
     const res = await ai.models.generateContent({
       model: args.model,
       contents: contents.length === 1 ? contents[0].text : contents,

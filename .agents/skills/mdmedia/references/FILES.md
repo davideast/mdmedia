@@ -51,7 +51,7 @@ Flags:
 - `-p "<prompt>"` or `-i prompt.md`.
 - `-r style.png`: match the style of a reference image.
 - `-a 16:9|1:1|4:3|3:2`.
-- `--size 1K|2K|4K`.
+- `-s, --size 1K|2K|4K` (or `--image-size`, `--resolution`).
 
 ## music
 
