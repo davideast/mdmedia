@@ -198,7 +198,7 @@ function LibraryNarrationCard({
               <span className="sr-only">Download for offline</span>
             </Button>
           ) : null}
-          {isReady ? <RetentionControl type="narration" id={narration.id} compact className="size-11" /> : null}
+          {isReady ? <RetentionControl type="narration" id={narration.id} className="size-11" /> : null}
           <Button
             type="button"
             variant="ghost"

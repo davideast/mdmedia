@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
+import type { HeaderAction } from '@/components/shell/header-action';
 import { useWorkspace, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { useNarration } from '@/components/shell/narration-provider';
 import { useAuth } from '@/lib/auth-context';
@@ -95,14 +96,12 @@ export function MusicEditor({ id }: { id?: string }) {
     } catch (e) { report(e); }
   }
   const title = id ? music?.title ?? 'Music' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New music';
-  return <WorkbenchPanel workspacePage title={title} icon={<Music2 size={13} />} bodyClassName="gap-0 p-0" actions={<>
-    {music && <DropdownMenu><DropdownMenuTrigger asChild><button aria-label="Music actions" className="grid size-7 place-items-center rounded-md text-ink-muted hover:bg-muted"><MoreHorizontal size={16} /></button></DropdownMenuTrigger><DropdownMenuContent align="end">
+  const optionsAction: HeaderAction = { icon: PanelRight, label: 'Music options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' };
+  return <WorkbenchPanel workspacePage title={title} icon={<Music2 size={13} />} bodyClassName="gap-0 p-0" actions={music ? [{ icon: MoreHorizontal, label: 'Music actions', menu: <>
       <DropdownMenuItem onSelect={() => void history()}><History size={15} />History</DropdownMenuItem>
       <DropdownMenuItem onSelect={() => { const next = crypto.randomUUID(); store.setMusicDraft(next, { ...request, kind: 'music' }); router.push(`/studio/music?draft=${next}`); }}><Copy size={15} />Duplicate</DropdownMenuItem>
       <DropdownMenuItem onSelect={() => { setRename(music.title); setRenameOpen(true); }}><Pencil size={15} />Rename</DropdownMenuItem>
-    </DropdownMenuContent></DropdownMenu>}
-    <MediaIconAction compact label="Music options" aria-expanded={drawer === 'options'} onClick={() => setDrawer(drawer === 'options' ? '' : 'options')}><PanelRight size={15} /></MediaIconAction>
-  </>}>
+    </> }, optionsAction] : [optionsAction]}>
     {loadError && <p role="alert" className="p-4 text-sm text-destructive">{loadError}</p>}
     {asset && result && <MusicPlayer key={asset.id} result={result} title={title} onStart={() => stream.player?.pause()} otherAudioPlaying={stream.playing} />}
     {selected && <Button variant="ghost" className="mx-4 mt-3 self-start" onClick={() => setSelected(null)}>Back to latest</Button>}
