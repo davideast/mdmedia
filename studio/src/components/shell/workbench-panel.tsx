@@ -1,6 +1,6 @@
 "use client";
 
-import { PinWorkButton } from "./work-navigation";
+import { HEADER_BUTTON_CLASS, HEADER_ICON_SIZE, HeaderActionButton, type HeaderActions } from "./header-action";
 import { cn } from "cn";
 import { useEffect, useImperativeHandle, useRef, type ReactNode } from "react";
 import { PanelLeft, PanelRight } from "lucide-react";
@@ -13,6 +13,10 @@ import { useOptionalWorkspace } from "@/components/shell/workspace-provider";
  * Geometry is the study's: a 36px header on the inset plane, a hairline
  * underneath, and a body that scrolls independently of its siblings. The
  * palette is this app's.
+ *
+ * The header holds the title and at most two critical actions
+ * (`HeaderActions`), drawn by one button at one scale. It shows no status or
+ * loading state; anything else goes in the right panel or the content.
  */
 export function WorkbenchPanel({
   title,
@@ -33,7 +37,8 @@ export function WorkbenchPanel({
   title?: string;
   titleNode?: ReactNode;
   icon?: ReactNode;
-  actions?: ReactNode;
+  /** One or two actions, the last rightmost. Pinning, retention and settings belong in the right panel. */
+  actions?: HeaderActions;
   children: ReactNode;
   floating?: ReactNode;
   scrollRef?: React.Ref<HTMLDivElement>;
@@ -111,9 +116,9 @@ export function WorkbenchPanel({
                   onClick={shell.toggleNav}
                   aria-label={shell.navSheetOpen ? "Close navigation" : "Open navigation"}
                   aria-expanded={shell.navSheetOpen}
-                  className="inline-flex size-7 flex-none items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden md:hidden"
+                  className={cn(HEADER_BUTTON_CLASS, "text-ink-muted hover:bg-muted hover:text-foreground md:hidden")}
                 >
-                  <PanelLeft size={15} strokeWidth={2} />
+                  <PanelLeft size={HEADER_ICON_SIZE} strokeWidth={2} />
                 </button>
               ) : null}
               <h2 className="inline-flex min-w-0 flex-1 items-center gap-1.5 text-[12px] font-semibold text-foreground">
@@ -122,17 +127,16 @@ export function WorkbenchPanel({
               </h2>
             </div>
             <div className="flex flex-none items-center gap-1">
-              {workspacePage && workspace ? <PinWorkButton /> : null}
-              {actions}
+              {actions?.map((action, index) => <HeaderActionButton key={index} action={action} />)}
               {shell?.showContextToggle ? (
                 <button
                   type="button"
                   onClick={shell.toggleContext}
                   aria-label={shell.contextSheetOpen ? "Close details" : "Open details"}
                   aria-expanded={shell.contextSheetOpen}
-                  className="inline-flex size-7 flex-none items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden lg:hidden"
+                  className={cn(HEADER_BUTTON_CLASS, "text-ink-muted hover:bg-muted hover:text-foreground lg:hidden")}
                 >
-                  <PanelRight size={15} strokeWidth={2} />
+                  <PanelRight size={HEADER_ICON_SIZE} strokeWidth={2} />
                 </button>
               ) : null}
             </div>

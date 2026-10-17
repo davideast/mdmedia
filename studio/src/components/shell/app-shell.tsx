@@ -121,10 +121,13 @@ export function AppShell({
   }, [pathname]);
 
   const busy = stream.status === "starting" || stream.status === "streaming";
+  // Pressing Play is acknowledged here, never in the page's top bar.
+  const loadingAudio = !usingDownloads && stream.id !== null && stream.status === "loading";
   const showPlayerBar = shouldShowPlayerBar({
     hasOfflineTrack: offlinePlayback.track !== null,
     player: stream.player,
     durationMs: stream.durationMs,
+    loadingAudio,
   });
 
   useEffect(() => {
@@ -313,6 +316,7 @@ export function AppShell({
             durationMs={stream.durationMs}
             playing={stream.playing}
             busy={busy}
+            loading={loadingAudio}
             title={stream.title || undefined}
             href={!offline && stream.id ? `/narration/${stream.id}` : undefined}
             subtitle={subtitle || undefined}

@@ -26,6 +26,8 @@ import {
 import { useWorkspace, useWorkspaceField } from "@/components/shell/workspace-provider";
 import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import type { HeaderActions } from "@/components/shell/header-action";
+import { KeepSection } from "@/components/shell/keep-section";
 import { useAuth } from "@/lib/auth-context";
 import { currentIdToken } from "@/lib/firebase";
 import { deleteNarration, updateVisibility } from "@/lib/narrations";
@@ -61,7 +63,7 @@ export function NarrationSettings({
   narration: Narration | null;
   narrationId?: string;
   canEdit: boolean;
-  actions?: React.ReactNode;
+  actions?: HeaderActions;
 }) {
   const { store, activeView } = useWorkspace();
   const router = useRouter();
@@ -217,14 +219,11 @@ export function NarrationSettings({
     <WorkbenchPanel
       title="Details"
       icon={<Info size={13} strokeWidth={2} />}
-      actions={
-        <>
-          {pending ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
-          {actions}
-        </>
-      }
+      actions={actions}
       bodyClassName="gap-6 p-4"
     >
+      <KeepSection media={canEdit && effectiveId ? { type: "narration", id: effectiveId } : undefined} />
+
       {isAdapted ? (
         <div className="grid gap-2">
           <Label className="t-label">Document view</Label>

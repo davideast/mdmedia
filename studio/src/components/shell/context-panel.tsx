@@ -11,6 +11,9 @@ import {
 import { ComposerSettings } from "@/components/studio/composer-settings";
 import { NarrationSettings } from "@/components/narration/narration-settings";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import type { HeaderActions } from "@/components/shell/header-action";
+import { KeepSection } from "@/components/shell/keep-section";
+import type { MediaType } from "@/lib/media-types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { watchNarration } from "@/lib/narrations";
 import { useAuth } from "@/lib/auth-context";
@@ -21,7 +24,7 @@ function NarrationContextPanel({
   actions,
 }: {
   id: string;
-  actions?: React.ReactNode;
+  actions?: HeaderActions;
 }) {
   const { user } = useAuth();
   const [narration, setNarration] = useState<Narration | null>(null);
@@ -40,8 +43,17 @@ function NarrationContextPanel({
   );
 }
 
-function QuietPanel() {
-  return <WorkbenchPanel bodyClassName="p-4">{null}</WorkbenchPanel>;
+const MEDIA_ROUTE = /^\/(image|video|music)\/([^/?#]+)/;
+
+/** Pages without their own inspector still get Keep: pinning, and retention for media. */
+function WorkPanel({ pathname, actions }: { pathname: string; actions?: HeaderActions }) {
+  const match = MEDIA_ROUTE.exec(pathname);
+  const media = match ? { type: match[1] as MediaType, id: decodeURIComponent(match[2]!) } : undefined;
+  return (
+    <WorkbenchPanel title="Details" icon={<Info size={13} strokeWidth={2} />} actions={actions} bodyClassName="gap-6 p-4">
+      <KeepSection media={media} />
+    </WorkbenchPanel>
+  );
 }
 
 /**
@@ -102,20 +114,10 @@ export function ContextPanel({
     );
   }
 
-  const collapseAction =
-    onToggleDock === undefined ? null : (
-      <Tooltip>
-        <TooltipTrigger
-          onClick={onToggleDock}
-          aria-label="Collapse panel"
-          aria-expanded={true}
-          className="inline-flex size-7 flex-none items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden"
-        >
-          <PanelRightClose size={15} strokeWidth={2} />
-        </TooltipTrigger>
-        <TooltipContent side="left">Collapse {sectionLabel.toLowerCase()}</TooltipContent>
-      </Tooltip>
-    );
+  const collapseAction: HeaderActions | undefined =
+    onToggleDock === undefined
+      ? undefined
+      : [{ icon: PanelRightClose, label: `Collapse ${sectionLabel.toLowerCase()}`, onClick: onToggleDock, expanded: true }];
 
   if (isStudio) return <ComposerSettings actions={collapseAction} />;
 
@@ -126,5 +128,5 @@ export function ContextPanel({
     }
   }
 
-  return <QuietPanel />;
+  return <WorkPanel pathname={pathname} actions={collapseAction} />;
 }

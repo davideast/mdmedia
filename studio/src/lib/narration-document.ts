@@ -114,8 +114,10 @@ export function shouldShowPlayerBar(input: {
   hasOfflineTrack: boolean;
   player: unknown | null;
   durationMs: number;
+  /** A narration's audio was requested and has not started; the bar acknowledges Play. */
+  loadingAudio?: boolean;
 }): boolean {
-  return input.hasOfflineTrack || (input.player !== null && input.durationMs > 0);
+  return input.hasOfflineTrack || input.loadingAudio === true || (input.player !== null && input.durationMs > 0);
 }
 
 interface DocumentSource {
