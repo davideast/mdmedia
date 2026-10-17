@@ -116,6 +116,19 @@ describe('Narration Playback Flicker & Disabled Controls Regression', () => {
       ).toBe(true);
     });
 
+    it('shows the bar the moment audio starts loading, so pressing Play is acknowledged there and not in the page header', () => {
+      expect(shouldShowPlayerBar({ hasOfflineTrack: false, player: null, durationMs: 0, loadingAudio: true })).toBe(true);
+      expect(shouldShowPlayerBar({ hasOfflineTrack: false, player: null, durationMs: 0, loadingAudio: false })).toBe(false);
+    });
+
+    it('the player bar draws a loading line in place of the scrubber until sound starts', () => {
+      const bar = readFileSync(resolve(import.meta.dir, '../../studio/src/components/reader/audio-player-bar.tsx'), 'utf8');
+      const shell = readFileSync(resolve(import.meta.dir, '../../studio/src/components/shell/app-shell.tsx'), 'utf8');
+      expect(bar).toContain('role="progressbar"');
+      expect(bar).toContain('Loading audio');
+      expect(shell).toContain('loadingAudio');
+    });
+
     it('AppShell uses shouldShowPlayerBar and never pops up a disabled player bar from transcript presence alone', () => {
       const appShellSource = readFileSync(
         resolve(import.meta.dir, '../../studio/src/components/shell/app-shell.tsx'),

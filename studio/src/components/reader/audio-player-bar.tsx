@@ -218,6 +218,7 @@ export function AudioPlayerBar({
   durationMs,
   playing,
   busy,
+  loading = false,
   title,
   subtitle,
   href,
@@ -232,6 +233,8 @@ export function AudioPlayerBar({
   playing: boolean;
   /** Synthesis still running — the track is not yet its final length. */
   busy: boolean;
+  /** Audio was requested and has not started: a loading line replaces the scrubber. */
+  loading?: boolean;
   title?: string;
   subtitle?: React.ReactNode;
   href?: string;
@@ -250,7 +253,13 @@ export function AudioPlayerBar({
   }, [player, rate]);
 
   const ready = player !== null && durationMs > 0;
-  const displayTitle = title && title.trim().length > 0 ? title : "Untitled narration";
+  const waiting = loading && !ready;
+  const displayTitle = title && title.trim().length > 0 ? title : waiting ? "Narration" : "Untitled narration";
+  const loadingLine = (
+    <div role="progressbar" aria-label="Loading audio" className="player-loading-track min-w-20 flex-1">
+      <span className="player-loading-bar" />
+    </div>
+  );
 
   const toggle = useCallback(() => {
     if (player === null) return;
@@ -307,7 +316,7 @@ export function AudioPlayerBar({
           </span>
         )}
         <span className="t-meta truncate text-[11px] leading-tight">
-          {subtitle ?? (busy ? "Synthesizing…" : "Narration")}
+          {waiting ? "Loading audio…" : subtitle ?? (busy ? "Synthesizing…" : "Narration")}
         </span>
       </div>
     </div>
@@ -376,19 +385,21 @@ export function AudioPlayerBar({
             </TransportButton>
           ) : null}
 
-          <Slider
-            aria-label="Position"
-            value={[Math.min(positionMs, durationMs)]}
-            min={0}
-            max={Math.max(durationMs, 1)}
-            step={100}
-            disabled={!ready}
-            onValueChange={([next]) => player?.seek(next)}
-            className="min-w-20 flex-1 px-1.5"
-          />
+          {waiting ? loadingLine : (
+            <Slider
+              aria-label="Position"
+              value={[Math.min(positionMs, durationMs)]}
+              min={0}
+              max={Math.max(durationMs, 1)}
+              step={100}
+              disabled={!ready}
+              onValueChange={([next]) => player?.seek(next)}
+              className="min-w-20 flex-1 px-1.5"
+            />
+          )}
 
           <span className="t-mono flex-none text-[11px] tabular-nums whitespace-nowrap">
-            {clock(positionMs)} / {busy ? "––:––" : clock(durationMs)}
+            {clock(positionMs)} / {busy || waiting ? "––:––" : clock(durationMs)}
           </span>
         </div>
 
@@ -455,18 +466,20 @@ export function AudioPlayerBar({
           <span className="t-mono flex-none text-[11px] tabular-nums text-ink-muted">
             {clock(positionMs)}
           </span>
-          <Slider
-            aria-label="Position"
-            value={[Math.min(positionMs, durationMs)]}
-            min={0}
-            max={Math.max(durationMs, 1)}
-            step={100}
-            disabled={!ready}
-            onValueChange={([next]) => player?.seek(next)}
-            className="flex-1 min-w-0 px-1"
-          />
+          {waiting ? loadingLine : (
+            <Slider
+              aria-label="Position"
+              value={[Math.min(positionMs, durationMs)]}
+              min={0}
+              max={Math.max(durationMs, 1)}
+              step={100}
+              disabled={!ready}
+              onValueChange={([next]) => player?.seek(next)}
+              className="flex-1 min-w-0 px-1"
+            />
+          )}
           <span className="t-mono flex-none text-[11px] tabular-nums text-ink-muted">
-            {busy ? "––:––" : clock(durationMs)}
+            {busy || waiting ? "––:––" : clock(durationMs)}
           </span>
         </div>
       </div>
