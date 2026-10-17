@@ -11,6 +11,7 @@ import { SourceDocumentView } from "@/components/reader/source-document-view";
 import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
+import { projectNarrationView } from "@/lib/narration-document";
 import { updateNarrationTitle } from "@/lib/narrations";
 import { useNarrationDocument } from "@/lib/use-narration-document";
 import { useWorkspaceField } from "@/components/shell/workspace-provider";
@@ -23,12 +24,7 @@ export default function NarrationPage() {
   const { stream: playback, playNarration, documentView, setDocumentView, generationQueue } = useNarration();
   const document = useNarrationDocument(id);
   const isLive = playback.id === id;
-  const stream = isLive ? playback : {
-    id, title: document?.title ?? "", voice: document?.voice ?? null, transcript: document?.transcript ?? "",
-    sourceMarkdown: document?.sourceMarkdown ?? null, adapted: document?.adapted ?? false,
-    chunks: document?.chunks ?? [], status: document?.status ?? "loading", errorMessage: document?.errorMessage ?? null,
-    player: null, playing: false, activeWord: null, durationMs: 0, positionMs: 0,
-  };
+  const stream = projectNarrationView(id, document, playback);
 
   // Immediate synchronous projection: if docParam is present, use it directly during render
   // so page reloads load the active tab first with zero layout shift or hydration mismatch.
@@ -81,11 +77,21 @@ export default function NarrationPage() {
     [stream.chunks],
   );
 
+  const wordsDurationMs = useMemo(
+    () => words.reduce((end, word) => Math.max(end, word.endMs), 0),
+    [words],
+  );
+  const loadedDurationMs = Math.max(stream.durationMs, wordsDurationMs);
+
   const audioLoaded = stream.player !== null && stream.durationMs > 0;
 
   const handleSeekWord = (startMs: number) => {
-    if (isLive && playback.player) playback.player.seek(startMs);
-    else playNarration(id, startMs);
+    if (isLive && playback.player && playback.durationMs > 0) {
+      playback.player.seek(startMs);
+      if (!playback.playing) void playback.player.play();
+    } else {
+      playNarration(id, startMs);
+    }
   };
 
   const displayTitle =
@@ -131,6 +137,7 @@ export default function NarrationPage() {
   const busy =
     stream.status === "starting" ||
     stream.status === "streaming" ||
+    (isLive && playback.status === "loading") ||
     Boolean(activeQueueJob);
   const empty = stream.transcript.length === 0;
 
@@ -241,7 +248,7 @@ export default function NarrationPage() {
         <div className="flex items-center gap-1">
           <Button type="button" size="sm" disabled={empty || stream.status === "error"} aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
             onClick={() => {
-              if (isLive && playback.player) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
+              if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
               else playNarration(id);
             }} className="h-8 gap-1.5">
             {stream.playing ? <Pause size={13} /> : <Play size={13} />}<span>{stream.playing ? "Pause" : "Play"}</span>
@@ -337,7 +344,7 @@ export default function NarrationPage() {
           spokenThrough={spokenThrough}
           words={words}
           audioLoaded={audioLoaded || words.length > 0}
-          loadedDurationMs={isLive ? stream.durationMs : words.reduce((end, word) => Math.max(end, word.endMs), 0)}
+          loadedDurationMs={loadedDurationMs}
           onSeekWord={handleSeekWord}
         />
       )}

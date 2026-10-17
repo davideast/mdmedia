@@ -17,6 +17,7 @@ import { ShellContext, type ShellContextValue } from "@/components/shell/shell-c
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useMediaSession } from "@/lib/use-media-session";
 import { useConnectivity } from "@/lib/connectivity";
+import { shouldShowPlayerBar } from "@/lib/narration-document";
 import { useOfflinePlayback } from "@/components/shell/offline-playback-provider";
 
 const DOCK_KEY = "mdmedia.nav.docked.v2";
@@ -106,7 +107,6 @@ export function AppShell({
   });
   const breakpoints = useResponsiveBreakpoints();
   const hasContext = pathname === "/studio" || pathname.startsWith("/narration/");
-  const isNarrationRoute = pathname.startsWith("/narration/");
   const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
@@ -121,9 +121,11 @@ export function AppShell({
   }, [pathname]);
 
   const busy = stream.status === "starting" || stream.status === "streaming";
-  const showPlayerBar = offlinePlayback.track !== null ||
-    (isNarrationRoute && stream.transcript.length > 0) ||
-    (stream.player !== null && stream.durationMs > 0);
+  const showPlayerBar = shouldShowPlayerBar({
+    hasOfflineTrack: offlinePlayback.track !== null,
+    player: stream.player,
+    durationMs: stream.durationMs,
+  });
 
   useEffect(() => {
     const stored = window.localStorage.getItem(DOCK_KEY);

@@ -66,6 +66,19 @@ function extractPcm(wav: Uint8Array): Uint8Array {
 let sharedAudio: HTMLAudioElement | null = null;
 /** Releases the shared element from the player currently using it. */
 let releaseSharedAudio: (() => void) | null = null;
+/** Pre-unlocked Web Audio context for streaming checkpoints that resolve after the click gesture. */
+let pendingAudioContext: AudioContext | null = null;
+
+function createAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  const Ctor = window.AudioContext;
+  if (!Ctor) return null;
+  try {
+    return new Ctor({ sampleRate: SAMPLE_RATE });
+  } catch {
+    return new Ctor();
+  }
+}
 
 function sharedAudioElement(): HTMLAudioElement {
   if (!sharedAudio) {
@@ -83,6 +96,14 @@ function sharedAudioElement(): HTMLAudioElement {
  * unlocks it for later programmatic play (the next playlist track).
  */
 export function unlockPlaybackAudio(): void {
+  if (typeof window !== "undefined") {
+    if (!pendingAudioContext || pendingAudioContext.state === "closed") {
+      pendingAudioContext = createAudioContext();
+    }
+    if (pendingAudioContext && pendingAudioContext.state !== "running") {
+      void pendingAudioContext.resume().catch(() => undefined);
+    }
+  }
   if (typeof document === "undefined" || releaseSharedAudio !== null) return;
   const audio = sharedAudioElement();
   if (!audio.paused) return;
@@ -490,17 +511,16 @@ export class StreamingPcmPlayer {
   private ensureContext(): AudioContext | null {
     if (this.destroyed) return null;
     if (this.context) return this.context;
-    if (typeof window === "undefined") return null;
 
-    const Ctor = window.AudioContext;
-    if (!Ctor) return null;
-
-    let context: AudioContext;
-    try {
-      context = new Ctor({ sampleRate: SAMPLE_RATE });
-    } catch {
-      context = new Ctor();
+    let context: AudioContext | null = null;
+    if (pendingAudioContext && pendingAudioContext.state !== "closed") {
+      context = pendingAudioContext;
+      pendingAudioContext = null;
+    } else {
+      context = createAudioContext();
     }
+    if (!context) return null;
+
     const gain = context.createGain();
     gain.gain.value = this.volumeValue;
     gain.connect(context.destination);
