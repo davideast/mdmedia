@@ -64,10 +64,10 @@ describe('Narration Streaming Lifecycle & Pre-Creation Resilience', () => {
   });
 
   describe('Seam 4: Mid-Stream Failure & Checkpoint Serialization (narration-server.ts)', () => {
-    it('drains checkpointChain in the catch block before failDocument and discardObjects', () => {
+    it('drains pending checkpoints in the catch block before failDocument and discardObjects', () => {
       const catchIndex = narrationServerSource.indexOf('} catch (error) {');
       const drainIndex = narrationServerSource.indexOf(
-        'await checkpointChain.catch(() => undefined);',
+        'await settleCheckpoints();',
         catchIndex
       );
       const failDocIndex = narrationServerSource.indexOf('await failDocument(', catchIndex);

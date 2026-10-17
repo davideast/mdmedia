@@ -31,7 +31,8 @@ import {
   type Visibility,
   type VoiceName,
 } from "./types";
-import { alignPcmFrames, wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
+import { alignPcmFrames, type NarrationTimingsFile } from "./wav";
+import { createCheckpointScheduler, wrapPcmPartsAsWav } from "./narration-checkpoints";
 import type { RetentionPatch } from "./retention";
 import { carriedRetention } from "./retention-server";
 import {
@@ -391,7 +392,7 @@ export function createNarrationStream({
   const run = async () => {
     let pipelineError: Error | null = null;
     let currentProcessingChunkIndex: number | undefined = undefined;
-    let checkpointChain = Promise.resolve();
+    let settleCheckpoints: () => Promise<void> = async () => {};
 
     try {
       const client = createGeminiClient();
@@ -616,7 +617,7 @@ export function createNarrationStream({
           return;
         }
         const durationMs = Math.round(totalBytes / BYTES_PER_MS);
-        const wav = wrapPcmAsWav(concatPcm(allPcm, totalBytes));
+        const wav = wrapPcmPartsAsWav(allPcm, totalBytes);
         const timingsFile: NarrationTimingsFile = {
           id,
           title,
@@ -626,7 +627,8 @@ export function createNarrationStream({
           sourceMarkdown,
           adapted: request.rewriteForNarration,
         };
-        const audioBuffer = Buffer.from(wav);
+        // A view over the WAV: copying it again would hold the whole recording twice.
+        const audioBuffer = Buffer.from(wav.buffer, wav.byteOffset, wav.byteLength);
         const timingsBuffer = Buffer.from(JSON.stringify(timingsFile));
 
         const bucket = adminBucket();
@@ -654,6 +656,21 @@ export function createNarrationStream({
         await syncNarrationCatalog(id);
         return durationMs;
       };
+
+      // Uploading the whole recording after every chunk costs work proportional
+      // to the square of its length, so checkpoints are spaced out and the
+      // document is only refreshed in between.
+      const checkpoints = createCheckpointScheduler({
+        totalBytes: () => totalBytes,
+        upload: async () => {
+          const bytes = totalBytes;
+          return (await persistSnapshot("streaming")) === undefined ? undefined : bytes;
+        },
+        heartbeat: async () => {
+          await docRef.update({ updatedAt: Date.now() });
+        },
+      });
+      settleCheckpoints = checkpoints.settle;
 
       bus.on("chunk:complete", ({ chunkIndex }) => {
         const source = documentChunks[chunkIndex];
@@ -690,10 +707,7 @@ export function createNarrationStream({
         pendingChunkParts = [];
         pendingChunkBytes = 0;
 
-        checkpointChain = checkpointChain
-          .then(() => persistSnapshot("streaming"))
-          .then(() => undefined)
-          .catch(() => undefined);
+        checkpoints.request();
       });
 
       await pipeline.processDocument(
@@ -701,7 +715,7 @@ export function createNarrationStream({
         request.voiceId,
         request.voiceProvider === "gemini" ? request.promptStyle : undefined,
       );
-      await checkpointChain;
+      await settleCheckpoints();
 
       if (cancelled) {
         await purgeDocumentAndStorage();
@@ -735,7 +749,7 @@ export function createNarrationStream({
       const durationMs = (await persistSnapshot("ready")) ?? Math.round(totalBytes / BYTES_PER_MS);
       queue.push({ type: "done", id, durationMs });
     } catch (error) {
-      await checkpointChain.catch(() => undefined);
+      await settleCheckpoints();
       if (cancelled) {
         await purgeDocumentAndStorage();
         return;
