@@ -1,6 +1,7 @@
 import { verifyIdToken } from "@/lib/firebase-admin";
 import { parseNarrationRequest } from "@/lib/narration-server";
 import { startNarration } from "@/lib/narration-start";
+import { RetentionInputError, extractRetention, type RetentionPatch } from "@/lib/retention";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -46,6 +47,18 @@ export async function POST(request: Request): Promise<Response> {
     body = null;
   }
 
+  let retention: RetentionPatch | undefined;
+  try {
+    const split = extractRetention(body, Date.now());
+    body = split.rest;
+    retention = split.patch;
+  } catch (error) {
+    if (error instanceof RetentionInputError) {
+      return Response.json({ message: error.message }, { status: 400, headers: cors });
+    }
+    throw error;
+  }
+
   const parsed = parseNarrationRequest(body);
   if (!parsed) {
     return Response.json(
@@ -54,7 +67,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const started = await startNarration({ uid, request: parsed, signal: request.signal });
+  const started = await startNarration({ uid, request: parsed, signal: request.signal, retention });
   if (!started.ok) {
     return Response.json({ message: started.message }, { status: started.status, headers: cors });
   }

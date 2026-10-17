@@ -49,17 +49,28 @@ function defaultFor(type: MediaType, settings: RetentionSettings): TtlDefault | 
   return type in settings.byType ? settings.byType[type] ?? null : settings.global;
 }
 
+export type RetentionSource = 'locked' | 'item' | 'type-default' | 'global-default' | 'none';
+
+/** When the item expires and which rule decided it, for showing people why. */
+export function explainRetention(
+  item: Pick<RetainedItem, 'type' | 'createdAt' | 'locked' | 'expiresAt'>,
+  settings: RetentionSettings,
+): { expiresAt: number | null; source: RetentionSource } {
+  if (item.locked) return { expiresAt: null, source: 'locked' };
+  if (typeof item.expiresAt === 'number') return { expiresAt: item.expiresAt, source: 'item' };
+  const fallback = defaultFor(item.type, settings);
+  const source = item.type in settings.byType ? 'type-default' : 'global-default';
+  if (!fallback || item.createdAt < fallback.since) return { expiresAt: null, source: 'none' };
+  const ms = parseTtl(fallback.ttl);
+  return ms === undefined ? { expiresAt: null, source: 'none' } : { expiresAt: item.createdAt + ms, source };
+}
+
 /** When the item expires, or null if it is kept. */
 export function resolveExpiry(
   item: Pick<RetainedItem, 'type' | 'createdAt' | 'locked' | 'expiresAt'>,
   settings: RetentionSettings,
 ): number | null {
-  if (item.locked) return null;
-  if (typeof item.expiresAt === 'number') return item.expiresAt;
-  const fallback = defaultFor(item.type, settings);
-  if (!fallback || item.createdAt < fallback.since) return null;
-  const ms = parseTtl(fallback.ttl);
-  return ms === undefined ? null : item.createdAt + ms;
+  return explainRetention(item, settings).expiresAt;
 }
 
 export function isExpired(item: RetainedItem, settings: RetentionSettings, now: number): boolean {
@@ -118,4 +129,73 @@ export function readRetentionSettings(value: unknown): RetentionSettings {
   }
   const global = readDefault(raw.global);
   return { global: global ?? null, byType };
+}
+
+/** A request to change one item's retention. Only the keys present change. */
+export interface RetentionPatch {
+  locked?: boolean;
+  /** An absolute time, or null to clear the item's own expiry. */
+  expiresAt?: number | null;
+}
+
+/** Bad retention input; routes turn it into a 400. */
+export class RetentionInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RetentionInputError';
+  }
+}
+
+const TTL_HINT = 'Use a number and m, h, d or w, like 36h.';
+
+/**
+ * Reads `{ ttl?, expiresAt?, locked? }`. A ttl is relative to `now` and becomes
+ * an absolute expiry; `null` clears it. Anything else is refused, so a typo can
+ * never silently leave work with the wrong lifetime.
+ */
+export function parseRetentionPatch(value: unknown, now: number): RetentionPatch {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new RetentionInputError('Send retention as an object like { "ttl": "36h" } or { "locked": true }.');
+  }
+  const raw = value as Record<string, unknown>;
+  const unknown = Object.keys(raw).filter((key) => key !== 'ttl' && key !== 'expiresAt' && key !== 'locked');
+  if (unknown.length > 0) throw new RetentionInputError(`Unknown retention field: ${unknown.join(', ')}. Use ttl, expiresAt or locked.`);
+  if (Object.keys(raw).length === 0) throw new RetentionInputError('Send at least one of ttl, expiresAt or locked.');
+  if ('ttl' in raw && 'expiresAt' in raw) throw new RetentionInputError('Send either ttl or expiresAt, not both.');
+
+  const patch: RetentionPatch = {};
+  if ('locked' in raw) {
+    if (typeof raw.locked !== 'boolean') throw new RetentionInputError('locked must be true or false.');
+    patch.locked = raw.locked;
+  }
+  if ('ttl' in raw) {
+    if (raw.ttl === null) patch.expiresAt = null;
+    else {
+      const ms = typeof raw.ttl === 'string' ? parseTtl(raw.ttl) : undefined;
+      if (ms === undefined) throw new RetentionInputError(`"${String(raw.ttl)}" is not a valid ttl. ${TTL_HINT}`);
+      patch.expiresAt = now + ms;
+    }
+  }
+  if ('expiresAt' in raw) {
+    if (raw.expiresAt === null) patch.expiresAt = null;
+    else {
+      const at = typeof raw.expiresAt === 'number' ? raw.expiresAt : typeof raw.expiresAt === 'string' ? Date.parse(raw.expiresAt) : NaN;
+      if (!Number.isFinite(at)) throw new RetentionInputError('expiresAt must be a timestamp in milliseconds or an ISO date.');
+      if (at <= now) throw new RetentionInputError('expiresAt must be in the future.');
+      patch.expiresAt = at;
+    }
+  }
+  return patch;
+}
+
+/**
+ * Splits retention out of a create body (`ttl` shorthand or a `retention`
+ * object) so the rest can still be validated strictly by the type's own parser.
+ */
+export function extractRetention(body: unknown, now: number): { rest: unknown; patch: RetentionPatch | undefined } {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { rest: body, patch: undefined };
+  const { ttl, retention, ...rest } = body as Record<string, unknown>;
+  if (ttl === undefined && retention === undefined) return { rest: body, patch: undefined };
+  if (ttl !== undefined && retention !== undefined) throw new RetentionInputError('Send either ttl or retention, not both.');
+  return { rest, patch: parseRetentionPatch(ttl !== undefined ? { ttl } : retention, now) };
 }

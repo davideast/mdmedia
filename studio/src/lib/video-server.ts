@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { GeminiOmniVideoProvider, readMp4Duration, type VideoGenerationResult } from 'mdmedia/video';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
+import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
 import { parseVideoRequest, readVideoDefaults, videoActionBody, MAX_VIDEO_BYTES } from './video-request';
@@ -103,7 +104,7 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
       assemblyMode: 'clips', clipAssetId: null, clipDurationSeconds: null, parentClipDurationSeconds: null,
       createdAt: now, updatedAt: now, leaseUntil: 0, leaseToken: null, error: null };
     const item: VideoItem = { id: itemId, type: 'video', ownerUid: uid, title, status: 'queued', visibility: 'private', request,
-      createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/video/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
+      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/video/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
       thumbnailAssetId: previous?.thumbnailAssetId ?? null, durationMs: previous?.durationMs ?? 0, latestGenerationId: generationId, latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null, continuationUnavailableFor: previous?.continuationUnavailableFor ?? null };
     tx.set(itemRef(itemId), item); tx.set(generationRef(generationId), job);
     tx.set(adminDb().collection('mediaActivity').doc(generationId), { id: generationId, itemId, ownerUid: uid, type: 'video', title, status: 'queued', phase: 'queued', createdAt: now, updatedAt: now, href: item.href });
