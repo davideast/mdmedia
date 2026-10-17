@@ -273,6 +273,8 @@ export const INSTRUCTION_PRESETS: readonly TextPreset[] = [
 ];
 
 export interface UserSettings {
+  /** How long generations are kept: a default per media type and a global one. */
+  retention?: import('./retention').RetentionSettings;
   imageDefaults?: import('./media-types').ImageRequest;
   musicDefaults?: import('./media-types').MusicRequest;
   videoDefaults?: import('./media-types').VideoRequest;

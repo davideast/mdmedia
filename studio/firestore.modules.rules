@@ -99,7 +99,10 @@ service cloud.firestore {
               .hasOnly(['title', 'visibility', 'sharedWith', 'sharedWithLabels', 'updatedAt']))
         && validNarrationFields();
 
-      allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      // A locked narration is kept until it is unlocked through the API, which
+      // writes `locked` with the Admin SDK.
+      allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid)
+        && resource.data.get('locked', false) != true;
     }
 
     match /playlists/{playlistId} {
