@@ -3,7 +3,7 @@
 import { HEADER_BUTTON_CLASS, HEADER_ICON_SIZE, HeaderActionButton, type HeaderActions } from "./header-action";
 import { cn } from "cn";
 import { useEffect, useImperativeHandle, useRef, type ReactNode } from "react";
-import { Loader2, PanelLeft, PanelRight } from "lucide-react";
+import { PanelLeft, PanelRight } from "lucide-react";
 import { useOptionalShell } from "@/components/shell/shell-context";
 import { useOptionalWorkspace } from "@/components/shell/workspace-provider";
 
@@ -14,16 +14,15 @@ import { useOptionalWorkspace } from "@/components/shell/workspace-provider";
  * underneath, and a body that scrolls independently of its siblings. The
  * palette is this app's.
  *
- * The header holds the title and at most two actions (`HeaderActions`), all
- * drawn by one button so the row stays aligned. Anything else goes in the
- * right panel.
+ * The header holds the title and at most two critical actions
+ * (`HeaderActions`), drawn by one button at one scale. It shows no status or
+ * loading state; anything else goes in the right panel or the content.
  */
 export function WorkbenchPanel({
   title,
   titleNode,
   icon,
   actions,
-  busy = false,
   children,
   floating,
   scrollRef,
@@ -40,8 +39,6 @@ export function WorkbenchPanel({
   icon?: ReactNode;
   /** One or two actions, the last rightmost. Pinning, retention and settings belong in the right panel. */
   actions?: HeaderActions;
-  /** Shows a small spinner after the title while the panel's content is saving or loading. */
-  busy?: boolean;
   children: ReactNode;
   floating?: ReactNode;
   scrollRef?: React.Ref<HTMLDivElement>;
@@ -127,7 +124,6 @@ export function WorkbenchPanel({
               <h2 className="inline-flex min-w-0 flex-1 items-center gap-1.5 text-[12px] font-semibold text-foreground">
                 {icon}
                 {titleNode ?? <span className="truncate">{title}</span>}
-                {busy ? <Loader2 size={13} aria-label="Saving" className="flex-none animate-spin text-ink-muted" /> : null}
               </h2>
             </div>
             <div className="flex flex-none items-center gap-1">

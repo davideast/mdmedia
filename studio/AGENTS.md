@@ -1,21 +1,23 @@
 # Studio agent instructions
 
-## Page headers hold only the essentials
+## Page top bars hold only the title and critical actions
 
-A page header (the `WorkbenchPanel` top bar) holds the navigation toggle, the
-title, at most two actions, and the right-panel toggle. Nothing else.
+A page's top bar (the `WorkbenchPanel` header) holds the title, the page's
+critical actions, and the existing navigation and right-panel toggles. Nothing
+else goes there.
 
-- Pass actions as `HeaderActions` (`components/shell/header-action.tsx`): one or
-  two `HeaderAction` objects, the last rightmost. The type allows no more, and
-  `HeaderActionButton` draws every one at the same size, so the row stays
-  aligned. Never pass JSX to `actions`; `test/studio/header-actions.test.ts`
-  fails if you do.
-- Only actions someone needs on nearly every visit belong there, such as Play
-  and Copy on a narration. Mark the main one `emphasis: "primary"`.
-- Everything else, including pinning, retention, sharing, playlists and
-  settings, goes in the right panel. The `KeepSection` there already holds
-  pinning and retention.
-- Do not add header controls as a side effect of other work. If a feature needs
-  a per-item control, put it in the right panel and say where it went.
-- Check the header at phone width (about 390px) after any change to it: the
-  title should still read as more than a few words.
+- **Critical actions only.** On a narration that is Copy and Play. Do not add
+  a control to a top bar unless the owner asked for that exact control there.
+  A new feature's per-item control goes in the right panel (the `KeepSection`
+  holds pinning and retention) or in the page content; say where it went.
+- **No status or loading in the top bar.** No spinners, "saving" marks,
+  progress, badges or counts. Show loading in the content or the player.
+- **One visual scale.** Pass actions as `HeaderActions` from
+  `components/shell/header-action.tsx`: one or two `HeaderAction` objects, the
+  last rightmost. `HeaderActionButton` draws every action as the same filled
+  32px circle with a 16px icon; the main action (`emphasis: "primary"`) is the
+  inverted fill. Never pass JSX to `actions`, and never style a header button
+  by hand. `test/studio/header-actions.test.ts` fails if you do.
+- **Check it.** After any top bar change, render it at phone width (about
+  390px) and compare the actions side by side. The title should read as more
+  than a few words, and the actions should look the same size.
