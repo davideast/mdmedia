@@ -185,6 +185,8 @@ export function useNarrationStream(): NarrationStreamState {
   const docUnsubRef = useRef<(() => void) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const loadSessionRef = useRef(0);
+  const activeLoadIdRef = useRef<string | null>(null);
+  const pendingOptionsRef = useRef<{ autoPlay?: boolean; startAtMs?: number }>({});
   const latestDocRef = useRef<{ sourceMarkdown?: string; adapted?: boolean }>({});
 
   const ensurePlayer = useCallback((): StreamingPcmPlayer => {
@@ -206,6 +208,8 @@ export function useNarrationStream(): NarrationStreamState {
 
   const resetPlayer = useCallback(() => {
     loadSessionRef.current++;
+    activeLoadIdRef.current = null;
+    pendingOptionsRef.current = {};
     latestDocRef.current = {};
     docUnsubRef.current?.();
     docUnsubRef.current = null;
@@ -220,6 +224,8 @@ export function useNarrationStream(): NarrationStreamState {
   useEffect(
     () => () => {
       loadSessionRef.current++;
+      activeLoadIdRef.current = null;
+      pendingOptionsRef.current = {};
       latestDocRef.current = {};
       abortRef.current?.abort();
       docUnsubRef.current?.();
@@ -373,11 +379,12 @@ export function useNarrationStream(): NarrationStreamState {
 
   const loadExisting = useCallback<NarrationStreamState['loadExisting']>(
     async (narrationId, options) => {
-      // If this narration is already loaded and ready in the player, reuse it directly
-      // from memory instead of tearing down and re-downloading from Storage.
+      // If this narration is already loaded in the player (either ready or streaming
+      // with at least one decoded checkpoint), reuse it directly from memory instead of
+      // tearing down and re-downloading from Storage.
       if (
         idRef.current === narrationId &&
-        statusRef.current === 'ready' &&
+        (statusRef.current === 'ready' || statusRef.current === 'streaming') &&
         playerRef.current !== null &&
         playerRef.current.durationMs > 0
       ) {
@@ -388,19 +395,46 @@ export function useNarrationStream(): NarrationStreamState {
         return;
       }
 
+      // If a load session for this narration is already in flight (downloading the
+      // initial audio blob or waiting for the first synthesis checkpoint), coalesce
+      // the caller's options instead of aborting the in-flight request and flickering.
+      if (
+        idRef.current === narrationId &&
+        activeLoadIdRef.current === narrationId &&
+        (statusRef.current === 'loading' || statusRef.current === 'streaming')
+      ) {
+        if (options?.autoPlay !== undefined) {
+          pendingOptionsRef.current.autoPlay = options.autoPlay;
+        }
+        if (options?.startAtMs !== undefined) {
+          pendingOptionsRef.current.startAtMs = options.startAtMs;
+        }
+        return;
+      }
+
+      const sameNarration = idRef.current === narrationId;
       abortRef.current?.abort();
       abortRef.current = null;
       resetPlayer();
 
       const session = ++loadSessionRef.current;
+      activeLoadIdRef.current = narrationId;
+      pendingOptionsRef.current = {
+        autoPlay: options?.autoPlay,
+        startAtMs: options?.startAtMs,
+      };
 
+      idRef.current = narrationId;
+      statusRef.current = 'loading';
       setId(narrationId);
-      setTitle('');
-      setVoice(null);
-      setTranscript('');
-      setSourceMarkdown(null);
-      setAdapted(false);
-      setChunks([]);
+      if (!sameNarration) {
+        setTitle('');
+        setVoice(null);
+        setTranscript('');
+        setSourceMarkdown(null);
+        setAdapted(false);
+        setChunks([]);
+      }
       setErrorMessage(null);
       setStatus('loading');
 
@@ -429,19 +463,26 @@ export function useNarrationStream(): NarrationStreamState {
 
         if (session !== loadSessionRef.current) return;
 
-        if (options?.autoPlay) {
-          if (options.startAtMs !== undefined) activePlayer.seek(options.startAtMs);
+        if (pendingOptionsRef.current.startAtMs !== undefined) {
+          activePlayer.seek(pendingOptionsRef.current.startAtMs);
+          pendingOptionsRef.current.startAtMs = undefined;
+        }
+        if (pendingOptionsRef.current.autoPlay) {
           void activePlayer.play();
         }
+        statusRef.current = 'ready';
         setStatus('ready');
 
+        let shouldStopWatch = false;
         const stopDocWatch = () => {
+          shouldStopWatch = true;
           docUnsubRef.current?.();
           docUnsubRef.current = null;
         };
         stopDocWatch();
+        shouldStopWatch = false;
 
-        docUnsubRef.current = watchNarration(narrationId, (narration) => {
+        const unsub = watchNarration(narrationId, (narration) => {
           if (session !== loadSessionRef.current) {
             stopDocWatch();
             return;
@@ -475,6 +516,11 @@ export function useNarrationStream(): NarrationStreamState {
             stopDocWatch();
           }
         });
+        if (shouldStopWatch || session !== loadSessionRef.current) {
+          unsub();
+        } else {
+          docUnsubRef.current = unsub;
+        }
         return;
       }
 
@@ -486,6 +532,7 @@ export function useNarrationStream(): NarrationStreamState {
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
       let lastDurationMs = -1;
       let autoPlayed = false;
+      let probedInitialStreamingCheckpoint = false;
       let loadChain = Promise.resolve();
       const prefetched = takePrefetched(narrationId);
       let finalPulled = false;
@@ -495,7 +542,10 @@ export function useNarrationStream(): NarrationStreamState {
         loadChain = loadChain
           .then(() => pullCheckpoint(true))
           .then((ok) => {
-            if (ok && session === loadSessionRef.current) setStatus('ready');
+            if (ok && session === loadSessionRef.current) {
+              statusRef.current = 'ready';
+              setStatus('ready');
+            }
           });
       };
 
@@ -518,6 +568,8 @@ export function useNarrationStream(): NarrationStreamState {
             if (!audioResponse.ok || !timingsResponse.ok) {
               if (isFinal) {
                 const failing = audioResponse.ok ? timingsResponse : audioResponse;
+                activeLoadIdRef.current = null;
+                statusRef.current = 'error';
                 setStatus('error');
                 setErrorMessage(await readMessage(failing, LOAD_FAILURE));
               }
@@ -532,6 +584,9 @@ export function useNarrationStream(): NarrationStreamState {
 
           if (session !== loadSessionRef.current) return false;
 
+          if (typeof timingsFile.durationMs === 'number' && timingsFile.durationMs > lastDurationMs) {
+            lastDurationMs = timingsFile.durationMs;
+          }
           if (timingsFile.title) {
             setTitle((current) => (current.trim().length > 0 ? current : timingsFile.title));
           }
@@ -556,15 +611,22 @@ export function useNarrationStream(): NarrationStreamState {
             URL.revokeObjectURL(objectUrl);
           }
 
-          if (options?.autoPlay && !autoPlayed) {
-            autoPlayed = true;
-            if (options.startAtMs !== undefined) activePlayer.seek(options.startAtMs);
-            void activePlayer.play();
+          if (session !== loadSessionRef.current) return false;
+
+          if (pendingOptionsRef.current.startAtMs !== undefined) {
+            activePlayer.seek(pendingOptionsRef.current.startAtMs);
+            pendingOptionsRef.current.startAtMs = undefined;
+          }
+          if (pendingOptionsRef.current.autoPlay && !autoPlayed) {
+            await activePlayer.play();
+            autoPlayed = activePlayer.playing;
           }
           return true;
         } catch {
           if (session !== loadSessionRef.current) return false;
           if (isFinal) {
+            activeLoadIdRef.current = null;
+            statusRef.current = 'error';
             setStatus('error');
             setErrorMessage(LOAD_FAILURE);
           }
@@ -572,21 +634,26 @@ export function useNarrationStream(): NarrationStreamState {
         }
       };
 
+      let shouldStopWatch = false;
       const stopDocWatch = () => {
+        shouldStopWatch = true;
         docUnsubRef.current?.();
         docUnsubRef.current = null;
       };
 
       stopDocWatch();
+      shouldStopWatch = false;
       if (session !== loadSessionRef.current) return;
 
-      docUnsubRef.current = watchNarration(narrationId, (narration) => {
+      const unsub = watchNarration(narrationId, (narration) => {
         if (session !== loadSessionRef.current) {
           stopDocWatch();
           return;
         }
 
         if (!narration) {
+          activeLoadIdRef.current = null;
+          statusRef.current = 'error';
           setStatus('error');
           setErrorMessage(LOAD_FAILURE);
           stopDocWatch();
@@ -604,6 +671,8 @@ export function useNarrationStream(): NarrationStreamState {
         };
 
         if (narration.status === 'error') {
+          activeLoadIdRef.current = null;
+          statusRef.current = 'error';
           setStatus('error');
           setErrorMessage(narration.errorMessage ?? LOAD_FAILURE);
           stopDocWatch();
@@ -613,22 +682,46 @@ export function useNarrationStream(): NarrationStreamState {
         const isStaleStreaming =
           narration.status === 'streaming' &&
           narration.durationMs > 0 &&
-          Date.now() - narration.updatedAt > 15_000;
+          Date.now() - narration.updatedAt > 5 * 60_000;
 
         if (narration.status === 'streaming' && !isStaleStreaming) {
+          statusRef.current = 'streaming';
           setStatus('streaming');
           if (narration.durationMs > 0 && narration.durationMs !== lastDurationMs) {
             lastDurationMs = narration.durationMs;
+            loadChain = loadChain.then(() => pullCheckpoint(false)).then(() => undefined);
+          } else if (narration.durationMs === 0 && !probedInitialStreamingCheckpoint) {
+            probedInitialStreamingCheckpoint = true;
             loadChain = loadChain.then(() => pullCheckpoint(false)).then(() => undefined);
           }
           return;
         }
 
-        if (narration.status === 'ready' || isStaleStreaming) {
+        if (isStaleStreaming) {
+          if (narration.durationMs > 0 && narration.durationMs !== lastDurationMs) {
+            lastDurationMs = narration.durationMs;
+            loadChain = loadChain
+              .then(() => pullCheckpoint(true))
+              .then((ok) => {
+                if (ok && session === loadSessionRef.current) {
+                  statusRef.current = 'ready';
+                  setStatus('ready');
+                }
+              });
+          }
+          return;
+        }
+
+        if (narration.status === 'ready') {
           stopDocWatch();
           pullFinal();
         }
       });
+      if (shouldStopWatch || session !== loadSessionRef.current) {
+        unsub();
+      } else {
+        docUnsubRef.current = unsub;
+      }
       // A prefetched recording is already final: start it without waiting for
       // the document listener's first snapshot. The listener still fills in
       // the document fields.
@@ -639,6 +732,8 @@ export function useNarrationStream(): NarrationStreamState {
 
   const cancel = useCallback(() => {
     loadSessionRef.current++;
+    activeLoadIdRef.current = null;
+    pendingOptionsRef.current = {};
     latestDocRef.current = {};
     docUnsubRef.current?.();
     docUnsubRef.current = null;
