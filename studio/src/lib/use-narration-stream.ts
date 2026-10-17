@@ -15,6 +15,7 @@ import { auth } from './firebase';
 import { watchNarration } from './narrations';
 import { getMediaStore } from './media-store';
 import { StreamingPcmPlayer } from './pcm-player';
+import { streamWavInto } from './wav-stream';
 import type { AlignedChunk, AlignedWord, StreamEvent, Visibility, VoiceName } from './types';
 import type { NarrationTimingsFile } from './wav';
 
@@ -549,6 +550,40 @@ export function useNarrationStream(): NarrationStreamState {
           });
       };
 
+      const applyTimings = (timingsFile: NarrationTimingsFile) => {
+        if (typeof timingsFile.durationMs === 'number' && timingsFile.durationMs > lastDurationMs) {
+          lastDurationMs = timingsFile.durationMs;
+        }
+        if (timingsFile.title) {
+          setTitle((current) => (current.trim().length > 0 ? current : timingsFile.title));
+        }
+        if (timingsFile.transcript) setTranscript(timingsFile.transcript);
+        if (timingsFile.sourceMarkdown !== undefined) {
+          setSourceMarkdown(timingsFile.sourceMarkdown);
+        } else if (latestDocRef.current.sourceMarkdown !== undefined) {
+          setSourceMarkdown(latestDocRef.current.sourceMarkdown);
+        }
+        if (timingsFile.adapted !== undefined) {
+          setAdapted(timingsFile.adapted);
+        } else if (latestDocRef.current.adapted !== undefined) {
+          setAdapted(latestDocRef.current.adapted);
+        }
+        setChunks([...timingsFile.chunks].sort((a, b) => a.index - b.index));
+      };
+
+      const startRequestedPlayback = async (activePlayer: StreamingPcmPlayer) => {
+        if (session !== loadSessionRef.current) return;
+        if (pendingOptionsRef.current.startAtMs !== undefined) {
+          activePlayer.seek(pendingOptionsRef.current.startAtMs);
+          pendingOptionsRef.current.startAtMs = undefined;
+        }
+        if (pendingOptionsRef.current.autoPlay && !autoPlayed) {
+          autoPlayed = true;
+          await activePlayer.play();
+          autoPlayed = activePlayer.playing;
+        }
+      };
+
       const pullCheckpoint = async (isFinal: boolean): Promise<boolean> => {
         if (session !== loadSessionRef.current) return false;
         try {
@@ -576,6 +611,20 @@ export function useNarrationStream(): NarrationStreamState {
               return false;
             }
 
+            // A finished recording is played while it downloads: sound starts
+            // once about a second has arrived instead of after the whole file.
+            const startingFresh = (playerRef.current?.durationMs ?? 0) === 0;
+            if (isFinal && startingFresh && audioResponse.body) {
+              timingsFile = (await timingsResponse.json()) as NarrationTimingsFile;
+              if (session !== loadSessionRef.current) return false;
+              applyTimings(timingsFile);
+              const activePlayer = ensurePlayer();
+              return await streamWavInto(activePlayer, audioResponse.body, {
+                onBuffered: () => void startRequestedPlayback(activePlayer),
+                isCurrent: () => session === loadSessionRef.current,
+              });
+            }
+
             [audioBlob, timingsFile] = await Promise.all([
               audioResponse.blob(),
               timingsResponse.json() as Promise<NarrationTimingsFile>,
@@ -583,25 +632,7 @@ export function useNarrationStream(): NarrationStreamState {
           }
 
           if (session !== loadSessionRef.current) return false;
-
-          if (typeof timingsFile.durationMs === 'number' && timingsFile.durationMs > lastDurationMs) {
-            lastDurationMs = timingsFile.durationMs;
-          }
-          if (timingsFile.title) {
-            setTitle((current) => (current.trim().length > 0 ? current : timingsFile.title));
-          }
-          if (timingsFile.transcript) setTranscript(timingsFile.transcript);
-          if (timingsFile.sourceMarkdown !== undefined) {
-            setSourceMarkdown(timingsFile.sourceMarkdown);
-          } else if (latestDocRef.current.sourceMarkdown !== undefined) {
-            setSourceMarkdown(latestDocRef.current.sourceMarkdown);
-          }
-          if (timingsFile.adapted !== undefined) {
-            setAdapted(timingsFile.adapted);
-          } else if (latestDocRef.current.adapted !== undefined) {
-            setAdapted(latestDocRef.current.adapted);
-          }
-          setChunks([...timingsFile.chunks].sort((a, b) => a.index - b.index));
+          applyTimings(timingsFile);
 
           const objectUrl = URL.createObjectURL(audioBlob);
           const activePlayer = ensurePlayer();
@@ -612,15 +643,7 @@ export function useNarrationStream(): NarrationStreamState {
           }
 
           if (session !== loadSessionRef.current) return false;
-
-          if (pendingOptionsRef.current.startAtMs !== undefined) {
-            activePlayer.seek(pendingOptionsRef.current.startAtMs);
-            pendingOptionsRef.current.startAtMs = undefined;
-          }
-          if (pendingOptionsRef.current.autoPlay && !autoPlayed) {
-            await activePlayer.play();
-            autoPlayed = activePlayer.playing;
-          }
+          await startRequestedPlayback(activePlayer);
           return true;
         } catch {
           if (session !== loadSessionRef.current) return false;
