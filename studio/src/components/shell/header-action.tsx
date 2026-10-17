@@ -1,16 +1,17 @@
 "use client";
 
 import type { ComponentType, ReactNode } from "react";
-import { Loader2 } from "lucide-react";
 import { cn } from "cn";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 /**
  * One action in a page header. Headers take at most two (see `HeaderActions`),
- * so only what someone needs on every visit goes there: Play, Copy, a panel
- * toggle. Everything else, such as pinning, retention, sharing and settings,
- * belongs in the right panel.
+ * and only the page's critical actions belong there, such as Copy and Play on
+ * a narration. No status or loading indicators, pins, badges or settings: those
+ * go in the right panel or the content. Every action is the same filled 32px
+ * circle with a 16px icon, so they read at the same scale; the main one is the
+ * inverted fill.
  */
 export interface HeaderAction {
   /** A lucide icon component. Drawn at the header's single icon size. */
@@ -21,8 +22,6 @@ export interface HeaderAction {
   /** Items for a menu opened by this action, instead of `onClick`. */
   menu?: ReactNode;
   disabled?: boolean;
-  /** Shows a spinner in place of the icon while something loads. */
-  busy?: boolean;
   /** For toggles: whether the thing it opens is open. */
   expanded?: boolean;
   /** The page's main action is filled; the rest are quiet. */
@@ -45,7 +44,6 @@ export function HeaderActionButton({ action }: { action: HeaderAction }) {
     <button
       type="button"
       aria-label={action.label}
-      aria-busy={action.busy || undefined}
       aria-expanded={action.expanded}
       disabled={action.disabled}
       onClick={action.menu ? undefined : action.onClick}
@@ -53,14 +51,10 @@ export function HeaderActionButton({ action }: { action: HeaderAction }) {
         HEADER_BUTTON_CLASS,
         action.emphasis === "primary"
           ? "bg-foreground text-background hover:opacity-90"
-          : "text-ink-muted hover:bg-muted hover:text-foreground aria-expanded:bg-muted",
+          : "bg-foreground/12 text-foreground hover:bg-foreground/20 aria-expanded:bg-foreground/20",
       )}
     >
-      {action.busy ? (
-        <Loader2 size={HEADER_ICON_SIZE} strokeWidth={2} className="animate-spin" />
-      ) : (
-        <Icon size={HEADER_ICON_SIZE} strokeWidth={2} className={action.iconClassName} />
-      )}
+      <Icon size={HEADER_ICON_SIZE} strokeWidth={2} className={action.iconClassName} />
     </button>
   );
 

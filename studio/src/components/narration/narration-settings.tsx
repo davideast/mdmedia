@@ -220,7 +220,6 @@ export function NarrationSettings({
       title="Details"
       icon={<Info size={13} strokeWidth={2} />}
       actions={actions}
-      busy={pending}
       bodyClassName="gap-6 p-4"
     >
       <KeepSection media={canEdit && effectiveId ? { type: "narration", id: effectiveId } : undefined} />
