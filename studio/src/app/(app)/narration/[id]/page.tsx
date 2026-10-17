@@ -134,11 +134,6 @@ export default function NarrationPage() {
     }
   };
 
-  const busy =
-    stream.status === "starting" ||
-    stream.status === "streaming" ||
-    (isLive && playback.status === "loading") ||
-    Boolean(activeQueueJob);
   const empty = stream.transcript.length === 0;
 
   const [copiedView, setCopiedView] = useState<string | null>(null);
@@ -194,8 +189,6 @@ export default function NarrationPage() {
     disabled: activeDocumentView !== "adapted" || empty,
   });
 
-  // Audio is loading for this narration and has not started yet.
-  const loadingAudio = isLive && playback.status === "loading" && !playback.playing;
   const playAction: HeaderAction = {
     icon: stream.playing ? Pause : Play,
     label: stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`,
@@ -204,7 +197,6 @@ export default function NarrationPage() {
       else playNarration(id);
     },
     disabled: empty || stream.status === "error",
-    busy: loadingAudio,
     emphasis: "primary",
     iconClassName: stream.playing ? "fill-current" : "translate-x-px fill-current",
   };
@@ -264,7 +256,6 @@ export default function NarrationPage() {
           </span>
         )
       }
-      busy={busy}
       actions={empty ? [playAction] : [copyAction, playAction]}
     >
       {stream.status === "error" && !activeQueueJob || failedQueueJob ? (
