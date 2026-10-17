@@ -4,13 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { BookOpen, Check, Copy, FileText, Loader2, Pause, Play } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/reader/follow-button";
 import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
 import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
-import { RetentionControl } from "@/components/studio/retention-control";
+import type { HeaderAction } from "@/components/shell/header-action";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
 import { projectNarrationView } from "@/lib/narration-document";
 import { updateNarrationTitle } from "@/lib/narrations";
@@ -195,6 +194,26 @@ export default function NarrationPage() {
     disabled: activeDocumentView !== "adapted" || empty,
   });
 
+  // Audio is loading for this narration and has not started yet.
+  const loadingAudio = isLive && playback.status === "loading" && !playback.playing;
+  const playAction: HeaderAction = {
+    icon: stream.playing ? Pause : Play,
+    label: stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`,
+    onClick: () => {
+      if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
+      else playNarration(id);
+    },
+    disabled: empty || stream.status === "error",
+    busy: loadingAudio,
+    emphasis: "primary",
+    iconClassName: stream.playing ? "fill-current" : "translate-x-px fill-current",
+  };
+  const copyAction: HeaderAction = {
+    icon: copied ? Check : Copy,
+    label: copied ? `Copied ${documentConfig.name}` : `Copy ${documentConfig.name} as markdown`,
+    onClick: () => void handleCopy(),
+  };
+
   return (
     <WorkbenchPanel
       workspacePage
@@ -245,51 +264,8 @@ export default function NarrationPage() {
           </span>
         )
       }
-      actions={
-        <div className="flex items-center gap-1">
-          {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
-          {stream.status === "ready" ? <RetentionControl type="narration" id={id} /> : null}
-          {!empty ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleCopy}
-              title={
-                copied
-                  ? `Copied ${documentConfig.name}`
-                  : `Copy ${documentConfig.name} as markdown`
-              }
-              aria-label={
-                copied
-                  ? `Copied ${documentConfig.name}`
-                  : `Copy ${documentConfig.name} as markdown`
-              }
-              className="size-7 p-0 text-ink-muted hover:text-foreground"
-            >
-              {copied ? (
-                <Check size={13} strokeWidth={2.5} className="text-primary" />
-              ) : (
-                <Copy size={13} strokeWidth={2} />
-              )}
-            </Button>
-          ) : null}
-          <Button
-            type="button"
-            size="icon-xs"
-            disabled={empty || stream.status === "error"}
-            title={stream.playing ? "Pause" : "Play"}
-            aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
-            onClick={() => {
-              if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
-              else playNarration(id);
-            }}
-            className="size-7 rounded-full p-0"
-          >
-            {stream.playing ? <Pause size={13} className="fill-current" /> : <Play size={13} className="translate-x-px fill-current" />}
-          </Button>
-        </div>
-      }
+      busy={busy}
+      actions={empty ? [playAction] : [copyAction, playAction]}
     >
       {stream.status === "error" && !activeQueueJob || failedQueueJob ? (
         <p className="text-[0.95rem] text-ink-muted">

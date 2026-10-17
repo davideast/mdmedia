@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
+import type { HeaderAction } from '@/components/shell/header-action';
 import { useWorkspace, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { useAuth } from '@/lib/auth-context';
 import { MediaClientError, studioJson } from '@/lib/media-client';
@@ -122,16 +123,14 @@ export function VideoEditor({ id }: { id?: string }) {
   }
   const title = id ? video?.title ?? 'Video' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New video';
   const report = (e: unknown) => setError((e as Error).message);
-  return <WorkbenchPanel workspacePage title={title} icon={<Video size={13} strokeWidth={2} />} bodyClassName="gap-0 p-0" actions={<>
-    {id && <DropdownMenu><DropdownMenuTrigger asChild><MediaIconAction compact label="Video actions"><MoreHorizontal size={15} /></MediaIconAction></DropdownMenuTrigger><DropdownMenuContent align="end">
+  const optionsAction: HeaderAction = { icon: PanelRight, label: 'Video options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' };
+  return <WorkbenchPanel workspacePage title={title} icon={<Video size={13} strokeWidth={2} />} bodyClassName="gap-0 p-0" actions={id ? [{ icon: MoreHorizontal, label: 'Video actions', menu: <>
       <DropdownMenuItem disabled={!video?.result || Boolean(selected)} onSelect={() => setDrawer('clips')}><ListVideo size={16} />Clips</DropdownMenuItem>
       <DropdownMenuItem onSelect={() => void history()}><History size={16} />History</DropdownMenuItem>
       <DropdownMenuItem disabled={busy || Boolean(pending) || !video} onSelect={regenerate}><RotateCcw size={16} />Regenerate latest</DropdownMenuItem>
       <DropdownMenuItem onSelect={() => { setRename(video?.title ?? ''); setRenameOpen(true); }}><Pencil size={16} />Rename</DropdownMenuItem>
       <DropdownMenuItem disabled={!video} onSelect={duplicate}><Copy size={16} />Duplicate</DropdownMenuItem>
-    </DropdownMenuContent></DropdownMenu>}
-    <MediaIconAction compact label="Video options" aria-expanded={drawer === 'options'} onClick={() => setDrawer(drawer === 'options' ? '' : 'options')}><PanelRight size={15} /></MediaIconAction>
-  </>}>
+    </> }, optionsAction] : [optionsAction]}>
     {loadError && <p role="alert" className="p-4 text-sm text-destructive">{loadError}</p>}
     {asset && <div className="grid shrink-0 gap-2 p-4 pb-0 sm:p-6 sm:pb-0">
       {media.url ? <video key={asset.id} ref={playerRef} src={media.url} poster={poster.url || undefined} controls playsInline preload="metadata" aria-label={video?.title ?? 'Generated video'} className="max-h-[55dvh] w-full rounded-lg border border-border bg-black" /> : <div role="status" className="grid min-h-48 place-content-center rounded-lg bg-muted text-sm text-ink-muted">{media.error || 'Loading video…'}</div>}

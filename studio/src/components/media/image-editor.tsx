@@ -117,7 +117,7 @@ export function ImageEditor({ id }: { id?: string }) {
   }
   const title = id ? image?.title ?? 'Image' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New image';
   return <WorkbenchPanel workspacePage title={title} icon={<ImageIcon size={13} strokeWidth={2} />} bodyClassName="gap-0 p-0"
-    actions={<MediaIconAction label="Image options" compact onClick={() => setOptionsOpen(!optionsOpen)} aria-expanded={optionsOpen}><PanelRight size={15} strokeWidth={2} /></MediaIconAction>}>
+    actions={[{ icon: PanelRight, label: 'Image options', onClick: () => setOptionsOpen(!optionsOpen), expanded: optionsOpen }]}>
     {loadError && <p role="alert" className="px-4 pt-4 text-sm text-destructive sm:px-6">{loadError}</p>}
     {asset && <div className="grid shrink-0 gap-3 p-4 pb-0 sm:p-6 sm:pb-0">
       <AssetImage id={asset.id} alt={image?.title ?? 'Generated image'} className="h-[55dvh] min-h-64 rounded-lg border border-border p-2" />
