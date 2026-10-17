@@ -62,4 +62,31 @@ describe('Narration Streaming Lifecycle & Pre-Creation Resilience', () => {
       expect(readerPageSource).toContain('Synthesizing audio');
     });
   });
+
+  describe('Seam 4: Mid-Stream Failure & Checkpoint Serialization (narration-server.ts)', () => {
+    it('drains checkpointChain in the catch block before failDocument and discardObjects', () => {
+      const catchIndex = narrationServerSource.indexOf('} catch (error) {');
+      const drainIndex = narrationServerSource.indexOf(
+        'await checkpointChain.catch(() => undefined);',
+        catchIndex
+      );
+      const failDocIndex = narrationServerSource.indexOf('await failDocument(', catchIndex);
+      const discardIndex = narrationServerSource.indexOf('await discardObjects();', catchIndex);
+
+      expect(catchIndex).toBeGreaterThan(-1);
+      expect(drainIndex).toBeGreaterThan(catchIndex);
+      expect(drainIndex).toBeLessThan(failDocIndex);
+      expect(failDocIndex).toBeLessThan(discardIndex);
+    });
+
+    it('clears durationMs, audioPath, and timingsPath when marking a document as error', () => {
+      const failDocStart = narrationServerSource.indexOf('const failDocument = async');
+      const failDocEnd = narrationServerSource.indexOf('const discardObjects = async');
+      const failDocBlock = narrationServerSource.slice(failDocStart, failDocEnd);
+
+      expect(failDocBlock).toContain('durationMs: 0');
+      expect(failDocBlock).toContain('audioPath: ""');
+      expect(failDocBlock).toContain('timingsPath: ""');
+    });
+  });
 });

@@ -316,6 +316,9 @@ export function createNarrationStream({
     try {
       const updateData: Record<string, unknown> = {
         status: "error",
+        durationMs: 0,
+        audioPath: "",
+        timingsPath: "",
         updatedAt: Date.now(),
       };
       if (typeof error === "string") {
@@ -369,6 +372,7 @@ export function createNarrationStream({
   const run = async () => {
     let pipelineError: Error | null = null;
     let currentProcessingChunkIndex: number | undefined = undefined;
+    let checkpointChain = Promise.resolve();
 
     try {
       const client = createGeminiClient();
@@ -583,7 +587,13 @@ export function createNarrationStream({
       const objectMetadata = { metadata: { ownerUid: uid } };
 
       const persistSnapshot = async (status: "streaming" | "ready") => {
-        if (totalBytes === 0) return;
+        if (
+          totalBytes === 0 ||
+          cancelled ||
+          (status === "streaming" && pipelineError !== null)
+        ) {
+          return;
+        }
         const durationMs = Math.round(totalBytes / BYTES_PER_MS);
         const wav = wrapPcmAsWav(concatPcm(allPcm, totalBytes));
         const timingsFile: NarrationTimingsFile = {
@@ -623,8 +633,6 @@ export function createNarrationStream({
         await syncNarrationCatalog(id);
         return durationMs;
       };
-
-      let checkpointChain = Promise.resolve();
 
       bus.on("chunk:complete", ({ chunkIndex }) => {
         const source = documentChunks[chunkIndex];
@@ -706,6 +714,7 @@ export function createNarrationStream({
       const durationMs = (await persistSnapshot("ready")) ?? Math.round(totalBytes / BYTES_PER_MS);
       queue.push({ type: "done", id, durationMs });
     } catch (error) {
+      await checkpointChain.catch(() => undefined);
       if (cancelled) {
         await purgeDocumentAndStorage();
         return;
