@@ -54,11 +54,66 @@ const TRANSIENT_KEYWORDS = [
   "econnreset",
   "etimedout",
   "fetch failed",
+  "terminated",
+  "socket hang up",
   "eai_again",
   "service unavailable",
   "bad gateway",
   "gateway timeout",
+  "und_err_socket",
+  "und_err_connect_timeout",
+  "und_err_headers_timeout",
+  "und_err_body_timeout",
 ];
+
+function extractErrorChain(error: unknown): {
+  status: number;
+  rawCode: string;
+  rawMessage: string;
+} {
+  let status = 0;
+  const codes: string[] = [];
+  const messages: string[] = [];
+
+  let current: any = error;
+  for (let depth = 0; current && depth < 5; depth++) {
+    if (!status) {
+      const candidateStatus = Number(
+        current?.status ?? current?.statusCode ?? current?.error?.status ?? 0
+      );
+      if (Number.isFinite(candidateStatus) && candidateStatus > 0) {
+        status = candidateStatus;
+      }
+    }
+    const candidateCode = current?.error?.code ?? current?.code;
+    if (
+      candidateCode !== undefined &&
+      candidateCode !== null &&
+      String(candidateCode).trim() !== ""
+    ) {
+      codes.push(String(candidateCode).toLowerCase());
+    }
+    const candidateMessage =
+      current?.error?.message ??
+      current?.message ??
+      current?.body ??
+      (depth === 0 && !(current instanceof Error) ? String(current) : undefined);
+    if (
+      candidateMessage !== undefined &&
+      candidateMessage !== null &&
+      String(candidateMessage).trim() !== ""
+    ) {
+      messages.push(String(candidateMessage));
+    }
+    current = current?.cause;
+  }
+
+  return {
+    status,
+    rawCode: codes.join(" "),
+    rawMessage: messages.join(" | "),
+  };
+}
 
 /**
  * Inspects any raw error from the TTS provider, pipeline, or Gemini API
@@ -68,15 +123,7 @@ export function classifyNarrationError(
   error: unknown,
   context?: NarrationErrorContext
 ): ClassifiedNarrationError {
-  const errObj = error as any;
-  const status = Number(errObj?.status ?? errObj?.statusCode ?? 0);
-  const rawCode = String(errObj?.error?.code ?? errObj?.code ?? "").toLowerCase();
-  const rawMessage = String(
-    errObj?.error?.message ??
-      errObj?.message ??
-      errObj?.body ??
-      (error instanceof Error ? error.message : String(error))
-  );
+  const { status, rawCode, rawMessage } = extractErrorChain(error);
   const lowerMessage = rawMessage.toLowerCase();
 
   const chunkIndex = context?.currentChunkIndex;
@@ -164,7 +211,7 @@ export function classifyNarrationError(
   // 5. Upstream Service Unavailable / Network Timeouts (5xx)
   const isTransient =
     (status >= 500 && status < 600) ||
-    TRANSIENT_KEYWORDS.some((kw) => lowerMessage.includes(kw));
+    TRANSIENT_KEYWORDS.some((kw) => lowerMessage.includes(kw) || rawCode.includes(kw));
 
   if (isTransient) {
     return {

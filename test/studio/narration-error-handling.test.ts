@@ -100,6 +100,21 @@ describe('Narration Error Classification Suite', () => {
       expect(classified.category).toBe('transient');
       expect(classified.retryable).toBe(true);
     });
+
+    it('classifies Undici TypeError: terminated with nested ECONNRESET cause as retryable UPSTREAM_UNAVAILABLE', () => {
+      const cause = Object.assign(new Error('read ECONNRESET'), {
+        errno: -54,
+        code: 'ECONNRESET',
+        syscall: 'read',
+      });
+      const undiciError = new TypeError('terminated', { cause });
+      const classified = classifyNarrationError(undiciError, { currentChunkIndex: 25 });
+
+      expect(classified.code).toBe('UPSTREAM_UNAVAILABLE');
+      expect(classified.category).toBe('transient');
+      expect(classified.retryable).toBe(true);
+      expect(classified.chunkIndex).toBe(25);
+    });
   });
 
   describe('Fallback Generic Handling', () => {

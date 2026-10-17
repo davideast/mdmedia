@@ -6,6 +6,62 @@ import { delay, calculateBackoffMs } from './backoff.js';
 
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-3.1-flash-tts-preview';
 
+const TRANSIENT_ERROR_CODES = new Set([
+  'ECONNRESET',
+  'ETIMEDOUT',
+  'EAI_AGAIN',
+  'ECONNREFUSED',
+  'EPIPE',
+  'ENOTFOUND',
+  'UND_ERR_SOCKET',
+  'UND_ERR_CONNECT_TIMEOUT',
+  'UND_ERR_HEADERS_TIMEOUT',
+  'UND_ERR_BODY_TIMEOUT',
+]);
+
+const TRANSIENT_MESSAGE_KEYWORDS = [
+  'retryable',
+  'econnreset',
+  'etimedout',
+  'fetch failed',
+  'terminated',
+  'socket hang up',
+  'eai_again',
+  'service unavailable',
+  'bad gateway',
+  'gateway timeout',
+];
+
+export function isRetryableGeminiTtsError(err: unknown): boolean {
+  if (!err) return false;
+  if (err instanceof TypeError) return true;
+
+  let current: any = err;
+  for (let depth = 0; current && depth < 5; depth++) {
+    const status = Number(
+      current?.status ?? current?.statusCode ?? current?.error?.status ?? 0
+    );
+    if (status === 408 || status === 429 || (status >= 500 && status < 600)) {
+      return true;
+    }
+    if (current?.name === 'RetryableApiError' || current instanceof TypeError) {
+      return true;
+    }
+    const code = String(current?.code ?? current?.error?.code ?? '').toUpperCase();
+    if (code && TRANSIENT_ERROR_CODES.has(code)) {
+      return true;
+    }
+    const message = String(
+      current?.error?.message ?? current?.message ?? ''
+    ).toLowerCase();
+    if (TRANSIENT_MESSAGE_KEYWORDS.some((kw) => message.includes(kw))) {
+      return true;
+    }
+    current = current?.cause;
+  }
+  return false;
+}
+
 function usesVerbatimTranscript(model: string): boolean {
   return model === 'gemini-3.8-flash-tts' || model === 'gemini-3.8-flash-lite-tts';
 }
@@ -61,9 +117,12 @@ export class GeminiTTSProvider implements ITTSProvider {
         const chunkBuffer: Uint8Array[] = [];
         for await (const event of stream as unknown as AsyncIterable<any>) {
           if (event.event_type === 'error') {
-            throw new Error(
+            const eventError: any = new Error(
               event.error?.message || 'Gemini TTS generation error from model'
             );
+            if (event.error?.code !== undefined) eventError.code = event.error.code;
+            if (event.error?.status !== undefined) eventError.status = event.error.status;
+            throw eventError;
           }
           if (
             event.event_type === 'step.delta' &&
@@ -80,13 +139,7 @@ export class GeminiTTSProvider implements ITTSProvider {
         return;
       } catch (err: any) {
         attempt++;
-        const isRetryable =
-          err?.status === 429 ||
-          (err?.status >= 500 && err?.status < 600) ||
-          err?.message?.includes('RETRYABLE') ||
-          err?.name === 'RetryableApiError';
-
-        if (!isRetryable || attempt > this.maxRetries) {
+        if (!isRetryableGeminiTtsError(err) || attempt > this.maxRetries) {
           throw err;
         }
         await delay(calculateBackoffMs(attempt - 1));

@@ -130,4 +130,48 @@ describe('GeminiTTSProvider', () => {
     expect(error).not.toBeNull();
     expect(error?.message).toContain('Developer instruction is not enabled for this model');
   });
+
+  it('retries when an active stream drops with TypeError: terminated (cause: ECONNRESET) without duplicating buffered audio', async () => {
+    let attempts = 0;
+
+    const mockAi = {
+      interactions: {
+        create: async () => {
+          attempts++;
+          return (async function* () {
+            const chunk1 = Buffer.from(new Uint8Array([1, 2, 3, 4])).toString('base64');
+            yield {
+              event_type: 'step.delta',
+              delta: { type: 'audio', data: chunk1 },
+            };
+            if (attempts === 1) {
+              const cause = Object.assign(new Error('read ECONNRESET'), {
+                errno: -54,
+                code: 'ECONNRESET',
+                syscall: 'read',
+              });
+              throw new TypeError('terminated', { cause });
+            }
+            const chunk2 = Buffer.from(new Uint8Array([5, 6, 7, 8])).toString('base64');
+            yield {
+              event_type: 'step.delta',
+              delta: { type: 'audio', data: chunk2 },
+            };
+          })();
+        },
+      },
+    } as unknown as GoogleGenAI;
+
+    const provider = new GeminiTTSProvider(mockAi, 2);
+    const received: Uint8Array[] = [];
+
+    for await (const pcm of provider.streamAudio('Hello world', 'Puck')) {
+      received.push(pcm);
+    }
+
+    expect(attempts).toBe(2);
+    expect(received.length).toBe(2);
+    expect(Array.from(received[0])).toEqual([1, 2, 3, 4]);
+    expect(Array.from(received[1])).toEqual([5, 6, 7, 8]);
+  });
 });
