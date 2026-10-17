@@ -69,6 +69,7 @@ export default function StudioPage() {
         rewriteInstructions: draft.rewriteInstructions?.trim() || undefined,
         structureMarkdown: draft.structureMarkdown,
         visibility: draft.visibility,
+        ttl: draft.ttl,
         speed: draft.speed,
         verbalizeDiagrams: draft.verbalizeDiagrams,
       });

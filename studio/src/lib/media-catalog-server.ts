@@ -83,7 +83,8 @@ export async function listMedia(caller: Caller, url: URL) {
       if (matchesWork(`${data.title} ${data.sourcePreview ?? ''} ${data.id}`, q)) {
         items.push({ id: data.id, type: data.type, title: data.title, status: data.status,
           createdAt: data.createdAt, updatedAt: data.updatedAt, href: data.href, thumbnailAssetId: data.thumbnailAssetId,
-          ...(data.durationMs === undefined ? {} : { durationMs: data.durationMs }) });
+          ...(data.durationMs === undefined ? {} : { durationMs: data.durationMs }),
+          locked: data.locked === true, expiresAt: typeof data.expiresAt === 'number' ? data.expiresAt : null });
       }
       if (items.length === 50 || scanned >= 500) return { items, nextCursor: cursor, indexing: false };
     }

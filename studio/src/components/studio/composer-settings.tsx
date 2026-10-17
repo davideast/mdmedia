@@ -15,6 +15,7 @@ import { PresetField } from "@/components/studio/preset-field";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
 import { addPreset } from "@/lib/presets";
+import { DEFAULT_RETENTION, TTL_PRESETS, defaultTtlFor } from "@/lib/retention";
 import {
   DEFAULT_SETTINGS,
   DELIVERY_PRESETS,
@@ -37,6 +38,7 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
   const { draft, setDraft } = useNarration();
   const { profile, updateSettings } = useAuth();
   const settings = profile?.settings ?? DEFAULT_SETTINGS;
+  const defaultTtl = defaultTtlFor("narration", settings.retention ?? DEFAULT_RETENTION);
   const deliveryPresets = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructionPresets = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];
 
@@ -139,6 +141,33 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
         </Select>
         <p className="t-meta">
           {VISIBILITY.find((option) => option.value === draft.visibility)?.hint}
+        </p>
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="narration-ttl" className="t-label">
+          Delete after
+        </Label>
+        <Select
+          value={draft.ttl ?? "default"}
+          onValueChange={(value) => setDraft({ ttl: value === "default" ? undefined : value })}
+        >
+          <SelectTrigger id="narration-ttl" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Use my default</SelectItem>
+            {TTL_PRESETS.map((preset) => (
+              <SelectItem key={preset.value} value={preset.value}>{preset.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="t-meta">
+          {draft.ttl
+            ? "This narration is deleted after that, unless you lock it."
+            : defaultTtl === null
+              ? "Narrations are kept until you delete them."
+              : `Your default: deleted after ${TTL_PRESETS.find((preset) => preset.value === defaultTtl)?.label ?? defaultTtl}.`}
         </p>
       </div>
     </WorkbenchPanel>

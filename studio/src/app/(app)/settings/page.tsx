@@ -18,6 +18,7 @@ import { useNarration } from "@/components/shell/narration-provider";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { ConnectedApps } from "@/components/studio/connected-apps";
 import { PresetList } from "@/components/studio/preset-list";
+import { RetentionSettings } from "@/components/studio/retention-settings";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
 import { ONE_OFF, selectedPresetId } from "@/lib/presets";
@@ -349,6 +350,16 @@ export default function SettingsPage() {
               </SelectContent>
             </Select>
           </Row>
+        </div>
+
+        <Separator />
+
+        <div className="grid gap-5">
+          <div className="grid gap-1">
+            <h2 className="t-card-title">How long to keep things</h2>
+            <p className="t-meta">Generations are deleted after this long unless you lock them or give them their own time. Locked items are never deleted.</p>
+          </div>
+          <RetentionSettings />
         </div>
 
         <Separator />
