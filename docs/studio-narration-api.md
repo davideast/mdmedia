@@ -117,6 +117,33 @@ POST /api/v1/playlists/{id}/items
 The app uses the same rule: adding and removing are atomic array changes, and
 moving a track is a transaction against the current order.
 
+## Retention
+
+Every generation (narration, image, video, music, sound effect) can be given a
+lifetime, or locked so it is never deleted. An item resolves, in order, to:
+locked (kept, and cannot be deleted), its own expiry, the default for its media
+type, the global default, or kept forever. A running generation is never
+deleted, and a new default reaches only items made after it is set unless you
+ask for it to reach existing ones too.
+
+| Request | Does |
+|---|---|
+| `POST` any create endpoint with `"ttl": "6h"` (or `"retention": { "ttl": "6h", "locked": true }`) | Creates the item with that lifetime. |
+| `GET /api/v1/media/{type}/{id}` | Returns `retention`: `locked`, the item's own `expiresAt`, the `effectiveExpiresAt` once defaults apply, and which rule decided it (`source`). |
+| `PATCH /api/v1/media/{type}/{id}` with `{ "retention": { "ttl": "36h" } }` | Sets or extends the lifetime. `{ "ttl": null }` clears it, `{ "locked": true }` locks, `{ "locked": false }` unlocks. `expiresAt` takes a future timestamp or ISO date instead of `ttl`. |
+| `GET /api/v1/retention` | Returns the defaults per media type and the global one. |
+| `PUT /api/v1/retention` with `{ "target": "narration", "ttl": "7d" }` | Sets a default. `target` is a media type or `global`; `ttl` is a duration, `keep` (never expire, even under a global default) or `inherit` (follow the global default). Add `"retroactive": true` to reach items that already exist. Signed-in sessions only, never an API key. |
+| `GET /api/v1/retention/preview` | Lists what the next sweep would delete. Add `target`, `ttl` and `retroactive=1` to see the effect of a default before saving it. |
+| `POST /api/v1/retention/sweep` | Deletes your expired items now. Signed-in sessions only. |
+
+A `ttl` is a number and a unit, `m`, `h`, `d` or `w`: `90m`, `6h`, `3d`, `2w`.
+Deleting a locked narration is refused with `409 locked`; unlock it first.
+
+The server sweeps about once a minute and deletes at most 25 items per pass, the
+oldest expiry first. Set `MDMEDIA_RETENTION_SWEEP=off` to disable it,
+`MDMEDIA_RETENTION_DRY_RUN=1` to log what it would delete instead of deleting,
+and `MDMEDIA_RETENTION_INTERVAL_MS` to change the interval (10 seconds at least).
+
 ## Connecting a client (device flow)
 
 1. `mdmedia studio login` calls `POST /api/v1/device` and prints a code and
