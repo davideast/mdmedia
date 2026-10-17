@@ -246,13 +246,6 @@ export default function NarrationPage() {
       }
       actions={
         <div className="flex items-center gap-1">
-          <Button type="button" size="sm" disabled={empty || stream.status === "error"} aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
-            onClick={() => {
-              if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
-              else playNarration(id);
-            }} className="h-8 gap-1.5">
-            {stream.playing ? <Pause size={13} /> : <Play size={13} />}<span>{stream.playing ? "Pause" : "Play"}</span>
-          </Button>
           {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
           {!empty ? (
             <Button
@@ -279,6 +272,20 @@ export default function NarrationPage() {
               )}
             </Button>
           ) : null}
+          <Button
+            type="button"
+            size="icon-xs"
+            disabled={empty || stream.status === "error"}
+            title={stream.playing ? "Pause" : "Play"}
+            aria-label={stream.playing ? `Pause ${displayTitle}` : `Play ${displayTitle}`}
+            onClick={() => {
+              if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
+              else playNarration(id);
+            }}
+            className="size-7 rounded-full p-0"
+          >
+            {stream.playing ? <Pause size={13} className="fill-current" /> : <Play size={13} className="translate-x-px fill-current" />}
+          </Button>
         </div>
       }
     >
