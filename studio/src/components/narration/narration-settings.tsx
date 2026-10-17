@@ -626,11 +626,12 @@ export function NarrationSettings({
             type="button"
             variant="outline"
             size="sm"
+            disabled={narration?.locked === true}
             onClick={() => setDeleteDialogOpen(true)}
             className="w-full justify-center text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
           >
             <Trash2 size={13} strokeWidth={2} />
-            <span>Delete narration</span>
+            <span>{narration?.locked ? "Locked. Unlock it to delete." : "Delete narration"}</span>
           </Button>
         </div>
       ) : null}

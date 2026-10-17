@@ -1,3 +1,4 @@
+import { parseTtl } from './retention';
 import { parseMusicRequest } from './music-request';
 import { parseVideoRequest } from './video-request';
 import type { ImageDraft, VideoDraft, MusicDraft } from './media-types';
@@ -66,6 +67,7 @@ function readDraft(value: unknown): Partial<Draft> {
   for (const field of ['rewriteForNarration', 'structureMarkdown', 'verbalizeDiagrams'] as const) {
     if (typeof raw[field] === 'boolean') draft[field] = raw[field];
   }
+  if (typeof raw.ttl === 'string' && parseTtl(raw.ttl) !== undefined) draft.ttl = raw.ttl;
   if (raw.visibility === 'private' || raw.visibility === 'shared' || raw.visibility === 'public') draft.visibility = raw.visibility;
   if (typeof raw.speed === 'number' && Number.isFinite(raw.speed)) draft.speed = raw.speed;
   if (raw.voice && typeof raw.voice === 'object') {

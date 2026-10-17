@@ -18,23 +18,13 @@ import {
   setDefaultTtl,
   type RetentionPatch,
   type RetentionSettings,
-  type RetentionSource,
+  type RetentionView,
 } from './retention';
 import { loadUserSettings } from './user-settings-server';
 
 export interface StoredRetention {
   locked?: boolean;
   expiresAt?: number | null;
-}
-
-/** What an item's retention is, and why. */
-export interface RetentionView {
-  locked: boolean;
-  /** The expiry set on this item itself, if any. */
-  expiresAt: number | null;
-  /** When it will actually expire once defaults are applied; null if never. */
-  effectiveExpiresAt: number | null;
-  source: RetentionSource;
 }
 
 /**

@@ -23,6 +23,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNarration } from "@/components/shell/narration-provider";
+import { RetentionControl } from "@/components/studio/retention-control";
+import { useAuth } from "@/lib/auth-context";
+import { DEFAULT_RETENTION, retentionNote } from "@/lib/retention";
+import { useNow } from "@/lib/use-now";
 import { deleteNarration, watchNarration } from "@/lib/narrations";
 import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import type { Narration } from "@/lib/types";
@@ -65,6 +69,13 @@ function LibraryNarrationCard({
   onDelete: (narration: Narration) => void;
 }) {
   const isReady = narration.status === "ready";
+  const retention = useAuth().profile?.settings.retention ?? DEFAULT_RETENTION;
+  const now = useNow();
+  const note = retentionNote(
+    { type: "narration", createdAt: narration.createdAt, locked: narration.locked === true, expiresAt: narration.expiresAt ?? null },
+    retention,
+    now,
+  );
   const offlineMetadata = useMemo<OfflineNarrationMetadata>(
     () => ({
       title: narration.title,
@@ -126,6 +137,7 @@ function LibraryNarrationCard({
           <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
           <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
           <span>{READABLE_VISIBILITY[narration.visibility]}</span>
+          {note ? <span>{note}</span> : null}
           {narration.adapted ? (
             <span className="inline-flex items-center gap-1 text-primary">
               <Sparkles size={11} /> Adapted for ear
@@ -186,14 +198,16 @@ function LibraryNarrationCard({
               <span className="sr-only">Download for offline</span>
             </Button>
           ) : null}
+          {isReady ? <RetentionControl type="narration" id={narration.id} compact className="size-11" /> : null}
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            disabled={narration.locked === true}
             onClick={() => onDelete(narration)}
             className="size-11 text-ink-muted hover:bg-destructive/10 hover:text-destructive"
-            title={`Delete ${narration.title}`}
-            aria-label={`Delete ${narration.title}`}
+            title={narration.locked ? "Locked. Unlock it to delete." : `Delete ${narration.title}`}
+            aria-label={narration.locked ? `${narration.title} is locked` : `Delete ${narration.title}`}
           >
             <Trash2 size={16} strokeWidth={2} />
             <span className="sr-only">Delete</span>
@@ -226,7 +240,7 @@ export function NarrationLibraryEntry({ id, onDeleted }: { id: string; onDeleted
   const handleConfirmDelete = () => {
     if (stream.id === id) stream.cancel();
     setConfirmDelete(false);
-    void deleteNarration(id).then(onDeleted).catch(() => toast.error('Could not delete narration.'));
+    void deleteNarration(id).then(onDeleted).catch((error) => toast.error(error instanceof Error && error.message.includes('locked') ? error.message : 'Could not delete narration.'));
   };
   if (!narration) return <p className="rounded-lg border border-border p-4 text-sm text-ink-muted">Loading narration…</p>;
   return <><LibraryNarrationCard narration={narration} isCurrentTrack={stream.id === id} isPlaying={stream.playing} onPlay={playTrack} onDelete={() => setConfirmDelete(true)} />

@@ -31,6 +31,7 @@ export interface GenerationJob {
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
   visibility: Visibility;
+  ttl?: string;
   speed?: number;
   verbalizeDiagrams?: boolean;
   status: JobStatus;
@@ -61,6 +62,7 @@ export interface GenerationQueueState {
     rewriteInstructions?: string;
     structureMarkdown?: boolean;
     visibility: Visibility;
+    ttl?: string;
     speed?: number;
     verbalizeDiagrams?: boolean;
   }) => Promise<{ jobId: string; narrationId: string }>;
@@ -155,6 +157,7 @@ export function useGenerationQueue(): GenerationQueueState {
       rewriteInstructions?: string;
       structureMarkdown?: boolean;
       visibility: Visibility;
+      ttl?: string;
       speed?: number;
       verbalizeDiagrams?: boolean;
     }): Promise<{ jobId: string; narrationId: string }> => {
@@ -179,6 +182,7 @@ export function useGenerationQueue(): GenerationQueueState {
         rewriteInstructions: input.rewriteInstructions,
         structureMarkdown: input.structureMarkdown,
         visibility: input.visibility,
+        ttl: input.ttl,
         speed: input.speed,
         verbalizeDiagrams: input.verbalizeDiagrams,
         status: 'queued',
@@ -382,6 +386,7 @@ export function useGenerationQueue(): GenerationQueueState {
         rewriteInstructions: existingJob.rewriteInstructions,
         structureMarkdown: existingJob.structureMarkdown,
         visibility: existingJob.visibility,
+        ttl: existingJob.ttl,
         speed: existingJob.speed,
         verbalizeDiagrams: existingJob.verbalizeDiagrams,
       });

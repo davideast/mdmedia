@@ -10,6 +10,7 @@ import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
 import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import { RetentionControl } from "@/components/studio/retention-control";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
 import { projectNarrationView } from "@/lib/narration-document";
 import { updateNarrationTitle } from "@/lib/narrations";
@@ -254,6 +255,7 @@ export default function NarrationPage() {
             {stream.playing ? <Pause size={13} /> : <Play size={13} />}<span>{stream.playing ? "Pause" : "Play"}</span>
           </Button>
           {busy ? <Loader2 size={13} className="animate-spin text-ink-muted" /> : null}
+          {stream.status === "ready" ? <RetentionControl type="narration" id={id} /> : null}
           {!empty ? (
             <Button
               type="button"

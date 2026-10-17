@@ -49,7 +49,22 @@ function defaultFor(type: MediaType, settings: RetentionSettings): TtlDefault | 
   return type in settings.byType ? settings.byType[type] ?? null : settings.global;
 }
 
+/** The TTL a new item of this type starts with, like `7d`, or null if it is kept. */
+export function defaultTtlFor(type: MediaType, settings: RetentionSettings): string | null {
+  return defaultFor(type, settings)?.ttl ?? null;
+}
+
 export type RetentionSource = 'locked' | 'item' | 'type-default' | 'global-default' | 'none';
+
+/** What an item's retention is, and why. This is what the API returns. */
+export interface RetentionView {
+  locked: boolean;
+  /** The expiry set on this item itself, if any. */
+  expiresAt: number | null;
+  /** When it will actually expire once defaults are applied; null if never. */
+  effectiveExpiresAt: number | null;
+  source: RetentionSource;
+}
 
 /** When the item expires and which rule decided it, for showing people why. */
 export function explainRetention(
@@ -198,4 +213,36 @@ export function extractRetention(body: unknown, now: number): { rest: unknown; p
   if (ttl === undefined && retention === undefined) return { rest: body, patch: undefined };
   if (ttl !== undefined && retention !== undefined) throw new RetentionInputError('Send either ttl or retention, not both.');
   return { rest, patch: parseRetentionPatch(ttl !== undefined ? { ttl } : retention, now) };
+}
+
+/** Lifetimes offered in menus. Anything else can still be typed. */
+export const TTL_PRESETS: ReadonlyArray<{ value: string; label: string }> = [
+  { value: '1h', label: '1 hour' },
+  { value: '6h', label: '6 hours' },
+  { value: '1d', label: '1 day' },
+  { value: '3d', label: '3 days' },
+  { value: '7d', label: '7 days' },
+  { value: '30d', label: '30 days' },
+];
+
+/** A short phrase for how long is left, such as `5h` or `3d`; `due` once it has passed. */
+export function describeTimeLeft(expiresAt: number, now: number): string {
+  const ms = expiresAt - now;
+  if (ms <= 0) return 'due';
+  if (ms < UNIT_MS.m) return 'under a minute';
+  if (ms < UNIT_MS.h) return `${Math.floor(ms / UNIT_MS.m)}m`;
+  if (ms < UNIT_MS.d) return `${Math.floor(ms / UNIT_MS.h)}h`;
+  if (ms < UNIT_MS.w) return `${Math.floor(ms / UNIT_MS.d)}d`;
+  return `${Math.floor(ms / UNIT_MS.w)}w`;
+}
+
+/** What a library line says about retention: nothing for items that are simply kept. */
+export function retentionNote(
+  item: Pick<RetainedItem, 'type' | 'createdAt' | 'locked' | 'expiresAt'>,
+  settings: RetentionSettings,
+  now: number,
+): string | null {
+  const { expiresAt, source } = explainRetention(item, settings);
+  if (source === 'locked') return 'Locked';
+  return expiresAt === null ? null : expiresAt <= now ? 'Deleting soon' : `Deletes in ${describeTimeLeft(expiresAt, now)}`;
 }

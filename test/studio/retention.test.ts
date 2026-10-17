@@ -5,10 +5,14 @@ import { resolve } from 'node:path';
 import {
   RetentionInputError,
   canDelete,
+  defaultTtlFor,
+  TTL_PRESETS,
+  describeTimeLeft,
   explainRetention,
   extractRetention,
   isExpired,
   parseRetentionPatch,
+  retentionNote,
   parseTtl,
   readRetentionSettings,
   resolveExpiry,
@@ -197,5 +201,50 @@ describe('explainRetention', () => {
     expect(explainRetention({ ...base, type: 'image' }, settings)).toEqual({ expiresAt: NOW + 30 * DAY, source: 'global-default' });
     expect(explainRetention({ ...base, type: 'video' }, settings)).toEqual({ expiresAt: null, source: 'none' });
     expect(explainRetention(base, none)).toEqual({ expiresAt: null, source: 'none' });
+  });
+});
+
+describe('describeTimeLeft', () => {
+  test('rounds to the most useful unit', () => {
+    expect(describeTimeLeft(NOW + 20_000, NOW)).toBe('under a minute');
+    expect(describeTimeLeft(NOW + 42 * 60_000, NOW)).toBe('42m');
+    expect(describeTimeLeft(NOW + 5 * HOUR + 20 * 60_000, NOW)).toBe('5h');
+    expect(describeTimeLeft(NOW + 3 * DAY + 4 * HOUR, NOW)).toBe('3d');
+    expect(describeTimeLeft(NOW + 40 * DAY, NOW)).toBe('5w');
+  });
+
+  test('an expiry in the past reads as due', () => {
+    expect(describeTimeLeft(NOW - 5000, NOW)).toBe('due');
+  });
+});
+
+describe('TTL_PRESETS', () => {
+  test('every preset is a valid ttl', () => {
+    for (const preset of TTL_PRESETS) expect(parseTtl(preset.value)).toBeDefined();
+  });
+});
+
+describe('retentionNote', () => {
+  const item = { type: 'narration' as const, createdAt: NOW, locked: false, expiresAt: null };
+  const settings: RetentionSettings = { global: null, byType: { narration: { ttl: '7d', since: 0 } } };
+
+  test('says nothing about an item that is simply kept', () => {
+    expect(retentionNote({ ...item, type: 'image' }, settings, NOW)).toBeNull();
+  });
+
+  test('names a lock, a countdown, and an overdue item', () => {
+    expect(retentionNote({ ...item, locked: true }, settings, NOW)).toBe('Locked');
+    expect(retentionNote(item, settings, NOW + DAY)).toBe('Deletes in 6d');
+    expect(retentionNote({ ...item, expiresAt: NOW - 1 }, settings, NOW)).toBe('Deleting soon');
+  });
+});
+
+describe('defaultTtlFor', () => {
+  test('reports what a new item starts with', () => {
+    const settings: RetentionSettings = { global: { ttl: '30d', since: 0 }, byType: { narration: { ttl: '7d', since: 0 }, video: null } };
+    expect(defaultTtlFor('narration', settings)).toBe('7d');
+    expect(defaultTtlFor('image', settings)).toBe('30d');
+    expect(defaultTtlFor('video', settings)).toBeNull();
+    expect(defaultTtlFor('sfx', none)).toBeNull();
   });
 });

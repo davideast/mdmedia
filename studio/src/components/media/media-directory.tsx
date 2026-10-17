@@ -10,6 +10,10 @@ import { CreateMenu } from '@/components/shell/create-menu';
 import { useRouteQuery, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { useNarration } from '@/components/shell/narration-provider';
 import type { MediaSummary } from '@/lib/media-types';
+import { RetentionControl } from '@/components/studio/retention-control';
+import { useAuth } from '@/lib/auth-context';
+import { DEFAULT_RETENTION, retentionNote } from '@/lib/retention';
+import { useNow } from '@/lib/use-now';
 import { MEDIA_TYPES } from '@/lib/media-types';
 import { studioJson } from '@/lib/media-client';
 import { deleteNarration } from '@/lib/narrations';
@@ -31,6 +35,8 @@ export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
   const [retry, setRetry] = useState(0);
   const [loading, setLoading] = useState(true);
   const { generationQueue } = useNarration();
+  const retention = useAuth().profile?.settings.retention ?? DEFAULT_RETENTION;
+  const now = useNow();
   const scrollRef = useRef<HTMLDivElement>(null);
   let previous: string[] = [];
   try { const saved = JSON.parse(back || '{}'); if (saved.query === query && saved.type === type && saved.cursor === cursor && Array.isArray(saved.previous)) previous = saved.previous; } catch { /* Direct links have no page history. */ }
@@ -72,9 +78,9 @@ export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
     {loading ? <p role="status" className="py-6 text-center text-sm text-ink-muted">Loading {title.toLowerCase()}…</p> : error ? <div role="alert" className="grid gap-2 text-sm text-destructive"><p>{error}</p><Button variant="outline" onClick={() => setRetry(value => value + 1)}>Retry</Button></div> : page?.indexing ? <p role="status" className="py-6 text-sm text-ink-muted">Preparing your existing Library for all media…</p> : <div className="grid gap-3" aria-label={`${title} items`}>
       {rows.map(row => kind === 'library' && row.type === 'narration' ? <NarrationLibraryEntry key={`narration_${row.id}`} id={row.id} onDeleted={() => setRetry(value => value + 1)} /> : <div key={`${row.type}_${row.id}`} className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card/60 p-3 hover:bg-card"><Link href={row.href} className="flex min-w-0 flex-1 items-center gap-4">
         {row.thumbnailAssetId && kind === 'library' ? <AssetImage id={row.thumbnailAssetId} thumbnail alt={row.title} className="h-20 w-28 shrink-0 rounded-md" /> : row.type === 'music' ? <Music2 size={22} className="shrink-0 text-ink-muted" /> : row.type === 'video' ? <Video size={22} className="shrink-0 text-ink-muted" /> : row.type === 'image' ? <ImageIcon size={22} className="shrink-0 text-ink-muted" /> : <AudioLines size={22} className="shrink-0 text-ink-muted" />}
-        <div className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{row.title}</span><span className="mt-1 block text-xs text-ink-muted">{MEDIA_TYPES.find(item => item.type === row.type)?.label} · {labels[row.phase ?? row.status] ?? row.status} · {new Date(row.createdAt).toLocaleString()}</span></div>
+        <div className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{row.title}</span><span className="mt-1 block text-xs text-ink-muted">{MEDIA_TYPES.find(item => item.type === row.type)?.label} · {labels[row.phase ?? row.status] ?? row.status} · {new Date(row.createdAt).toLocaleString()}{(() => { const note = retentionNote({ type: row.type, createdAt: row.createdAt, locked: row.locked === true, expiresAt: row.expiresAt ?? null }, retention, now); return note ? ` · ${note}` : ''; })()}</span></div>
         {['queued', 'generating'].includes(row.status) && <Loader2 size={16} className="shrink-0 animate-spin text-primary" />}
-      </Link>{kind === 'activity' && row.type === 'narration' && row.status === 'generating' && <Button variant="ghost" size="icon" title="Cancel generation" aria-label={`Cancel ${row.title}`} onClick={() => void handleCancelOrphan(row.itemId ?? row.id)}><X size={16} /></Button>}</div>)}
+      </Link>{kind === 'library' && row.type !== 'narration' && ['ready', 'error', 'interrupted'].includes(row.status) && <RetentionControl type={row.type} id={row.id} compact onChange={() => setRetry(value => value + 1)} />}{kind === 'activity' && row.type === 'narration' && row.status === 'generating' && <Button variant="ghost" size="icon" title="Cancel generation" aria-label={`Cancel ${row.title}`} onClick={() => void handleCancelOrphan(row.itemId ?? row.id)}><X size={16} /></Button>}</div>)}
       {!rows.length && <p className="py-8 text-center text-sm text-ink-muted">{query ? 'No matches in this batch. Continue to older work if available.' : kind === 'library' ? 'Your saved work appears here.' : 'Generation attempts appear here across all media.'}</p>}
     </div>}
     {!loading && !error && !page?.indexing && (cursor || page?.nextCursor) && <div className="flex items-center justify-between gap-2"><Button variant="outline" disabled={!cursor} onClick={() => navigate(query, type, previous.at(-1) ?? '', previous.slice(0, -1))}>Previous</Button><span className="text-xs text-ink-muted">Up to 50 items per page</span><Button variant="outline" disabled={!page?.nextCursor} onClick={() => navigate(query, type, JSON.stringify(page?.nextCursor), [...previous, cursor])}>{query ? 'Continue search' : 'Older work'}</Button></div>}

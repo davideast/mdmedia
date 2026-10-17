@@ -126,6 +126,8 @@ export function toNarration(snapshot: {
     authorPhoto: asString(data.authorPhoto),
     createdAt: asNumber(data.createdAt),
     updatedAt: asNumber(data.updatedAt),
+    locked: data.locked === true,
+    expiresAt: typeof data.expiresAt === 'number' ? data.expiresAt : null,
   };
   if (typeof data.errorMessage === 'string' && data.errorMessage.length > 0) {
     narration.errorMessage = data.errorMessage;
@@ -289,6 +291,11 @@ export function updateNarrationTitle(id: string, title: string): void {
 }
 
 export async function deleteNarration(id: string): Promise<void> {
+  // A locked narration is refused before anything local is touched; the Rules
+  // and the server refuse it too, but by then the offline copy would be gone.
+  if ((await getNarrationOnce(id).catch(() => null))?.locked) {
+    throw new Error('This narration is locked. Unlock it before deleting it.');
+  }
   // 1. Optimistic direct client-side Firestore document deletion.
   // Firestore mutations update the local cache immediately, notifying active onSnapshot
   // listeners synchronously, and queue the write for server sync with rollback capabilities.

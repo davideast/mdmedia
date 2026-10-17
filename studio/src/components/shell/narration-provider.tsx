@@ -41,6 +41,8 @@ export interface Draft {
   rewriteInstructions?: string;
   structureMarkdown?: boolean;
   visibility: Visibility;
+  /** How long to keep the narration, like `6h`. Unset uses the default for narrations. */
+  ttl?: string;
   speed?: number;
   verbalizeDiagrams?: boolean;
   /** The delivery preset the composer chose, or "one-off" for text used once. */
