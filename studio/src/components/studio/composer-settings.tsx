@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
+import type { HeaderActions } from "@/components/shell/header-action";
+import { KeepSection } from "@/components/shell/keep-section";
 import { useNarration } from "@/components/shell/narration-provider";
 import { PresetField } from "@/components/studio/preset-field";
 import { VoicePicker } from "@/components/studio/voice-picker";
@@ -31,10 +33,9 @@ const VISIBILITY: ReadonlyArray<{ value: Visibility; label: string; hint: string
   { value: "public", label: "Anyone with the link", hint: "No sign-in required to listen." },
 ];
 
-import type { ReactNode } from "react";
 
 /** Voice and delivery controls for the composer. */
-export function ComposerSettings({ actions }: { actions?: ReactNode }) {
+export function ComposerSettings({ actions }: { actions?: HeaderActions }) {
   const { draft, setDraft } = useNarration();
   const { profile, updateSettings } = useAuth();
   const settings = profile?.settings ?? DEFAULT_SETTINGS;
@@ -49,6 +50,8 @@ export function ComposerSettings({ actions }: { actions?: ReactNode }) {
       actions={actions}
       bodyClassName="gap-6 p-4"
     >
+      <KeepSection />
+
       <div className="grid gap-2">
         <Label htmlFor="voice" className="t-label">
           Reader

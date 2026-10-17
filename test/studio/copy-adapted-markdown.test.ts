@@ -22,10 +22,10 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
   const sourceDocumentView = readFileSync(sourceDocumentViewPath, "utf8");
 
   describe("Narration Reader Page (Workbench Header Action)", () => {
-    it("imports Check and Copy icons along with Button component", () => {
+    it("imports Check and Copy icons and draws them through a header action", () => {
       expect(narrationPage).toContain("Check");
       expect(narrationPage).toContain("Copy");
-      expect(narrationPage).toContain('from "@/components/ui/button"');
+      expect(narrationPage).toContain('from "@/components/shell/header-action"');
     });
 
     it("implements context-aware copying of active document view (Adapted, Source, Raw) to clipboard with feedback", () => {
@@ -41,8 +41,8 @@ describe("Copy Audio Adapted Document as Markdown Architecture", () => {
 
     it("renders clean icon-only copy button in WorkbenchPanel actions when narration is loaded", () => {
       expect(narrationPage).toContain("actions={");
-      expect(narrationPage).toContain("onClick={handleCopy}");
-      expect(narrationPage).toContain('className="size-7 p-0 text-ink-muted hover:text-foreground"');
+      expect(narrationPage).toContain("onClick: () => void handleCopy()");
+      expect(narrationPage).toContain("icon: copied ? Check : Copy");
       expect(narrationPage).not.toContain('<span>{copied ? "Copied markdown"');
     });
   });
