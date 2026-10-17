@@ -19,6 +19,10 @@ export interface MediaSummary {
   thumbnailAssetId: string | null;
   durationMs?: number;
   sourcePreview?: string;
+  /** A locked item is kept until unlocked. See retention.ts. */
+  locked?: boolean;
+  /** When this item expires, set on the item itself. Null or absent means its type's default applies. */
+  expiresAt?: number | null;
 }
 export interface ImageDraft {
   kind: 'image';

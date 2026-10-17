@@ -5,6 +5,7 @@ import { saveMusicAsset, type MusicAsset } from './music-assets-server';
 import { musicPrompt, readMusicDefaults, MAX_MUSIC_BYTES } from './music-request';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
+import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
 import { decideIdempotentReplay } from './image-jobs';
@@ -85,7 +86,7 @@ export async function submitMusic(uid: string, request: MusicRequest, key: strin
     if (apiKeyId) nextHourly[apiKeyId] = { ...current, count: current.count + 1 };
     const title = previous?.title ?? titleFor(request.prompt);
     const item: MusicItem = { id: itemId, type: 'music', ownerUid: uid, title, status: 'queued', visibility: 'private',
-      createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/music/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
+      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/music/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
       thumbnailAssetId: previous?.thumbnailAssetId ?? null, durationMs: previous?.durationMs ?? 0, request, latestGenerationId: generationId,
       latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null };
     const generation: MusicGeneration = { id: generationId, ownerUid: uid, itemId, type: 'music', title, request,

@@ -4,6 +4,7 @@ import { videoToolsAvailable } from './video-assets-server';
 import { saveSfxAsset, sfxOriginalPath, storeSfxOriginal, type SfxAsset } from './sfx-assets-server';
 import { readSfxDefaults } from './sfx-request';
 import { adminBucket, adminDb } from './firebase-admin';
+import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
 import { decideIdempotentReplay } from './image-jobs';
@@ -81,7 +82,7 @@ export async function submitSfx(uid: string, request: SfxRequest, key: string, e
     const title = previous?.title ?? titleFor(request.prompt);
     // No sound effect page exists yet, so saved work opens the Library.
     const item: SfxItem = { id: itemId, type: 'sfx', ownerUid: uid, title, status: 'queued', visibility: 'private',
-      createdAt: previous?.createdAt ?? now, updatedAt: now, href: '/library', sourcePreview: request.prompt.slice(0, 4000),
+      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: '/library', sourcePreview: request.prompt.slice(0, 4000),
       thumbnailAssetId: previous?.thumbnailAssetId ?? null, durationMs: previous?.durationMs ?? 0, request, latestGenerationId: generationId,
       latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null };
     const generation: SfxGeneration = { id: generationId, ownerUid: uid, itemId, type: 'sfx', title, request, provider: 'elevenlabs', model: configuredSfxModel(),

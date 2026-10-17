@@ -32,6 +32,8 @@ import {
   type VoiceName,
 } from "./types";
 import { alignPcmFrames, wrapPcmAsWav, type NarrationTimingsFile } from "./wav";
+import type { RetentionPatch } from "./retention";
+import { carriedRetention } from "./retention-server";
 import {
   classifyNarrationError,
   type ClassifiedNarrationError,
@@ -87,6 +89,14 @@ export function timingsObjectPath(uid: string, id: string): string {
 /** Allocates the document id that the Storage objects will reuse verbatim. */
 export function newNarrationId(): string {
   return adminDb().collection("narrations").doc().id;
+}
+
+/** Thrown when someone tries to delete a locked narration. Routes map it to HTTP 409. */
+export class NarrationLockedError extends Error {
+  constructor() {
+    super("This narration is locked. Unlock it before deleting it.");
+    this.name = "NarrationLockedError";
+  }
 }
 
 /**
@@ -202,14 +212,19 @@ export async function purgeNarrationData(
   id: string,
   uid: string,
 ): Promise<{ deleted: boolean }> {
+  const docRef = adminDb().collection("narrations").doc(id);
+
+  // 0. A locked narration is refused before anything is touched, including a
+  // live synthesis. The transaction below re-checks in case it changes meanwhile.
+  const current = (await docRef.get()).data();
+  if (current?.locked === true && current.ownerUid === uid) throw new NarrationLockedError();
+
   // 1. Abort any in-flight synthesis pipeline
   const active = activeStreams.get(id);
   if (active && active.uid === uid) {
     active.abort();
     activeStreams.delete(id);
   }
-
-  const docRef = adminDb().collection("narrations").doc(id);
 
   // 2. Atomic deletion in a Firestore transaction
   await adminDb().runTransaction(async (tx) => {
@@ -219,6 +234,7 @@ export async function purgeNarrationData(
     if (data?.ownerUid && data.ownerUid !== uid) {
       throw new Error("Forbidden: You do not own this narration.");
     }
+    if (data?.locked === true) throw new NarrationLockedError();
     tx.delete(docRef);
   });
 
@@ -267,6 +283,8 @@ interface StreamParams {
   id: string;
   request: NarrationRequest;
   signal: AbortSignal;
+  /** How long to keep this narration, if the caller asked. */
+  retention?: RetentionPatch;
 }
 
 /**
@@ -281,6 +299,7 @@ export function createNarrationStream({
   id,
   request,
   signal,
+  retention,
 }: StreamParams): ReadableStream<Uint8Array> {
   const queue = new EventQueue();
   const encoder = new TextEncoder();
@@ -412,6 +431,8 @@ export function createNarrationStream({
         if (owner !== undefined && owner !== uid) {
           throw new NarrationOwnershipError();
         }
+        // Regenerating an id keeps its lock and expiry unless the caller sets new ones.
+        Object.assign(initialNarration, carriedRetention(snap.exists ? snap.data() : undefined), retention);
         tx.set(docRef, initialNarration);
       });
       docWritten = true;

@@ -128,6 +128,10 @@ export type NarrationErrorCategory =
 export interface Narration {
   id: string;
   ownerUid: string;
+  /** A locked narration is kept until unlocked. Written server-side only. */
+  locked?: boolean;
+  /** When this narration expires, if set on it directly. */
+  expiresAt?: number | null;
   title: string;
   /** What the user pasted in. */
   sourceMarkdown: string;

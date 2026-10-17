@@ -1,6 +1,7 @@
 import { apiError, authenticate, authorize, forbiddenScope, hasScope, unauthorized } from "@/lib/api-auth";
 import { apiOrigin } from "@/lib/api-origin";
 import { resolveNarrationBody, toNarrationResource } from "@/lib/narration-api";
+import { RetentionInputError, extractRetention, type RetentionPatch } from "@/lib/retention";
 import { activeStreamCount, listOwnNarrations } from "@/lib/narration-server";
 import { startNarration } from "@/lib/narration-start";
 import { PlaylistOpError } from "@/lib/playlist-ops";
@@ -56,6 +57,16 @@ export async function POST(request: Request): Promise<Response> {
     return apiError(400, "invalid_json", "The request body must be JSON.");
   }
 
+  let retention: RetentionPatch | undefined;
+  try {
+    const split = extractRetention(body, Date.now());
+    body = split.rest;
+    retention = split.patch;
+  } catch (error) {
+    if (error instanceof RetentionInputError) return apiError(400, "invalid_retention", error.message);
+    throw error;
+  }
+
   const resolved = resolveNarrationBody(body, await loadUserSettings(caller.uid), { restricted: caller.kind === "apiKey" });
   if (!resolved.ok) return apiError(resolved.status, resolved.code, resolved.message);
 
@@ -81,7 +92,7 @@ export async function POST(request: Request): Promise<Response> {
 
   // Detach from this request: the response returns now and synthesis carries on.
   const detached = new AbortController();
-  const started = await startNarration({ uid: caller.uid, request: resolved.request, signal: detached.signal });
+  const started = await startNarration({ uid: caller.uid, request: resolved.request, signal: detached.signal, retention });
   if (!started.ok) return apiError(started.status, started.code, started.message);
   detached.abort();
   void started.stream.cancel().catch(() => {});

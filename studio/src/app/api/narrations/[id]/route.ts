@@ -1,5 +1,5 @@
 import { verifyIdToken } from "@/lib/firebase-admin";
-import { purgeNarrationData } from "@/lib/narration-server";
+import { NarrationLockedError, purgeNarrationData } from "@/lib/narration-server";
 
 export const runtime = "nodejs";
 
@@ -21,6 +21,9 @@ export async function DELETE(
     const result = await purgeNarrationData(id, uid);
     return Response.json({ ok: true, id, ...result }, { status: 200 });
   } catch (err: any) {
+    if (err instanceof NarrationLockedError) {
+      return Response.json({ message: err.message, code: "locked" }, { status: 409 });
+    }
     const message = err instanceof Error ? err.message : "Failed to purge narration.";
     const status = message.includes("Forbidden") ? 403 : 500;
     return Response.json({ message }, { status });

@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { adaptGeminiImagePrompt, generateGeminiImage, GeminiImageError, type ImageAspectRatio, type ImageResolution } from 'mdmedia/image';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
+import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, saveImageAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId, readImageDefaults } from './image-request';
 import { decideIdempotentReplay, executeImageJob } from './image-jobs';
@@ -80,7 +81,7 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
     if (apiKeyId) nextHourly[apiKeyId] = { ...current, count: current.count + 1 };
     const title = previous?.title ?? titleFor(request.prompt);
     const item: ImageItem = { id: itemId, type: 'image', ownerUid: uid, title, status: 'queued', visibility: 'private',
-      createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/image/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
+      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/image/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
       thumbnailAssetId: previous?.thumbnailAssetId ?? null, request, latestGenerationId: generationId,
       latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null };
     const generation: ImageGeneration = { id: generationId, ownerUid: uid, itemId, type: 'image', title, request,

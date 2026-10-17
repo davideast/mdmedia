@@ -3,8 +3,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import {
+  RetentionInputError,
   canDelete,
+  explainRetention,
+  extractRetention,
   isExpired,
+  parseRetentionPatch,
   parseTtl,
   readRetentionSettings,
   resolveExpiry,
@@ -133,5 +137,65 @@ describe('firestore rules', () => {
       const del = block.slice(block.indexOf('allow delete'), block.indexOf(';', block.indexOf('allow delete')));
       expect(del).toContain("resource.data.get('locked', false) != true");
     }
+  });
+});
+
+describe('parseRetentionPatch', () => {
+  test('a ttl becomes an absolute expiry from now', () => {
+    expect(parseRetentionPatch({ ttl: '6h' }, NOW)).toEqual({ expiresAt: NOW + 6 * HOUR });
+  });
+
+  test('an explicit expiry must be a future timestamp', () => {
+    expect(parseRetentionPatch({ expiresAt: NOW + 5000 }, NOW)).toEqual({ expiresAt: NOW + 5000 });
+    expect(parseRetentionPatch({ expiresAt: new Date(NOW + 5000).toISOString() }, NOW)).toEqual({ expiresAt: NOW + 5000 });
+    expect(() => parseRetentionPatch({ expiresAt: NOW - 1 }, NOW)).toThrow(RetentionInputError);
+    expect(() => parseRetentionPatch({ expiresAt: 'tomorrow-ish' }, NOW)).toThrow(RetentionInputError);
+  });
+
+  test('null clears the expiry, and locking is independent of it', () => {
+    expect(parseRetentionPatch({ ttl: null }, NOW)).toEqual({ expiresAt: null });
+    expect(parseRetentionPatch({ locked: true }, NOW)).toEqual({ locked: true });
+    expect(parseRetentionPatch({ locked: false, ttl: '1d' }, NOW)).toEqual({ locked: false, expiresAt: NOW + DAY });
+  });
+
+  test('refuses an empty patch, unknown keys, both ttl and expiresAt, and bad types', () => {
+    for (const bad of [{}, { ttl: '6h', expiresAt: NOW + 1000 }, { locked: 'yes' }, { ttl: 'soon' }, { ttl: 5 }, { color: 'red' }, 'x', null, []]) {
+      expect(() => parseRetentionPatch(bad, NOW)).toThrow(RetentionInputError);
+    }
+  });
+});
+
+describe('extractRetention', () => {
+  test('lifts ttl and retention out of a create body so the rest still validates strictly', () => {
+    const { rest, patch } = extractRetention({ prompt: 'a fox', ttl: '2h' }, NOW);
+    expect(rest).toEqual({ prompt: 'a fox' });
+    expect(patch).toEqual({ expiresAt: NOW + 2 * HOUR });
+    const nested = extractRetention({ prompt: 'a fox', retention: { ttl: '1d', locked: true } }, NOW);
+    expect(nested.rest).toEqual({ prompt: 'a fox' });
+    expect(nested.patch).toEqual({ expiresAt: NOW + DAY, locked: true });
+  });
+
+  test('a body without retention passes through untouched', () => {
+    const body = { prompt: 'a fox' };
+    expect(extractRetention(body, NOW)).toEqual({ rest: body, patch: undefined });
+    expect(extractRetention('not an object', NOW)).toEqual({ rest: 'not an object', patch: undefined });
+  });
+
+  test('ttl and retention together are ambiguous', () => {
+    expect(() => extractRetention({ ttl: '1h', retention: { ttl: '2h' } }, NOW)).toThrow(RetentionInputError);
+  });
+});
+
+describe('explainRetention', () => {
+  const base = { type: 'narration' as const, createdAt: NOW, locked: false, expiresAt: null };
+  const settings: RetentionSettings = { global: { ttl: '30d', since: 0 }, byType: { narration: { ttl: '7d', since: 0 }, video: null } };
+
+  test('names the rule that decided the expiry', () => {
+    expect(explainRetention({ ...base, locked: true }, settings)).toEqual({ expiresAt: null, source: 'locked' });
+    expect(explainRetention({ ...base, expiresAt: NOW + HOUR }, settings)).toEqual({ expiresAt: NOW + HOUR, source: 'item' });
+    expect(explainRetention(base, settings)).toEqual({ expiresAt: NOW + 7 * DAY, source: 'type-default' });
+    expect(explainRetention({ ...base, type: 'image' }, settings)).toEqual({ expiresAt: NOW + 30 * DAY, source: 'global-default' });
+    expect(explainRetention({ ...base, type: 'video' }, settings)).toEqual({ expiresAt: null, source: 'none' });
+    expect(explainRetention(base, none)).toEqual({ expiresAt: null, source: 'none' });
   });
 });

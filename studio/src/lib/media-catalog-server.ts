@@ -9,7 +9,8 @@ export function narrationSummary(id: string, data: Record<string, unknown>): Med
   return { id, type: 'narration', ownerUid: String(data.ownerUid), title: String(data.title ?? 'Narration'),
     status: data.status === 'streaming' ? 'generating' : data.status === 'error' ? 'error' : 'ready',
     createdAt: Number(data.createdAt), updatedAt: Number(data.updatedAt), href: `/narration/${id}`, thumbnailAssetId: null,
-    durationMs: Number(data.durationMs ?? 0), sourcePreview: String(data.sourceMarkdown ?? data.transcript ?? '').slice(0, 4000) };
+    durationMs: Number(data.durationMs ?? 0), sourcePreview: String(data.sourceMarkdown ?? data.transcript ?? '').slice(0, 4000),
+    locked: data.locked === true, expiresAt: typeof data.expiresAt === 'number' ? data.expiresAt : null };
 }
 export async function syncNarrationCatalog(id: string) {
   const ref = adminDb().collection('mediaItems').doc(`narration_${id}`);
