@@ -1,4 +1,5 @@
 import { readMusicDefaults } from './music-request';
+import { readRetentionSettings } from './retention';
 import { readVideoDefaults } from './video-request';
 import { readImageDefaults } from './image-request';
 /**
@@ -34,6 +35,7 @@ export function readSettings(value: unknown): UserSettings {
     ? (raw.highlightColor as HighlightColorId)
     : DEFAULT_SETTINGS.highlightColor;
   return {
+    retention: readRetentionSettings(raw.retention),
     imageDefaults: readImageDefaults(raw.imageDefaults),
     musicDefaults: readMusicDefaults(raw.musicDefaults),
     videoDefaults: readVideoDefaults(raw.videoDefaults),
