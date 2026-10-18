@@ -6,6 +6,7 @@
 //   bun spikes/story/render.ts spikes/story/lighthouse.md --fake   (no API key)
 
 import { mkdir, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { spawnSync } from 'node:child_process';
@@ -125,8 +126,18 @@ async function collect(stream: AsyncIterable<any>) {
 // Renders are cached by request, so a rerun only pays for calls that changed or failed.
 const CACHE = join(import.meta.dir, 'out', '.cache');
 
-function geminiSpeak(model: string): Speak {
-  const client = createGeminiClient();
+// GEMINI_API_KEY from the environment, else the file a person put there for this spike.
+const KEY_FILE = join(homedir(), '.config', 'mdmedia', 'gemini-key');
+
+async function geminiKey(): Promise<string> {
+  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+  const file = Bun.file(KEY_FILE);
+  if (await file.exists()) return (await file.text()).trim();
+  throw new Error(`Set GEMINI_API_KEY or write the key to ${KEY_FILE}.`);
+}
+
+function geminiSpeak(model: string, apiKey: string): Speak {
+  const client = createGeminiClient({ getApiKey: () => apiKey });
   return async (lines) => {
     const speakers = [...new Set(lines.map((l) => l.speaker))];
     let input: string;
@@ -247,7 +258,7 @@ for (const seg of segments) {
 // ---------- render ----------
 
 const gapMs = ms(values.gap ?? meta.gap ?? '400ms');
-const speak = values.fake ? fakeSpeak : geminiSpeak(values.model!);
+const speak = values.fake ? fakeSpeak : geminiSpeak(values.model!, await geminiKey());
 const tag = values.fake ? `${values.mode}-fake` : values.mode!;
 const out = resolve(values.out ?? join(import.meta.dir, 'out', basename(file, '.md'), tag));
 await mkdir(join(out, 'calls'), { recursive: true });
