@@ -1,6 +1,6 @@
 // Executed in an isolated process so SDK mocks cannot affect other tests.
 import assert from 'node:assert/strict';
-import { DAY, HOUR, call, deletedObjects, documents, json } from './retention-server-fixture';
+import { DAY, HOUR, call, deletedObjects, documents, json, queryReads } from './retention-server-fixture';
 
 const now = Date.now();
 const narration = (ownerUid: string, patch: Record<string, unknown> = {}) =>
@@ -42,8 +42,15 @@ const sweepRoutes = {
 };
 const ids = (report: { expired: Array<{ type: string; id: string }> }) => report.expired.map((item) => `${item.type}:${item.id}`).sort();
 
-// A dry run reports the right items and deletes nothing.
+// A sweep reads only items that could be due, never the whole library: not
+// recent items, not ones with a future expiry, not kept types, and nothing of
+// someone with no defaults beyond what has its own expiry.
+queryReads.clear();
 const dry = await sweepExpired({ now, dryRun: true });
+for (const unread of ['narrations/n-new', 'narrations/o-keep', 'mediaItems/image_i-future', 'mediaItems/video_v-old', 'mediaItems/narration_n-old']) {
+  assert.ok(!queryReads.has(unread), `${unread} should not be read by a sweep`);
+}
+// A dry run reports the right items and deletes nothing.
 assert.deepEqual(ids(dry), ['image:i-old', 'narration:n-old', 'narration:n-stuck', 'narration:o-short']);
 assert.equal(dry.purged, 0);
 assert.ok(documents.has('narrations/n-old') && documents.has('mediaItems/image_i-old'));

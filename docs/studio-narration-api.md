@@ -139,8 +139,9 @@ ask for it to reach existing ones too.
 A `ttl` is a number and a unit, `m`, `h`, `d` or `w`: `90m`, `6h`, `3d`, `2w`.
 Deleting a locked narration is refused with `409 locked`; unlock it first.
 
-The server sweeps about once a minute and deletes at most 25 items per pass, the
-oldest expiry first. Set `MDMEDIA_RETENTION_SWEEP=off` to disable it,
+The server sweeps about every 10 minutes and deletes at most 25 items per pass,
+the oldest expiry first. A sweep reads only items that could be due: those whose
+own expiry has passed, and those old enough for a default to have expired them. Set `MDMEDIA_RETENTION_SWEEP=off` to disable it,
 `MDMEDIA_RETENTION_DRY_RUN=1` to log what it would delete instead of deleting,
 and `MDMEDIA_RETENTION_INTERVAL_MS` to change the interval (10 seconds at least).
 
