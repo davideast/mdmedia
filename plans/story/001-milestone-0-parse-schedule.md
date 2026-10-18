@@ -1,4 +1,4 @@
-# Plan 001: Story milestone 0 — parser, schemas, scheduler, `story check` and `story plan`
+# Plan 001: Story milestone 0 — parser, schemas, scheduler, cache keys, `story check`
 
 > **Executor instructions**: Follow this plan step by step. Run every
 > verification command and confirm the expected result before moving to the
@@ -14,90 +14,74 @@
 ## Status
 
 - **Priority**: P1
-- **Effort**: M
+- **Effort**: S
 - **Risk**: LOW (no audio, no network, no providers)
-- **Depends on**: [000 design](000-design.md), sections 3, 4, 7, 8, 9, 10, 13 and 15
+- **Depends on**: [000 design](000-design.md), sections 1, 3, 4, 7, 9, 10, 12
 - **Category**: feature
 - **Planned at**: commit `4eb8f62`, 2026-10-18
 
 ## Why this matters
 
-Everything later in the story work (rendering, mixing, captions, the reader,
-video) reads the script and the timeline. Milestone 0 makes those two data
-structures real, validated and tested, with no audio at all, so every later
-milestone builds on a format that is already pinned down by golden files.
+Every later milestone reads the script and the timeline. This milestone makes
+those two structures real and pinned by tests, with the smallest parser that
+can carry a story: front matter, narration, lines, scenes, chapters and pauses.
+Nothing here guesses at taste or guards against problems not yet seen
+(design section 1).
 
 ## Scope
 
-In:
+In: `src/story/` with the script and timeline types, front matter parsing,
+body parsing, the six errors in design 3.5, the scheduler, render cache keys,
+the `mdmedia/story` subpath and `mdmedia story check`.
 
-- `src/story/` module: types for `script.json` and `timeline.json` (design 4.1,
-  4.2), duration parsing, front matter parsing and validation, body parsing,
-  diagnostics, pacing defaults, scheduling with supplied durations, build
-  planning with cache keys.
-- `mdmedia/story` package subpath.
-- `mdmedia story check` and `mdmedia story plan`.
-- Fixtures, golden files and tests.
-
-Out (later milestones): any provider call, audio, the Node runtime and its
-ports, `build.json` writing, `story build`, `cast`, `clean`, art, captions.
-The `build.json` type is declared (design 4.3) but not produced.
+Out: anything from design 3.4 (credits, effects, music, art), audio, providers,
+`build.json` writing, `story build`, `story plan`, warnings of any kind,
+pacing rules beyond the one default gap.
 
 ## Current state
 
-- Markdown is parsed with `marked`'s lexer elsewhere:
+- `marked`'s lexer parses markdown elsewhere:
 
   ```ts
   // src/chunker/storyboard-parser.ts:1
   import { lexer, type Token, type Tokens } from 'marked';
   ```
 
-- CLI commands are `citty` definitions registered in `src/cli/command.ts`
-  (`audioCommand`, `videoCommand`, `imageCommand`, `musicCommand`,
-  `sfxCommand`, plus `studio`).
-- The package exposes subpaths through `package.json` `exports`
-  (`./audio`, `./video`, `./chunker`, `./pipeline`, `./tts`, …) and re-exports
-  from `src/index.ts`.
-- Dependencies include `marked` and `citty`; there is no YAML parser and no
-  schema library.
-- Tests run with `bun test` at the repository root; CI runs `bunx tsc --noEmit`,
+- CLI commands are `citty` definitions registered in `src/cli/command.ts`.
+- The package exposes subpaths through `package.json` `exports` and re-exports
+  them from `src/index.ts`.
+- Dependencies include `marked` and `citty`; there is no YAML parser.
+- Tests run with `bun test` at the repository root. CI runs `bunx tsc --noEmit`,
   `bun run build`, `bun test`, `bun run verify`.
 
 ## Decisions for this plan
 
-1. **YAML: add `yaml` (eemeli/yaml).** Its `parseDocument` keeps source ranges
-   for every node, so front matter and cue block diagnostics can point at the
-   exact key. No schema library: validation is hand-written against `yaml`
-   nodes so every error carries a position.
-2. **Markdown: keep `marked`.** Its lexer tokens are contiguous and each has
-   `raw`, so a running offset gives every token's source position. Step 4
-   verifies this holds for the fixtures; if it does not, that is a STOP
-   condition (switching to remark is a design change, not an executor choice).
-3. **Hashing: Web Crypto.** Cache keys use `crypto.subtle.digest('SHA-256')`,
-   available in Node 18+ and browsers, so `planStory` stays platform-free. It is
-   therefore async.
-4. **No `node:` imports anywhere under `src/story/` except `src/cli/story-command.ts`.**
-   The parser, scheduler and planner must run unchanged in a browser.
+1. **Add `yaml` (eemeli/yaml)**, the only new dependency. `parseDocument` keeps
+   source ranges, so front matter errors point at the exact key. Validation is
+   hand-written against its nodes; no schema library.
+2. **Keep `marked`.** Its lexer tokens are contiguous with `raw` text, so a
+   running offset gives each token's position. Step 3 proves this on the
+   fixtures.
+3. **Web Crypto for hashing** (`crypto.subtle.digest('SHA-256')`), so the key
+   function also runs in a browser. It is async.
+4. **Nothing under `src/story/` imports a `node:` module**; only
+   `src/cli/story-command.ts` may.
 
 ## Files
 
 | Path | Purpose |
 |---|---|
-| `src/story/types.ts` | `StoryScript`, `CastMember`, `VoiceRef`, `Chapter`, `Scene`, `Segment`, `StoryTimeline`, `TimelineClip`, `StoryBuild`, `Diagnostic`, `SourceRange`, `PacingRules` (design section 4) |
-| `src/story/diagnostics.ts` | Diagnostic codes from design 3.7, `StoryError`, offset → line/column conversion |
-| `src/story/duration.ts` | `parseDuration('1.5s' \| '1500ms' \| '0:02')` → ms or a diagnostic |
-| `src/story/front-matter.ts` | Split front matter from the body, parse with `yaml`, validate, resolve cast (adding `NARRATOR`), credits and pacing |
-| `src/story/pacing.ts` | Default pacing rules (design section 9) and merging overrides |
+| `src/story/types.ts` | `StoryScript`, `CastMember`, `VoiceRef`, `Chapter`, `Scene`, `Segment`, `StoryTimeline`, `Diagnostic`, `SourceRange`, `StoryError` (design 4.1, 4.2) |
+| `src/story/source.ts` | Offset to 1-based line and column; `parseDuration` (`1.5s`, `1500ms`, `0:02`) |
+| `src/story/front-matter.ts` | Split and parse front matter; validate the keys in design 3.1 |
 | `src/story/parse.ts` | `parseStory(markdown, { path })` → `{ script?, diagnostics }` |
-| `src/story/credits.ts` | Opening, chapter and closing credit text from front matter (design 15.6) |
 | `src/story/schedule.ts` | `scheduleStory(script, durations)` → `StoryTimeline` |
-| `src/story/plan.ts` | `renderKey(segment, script)` and `planStory(script, { cache? })` |
-| `src/story/fake-durations.ts` | Deterministic durations for tests and `story plan` (words × 380 ms + 250 ms; cue durations as written, else 2 s) |
-| `src/story/index.ts` | Public exports for `mdmedia/story` |
-| `src/cli/story-command.ts` | `mdmedia story check` and `mdmedia story plan` |
-| `test/story/fixtures/*.md` | `two-voices.md`, `chapter-with-cues.md`, `credits-and-pacing.md`, plus one file per diagnostic under `errors/` |
-| `test/story/golden/*.json` | Expected `script.json` and `timeline.json` per fixture |
-| `test/story/*.test.ts` | Tests listed in step 9 |
+| `src/story/key.ts` | `renderKey(segment, script, provider?)` → `line:<sha256>` |
+| `src/story/index.ts` | Public exports |
+| `src/cli/story-command.ts` | `mdmedia story check <file> [--json]` |
+| `test/story/fixtures/` | `two-voices.md`, `scenes-and-pauses.md`, and one file per error under `errors/` |
+| `test/story/golden/` | Expected `script.json` and `timeline.json` for the two fixtures |
+| `test/story/*.test.ts` | The tests named in each step |
 
 ## Steps
 
@@ -107,162 +91,121 @@ The `build.json` type is declared (design 4.3) but not produced.
 2. `bun add yaml`.
 3. **Verify**: `grep '"yaml"' package.json` shows it under `dependencies`.
 
-### 2. Types
+### 2. Types and source helpers
 
-Write `src/story/types.ts` exactly as design section 4, with these additions:
+- `types.ts` exactly as design 4.1 and 4.2, plus
+  `type VoiceRef = string | { provider: 'gemini' | 'elevenlabs'; id: string }`,
+  `interface SourceRange { line; column; endLine; endColumn }` (1-based),
+  `interface Diagnostic { code; message; source?: SourceRange }` with the six
+  codes from design 3.5, and `class StoryError extends Error { code; source? }`.
+- `source.ts`: `toSourceRange(text, start, end)` and `parseDuration(text)`,
+  which returns milliseconds or `undefined` for anything that is not
+  `Ns`, `N.Ns`, `Nms` or `M:SS` with a positive value.
 
-- `type CastId = string` (upper-case).
-- `type VoiceRef = string | { provider: 'gemini' | 'elevenlabs'; id: string }`.
-- `interface SourceRange { line: number; column: number; endLine: number; endColumn: number }` (1-based).
-- `type MusicCue = 'intro' | 'outro' | 'bed' | 'transition' | 'stinger'`.
-- `interface Diagnostic { code: DiagnosticCode; severity: 'error' | 'warning'; message: string; source?: SourceRange }`.
+**Verify**: `bunx tsc --noEmit` and `bun test test/story/source.test.ts`.
 
-**Verify**: `bunx tsc --noEmit` passes.
+### 3. Tokens with positions
 
-### 3. Durations and diagnostics
+In `parse.ts`, lex the body with `marked.lexer` and walk top-level tokens with
+a running offset that starts after the front matter.
 
-- `parseDuration` accepts `Ns`, `N.Ns`, `Nms`, `M:SS`; rejects negatives,
-  empty strings and anything else with `bad-duration`.
-- `toSourceRange(markdown, startOffset, endOffset)` converts offsets to 1-based
-  line and column.
+**Verify**: a test asserts that joining every top-level token's `raw` equals
+the body of each fixture exactly. If any fixture fails, STOP.
 
-**Verify**: `bun test test/story/duration.test.ts test/story/diagnostics.test.ts`.
+### 4. Front matter
 
-### 4. Body tokenization with positions
-
-In `parse.ts`, lex the body with `marked.lexer`, walking tokens with a running
-offset that starts after the front matter. For every token record
-`[start, start + raw.length)`.
-
-**Verify**: a test asserts that concatenating every top-level token's `raw` for
-each fixture equals the body exactly. If any fixture fails this, STOP.
-
-### 5. Front matter
-
-- Split on a leading `---\n … \n---\n`. A missing front matter block is
-  `missing-front-matter` (add this code; error).
-- `yaml.parseDocument`; YAML syntax errors become `bad-yaml` diagnostics with
-  positions (add this code; error).
-- Validate keys from design 3.1. Unknown top-level keys: `unknown-key`. Cast
-  entries without `voice`: `missing-voice`. `narrator` is required.
-- Upper-case cast keys; the narrator becomes `NARRATOR`.
-- `credits.opening` / `credits.closing` accept `true`, `false` or a string.
-- `pacing` accepts `default` or a map of the rule names in `pacing.ts`; unknown
-  rule names are `unknown-key`.
+- A missing leading `---` block is `missing-front-matter`.
+- `yaml.parseDocument` errors become `bad-yaml` with positions.
+- Allowed keys: `title`, `author`, `imprint`, `language`, `gap`, `narrator`,
+  `cast`. Anything else is `unknown-key`. `title` and `narrator` are required
+  (`unknown-key` is not the right code for these: report `missing-voice` for a
+  narrator without a voice and a `bad-yaml`-style message for a missing title;
+  if a seventh code seems necessary, STOP and report rather than inventing one).
+- `narrator` and each cast member need `voice`; otherwise `missing-voice`.
+  `delivery` defaults to an empty string.
+- `gap` uses `parseDuration`; invalid is `bad-duration`; absent is 400 ms.
+- The narrator becomes cast member `NARRATOR`. Cast ids are upper-cased.
 
 **Verify**: `bun test test/story/front-matter.test.ts`.
 
-### 6. Body classification
-
-Walk tokens in order and build chapters, scenes and segments:
+### 5. Body
 
 | Token | Becomes |
 |---|---|
-| `heading` depth 1 | new chapter (id `NN-slug-of-title`) |
-| `heading` depth 2 | displayed section title (stored on the scene; not spoken) |
-| `heading` depth 3 | new scene |
-| `hr` | new scene with a scene-break gap |
-| `paragraph` matching `^\*\*([^*]+)\*\*\s*(?:\*\(([^)]*)\)\*)?\s*:\s*(.+)$` (single line or wrapped) | `line` for that speaker; delivery = cast default + parenthetical |
-| other `paragraph`, `list`, `blockquote` | `line` spoken by `NARRATOR` |
-| `code` with lang `sfx`, `music`, `pause`, `scene` | cue segment; body parsed with `yaml` and validated |
-| `code` with any other lang | ignored for speech; `unknown-block` warning only if the lang looks like a typo of a cue type (edit distance ≤ 2) |
-| `space` | nothing |
+| `heading` depth 1 | a new chapter, id `NN-slug` from its text |
+| `heading` depth 2 | stored as the current scene's `title`; not spoken |
+| `heading` depth 3, `hr` | a new scene |
+| `paragraph` that starts with `**Name**`, an optional `*(delivery)*`, then `:` | a `line` for that speaker |
+| any other `paragraph`, `list`, `blockquote` | a `line` spoken by `NARRATOR` |
+| `code` with lang `pause` | a `pause` segment from `parseDuration` of its text; invalid is `bad-duration` |
+| any other `code`, `space`, `html` | nothing |
 
-Rules:
-
-- Speaker names match cast keys case-insensitively; no match is
+- Speaker names match cast ids case-insensitively; no match is
   `unknown-speaker` with the range of the bold name.
-- `text` is the spoken form (inline markdown stripped); `display` keeps the
-  original markdown.
-- `{sfx: …}` and `[tag]` patterns in text add a `reserved-syntax` warning and
-  are spoken as written.
-- Segment ids: `<chapterId>/<NNNN>-<kind-or-speaker>`, numbered within the
-  chapter, for file names only.
-- Content before the first `#` heading goes into an implicit chapter `00` with
-  no title.
-- Credits from `credits.ts` are inserted as `credit` segments: opening before
-  the first chapter, closing after the last, chapter credits when enabled.
+- `delivery` is the character's default plus the parenthetical, joined with
+  `, ` when both exist.
+- `text` is the spoken form with inline markdown removed; `display` keeps the
+  original.
+- Content before the first `#` heading forms chapter `00` with no title.
+- Segment ids: `<chapterId>/<NNNN>-<speaker lower-case | pause>`, numbered
+  within the chapter.
 
-**Verify**: `bun test test/story/parse.test.ts` (golden scripts for the three
-fixtures; one test per diagnostic code).
+**Verify**: `bun test test/story/parse.test.ts`, with golden `script.json` for
+both fixtures and one test per error code.
 
-### 7. Scheduler
+### 6. Scheduler
 
-`scheduleStory(script, durations: Record<segmentId, number>)`:
+`scheduleStory(script, durations)`:
 
-- Places voice segments (lines and credits) sequentially with the gaps from
-  `script.pacing`: different speakers, same speaker, narration boundary, scene
-  break, chapter break, opening credit to first chapter.
-- `sfx` at `after` starts when the previous voice segment ends and does not
-  delay the next voice segment unless it is longer than the gap; `with` starts
-  with the previous segment; `before` ends when the next voice segment starts.
-- `pause` adds its duration to the voice track.
-- `music`: `intro` before the opening credit with its fades; `outro` after the
-  closing credit; `bed` from its position until `until`; `transition` between
-  chapters, extending the chapter gap to its duration; ducking parameters
-  copied from the cue and pacing.
-- Fills `chapters[]` and `scenes[]` ranges, `durationMs`, `sampleRate: 48000`,
-  `channels: 2`. `render` is the segment's render key from `plan.ts`; `words`
-  is omitted in milestone 0.
-- Missing durations for a segment are an error (`StoryError` code
-  `missing-duration`).
+- Walks segments in order. A `line` occupies its duration from `durations`
+  (missing is a `StoryError` with code `missing-duration`). After each line
+  comes the script's `gapMs`, unless the next segment is a `pause`, which
+  replaces the gap with its own duration. Consecutive pauses add up.
+- No gap after the last line.
+- Fills `clips` (lines only, with `render` set to the segment's render key),
+  `chapters`, `scenes` and `durationMs`.
 
-**Verify**: `bun test test/story/schedule.test.ts` — golden timelines from
-`fake-durations.ts`, plus property tests over all fixtures:
+**Verify**: `bun test test/story/schedule.test.ts`, with golden timelines from
+fixed durations, and checks that clips never overlap, every gap equals
+`gapMs` or the written pause, and chapters and scenes cover `[0, durationMs]`
+without gaps.
 
-- no two voice clips overlap;
-- every gap between consecutive voice clips equals the matching pacing rule
-  (or the pause, transition or `sfx` override);
-- chapters and scenes cover `[0, durationMs]` without gaps or overlaps;
-- every clip ends at or before `durationMs`.
+### 7. Render keys
 
-### 8. Planner and render keys
+`renderKey(segment, script, provider = { name: 'gemini', model: 'default' })`
+hashes the provider name and model, the speaker's voice, the full delivery,
+`text`, `meta.language`, and a `RENDER_VERSION` constant, and returns
+`line:<hex>`. Pauses have no key.
 
-- `renderKey(segment, script)` hashes exactly the inputs listed in design
-  section 8 (no ids, no ordinals), prefixed by kind: `line:<sha>`, `sfx:<sha>`,
-  `music:<sha>`.
-- `planStory(script, { cache? })` returns
-  `{ renders: { key, segmentId, kind, cached }[], counts: { total, cached, toRender }, estimate: { ttsCharacters, sfxCalls, musicCalls } }`.
-  `cache` is an optional `(key) => Promise<boolean>`; without it everything is
-  `toRender`.
+**Verify**: `bun test test/story/key.test.ts`:
 
-**Verify**: `bun test test/story/plan.test.ts`, including:
+- inserting a line in a fixture changes no other line's key;
+- changing one character's default delivery changes only that character's keys;
+- the same input gives the same key twice.
 
-- inserting a line in the middle of a fixture changes no other segment's key;
-- changing a character's default delivery changes only that character's keys;
-- the same input gives the same keys in two runs.
+### 8. Exports and CLI
 
-### 9. Public exports and CLI
-
-1. `src/story/index.ts` exports `parseStory`, `scheduleStory`, `planStory`,
-   `renderKey`, `fakeDurations` and all types. Add `"./story"` to `package.json`
-   `exports` (matching the existing subpath entries) and
-   `export * from './story/index.js'` in `src/index.ts`.
-2. `src/cli/story-command.ts` defines `mdmedia story` with:
-   - `check <file> [--json]`: prints diagnostics as `file:line:col severity code message`;
-     exit `1` if any error, else `0`.
-   - `plan <file> [--json]`: runs check, then plans with fake durations and
-     prints chapter count, segment counts by kind, total duration (fake),
-     renders to do, and the estimate. Exit `1` on errors.
-   - `--online` on `check` and the `build`, `cast`, `clean` subcommands are not
-     added in this milestone.
-3. Register it in `src/cli/command.ts`. It is never chosen by extension
-   routing.
+1. `src/story/index.ts` exports `parseStory`, `scheduleStory`, `renderKey`,
+   `StoryError` and the types. Add `"./story"` to `package.json` `exports`
+   following the existing entries, and `export * from './story/index.js'` to
+   `src/index.ts`.
+2. `src/cli/story-command.ts` defines `mdmedia story check <file> [--json]`:
+   prints `file:line:col code message` per diagnostic (or `no problems`), or a
+   JSON array with `--json`; exits `1` if there are any diagnostics, else `0`.
+3. Register it in `src/cli/command.ts`. Extension routing never picks it.
 
 **Verify**:
 
 ```bash
 bun run build
-node dist/bin.js story check test/story/fixtures/two-voices.md            # exit 0, "no problems"
-node dist/bin.js story check test/story/fixtures/errors/unknown-speaker.md; echo $?   # prints the diagnostic, exit 1
-node dist/bin.js story plan test/story/fixtures/chapter-with-cues.md --json   # valid JSON matching the plan shape
+node dist/bin.js story check test/story/fixtures/two-voices.md                         # "no problems", exit 0
+node dist/bin.js story check test/story/fixtures/errors/unknown-speaker.md; echo $?   # the diagnostic, then 1
+node dist/bin.js story check test/story/fixtures/errors/unknown-speaker.md --json     # JSON array
 ```
 
-and `bun test test/story/cli.test.ts` (JSON snapshots and exit codes).
+and `bun test test/story/cli.test.ts` (JSON output and exit codes).
 
-### 10. Full checks
-
-**Verify**, all from the repository root:
+### 9. Full checks
 
 ```bash
 bunx tsc --noEmit
@@ -276,19 +219,18 @@ All pass, and the last line prints `story is platform-free`.
 
 ## Done when
 
-- The three fixtures produce golden `script.json` and `timeline.json`.
-- Every diagnostic code in design 3.7 (plus `missing-front-matter`, `bad-yaml`)
-  has a test.
-- The scheduler property tests hold for every fixture.
-- `mdmedia story check` and `mdmedia story plan` work from the built CLI with
-  the exit codes above.
+- Both fixtures produce their golden `script.json` and `timeline.json`.
+- Each of the six error codes has a test.
+- Scheduler and key tests pass.
+- `mdmedia story check` works from the built CLI with the exit codes above.
 - Nothing under `src/story/` imports a `node:` module.
 - The branch is committed locally and not pushed.
 
 ## STOP conditions
 
-- Concatenated token `raw` does not reproduce a fixture's body (step 4).
-- Any schema in design section 4 needs a change to implement this plan.
+- Joined token `raw` does not reproduce a fixture's body (step 3).
+- A schema in design section 4 needs a change, or a seventh error code seems
+  necessary.
 - A dependency other than `yaml` seems necessary.
 - `bun test` fails outside `test/story/` after your changes.
-- The drift check shows changes to in-scope files that contradict "Current state".
+- The drift check shows changes that contradict "Current state".

@@ -1,45 +1,49 @@
 # Story: design
 
 A **story** is a markdown document that builds into a dramatic audio recording
-(narrator, cast, sound effects, music) and, optionally, an illustrated graphic
-novel and an MP4 playthrough. mdmedia treats it like a build tool: a source
-file compiles to a timeline, renders are cached by content, and a build writes
-a predictable output tree.
+(narrator, cast, and later sound effects and music) and, eventually, an
+illustrated graphic novel and an MP4 playthrough. mdmedia treats it like a build
+tool: a source file compiles to a timeline, renders are cached by content, and a
+build writes a predictable output tree.
 
-This document settles everything that has to be decided before implementation:
-the notation, the data model, the platform boundaries, the public API, the CLI,
-the output layout, caching, testing and the order of work. Later plans in this
+This document fixes what has to be decided before implementation and leaves
+everything else to the milestone that proves it is needed. Later plans in this
 folder (`001-…`) are step-by-step implementation plans that point back here.
 
-- **Status**: decisions settled 2026-10-18 (section 15); milestone 0 can be planned
+- **Status**: decisions settled 2026-10-18 (section 14); scope trimmed to what is
+  proven (section 1)
 - **Planned at**: commit `4eb8f62`, 2026-10-18
-- **Scope of v0**: audio only (milestones 0 to 5). Art, captions, the reader and
-  video are designed here so v0 does not paint them into a corner, but they are
-  built later.
 
-## 1. Goals and non-goals
+## 1. Principles
 
-**Goals**
+These decide what gets built and what does not.
 
-1. One markdown file is the whole production: cast, delivery, cues, scenes.
-   It stays readable as plain markdown on GitHub or in any editor.
-2. The output sounds produced: paced dialogue, level-matched voices, music that
-   ducks under speech, crossfaded transitions, opening and closing credits.
-3. Every part is usable alone. A two-voice narration, an audiobook with credits,
-   or a narration with a music bed uses the same modules as the full graphic
-   novel.
-4. Builds are incremental and reproducible. Editing one line re-renders one
-   line. The same source and cache give byte-identical output.
-5. Platform work sits behind interfaces. v0 ships Node implementations backed
-   by ffmpeg; a browser implementation (Web Audio, WebCodecs, Mediabunny) can
-   be added later without changing callers.
+1. **Code owns what is mechanical and checkable; the model owns judgment.**
 
-**Non-goals for v0**
+   | Code | Model |
+   |---|---|
+   | Parsing the stated notation | Turning loose prose into that notation |
+   | Hashing and the render cache | Choosing each line's delivery |
+   | Timing arithmetic: durations plus the gaps written in the script | Deciding pacing: where a beat lands, where to rush |
+   | Provider calls, mixing, encoding, loudness to a published standard | Art prompts and character consistency |
+   | The output file layout | Placing captions on an image (it can return boxes) |
+   | Machine-readable errors | Fixing a story from those errors |
 
-- Generated video clips (the MP4 in this design is a composition of stills).
-- A visual timeline editor.
-- Real-time collaborative editing of stories in Studio.
-- Inline cues inside a sentence (reserved syntax only; see 3.6).
+2. **Judgment is data, not constants.** Pacing, delivery and placement are
+   written in the script (by the author or a model) and the code applies them.
+   There are no rule tables of taste; there is one default gap.
+3. **Evidence before rules.** A check, heuristic or cleanup step is added only
+   after its failure has been seen or heard, and is removed if a model can do
+   the job instead.
+4. **Generation is not deterministic, so make it cheap to redo one piece.**
+   Content-addressed caching gives reproducible builds and lets one line, effect
+   or image be regenerated without touching the rest.
+5. **The CLI is a model's toolbox.** Commands are fast, deterministic and offer
+   `--json`, so an agent can loop: write, check, table-read, listen, adjust one
+   thing, rebuild.
+6. **Schemas grow by milestone.** Each version carries only what has been
+   built. Fields for sound effects, music, art and captions are added by the
+   milestones that build them, behind the schema version.
 
 ## 2. Concepts
 
@@ -47,507 +51,308 @@ folder (`001-…`) are step-by-step implementation plans that point back here.
 |---|---|
 | **Story** | The source markdown file. |
 | **Cast** | The narrator and characters, each with a voice and default delivery. |
-| **Segment** | One unit on the timeline: a spoken line, a narration paragraph, a sound effect, a music cue, a pause, or a credit. |
-| **Scene** | A run of segments sharing one illustration. Starts at a `###` heading or a `scene` block. |
-| **Chapter** | A `#` heading. Chapters carry transition music and chapter art. |
+| **Segment** | One unit of the script: a spoken line (narration is a line by the narrator) or a pause. Later milestones add credits, effects and music. |
+| **Scene** | A run of segments. Starts at a `###` heading or a horizontal rule. Later carries one illustration. |
+| **Chapter** | A `#` heading. |
 | **Script** | The parsed, validated story (`script.json`). Pure data, no durations. |
-| **Render** | One generated asset (a line's audio, an effect, a music cue, an image), cached by content hash. |
-| **Timeline** | The script plus measured durations and scheduling: every segment's start, end, gain and fades (`timeline.json`). |
-| **Target** | One kind of output: `audio`, `text`, `art`, `video`, `player`. |
+| **Render** | One generated asset, cached by content hash. |
+| **Timeline** | The script plus measured durations: every segment's start and end (`timeline.json`). |
 | **Build** | One run that writes a `dist/` tree and `build.json`. |
 
-## 3. Notation (v0)
+## 3. Notation
 
-Plain markdown carries the story. Front matter declares the production. Fenced
-blocks with a type carry cues where they happen. Nothing requires the tool to
-read.
+Plain markdown carries the story. Front matter declares the production. Nothing
+requires the tool to read.
 
-### 3.1 Front matter
+### 3.1 Front matter (milestone 0)
 
 ```yaml
 ---
 title: The Most Embarrassing Day of My Life
 author: David East
-imprint: East Side Audio          # used in the opening credit; never defaulted to a real publisher
+imprint: East Side Audio     # spoken in the opening credit (milestone 3); never defaulted
 language: en
+gap: 400ms                   # the one default pause between segments
 narrator:
-  voice: Puck                     # a Gemini voice name, or { provider: elevenlabs, id: … }
+  voice: Puck                # a Gemini voice name, or { provider: elevenlabs, id: … }
   delivery: warm, unhurried
 cast:
   MAYA:
     voice: Kore
     delivery: quick, defensive
-    look: 11 years old, curly hair, yellow raincoat     # used by art; ignored for audio-only builds
   DAD:
     voice: Charon
     delivery: dry, amused
-credits:
-  opening: true                   # "{imprint} presents… {title}, by {author}. Read by {cast}."
-  closing: true                   # "The End."
-pacing: default                   # or a map overriding the rules in section 9
-art:                              # optional; absent means audio-only
-  style: inked graphic novel, muted watercolor
-  aspect: 3:2
 ---
 ```
 
-Cast keys are upper-case names used in the text. A missing `voice` is an error.
-Unknown top-level keys are an error, so typos fail fast.
+- `title`, `narrator` and at least a `voice` per cast member are required.
+- Cast keys are names used in the text; they match case-insensitively.
+- Unknown keys are an error. A strict, explicit error is what lets a model
+  correct itself.
+- Later milestones add `credits` (3), `art` (6) and per-character `look` (A).
 
-### 3.2 Narration
+### 3.2 Narration and lines
 
-Any paragraph that is not a line or a cue is narration, spoken by the narrator.
-List items and block quotes are narration too. Inline markdown (`**`, `_`,
-links) is stripped before speech and kept for display.
-
-### 3.3 Lines
-
-A paragraph that starts with a bold cast name followed by a colon is a line:
+Any paragraph, list or block quote that is not a line is narration, spoken by
+the narrator. A paragraph that starts with a bold cast name and a colon is a
+line:
 
 ```markdown
+The bus was already moving when Maya realized.
+
 **MAYA** *(whispering)*: Please tell me nobody saw that.
+
 **DAD**: Everyone saw that.
 ```
 
-- The name must be in `cast`; an unknown name is an error with its position.
-- An optional italic parenthetical is that line's delivery. It is added to the
-  character's default delivery, not substituted for it.
-- A line continues until the end of the paragraph. A new speaker needs a new
-  paragraph.
+- An optional italic parenthetical is that line's delivery, added to the
+  character's default.
+- Inline markdown is stripped for speech and kept for display.
+- A new speaker needs a new paragraph.
 
-### 3.4 Structure
+### 3.3 Structure and pauses
 
-- `#` heading: chapter. Its text is the chapter title (spoken in a chapter
-  credit if `credits.chapters` is on, and used for file names).
-- `##` heading: part or section title, displayed but not spoken unless the
-  pacing says so.
-- `###` heading: a new scene.
-- A horizontal rule (`---` in the body) is a scene break with a long pause.
-
-### 3.5 Cue blocks
-
-Fenced code blocks whose info string is a cue type. Their body is YAML.
+- `#` heading: a chapter. `###` heading or a horizontal rule: a new scene.
+  `##` headings are displayed, not spoken.
+- Every segment is followed by the default `gap`. Anything else is written
+  explicitly:
 
 ````markdown
-```sfx
-prompt: whole bus bursts out laughing
-duration: 3s
-at: after         # after (default) | with | before — relative to the previous segment
-gain: -6dB
-```
-
-```music
-cue: intro        # intro | outro | bed | transition | stinger
-prompt: playful pizzicato, light percussion
-fade_in: 2s
-fade_out: 3s
-duck: -14dB       # gain under speech while it plays; omitted means no ducking
-until: chapter    # bed only: chapter | scene | next-music
-```
-
 ```pause
-duration: 1.5s
-```
-
-```scene
-art: the school bus aisle from Maya's seat, everyone turned around
-characters: [MAYA]
+1.5s
 ```
 ````
 
-Rules:
+  A `pause` block replaces the gap at that point. Durations are `1.5s`,
+  `1500ms` or `0:02`. Chapter and scene breaks get no special treatment; the
+  author or the director step (section 8) adds pauses where they belong.
+- Any other fenced code block is left out of the speech and kept for display.
 
-- A block with an unknown type is passed through as a normal code block and a
-  warning is reported, so documentation code samples still work.
-- `at: with` overlaps the previous segment (an effect under a line). `before`
-  places it so it ends as the next segment starts.
-- Durations are written `1.5s`, `1500ms` or `0:02`.
-- Every cue gets a stable id from its position and content (section 8).
+### 3.4 Added by later milestones
 
-### 3.6 Reserved for later
+Each is specified, implemented and tested in the milestone that needs it:
 
-- `{sfx: door}` inline markers for mid-sentence effects.
-- `[whispers]`-style inline delivery tags passed through to providers that
-  support them (ElevenLabs v3).
+| Notation | Milestone |
+|---|---|
+| `credits:` front matter and credit segments | 3 |
+| ` ```sfx ` blocks and their timing relative to lines | 4 |
+| ` ```music ` blocks: fades, beds, ducking, transitions | 5 |
+| ` ```scene ` art direction, `art:` and `look:` front matter | A, 6, 7 |
+| Inline cues inside a sentence | when a story needs one |
 
-They are parsed as plain text in v0 and flagged by `story check` so authors
-know they are not yet active.
+### 3.5 Errors
 
-### 3.7 Validation
+`story check` reports only problems that would stop a build, each with file,
+line and column:
 
-`story check` reports diagnostics with file, line and column:
-
-| Code | Severity | Example |
-|---|---|---|
-| `unknown-speaker` | error | `**MAYOR**:` with no `MAYOR` in cast |
-| `missing-voice` | error | cast entry without `voice` |
-| `unknown-key` | error | `narator:` in front matter |
-| `bad-duration` | error | `duration: soon` |
-| `unknown-block` | warning | ` ```sfxx ` |
-| `reserved-syntax` | warning | `{sfx: door}` in text |
-| `voice-unavailable` | error | an ElevenLabs voice the account cannot use (needs network; `check --online`) |
+| Code | Example |
+|---|---|
+| `missing-front-matter` | no front matter block |
+| `bad-yaml` | YAML syntax error |
+| `unknown-key` | `narator:` in front matter |
+| `missing-voice` | a cast member without `voice` |
+| `unknown-speaker` | `**MAYOR**:` with no `MAYOR` in the cast |
+| `bad-duration` | ` ```pause ` containing `soon` |
 
 ## 4. Data model
 
-All three files carry a `schema` field with a version. Readers reject an
-unknown major version.
+Every file carries a `schema` field; readers reject an unknown major version.
+Later milestones add segment kinds and fields as minor versions.
 
-### 4.1 `script.json` (parse output, no durations)
+### 4.1 `script.json` (milestone 0)
 
 ```ts
 interface StoryScript {
   schema: 'mdmedia.story.script/1';
   source: { path: string; sha256: string };
   meta: { title: string; author?: string; imprint?: string; language: string };
-  cast: Record<CastId, CastMember>;          // includes 'NARRATOR'
-  credits: { opening: boolean; closing: boolean; chapters: boolean };
-  pacing: PacingRules;                        // resolved: defaults merged with overrides
-  art?: ArtDirection;
+  gapMs: number;
+  cast: Record<CastId, CastMember>;            // includes 'NARRATOR'
   chapters: Chapter[];
 }
 
-interface CastMember { id: CastId; voice: VoiceRef; delivery: string; look?: string }
-
-interface Chapter { id: string; index: number; title: string; scenes: Scene[] }
-interface Scene { id: string; index: number; title?: string; art?: SceneArt; segments: Segment[] }
+interface CastMember { id: CastId; voice: VoiceRef; delivery: string }
+interface Chapter { id: string; index: number; title?: string; scenes: Scene[] }
+interface Scene { id: string; index: number; title?: string; segments: Segment[] }
 
 type Segment =
   | { kind: 'line'; id: string; speaker: CastId; text: string; display: string; delivery: string; source: SourceRange }
-  | { kind: 'sfx'; id: string; prompt: string; durationMs?: number; at: 'after' | 'with' | 'before'; gainDb: number; source: SourceRange }
-  | { kind: 'music'; id: string; cue: MusicCue; prompt: string; fadeInMs: number; fadeOutMs: number; duckDb?: number; until?: 'chapter' | 'scene' | 'next-music'; source: SourceRange }
-  | { kind: 'pause'; id: string; durationMs: number; source: SourceRange }
-  | { kind: 'credit'; id: string; role: 'opening' | 'closing' | 'chapter'; text: string };
+  | { kind: 'pause'; id: string; durationMs: number; source: SourceRange };
 ```
 
-Narration is a `line` whose speaker is `NARRATOR`. Credits are generated
-segments, so they render, cache and mix like any other line.
-
-### 4.2 `timeline.json` (schedule)
+### 4.2 `timeline.json` (milestone 0)
 
 ```ts
 interface StoryTimeline {
   schema: 'mdmedia.story.timeline/1';
   durationMs: number;
-  sampleRate: 48000;
-  channels: 2;
-  chapters: { id: string; title: string; startMs: number; endMs: number }[];
-  scenes: { id: string; chapterId: string; startMs: number; endMs: number; image?: string }[];
-  clips: TimelineClip[];                      // sorted by startMs
-  words?: { segmentId: string; startMs: number; endMs: number; charStart: number; charEnd: number }[];
-}
-
-interface TimelineClip {
-  segmentId: string;
-  track: 'voice' | 'sfx' | 'music';
-  render: string;                             // cache key of the audio
-  startMs: number;
-  endMs: number;
-  offsetMs: number;                           // into the render, for trims
-  gainDb: number;
-  fadeInMs: number;
-  fadeOutMs: number;
-  duck?: { depthDb: number; attackMs: number; releaseMs: number };   // music under voice
+  chapters: { id: string; startMs: number; endMs: number }[];
+  scenes: { id: string; chapterId: string; startMs: number; endMs: number }[];
+  clips: { segmentId: string; render: string; startMs: number; endMs: number }[];
 }
 ```
 
-The timeline is the only input to every renderer: the mixer, caption writer,
-reader and video composer. Nothing downstream reads the markdown.
+The scheduler places lines one after another: each line's duration, then the
+default gap or the pause written after it. That is all it does.
 
-### 4.3 `build.json` (manifest)
+### 4.3 `build.json` (milestone 1)
 
 ```ts
 interface StoryBuild {
   schema: 'mdmedia.story.build/1';
   tool: { name: 'mdmedia'; version: string };
   source: { path: string; sha256: string };
-  targets: Target[];
-  runtime: { name: string; capabilities: string[] };   // e.g. 'node-ffmpeg', ffmpeg version
-  renders: Record<string, {                    // cache key -> provenance
-    segmentId: string; kind: string; provider: string; model: string;
-    durationMs?: number; bytes: number; cached: boolean; costUnits?: number;
-  }>;
+  ffmpeg: { path: string; version: string };
+  renders: Record<string, { segmentId: string; provider: string; model: string; durationMs: number; cached: boolean }>;
   outputs: { path: string; sha256: string; bytes: number }[];
-  diagnostics: Diagnostic[];
 }
 ```
 
-## 5. Architecture
+## 5. Pipeline
 
 ```
 story.md
-   │ parse            (pure)
-   ▼
-StoryScript ── resolve cast, credits, pacing defaults   (pure)
-   │ plan             (pure: cache keys, what needs rendering, cost estimate)
-   ▼
-BuildPlan
-   │ render           (providers: TTS, SFX, music, image; results into RenderCache)
-   ▼
-Renders + measured durations   (MediaProbe)
-   │ schedule         (pure: pacing rules -> TimelineClip[])
-   ▼
-StoryTimeline
-   │ targets          (runtime ports)
-   ├─ audio:  AudioMixer -> master; AudioEncoder; AudiobookPackager -> m4b, mp3, chapters, stems, lines
-   ├─ text:   transcript.md, captions.vtt, alignment.json   (pure)
-   ├─ art:    ImageProcessor -> display sizes; caption layout   (later)
-   ├─ video:  VideoComposer -> mp4   (later)
-   └─ player: static reader bundle   (later)
+  │ parseStory                 pure
+  ▼
+script.json
+  │ render each line           providers, render cache            (milestone 1)
+  ▼
+durations
+  │ scheduleStory              pure: durations + gaps
+  ▼
+timeline.json
+  │ mix, normalize, encode     audio runtime (ffmpeg)             (milestone 1)
+  ▼
+dist/
 ```
 
-Pure stages have no I/O and no platform dependency; they run unchanged in Node
-and the browser and are tested with golden files. Everything with I/O goes
-through a port.
+Parsing and scheduling do no I/O and import nothing from Node, so they run
+unchanged in a browser (Studio's live preview, later).
 
-## 6. Platform ports
+## 6. The audio runtime boundary
 
-Ports describe a job with data, never an ffmpeg operation. Each port has one
-contract test suite; an implementation is accepted when it passes.
-
-### 6.1 Media handles
-
-Browsers have no file paths, so ports exchange handles, not paths.
+All ffmpeg use lives in one module behind a small interface, so a browser
+implementation (Web Audio and Mediabunny) can replace it later. Only what
+milestone 1 uses is defined now; image, video and other interfaces are added
+with their milestones, and a capability registry only if a second runtime
+appears.
 
 ```ts
 interface MediaHandle {
-  readonly id: string;                         // cache key or artifact path
+  readonly id: string;
   readonly mimeType: string;
-  readonly bytes: number;
   stream(): ReadableStream<Uint8Array>;
-  /** Node only: a local file path, so ffmpeg can read without copying. */
-  readonly localPath?: string;
+  readonly localPath?: string;                 // Node only, so ffmpeg reads without copying
 }
 
-interface PcmAudio { sampleRate: number; channels: 1 | 2; frames: Float32Array[] }
-```
-
-### 6.2 The ports
-
-```ts
-interface MediaProbe {
-  probe(input: MediaHandle): Promise<{ durationMs: number; sampleRate: number; channels: number; codec: string }>;
+interface AudioRuntime {
+  probe(input: MediaHandle): Promise<{ durationMs: number }>;
+  /** Mix the timeline's clips into one master and normalize it to the loudness target. */
+  mix(timeline: StoryTimeline, source: (renderKey: string) => MediaHandle, out: { loudnessLufs: number; truePeakDb: number }): Promise<MediaHandle>;
+  encode(input: MediaHandle, format: 'mp3' | 'wav'): Promise<MediaHandle>;
 }
 
-interface AudioDecoder {
-  /** Provider output (wav, mp3) to PCM at the requested rate and channel count. */
-  decode(input: MediaHandle, to: { sampleRate: number; channels: 1 | 2 }): Promise<PcmAudio>;
-}
-
-interface AudioMixer {
-  /** Render the whole timeline to one PCM master, applying gain, fades and ducking. */
-  mix(timeline: StoryTimeline, sources: (renderKey: string) => MediaHandle, opts?: { signal?: AbortSignal; onProgress?: (fraction: number) => void }): Promise<MediaHandle>;
-}
-
-interface LoudnessNormalizer {
-  measure(input: MediaHandle): Promise<{ integratedLufs: number; truePeakDb: number }>;
-  normalize(input: MediaHandle, target: { integratedLufs: number; truePeakDb: number }): Promise<MediaHandle>;
-}
-
-interface AudioEncoder {
-  readonly formats: readonly AudioFormat[];    // e.g. ['wav', 'mp3', 'aac', 'opus']
-  encode(input: MediaHandle, format: AudioFormat, opts?: { bitrateKbps?: number; range?: { startMs: number; endMs: number } }): Promise<MediaHandle>;
-}
-
-interface AudiobookPackager {
-  /** One file with chapter markers, cover art and tags. */
-  package(input: { audio: MediaHandle; chapters: { title: string; startMs: number }[]; cover?: MediaHandle; tags: AudiobookTags }, format: 'm4b' | 'mp3'): Promise<MediaHandle>;
-}
-
-interface ImageProcessor {                     // art target (later)
-  resize(input: MediaHandle, opts: { width: number; format: 'webp' | 'png' | 'jpeg'; quality?: number }): Promise<MediaHandle>;
-}
-
-interface VideoComposer {                      // video target (later)
-  compose(input: { timeline: StoryTimeline; image: (sceneId: string) => MediaHandle; audio: MediaHandle; captions?: MediaHandle; burnCaptions?: boolean; fps: number; size: { width: number; height: number } }): Promise<MediaHandle>;
-}
-
-interface ArtifactStore {                      // where a build writes (fs dir, OPFS, zip)
-  write(path: string, data: MediaHandle | Uint8Array | string): Promise<void>;
-  exists(path: string): Promise<boolean>;
-  remove(prefix: string): Promise<void>;
-}
-
-interface RenderCache {                        // content-addressed renders (fs, IndexedDB)
+interface RenderCache {
   get(key: string): Promise<MediaHandle | undefined>;
-  put(key: string, data: Uint8Array | MediaHandle, mimeType: string): Promise<MediaHandle>;
-}
-
-interface MediaRuntime {
-  name: string;
-  capabilities: ReadonlySet<Capability>;       // checked before a build starts
-  probe: MediaProbe;
-  decoder: AudioDecoder;
-  mixer: AudioMixer;
-  loudness: LoudnessNormalizer;
-  encoder: AudioEncoder;
-  audiobook: AudiobookPackager;
-  images?: ImageProcessor;
-  video?: VideoComposer;
+  put(key: string, data: Uint8Array, mimeType: string): Promise<MediaHandle>;
 }
 ```
 
-`Capability` values such as `audio.mix`, `encode.mp3`, `package.m4b`,
-`video.compose` let a build fail before rendering anything when a target is
-impossible on the current runtime ("this runtime cannot write M4B; choose mp3").
+- The Node implementation spawns ffmpeg with argument arrays; it does not use
+  `fluent-ffmpeg` (deprecated).
+- ffmpeg is found in this order: `MDMEDIA_FFMPEG` (or an `ffmpegPath` option),
+  an installed `ffmpeg-static`, then `ffmpeg` on the `PATH`. `ffmpeg-static` is
+  an optional peer dependency, because it and its binary are GPL-3.0 and
+  mdmedia is MIT. A missing binary is a clear error, not a crash.
+- One contract test suite covers `AudioRuntime`; a browser implementation is
+  accepted by passing the same suite.
+- Loudness targets a published audiobook standard (−19 LUFS, −2 dBTP). Room
+  tone, silence trimming and other cleanup are added only if milestone 1's
+  renders are heard to need them.
 
-### 6.3 Implementations
-
-| Port | v0 (Node) | Later (browser) |
-|---|---|---|
-| `MediaProbe`, `AudioDecoder` | ffprobe / ffmpeg | Web Audio `decodeAudioData`; Mediabunny for containers |
-| `AudioMixer` | ffmpeg `filter_complex` (`adelay`, `volume`, `afade`, `amix`, `sidechaincompress`) | `OfflineAudioContext` gain automation |
-| `LoudnessNormalizer` | ffmpeg `loudnorm` (two pass) | an R128 meter over PCM |
-| `AudioEncoder` | ffmpeg (`libmp3lame`, `aac`, `libopus`) | WebCodecs via Mediabunny |
-| `AudiobookPackager` | ffmpeg with an `FFMETADATA` chapter file | Mediabunny MP4 with chapters, if supported; otherwise not offered |
-| `ImageProcessor` | sharp | canvas `OffscreenCanvas.convertToBlob` |
-| `VideoComposer` | ffmpeg (`zoompan`, `xfade`, ASS subtitles) | Mediabunny with canvas frames |
-| `ArtifactStore`, `RenderCache` | filesystem | OPFS / IndexedDB / zip |
-
-`createNodeRuntime()` finds ffmpeg in this order: the `MDMEDIA_FFMPEG`
-environment variable (or `ffmpegPath` option), then the `ffmpeg-static` package
-if the user installed it, then `ffmpeg` on the `PATH`. It checks the binary and
-its version once and reports a clear error if none is found. `ffmpeg-static` is
-an optional peer dependency of the published package, not a dependency: it and
-its binary are GPL-3.0, and mdmedia is MIT, so installing mdmedia must not pull
-GPL code by default. Studio, an application, keeps its direct dependency.
-
-Licensing notes (not legal advice):
-
-- ffmpeg runs as a separate program; mdmedia never links it, so mdmedia's code
-  stays MIT.
-- Running ffmpeg on your own machine or server has no GPL obligations; serving
-  outputs is not distribution. Generated media is not covered by ffmpeg's
-  license.
-- Distributing the binary (a public Docker image of Studio, a bundled app)
-  requires shipping the GPL text and offering that exact build's source.
-- Audio-only builds need only LGPL or BSD codecs (LAME MP3, ffmpeg's AAC,
-  Opus). The video target needs an H.264 encoder: x264 (GPL) or OpenH264 (BSD).
-- The browser runtime uses WebCodecs and Mediabunny, not `ffmpeg.wasm`, which
-  would distribute ffmpeg to every visitor.
-
-`fluent-ffmpeg` is not used; it is deprecated. The Node runtime spawns ffmpeg
-directly with argument arrays (no shell).
-
-### 6.4 Providers
-
-Providers stay where they are and are injected:
-
-- `ITTSProvider` (Gemini, ElevenLabs). v0 adds an optional
-  `streamAudioWithTimings` so providers that return word timestamps
-  (ElevenLabs) can feed `timeline.words`; others fall back to the existing
-  estimator.
-- `ISoundEffectsProvider`, `IMusicProvider` as they are.
-- A new `IImageProvider` interface wrapping `generateGeminiImage`, needed for
-  the art target; reference images carry the character sheets.
+Licensing (not legal advice): running ffmpeg yourself has no GPL obligations,
+and generated media is not covered. Distributing the binary (for example a
+public Studio image) means shipping the GPL text and pointing to that build's
+source. Audio-only builds need only LGPL or BSD codecs; GPL enters with an
+H.264 encoder for video (OpenH264 is the BSD alternative).
 
 ## 7. Public API (`mdmedia/story`)
 
-```ts
-import { parseStory, planStory, scheduleStory, buildStory, createNodeRuntime } from 'mdmedia/story';
+Milestone 0:
 
-const { script, diagnostics } = parseStory(markdown, { path: 'story.md' });   // pure
-const plan = planStory(script, { targets: ['audio', 'text'], cache });       // what renders, cache hits, cost estimate
-const timeline = scheduleStory(script, durations);                           // pure; durations by segment id
+```ts
+import { parseStory, scheduleStory, renderKey } from 'mdmedia/story';
+
+const { script, diagnostics } = parseStory(markdown, { path: 'story.md' });
+const key = await renderKey(segment, script);           // content hash, see section 9
+const timeline = scheduleStory(script, durations);      // durations by segment id
+```
+
+Milestone 1 adds:
+
+```ts
+import { buildStory, createNodeAudioRuntime, createFileRenderCache } from 'mdmedia/story';
 
 const result = await buildStory({
   source: { path: 'story.md', markdown },
   outDir: 'dist/the-most-embarrassing-day',
-  targets: ['audio', 'text'],
-  runtime: createNodeRuntime(),
-  providers: { tts, sfx, music, images },
+  runtime: createNodeAudioRuntime(),
+  tts,                                   // existing ITTSProvider
   cache: createFileRenderCache('.mdmedia/cache'),
-  store: createDirectoryStore('dist/the-most-embarrassing-day'),
-  only: { chapters: ['01-the-bus'] },          // optional partial build
-  force: false,                                 // ignore cache hits
-  tableRead: false,                             // fast, cheap voices for pacing passes
+  tableRead: false,
   signal,
-  onEvent: (event) => {},                       // typed progress events
+  onEvent,
 });
-// result: { build: StoryBuild; timeline: StoryTimeline; outputs: string[] }
 ```
 
-Rules:
+- Pure functions take and return plain data.
+- `buildStory` reads nothing from globals or the environment except through the
+  runtime it is given.
+- Errors are `StoryError` with a `code` and, where it applies, a `SourceRange`.
 
-- Pure functions take and return plain data and never touch I/O, so Studio can
-  run `parseStory` and `scheduleStory` in the browser for live previews.
-- `buildStory` never reads globals or environment variables; everything comes
-  in through its options.
-- Errors are `StoryError` with a `code` and, where it applies, a
-  `SourceRange`.
-- Events extend the existing pipeline event bus types:
-  `parse:done`, `render:start|done|cached`, `schedule:done`,
-  `target:start|done`, `build:done`.
+## 8. The director step (after milestone 2)
 
-## 8. Caching and incrementality
+Rather than coding heuristics for pacing, delivery or structure, an optional
+model step turns any markdown or prose into canonical story notation, with
+explicit cast, deliveries and pauses, written to a file the author can read and
+edit:
 
-A render's cache key is a SHA-256 of everything that affects its bytes:
-
-```
-line:   provider, model, voice, delivery (default + per line), normalized text, language, tool render version
-sfx:    provider, model, prompt, duration, loop, tool render version
-music:  provider, model, prompt, cue kind, tool render version
-image:  provider, model, prompt, style, aspect, reference image keys, tool render version
+```bash
+mdmedia story direct notes.md -o story.md
 ```
 
-- Segment ids are derived from chapter, scene, kind and an ordinal, for file
-  names only. Cache keys never include ids or ordinals, so inserting a line
-  renumbers files without re-rendering anything.
-- Mixing and encoding outputs are keyed by the timeline hash plus runtime
-  version, so a pacing change re-mixes without re-rendering voices.
-- `.mdmedia/cache` lives next to the story by default; `--cache <dir>` moves
-  it. `story clean` removes `dist/`; `story clean --cache` also prunes renders
-  no longer referenced by any build manifest in the project.
-- Encoded files use fixed metadata dates so identical inputs give identical
-  bytes.
+It follows the pattern of the existing narration rewrite adapter. The parser
+stays small and strict; the model handles what is ambiguous, once and visibly.
+A model that can listen (Gemini understands audio) reviewing a table read and
+suggesting pause changes is an option to try later, not part of the plan.
 
-## 9. Pacing
+## 9. Caching
 
-The scheduler turns segments into clips with these rules. All values are
-defaults that front matter `pacing:` can override.
+A render's cache key is a SHA-256 (Web Crypto, so it also works in a browser)
+of what affects its bytes:
 
-| Rule | Default |
-|---|---|
-| Gap between two lines by different speakers | 350 ms |
-| Gap between two lines by the same speaker | 600 ms |
-| Gap after narration before a line, and the reverse | 500 ms |
-| Gap at a scene break | 1.5 s |
-| Gap at a chapter break (before transition music) | 2.5 s |
-| Opening credit to first chapter | 2 s |
-| Room tone under voice tracks | on, −60 dBFS |
-| Music duck under speech | as written on the cue; attack 120 ms, release 600 ms |
-| Target loudness | −19 LUFS integrated, −2 dBTP |
+```
+line: provider, model, voice, delivery (default + per line), spoken text, language, render version
+```
 
-Each line's render is trimmed of leading and trailing silence before
-scheduling, so the gaps above are the real gaps. `story build --table-read`
-uses a fast model and skips music so pacing can be tuned in seconds.
+- Segment ids name files only. Keys never include ids or positions, so
+  inserting a line renumbers files without re-rendering anything.
+- A change to gaps or pauses re-mixes without re-rendering voices.
+- The cache lives in `.mdmedia/cache` next to the story; `--cache` moves it.
+- Later milestones add keys for effects, music and images in the same way.
 
 ## 10. CLI
 
-```
-mdmedia story check <story.md> [--online] [--json]
-mdmedia story plan  <story.md> [--targets audio,text] [--json]
-mdmedia story build <story.md> [--out dist/<slug>] [--targets audio,text,art,video,player]
-                               [--chapter 01-the-bus] [--force] [--table-read] [--cache .mdmedia/cache] [--json]
-mdmedia story cast  <story.md> [--preview MAYA] [--json]
-mdmedia story clean <story.md> [--cache]
-```
-
-| Command | What it does | Network |
+| Command | Milestone | What it does |
 |---|---|---|
-| `check` | Parse and validate; print diagnostics with positions | no (`--online` checks voices) |
-| `plan` | Show what would render, cache hits, estimated provider calls and cost | no |
-| `build` | Render, schedule and write the requested targets | yes |
-| `cast` | List the cast with voices and deliveries; `--preview` renders one sample line per character | yes for previews |
-| `clean` | Remove the build output, optionally prune the cache | no |
+| `mdmedia story check <file> [--json]` | 0 | Parse and validate; diagnostics as `file:line:col code message`; exit 1 on errors |
+| `mdmedia story build <file> [--out] [--table-read] [--cache] [--json]` | 1 | Render lines, schedule, mix, write `dist/` |
+| `mdmedia story direct <input> -o <story.md>` | after 2 | Model step from section 8 |
+| `cast`, `clean` | when needed | Previews and cleanup, added if real use asks for them |
 
-- Default targets are `audio,text`. `art`, `video` and `player` are rejected
-  in v0 with a message naming the milestone that adds them.
-- `--json` prints machine-readable results for agents and CI.
-- Exit codes: `0` success, `1` diagnostics with errors, `2` provider failure,
-  `3` runtime missing a capability (for example no ffmpeg), `130` cancelled.
-- `.mdmedia.json` may hold a `story` section with defaults (`out`, `cache`,
-  `targets`, provider choice), lower precedence than flags.
-- The existing extension routing is unchanged; `story` is always explicit.
+Exit codes: `0` success, `1` errors in the story, `2` provider failure, `3`
+ffmpeg missing, `130` cancelled. `story` is never chosen by extension routing.
 
 ## 11. Output
 
@@ -557,99 +362,65 @@ dist/<slug>/
   script.json
   timeline.json
   audio/
-    <slug>.m4b
     <slug>.mp3
-    master.wav                                  # 48 kHz stereo, normalized
-    chapters/00-opening-credits.mp3 … 99-closing-credits.mp3
-    stems/voices.wav  sfx.wav  music.wav
-    lines/<chapter>/<NNNN>-<speaker|sfx-slug|music-cue>.wav
+    master.wav                                   # 48 kHz stereo, normalized
+    lines/<chapter>/<NNNN>-<speaker>.wav         # each line as rendered
   text/
     transcript.md
-    captions.vtt                                # <v Speaker> spans, word timestamps when known
-    alignment.json
-  art/                                          # art target (later)
-    cover.png
-    characters/<id>.png
-    scenes/<chapter>/<NN>.png  <NN>.webp  <NN>.thumb.webp
-    chapters/<chapter>.png
-    layout/<chapter>/<NN>.json
-  video/<slug>.mp4                              # video target (later)
-  player/index.html                             # player target (later)
 ```
 
-- `slug` is derived from the title (`the-most-embarrassing-day`), overridable
-  with `--out`.
-- Chapter files are slices of the master, so transitions match the full file.
-- Lines stay at the provider's native format (24 kHz mono) and are trimmed and
-  level-matched copies of their renders.
-- Paths are stable for a given script; a reader or agent can rely on them.
+- Milestone 3 adds `audio/<slug>.m4b`, `audio/chapters/` and `text/captions.vtt`.
+  Milestones 4 and 5 add `audio/stems/` once there is more than one track.
+  Art, the reader and video add `art/`, `player/` and `video/`.
+- `slug` comes from the title; `--out` overrides it.
+- Paths are stable for a given script, so a reader or agent can rely on them.
 
-## 12. Studio integration (after v0)
-
-- A new `story` media type in `MediaType`, with the same output tree stored
-  under `stories/{uid}/{id}/` and served through the existing asset routes.
-- Studio uses the same `buildStory` with the Node runtime on the server; the
-  browser runs `parseStory` and `scheduleStory` for the editor's live
-  diagnostics and timeline preview.
-- Retention applies to stories like any other media; `master.wav` and `stems/`
-  default to a short TTL because they can be rebuilt from the cache.
-
-## 13. Testing
+## 12. Testing
 
 | Layer | How |
 |---|---|
-| Parser | Golden files: `test/story/fixtures/*.md` → expected `script.json`, plus one test per diagnostic code |
-| Scheduler | Golden timelines from fixed fake durations; property tests (no overlaps on the voice track, gaps match rules) |
-| Ports | One contract suite per port in `test/story/contracts/`, run against the Node runtime now and the browser runtime later |
-| Providers | A deterministic fake TTS, SFX and music provider that emits tones of a length derived from the text, so full builds run offline in CI |
-| Build | End-to-end build of a fixture story with fake providers; assert the output tree, `build.json`, durations (via `MediaProbe`) and loudness within tolerance |
-| CLI | `--json` output snapshots and exit codes |
+| Parser | Golden `script.json` for a few fixture stories; one test per error code |
+| Scheduler | Golden timelines from fixed durations; clips never overlap and each gap equals what the script says |
+| Cache keys | Inserting a line changes no other key; changing a delivery changes only that character's keys |
+| Audio runtime | One contract suite, run against the Node implementation; skipped with a reason when no ffmpeg is available |
+| Build | A fixture story built with a fake TTS provider that emits tones, so CI needs no network; check the output tree and durations |
+| CLI | `--json` snapshots and exit codes |
 
-CI already runs `bun test` at the repository root; ffmpeg-backed tests skip
-with a reason when no ffmpeg binary is available, the same way the Studio
-render test skips without Studio's React.
+## 13. Milestones
 
-## 14. Milestones
-
-| # | Milestone | Exit criteria |
+| # | Milestone | Usable at the end |
 |---|---|---|
-| 0 | Notation, schemas, parser, scheduler with fake durations, `story check` and `story plan` | Golden tests pass; three fixture stories produce `script.json` and `timeline.json`; no audio |
-| 1 | Node runtime (probe, decode, mix, loudness, encode), render cache, two voices, `story build --targets audio,text`, table read | A two-voice scene builds to `master.wav`, `.mp3` and `lines/`; editing one line re-renders one line |
-| 2 | Any cast size, narration between lines, pacing overrides | A multi-character scene sounds paced; property tests hold |
-| 3 | Opening, chapter and closing credits; `.m4b` with chapters and cover | The audiobook opens in a standard player with chapters |
-| 4 | Sound effect cues (`after`, `with`, `before`) | Effects land where written; stems separate cleanly |
-| 5 | Music cues: intro, outro, beds with ducking, chapter transitions | A full chapter production at target loudness |
-| A | Prototype (in parallel with 1 to 3): character sheets and scene consistency | A go or no-go on the art approach; any notation changes folded back here |
-| B | Prototype (in parallel with 1 to 3): caption placement on one image | A go or no-go on caption layout |
-| 6 | Art target and reader (two columns on desktop, stacked on phone) | An illustrated build plays in `player/index.html` |
-| 7 | Scene and chapter art across a story | A consistent illustrated production |
+| 0 | Parser, schemas, scheduler, cache keys, `story check` | Write a story and get exact errors with positions; no audio |
+| 1 | Audio runtime (ffmpeg), render cache, one call per line, `story build`, table read | A two-voice scene as an MP3; edit one line and only it re-renders |
+| 2 | Any cast size, narrator between lines | Multi-character dialogue scenes |
+| D | Director step | Turn loose notes into a story file a person can edit |
+| 3 | Credits, M4B with chapters and cover, captions VTT | A standard audiobook |
+| 4 | Sound effects | Effects where the story says |
+| 5 | Music: fades, beds with ducking, transitions | A fully produced audio drama |
+| S | Studio `story` media type | Write and listen from your phone |
+| A | Prototype: character sheets and scene consistency | A go or no-go on art |
+| B | Prototype: caption placement on one image | A go or no-go on captions |
+| 6 | Art target and reader | Read and listen together |
+| 7 | Art for every scene and chapter | An illustrated production |
 | 8 | Captions with word highlighting | The graphic novel |
-| 9 | Video target (ffmpeg composition) | `video/<slug>.mp4` matches the timeline |
+| 9 | Video (ffmpeg composition) | A shareable MP4 playthrough |
 
-Milestones 0 to 5 ship a multi-voice audiobook on their own.
+Each milestone specifies its own notation, schema fields and checks, and adds a
+rule only after hearing or seeing the problem it solves. A and B run alongside
+1 to 3.
 
-## 15. Decisions (settled 2026-10-18)
+## 14. Decisions (settled 2026-10-18)
 
-1. **Name: `story`** for the media type, CLI group (`mdmedia story …`) and
-   package subpath (`mdmedia/story`). It names the source, so it fits audio-only
-   and illustrated builds alike.
-2. **Line syntax: `**NAME** *(delivery)*: text`.** Renders sensibly in any
-   markdown viewer, one line per paragraph, unambiguous to parse. Names match
-   the cast case-insensitively (`**Maya**:` is `MAYA`).
-3. **Speech: one provider call per line by default.** Works with any cast size
-   and both providers, gives exact pause control, per-line re-rendering and
-   line boundaries for captions. ElevenLabs Text to Dialogue is tried as an
-   experiment in milestone 2 and kept only if it clearly sounds better.
-4. **Master: 48 kHz stereo.** Keeps Lyria's stereo music intact and matches
-   video. Voices stay centred; lines stay at 24 kHz mono.
-5. **ffmpeg: resolved at runtime**, in the order `MDMEDIA_FFMPEG`, an installed
-   `ffmpeg-static`, then `ffmpeg` on the `PATH` (section 6.3).
-   `ffmpeg-static` is an optional peer dependency because it is GPL-3.0; Studio
-   keeps its direct dependency.
-6. **Credits: default templates, overridable, publisher line only with an
-   `imprint`.**
-   - Opening: "{imprint} presents… {title}, by {author}. Read to you by
-     {narrator voice}." Without an imprint it starts at the title.
-   - Closing: "This has been {title}, by {author}. The End."
-   - `credits.opening` and `credits.closing` accept custom text in place of
-     `true`. A real publisher's name is never a default.
+1. **Name: `story`** for the media type, CLI group and package subpath.
+2. **Lines: `**NAME** *(delivery)*: text`**, names matched case-insensitively.
+3. **Speech: one provider call per line by default.** ElevenLabs Text to
+   Dialogue is tried in milestone 2 and kept only if it clearly sounds better.
+4. **Master: 48 kHz stereo**, lines at their native 24 kHz mono.
+5. **ffmpeg: resolved at runtime** (`MDMEDIA_FFMPEG`, an installed
+   `ffmpeg-static`, then `PATH`); `ffmpeg-static` is an optional peer
+   dependency. Studio keeps its direct dependency.
+6. **Credits (milestone 3): default templates you can override.** Opening:
+   "{imprint} presents… {title}, by {author}. Read to you by {narrator voice}."
+   (starting at the title when there is no imprint). Closing: "This has been
+   {title}, by {author}. The End." Custom text replaces either. A real
+   publisher's name is never a default.
