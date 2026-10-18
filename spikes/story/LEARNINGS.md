@@ -42,6 +42,52 @@ _To fill in from listening:_
 5. Mara's whisper (`line/calls/014-mara.wav`) ends without a quiet tail; is
    it cut off?
 
+## Run 2 inputs: real texts
+
+Two public domain texts from Project Gutenberg, adapted by hand (Claude as
+director), so the director step is being exercised too:
+
+- `pride-and-prejudice-34.md`: the full proposal scene. Narrator plus two
+  speakers.
+- `earnest-act-1.md`: from the opening to "What on earth do you mean by a
+  Bunburyist?". Three speakers plus one narrated setting.
+
+Director decisions made while adapting, each a candidate rule or a judgment
+to leave to the model:
+
+- **Speech tags dropped** ("replied she", "said Darcy"); their manner became
+  delivery ("in a less tranquil tone, with a heightened colour" → `less
+  tranquil, colour heightening`).
+- **Speech broken by narration** ("But, perhaps," added he, stopping in his
+  walk, "these offences…") became two lines by the same speaker with
+  different deliveries; the action went into the second line's delivery.
+- **Stage directions** in the play became delivery when they describe manner
+  (`[Languidly]`) and were dropped when they describe action that sound
+  cannot carry (`[Hands them on a salver]`). Entrances and exits were dropped
+  or replaced by a pause.
+- **Mid-line interruption by action** ("Divorces are made in Heaven—" then
+  Algernon snatches the plate) became two lines with a `0ms` pause between.
+- **Pauses** were added where the text names a silence ("The pause was to
+  Elizabeth's feelings dreadful") and after exits.
+- **Italic emphasis** (`*feel*`, `*there*`) is kept in the display text and
+  lost in the spoken text. Whether the TTS should get emphasis is open.
+
+Run mode now caps each call at 1,500 characters (`--max-run`), because an
+uncapped Earnest run reached 3,040 characters, about three and a half minutes
+in one call.
+
+## Cases for later
+
+- **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in
+  isolation and interleave them like a real radio production, including
+  overlaps, rather than forcing everything through two-speaker calls. This
+  makes the timeline a mix of placed clips, not a sequence.
+- **Narrator who is also a character (Holmes, Watson).** Watson's narration
+  and his dialogue are one voice; the narration can get a post-production
+  effect so it sounds like thought, inside his head. That makes per-line
+  audio effects a production feature, and the speaker model needs "narrator
+  is cast member X".
+
 ## What this changes in the design (provisional)
 
 - The silence between lines is decided by the model's clip edges as much as

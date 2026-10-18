@@ -1,6 +1,6 @@
 # Story spike (throwaway)
 
-One script that renders `lighthouse.md` to an MP3 so we can listen before
+One script that renders a story file to an MP3 so we can listen before
 designing more. Nothing here is part of the package; `LEARNINGS.md` is the only
 thing meant to outlive this branch.
 
@@ -20,7 +20,12 @@ wall time, audio length, quiet edges per call, usage if the API returned it).
   scene break between them, go in one multi-speaker call (the API takes
   exactly two speakers).
 - `--gap 0ms` / `--gap 250ms`: try other fixed gaps (default 400 ms).
+- `--max-run 1500`: the most characters one run-mode call may carry.
 - `--model <id>`: another TTS model.
+
+Inputs: `lighthouse.md` (written for the spike), `pride-and-prejudice-34.md`
+and `earnest-act-1.md` (public domain, from Project Gutenberg, adapted to the
+notation by hand).
 
 ## What to listen for
 

@@ -40,12 +40,13 @@ const { values, positionals } = parseArgs({
     model: { type: 'string', default: DEFAULT_GEMINI_TTS_MODEL },
     out: { type: 'string' },
     fake: { type: 'boolean', default: false },
+    'max-run': { type: 'string', default: '1500' },
   },
 });
 
 const file = positionals[0];
 if (!file || (values.mode !== 'line' && values.mode !== 'run')) {
-  console.error('usage: bun spikes/story/render.ts <story.md> [--mode line|run] [--gap 400ms] [--model id] [--fake]');
+  console.error('usage: bun spikes/story/render.ts <story.md> [--mode line|run] [--gap 400ms] [--model id] [--max-run 1500] [--fake]');
   process.exit(2);
 }
 
@@ -201,7 +202,8 @@ type Lines = Array<{ speaker: string; delivery: string; text: string }>;
 type Step = { kind: 'call'; lines: Lines } | { kind: 'pause'; ms: number };
 
 // line: one call per line. run: consecutive lines with at most two speakers and
-// no pause or scene break between them share one multi-speaker call.
+// no pause or scene break between them share one multi-speaker call, up to
+// --max-run characters (about two minutes of audio at the default).
 const steps: Step[] = [];
 let sceneBreak = false;
 for (const seg of segments) {
@@ -212,7 +214,8 @@ for (const seg of segments) {
   sceneBreak = false;
   if (values.mode === 'run' && joinable && last?.kind === 'call') {
     const speakers = new Set([...last.lines.map((l) => l.speaker), seg.speaker]);
-    if (speakers.size <= 2) { last.lines.push(seg); continue; }
+    const chars = last.lines.reduce((n, l) => n + l.text.length, 0) + seg.text.length;
+    if (speakers.size <= 2 && chars <= Number(values['max-run'])) { last.lines.push(seg); continue; }
   }
   steps.push({ kind: 'call', lines: [seg] });
 }
