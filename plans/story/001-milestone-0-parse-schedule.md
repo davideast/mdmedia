@@ -117,12 +117,10 @@ the body of each fixture exactly. If any fixture fails, STOP.
 - A missing leading `---` block is `missing-front-matter`.
 - `yaml.parseDocument` errors become `bad-yaml` with positions.
 - Allowed keys: `title`, `author`, `imprint`, `language`, `gap`, `narrator`,
-  `cast`. Anything else is `unknown-key`. `title` and `narrator` are required
-  (`unknown-key` is not the right code for these: report `missing-voice` for a
-  narrator without a voice and a `bad-yaml`-style message for a missing title;
-  if a seventh code seems necessary, STOP and report rather than inventing one).
-- `narrator` and each cast member need `voice`; otherwise `missing-voice`.
-  `delivery` defaults to an empty string.
+  `cast`. Anything else is `unknown-key`.
+- A missing `title` or `narrator`, or a narrator or cast member without
+  `voice`, is `missing-field`, pointing at the parent key (or the front matter
+  start when the key is absent). `delivery` defaults to an empty string.
 - `gap` uses `parseDuration`; invalid is `bad-duration`; absent is 400 ms.
 - The narrator becomes cast member `NARRATOR`. Cast ids are upper-cased.
 

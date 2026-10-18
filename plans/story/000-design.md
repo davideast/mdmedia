@@ -151,7 +151,7 @@ line and column:
 | `missing-front-matter` | no front matter block |
 | `bad-yaml` | YAML syntax error |
 | `unknown-key` | `narator:` in front matter |
-| `missing-voice` | a cast member without `voice` |
+| `missing-field` | no `title`, no `narrator`, or a cast member without `voice` |
 | `unknown-speaker` | `**MAYOR**:` with no `MAYOR` in the cast |
 | `bad-duration` | ` ```pause ` containing `soon` |
 
