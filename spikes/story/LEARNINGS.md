@@ -103,6 +103,34 @@ in one call.
   failure reporting, a retry, and a way to rephrase the cue or merge the line
   with a neighbour. The render must not die on one refusal.
 
+## Run 2 checked by a model listener
+
+`check.ts` sends a render (downsampled to 32 kb/s mono) and its story file
+to `gemini-3.5-flash` and asks for timestamped problems. Each flagged moment
+was then transcribed on its own to confirm it.
+
+- **The checker is a usable screen, not proof.** With four errors planted in
+  the script it caught three (a changed word, a reassigned line, a deleted
+  line) and missed one ("Divorces" changed to "Marriages"). Its free-text
+  notes praised every render and are worthless.
+- **Real: TTS dropped the end of a line.** P&P line mode, Darcy: "My faults,
+  according to this calculation, are heavy indeed!" ends at "are"; the last
+  two words are missing from the clip. A build needs a verify step that
+  compares each clip's transcript with its text and re-renders on mismatch.
+- **Real: run mode read markup aloud.** Earnest run mode: "Algernon. Reading
+  aloud, relishing it." was spoken before the line. The multi-speaker prompt
+  format (`NAME: [cue] text`) leaks into the audio.
+- **False alarm: "wrong voice".** Algernon's aside after Lane leaves was
+  flagged as the narrator's voice; a voice-labelled transcript shows it is
+  Algernon's voice, and that call could only use his voice.
+- **A clip with no quiet tail is not a truncation signal.** Four clips ended
+  without one; only one (the Darcy line above) was cut. The others end on a
+  whisper or a trailing comma.
+- **Refusal fallback works.** Jack's refused line rendered with its line cue
+  only (`fallback: "line cue only"` in the report).
+- **Quota**: checking four 12-minute renders back to back hit 429s on
+  `gemini-3.5-flash`; `gemini-3.5-flash-lite` served the short transcriptions.
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in

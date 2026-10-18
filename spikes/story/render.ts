@@ -31,6 +31,7 @@ interface Call {
   tailMs: number;
   usage?: unknown;
   cached?: boolean;
+  fallback?: string;
 }
 
 interface Failure { label: string; code?: unknown; message: string; input?: string }
@@ -101,9 +102,11 @@ for (const block of body.split(/\n{2,}/)) {
 
 // ---------- providers ----------
 
+type Lines = Array<{ speaker: string; delivery: string; text: string }>;
+
 type Speak = (
   lines: Array<{ speaker: string; delivery: string; text: string }>
-) => Promise<{ pcm: Uint8Array; usage?: unknown; cached?: boolean }>;
+) => Promise<{ pcm: Uint8Array; usage?: unknown; cached?: boolean; fallback?: string }>;
 
 function styleFor(speaker: string, delivery: string): string {
   return [cast[speaker]!.delivery, delivery].filter(Boolean).join(', ');
@@ -136,49 +139,71 @@ async function geminiKey(): Promise<string> {
   throw new Error(`Set GEMINI_API_KEY or write the key to ${KEY_FILE}.`);
 }
 
+// Cue levels tried in order when the input filter refuses a prompt:
+// 0 = character default plus line cue, 1 = line cue only, 2 = no cue.
+const CUE_LEVELS = ['full cue', 'line cue only', 'no cue'] as const;
+
+function buildRequest(model: string, lines: Lines, level: number) {
+  const speakers = [...new Set(lines.map((l) => l.speaker))];
+  const cue = (speaker: string, delivery: string) =>
+    level === 0 ? styleFor(speaker, delivery) : level === 1 ? delivery : '';
+  let input: string;
+  let speech_config: Array<{ voice: string; speaker?: string }>;
+  if (speakers.length === 1) {
+    // One voice, possibly several lines with different cues: one cue per paragraph.
+    input = lines
+      .map(({ speaker, delivery, text }) => {
+        const style = cue(speaker, delivery);
+        return style ? `[${style}]\n${text}` : text;
+      })
+      .join('\n\n');
+    speech_config = [{ voice: cast[speakers[0]!]!.voice }];
+  } else {
+    const who = level === 0 ? ' ' + speakers.map((s) => `${s} is ${cast[s]!.delivery}.`).join(' ') : '';
+    input =
+      `Perform this scene as a radio drama.${who}\n\n` +
+      lines
+        .map((l) => {
+          const c = level < 2 ? l.delivery : '';
+          return `${l.speaker}: ${c ? `[${c}] ` : ''}${l.text}`;
+        })
+        .join('\n');
+    speech_config = speakers.map((s) => ({ speaker: s, voice: cast[s]!.voice }));
+  }
+  return { model, input, speech_config };
+}
+
 function geminiSpeak(model: string, apiKey: string): Speak {
   const client = createGeminiClient({ getApiKey: () => apiKey });
   return async (lines) => {
-    const speakers = [...new Set(lines.map((l) => l.speaker))];
-    let input: string;
-    let speech_config: Array<{ voice: string; speaker?: string }>;
-    if (speakers.length === 1) {
-      // One voice, possibly several lines with different cues: one cue per paragraph.
-      input = lines
-        .map(({ speaker, delivery, text }) => {
-          const style = styleFor(speaker, delivery);
-          return style ? `[${style}]\n${text}` : text;
-        })
-        .join('\n\n');
-      speech_config = [{ voice: cast[speakers[0]!]!.voice }];
-    } else {
-      const who = speakers.map((s) => `${s} is ${cast[s]!.delivery}.`).join(' ');
-      input =
-        `Perform this scene as a radio drama. ${who}\n\n` +
-        lines.map((l) => `${l.speaker}: ${l.delivery ? `[${l.delivery}] ` : ''}${l.text}`).join('\n');
-      speech_config = speakers.map((s) => ({ speaker: s, voice: cast[s]!.voice }));
-    }
-    const request = { model, input, speech_config };
-    const key = new Bun.CryptoHasher('sha256').update(JSON.stringify(request)).digest('hex');
-    const cached = Bun.file(join(CACHE, `${key}.pcm`));
-    if (await cached.exists()) return { pcm: new Uint8Array(await cached.arrayBuffer()), cached: true };
-    try {
-      const stream = await client.interactions.create({
-        model,
-        input,
-        response_format: { type: 'audio' },
-        generation_config: { speech_config },
-        stream: true,
-      } as any);
-      const result = await collect(stream as unknown as AsyncIterable<any>);
-      await mkdir(CACHE, { recursive: true });
-      await writeFile(join(CACHE, `${key}.pcm`), result.pcm);
-      return result;
-    } catch (error: any) {
-      throw Object.assign(new Error(error?.error?.message ?? error?.message ?? String(error)), {
-        code: error?.error?.code ?? error?.status,
-        input,
-      });
+    for (let level = 0; ; level++) {
+      const request = buildRequest(model, lines, level);
+      const key = new Bun.CryptoHasher('sha256').update(JSON.stringify(request)).digest('hex');
+      const cached = Bun.file(join(CACHE, `${key}.pcm`));
+      const fallback = level > 0 ? CUE_LEVELS[level] : undefined;
+      if (await cached.exists()) {
+        return { pcm: new Uint8Array(await cached.arrayBuffer()), cached: true, fallback };
+      }
+      try {
+        const stream = await client.interactions.create({
+          model,
+          input: request.input,
+          response_format: { type: 'audio' },
+          generation_config: { speech_config: request.speech_config },
+          stream: true,
+        } as any);
+        const result = await collect(stream as unknown as AsyncIterable<any>);
+        await mkdir(CACHE, { recursive: true });
+        await writeFile(join(CACHE, `${key}.pcm`), result.pcm);
+        return { ...result, fallback };
+      } catch (error: any) {
+        const code = error?.error?.error?.code ?? error?.error?.code ?? error?.status;
+        if (code === 'prohibited_content' && level < CUE_LEVELS.length - 1) continue;
+        throw Object.assign(new Error(error?.error?.message ?? error?.message ?? String(error)), {
+          code,
+          input: request.input,
+        });
+      }
     }
   };
 }
@@ -233,7 +258,6 @@ function ffmpegPath(): string {
 
 // ---------- group into calls ----------
 
-type Lines = Array<{ speaker: string; delivery: string; text: string }>;
 type Step = { kind: 'call'; lines: Lines } | { kind: 'pause'; ms: number };
 
 // line: one call per line. run: consecutive lines with at most two speakers and
@@ -286,7 +310,7 @@ await Promise.all(
         console.error(`${label}  FAILED  ${error.code ?? ''} ${error.message.split('\n')[0]}`);
         continue;
       }
-      const { pcm: audio, usage, cached } = result;
+      const { pcm: audio, usage, cached, fallback } = result;
       pcm[job.i] = audio;
       await writeFile(join(out, 'calls', `${label}.wav`), wav(audio));
       calls.push({
@@ -298,6 +322,7 @@ await Promise.all(
         ...quietEdges(audio),
         usage,
         cached,
+        fallback,
       });
       console.error(`${label}  ${durationMs(audio)} ms audio`);
     }
