@@ -37,8 +37,12 @@ export function MediaComposer({
   children?: ReactNode;
 }) {
   return (
-    <div className={`grid min-h-0 min-w-0 grid-rows-[1fr_auto] gap-5 p-4 sm:p-6 ${grow ? "flex-1" : "shrink-0"}`}>
-      <div className="grid min-h-0 grid-rows-[auto_1fr] gap-3">
+    // The composer never shrinks below its heading, a 14rem text box and the
+    // footer; otherwise the box draws over the footer when content below it
+    // (saved drafts, results) takes the height. The box keeps a fixed size and
+    // scrolls its text, and the page scrolls to reach what follows.
+    <div className={`grid min-w-0 grid-rows-[1fr_auto] gap-5 p-4 sm:p-6 ${grow ? "flex-1" : "shrink-0"}`}>
+      <div className="grid grid-rows-[auto_minmax(14rem,1fr)] gap-3">
         <h1 className="t-h2">{heading}</h1>
         <Textarea
           aria-label={label}
@@ -48,7 +52,7 @@ export function MediaComposer({
           maxLength={maxLength}
           disabled={disabled}
           spellCheck={false}
-          className="h-full min-h-[14rem] resize-none rounded-lg p-4 text-[0.95rem] leading-[1.68]"
+          className="h-full min-h-0 resize-none rounded-lg p-4 text-[0.95rem] leading-[1.68] field-sizing-fixed"
         />
         {children}
       </div>
