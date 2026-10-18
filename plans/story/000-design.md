@@ -11,7 +11,7 @@ the notation, the data model, the platform boundaries, the public API, the CLI,
 the output layout, caching, testing and the order of work. Later plans in this
 folder (`001-…`) are step-by-step implementation plans that point back here.
 
-- **Status**: draft for review
+- **Status**: decisions settled 2026-10-18 (section 15); milestone 0 can be planned
 - **Planned at**: commit `4eb8f62`, 2026-10-18
 - **Scope of v0**: audio only (milestones 0 to 5). Art, captions, the reader and
   video are designed here so v0 does not paint them into a corner, but they are
@@ -403,9 +403,27 @@ impossible on the current runtime ("this runtime cannot write M4B; choose mp3").
 | `VideoComposer` | ffmpeg (`zoompan`, `xfade`, ASS subtitles) | Mediabunny with canvas frames |
 | `ArtifactStore`, `RenderCache` | filesystem | OPFS / IndexedDB / zip |
 
-ffmpeg comes from `ffmpeg-static`, which Studio already uses, with an
-`MDMEDIA_FFMPEG` override for a system binary. `createNodeRuntime()` checks the
-binary and its version once and reports a clear error if it is missing.
+`createNodeRuntime()` finds ffmpeg in this order: the `MDMEDIA_FFMPEG`
+environment variable (or `ffmpegPath` option), then the `ffmpeg-static` package
+if the user installed it, then `ffmpeg` on the `PATH`. It checks the binary and
+its version once and reports a clear error if none is found. `ffmpeg-static` is
+an optional peer dependency of the published package, not a dependency: it and
+its binary are GPL-3.0, and mdmedia is MIT, so installing mdmedia must not pull
+GPL code by default. Studio, an application, keeps its direct dependency.
+
+Licensing notes (not legal advice):
+
+- ffmpeg runs as a separate program; mdmedia never links it, so mdmedia's code
+  stays MIT.
+- Running ffmpeg on your own machine or server has no GPL obligations; serving
+  outputs is not distribution. Generated media is not covered by ffmpeg's
+  license.
+- Distributing the binary (a public Docker image of Studio, a bundled app)
+  requires shipping the GPL text and offering that exact build's source.
+- Audio-only builds need only LGPL or BSD codecs (LAME MP3, ffmpeg's AAC,
+  Opus). The video target needs an H.264 encoder: x264 (GPL) or OpenH264 (BSD).
+- The browser runtime uses WebCodecs and Mediabunny, not `ffmpeg.wasm`, which
+  would distribute ffmpeg to every visitor.
 
 `fluent-ffmpeg` is not used; it is deprecated. The Node runtime spawns ffmpeg
 directly with argument arrays (no shell).
@@ -610,19 +628,28 @@ render test skips without Studio's React.
 
 Milestones 0 to 5 ship a multi-voice audiobook on their own.
 
-## 15. Decisions needed before milestone 0
+## 15. Decisions (settled 2026-10-18)
 
-1. **Name.** `story` for the media type, CLI group and package subpath, as used
-   here. Alternatives: `drama`, `production`.
-2. **Line syntax.** `**NAME** *(delivery)*: text` as above, versus
-   Fountain-style upper-case names on their own line. The bold form reads
-   well in any markdown renderer and needs no blank-line rules.
-3. **Default speech renderer.** One provider call per line (works with both
-   providers and any cast size) as the default, with ElevenLabs Text to
-   Dialogue as an opt-in renderer for conversational runs.
-4. **Master format.** 48 kHz stereo, so stereo music survives; lines stay at
-   24 kHz mono.
-5. **ffmpeg source.** `ffmpeg-static` by default with an `MDMEDIA_FFMPEG`
-   override, matching Studio.
-6. **Credits wording.** The opening credit template in 3.1, with `imprint`
-   required for it to be spoken and never defaulted to a real publisher.
+1. **Name: `story`** for the media type, CLI group (`mdmedia story …`) and
+   package subpath (`mdmedia/story`). It names the source, so it fits audio-only
+   and illustrated builds alike.
+2. **Line syntax: `**NAME** *(delivery)*: text`.** Renders sensibly in any
+   markdown viewer, one line per paragraph, unambiguous to parse. Names match
+   the cast case-insensitively (`**Maya**:` is `MAYA`).
+3. **Speech: one provider call per line by default.** Works with any cast size
+   and both providers, gives exact pause control, per-line re-rendering and
+   line boundaries for captions. ElevenLabs Text to Dialogue is tried as an
+   experiment in milestone 2 and kept only if it clearly sounds better.
+4. **Master: 48 kHz stereo.** Keeps Lyria's stereo music intact and matches
+   video. Voices stay centred; lines stay at 24 kHz mono.
+5. **ffmpeg: resolved at runtime**, in the order `MDMEDIA_FFMPEG`, an installed
+   `ffmpeg-static`, then `ffmpeg` on the `PATH` (section 6.3).
+   `ffmpeg-static` is an optional peer dependency because it is GPL-3.0; Studio
+   keeps its direct dependency.
+6. **Credits: default templates, overridable, publisher line only with an
+   `imprint`.**
+   - Opening: "{imprint} presents… {title}, by {author}. Read to you by
+     {narrator voice}." Without an imprint it starts at the title.
+   - Closing: "This has been {title}, by {author}. The End."
+   - `credits.opening` and `credits.closing` accept custom text in place of
+     `true`. A real publisher's name is never a default.
