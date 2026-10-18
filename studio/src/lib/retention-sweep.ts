@@ -1,19 +1,20 @@
 /**
  * Deletes generations whose time is up.
  *
- * `sweepExpired` is the one place that decides what goes: it applies
- * `isExpired` to every item, never touches a locked or still-generating one,
+ * `sweepExpired` is the one place that decides what goes: it reads only items
+ * that could be due, applies `isExpired` to each, never touches a locked or
+ * still-generating one,
  * and deletes at most `limit` per run so a mistaken default cannot wipe a
  * library in a single pass. `startRetentionSweeper` runs it on a timer inside
  * the server, the same way the media workers run.
  */
 
-import type { DocumentData, Query, QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import type { DocumentData, Query } from 'firebase-admin/firestore';
 
 import { adminBucket, adminDb } from './firebase-admin';
 import type { MediaType } from './media-types';
 import { purgeNarrationData, STALE_STREAMING_MS } from './narration-server';
-import { DEFAULT_RETENTION, isExpired, resolveExpiry, type RetainedItem, type RetentionSettings } from './retention';
+import { DEFAULT_RETENTION, defaultTtlFor, isExpired, parseTtl, resolveExpiry, type RetainedItem, type RetentionSettings } from './retention';
 import { loadRetentionSettings } from './retention-server';
 
 export interface SweepCandidate {
@@ -53,21 +54,9 @@ export class MediaLockedError extends Error {
   }
 }
 
-const PAGE = 200;
+/** The most candidates one query returns; the next sweep picks up the rest. */
+const CANDIDATE_LIMIT = 500;
 const OTHER_TYPES: MediaType[] = ['image', 'video', 'music', 'sfx'];
-
-async function* pages(base: Query): AsyncGenerator<QueryDocumentSnapshot[]> {
-  let after: string | undefined;
-  for (;;) {
-    let query = base.orderBy('__name__').limit(PAGE);
-    if (after !== undefined) query = query.startAfter(after);
-    const { docs } = await query.get();
-    if (docs.length === 0) return;
-    yield docs;
-    if (docs.length < PAGE) return;
-    after = docs.at(-1)!.id;
-  }
-}
 
 /**
  * Deletes an image, video, music or sfx item with everything it owns: stored
@@ -132,15 +121,43 @@ export async function sweepExpired(options: SweepOptions = {}): Promise<SweepRep
     expired.push({ type, id, ownerUid: owner, title: String(data.title ?? ''), expiresAt: resolveExpiry(item, settings)! });
   };
 
-  const narrations = adminDb().collection('narrations');
-  const media = adminDb().collection('mediaItems');
-  for await (const docs of pages(options.uid ? narrations.where('ownerUid', '==', options.uid) : narrations)) {
-    for (const doc of docs) await consider('narration', doc.id, doc.data(), narrationStatus(doc.data(), now));
-  }
-  for await (const docs of pages(options.uid ? media.where('ownerUid', '==', options.uid) : media)) {
+  // Only items that could be due are read, never the whole library: a
+  // narration document carries its full text, and reading every one each pass
+  // is work the server does not need to do.
+  const seen = new Set<string>();
+  const run = async (query: Query, isNarration: boolean) => {
+    const { docs } = await query.limit(CANDIDATE_LIMIT).get();
     for (const doc of docs) {
       const data = doc.data();
-      if (OTHER_TYPES.includes(data.type)) await consider(data.type, String(data.id ?? doc.id), data, mediaStatus(data.status));
+      const type: MediaType | undefined = isNarration ? 'narration' : OTHER_TYPES.includes(data.type) ? data.type : undefined;
+      if (!type) continue;
+      const id = isNarration ? doc.id : String(data.id ?? doc.id);
+      if (seen.has(`${type}:${id}`)) continue;
+      seen.add(`${type}:${id}`);
+      await consider(type, id, data, isNarration ? narrationStatus(data, now) : mediaStatus(data.status));
+    }
+  };
+
+  const narrations = adminDb().collection('narrations');
+  const media = adminDb().collection('mediaItems');
+  const scoped = (query: Query) => (options.uid ? query.where('ownerUid', '==', options.uid) : query);
+
+  // 1. Items whose own expiry has passed.
+  await run(scoped(narrations.where('expiresAt', '<=', now)), true);
+  await run(scoped(media.where('expiresAt', '<=', now)), false);
+
+  // 2. Items old enough for a default to have expired them, per person with a default.
+  const owners = options.uid ? [options.uid] : (await adminDb().collection('users').get()).docs.map((doc) => doc.id);
+  for (const owner of owners) {
+    const settings = await settingsFor(owner);
+    for (const type of ['narration', ...OTHER_TYPES] as MediaType[]) {
+      const ttl = defaultTtlFor(type, settings);
+      const ms = ttl === null ? undefined : parseTtl(ttl);
+      if (ms === undefined) continue;
+      const base = type === 'narration'
+        ? narrations.where('ownerUid', '==', owner)
+        : media.where('ownerUid', '==', owner).where('type', '==', type);
+      await run(base.where('createdAt', '<=', now - ms), type === 'narration');
     }
   }
 
@@ -169,11 +186,11 @@ const sweeper = globalSweeper.__mdmediaRetentionSweeper ??= { timer: null, runni
 /**
  * Starts the periodic sweep. `MDMEDIA_RETENTION_SWEEP=off` disables it,
  * `MDMEDIA_RETENTION_DRY_RUN=1` only logs what it would delete, and
- * `MDMEDIA_RETENTION_INTERVAL_MS` changes the 60 second cadence (10 s minimum).
+ * `MDMEDIA_RETENTION_INTERVAL_MS` changes the 10 minute cadence (10 s minimum).
  */
 export function startRetentionSweeper(): void {
   if (sweeper.timer || process.env.MDMEDIA_RETENTION_SWEEP === 'off') return;
-  const interval = Math.max(10_000, Number(process.env.MDMEDIA_RETENTION_INTERVAL_MS) || 60_000);
+  const interval = Math.max(10_000, Number(process.env.MDMEDIA_RETENTION_INTERVAL_MS) || 600_000);
   const dryRun = process.env.MDMEDIA_RETENTION_DRY_RUN === '1';
   const tick = async () => {
     if (sweeper.running) return;

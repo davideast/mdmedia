@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 
 export const documents = new Map<string, Record<string, any>>();
 export const deletedObjects: string[] = [];
+/** Every document a collection query returned, so tests can see what a sweep read. */
+export const queryReads = new Set<string>();
 let sequence = 0;
 
 function setPath(target: Record<string, any>, path: string, value: unknown) {
@@ -49,6 +51,7 @@ class Query {
     entries.sort((a, b) => compare(a, this.orders.map(([field]) => value(b, field))));
     if (this.after.length) entries = entries.filter(entry => compare(entry, this.after) > 0);
     const docs = entries.slice(0, this.cap).map(([path]) => { const ref = new Ref(path); return { id: ref.id, ref, exists: true, data: () => structuredClone(documents.get(path)) }; });
+    for (const doc of docs) queryReads.add(doc.ref.path);
     return { docs, empty: docs.length === 0, size: docs.length };
   }
 }
