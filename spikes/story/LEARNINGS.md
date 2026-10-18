@@ -76,6 +76,33 @@ Run mode now caps each call at 1,500 characters (`--max-run`), because an
 uncapped Earnest run reached 3,040 characters, about three and a half minutes
 in one call.
 
+## Run 2 measured
+
+| | calls | audio | wall | audio tokens | chars per audio second |
+|---|---|---|---|---|---|
+| P&P line | 31 | 750 s | 103 s | 18,053 | 13.0 |
+| P&P run | 12 | 714 s | 91 s | 17,650 | 13.9 |
+| Earnest line | 76 (1 refused) | 733 s | 112 s | 17,428 | 10.9 |
+| Earnest run | 12 | 636 s | 81 s | 15,750 | 12.6 |
+
+- **Run mode speaks faster, not just with fewer gaps.** Earnest is 97 s
+  shorter in run mode; about 70 s of that is 64 fewer gaps and clip edges,
+  the rest is delivery: 12.6 characters per second against 10.9. One-line
+  calls are slower and more deliberate, which may suit drama and hurt comedy.
+- **Clip edges are the same everywhere**: about 260 ms lead and 360 ms tail
+  across all six renders. That is a property of the model, so it is
+  measurable once and correctable mechanically.
+- **Cost is still 25 audio tokens per second** in every render. A 12-minute
+  chapter is about 18,000 audio tokens per mode.
+- **Rendering is about seven times faster than real time** with four calls in
+  flight.
+- **The safety filter refused a harmless line.** Earnest line mode, Jack:
+  `[earnest, easily flustered, trying to keep his dignity]\nIn the country.`
+  The same words passed inside a longer run-mode prompt. Short single-line
+  prompts seem more exposed to false positives, so a build needs per-call
+  failure reporting, a retry, and a way to rephrase the cue or merge the line
+  with a neighbour. The render must not die on one refusal.
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in
