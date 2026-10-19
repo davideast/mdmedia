@@ -1,12 +1,14 @@
 import { END_ANCHOR, ID_PATTERN, START_ANCHOR, parseTimeRef, type ParsedTime } from './anchor.js';
 import type {
   AudioClip,
+  AudioFilter,
   CutError,
   CutFile,
   CutResult,
   Line,
   Overlay,
   ResolvedAudio,
+  ResolvedAudioFilter,
   ResolvedKey,
   ResolvedLine,
   ResolvedMotionKey,
@@ -14,10 +16,13 @@ import type {
   ResolvedSegment,
   ResolvedSegmentAudio,
   ResolvedSource,
+  ResolvedWave,
+  ResolvedZoom,
   SourceRef,
   Timeline,
   TimelineItem,
   TimeRef,
+  Wave,
   Word,
 } from './types.js';
 
@@ -58,6 +63,19 @@ function normalize(path: string): string {
 
 function joinPath(base: string, rel: string): string {
   return isAbsolute(rel) ? normalize(rel) : normalize(`${base}/${rel}`);
+}
+
+/** The folder every relative media path resolves against: `options.root`, else `media.root`, relative to `cutDir`. */
+export function mediaRoot(cut: CutFile, options: Pick<ResolveOptions, 'root' | 'cutDir'> = {}): string {
+  const configured = options.root ?? cut.media.root;
+  return !isAbsolute(configured) && options.cutDir ? joinPath(options.cutDir, configured) : normalize(configured);
+}
+
+/** `path` relative to `root` when it is inside it, else `path` unchanged. */
+export function relativeToRoot(root: string, path: string): string {
+  const base = normalize(root);
+  const full = normalize(path);
+  return full.startsWith(`${base}/`) ? full.slice(base.length + 1) : full;
 }
 
 // ---------------------------------------------------------------------------
@@ -122,6 +140,16 @@ function clippedEnd(start: number | undefined, natural: number | undefined, unti
   return naturalEnd === undefined ? until : Math.min(naturalEnd, until);
 }
 
+/** Filters with their defaults filled in. */
+function resolveFilters(filters: AudioFilter[] | undefined): ResolvedAudioFilter[] {
+  return (filters ?? []).map((f) => (f.kind === 'crush' ? { ...f, mix: f.mix ?? 1 } : { ...f }));
+}
+
+function resolveWave(wave: Wave | undefined, origin: number): ResolvedWave | null {
+  if (!wave) return null;
+  return { shape: wave.shape ?? 'sin', center: wave.center, amplitude: wave.amplitude, period: wave.period, phase: wave.phase ?? 0, origin };
+}
+
 // ---------------------------------------------------------------------------
 
 type Kind = 'segment' | 'line' | 'music' | 'sfx' | 'overlay';
@@ -164,8 +192,7 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
   if (errors.length > 0) return { ok: false, errors };
 
   // Media.
-  const configuredRoot = options.root ?? cut.media.root;
-  const root = !isAbsolute(configuredRoot) && options.cutDir ? joinPath(options.cutDir, configuredRoot) : normalize(configuredRoot);
+  const root = mediaRoot(cut, options);
   const takes = cut.media.takes ?? DEFAULT_TAKES;
   const source = (ref: SourceRef): ResolvedSource => {
     if (ref.startsWith('take:')) {
@@ -200,6 +227,11 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
   };
   const optionalAnchor = (ref: TimeRef | undefined, id: string, field: string): ParsedTime | null | undefined =>
     ref === undefined ? undefined : anchor(ref, id, field);
+  /** A time inside segment `scope`: a number is seconds from its start, a string an anchor as usual. */
+  const scopedAnchor = (ref: TimeRef, scope: string | undefined, id: string, field: string): ParsedTime | null =>
+    scope !== undefined && typeof ref === 'number' && Number.isFinite(ref)
+      ? { kind: 'anchor', target: scope, point: 'start', offset: ref }
+      : anchor(ref, id, field);
 
   const graph = new TimeGraph(errors);
 
@@ -239,9 +271,14 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
       graph.define(`${line.id}.end`, (get) => (until !== undefined ? timeOf(until, get) : get(`${seg}.end`)));
     } else {
       const at = anchor(line.at, line.id, 'at');
-      const natural = lengthOf(source(line.src)) ?? line.duration;
+      const from = line.in ?? 0;
+      const sourceLength = lengthOf(source(line.src)) ?? line.duration;
+      const natural = line.out !== undefined ? line.out - from : sourceLength === undefined ? undefined : sourceLength - from;
+      if (line.out !== undefined && line.out < from) {
+        fail({ code: 'out-before-in', id: line.id, field: 'out', message: `${line.id}: out (${line.out}) is before in (${from})` });
+      }
       if (natural === undefined && until === undefined) {
-        fail({ code: 'unknown-length', id: line.id, message: `${line.id}: give a duration or an until, or a mediaLength probe` });
+        fail({ code: 'unknown-length', id: line.id, message: `${line.id}: give an out, a duration or an until, or a mediaLength probe` });
       }
       graph.define(`${line.id}.start`, (get) => timeOf(at, get));
       graph.define(`${line.id}.end`, (get) =>
@@ -278,17 +315,30 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
     );
   }
 
-  // Overlays.
+  // Overlays. One in a segment is timed in the segment's clock, and by default spans it.
+  const overlayScope = new Map<string, string | undefined>();
   for (const overlay of overlays) {
-    const at = anchor(overlay.at, overlay.id, 'at');
-    const until = optionalAnchor(overlay.until, overlay.id, 'until');
-    if (overlay.duration === undefined && until === undefined) {
+    let scope: string | undefined;
+    if (overlay.segment !== undefined) {
+      if (kinds.get(overlay.segment) === 'segment') scope = overlay.segment;
+      else fail({ code: 'unknown-segment', id: overlay.id, field: 'segment', message: `${overlay.id}: no segment is called "${overlay.segment}"` });
+    }
+    overlayScope.set(overlay.id, scope);
+    const at = overlay.at === undefined ? undefined : scopedAnchor(overlay.at, scope, overlay.id, 'at');
+    const until = overlay.until === undefined ? undefined : scopedAnchor(overlay.until, scope, overlay.id, 'until');
+    if (overlay.at === undefined && overlay.segment === undefined) {
+      fail({ code: 'bad-shape', id: overlay.id, field: 'at', message: `${overlay.id}: an overlay needs an at, unless it is in a segment` });
+    }
+    if (overlay.segment === undefined && overlay.duration === undefined && until === undefined) {
       fail({ code: 'unknown-length', id: overlay.id, message: `${overlay.id}: give an until or a duration` });
     }
-    graph.define(`${overlay.id}.start`, (get) => timeOf(at, get));
-    graph.define(`${overlay.id}.end`, (get) =>
-      clippedEnd(get(`${overlay.id}.start`), overlay.duration, until ? timeOf(until, get) : undefined, until !== undefined),
-    );
+    graph.define(`${overlay.id}.start`, (get) => (at !== undefined ? timeOf(at, get) : scope ? get(`${scope}.start`) : undefined));
+    graph.define(`${overlay.id}.end`, (get) => {
+      const start = get(`${overlay.id}.start`);
+      if (until !== undefined) return clippedEnd(start, overlay.duration, timeOf(until, get), true);
+      if (overlay.duration !== undefined) return add(start, overlay.duration);
+      return scope ? get(`${scope}.end`) : undefined;
+    });
   }
 
   // Keyframes refer to items but nothing refers to keyframes, so they can't make cycles.
@@ -299,10 +349,26 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
     }
   }
   const motionKeys = new Map<string, Array<{ ref: ParsedTime | null; x?: number; y?: number }>>();
+  const opacityKeys = new Map<string, Array<{ ref: ParsedTime | null; value: number }>>();
   for (const overlay of overlays) {
+    const scope = overlayScope.get(overlay.id);
     if (overlay.motion) {
-      motionKeys.set(overlay.id, overlay.motion.map((k, i) => ({ ref: anchor(k.at, overlay.id, `motion[${i}].at`), x: k.x, y: k.y })));
+      motionKeys.set(overlay.id, overlay.motion.map((k, i) => ({ ref: scopedAnchor(k.at, scope, overlay.id, `motion[${i}].at`), x: k.x, y: k.y })));
     }
+    if (Array.isArray(overlay.opacity)) {
+      opacityKeys.set(overlay.id, overlay.opacity.map((k, i) => ({ ref: scopedAnchor(k.at, scope, overlay.id, `opacity[${i}].at`), value: k.value })));
+    }
+    for (const axis of ['x', 'y'] as const) {
+      if (!overlay.wave?.[axis]) continue;
+      const also = [overlay[axis] !== undefined ? axis : undefined, overlay.motion?.some((k) => k[axis] !== undefined) ? `motion ${axis}` : undefined].filter(Boolean);
+      if (also.length > 0) {
+        fail({ code: 'conflicting-fields', id: overlay.id, field: `wave.${axis}`, message: `${overlay.id}: wave.${axis} sets ${axis}, so drop its ${also.join(' and ')}` });
+      }
+    }
+  }
+  const zoomKeys = new Map<string, Array<{ ref: ParsedTime | null; scale: number }>>();
+  for (const seg of cut.segments) {
+    if (seg.zoom) zoomKeys.set(seg.id, seg.zoom.keys.map((k, i) => ({ ref: scopedAnchor(k.at, seg.id, seg.id, `zoom.keys[${i}].at`), scale: k.scale })));
   }
 
   // Compute every point, so every cycle and unresolvable point is found.
@@ -332,6 +398,12 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
     const t = timeOf(ref, graph.get);
     if (t === undefined) throw new Error('unresolved keyframe');
     return round(t);
+  };
+  const checkInside = (id: string, field: string, from: number, to: number, segment: string, segStart: number, segEnd: number): void => {
+    if (from < segStart - EPS || to > segEnd + EPS) {
+      const what = from === to ? `${from} s` : `${from}–${to} s`;
+      fail({ code: 'outside-segment', id, field, message: `${id}: ${field} (${what}) is outside its segment ${segment} (${segStart}–${segEnd} s)` });
+    }
   };
   const checkOrder = (id: string, field: string, times: number[]): void => {
     for (let i = 1; i < times.length; i++) {
@@ -373,6 +445,21 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
         audio = { src: aSrc, in: aIn, out: aOut, volume: a.volume ?? 1, fadeIn: a.fadeIn ?? 0, fadeOut: a.fadeOut ?? 0, start, end: aEnd };
       }
     }
+
+    let zoom: ResolvedZoom | null = null;
+    const zKeys = zoomKeys.get(seg.id);
+    if (seg.zoom && zKeys) {
+      const { width, height } = cut.meta;
+      const f = seg.zoom.focus;
+      const focus = !f ? { x: width / 2, y: height / 2 } : f.unit === 'fraction' ? { x: round(f.x * width), y: round(f.y * height) } : { x: f.x, y: f.y };
+      if (focus.x > width + EPS || focus.y > height + EPS) {
+        fail({ code: 'bad-value', id: seg.id, field: 'zoom.focus', message: `${seg.id}: zoom.focus (${focus.x}, ${focus.y}) is outside the ${width}×${height} picture` });
+      }
+      const keys = zKeys.map((k) => ({ t: resolveTime(k.ref), value: k.scale }));
+      checkOrder(seg.id, 'zoom.keys', keys.map((k) => k.t));
+      keys.forEach((k, i) => checkInside(seg.id, `zoom.keys[${i}].at`, k.t, k.t, seg.id, start, end));
+      zoom = { focus, keys };
+    }
     return {
       kind: 'segment',
       id: seg.id,
@@ -389,6 +476,7 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
       fadeIn,
       fadeOut,
       audio,
+      zoom,
     };
   });
   for (let i = 1; i < resolvedSegments.length; i++) {
@@ -414,8 +502,12 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
       toTimeline = (t) => segStart + (t - audioIn);
       audio = { kind: 'segment', segment: line.segment };
     } else {
-      toTimeline = (t) => start + t;
-      audio = { kind: 'file', src: source(line.src), volume: line.volume ?? 1 };
+      const from = line.in ?? 0;
+      const src = source(line.src);
+      const out = round(from + Math.max(0, end - start));
+      checkMedia(line.id, 'out', src, out);
+      toTimeline = (t) => start + (t - from);
+      audio = { kind: 'file', src, in: from, out, volume: line.volume ?? 1, filters: resolveFilters(line.filters) };
     }
     const words: Word[] = [];
     for (const w of line.words ?? []) {
@@ -447,7 +539,7 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
     } else {
       volume = [{ t: start, value: typeof clip.volume === 'number' ? clip.volume : 1 }];
     }
-    return { kind, id: clip.id, label: clip.label ?? clip.id, start, end, src, in: from, out, volume, fadeIn, fadeOut };
+    return { kind, id: clip.id, label: clip.label ?? clip.id, start, end, src, in: from, out, volume, fadeIn, fadeOut, filters: resolveFilters(clip.filters) };
   };
   const resolvedMusic = music.map((m) => resolveAudio(m, 'music'));
   const resolvedSfx = sfx.map((m) => resolveAudio(m, 'sfx'));
@@ -475,6 +567,17 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
       });
       checkOrder(overlay.id, 'motion', motion.map((k) => k.t));
     }
+    let opacity: ResolvedKey[] = [{ t: start, value: typeof overlay.opacity === 'number' ? overlay.opacity : 1 }];
+    const oKeys = opacityKeys.get(overlay.id);
+    if (oKeys && oKeys.length > 0) {
+      opacity = oKeys.map((k) => ({ t: resolveTime(k.ref), value: k.value }));
+      checkOrder(overlay.id, 'opacity', opacity.map((k) => k.t));
+    }
+    const scope = overlayScope.get(overlay.id);
+    const segment = scope === undefined ? undefined : resolvedById.get(scope);
+    if (segment) checkInside(overlay.id, 'at', start, end, segment.id, segment.start, segment.end);
+    // A wave's clock is the overlay's own: from its segment's start when it is in one, else from its start.
+    const origin = segment ? segment.start : start;
     return {
       kind: 'overlay',
       id: overlay.id,
@@ -482,7 +585,12 @@ export function resolveCut(cut: CutFile, options: ResolveOptions = {}): CutResul
       start,
       end,
       src: source(overlay.src),
+      segment: scope ?? null,
+      width: overlay.width ?? null,
+      height: overlay.height ?? null,
       motion,
+      wave: { x: resolveWave(overlay.wave?.x, origin), y: resolveWave(overlay.wave?.y, origin) },
+      opacity,
       fadeIn,
       fadeOut,
       blink: overlay.blink ?? null,

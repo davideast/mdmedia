@@ -9,16 +9,20 @@ import {
   positionAt,
   resolveCut,
   resolveCutJson,
+  waveAt,
+  zoomAt,
   type CutErrorCode,
   type CutFile,
   type Timeline,
 } from './index.js';
 
-const ROOT = '/tmp/claude-1000/-home-david-repos-davideast-satisfy-md/366e8408-4b0c-4005-96b5-3535166ca34f/scratchpad/crt';
 
 function loadJson(name: string): unknown {
   return JSON.parse(readFileSync(new URL(`../../docs/cuts/${name}`, import.meta.url), 'utf8'));
 }
+
+/** The media root the Night Wagon cuts name. Paths are checked against it; no media is read. */
+const ROOT = (loadJson('night-wagon-take9.cut.json') as { media: { root: string } }).media.root;
 
 function resolveExample(name: string): Timeline {
   const result = resolveCutJson(loadJson(name));
@@ -309,5 +313,235 @@ describe('parseCut', () => {
     const result = parseCut(json);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors[0].code).toBe('conflicting-fields');
+  });
+});
+
+function resolved(c: CutFile, options?: Parameters<typeof resolveCut>[1]): Timeline {
+  const result = resolveCut(c, options);
+  if (!result.ok) throw new Error(result.errors.map((e) => e.message).join('\n'));
+  return result.value;
+}
+
+/** The parse errors for one item patched into the small test cut, as [code, field] pairs. */
+function parseErrors(patch: Record<string, unknown>): Array<[string, string | undefined]> {
+  const result = parseCut({ ...cut(), ...patch });
+  return result.ok ? [] : result.errors.map((e) => [e.code, e.field]);
+}
+
+describe('zoom on a segment', () => {
+  it('scales about the middle by default, between keys in the segment\'s clock', () => {
+    // Segment b runs 2–3. Keys: 1 at its start, 1.1 at its end.
+    const c = cut();
+    c.segments[1] = { ...c.segments[1], zoom: { keys: [{ at: 0, scale: 1 }, { at: 'b.end', scale: 1.1 }] } };
+    const b = byId(resolved(c).segments, 'b');
+    expect(b.zoom).toEqual({ focus: { x: 640, y: 360 }, keys: [{ t: 2, value: 1 }, { t: 3, value: 1.1 }] });
+    expect(zoomAt(b, 2.5).scale).toBeCloseTo(1.05, 9);
+    expect(zoomAt(b, 1)).toEqual({ scale: 1, focus: { x: 640, y: 360 } });
+    expect(zoomAt(b, 9).scale).toBeCloseTo(1.1, 9);
+    expect(zoomAt(byId(resolved(c).segments, 'a'), 1)).toEqual({ scale: 1, focus: null });
+  });
+
+  it('keeps a focus given in pixels or as fractions of the picture', () => {
+    const c = cut();
+    c.segments[0] = { ...c.segments[0], zoom: { focus: { x: 872, y: 243 }, keys: [{ at: 0.4, scale: 1 }, { at: 2, scale: 1.2 }] } };
+    c.segments[1] = { ...c.segments[1], zoom: { focus: { x: 0.25, y: 0.75, unit: 'fraction' }, keys: [{ at: 0, scale: 1.5 }] } };
+    const t = resolved(c);
+    expect(byId(t.segments, 'a').zoom?.focus).toEqual({ x: 872, y: 243 });
+    expect(zoomAt(byId(t.segments, 'a'), 0.2).scale).toBe(1);
+    expect(byId(t.segments, 'b').zoom?.focus).toEqual({ x: 320, y: 540 });
+  });
+
+  it('rejects keys outside the segment, out of order, below 1, or a focus off the picture', () => {
+    const zoomed = (zoom: unknown): CutFile => {
+      const c = cut();
+      c.segments[1] = { ...c.segments[1], zoom: zoom as NonNullable<CutFile['segments'][number]['zoom']> };
+      return c;
+    };
+    expect(codes(zoomed({ keys: [{ at: 0, scale: 1 }, { at: 1.5, scale: 1.2 }] }))).toEqual(['outside-segment']);
+    expect(codes(zoomed({ keys: [{ at: 'a', scale: 1 }] }))).toEqual(['outside-segment']);
+    expect(codes(zoomed({ keys: [{ at: 0.8, scale: 1 }, { at: 0.2, scale: 1.2 }] }))).toEqual(['keyframes-unordered']);
+    expect(codes(zoomed({ focus: { x: 2000, y: 0 }, keys: [{ at: 0, scale: 1 }] }))).toEqual(['bad-value']);
+    const json = { ...cut(), segments: [{ id: 'a', src: 'take:a', in: 0, out: 1, zoom: { keys: [{ at: 0, scale: 0.5 }] } }] };
+    expect(parseErrors(json)).toEqual([['bad-value', 'segments[0].zoom.keys[0].scale']]);
+    expect(parseErrors({ segments: [{ id: 'a', src: 'take:a', in: 0, out: 1, zoom: { keys: [] } }] })).toEqual([['bad-shape', 'segments[0].zoom.keys']]);
+    expect(parseErrors({ segments: [{ id: 'a', src: 'take:a', in: 0, out: 1, zoom: { focus: { x: 2, y: 0.5, unit: 'fraction' }, keys: [{ at: 0, scale: 1 }] } }] }))
+      .toEqual([['bad-value', 'segments[0].zoom.focus.x']]);
+  });
+});
+
+describe('overlays in a segment', () => {
+  it('span their segment by default and take times in its clock', () => {
+    const t = resolved(
+      cut({
+        overlays: [
+          { id: 'whole', src: 'g.png', segment: 'b' },
+          { id: 'part', src: 'g.png', segment: 'b', at: 0.4, until: 0.9, width: 1024, height: 576, motion: [{ at: 0.4, x: 10 }, { at: 0.9, x: 20 }] },
+          { id: 'tail', src: 'g.png', segment: 'b', at: 'b+0.5', duration: 0.25 },
+          { id: 'over', src: 'g.png', at: 0, until: '@end' },
+        ],
+      }),
+    );
+    expect(byId(t.overlays, 'whole')).toMatchObject({ start: 2, end: 3, segment: 'b', width: null, height: null });
+    const part = byId(t.overlays, 'part');
+    expect(part).toMatchObject({ start: 2.4, end: 2.9, segment: 'b', width: 1024, height: 576 });
+    expect(part.motion).toEqual([{ t: 2.4, x: 10, y: 0 }, { t: 2.9, x: 20, y: 0 }]);
+    expect(byId(t.overlays, 'tail')).toMatchObject({ start: 2.5, end: 2.75 });
+    expect(byId(t.overlays, 'over').segment).toBeNull();
+  });
+
+  it('must lie inside its segment, which must exist', () => {
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', segment: 'b', at: 0.5, duration: 1 }] }))).toEqual(['outside-segment']);
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', segment: 'b', at: 'a' }] }))).toEqual(['outside-segment']);
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', segment: 'zzz' }] }))).toEqual(['unknown-segment']);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', duration: 1 }] })).toEqual([['bad-shape', 'overlays[0].at']]);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, width: 0 }] })).toEqual([['bad-value', 'overlays[0].width']]);
+  });
+});
+
+describe('waves', () => {
+  it("sweep Night Wagon Take 7's scanner as x = 300 sin(2πt / 1.5)", () => {
+    // nw7/edit.mjs: overlay=x='300*sin(2*PI*t/1.5)' over the 1.5 s hook on black.
+    const t = resolved(cut({ overlays: [{ id: 'scan', src: 's.png', segment: 'a', wave: { x: { center: 0, amplitude: 300, period: 1.5 } } }] }));
+    const scan = byId(t.overlays, 'scan');
+    for (let s = 0; s <= 2; s += 0.01) expect(positionAt(scan, s).x).toBeCloseTo(300 * Math.sin((2 * Math.PI * s) / 1.5), 9);
+    expect(positionAt(scan, 0.375)).toEqual({ x: 300, y: 0 });
+  });
+
+  it("count from the overlay's start over the finished picture, and take a phase and cos", () => {
+    const t = resolved(
+      cut({
+        overlays: [
+          { id: 'g', src: 'g.png', at: 1, duration: 1, y: 65, wave: { x: { shape: 'cos', center: 52, amplitude: -250, period: 1 } } },
+          { id: 'h', src: 'g.png', segment: 'b', at: 0.4, wave: { x: { center: 360, amplitude: 6, period: 1, phase: 0.52 }, y: { center: -45, amplitude: 0, period: 1 } } },
+        ],
+      }),
+    );
+    const g = byId(t.overlays, 'g');
+    expect(g.wave.x).toEqual({ shape: 'cos', center: 52, amplitude: -250, period: 1, phase: 0, origin: 1 });
+    expect(positionAt(g, 1)).toEqual({ x: -198, y: 65 });
+    expect(positionAt(g, 1.5).x).toBeCloseTo(302, 9);
+    // In a segment, its clock is the segment's: 2 + 0.52 is the wave's zero crossing.
+    const h = byId(t.overlays, 'h');
+    expect(h.wave.x?.origin).toBe(2);
+    expect(positionAt(h, 2.52).x).toBeCloseTo(360, 9);
+    expect(positionAt(h, 2.77).x).toBeCloseTo(366, 9);
+    expect(positionAt(h, 2.6).y).toBe(-45);
+    expect(waveAt({ shape: 'sin', center: 1, amplitude: 2, period: 4, phase: 0, origin: 10 }, 11)).toBeCloseTo(3, 9);
+  });
+
+  it('own their axis: no x or motion x beside a wave on x', () => {
+    const wave = { x: { center: 0, amplitude: 1, period: 1 } };
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, x: 5, wave }] }))).toEqual(['conflicting-fields']);
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, motion: [{ at: 0, x: 1 }], wave }] }))).toEqual(['conflicting-fields']);
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, y: 3, motion: [{ at: 0, y: 1 }], wave }] }))).toEqual([]);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, wave: { x: { center: 0, amplitude: 1, period: 0 } } }] }))
+      .toEqual([['bad-value', 'overlays[0].wave.x.period']]);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, wave: { x: { center: 0, amplitude: 1, period: 1, shape: 'square' } } }] }))
+      .toEqual([['bad-shape', 'overlays[0].wave.x.shape']]);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, wave: { z: {} } }] })).toEqual([['bad-shape', 'overlays[0].wave.z']]);
+  });
+});
+
+describe('opacity keys', () => {
+  it('drop an overlay out with two pairs of jumps, and multiply its fades', () => {
+    const t = resolved(
+      cut({
+        overlays: [
+          {
+            id: 'o', src: 'g.png', segment: 'a', fadeOut: 0.5,
+            opacity: [{ at: 1.04, value: 1 }, { at: 1.04, value: 0 }, { at: 1.1, value: 0 }, { at: 1.1, value: 1 }],
+          },
+          { id: 'ramp', src: 'g.png', at: 0, duration: 2, opacity: [{ at: 0, value: 0 }, { at: 1, value: 0.5 }] },
+          { id: 'half', src: 'g.png', at: 0, duration: 2, opacity: 0.5 },
+        ],
+      }),
+    );
+    const o = byId(t.overlays, 'o');
+    expect(o.opacity).toEqual([{ t: 1.04, value: 1 }, { t: 1.04, value: 0 }, { t: 1.1, value: 0 }, { t: 1.1, value: 1 }]);
+    expect(opacityAt(o, 1.0)).toBe(1);
+    expect(opacityAt(o, 1.04)).toBe(0);
+    expect(opacityAt(o, 1.07)).toBe(0);
+    expect(opacityAt(o, 1.1)).toBe(1);
+    expect(opacityAt(o, 1.75)).toBeCloseTo(0.5, 9);
+    expect(opacityAt(byId(t.overlays, 'ramp'), 0.5)).toBeCloseTo(0.25, 9);
+    expect(opacityAt(byId(t.overlays, 'ramp'), 1.5)).toBe(0.5);
+    expect(byId(t.overlays, 'half').opacity).toEqual([{ t: 0, value: 0.5 }]);
+    expect(opacityAt(byId(t.overlays, 'half'), 1)).toBe(0.5);
+  });
+
+  it('stay between 0 and 1, in order', () => {
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, opacity: 2 }] })).toEqual([['bad-value', 'overlays[0].opacity']]);
+    expect(parseErrors({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, opacity: [{ at: 0, value: -1 }] }] }))
+      .toEqual([['bad-value', 'overlays[0].opacity[0].value']]);
+    expect(codes(cut({ overlays: [{ id: 'o', src: 'g.png', at: 0, duration: 1, opacity: [{ at: 0.5, value: 1 }, { at: 0.2, value: 0 }] }] })))
+      .toEqual(['keyframes-unordered']);
+  });
+});
+
+describe('a line with its own stretch of another take', () => {
+  it('plays from its in to its out, and maps its words from the take', () => {
+    const t = resolved(
+      cut({
+        lines: [
+          {
+            id: 'hello', speaker: 'Rex', text: 'Hello, Victoria.', src: 'take:doors', in: 3, out: 4, at: 'a+1.95',
+            words: [{ text: 'Hello,', start: 3.1, end: 3.5 }, { text: 'Victoria.', start: 3.6, end: 4.1 }],
+          },
+        ],
+      }),
+    );
+    const hello = byId(t.lines, 'hello');
+    expect([hello.start, hello.end]).toEqual([1.95, 2.95]);
+    expect(hello.audio).toEqual({ kind: 'file', src: { kind: 'take', ref: 'take:doors', name: 'doors', path: '/media/takes/doors.mp4' }, in: 3, out: 4, volume: 1, filters: [] });
+    // 3.1 s in the take is 0.1 s into the line; the last word is clipped at the line's end.
+    expect(hello.words).toEqual([{ text: 'Hello,', start: 2.05, end: 2.45 }, { text: 'Victoria.', start: 2.55, end: 2.95 }]);
+  });
+
+  it('runs to the end of its source without an out, and is cut off by until', () => {
+    const line = { id: 'l', speaker: 'S', text: 'Hi.', src: 'take:doors', in: 1, at: 0 };
+    expect(byId(resolved(cut({ lines: [line] }), { mediaLength: () => 4 }).lines, 'l')).toMatchObject({ start: 0, end: 3, audio: { in: 1, out: 4 } });
+    expect(byId(resolved(cut({ lines: [{ ...line, duration: 2.5 }] })).lines, 'l')).toMatchObject({ end: 1.5, audio: { out: 2.5 } });
+    expect(byId(resolved(cut({ lines: [{ ...line, out: 3, until: 'a+0.5' }] })).lines, 'l')).toMatchObject({ end: 0.5, audio: { in: 1, out: 1.5 } });
+  });
+
+  it('reports an out before its in, or past the media, and keeps in and out off segment lines', () => {
+    expect(codes(cut({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', src: 'take:x', in: 2, out: 1, at: 0 }] }))).toContain('out-before-in');
+    const past = resolveCut(cut({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', src: 'take:x', in: 1, out: 6, at: 0 }] }), { mediaLength: () => 4 });
+    expect(past.ok ? [] : past.errors.map((e) => e.code)).toContain('out-past-media');
+    expect(parseErrors({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', segment: 'a', in: 1 }] })).toEqual([['conflicting-fields', 'lines[0].in']]);
+    expect(parseErrors({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', src: 'l.wav', at: 0, in: -1 }] })).toEqual([['bad-value', 'lines[0].in']]);
+  });
+});
+
+describe('audio filters', () => {
+  it('resolve on lines and clips in order, with their defaults', () => {
+    const t = resolved(
+      cut({
+        lines: [
+          {
+            id: 'watch', speaker: 'B', text: 'Rick.', src: 'b4.wav', at: 0, duration: 1, volume: 1.5,
+            filters: [{ kind: 'highpass', frequency: 500 }, { kind: 'lowpass', frequency: 3200 }, { kind: 'crush', bits: 10, mix: 0.25 }],
+          },
+        ],
+        sfx: [{ id: 'hey', src: 'hey.wav', at: 0, duration: 0.6, filters: [{ kind: 'echo', inGain: 0.8, outGain: 0.6, delay: 0.06, decay: 0.3 }, { kind: 'crush', bits: 8 }] }],
+        music: [{ id: 'm', src: 'm.mp3', at: 0, duration: 1 }],
+      }),
+    );
+    expect(byId(t.lines, 'watch').audio).toMatchObject({
+      volume: 1.5,
+      filters: [{ kind: 'highpass', frequency: 500 }, { kind: 'lowpass', frequency: 3200 }, { kind: 'crush', bits: 10, mix: 0.25 }],
+    });
+    expect(byId(t.sfx, 'hey').filters).toEqual([{ kind: 'echo', inGain: 0.8, outGain: 0.6, delay: 0.06, decay: 0.3 }, { kind: 'crush', bits: 8, mix: 1 }]);
+    expect(byId(t.music, 'm').filters).toEqual([]);
+  });
+
+  it('report unknown kinds and values out of range', () => {
+    const line = (filters: unknown[]): Record<string, unknown> => ({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', src: 'l.wav', at: 0, duration: 1, filters }] });
+    expect(parseErrors(line([{ kind: 'reverb' }]))).toEqual([['bad-shape', 'lines[0].filters[0].kind']]);
+    expect(parseErrors(line([{ kind: 'highpass', frequency: 0 }]))).toEqual([['bad-value', 'lines[0].filters[0].frequency']]);
+    expect(parseErrors(line([{ kind: 'crush', bits: 80 }]))).toEqual([['bad-value', 'lines[0].filters[0].bits']]);
+    expect(parseErrors(line([{ kind: 'echo', inGain: 0.8, outGain: 0.6, delay: 60, decay: 3 }]))).toEqual([['bad-value', 'lines[0].filters[0].decay']]);
+    expect(parseErrors(line([{ kind: 'echo', inGain: 0.8, outGain: 0.6, decay: 0.3 }]))).toEqual([['bad-shape', 'lines[0].filters[0].delay']]);
+    expect(parseErrors({ lines: [{ id: 'l', speaker: 'S', text: 'Hi.', segment: 'a', filters: [] }] })).toEqual([['conflicting-fields', 'lines[0].filters']]);
   });
 });

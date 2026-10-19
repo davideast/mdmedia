@@ -41,6 +41,39 @@ export interface CutFile {
   picture?: PictureFades;
 }
 
+/**
+ * A cut written as changes to another cut, its base: `extends` names a cut in
+ * the same folder (`<name>.cut.json`). `extendCut` turns it into a full cut.
+ *
+ * - `meta` and `media` fields replace the base's, field by field; `output` and
+ *   `picture` replace the base's whole.
+ * - In each list, an item whose id is in the base's list replaces that item
+ *   where it stands; any other item is added at the end. A segment's `after`
+ *   places it after the segment with that id, or first with `"@start"`.
+ * - `remove` drops items by id, from whichever list holds them.
+ */
+export interface CutExtension {
+  format: typeof CUT_FORMAT;
+  /** The base cut's name: its file stem, e.g. `bellamy-ranch-take6`. */
+  extends: string;
+  meta?: Partial<CutMeta>;
+  media?: Partial<MediaRoots>;
+  output?: string;
+  segments?: ExtensionSegment[];
+  lines?: Line[];
+  music?: AudioClip[];
+  sfx?: AudioClip[];
+  overlays?: Overlay[];
+  picture?: PictureFades;
+  remove?: string[];
+}
+
+/** A segment in an extension, which can say where it goes. */
+export type ExtensionSegment = Segment & {
+  /** Put the segment after the segment with this id, or first with `"@start"`. */
+  after?: string;
+};
+
 export interface CutMeta {
   title: string;
   /** The show's key, e.g. `night-wagon`. */
@@ -100,6 +133,42 @@ export interface Segment {
    * `in`/`out`, at full volume. `false` makes the segment silent.
    */
   audio?: SegmentAudio | false;
+  /** A push-in: the picture scaled about a fixed point, after the segment's own overlays are drawn. */
+  zoom?: Zoom;
+}
+
+/**
+ * A time inside a segment: a number is seconds from the segment's start; a
+ * string is an anchor on the timeline, as anywhere else (`"tag.end"`).
+ */
+export type SegmentTimeRef = TimeRef;
+
+/** A zoom keyframe: the picture's scale at a time in the segment. */
+export interface ZoomKey {
+  at: SegmentTimeRef;
+  /** 1 is the picture as framed; 1.2 is 20 % larger. At least 1. */
+  scale: number;
+}
+
+/**
+ * A point of the segment's picture, as framed in the output (after any crop
+ * and scaling): output pixels by default, or fractions of the width and height
+ * with `unit: "fraction"`.
+ */
+export interface FocusPoint {
+  x: number;
+  y: number;
+  unit?: 'px' | 'fraction';
+}
+
+/**
+ * Scales a segment's picture about `focus`, which stays where it is on screen.
+ * The scale is linear between keys and held before the first and after the last.
+ */
+export interface Zoom {
+  /** Default: the middle of the picture. */
+  focus?: FocusPoint;
+  keys: ZoomKey[];
 }
 
 /**
@@ -141,13 +210,23 @@ interface LineBase {
   words?: Word[];
 }
 
-/** A line with its own audio file, usually TTS. */
+/**
+ * A line with its own sound: a TTS file, or a stretch of another take
+ * (`take:<name>` with `in` and `out`). Its words are in that source's clock.
+ */
 export interface FileLine extends LineBase {
   src: SourceRef;
   at: TimeRef;
-  /** The file's length in seconds, if known. A probe given to the resolver overrides it. */
+  /** Source time the line's sound starts from, seconds. Default 0. */
+  in?: number;
+  /** Source time the line's sound stops at. Default: the end of the source. */
+  out?: number;
+  /** The source's length in seconds, if known. A probe given to the resolver overrides it. */
   duration?: number;
+  /** Gain, applied after `filters`. Default 1. */
   volume?: number;
+  /** Applied in order, before `volume`. */
+  filters?: AudioFilter[];
   segment?: never;
 }
 
@@ -162,10 +241,51 @@ export interface SegmentLine extends LineBase {
 
 export type Line = FileLine | SegmentLine;
 
+/** A value at a time, linear to the next key. Two keys at the same time make a jump. */
 export interface VolumeKey {
   at: TimeRef;
   value: number;
 }
+
+/** An opacity keyframe, 0 to 1. Linear between keys; two keys at the same time make a jump. */
+export type OpacityKey = VolumeKey;
+
+/** Cuts everything below `frequency` Hz. */
+export interface HighpassFilter {
+  kind: 'highpass';
+  frequency: number;
+}
+
+/** Cuts everything above `frequency` Hz. */
+export interface LowpassFilter {
+  kind: 'lowpass';
+  frequency: number;
+}
+
+/** Reduces the bit depth, mixed with the dry sound: a cheap speaker's grit. */
+export interface CrushFilter {
+  kind: 'crush';
+  /** 1 to 64. */
+  bits: number;
+  /** How much of the crushed sound is heard, 0 to 1. Default 1. */
+  mix?: number;
+}
+
+/** One echo: the sound again `delay` seconds later, at `decay` of its level. */
+export interface EchoFilter {
+  kind: 'echo';
+  /** Gain into the echo, 0 to 1. */
+  inGain: number;
+  /** Gain of the result, 0 to 1. */
+  outGain: number;
+  /** Seconds. */
+  delay: number;
+  /** The echo's level against the sound, 0 to 1. */
+  decay: number;
+}
+
+/** A sound filter on a line or an audio clip, applied in list order. */
+export type AudioFilter = HighpassFilter | LowpassFilter | CrushFilter | EchoFilter;
 
 /** A relay-style tick: a short decaying tone at the start of every period. */
 export interface TickSynth {
@@ -204,6 +324,8 @@ export interface AudioClip {
   volume?: number | VolumeKey[];
   fadeIn?: number;
   fadeOut?: number;
+  /** Applied in order, before `volume` and the fades. */
+  filters?: AudioFilter[];
 }
 
 export interface MotionKey {
@@ -219,19 +341,51 @@ export interface Blink {
   on: number;
 }
 
+/**
+ * A value that swings: `center + amplitude · sin(2π(t − phase) / period)`, or
+ * `cos` with `shape: "cos"`. `t` is the overlay's own clock: seconds from its
+ * start, or from its segment's start for an overlay in a segment.
+ */
+export interface Wave {
+  /** Default `sin`. */
+  shape?: 'sin' | 'cos';
+  center: number;
+  /** Negative flips the swing. */
+  amplitude: number;
+  /** Seconds per cycle. */
+  period: number;
+  /** Seconds the wave is delayed by. Default 0. */
+  phase?: number;
+}
+
 /** A PNG over the picture. Plays from `at` until `until` or for `duration`. */
 export interface Overlay {
   id: string;
   label?: string;
   src: SourceRef;
-  at: TimeRef;
+  /**
+   * The segment this overlay is drawn into, before the segment's zoom, so it
+   * zooms with the picture. Its times are then segment times (a number is
+   * seconds from the segment's start), and it must lie inside the segment.
+   */
+  segment?: string;
+  /** Required unless the overlay is in a segment, where it defaults to the segment's start. */
+  at?: TimeRef;
+  /** For an overlay in a segment, defaults to the segment's end. */
   until?: TimeRef;
   duration?: number;
   /** Top-left position in output pixels. Default 0, 0. */
   x?: number;
   y?: number;
+  /** Drawn size in output pixels. Default: the image's own; with only one, the other keeps the image's aspect. */
+  width?: number;
+  height?: number;
   /** Position keyframes on the timeline, linear between them. Overrides `x`/`y` where given. */
   motion?: MotionKey[];
+  /** An axis that swings, instead of following `x`/`y` and `motion`. */
+  wave?: { x?: Wave; y?: Wave };
+  /** A constant alpha, or keyframes, linear between them (two at one time make a jump). Default 1. */
+  opacity?: number | OpacityKey[];
   /** Alpha fades, seconds. */
   fadeIn?: number;
   fadeOut?: number;
@@ -270,6 +424,13 @@ export interface ResolvedSegmentAudio {
   end: number;
 }
 
+export interface ResolvedZoom {
+  /** The fixed point, in output pixels of the picture as framed. */
+  focus: { x: number; y: number };
+  /** Scale keyframes on the timeline. */
+  keys: ResolvedKey[];
+}
+
 export interface ResolvedSegment extends ResolvedBase {
   kind: 'segment';
   index: number;
@@ -283,10 +444,24 @@ export interface ResolvedSegment extends ResolvedBase {
   fadeIn: number;
   fadeOut: number;
   audio: ResolvedSegmentAudio | null;
+  /** The push-in, or null when the picture isn't zoomed. */
+  zoom: ResolvedZoom | null;
 }
 
+/** An audio filter with its defaults filled in. */
+export type ResolvedAudioFilter = HighpassFilter | LowpassFilter | (CrushFilter & { mix: number }) | EchoFilter;
+
 export type ResolvedLineAudio =
-  | { kind: 'file'; src: ResolvedSource; volume: number }
+  | {
+      kind: 'file';
+      src: ResolvedSource;
+      /** Source seconds the line plays from. */
+      in: number;
+      /** `in` plus the played length. */
+      out: number;
+      volume: number;
+      filters: ResolvedAudioFilter[];
+    }
   | { kind: 'segment'; segment: string };
 
 export interface ResolvedLine extends ResolvedBase {
@@ -313,6 +488,7 @@ export interface ResolvedAudio extends ResolvedBase {
   volume: ResolvedKey[];
   fadeIn: number;
   fadeOut: number;
+  filters: ResolvedAudioFilter[];
 }
 
 export interface ResolvedMotionKey {
@@ -321,11 +497,31 @@ export interface ResolvedMotionKey {
   y: number;
 }
 
+/** A wave with its defaults filled in, and the timeline time its clock starts at. */
+export interface ResolvedWave {
+  shape: 'sin' | 'cos';
+  center: number;
+  amplitude: number;
+  period: number;
+  phase: number;
+  /** The timeline time where the wave's `t` is 0. */
+  origin: number;
+}
+
 export interface ResolvedOverlay extends ResolvedBase {
   kind: 'overlay';
   src: ResolvedSource;
+  /** The segment it is drawn into (before that segment's zoom), or null when it is over the finished picture. */
+  segment: string | null;
+  /** Drawn size in output pixels; null keeps the image's own (or its aspect). */
+  width: number | null;
+  height: number | null;
   /** Position keyframes; one key when the overlay doesn't move. */
   motion: ResolvedMotionKey[];
+  /** Axes that swing; on its axis a wave wins over `motion`. */
+  wave: { x: ResolvedWave | null; y: ResolvedWave | null };
+  /** Opacity keyframes on the timeline; one key when it is constant. */
+  opacity: ResolvedKey[];
   fadeIn: number;
   fadeOut: number;
   blink: Blink | null;
@@ -374,7 +570,11 @@ export type CutErrorCode =
   | 'keyframes-unordered'
   | 'out-past-media'
   | 'no-segments'
-  | 'length-mismatch';
+  | 'length-mismatch'
+  | 'outside-segment'
+  | 'bad-value'
+  | 'unknown-item'
+  | 'extends-cycle';
 
 export interface CutError {
   code: CutErrorCode;

@@ -18,7 +18,7 @@ adds Take 10's ending.
   "format": "mdmedia.cut@1",
   "meta": { "title": "Night Wagon", "show": "night-wagon", "version": "Take 9 (opens on the road)",
             "length": 26.3, "fps": 24, "width": 1280, "height": 720 },
-  "media": { "root": "/tmp/…/scratchpad/crt", "takes": "takes/{name}.mp4" },
+  "media": { "root": "/home/david/.local/share/mdmedia/productions/crt-tv", "takes": "takes/{name}.mp4" },
   "output": "takes/night-wagon-take9.mp4",
   "segments": [ … ],
   "lines": [ … ],
@@ -39,7 +39,9 @@ whole file. Most items also take a `label` for the timeline.
 
 `media.root` is the base for every relative path. It can be absolute, or
 relative to the cut file's folder. The resolver's `root` option overrides it,
-so moving the media out of the scratchpad means changing one value.
+so moving the media means changing one value. The Night Wagon cuts keep theirs
+in the CRT TV production's home, `~/.local/share/mdmedia/productions/crt-tv`,
+which is also Studio's default (`MDMEDIA_CUT_MEDIA_ROOT` overrides it).
 
 A `src` is one of:
 
@@ -77,8 +79,11 @@ How each item's start and end are found:
   `until`, they end there.
 - **A line from a segment** starts and ends with its segment, unless its `at`
   or `until` says otherwise.
-- **Keyframes** (volume, motion) are placed by the same anchors. Nothing
-  can anchor to a keyframe.
+- **Keyframes** (volume, motion, opacity, zoom) are placed by the same
+  anchors. Nothing can anchor to a keyframe.
+- **Inside a segment** (its zoom keys, and an overlay drawn into it), a number
+  is seconds from the segment's start, so it moves with the segment; a string
+  is an anchor as anywhere else. `0.4` and `"tag+0.4"` are the same time there.
 
 Every item has two points, `id.start` and `id.end`. The resolver computes each
 point from the points it refers to. A point that refers back to itself, by any
@@ -123,10 +128,32 @@ Buddy's shots are a dashboard picture over a quiet room hum from another take:
   "audio": { "src": "take:nw7-dash-t1", "in": 0, "volume": 0.7 } }
 ```
 
+### Zoom
+
+`zoom` pushes in on a segment: its picture is scaled about a `focus` point,
+which stays where it is on screen. `keys` give the scale (1 is the picture as
+framed, and it can't go below 1) at times in the segment, linear between keys
+and held before the first and after the last. The focus is in output pixels of
+the picture as framed (after any crop), or fractions of it with
+`"unit": "fraction"`; without one it is the middle. Drive-In's tag holds still
+for 0.4 s, then pushes in 20 % to its end, keeping the far wagon at
+(872, 243) where it is:
+
+```json
+{ "id": "tag", "src": "take:nwdi-rows-t1", "in": 1.9, "out": 3.5,
+  "zoom": { "focus": { "x": 872, "y": 243 }, "keys": [ { "at": 0.4, "scale": 1 }, { "at": "tag.end", "scale": 1.2 } ] } }
+```
+
+Its family shot is `{ "keys": [ { "at": 0, "scale": 1 }, { "at": "fam.end", "scale": 1.035 } ] }`,
+3.5 % about the middle. Keys must lie inside the segment. A picture point `p`
+lands on screen at `focus + (p − focus) · scale`; overlays drawn into the
+segment (below) are zoomed with it.
+
 ## Lines
 
-A line is either its own audio file (TTS), or words heard in a segment's own
-audio (Rick on camera). A segment line adds no sound; it labels the timeline.
+A line either carries its own sound (a TTS file, or a stretch of another
+take), or is words heard in a segment's own audio (Rick on camera). A segment
+line adds no sound; it labels the timeline.
 
 ```json
 { "id": "getaway", "speaker": "Rick", "text": "They're getting away, Buddy.", "segment": "r1" },
@@ -139,9 +166,130 @@ audio (Rick on camera). A segment line adds no sound; it labels the timeline.
 A segment line can run past its segment with `until`: "TURBO... BOOST!" is
 `"segment": "yell", "until": "press.end"`.
 
+A line with its own sound plays its `src` from `in` (default 0) to `out`
+(default the end of the source), so it can be part of another take, laid
+anywhere as a J- or L-cut. Bellamy's "Hello, Victoria." is 3.0–4.0 s of Take 5's
+doorway shot, heard 1.95 s into the doors:
+
+```json
+{ "id": "hello", "speaker": "Rex", "text": "Hello, Victoria.", "src": "take:bel5-s2-t1", "in": 3.0, "out": 4.0,
+  "at": "doors+1.95" }
+```
+
+Its length is `out - in`, else the source's length (probed, or `duration`)
+less `in`, cut off at `until`. Its words are in the take's clock.
+
+`filters` (on a line with its own sound, or on any music or sound effect)
+change how it sounds, in list order, before `volume`:
+
+| Filter | Fields |
+|---|---|
+| `highpass` | `frequency` in Hz: cuts what is below it |
+| `lowpass` | `frequency` in Hz: cuts what is above it |
+| `crush` | `bits` (1–64) and `mix` (0–1, default 1): fewer bits, mixed with the dry sound |
+| `echo` | `inGain` and `outGain` (0–1), `delay` in seconds and `decay` (0–1): one echo |
+
+Buddy through the watch's little speaker, and the off-screen "Hey!" across
+the lot:
+
+```json
+{ "id": "overhere", "speaker": "Buddy", "text": "Rick. I'm over here.", "src": "audio/tts/di-b4.wav",
+  "at": "rw+0.3", "until": "rw.end", "duration": 1.4861, "volume": 1.5,
+  "filters": [ { "kind": "highpass", "frequency": 500 }, { "kind": "lowpass", "frequency": 3200 },
+               { "kind": "crush", "bits": 10, "mix": 0.25 } ] },
+{ "id": "hey", "speaker": "Voice (off-screen)", "text": "Hey!", "src": "audio/tts/di-hey.wav",
+  "at": "run+0.12", "until": "run.end", "duration": 0.6037, "volume": 0.8,
+  "filters": [ { "kind": "echo", "inGain": 0.8, "outGain": 0.6, "delay": 0.06, "decay": 0.3 } ] }
+```
+
+The format only describes them; nothing renders a cut yet.
+
 `words` (optional) are `{ text, start, end }` in the audio's own clock: the
 file's time for TTS, the source take's time for a segment line. The resolver
-maps them onto the timeline and drops words outside the line.
+maps them onto the timeline and drops words outside the line. They usually
+come from a words file rather than being written by hand; see below.
+
+## Word timings: the words file
+
+`mdmedia cut words` gives every line real word timings by forced alignment,
+and keeps them in a companion file, `<name>.words.json` next to
+`<name>.cut.json`, so the cut file stays as you wrote it:
+
+```sh
+mdmedia cut words docs/cuts/night-wagon-take9.cut.json [--force] [--root <media root>] [--aligner elevenlabs]
+```
+
+For each line it cuts the line's audio window out of its source, in the
+source's own clock, as mono 16 kHz WAV (with ffmpeg), aligns it against the
+line's `text`, and shifts the words back into the source's clock:
+
+- **A line with its own sound** is its source from the line's `in` (0 for a
+  TTS file) for the line's length on the timeline, so a line cut off by
+  `until` or its `out` stops there.
+- **A segment line** is its segment's audio source from the audio in-point, for
+  the line's length. A line that runs past its segment with `until` carries
+  on in the same source: "TURBO... BOOST!" runs from the yell into the press,
+  which plays the same take in step. If the next segment's sound isn't that
+  take in step, the command warns.
+
+Each entry stores the words (with the aligner's per-word loss), the overall
+loss, the line's text, the aligner's name, and a fingerprint of what was
+aligned: the source path relative to the media root, the window, the
+file's SHA-256, and the method that snapped its first word (below):
+
+```json
+"bridge": {
+  "text": "The bridge ahead is out, Rick.",
+  "aligner": "elevenlabs",
+  "fingerprint": { "source": "audio/tts/b2.wav", "start": 0, "end": 1.5, "sha256": "bd34…", "snap": "speech-onset@1" },
+  "loss": 0.513,
+  "snap": { "aligned": 0.1, "start": 0.06, "onset": 0.06, "floor": -56.1 },
+  "words": [
+    { "text": "The", "start": 0.06, "end": 0.14, "loss": 0.694 },
+    …
+  ]
+}
+```
+
+The aligner starts a line's first word late: on Buddy's clean TTS lines it
+says 0.10–0.12 s, on a 20 ms grid, where the speech is audible from 0.06–0.08 s.
+Its ends are right. So each line's first word is snapped back to the speech
+onset measured in the same window: levels every 10 ms in the speech band
+(300–3400 Hz), a threshold 7 dB above the window's own background (its 10th
+percentile frame) but never more than 30 dB below its loudest frame, and the
+onset is the first frame above it that starts a run of at least 30 ms, so a
+click doesn't count. The start only ever moves earlier, by at most 0.10 s, and
+never before the window; no other word and no end is touched. The same
+threshold works for near-silent TTS and for Rick's takes over road noise. Each
+entry records it as `"snap": { "aligned", "start", "onset", "floor" }` (the
+aligner's start, the start kept, the onset found or null, and the background
+in dBFS), and the fingerprint names the method (`"snap": "speech-onset@1"`),
+so a line snapped by another method, or not at all, is realigned once. The
+measuring code is in `src/cut/onset.ts`.
+
+A run aligns only the lines whose text, window, source file, aligner or
+snapping method changed; `--force` redoes them all. The file is written the same way every
+time, so an unchanged run leaves it untouched. The command prints each line's
+speech on the timeline (first word's start to last word's end), its loss, and
+whether it was `fresh` (kept), `aligned`, or `stale` (no usable words, with
+the reason). It warns, without failing, when a line's loss is over 0.9 (clean
+TTS aligns at about 0.5–0.7, Rick's noisy on-camera lines at about 0.7, the
+shouted yell at 1.03) or when it got a different number of words than its text
+has. Blank and punctuation-only entries ("...") are dropped.
+
+The media root is `--root`, else `MDMEDIA_CUT_MEDIA_ROOT` (as Studio reads
+it), else the cut's `media.root`. The ElevenLabs aligner reads its key from
+`ELEVENLABS_API_KEY` or `ELEVEN_LABS_KEY`, and the key needs the
+`forced_alignment` permission. ffmpeg is `FFMPEG_PATH`, else `ffmpeg-static`
+when it is installed, else `ffmpeg` on the `PATH`.
+
+`applyWords(cut, wordsFile, options)` puts a words file's words on a parsed
+cut before it is resolved, so `resolveCut` itself never reads files. It never
+uses stale words: a line whose text, window or source file no longer matches
+its entry gets no words at all and is listed in `stale`. Pass `sha256` (a
+file's hash by path) to compare the audio's contents; lines it can't check are
+listed in `unchecked`. Studio's cut viewer loads `<name>.words.json` this way,
+and times the gaps between lines from first word to last word.
 
 ## Music, stings and sound effects
 
@@ -168,6 +316,17 @@ These keys match the script's volume expression to within 0.001 at every
 point (a test checks this). Lengthen r3 and the ramp still starts at Rick's
 first line and still peaks at the halt.
 
+Two keys at the same time make a jump; at that instant the value is the later
+key's. Drive-In's second theme bed steps up from 0.18 to 0.3 as the job
+starts, rises, and steps down to 0.42 on "Buddy... Buddy?":
+
+```json
+"volume": [
+  { "at": "sneak", "value": 0.18 }, { "at": "sneak", "value": 0.3 },
+  { "at": "lost", "value": 0.7002 }, { "at": "lost", "value": 0.42 }
+]
+```
+
 A `synth` is a generated sound. The one kind so far is Take 10's hazard relay:
 
 ```json
@@ -191,13 +350,82 @@ list order:
 ```
 
 - `x` and `y` place its top-left corner; `motion` keyframes move it.
-- `fadeIn` and `fadeOut` fade its alpha.
+- `width` and `height` draw it at that size in output pixels; with only one,
+  the other keeps the image's aspect. Default: the image's own size.
+- `wave: { "x": …, "y": … }` swings an axis instead (below).
+- `opacity` is a constant alpha (0–1) or keyframes, linear between them, two
+  at one time making a jump.
+- `fadeIn` and `fadeOut` fade its alpha, on top of `opacity`.
 - `blink: { "period": 0.7, "on": 0.35 }` shows it for the first `on` seconds
   of each period, counted from its start. Take 10's hazard lamps blink in step
   with the tick this way.
 
+An overlay with a `segment` is drawn into that segment's picture, before its
+zoom, so it zooms with the shot. It lies inside the segment, its times are in
+the segment's clock (a number is seconds from the segment's start), and it
+runs from the segment's start to its end unless `at`, `until` or `duration`
+say otherwise.
+
+A wave is `center + amplitude · sin(2π(t − phase) / period)`, or `cos` with
+`"shape": "cos"`; `phase` is in seconds. `t` is the overlay's own clock: from
+its segment's start for an overlay in a segment, else from its own start. A
+wave owns its axis, so the overlay can't also give that axis an `x`/`y` or
+motion keys.
+
+Drive-In's grille glow sweeps once across the grille, `x = 52 − 250·cos(2πt)`,
+drops out from 1.04 to 1.10 s, and fades over its last 0.3 s. The tag glow is
+drawn at 1024×576 into the tag shot from 0.4 s, before the shot's push-in,
+drops out from 0.45 to 0.52 s, then sweeps as `x = 360 + 6·sin(2π(t − 0.52))`:
+
+```json
+{ "id": "grilleGlow", "src": "nwdi/grille-glow.png", "segment": "grille", "until": 1.28, "y": 65, "fadeOut": 0.3,
+  "wave": { "x": { "shape": "cos", "center": 52, "amplitude": -250, "period": 1 } },
+  "opacity": [ { "at": 1.04, "value": 1 }, { "at": 1.04, "value": 0 }, { "at": 1.1, "value": 0 }, { "at": 1.1, "value": 1 } ] },
+{ "id": "tagGlow", "src": "nwdi/tag-glow.png", "segment": "tag", "at": 0.4, "y": -45, "width": 1024, "height": 576,
+  "wave": { "x": { "center": 360, "amplitude": 6, "period": 1, "phase": 0.52 } },
+  "opacity": [ { "at": 0.45, "value": 1 }, { "at": 0.45, "value": 0 }, { "at": 0.52, "value": 0 }, { "at": 0.52, "value": 1 } ] }
+```
+
+Night Wagon Take 7's scanner sweep over the black open is
+`{ "x": { "center": 0, "amplitude": 300, "period": 1.5 } }`.
+
 `picture.fadeIn` and `picture.fadeOut` fade the whole finished picture, after
 the overlays, at the start and end of the cut.
+
+## Variants: `extends`
+
+A cut can be written as changes to another, its base. `extends` names the
+base by its file stem, `<name>.cut.json` in the same folder. Bellamy Take 6's
+other ending freezes on Rex's smirk instead of her stunned face:
+
+```json
+{
+  "format": "mdmedia.cut@1",
+  "extends": "bellamy-ranch-take6",
+  "meta": { "version": "Take 6 (shot by shot, freeze on Rex)" },
+  "output": "takes/bellamy-take6-rex.mp4",
+  "remove": ["smirk"],
+  "segments": [
+    { "id": "freeze", "src": "take:bel6-rex-t1", "in": 3.32, "out": 4.2, "end": "sting.end", "fadeOut": 0.5,
+      "audio": { "src": "take:bel6-gasp-t1", "in": 1.0, "out": 2.8, "volume": 0.5 } }
+  ]
+}
+```
+
+- `meta` and `media` fields replace the base's, field by field; `output` and
+  `picture` replace the base's whole.
+- In each list, an item with the id of one of the base's items replaces it,
+  whole, where it stands; an item with a new id is added at the end. A segment
+  can say where it goes with `"after": "<segment id>"`, or `"after": "@start"`
+  to go first.
+- `remove` drops items by id, from whichever list holds them.
+
+A base can extend another cut in turn. The loader merges the chain into a full
+cut before anything resolves it: `loadCutSource(json, readBase)` takes a
+function that returns a base's parsed JSON by name, so it reads no files
+itself; `readCutFile(path)` (in `src/cut/align.ts`) reads them from disk, and
+`mdmedia cut words` and Studio's viewer use it. `parseCut` alone refuses a
+file with `extends`. A variant has its own words file.
 
 ## The resolved timeline
 
@@ -215,7 +443,12 @@ The timeline has:
 - `at`: every item's start by id.
 
 `gainAt`, `positionAt` and `opacityAt` give a clip's gain or an overlay's
-position and opacity at any time, for drawing the music line or previewing.
+position (waves included) and opacity at any time, for drawing the music line
+or previewing; `zoomAt` gives a segment's scale and focus, and `waveAt` one
+wave's value. A resolved segment has its `zoom` (focus in pixels, scale keys on
+the timeline) or null; an overlay its `segment` (or null), `width`/`height`,
+`wave` (each axis with its timeline `origin`) and `opacity` keys; a line with
+its own sound its `in`, `out` and `filters`; a clip its `filters`.
 
 Errors have a `code`, a `message`, and usually the item `id` and `field`:
 
@@ -234,4 +467,8 @@ Errors have a `code`, a `message`, and usually the item `id` and `field`:
 | `keyframes-unordered` | Keyframes go back in time |
 | `out-past-media` | An `out` is past the probed media length |
 | `length-mismatch` | `meta.length` differs from the segments' total |
+| `outside-segment` | A zoom key or an overlay in a segment is outside that segment |
+| `bad-value` | A number is out of its range (a scale below 1, an opacity over 1, a filter's bits) |
+| `unknown-item` | An extension removes, or places a segment after, an id its base doesn't have, or its base can't be read |
+| `extends-cycle` | Cuts extend each other in a loop |
 | `duplicate-id`, `bad-id`, `unknown-segment`, `loop-needs-length`, `conflicting-fields`, `no-segments`, `bad-shape` | As named |
