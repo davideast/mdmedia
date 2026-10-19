@@ -1,0 +1,224 @@
+<title>Lunch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: printed comic pages, 2:3, stacked down the screen like a trade
+   paperback; lettering scales with the page so it stays the same size on it. */
+:root {
+  --bg: #e4e7ec;
+  --page: #ffffff;
+  --ink: #111318;
+  --muted: #5c6370;
+  --caption: #fff3b0;
+  --balloon: #ffffff;
+  --accent: #1f4e9c;
+  --gold: #f2b632;
+  --font-letter: "Comic Neue", "Comic Sans MS", "Trebuchet MS", sans-serif;
+  --font-display: "Bangers", "Impact", sans-serif;
+  --font-ui: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #101318; --muted: #a0a8b6; --accent: #8db0f0; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #101318; --muted: #a0a8b6; --accent: #8db0f0; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 1rem/1.5 var(--font-ui); padding-inline: 16px; padding-block: 1.5rem 3rem; }
+.book { max-width: 44rem; margin-inline: auto; display: grid; gap: 2rem; width: 100%; }
+header { display: grid; gap: 0.35rem; }
+header .kicker { font: 700 0.72rem/1 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+header h1 { margin: 0; font: 400 clamp(2rem, 7vw, 3.2rem)/0.95 var(--font-display); letter-spacing: 0.02em; color: var(--muted); }
+header h1 b { color: var(--accent); font-weight: 400; }
+header p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 34rem; }
+
+.page {
+  position: relative; width: 100%; aspect-ratio: 2 / 3; background: var(--page);
+  container-type: inline-size; box-shadow: 0 2px 0 rgb(0 0 0 / 0.08), 0 18px 40px rgb(0 0 0 / 0.18);
+}
+.folio { position: absolute; bottom: 0.35cqw; right: 1.6cqw; font: 700 1.3cqw/1 var(--font-ui); color: #8a909b; }
+.panel { position: absolute; overflow: hidden; border: 0.45cqw solid var(--ink); background: #f3f4f6; }
+.panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.panel svg.tails { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.panel svg.tails path { fill: var(--balloon); stroke: var(--ink); stroke-width: 0.28cqw; stroke-linejoin: round; }
+
+.item { position: absolute; color: #111318; }
+.caption {
+  background: var(--caption); border: 0.28cqw solid #111318; padding: 0.7cqw 1.1cqw;
+  font: 700 2.05cqw/1.18 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
+}
+.balloon {
+  background: var(--balloon); border: 0.28cqw solid #111318; border-radius: 50% / 46%;
+  padding: 1.6cqw 2.4cqw; text-align: center;
+  font: 700 2.05cqw/1.16 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
+}
+.balloon.small { font-size: 1.6cqw; }
+.balloon.long { border-radius: 3.2cqw; }
+.sfx {
+  font: 400 6cqw/1 var(--font-display); color: var(--gold); letter-spacing: 0.04em;
+  -webkit-text-stroke: 0.3cqw #111318; text-shadow: 0.5cqw 0.5cqw 0 #111318; transform: rotate(-10deg);
+}
+.order { display: none; }
+.show-order .order {
+  display: grid; place-items: center; position: absolute; top: -1.4cqw; left: -1.4cqw; width: 2.8cqw; height: 2.8cqw;
+  border-radius: 50%; background: var(--accent); color: #fff; font: 700 1.5cqw/1 var(--font-ui);
+}
+.tools { display: flex; gap: 1rem; align-items: center; color: var(--muted); font-size: 0.85rem; }
+.tools label { display: flex; gap: 0.4rem; align-items: center; cursor: pointer; }
+footer { color: var(--muted); font-size: 0.85rem; display: grid; gap: 0.4rem; border-top: 2px dashed color-mix(in srgb, var(--muted) 40%, transparent); padding-top: 1rem; }
+footer p { margin: 0; max-width: 40rem; }
+</style>
+
+<div class="book">
+  <header>
+    <div class="kicker">The Most Embarrassing Day of My Life · Format test</div>
+    <h1><b>Lunch</b>, as a comic</h1>
+    <p id="dek"></p>
+    <div class="tools"><label for="order"><input id="order" type="checkbox"> Show reading order</label></div>
+  </header>
+  <main id="pages" class="book"></main>
+  <footer>
+    <p>Prototype. The page, panel shapes, balloons, tails and captions are laid out by code from a comic script; the art is drawn by gemini-3-pro-image against the same character sheet as the first version, with headroom left for the lettering.</p>
+  </footer>
+</div>
+
+<script>
+const COMIC = /*DATA*/null;
+const $ = (id) => document.getElementById(id);
+$('dek').textContent = `${COMIC.pages.length} page${COMIC.pages.length > 1 ? 's' : ''}, ${COMIC.panels.length} panels, ${COMIC.panels.reduce((n, p) => n + p.items.length, 0)} captions and balloons. Lettering is live text laid out by the page.`;
+
+function buildPage(page) {
+  const el = document.createElement('section');
+  el.className = 'page';
+  el.setAttribute('aria-label', `Page ${page.page}`);
+  const { w: PW, h: PH } = COMIC.page;
+  for (const p of COMIC.panels.filter((x) => x.page === page.page)) {
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    Object.assign(panel.style, { left: `${(p.x / PW) * 100}%`, top: `${(p.y / PH) * 100}%`, width: `${(p.w / PW) * 100}%`, height: `${(p.h / PH) * 100}%` });
+    const img = document.createElement('img');
+    img.alt = p.note; img.src = `img/${String(p.id).padStart(2, '0')}.webp`; img.decoding = 'async';
+    panel.append(img);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('tails');
+    panel.append(svg);
+    let n = 0;
+    for (const item of p.items) {
+      const d = document.createElement('div');
+      d.className = `item ${item.kind}` + (item.kind === 'balloon' && item.tone === 'small' ? ' small' : '') + (item.kind !== 'sfx' && item.text.length > 60 ? ' long' : '');
+      d.textContent = item.text;
+      d.dataset.who = item.who ?? '';
+      const o = document.createElement('span'); o.className = 'order'; o.textContent = String(++n); d.append(o);
+      panel.append(d);
+    }
+    panel._data = p;
+    el.append(panel);
+  }
+  const folio = document.createElement('div'); folio.className = 'folio'; folio.textContent = String(page.page); el.append(folio);
+  return el;
+}
+
+// Lettering layout. Heads come from a vision pass (faces.json), mapped through
+// the panel's object-fit crop. Each item, in reading order, takes the best
+// free spot: never over a head or another item, never before the item it
+// follows, as high as possible, captions toward the left, balloons near their
+// speaker. Tails end just short of the speaker's head.
+const SIDE = { left: 0.27, center: 0.5, right: 0.73 };
+function headsIn(panel, W, H) {
+  const p = panel._data, img = panel.querySelector('img');
+  const iw = img.naturalWidth || W, ih = img.naturalHeight || H;
+  const s = Math.max(W / iw, H / ih), dx = (W - iw * s) / 2, dy = (H - ih * s) / 2;
+  return (p.faces ?? []).map((f) => {
+    const [y0, x0, y1, x1] = f.box;
+    return { name: f.name, x: dx + x0 * iw * s, y: dy + y0 * ih * s, w: (x1 - x0) * iw * s, h: (y1 - y0) * ih * s };
+  });
+}
+const overlap = (a, b) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+
+function letterPanel(panel) {
+  const p = panel._data;
+  const W = panel.clientWidth, H = panel.clientHeight;
+  if (!W || !H) return;
+  const pad = W * 0.025, gap = W * 0.018;
+  const heads = headsIn(panel, W, H);
+  const keepOut = heads.map((h) => ({ x: h.x - W * 0.01, y: h.y - H * 0.02, w: h.w + W * 0.02, h: h.h + H * 0.03 }));
+  const items = [...panel.querySelectorAll('.item')];
+  const maxW = (W > H * 1.3 ? 0.4 : 0.62) * W;
+  for (const it of items) { it.style.maxWidth = `${it.classList.contains('sfx') ? W * 0.5 : maxW}px`; it.style.left = '0px'; it.style.top = '0px'; }
+  const placed = [];
+  let prev = null;
+  for (const it of items) {
+    const w = it.offsetWidth, h = it.offsetHeight;
+    const isBalloon = it.classList.contains('balloon'), isSfx = it.classList.contains('sfx');
+    const head = heads.find((x) => x.name === it.dataset.who);
+    const sideX = (SIDE[p.positions[it.dataset.who]] ?? 0.5) * W;
+    let best = null;
+    for (let pass = 0; pass < 2 && !best; pass++) {
+      for (let y = pad; y + h <= H - pad; y += H * 0.02) {
+        for (let x = pad; x + w <= W - pad; x += W * 0.02) {
+          const box = { x, y, w, h };
+          if (placed.some((q) => overlap({ x: q.x - gap, y: q.y - gap, w: q.w + 2 * gap, h: q.h + 2 * gap }, box) > 0)) continue;
+          if (pass === 0 && prev && !isSfx) {
+            const below = y >= prev.y + prev.h * 0.6;
+            const beside = y >= prev.y - h * 0.4 && x >= prev.x + prev.w + gap * 0.5;
+            if (!below && !beside) continue;
+          }
+          const faceHit = keepOut.reduce((n, k) => n + overlap(k, box), 0) / (w * h);
+          if (pass === 0 && faceHit > 0) continue;
+          let score = y / H + faceHit * 20;
+          if (isSfx) score = Math.abs(y + h / 2 - H * 0.45) / H + faceHit * 20;
+          else if (isBalloon) {
+            const tx = head ? head.x + head.w / 2 : sideX;
+            score += Math.abs(x + w / 2 - tx) / W * 0.8;
+            // Balloons belong above or beside the speaker's head, not under it.
+            if (head && y + h / 2 > head.y + head.h * 0.5) score += 0.6;
+          } else score += x / W * 0.6;
+          if (!best || score < best.score) best = { x, y, w, h, score };
+        }
+      }
+    }
+    best ??= { x: pad, y: pad, w, h };
+    placed.push({ ...best, it, head });
+    if (!isSfx) prev = best;
+  }
+
+  const svg = panel.querySelector('svg.tails');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.textContent = '';
+  for (const b of placed) {
+    b.it.style.left = `${b.x}px`; b.it.style.top = `${b.y}px`;
+    if (!b.it.classList.contains('balloon')) continue;
+    let tip;
+    if (b.head) {
+      const hx = b.head.x + b.head.w / 2;
+      tip = b.y + b.h < b.head.y
+        ? { x: Math.max(b.head.x + b.head.w * 0.2, Math.min(b.head.x + b.head.w * 0.8, b.x + b.w / 2)), y: b.head.y - H * 0.015 }
+        : { x: b.x + b.w / 2 < hx ? b.head.x - W * 0.012 : b.head.x + b.head.w + W * 0.012, y: b.head.y + b.head.h * 0.45 };
+    } else {
+      const side = p.positions[b.it.dataset.who];
+      tip = side ? { x: SIDE[side] * W, y: Math.min(H * 0.55, b.y + b.h + H * 0.1) } : { x: b.x + b.w / 2 < W / 2 ? 0 : W, y: b.y + b.h + H * 0.06 };
+    }
+    // Base: the point on the balloon's edge facing the tip.
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+    const ang = Math.atan2(tip.y - cy, tip.x - cx);
+    const bx = cx + Math.cos(ang) * b.w * 0.4, by = cy + Math.sin(ang) * b.h * 0.4;
+    const len = Math.hypot(tip.x - bx, tip.y - by);
+    if (len < 1) continue;
+    const maxLen = H * 0.16;
+    // Every tail reaches at least a little past the balloon so it reads as a tail.
+    const minLen = H * 0.045;
+    const k = len > maxLen ? maxLen / len : len < minLen ? minLen / len : 1;
+    const tx = bx + (tip.x - bx) * k, ty = by + (tip.y - by) * k;
+    const nx = -Math.sin(ang), ny = Math.cos(ang), half = Math.min(b.w, b.h) * 0.16;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${bx + nx * half} ${by + ny * half} Q ${(bx + tx) / 2} ${(by + ty) / 2} ${tx} ${ty} Q ${(bx + tx) / 2 + nx * half * 0.3} ${(by + ty) / 2 + ny * half * 0.3} ${bx - nx * half} ${by - ny * half} Z`);
+    svg.append(path);
+  }
+}
+
+const pagesEl = $('pages');
+for (const page of COMIC.pages) pagesEl.append(buildPage(page));
+const letterAll = () => document.querySelectorAll('.panel').forEach(letterPanel);
+Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]).then(letterAll);
+new ResizeObserver(letterAll).observe(pagesEl);
+$('order').addEventListener('change', (e) => document.body.classList.toggle('show-order', e.target.checked));
+</script>

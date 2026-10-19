@@ -26,6 +26,8 @@ const STYLES: Record<string, string> = {
 
 const args = Bun.argv.slice(2);
 const letter = args.includes('--letter');
+// --bleed: the page draws borders, so the art must fill the image edge to edge.
+const bleed = args.includes('--bleed');
 const [panelsPath, outDir, style, model = 'gemini-3-pro-image'] = args.filter((a) => !a.startsWith('--'));
 if (!panelsPath || !outDir || !style || !STYLES[style]) {
   console.error(`usage: bun spikes/story/tools/art.ts <panels.json> <out dir> <${Object.keys(STYLES).join('|')}> [model] [--letter]`);
@@ -109,7 +111,7 @@ await Promise.all(
           '. Spell every word exactly.'
         : 'No text anywhere: no speech bubbles, captions, sound effects, signs or writing.';
       const prompt =
-        `${STYLES[style]}. One comic panel. ${panel.shot}. ` +
+        `${STYLES[style]}. ${bleed ? 'One full-bleed illustration that fills the whole image edge to edge: no border, frame, boxes, panels or blank areas' : 'One comic panel'}. ${panel.shot}. ` +
         (who ? `Characters, drawn exactly as in the reference sheet: ${who}. ` : '') +
         `Setting, unless the shot says otherwise: ${settingFor(panel.from)}, at ${plan.world}. ${lettering}`;
       await draw(join(outDir, `panel-${String(panel.id).padStart(2, '0')}.png`), prompt, panel.aspect, reference);
