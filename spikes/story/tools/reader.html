@@ -1,0 +1,287 @@
+<title>The Most Embarrassing Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: one vertical comic strip down the middle, scene headings as school-bell
+   timestamps, a sticky version switcher on top and an audio deck pinned below. */
+:root {
+  --bg: #e9edf3;          /* locker-room gray-blue */
+  --paper: #fbfcfe;
+  --ink: #141a26;
+  --muted: #5b6577;
+  --wildcat-blue: #1f4e9c;
+  --wildcat-gold: #f2b632;
+  --line: #c9d1de;
+  --caption: #fde58a;
+  --bubble: #ffffff;
+  --active: #f2b632;
+  --font-display: "Bangers", "Impact", "Arial Black", sans-serif;
+  --font-letter: "Patrick Hand", "Comic Neue", "Trebuchet MS", sans-serif;
+  --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --strip: 46rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1422; --paper: #172036; --ink: #edf1f8; --muted: #9aa6bc;
+    --wildcat-blue: #7fa6ec; --wildcat-gold: #f5c45a; --line: #2a3754;
+    --caption: #fde58a; --bubble: #ffffff; --active: #f5c45a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1422; --paper: #172036; --ink: #edf1f8; --muted: #9aa6bc;
+  --wildcat-blue: #7fa6ec; --wildcat-gold: #f5c45a; --line: #2a3754;
+  --caption: #fde58a; --bubble: #ffffff; --active: #f5c45a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font: 1rem/1.5 var(--font-body);
+  padding-inline: 16px; padding-block: 0 9rem;
+}
+.wrap { max-width: var(--strip); margin-inline: auto; display: grid; gap: 1.25rem; }
+
+header.cover { padding-block: 2.5rem 0.5rem; display: grid; gap: 0.6rem; }
+.kicker { font: 700 0.75rem/1 var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--wildcat-blue); }
+h1 {
+  font: 400 clamp(2.6rem, 9vw, 4.6rem)/0.92 var(--font-display); letter-spacing: 0.02em; margin: 0;
+  text-wrap: balance; color: var(--ink);
+}
+h1 span { color: var(--wildcat-blue); -webkit-text-stroke: 0; }
+.dek { margin: 0; color: var(--muted); max-width: 36rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+.switcher {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); padding-block: 0.6rem; display: grid; gap: 0.4rem;
+}
+.versions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.versions button {
+  font: 700 0.85rem/1 var(--font-body); padding: 0.6rem 0.8rem; border-radius: 999px;
+  border: 2px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;
+}
+.versions button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.versions button:focus-visible, .deck button:focus-visible, .panel:focus-visible { outline: 3px solid var(--wildcat-gold); outline-offset: 3px; }
+.vnote { font-size: 0.8rem; color: var(--muted); margin: 0; }
+
+.scene { display: flex; align-items: baseline; gap: 0.75rem; padding-top: 1.5rem; }
+.scene time {
+  font: 400 1.6rem/1 var(--font-display); color: var(--paper); background: var(--wildcat-blue);
+  padding: 0.35rem 0.6rem 0.2rem; letter-spacing: 0.04em; transform: rotate(-2deg);
+}
+.scene small { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.8rem; }
+
+.panel {
+  position: relative; display: block; width: 100%; padding: 0; border: 3px solid var(--ink);
+  background: var(--paper); cursor: pointer; overflow: hidden; border-radius: 2px;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.panel img { display: block; width: 100%; height: auto; max-width: 100%; }
+.panel.active { box-shadow: 0 0 0 4px var(--active), 0 10px 30px rgb(0 0 0 / 0.18); }
+.panel .ph { aspect-ratio: var(--ar); display: grid; place-items: center; color: var(--muted); font-size: 0.85rem; }
+
+.letters { position: absolute; inset: 0; pointer-events: none; padding: 3%; display: flex; flex-direction: column; justify-content: space-between; gap: 2%; }
+.lettered .letters { display: none; }
+.letters .top, .letters .bottom { display: flex; flex-direction: column; gap: 0.4rem; }
+.caption {
+  align-self: flex-start; max-width: 70%; background: var(--caption); color: #141a26;
+  border: 2px solid #141a26; padding: 0.3rem 0.55rem; font: 1.05rem/1.2 var(--font-letter);
+  box-shadow: 3px 3px 0 #141a26;
+}
+.bubble {
+  max-width: 68%; background: var(--bubble); color: #141a26; border: 2px solid #141a26; border-radius: 1.2rem;
+  padding: 0.4rem 0.75rem; font: 1.1rem/1.2 var(--font-letter); position: relative;
+}
+.bubble:nth-child(odd) { align-self: flex-start; }
+.bubble:nth-child(even) { align-self: flex-end; }
+.bubble::after {
+  content: ""; position: absolute; bottom: -0.55rem; left: 1.2rem; width: 0.9rem; height: 0.9rem;
+  background: var(--bubble); border-right: 2px solid #141a26; border-bottom: 2px solid #141a26;
+  transform: rotate(45deg) skew(10deg, 10deg);
+}
+.bubble:nth-child(even)::after { left: auto; right: 1.2rem; }
+.bubble.loud { font-family: var(--font-display); font-size: 1.35rem; letter-spacing: 0.03em; border-radius: 0.4rem; border-width: 3px; }
+.bubble b { display: block; font: 700 0.62rem/1 var(--font-body); letter-spacing: 0.12em; text-transform: uppercase; color: #5b6577; margin-bottom: 0.15rem; }
+.sfx {
+  align-self: flex-end; font: 400 clamp(1.8rem, 7vw, 3rem)/1 var(--font-display); color: var(--wildcat-gold);
+  -webkit-text-stroke: 2px #141a26; text-shadow: 3px 3px 0 #141a26; transform: rotate(-8deg); letter-spacing: 0.04em;
+}
+.phone { align-self: flex-end; width: min(15rem, 62%); display: grid; gap: 0.3rem; background: #141a26; border-radius: 1rem; padding: 0.6rem; }
+.phone p { margin: 0; padding: 0.35rem 0.6rem; border-radius: 0.9rem; font: 0.85rem/1.25 var(--font-body); max-width: 85%; }
+.phone .them { background: #e5e5ea; color: #141a26; justify-self: start; }
+.phone .me { background: #2f7cf6; color: #fff; justify-self: end; }
+.phone small { color: #9aa6bc; font: 700 0.6rem/1 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; }
+
+footer.notes { color: var(--muted); font-size: 0.85rem; border-top: 2px dashed var(--line); padding-top: 1rem; display: grid; gap: 0.4rem; }
+footer.notes h2 { font: 400 1.4rem/1 var(--font-display); color: var(--ink); margin: 0; letter-spacing: 0.03em; }
+footer.notes p { margin: 0; max-width: 40rem; }
+
+.deck {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--ink); color: var(--bg);
+  padding: 0.6rem 16px calc(0.6rem + env(safe-area-inset-bottom, 0px));
+}
+.deck .row { max-width: var(--strip); margin-inline: auto; display: grid; grid-template-columns: auto 1fr auto; gap: 0.75rem; align-items: center; }
+.deck button.play {
+  width: 3rem; height: 3rem; border-radius: 50%; border: 0; background: var(--wildcat-gold); color: #141a26;
+  font: 400 1.1rem/1 var(--font-display); cursor: pointer; letter-spacing: 0.04em;
+}
+.deck .mid { min-width: 0; display: grid; gap: 0.25rem; }
+.deck .line { font: 1rem/1.25 var(--font-letter); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.25em; }
+.deck .line b { color: var(--wildcat-gold); font-family: var(--font-body); font-size: 0.7rem; letter-spacing: 0.1em; margin-right: 0.4rem; }
+.deck input[type="range"] { width: 100%; accent-color: var(--wildcat-gold); }
+.deck .time { white-space: nowrap; font: 0.75rem/1 var(--font-body); font-variant-numeric: tabular-nums; color: var(--bg); opacity: 0.8; text-align: right; display: grid; gap: 0.3rem; }
+.deck label { font-size: 0.7rem; display: flex; gap: 0.3rem; align-items: center; justify-content: flex-end; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .panel { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="cover">
+    <div class="kicker">Westfield Middle School · A story in eight bells</div>
+    <h1>The Most <span>Embarrassing</span> Day of My Life</h1>
+    <p class="dek">A middle school story about friendship, popularity, and one spectacularly bad decision. Press play and the panels follow the voices.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <nav class="switcher" aria-label="Art version">
+    <div class="versions" id="versions"></div>
+    <p class="vnote" id="vnote"></p>
+  </nav>
+
+  <main id="strip" class="wrap"></main>
+
+  <footer class="notes">
+    <h2>How this was made</h2>
+    <p>Prototype build from one markdown story file. Voices: Gemini TTS in two-speaker runs, Milo narrating in his own voice. Music: one Lyria clip per scene, ducked under speech. Art: each version draws a character sheet first, then every panel against it.</p>
+    <p id="credits"></p>
+  </footer>
+</div>
+
+<div class="deck" role="region" aria-label="Audio">
+  <div class="row">
+    <button class="play" id="play" type="button" aria-label="Play">PLAY</button>
+    <div class="mid">
+      <div class="line" id="nowline" aria-live="off"></div>
+      <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Position">
+    </div>
+    <div class="time">
+      <span id="clock">0:00</span>
+      <label for="follow"><input id="follow" type="checkbox" checked> Follow</label>
+    </div>
+  </div>
+</div>
+<audio id="audio" src="audio.mp3" preload="metadata"></audio>
+
+<script>
+const DATA = /*DATA*/null;
+
+const $ = (id) => document.getElementById(id);
+const audio = $('audio');
+const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+$('meta').textContent = '';
+for (const t of [`${fmt(DATA.durationMs)} of audio`, `${DATA.panels.length} panels`, `${DATA.versions.length} art versions`]) {
+  const s = document.createElement('span'); s.textContent = t; $('meta').append(s);
+}
+$('credits').textContent = DATA.credits;
+
+let version = DATA.versions.find((v) => v.id === store.get('version')) ?? DATA.versions[0];
+
+function lettersFor(panel) {
+  const box = document.createElement('div'); box.className = 'letters';
+  const top = document.createElement('div'); top.className = 'top';
+  const bottom = document.createElement('div'); bottom.className = 'bottom';
+  const phone = panel.text.filter((t) => t.kind === 'phone');
+  for (const t of panel.text) {
+    if (t.kind === 'caption') { const c = document.createElement('div'); c.className = 'caption'; c.textContent = t.text; top.append(c); }
+    if (t.kind === 'sfx') { const c = document.createElement('div'); c.className = 'sfx'; c.textContent = t.text; top.append(c); }
+    if (t.kind === 'bubble') {
+      const c = document.createElement('div'); c.className = 'bubble' + (t.loud ? ' loud' : '');
+      const who = document.createElement('b'); who.textContent = t.who === 'KID' || t.who === 'TECHKID' ? '' : t.who; if (who.textContent) c.append(who);
+      c.append(document.createTextNode(t.text)); bottom.append(c);
+    }
+  }
+  if (phone.length) {
+    const p = document.createElement('div'); p.className = 'phone';
+    const label = document.createElement('small'); label.textContent = 'Messages · Harper'; p.append(label);
+    for (const t of phone) { const m = document.createElement('p'); m.className = t.who === 'ME' ? 'me' : 'them'; m.textContent = t.text; p.append(m); }
+    bottom.append(p);
+  }
+  box.append(top, bottom);
+  return box;
+}
+
+const panelEls = [];
+function build() {
+  const strip = $('strip'); strip.textContent = '';
+  panelEls.length = 0;
+  let scene = -1;
+  for (const panel of DATA.panels) {
+    if (panel.scene !== scene) {
+      scene = panel.scene;
+      const s = DATA.scenes[scene];
+      const h = document.createElement('div'); h.className = 'scene';
+      const t = document.createElement('time'); t.textContent = s.title;
+      const small = document.createElement('small'); small.textContent = fmt(s.startMs);
+      h.append(t, small); strip.append(h);
+    }
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'panel' + (version.lettered ? ' lettered' : '');
+    b.setAttribute('aria-label', `Play from panel ${panel.id}: ${panel.alt}`);
+    b.style.setProperty('--ar', panel.aspect.replace(':', ' / '));
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async'; img.alt = panel.alt;
+    const [w, h] = panel.aspect.split(':').map(Number); img.width = 1000; img.height = Math.round(1000 * h / w);
+    img.src = `img/${version.id}/${String(panel.id).padStart(2, '0')}.webp`;
+    img.onerror = () => { const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = 'Panel not drawn in this version'; img.replaceWith(ph); };
+    b.append(img, lettersFor(panel));
+    b.addEventListener('click', () => { audio.currentTime = panel.startMs / 1000 + 0.01; audio.play().catch(() => {}); });
+    strip.append(b); panelEls.push(b);
+  }
+  activeIndex = -1; tick();
+}
+
+function renderVersions() {
+  const box = $('versions'); box.textContent = '';
+  for (const v of DATA.versions) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = v.label;
+    b.setAttribute('aria-pressed', String(v.id === version.id));
+    b.addEventListener('click', () => { version = v; store.set('version', v.id); renderVersions(); build(); });
+    box.append(b);
+  }
+  $('vnote').textContent = version.note;
+}
+
+let activeIndex = -1;
+function tick() {
+  const ms = audio.currentTime * 1000;
+  let i = -1; for (let k = 0; k < DATA.panels.length; k++) if (DATA.panels[k].startMs <= ms + 50) i = k;
+  if (i !== activeIndex) {
+    panelEls[activeIndex]?.classList.remove('active');
+    activeIndex = i;
+    const el = panelEls[i];
+    if (el) {
+      el.classList.add('active');
+      if ($('follow').checked && !audio.paused) {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      }
+    }
+  }
+  let line = null; for (const l of DATA.lines) if (l.startMs <= ms + 50) line = l; else break;
+  const now = $('nowline'); now.textContent = '';
+  if (line && audio.currentTime > 0) { const b = document.createElement('b'); b.textContent = line.narration ? 'MILO, NARRATING' : line.speaker; now.append(b, document.createTextNode(line.text)); }
+  $('clock').textContent = `${fmt(ms)} / ${fmt(DATA.durationMs)}`;
+  if (!seeking) $('seek').value = String(Math.round((ms / DATA.durationMs) * 1000));
+}
+
+let seeking = false;
+$('seek').addEventListener('input', () => { seeking = true; audio.currentTime = (Number($('seek').value) / 1000) * DATA.durationMs / 1000; });
+$('seek').addEventListener('change', () => { seeking = false; });
+$('play').addEventListener('click', () => { audio.paused ? audio.play().catch(() => {}) : audio.pause(); });
+audio.addEventListener('play', () => { $('play').textContent = 'PAUSE'; $('play').setAttribute('aria-label', 'Pause'); });
+audio.addEventListener('pause', () => { $('play').textContent = 'PLAY'; $('play').setAttribute('aria-label', 'Play'); });
+audio.addEventListener('timeupdate', tick);
+
+renderVersions();
+build();
+</script>

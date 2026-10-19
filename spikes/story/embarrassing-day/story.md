@@ -123,7 +123,7 @@ I grinned. Then my phone buzzed. A message from Harper.
 
 My stomach did a backflip.
 
-**MILO** *(typing, thrilled)*: Thanks!!
+**MILO** *(thrilled)*: Thanks!!
 
 Three dots appeared.
 
@@ -714,7 +714,7 @@ I'd spent months wanting the entire school to know my name.
 But somewhere along the way, I'd almost lost the one person who'd always been
 happy to say it.
 
-**JUNE** *(calling from down the hallway)*: Milo!
+**JUNE** *(shouting, far away)*: Milo!
 
 **MILO**: What?
 

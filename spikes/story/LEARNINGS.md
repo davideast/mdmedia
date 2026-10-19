@@ -131,6 +131,73 @@ was then transcribed on its own to confirm it.
 - **Quota**: checking four 12-minute renders back to back hit 429s on
   `gemini-3.5-flash`; `gemini-3.5-flash-lite` served the short transcriptions.
 
+## Run 3: a whole graphic novel with music (The Most Embarrassing Day of My Life)
+
+Input: `embarrassing-day/raw.md` (the author's text, untouched), adapted by
+hand into `embarrassing-day/story.md` (notation) and `embarrassing-day/panels.json`
+(51 panels). Output: a private reader page with four art versions, one audio
+track and panel sync.
+
+Pipeline, each step a separate throwaway tool:
+
+| Step | Tool | Result |
+|---|---|---|
+| Voices | `render.ts --mode run` | 24 calls, 19.3 min, about 2.8 min wall |
+| Check | `check.ts`, `tools/transcribe.ts` + word diff | 2 real defects found, fixed by re-rendering 2 calls |
+| Music | `tools/music.ts` (Lyria `lyria-3-clip-preview`) | 8 clips of about 30 s, 10 to 14 s each |
+| Mix | `tools/mix.ts` | 3 s music lead per scene, bed at -10 dB fading after 16 s, theme over the ending; 19.9 min |
+| Art | `tools/art.ts` | character sheet per style, then 51 panels against it; 204 panels, 0 failures |
+| Page | `tools/page.ts` + `tools/reader.html` | WebP panels, 96 kb/s MP3, timeline inlined; one Artifact publish |
+
+Findings:
+
+- **Narrator as a cast member works.** `narrator: MILO` puts narration in
+  Milo's voice, so a narration run with June is a two-speaker call. 289 lines
+  became 24 calls.
+- **Run mode loses per-line timing.** A run call returns one clip, so line
+  times inside it are estimated by character share. Good enough for panel
+  sync at this granularity; captions word-synced to audio would need forced
+  alignment or line mode.
+- **The fixed prompt format (notes "never say them aloud") still leaks
+  sometimes.** In 19 minutes: one cue read aloud ("calling from down the
+  hallway") and one duplicated line ("My stomach did a backflip" twice).
+  A re-render with a new cue then read *that* cue aloud ("typing fast,
+  thrilled"). Cues that describe an action leak more than cues that describe a
+  feeling; the third take with `(thrilled)` was clean. Leaks are per take,
+  so verification after every render is required, not a one-time fix.
+- **Transcript plus word diff is a better checker than asking a model for
+  problems.** The diff found both real defects; three other diffs were
+  transcription noise and were ruled out by transcribing short windows. The
+  model listener (flash-lite) reported one false problem and missed both.
+- **Caching makes fixes cheap.** Editing two cues in the story file
+  re-rendered 2 of 24 calls (35 s) and nothing else.
+- **Character consistency is strong** with a character sheet as the reference
+  image: outfits, hair and proportions held across 51 panels in every style.
+  Scene settings must be stated per panel or the model invents them (June's
+  cafeteria close-up first came back with a hallway behind her).
+- **Image models still write text into the art** (posters, milk cartons,
+  "REFUND") despite "no text"; harmless here.
+- **Model lettering is good in big bubbles and bad in small text.** Speech
+  bubbles were spelled right; the tiny phone screen read "autdiion" and
+  "Thankel". Page lettering stays exact and editable; model lettering looks
+  more like a comic.
+- **Flash image drew the manga version in half the time** and added spot
+  color (June's yellow cardigan) to a black-and-white style it was told to
+  keep monochrome.
+- **Lyria clips are fast and short (30 s)**, which suits scene intros and
+  beds; a continuous score would need longer songs or crossfaded clips.
+- **Quota is the practical limit.** Checks on `gemini-3.5-flash` hit 429s
+  repeatedly; `flash-lite` was available throughout.
+
+Open questions for the design:
+
+- Should panel timing come from the timeline (as here) or from the director
+  naming the line a panel starts on (also as here)? Both were needed.
+- Text placement on panels is naive (captions top, bubbles bottom). A
+  director step could name a bubble position per panel, or the art step
+  could leave space.
+- Sound effects are still untested (no ElevenLabs key).
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in
