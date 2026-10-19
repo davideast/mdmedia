@@ -87,6 +87,10 @@
     "./storage": {
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js"
+    },
+    "./cut": {
+      "types": "./dist/cut/index.d.ts",
+      "import": "./dist/cut/index.js"
     }
   },
   "bin": {
