@@ -1,0 +1,52 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "walt": {
+      "text": "WALT!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "review/clips/ch-regulars-take2.mp4", "start": 9.75, "end": 10.7, "sha256": "5b54b4737371a949d093dbe30e92c359843b788dad225bf8e91afe190616557b", "snap": "speech-onset@1" },
+      "loss": 1.334,
+      "snap": { "aligned": 9.89, "start": 9.83, "onset": 9.83, "floor": -59.4 },
+      "words": [
+        { "text": "WALT!", "start": 9.83, "end": 10.43, "loss": 1.334 }
+      ]
+    },
+    "story": {
+      "text": "What's the story, Walt?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "review/clips/ch-regulars-take2.mp4", "start": 10.7, "end": 13.042, "sha256": "5b54b4737371a949d093dbe30e92c359843b788dad225bf8e91afe190616557b", "snap": "speech-onset@1" },
+      "loss": 0.622,
+      "snap": { "aligned": 10.84, "start": 10.82, "onset": 10.82, "floor": -62 },
+      "words": [
+        { "text": "What's", "start": 10.82, "end": 11, "loss": 0.527 },
+        { "text": "the", "start": 11.02, "end": 11.12, "loss": 0.602 },
+        { "text": "story,", "start": 11.18, "end": 11.48, "loss": 0.609 },
+        { "text": "Walt?", "start": 11.58, "end": 11.88, "loss": 0.827 }
+      ]
+    },
+    "same": {
+      "text": "Same as yesterday, Eddie.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg3-walt-lines-t2.mp4", "start": 0.542, "end": 2.342, "sha256": "843f695a265cb77635ac58a82f12c2d0ed22c3f40255b358e4913c4c35f35b1e", "snap": "speech-onset@1" },
+      "loss": 0.664,
+      "snap": { "aligned": 0.702, "start": 0.622, "onset": 0.622, "floor": -63 },
+      "words": [
+        { "text": "Same", "start": 0.622, "end": 0.882, "loss": 0.598 },
+        { "text": "as", "start": 0.922, "end": 1.022, "loss": 0.731 },
+        { "text": "yesterday,", "start": 1.062, "end": 1.522, "loss": 0.666 },
+        { "text": "Eddie.", "start": 1.602, "end": 1.822, "loss": 0.669 }
+      ]
+    },
+    "stool": {
+      "text": "Different stool.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg3-walt-lines-t2.mp4", "start": 2.342, "end": 3.4, "sha256": "843f695a265cb77635ac58a82f12c2d0ed22c3f40255b358e4913c4c35f35b1e", "snap": "speech-onset@1" },
+      "loss": 0.836,
+      "snap": { "aligned": 2.442, "start": 2.432, "onset": 2.432, "floor": -62.7 },
+      "words": [
+        { "text": "Different", "start": 2.432, "end": 2.682, "loss": 0.736 },
+        { "text": "stool.", "start": 2.822, "end": 3.142, "loss": 0.976 }
+      ]
+    }
+  }
+}

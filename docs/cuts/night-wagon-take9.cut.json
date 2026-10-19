@@ -11,7 +11,7 @@
     "notes": "Take 8 opening straight on the road: a cold open with no title, the argument, the halt, the punchline over Rick's stunned face, then the title over the road as the outro, on the theme. Ported from crt/nw9/edit.mjs."
   },
   "media": {
-    "root": "/tmp/claude-1000/-home-david-repos-davideast-satisfy-md/366e8408-4b0c-4005-96b5-3535166ca34f/scratchpad/crt",
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
     "takes": "takes/{name}.mp4"
   },
   "output": "takes/night-wagon-take9.mp4",

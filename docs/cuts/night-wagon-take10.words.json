@@ -1,0 +1,143 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "getaway": {
+      "text": "They're getting away, Buddy.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/nw7-rick-lines-t1.mp4", "start": 0.45, "end": 1.75, "sha256": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8", "snap": "speech-onset@1" },
+      "loss": 0.716,
+      "snap": { "aligned": 0.63, "start": 0.63, "onset": 0.64, "floor": -44.4 },
+      "words": [
+        { "text": "They're", "start": 0.63, "end": 0.75, "loss": 0.701 },
+        { "text": "getting", "start": 0.79, "end": 0.97, "loss": 0.558 },
+        { "text": "away,", "start": 1.05, "end": 1.27, "loss": 0.839 },
+        { "text": "Buddy.", "start": 1.37, "end": 1.61, "loss": 0.823 }
+      ]
+    },
+    "bridge": {
+      "text": "The bridge ahead is out, Rick.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/b2.wav", "start": 0, "end": 1.5, "sha256": "bd34aba19d732ccbef3e5b4770051a374dac3b0922598b8dc55f2fbab59752b4", "snap": "speech-onset@1" },
+      "loss": 0.513,
+      "snap": { "aligned": 0.1, "start": 0.06, "onset": 0.06, "floor": -56.1 },
+      "words": [
+        { "text": "The", "start": 0.06, "end": 0.14, "loss": 0.694 },
+        { "text": "bridge", "start": 0.24, "end": 0.48, "loss": 0.526 },
+        { "text": "ahead", "start": 0.54, "end": 0.76, "loss": 0.527 },
+        { "text": "is", "start": 0.8, "end": 0.92, "loss": 0.504 },
+        { "text": "out,", "start": 1, "end": 1.16, "loss": 0.534 },
+        { "text": "Rick.", "start": 1.24, "end": 1.46, "loss": 0.403 }
+      ]
+    },
+    "jump": {
+      "text": "Then we jump it.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/nw7-rick-lines-t1.mp4", "start": 2.65, "end": 3.5, "sha256": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8", "snap": "speech-onset@1" },
+      "loss": 0.501,
+      "snap": { "aligned": 2.83, "start": 2.83, "onset": 2.83, "floor": -44.8 },
+      "words": [
+        { "text": "Then", "start": 2.83, "end": 2.95, "loss": 0.62 },
+        { "text": "we", "start": 2.99, "end": 3.13, "loss": 0.626 },
+        { "text": "jump", "start": 3.19, "end": 3.39, "loss": 0.547 },
+        { "text": "it.", "start": 3.43, "end": 3.47, "loss": 0.182 }
+      ]
+    },
+    "gap": {
+      "text": "Rick, it's a forty-foot gap.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/b4.wav", "start": 0, "end": 1.85, "sha256": "4cd21f6ff5b0fb353f91ef249b0866f3fefe468b97f4e515c98fae8cda1e72eb", "snap": "speech-onset@1" },
+      "loss": 0.562,
+      "snap": { "aligned": 0.12, "start": 0.08, "onset": 0.08, "floor": -99.8 },
+      "words": [
+        { "text": "Rick,", "start": 0.08, "end": 0.34, "loss": 0.486 },
+        { "text": "it's", "start": 0.78, "end": 0.88, "loss": 0.512 },
+        { "text": "a", "start": 0.92, "end": 0.96, "loss": 0.294 },
+        { "text": "forty-foot", "start": 1.02, "end": 1.44, "loss": 0.626 },
+        { "text": "gap.", "start": 1.56, "end": 1.82, "loss": 0.663 }
+      ]
+    },
+    "boost": {
+      "text": "We need to turbo boost!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/nw7-rick-lines-t1.mp4", "start": 4.95, "end": 6.2, "sha256": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8", "snap": "speech-onset@1" },
+      "loss": 0.689,
+      "snap": { "aligned": 5.15, "start": 5.14, "onset": 5.14, "floor": -45.5 },
+      "words": [
+        { "text": "We", "start": 5.14, "end": 5.21, "loss": 0.809 },
+        { "text": "need", "start": 5.25, "end": 5.37, "loss": 0.468 },
+        { "text": "to", "start": 5.39, "end": 5.51, "loss": 0.769 },
+        { "text": "turbo", "start": 5.55, "end": 5.85, "loss": 0.721 },
+        { "text": "boost!", "start": 5.93, "end": 6.17, "loss": 0.708 }
+      ]
+    },
+    "cant": {
+      "text": "Rick, we can't.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/b6.wav", "start": 0, "end": 0.9, "sha256": "1e72f93f00920ab09b190bf183e42b1cd6f4e6d414e8f2977f876c4053dd1886", "snap": "speech-onset@1" },
+      "loss": 0.641,
+      "snap": { "aligned": 0.1, "start": 0.1, "onset": 0.1, "floor": -86.6 },
+      "words": [
+        { "text": "Rick,", "start": 0.1, "end": 0.3, "loss": 0.526 },
+        { "text": "we", "start": 0.44, "end": 0.52, "loss": 0.577 },
+        { "text": "can't.", "start": 0.58, "end": 0.86, "loss": 0.807 }
+      ]
+    },
+    "notime": {
+      "text": "There's no time!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/nw7-rick-lines-t1.mp4", "start": 7.45, "end": 8.5, "sha256": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8", "snap": "speech-onset@1" },
+      "loss": 0.675,
+      "snap": { "aligned": 7.63, "start": 7.63, "onset": 7.64, "floor": -43.9 },
+      "words": [
+        { "text": "There's", "start": 7.63, "end": 7.79, "loss": 0.598 },
+        { "text": "no", "start": 7.83, "end": 8.01, "loss": 0.869 },
+        { "text": "time!", "start": 8.07, "end": 8.45, "loss": 0.781 }
+      ]
+    },
+    "no": {
+      "text": "Rick. No. We can't.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/b8.wav", "start": 0, "end": 2.1, "sha256": "c024fd898f9355cfb74c20b84606f676d7b4a103e214fe8882a52ddeae9e8b16", "snap": "speech-onset@1" },
+      "loss": 0.685,
+      "snap": { "aligned": 0.1, "start": 0.08, "onset": 0.08, "floor": -101.6 },
+      "words": [
+        { "text": "Rick.", "start": 0.08, "end": 0.3, "loss": 0.457 },
+        { "text": "No.", "start": 0.86, "end": 1.04, "loss": 0.822 },
+        { "text": "We", "start": 1.56, "end": 1.64, "loss": 0.329 },
+        { "text": "can't.", "start": 1.7, "end": 1.96, "loss": 0.814 }
+      ]
+    },
+    "turbo": {
+      "text": "TURBO... BOOST!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/nw7-rick-yell-t1.mp4", "start": 1.75, "end": 2.95, "sha256": "f9e5576e9e98ea1fb2e84b11b00bc0bdabfbfc2a4cd7a696ddb1de7e4128fb2b", "snap": "speech-onset@1" },
+      "loss": 1.029,
+      "snap": { "aligned": 2.11, "start": 2.11, "onset": 2.11, "floor": -43.5 },
+      "words": [
+        { "text": "TURBO...", "start": 2.11, "end": 2.51, "loss": 1.058 },
+        { "text": "BOOST!", "start": 2.65, "end": 2.91, "loss": 1.013 }
+      ]
+    },
+    "flashers": {
+      "text": "Rick. I'm a station wagon. ... And that button is for the flashers.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/b12b.wav", "start": 0, "end": 5.1548, "sha256": "a14a2cbe103e38a23332db41b3ece3b9c87a556809b5abf077fbab9cbdc1cf77", "snap": "speech-onset@1" },
+      "loss": 0.623,
+      "snap": { "aligned": 0.12, "start": 0.06, "onset": 0.06, "floor": -101.5 },
+      "words": [
+        { "text": "Rick.", "start": 0.06, "end": 0.36, "loss": 0.762 },
+        { "text": "I'm", "start": 0.96, "end": 1.02, "loss": 0.603 },
+        { "text": "a", "start": 1.08, "end": 1.12, "loss": 0.332 },
+        { "text": "station", "start": 1.2, "end": 1.56, "loss": 0.373 },
+        { "text": "wagon.", "start": 1.62, "end": 2.06, "loss": 0.763 },
+        { "text": "And", "start": 2.76, "end": 2.84, "loss": 0.631 },
+        { "text": "that", "start": 2.9, "end": 3.12, "loss": 0.705 },
+        { "text": "button", "start": 3.16, "end": 3.72, "loss": 0.505 },
+        { "text": "is", "start": 3.78, "end": 3.9, "loss": 0.462 },
+        { "text": "for", "start": 3.94, "end": 4.04, "loss": 0.446 },
+        { "text": "the", "start": 4.08, "end": 4.16, "loss": 0.295 },
+        { "text": "flashers.", "start": 4.22, "end": 4.82, "loss": 0.639 }
+      ]
+    }
+  }
+}

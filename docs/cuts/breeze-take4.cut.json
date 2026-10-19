@@ -1,0 +1,104 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Breeze mints",
+    "show": "breeze",
+    "version": "Take 4 (The Blowout)",
+    "length": 30.65,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "A date goes wrong in public: the convertible blows a tyre (our BANG), the tyre sags, she rolls her eyes, a mint rises out of the roll under our NEW! burst and BREEZE label, he chews, grins and winks, the blanket goes over the hood and her head settles on his shoulder, all under the jingle, which ducks under the bang and the announcer over the sunset wide. The music drops out on the cut to the tow truck; crickets through the trucker's deadpan stare, the sit-down, the open palm and the Breeze put in it; the sung \"Feel the Breeze!\" comes in as his head lands on the hero's shoulder and carries into Take 3's packshot with our BREEZE logo and Turn your day around!. Ported from br4/edit.mjs. Nobody speaks on camera: the only voice is the announcer (br-vo.wav); every other line is sung in the jingle. Not expressible yet, written as the closest equivalent: a line heard in a music clip (the sung lyrics are lines on the jingle file at volume 0, so they mark where they're sung and carry word timings while the jingle and sting clips carry the sound), and a line kept in step with its music clip (each sung line's in is fixed to the jingle's own clock, so moving the jingle doesn't move them)."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/breeze-take4.mp4",
+
+  "segments": [
+    { "id": "hook", "label": "The camera car ahead of the convertible at sunset", "src": "take:br4-hook-t1", "in": 1.84, "out": 3.95,
+      "audio": { "volume": 0.3 } },
+    { "id": "blow", "label": "Continuous: BANG, a wobble, onto the gravel", "src": "take:br4-blowout-t1", "in": 0, "out": 2.6,
+      "audio": { "volume": 0.45 } },
+    { "id": "flat", "label": "Insert: the tyre on its rim", "src": "take:br4-flat-t1", "in": 0.5, "out": 1.3,
+      "audio": { "volume": 0.3 } },
+    { "id": "her", "label": "Her: eye roll, arms fold, sigh", "src": "take:br4-her-t2", "in": 0.6, "out": 2.15,
+      "audio": { "volume": 0.3 } },
+    { "id": "roll", "label": "Insert: the mint rises out of the roll; his other hand takes it", "src": "take:br4-roll-t3", "in": 1.0, "out": 3.35,
+      "audio": { "volume": 0.3 } },
+    { "id": "him", "label": "Him, already chewing: turns to camera, grin, wink", "src": "take:br4-him-t2", "in": 2.0, "out": 3.85,
+      "audio": { "volume": 0.3 } },
+    { "id": "blanket", "label": "The blanket flicked over the hood", "src": "take:br4-blanket-t1", "in": 1.2, "out": 2.8,
+      "audio": { "volume": 0.35 } },
+    { "id": "hood", "label": "Both on the hood: her head settles on his shoulder", "src": "take:br4-hood-t2", "in": 1.4, "out": 3.05,
+      "audio": { "volume": 0.3 } },
+    { "id": "wide", "label": "Wide: silhouettes against the sun", "src": "take:br4-wide-t1", "in": 0.2, "out": 3.05,
+      "audio": { "volume": 0.25 } },
+
+    { "id": "truck", "label": "Music out: the tow truck pulls up behind them", "src": "take:br4-truck-t1", "in": 2.1, "out": 4.2,
+      "audio": { "volume": 0.9 } },
+    { "id": "look", "label": "The trucker's deadpan stare, a beat", "src": "take:br4-trucker-t1", "in": 0.3, "out": 1.95,
+      "audio": { "volume": 0.8 } },
+    { "id": "sit", "label": "He walks in and sits down beside them", "src": "take:br4-sit-t4", "in": 2.15, "out": 4.35,
+      "audio": { "volume": 0.8 } },
+    { "id": "palm", "label": "Without looking, the open palm", "src": "take:br4-palm-t2", "in": 1.0, "out": 1.95,
+      "audio": { "volume": 0.8 } },
+    { "id": "give", "label": "Insert: the hero puts a Breeze in it", "src": "take:br4-give-t1", "in": 1.15, "out": 2.65,
+      "audio": { "volume": 0.8 } },
+    { "id": "tag", "label": "Chewing, his head on the hero's shoulder", "src": "take:br4-tag-t1", "in": 1.6, "out": 3.99,
+      "audio": { "volume": 0.7 } },
+    { "id": "pack", "label": "Take 3's packshot", "src": "take:br3-s7-t1", "in": 0, "out": 2.5, "audio": false }
+  ],
+
+  "lines": [
+    { "id": "wrong", "speaker": "Jingle", "text": "When the day goes wrong,", "src": "audio/breeze-jingle.mp3",
+      "at": "jingle+3.16", "in": 4.66, "out": 8.4, "volume": 0 },
+    { "id": "cool1", "speaker": "Jingle", "text": "keep it cool, turn it round,", "src": "audio/breeze-jingle.mp3",
+      "at": "jingle+6.9", "in": 8.4, "out": 10.5, "volume": 0 },
+    { "id": "cool2", "speaker": "Jingle", "text": "keep it cool, turn it round,", "src": "audio/breeze-jingle.mp3",
+      "at": "jingle+9", "in": 10.5, "out": 12.8, "volume": 0 },
+    { "id": "wholeday", "speaker": "Jingle", "text": "turn your whole day around.", "src": "audio/breeze-jingle.mp3",
+      "at": "jingle+11.3", "in": 12.8, "out": 16.21, "volume": 0 },
+    { "id": "vo", "speaker": "Announcer", "text": "Breeze. The fresh mint that turns your day around.", "src": "audio/tts/br-vo.wav",
+      "at": "wide+0.2", "duration": 2.74, "volume": 1.3 },
+    { "id": "feel", "speaker": "Jingle", "text": "Feel the Breeze!", "src": "audio/breeze-jingle.mp3",
+      "at": "sting", "in": 21.55, "out": 25.49, "volume": 0 }
+  ],
+
+  "music": [
+    { "id": "jingle", "label": "The jingle under the setup, ducked under the bang and the announcer, out on the truck",
+      "src": "audio/breeze-jingle.mp3", "in": 1.5, "at": 0, "until": "truck", "fadeOut": 0.12,
+      "volume": [
+        { "at": "bang-0.03", "value": 0.8 },
+        { "at": "bang-0.03", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.16 }
+      ] },
+    { "id": "sting", "label": "Sung \"Feel the Breeze!\" as the trucker's head lands", "src": "audio/breeze-jingle.mp3",
+      "in": 21.55, "at": "tag+0.95", "until": "@end", "volume": 0.85, "fadeIn": 0.05, "fadeOut": 0.5 }
+  ],
+
+  "sfx": [
+    { "id": "bang", "label": "BANG", "src": "audio/br4-bang.mp3", "at": "blow+1.05", "duration": 1.48, "volume": 1.3 },
+    { "id": "hiss", "label": "Tyre hiss", "src": "audio/br4-hiss.mp3", "at": "flat+0.05", "duration": 2.0, "volume": 0.5 },
+    { "id": "truckfx", "label": "The tow truck pulls up", "src": "audio/br4-truck.mp3", "at": "truck+0.1", "duration": 4.0, "volume": 0.5 },
+    { "id": "crickets", "label": "Crickets through the silence, until the sting", "src": "audio/br4-crickets.mp3",
+      "at": "truck", "until": "sting+0.3", "volume": 0.55, "fadeIn": 0.4, "fadeOut": 0.3 }
+  ],
+
+  "overlays": [
+    { "id": "neww", "label": "NEW! burst", "src": "br4/new.png", "segment": "roll", "at": 0.35, "until": 1.35,
+      "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "label", "label": "BREEZE label, off before the second hand comes in", "src": "br4/label.png", "segment": "roll",
+      "at": 0.45, "until": 1.35, "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "logo", "label": "BREEZE logo", "src": "br3/logo.png", "segment": "pack", "at": 0.15,
+      "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "tagline", "label": "Turn your day around!", "src": "br3/tag.png", "segment": "pack", "at": 0.9,
+      "fadeIn": 0.12, "fadeOut": 0.1 }
+  ],
+
+  "picture": { "fadeOut": 0.35 }
+}

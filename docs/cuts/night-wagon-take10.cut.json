@@ -11,7 +11,7 @@
     "notes": "Take 9 with the longer punchline. The first half plays over Rick's stunned face, the second over his hand still on the red button, then the wagon at the edge with its hazards blinking to a relay tick-tock, then the title outro. Ported from crt/nw10/edit.mjs."
   },
   "media": {
-    "root": "/tmp/claude-1000/-home-david-repos-davideast-satisfy-md/366e8408-4b0c-4005-96b5-3535166ca34f/scratchpad/crt",
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
     "takes": "takes/{name}.mp4"
   },
   "output": "takes/night-wagon-take10.mp4",

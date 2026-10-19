@@ -1,0 +1,16 @@
+{
+  "format": "mdmedia.cut@1",
+  "extends": "bellamy-ranch-take6",
+  "meta": {
+    "version": "Take 6 (shot by shot, freeze on Rex)",
+    "notes": "Take 6 with the other ending: no cut to her stunned face; the sting lands on Rex's smirk, which runs on and freezes. Ported from bellamy6/edit.mjs rex."
+  },
+  "output": "takes/bellamy-take6-rex.mp4",
+
+  "remove": ["smirk"],
+  "segments": [
+    { "id": "freeze", "label": "Rex's smirk, frozen", "src": "take:bel6-rex-t1", "in": 3.32, "out": 4.2,
+      "end": "sting.end", "fadeOut": 0.5,
+      "audio": { "src": "take:bel6-gasp-t1", "in": 1.0, "out": 2.8, "volume": 0.5 } }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Bellamy Ranch",
+    "show": "bellamy-ranch",
+    "version": "Take 6 (shot by shot)",
+    "length": 25.47,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Take 5's titles, threat and doors, then her reaction runs straight on: she whips round as he says her name, gasps on the first frame of the reverse, the flute slips and shatters, and only then does she speak. A beat, Rex's deadpan joke, and Take 5's organ sting from the instant it ends, over his smirk and then her stunned push-in, frozen. Ported from bellamy6/edit.mjs (the default 'her' freeze; bellamy-ranch-take6-rex is the 'rex' one). \"Hello, Victoria.\" and \"Rex?\" are laid from their takes as J- and L-cuts: each line carries its own stretch of its take."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/bellamy-take6.mp4",
+
+  "segments": [
+    { "id": "titles", "label": "Opening titles, theme full", "src": "take:bellamy-1-t1", "in": 0, "out": 8 },
+    { "id": "threat", "label": "Victoria: the threat", "src": "take:bel5-s1-t1", "in": 0.3, "out": 3.7 },
+    { "id": "doors", "label": "The doors open, Rex in the doorway", "src": "take:bel5-s2-t1", "in": 0, "out": 2.5 },
+
+    { "id": "turn", "label": "She whips round", "src": "take:bel6-turn-t2", "in": 0, "out": 0.55,
+      "audio": { "src": "take:bel6-gasp-t1", "in": 1.0 } },
+    { "id": "gasp", "label": "Reverse: her gasp", "src": "take:bel6-gasp-t1", "in": 0.1, "out": 0.8 },
+    { "id": "hand", "label": "Her hand goes slack, the flute slips", "src": "take:bel6-drop-t1", "in": 0.3, "out": 0.85 },
+    { "id": "floor", "label": "The glass shatters on the marble", "src": "take:bel5-s5-t1", "in": 1.95, "out": 3.45 },
+    { "id": "vline", "label": "Victoria: you died", "src": "take:bel6-line-t1", "in": 1.3, "out": 3.15 },
+    { "id": "rex", "label": "Rex: a beat, then economy", "src": "take:bel6-rex-t1", "in": 0.5, "out": 3.32 },
+
+    { "id": "smirk", "label": "Rex's smirk on the first chord", "src": "take:bel6-rex-t1", "in": 3.32, "out": 3.75,
+      "audio": { "src": "take:bel6-gasp-t1", "in": 1.0, "out": 1.5, "volume": 0.5 } },
+    { "id": "freeze", "label": "Her stunned push-in, frozen", "src": "take:bel6-stunned-t1", "in": 0.2, "out": 2.0,
+      "end": "sting.end", "fadeOut": 0.5,
+      "audio": { "src": "take:bel6-gasp-t1", "in": 1.0, "out": 2.8, "volume": 0.5 } }
+  ],
+
+  "lines": [
+    { "id": "penny", "speaker": "Victoria", "text": "You'll never see a penny of the Bellamy fortune.", "segment": "threat" },
+    { "id": "hello", "speaker": "Rex", "text": "Hello, Victoria.", "src": "take:bel5-s2-t1", "in": 3.0, "out": 4.0,
+      "at": "doors+1.95" },
+    { "id": "rexq", "speaker": "Victoria", "text": "Rex?", "src": "take:bel6-line-t1", "in": 0.25, "out": 1.0,
+      "at": "floor+0.95" },
+    { "id": "died", "speaker": "Victoria", "text": "You died in that plane crash!", "segment": "vline" },
+    { "id": "economy", "speaker": "Rex", "text": "No. I just had to fly economy.", "segment": "rex" }
+  ],
+
+  "music": [
+    { "id": "sting", "label": "Organ sting (Take 5 shot 7)", "src": "take:bel5-s7-t1", "in": 0, "out": 3.6,
+      "at": "rex.end", "fadeOut": 0.8 }
+  ]
+}

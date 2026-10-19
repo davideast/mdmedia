@@ -1,0 +1,75 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "penny": {
+      "text": "You'll never see a penny of the Bellamy fortune.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/bel5-s1-t1.mp4", "start": 0.3, "end": 3.7, "sha256": "a2b30104f6ea23f10b1064d71bdeddd08f487867e26c5a5a250a136f8242cda2", "snap": "speech-onset@1" },
+      "loss": 0.78,
+      "snap": { "aligned": 1.04, "start": 1, "onset": 1, "floor": -72.8 },
+      "words": [
+        { "text": "You'll", "start": 1, "end": 1.2, "loss": 0.698 },
+        { "text": "never", "start": 1.28, "end": 1.46, "loss": 0.855 },
+        { "text": "see", "start": 1.58, "end": 1.68, "loss": 0.647 },
+        { "text": "a", "start": 1.74, "end": 1.86, "loss": 0.738 },
+        { "text": "penny", "start": 1.92, "end": 2.24, "loss": 0.855 },
+        { "text": "of", "start": 2.54, "end": 2.62, "loss": 0.762 },
+        { "text": "the", "start": 2.64, "end": 2.74, "loss": 0.525 },
+        { "text": "Bellamy", "start": 2.76, "end": 3.08, "loss": 0.868 },
+        { "text": "fortune.", "start": 3.22, "end": 3.66, "loss": 0.768 }
+      ]
+    },
+    "hello": {
+      "text": "Hello, Victoria.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/bel5-s2-t1.mp4", "start": 3, "end": 4, "sha256": "4f278e3054b5251778bcb70603273f06e45c051a4b7b645ff03ec779c07445ae", "snap": "speech-onset@1" },
+      "loss": 0.829,
+      "snap": { "aligned": 3.24, "start": 3.16, "onset": 3.16, "floor": -61.2 },
+      "words": [
+        { "text": "Hello,", "start": 3.16, "end": 3.4, "loss": 0.816 },
+        { "text": "Victoria.", "start": 3.52, "end": 3.98, "loss": 0.821 }
+      ]
+    },
+    "rexq": {
+      "text": "Rex?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/bel6-line-t1.mp4", "start": 0.25, "end": 1, "sha256": "877e2ccc7eb507e6e1716b7a658894f7317a2b0c3f0416dc5b13d21a7f31f934", "snap": "speech-onset@1" },
+      "loss": 1.276,
+      "snap": { "aligned": 0.41, "start": 0.37, "onset": 0.37, "floor": -67.1 },
+      "words": [
+        { "text": "Rex?", "start": 0.37, "end": 0.85, "loss": 1.276 }
+      ]
+    },
+    "died": {
+      "text": "You died in that plane crash!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/bel6-line-t1.mp4", "start": 1.3, "end": 3.15, "sha256": "877e2ccc7eb507e6e1716b7a658894f7317a2b0c3f0416dc5b13d21a7f31f934", "snap": "speech-onset@1" },
+      "loss": 0.815,
+      "snap": { "aligned": 1.46, "start": 1.42, "onset": 1.42, "floor": -63.3 },
+      "words": [
+        { "text": "You", "start": 1.42, "end": 1.54, "loss": 0.759 },
+        { "text": "died", "start": 1.66, "end": 1.9, "loss": 0.878 },
+        { "text": "in", "start": 1.94, "end": 2, "loss": 0.759 },
+        { "text": "that", "start": 2.04, "end": 2.2, "loss": 0.798 },
+        { "text": "plane", "start": 2.24, "end": 2.48, "loss": 0.77 },
+        { "text": "crash!", "start": 2.58, "end": 3.02, "loss": 0.927 }
+      ]
+    },
+    "economy": {
+      "text": "No. I just had to fly economy.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/bel6-rex-t1.mp4", "start": 0.5, "end": 3.32, "sha256": "be94256c719212f8b15ed03e9cab5aca6d145329bb7216181d91808c0d3bb860", "snap": "speech-onset@1" },
+      "loss": 0.629,
+      "snap": { "aligned": 1.12, "start": 1.03, "onset": 1.03, "floor": -68.5 },
+      "words": [
+        { "text": "No.", "start": 1.03, "end": 1.3, "loss": 0.655 },
+        { "text": "I", "start": 2.16, "end": 2.22, "loss": 0.702 },
+        { "text": "just", "start": 2.26, "end": 2.38, "loss": 0.621 },
+        { "text": "had", "start": 2.42, "end": 2.52, "loss": 0.653 },
+        { "text": "to", "start": 2.54, "end": 2.6, "loss": 0.43 },
+        { "text": "fly", "start": 2.66, "end": 2.82, "loss": 0.548 },
+        { "text": "economy.", "start": 2.86, "end": 3.3, "loss": 0.558 }
+      ]
+    }
+  }
+}
