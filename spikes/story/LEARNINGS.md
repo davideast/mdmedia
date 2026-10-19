@@ -198,6 +198,50 @@ Open questions for the design:
   could leave space.
 - Sound effects are still untested (no ElevenLabs key).
 
+## Run 4: traditional comic format (the lunch scene)
+
+`embarrassing-day/comic-lunch.md` is a comic script in the trade's page and
+panel format: `## Page N` with a `layout:` of panel rows, `### Panel N` with a
+`>` art note (shot, who stands left/center/right, balloon zone), then
+captions, balloons and sound effects in reading order. 4 pages, 21 panels,
+38 captions and balloons. Tools: `comic.ts` (parse, slot geometry, art plan),
+`art.ts --bleed`, `faces.ts`, `comic-audio.ts`, `render.ts --mode line`,
+`comic-page.ts` + `comic.html`.
+
+- **Adapting prose to comics is the main judgment.** The scene's 42 story
+  lines became 38 lettered items on 21 panels; most narration became
+  pictures. "Not angry. Worse. Hurt." became three close-ups, one caption
+  each. This is director work; the notation only has to carry its result.
+- **"Leave space for balloons" makes the image model draw empty boxes.**
+  Three of five panels came back with blank white frames. Asking for a
+  full-bleed image with headroom ("the top quarter shows only background
+  scenery") fixed it.
+- **Narrow slots override "tight close-up".** Two of three narrow close-ups
+  came back as full figures. "Extreme close-up: only her face, filling the
+  frame from her bangs to her chin" plus dropping the headroom rule for
+  close-ups worked first time.
+- **Lettering needs to know where heads are.** Guessed speaker sides put
+  Harper's balloons over her face. A vision pass (`gemini-3.5-flash`, one
+  call per panel, boxes 0-1000) found every named head correctly in all 21
+  panels; the layout then places items in reading order off faces, and tails
+  end just short of the speaker's head.
+- **Code owns lettering, model owns positions.** Balloons, tails, caption
+  boxes and reading order are deterministic page code (live text, exact
+  spelling); the model only supplies head boxes. Page lettering stayed exact
+  where model lettering misspelled small text in run 3.
+- **When art leaves no headroom, balloons go below the speaker.** Readable,
+  but a letterer would ask for more room; joined balloons for consecutive
+  lines by one speaker would help.
+- **Line mode suits comics.** One clip per caption or balloon gives exact
+  ranges for tap-to-hear and guided read-aloud. 37 lines, 131 s, 38 s wall;
+  4 short lines were refused by the input filter and rendered with their cue
+  dropped, which matches the earlier finding that short single-line prompts
+  trip the filter.
+- **Lettering scales with the page, which is too small on a phone.** The
+  page view letters at print size (2% of page width); the guided view
+  re-letters one panel with a minimum size so it reads on a phone. Wide
+  panels on a portrait phone get crowded.
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in

@@ -68,7 +68,7 @@ async function draw(file: string, prompt: string, aspectRatio: ImageAspectRatio,
       return;
     } catch (error: any) {
       const status = error?.status ?? error?.code;
-      const retryable = [429, 500, 503].includes(status) || /no image|timeout|fetch failed/i.test(error?.message ?? '');
+      const retryable = [429, 500, 503].includes(status) || /no image|timeout|fetch failed|aborted/i.test(error?.message ?? '');
       if (attempt < 4 && retryable) { await Bun.sleep(3000 * 2 ** attempt); continue; }
       report.push({ file, ms: Math.round(performance.now() - t0), ok: false, error: String(error?.message ?? error).slice(0, 300) });
       console.error(`${file}  FAILED  ${String(error?.message ?? error).slice(0, 200)}`);

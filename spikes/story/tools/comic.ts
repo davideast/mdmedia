@@ -132,7 +132,9 @@ const art = {
     aspect: p.aspect,
     shot:
       `${p.note}${place(p) ? ` Placement: ${place(p)}.` : ''} ` +
-      `Framing: generous ${p.zone === 'top' ? 'headroom; the top quarter of the image shows only background scenery such as ceiling, wall or banners' : 'foot room; the bottom quarter shows only floor or table'}, with no faces there`,
+      (/extreme close-up/i.test(p.note)
+        ? 'Framing: extreme close-up; the face fills the frame edge to edge, no body or room visible'
+        : `Framing: generous ${p.zone === 'top' ? 'headroom; the top quarter of the image shows only background scenery such as ceiling, wall or banners' : 'foot room; the bottom quarter shows only floor or table'}, with no faces there`),
     cast: Object.keys(p.positions).filter((n) => characters.characters[n]),
     text: [],
   })),

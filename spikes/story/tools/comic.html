@@ -33,37 +33,59 @@ header p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 34rem; 
 
 .page {
   position: relative; width: 100%; aspect-ratio: 2 / 3; background: var(--page);
-  container-type: inline-size; box-shadow: 0 2px 0 rgb(0 0 0 / 0.08), 0 18px 40px rgb(0 0 0 / 0.18);
+  container-type: inline-size; --u: 1cqw; box-shadow: 0 2px 0 rgb(0 0 0 / 0.08), 0 18px 40px rgb(0 0 0 / 0.18);
 }
-.folio { position: absolute; bottom: 0.35cqw; right: 1.6cqw; font: 700 1.3cqw/1 var(--font-ui); color: #8a909b; }
-.panel { position: absolute; overflow: hidden; border: 0.45cqw solid var(--ink); background: #f3f4f6; }
+.folio { position: absolute; bottom: calc(var(--u) * 0.35); right: calc(var(--u) * 1.6); font: 700 calc(var(--u) * 1.3)/1 var(--font-ui); color: #8a909b; }
+.panel { position: absolute; overflow: hidden; border: calc(var(--u) * 0.45) solid var(--ink); background: #f3f4f6; }
 .panel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .panel svg.tails { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.panel svg.tails path { fill: var(--balloon); stroke: var(--ink); stroke-width: 0.28cqw; stroke-linejoin: round; }
+.panel svg.tails path { fill: var(--balloon); stroke: var(--ink); stroke-width: calc(var(--u) * 0.28); stroke-linejoin: round; }
 
 .item { position: absolute; color: #111318; }
 .caption {
-  background: var(--caption); border: 0.28cqw solid #111318; padding: 0.7cqw 1.1cqw;
-  font: 700 2.05cqw/1.18 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
+  background: var(--caption); border: calc(var(--u) * 0.28) solid #111318; padding: calc(var(--u) * 0.7) calc(var(--u) * 1.1);
+  font: 700 calc(var(--u) * 2.05)/1.18 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
 }
 .balloon {
-  background: var(--balloon); border: 0.28cqw solid #111318; border-radius: 50% / 46%;
-  padding: 1.6cqw 2.4cqw; text-align: center;
-  font: 700 2.05cqw/1.16 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
+  background: var(--balloon); border: calc(var(--u) * 0.28) solid #111318; border-radius: 50% / 46%;
+  padding: calc(var(--u) * 1.6) calc(var(--u) * 2.4); text-align: center;
+  font: 700 calc(var(--u) * 2.05)/1.16 var(--font-letter); text-transform: uppercase; letter-spacing: 0.02em;
 }
-.balloon.small { font-size: 1.6cqw; }
-.balloon.long { border-radius: 3.2cqw; }
+.balloon.small { font-size: calc(var(--u) * 1.6); }
+.balloon.long { border-radius: calc(var(--u) * 3.2); }
 .sfx {
-  font: 400 6cqw/1 var(--font-display); color: var(--gold); letter-spacing: 0.04em;
-  -webkit-text-stroke: 0.3cqw #111318; text-shadow: 0.5cqw 0.5cqw 0 #111318; transform: rotate(-10deg);
+  font: 400 calc(var(--u) * 6)/1 var(--font-display); color: var(--gold); letter-spacing: 0.04em;
+  -webkit-text-stroke: calc(var(--u) * 0.3) #111318; text-shadow: calc(var(--u) * 0.5) calc(var(--u) * 0.5) 0 #111318; transform: rotate(-10deg);
 }
 .order { display: none; }
 .show-order .order {
-  display: grid; place-items: center; position: absolute; top: -1.4cqw; left: -1.4cqw; width: 2.8cqw; height: 2.8cqw;
-  border-radius: 50%; background: var(--accent); color: #fff; font: 700 1.5cqw/1 var(--font-ui);
+  display: grid; place-items: center; position: absolute; top: calc(var(--u) * -1.4); left: calc(var(--u) * -1.4); width: calc(var(--u) * 2.8); height: calc(var(--u) * 2.8);
+  border-radius: 50%; background: var(--accent); color: #fff; font: 700 calc(var(--u) * 1.5)/1 var(--font-ui);
 }
 .tools { display: flex; gap: 1rem; align-items: center; color: var(--muted); font-size: 0.85rem; }
 .tools label { display: flex; gap: 0.4rem; align-items: center; cursor: pointer; }
+[data-start] { cursor: pointer; }
+.item.speaking { box-shadow: 0 0 0 calc(var(--u) * 0.6) var(--gold); }
+.tools button {
+  font: 700 0.9rem/1 var(--font-ui); padding: 0.65rem 1rem; border-radius: 999px; border: 2px solid var(--ink);
+  background: var(--ink); color: #fff; cursor: pointer;
+}
+.tools { flex-wrap: wrap; }
+.guided {
+  position: fixed; inset: 0; z-index: 20; background: #0b0d11; color: #fff; display: grid;
+  grid-template-rows: 1fr auto; padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+}
+.guided[hidden] { display: none; }
+.guided .stage { display: grid; place-items: center; min-height: 0; padding: 16px; overflow: hidden; touch-action: pan-y; }
+.guided .stage .panel { position: relative; left: auto !important; top: auto !important; }
+.guided .bar { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 0.5rem; align-items: center; padding: 0.6rem 16px 0.9rem; }
+.guided .bar button {
+  font: 700 0.9rem/1 var(--font-ui); padding: 0.7rem 0.9rem; border-radius: 999px; border: 2px solid #fff;
+  background: transparent; color: #fff; cursor: pointer; min-width: 3rem;
+}
+.guided .bar button.primary { background: var(--gold); border-color: var(--gold); color: #111318; }
+.guided .bar span { font: 0.85rem/1.2 var(--font-ui); color: #a0a8b6; text-align: center; font-variant-numeric: tabular-nums; }
+.guided button:focus-visible, .tools button:focus-visible, [data-start]:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 footer { color: var(--muted); font-size: 0.85rem; display: grid; gap: 0.4rem; border-top: 2px dashed color-mix(in srgb, var(--muted) 40%, transparent); padding-top: 1rem; }
 footer p { margin: 0; max-width: 40rem; }
 </style>
@@ -73,13 +95,29 @@ footer p { margin: 0; max-width: 40rem; }
     <div class="kicker">The Most Embarrassing Day of My Life · Format test</div>
     <h1><b>Lunch</b>, as a comic</h1>
     <p id="dek"></p>
-    <div class="tools"><label for="order"><input id="order" type="checkbox"> Show reading order</label></div>
+    <div class="tools">
+      <button id="guide" type="button">Read panel by panel</button>
+      <label for="order"><input id="order" type="checkbox"> Show reading order</label>
+      <span id="hint"></span>
+    </div>
   </header>
   <main id="pages" class="book"></main>
   <footer>
     <p>Prototype. The page, panel shapes, balloons, tails and captions are laid out by code from a comic script; the art is drawn by gemini-3-pro-image against the same character sheet as the first version, with headroom left for the lettering.</p>
   </footer>
 </div>
+
+<div class="guided" id="guided" hidden role="dialog" aria-label="Guided reading">
+  <div class="stage" id="stage"></div>
+  <div class="bar">
+    <button id="g-close" type="button" aria-label="Close guided reading">Close</button>
+    <span id="g-pos"></span>
+    <button id="g-prev" type="button" aria-label="Previous panel">Back</button>
+    <button id="g-play" type="button" class="primary">Read aloud</button>
+    <button id="g-next" type="button" aria-label="Next panel">Next</button>
+  </div>
+</div>
+<audio id="audio" preload="auto"></audio>
 
 <script>
 const COMIC = /*DATA*/null;
@@ -107,6 +145,11 @@ function buildPage(page) {
       d.className = `item ${item.kind}` + (item.kind === 'balloon' && item.tone === 'small' ? ' small' : '') + (item.kind !== 'sfx' && item.text.length > 60 ? ' long' : '');
       d.textContent = item.text;
       d.dataset.who = item.who ?? '';
+      if (item.startMs !== undefined) {
+        d.dataset.start = String(item.startMs); d.dataset.end = String(item.endMs);
+        d.tabIndex = 0; d.setAttribute('role', 'button');
+        d.setAttribute('aria-label', `Hear ${item.kind === 'caption' ? 'caption' : (item.who ?? '').toLowerCase()}: ${item.text}`);
+      }
       const o = document.createElement('span'); o.className = 'order'; o.textContent = String(++n); d.append(o);
       panel.append(d);
     }
@@ -221,4 +264,89 @@ const letterAll = () => document.querySelectorAll('.panel').forEach(letterPanel)
 Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]).then(letterAll);
 new ResizeObserver(letterAll).observe(pagesEl);
 $('order').addEventListener('change', (e) => document.body.classList.toggle('show-order', e.target.checked));
+
+// Audio: each caption and balloon owns a range of one voice track.
+const audio = $('audio');
+if (COMIC.audio) { audio.src = 'audio.mp3'; $('hint').textContent = 'Tap any balloon or caption to hear it.'; }
+else { $('g-play').hidden = true; }
+let speaking = null, stopAt = 0, onDone = null;
+function stopSpeaking() {
+  audio.pause(); speaking?.classList.remove('speaking'); speaking = null; onDone = null;
+}
+function speak(el, done) {
+  stopSpeaking();
+  if (!el?.dataset.start) { done?.(); return; }
+  speaking = el; el.classList.add('speaking'); onDone = done ?? null;
+  stopAt = Number(el.dataset.end) / 1000;
+  audio.currentTime = Number(el.dataset.start) / 1000;
+  audio.play().catch(() => stopSpeaking());
+}
+audio.addEventListener('timeupdate', () => {
+  if (speaking && audio.currentTime >= stopAt) { const done = onDone; stopSpeaking(); done?.(); }
+});
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-start]');
+  if (!el) return;
+  e.stopPropagation(); reading = false; syncPlay(); speak(el);
+});
+document.addEventListener('keydown', (e) => {
+  const el = e.target.closest?.('[data-start]');
+  if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); reading = false; syncPlay(); speak(el); }
+});
+
+// Guided reading: one panel at a time, fitted to the screen, lettered afresh
+// at that size. "Read aloud" voices each item in order, then turns the panel.
+const panelsInOrder = () => [...document.querySelectorAll('#pages .panel')];
+let gIndex = 0, reading = false;
+function showPanel(i) {
+  const list = panelsInOrder();
+  gIndex = Math.max(0, Math.min(list.length - 1, i));
+  const src = list[gIndex], p = src._data;
+  const stage = $('stage'); stage.textContent = '';
+  const clone = src.cloneNode(true); clone._data = p;
+  const maxW = stage.clientWidth - 32, maxH = stage.clientHeight - 32;
+  const scale = Math.min(maxW / p.w, maxH / p.h);
+  Object.assign(clone.style, { width: `${p.w * scale}px`, height: `${p.h * scale}px` });
+  // Lettering is sized in hundredths of the page width (--u). On a small
+  // screen, size it as if the page were at least 640 px wide so one panel's
+  // lettering stays readable.
+  clone.style.setProperty('--u', `${Math.max(COMIC.page.w * scale, 640) / 100}px`);
+  stage.append(clone);
+  letterPanel(clone);
+  $('g-pos').textContent = `${gIndex + 1} / ${list.length}`;
+  $('g-pos').setAttribute('aria-label', `Page ${p.page}, panel ${p.index}; ${gIndex + 1} of ${list.length}`);
+}
+function readPanel() {
+  const items = [...$('stage').querySelectorAll('.item')];
+  let k = 0;
+  const next = () => {
+    if (!reading) return;
+    while (k < items.length && !items[k].dataset.start) k++;
+    if (k < items.length) { speak(items[k++], () => setTimeout(next, 250)); return; }
+    if (gIndex < panelsInOrder().length - 1) { setTimeout(() => { if (reading) { showPanel(gIndex + 1); readPanel(); } }, 700); }
+    else { reading = false; syncPlay(); }
+  };
+  next();
+}
+function syncPlay() { $('g-play').textContent = reading ? 'Pause' : 'Read aloud'; }
+$('guide').addEventListener('click', () => { $('guided').hidden = false; requestAnimationFrame(() => showPanel(gIndex)); $('g-next').focus(); });
+$('g-close').addEventListener('click', () => { reading = false; syncPlay(); stopSpeaking(); $('guided').hidden = true; $('guide').focus(); });
+$('g-next').addEventListener('click', () => { reading = false; syncPlay(); stopSpeaking(); showPanel(gIndex + 1); });
+$('g-prev').addEventListener('click', () => { reading = false; syncPlay(); stopSpeaking(); showPanel(gIndex - 1); });
+$('g-play').addEventListener('click', () => { reading = !reading; syncPlay(); if (reading) readPanel(); else stopSpeaking(); });
+$('stage').addEventListener('click', (e) => {
+  if (e.target.closest('[data-start]')) return;
+  const r = $('stage').getBoundingClientRect();
+  reading = false; syncPlay(); stopSpeaking();
+  showPanel(gIndex + (e.clientX > r.left + r.width / 2 ? 1 : -1));
+});
+document.addEventListener('keydown', (e) => {
+  if ($('guided').hidden) return;
+  if (e.key === 'ArrowRight') $('g-next').click();
+  if (e.key === 'ArrowLeft') $('g-prev').click();
+  if (e.key === 'Escape') $('g-close').click();
+});
+addEventListener('resize', () => { if (!$('guided').hidden) showPanel(gIndex); });
+// #guided opens straight into panel-by-panel reading.
+if (location.hash === '#guided') document.fonts.ready.then(() => $('guide').click());
 </script>

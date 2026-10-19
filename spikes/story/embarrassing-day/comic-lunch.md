@@ -127,21 +127,23 @@ layout: 1 1 1 | 1 1 | 1
 
 ### Panel 1
 
-> Tight close-up of June's eyes, blinking. Center: JUNE. Balloons: top.
+> Extreme close-up: only June's face, filling the frame from her bangs to her
+> chin, mid-blink. Center: JUNE. Balloons: top.
 
 For one second, I thought she'd laugh.
 
 ### Panel 2
 
-> The same tight close-up of June's face, expression going blank. Center:
-> JUNE. Balloons: top.
+> Extreme close-up: only June's face, filling the frame from her bangs to her
+> chin, expression gone blank. Center: JUNE. Balloons: top.
 
 Not angry.
 
 ### Panel 3
 
-> The same tight close-up; June's brows draw together, her eyes hurt.
-> Center: JUNE. Balloons: top.
+> Extreme close-up: only June's face, filling the frame from her bangs to her
+> chin, brows drawn together, eyes hurt and glistening. Center: JUNE.
+> Balloons: top.
 
 Worse. Hurt.
 
