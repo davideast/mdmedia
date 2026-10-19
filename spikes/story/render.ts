@@ -16,10 +16,20 @@ import { DEFAULT_GEMINI_TTS_MODEL } from '../../src/tts/gemini-tts-provider.js';
 const RATE = 24000; // headerless 16-bit mono PCM, as every provider here yields
 
 interface Cast { voice: string; delivery: string }
+interface Line {
+  speaker: string;
+  delivery: string;
+  text: string;
+  display: string;
+  narration: boolean;
+  scene: number;
+  id: number;
+}
 type Segment =
-  | { kind: 'line'; speaker: string; delivery: string; text: string }
+  | ({ kind: 'line' } & Line)
   | { kind: 'pause'; ms: number }
-  | { kind: 'scene'; title: string };
+  | { kind: 'scene'; title: string }
+  | { kind: 'music'; prompt: string };
 
 interface Call {
   label: string;
@@ -63,11 +73,15 @@ if (!fm) throw new Error('missing front matter');
 const meta = Bun.YAML.parse(fm[1]!) as {
   title: string;
   gap?: string;
-  narrator: Cast;
+  narrator: Cast | string;
   cast?: Record<string, Cast>;
 };
-const cast: Record<string, Cast> = { NARRATOR: meta.narrator };
+const cast: Record<string, Cast> = {};
 for (const [name, member] of Object.entries(meta.cast ?? {})) cast[name.toUpperCase()] = member;
+// `narrator: MILO` makes a cast member the narrator: narration is his voice, marked as narration.
+const narrator = typeof meta.narrator === 'string' ? meta.narrator.toUpperCase() : 'NARRATOR';
+if (typeof meta.narrator !== 'string') cast.NARRATOR = meta.narrator;
+if (!cast[narrator]) throw new Error(`narrator ${narrator} is not in the cast`);
 
 function ms(text: string): number {
   const m = /^\s*(\d+(?:\.\d+)?)\s*(ms|s)\s*$/.exec(text);
@@ -80,13 +94,20 @@ const plain = (text: string) =>
 
 const segments: Segment[] = [];
 const body = source.slice(fm[0].length);
+let scene = 0;
+let id = 0;
 for (const block of body.split(/\n{2,}/)) {
   const b = block.trim();
   if (!b) continue;
-  const pause = /^```pause\n([\s\S]*?)\n```$/.exec(b);
-  if (pause) { segments.push({ kind: 'pause', ms: ms(pause[1]!) }); continue; }
+  const fence = /^```(\w+)\n([\s\S]*?)\n```$/.exec(b);
+  if (fence) {
+    if (fence[1] === 'pause') segments.push({ kind: 'pause', ms: ms(fence[2]!) });
+    if (fence[1] === 'music') segments.push({ kind: 'music', prompt: fence[2]!.trim() });
+    continue; // other blocks (sfx, art) are notes for later steps
+  }
   if (/^#\s/.test(b)) continue; // chapter title: displayed only
   if (/^###\s/.test(b) || /^---$/.test(b)) {
+    scene++;
     segments.push({ kind: 'scene', title: b.replace(/^#+\s*/, '') });
     continue;
   }
@@ -94,23 +115,22 @@ for (const block of body.split(/\n{2,}/)) {
   if (line) {
     const speaker = line[1]!.trim().toUpperCase();
     if (!cast[speaker]) throw new Error(`unknown speaker: ${speaker}`);
-    segments.push({ kind: 'line', speaker, delivery: line[2]?.trim() ?? '', text: plain(line[3]!) });
+    const text = plain(line[3]!);
+    segments.push({ kind: 'line', speaker, delivery: line[2]?.trim() ?? '', text, display: text, narration: false, scene, id: id++ });
   } else {
-    segments.push({ kind: 'line', speaker: 'NARRATOR', delivery: '', text: plain(b) });
+    const text = plain(b);
+    segments.push({ kind: 'line', speaker: narrator, delivery: '', text, display: text, narration: true, scene, id: id++ });
   }
 }
 
 // ---------- providers ----------
 
-type Lines = Array<{ speaker: string; delivery: string; text: string }>;
+type Lines = Line[];
 
 type Speak = (
-  lines: Array<{ speaker: string; delivery: string; text: string }>
+  lines: Lines
 ) => Promise<{ pcm: Uint8Array; usage?: unknown; cached?: boolean; fallback?: string }>;
 
-function styleFor(speaker: string, delivery: string): string {
-  return [cast[speaker]!.delivery, delivery].filter(Boolean).join(', ');
-}
 
 async function collect(stream: AsyncIterable<any>) {
   const chunks: Uint8Array[] = [];
@@ -145,29 +165,24 @@ const CUE_LEVELS = ['full cue', 'line cue only', 'no cue'] as const;
 
 function buildRequest(model: string, lines: Lines, level: number) {
   const speakers = [...new Set(lines.map((l) => l.speaker))];
-  const cue = (speaker: string, delivery: string) =>
-    level === 0 ? styleFor(speaker, delivery) : level === 1 ? delivery : '';
   let input: string;
   let speech_config: Array<{ voice: string; speaker?: string }>;
+  const lineCue = (l: Line) => (level < 2 ? l.delivery : '');
   if (speakers.length === 1) {
-    // One voice, possibly several lines with different cues: one cue per paragraph.
-    input = lines
-      .map(({ speaker, delivery, text }) => {
-        const style = cue(speaker, delivery);
-        return style ? `[${style}]\n${text}` : text;
-      })
-      .join('\n\n');
+    // One voice: the character's default once, then a short cue per paragraph where written.
+    const head = level === 0 ? `[${cast[speakers[0]!]!.delivery}]\n\n` : '';
+    input =
+      head +
+      lines
+        .map((l) => (lineCue(l) ? `[${lineCue(l)}] ${l.text}` : l.text))
+        .join('\n\n');
     speech_config = [{ voice: cast[speakers[0]!]!.voice }];
   } else {
     const who = level === 0 ? ' ' + speakers.map((s) => `${s} is ${cast[s]!.delivery}.`).join(' ') : '';
     input =
-      `Perform this scene as a radio drama.${who}\n\n` +
-      lines
-        .map((l) => {
-          const c = level < 2 ? l.delivery : '';
-          return `${l.speaker}: ${c ? `[${c}] ` : ''}${l.text}`;
-        })
-        .join('\n');
+      `Perform this scene as a radio drama.${who} Words in square brackets are ` +
+      `performance notes: follow them, never say them aloud. Never say the speaker names.\n\n` +
+      lines.map((l) => `${l.speaker}: ${lineCue(l) ? `[${lineCue(l)}] ` : ''}${l.text}`).join('\n');
     speech_config = speakers.map((s) => ({ speaker: s, voice: cast[s]!.voice }));
   }
   return { model, input, speech_config };
@@ -264,10 +279,16 @@ type Step = { kind: 'call'; lines: Lines } | { kind: 'pause'; ms: number };
 // no pause or scene break between them share one multi-speaker call, up to
 // --max-run characters (about two minutes of audio at the default).
 const steps: Step[] = [];
+// Scene titles and music cues are markers on the next line; the mix gives them times.
+const markers: Array<{ kind: 'scene' | 'music'; text: string; lineId: number }> = [];
+let pendingMarkers: Array<{ kind: 'scene' | 'music'; text: string }> = [];
 let sceneBreak = false;
 for (const seg of segments) {
-  if (seg.kind === 'scene') { sceneBreak = true; continue; }
+  if (seg.kind === 'scene') { sceneBreak = true; pendingMarkers.push({ kind: 'scene', text: seg.title }); continue; }
+  if (seg.kind === 'music') { pendingMarkers.push({ kind: 'music', text: seg.prompt }); continue; }
   if (seg.kind === 'pause') { steps.push({ kind: 'pause', ms: seg.ms }); continue; }
+  for (const m of pendingMarkers) markers.push({ ...m, lineId: seg.id });
+  pendingMarkers = [];
   const last = steps.at(-1);
   const joinable = !sceneBreak;
   sceneBreak = false;
@@ -330,13 +351,30 @@ await Promise.all(
 );
 
 // Gap after every call unless a pause follows; pauses replace it and add up.
+// Each line gets a start and end: exact for one-line calls, and for a run the
+// speech between the clip's quiet edges is shared out by character count.
 const mix: Uint8Array[] = [];
+const timeline: Array<Omit<Line, 'delivery'> & { delivery: string; startMs: number; endMs: number }> = [];
+let cursor = 0;
 steps.forEach((step, i) => {
-  if (step.kind === 'pause') { mix.push(silence(step.ms)); return; }
-  mix.push(pcm[i]!);
+  if (step.kind === 'pause') { mix.push(silence(step.ms)); cursor += step.ms; return; }
+  const audio = pcm[i]!;
+  const length = durationMs(audio);
+  const { leadMs, tailMs } = quietEdges(audio);
+  const speech = Math.max(1, length - leadMs - tailMs);
+  const total = step.lines.reduce((n, l) => n + l.text.length, 0) || 1;
+  let offset = cursor + leadMs;
+  for (const l of step.lines) {
+    const share = (speech * l.text.length) / total;
+    timeline.push({ ...l, startMs: Math.round(offset), endMs: Math.round(offset + share) });
+    offset += share;
+  }
+  mix.push(audio);
+  cursor += length;
   const next = steps[i + 1];
-  if (next && next.kind === 'call') mix.push(silence(gapMs));
+  if (next && next.kind === 'call') { mix.push(silence(gapMs)); cursor += gapMs; }
 });
+const startOf = new Map(timeline.map((l) => [l.id, l.startMs]));
 const master = concat(mix);
 await writeFile(join(out, 'master.wav'), wav(master));
 
@@ -362,5 +400,21 @@ const report = {
   callsDetail: calls,
 };
 await writeFile(join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
+await writeFile(
+  join(out, 'timeline.json'),
+  JSON.stringify(
+    {
+      title: meta.title,
+      durationMs: report.durationMs,
+      cast: Object.fromEntries(Object.entries(cast).map(([k, v]) => [k, v.voice])),
+      narrator,
+      scenes: markers.filter((m) => m.kind === 'scene').map((m) => ({ title: m.text, startMs: startOf.get(m.lineId) ?? 0 })),
+      music: markers.filter((m) => m.kind === 'music').map((m) => ({ prompt: m.text, atMs: startOf.get(m.lineId) ?? 0 })),
+      lines: timeline,
+    },
+    null,
+    2
+  ) + '\n'
+);
 if (failures.length) console.log(`${failures.length} failed call(s); see failures in report.json`);
 console.log(`${mp3}\n${calls.length} calls, ${(report.durationMs / 1000).toFixed(1)} s audio, ${(report.wallMs / 1000).toFixed(1)} s wall`);

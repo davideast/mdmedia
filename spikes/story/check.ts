@@ -4,7 +4,7 @@
 //   bun spikes/story/check.ts spikes/story/earnest-act-1.md line
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { createGeminiClient } from '../../src/tts/gemini-client-factory.js';
@@ -16,13 +16,13 @@ if (!file) {
 }
 
 const name = basename(file, '.md');
-const dir = join(import.meta.dir, 'out', name, mode);
+const dir = process.env.CHECK_DIR ?? join(import.meta.dir, 'out', name, mode);
 const key = process.env.GEMINI_API_KEY ?? readFileSync(join(homedir(), '.config', 'mdmedia', 'gemini-key'), 'utf8').trim();
 
 // 32 kb/s mono keeps a 12-minute render well under the inline request limit.
 const small = join(process.env.TMPDIR ?? tmpdir(), `${name}-${mode}-check.mp3`);
 const ffmpeg = resolve(import.meta.dir, '../../node_modules/ffmpeg-static/ffmpeg');
-const ff = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', join(dir, `${name}.mp3`), '-ac', '1', '-ar', '16000', '-b:a', '32k', small]);
+const ff = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', join(dir, readdirSync(dir).find((f) => f.endsWith('.mp3'))!), '-ac', '1', '-ar', '16000', '-b:a', '32k', small]);
 if (ff.status !== 0) throw new Error('ffmpeg failed');
 
 const prompt = `You are checking an audio drama render against its script.
