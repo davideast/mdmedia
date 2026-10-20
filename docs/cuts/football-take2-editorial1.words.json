@@ -1,0 +1,1045 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "c_open": {
+      "text": "Good afternoon, everybody, and welcome to CGL Football! Moose, what are your keys to the game?",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-open-t5.mp4",
+        "start": 0.5,
+        "end": 5.95,
+        "sha256": "33336d4b1dcb3678fb0419af5e37e1cc9e3088619375e13edf4bfea861f4894b",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.098,
+      "snap": {
+        "aligned": 0.77,
+        "start": 0.77,
+        "onset": 0.5,
+        "floor": -45.1
+      },
+      "words": [
+        {
+          "text": "Good",
+          "start": 0.77,
+          "end": 1.24
+        },
+        {
+          "text": "afternoon,",
+          "start": 1.24,
+          "end": 1.62
+        },
+        {
+          "text": "everybody,",
+          "start": 1.62,
+          "end": 2.08
+        },
+        {
+          "text": "and",
+          "start": 2.08,
+          "end": 2.34
+        },
+        {
+          "text": "welcome",
+          "start": 2.34,
+          "end": 2.64
+        },
+        {
+          "text": "to",
+          "start": 2.64,
+          "end": 2.88
+        },
+        {
+          "text": "CGL",
+          "start": 2.88,
+          "end": 3.48
+        },
+        {
+          "text": "Football!",
+          "start": 3.48,
+          "end": 4.14
+        },
+        {
+          "text": "Moose,",
+          "start": 4.34,
+          "end": 4.52
+        },
+        {
+          "text": "what",
+          "start": 4.52,
+          "end": 4.7
+        },
+        {
+          "text": "are",
+          "start": 4.7,
+          "end": 4.82
+        },
+        {
+          "text": "your",
+          "start": 4.82,
+          "end": 4.96
+        },
+        {
+          "text": "keys",
+          "start": 4.96,
+          "end": 5.22
+        },
+        {
+          "text": "to",
+          "start": 5.22,
+          "end": 5.42
+        },
+        {
+          "text": "the",
+          "start": 5.42,
+          "end": 5.5
+        },
+        {
+          "text": "game?",
+          "start": 5.5,
+          "end": 5.74
+        }
+      ]
+    },
+    "m_k1": {
+      "text": "Key number one: score more points than the other team.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-m-k1-t5.mp4",
+        "start": 1.1,
+        "end": 4.4,
+        "sha256": "dd3249f8ae40ac6f4355c3c75b5216d2ee78fb7c9c5434f61e428c9c8b792578",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.12,
+      "snap": {
+        "aligned": 1.28,
+        "start": 1.28,
+        "onset": 1.28,
+        "floor": -51.9
+      },
+      "words": [
+        {
+          "text": "Key",
+          "start": 1.28,
+          "end": 1.44
+        },
+        {
+          "text": "number",
+          "start": 1.44,
+          "end": 1.7
+        },
+        {
+          "text": "one:",
+          "start": 1.7,
+          "end": 2.16
+        },
+        {
+          "text": "score",
+          "start": 2.16,
+          "end": 2.8
+        },
+        {
+          "text": "more",
+          "start": 2.8,
+          "end": 3.1
+        },
+        {
+          "text": "points",
+          "start": 3.1,
+          "end": 3.44
+        },
+        {
+          "text": "than",
+          "start": 3.44,
+          "end": 3.6
+        },
+        {
+          "text": "the",
+          "start": 3.6,
+          "end": 3.72
+        },
+        {
+          "text": "other",
+          "start": 3.72,
+          "end": 3.86
+        },
+        {
+          "text": "team.",
+          "start": 3.86,
+          "end": 4.16
+        }
+      ]
+    },
+    "m_k2": {
+      "text": "Key number two: don't let the other team score more points than you.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-m-k2-t7.mp4",
+        "start": 1.05,
+        "end": 5.15,
+        "sha256": "7cea7c24613716c4818151389927c42dae22c2bd8a563e724291e80c520b7830",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.074,
+      "snap": {
+        "aligned": 1.21,
+        "start": 1.21,
+        "onset": 1.21,
+        "floor": -55.8
+      },
+      "words": [
+        {
+          "text": "Key",
+          "start": 1.21,
+          "end": 1.37
+        },
+        {
+          "text": "number",
+          "start": 1.37,
+          "end": 1.65
+        },
+        {
+          "text": "two:",
+          "start": 1.65,
+          "end": 2.09
+        },
+        {
+          "text": "don't",
+          "start": 2.61,
+          "end": 2.83
+        },
+        {
+          "text": "let",
+          "start": 2.83,
+          "end": 2.95
+        },
+        {
+          "text": "the",
+          "start": 2.95,
+          "end": 3.11
+        },
+        {
+          "text": "other",
+          "start": 3.11,
+          "end": 3.27
+        },
+        {
+          "text": "team",
+          "start": 3.27,
+          "end": 3.57
+        },
+        {
+          "text": "score",
+          "start": 3.57,
+          "end": 3.87
+        },
+        {
+          "text": "more",
+          "start": 3.87,
+          "end": 4.13
+        },
+        {
+          "text": "points",
+          "start": 4.13,
+          "end": 4.47
+        },
+        {
+          "text": "than",
+          "start": 4.47,
+          "end": 4.69
+        },
+        {
+          "text": "you.",
+          "start": 4.69,
+          "end": 4.91
+        }
+      ]
+    },
+    "m_k3": {
+      "text": "Key number three: don't tackle your own guys.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-m-k3-t5.mp4",
+        "start": 0.8,
+        "end": 3.85,
+        "sha256": "e68c9bc2432241d6bc1a1255ef61ae54908c78f129b21571bd19e05c197d74e1",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.163,
+      "snap": {
+        "aligned": 0.95,
+        "start": 0.95,
+        "onset": 0.95,
+        "floor": -46.9
+      },
+      "words": [
+        {
+          "text": "Key",
+          "start": 0.95,
+          "end": 1.04
+        },
+        {
+          "text": "number",
+          "start": 1.04,
+          "end": 1.3
+        },
+        {
+          "text": "three:",
+          "start": 1.3,
+          "end": 1.74
+        },
+        {
+          "text": "don't",
+          "start": 1.74,
+          "end": 2.74
+        },
+        {
+          "text": "tackle",
+          "start": 2.74,
+          "end": 2.96
+        },
+        {
+          "text": "your",
+          "start": 2.96,
+          "end": 3.12
+        },
+        {
+          "text": "own",
+          "start": 3.12,
+          "end": 3.32
+        },
+        {
+          "text": "guys.",
+          "start": 3.32,
+          "end": 3.64
+        }
+      ]
+    },
+    "c_echo": {
+      "text": "...Don't tackle your own guys?",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-echo-t8.mp4",
+        "start": 0.45,
+        "end": 2.3,
+        "sha256": "2cd2b0d0a7ae68806834b404102adb36e22acf990afa86b90a315b55e6c66a72",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.086,
+      "snap": {
+        "aligned": 0.86,
+        "start": 0.86,
+        "onset": 0.86,
+        "floor": -45.3
+      },
+      "words": [
+        {
+          "text": "...Don't",
+          "start": 0.86,
+          "end": 1.11
+        },
+        {
+          "text": "tackle",
+          "start": 1.11,
+          "end": 1.37
+        },
+        {
+          "text": "your",
+          "start": 1.37,
+          "end": 1.55
+        },
+        {
+          "text": "own",
+          "start": 1.55,
+          "end": 1.73
+        },
+        {
+          "text": "guys?",
+          "start": 1.73,
+          "end": 2.03
+        }
+      ]
+    },
+    "m_effective": {
+      "text": "Yeah, Chet. I've seen it, and it is not effective.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/vs-moose2-t3.mp4",
+        "start": 1,
+        "end": 4.6,
+        "sha256": "50d23e47e5a95cdd1c222e00ebb5b9c654e755c361a440aac5f5bcb1509e9b28",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.144,
+      "snap": {
+        "aligned": 1.24,
+        "start": 1.24,
+        "onset": 1.24,
+        "floor": -50.1
+      },
+      "words": [
+        {
+          "text": "Yeah,",
+          "start": 1.24,
+          "end": 1.38
+        },
+        {
+          "text": "Chet.",
+          "start": 1.38,
+          "end": 1.76
+        },
+        {
+          "text": "I've",
+          "start": 1.76,
+          "end": 2.08
+        },
+        {
+          "text": "seen",
+          "start": 2.08,
+          "end": 2.22
+        },
+        {
+          "text": "it,",
+          "start": 2.22,
+          "end": 2.46
+        },
+        {
+          "text": "and",
+          "start": 2.46,
+          "end": 3.14
+        },
+        {
+          "text": "it",
+          "start": 3.14,
+          "end": 3.3
+        },
+        {
+          "text": "is",
+          "start": 3.3,
+          "end": 3.48
+        },
+        {
+          "text": "not",
+          "start": 3.48,
+          "end": 3.84
+        },
+        {
+          "text": "effective.",
+          "start": 3.84,
+          "end": 4.32
+        }
+      ]
+    },
+    "c_td": {
+      "text": "Touchdown, Icebreakers! That's key number one, Moose!",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-td-t9.mp4",
+        "start": 0.4,
+        "end": 3.95,
+        "sha256": "be4b2ef03a9029f00cb2816c2e90b23d535005e6d3dbdf827c3f1baec6847252",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.102,
+      "snap": {
+        "aligned": 0.58,
+        "start": 0.58,
+        "onset": 0.58,
+        "floor": -44.7
+      },
+      "words": [
+        {
+          "text": "Touchdown,",
+          "start": 0.58,
+          "end": 1.1
+        },
+        {
+          "text": "Icebreakers!",
+          "start": 1.26,
+          "end": 1.78
+        },
+        {
+          "text": "That's",
+          "start": 2.56,
+          "end": 2.84
+        },
+        {
+          "text": "key",
+          "start": 2.84,
+          "end": 2.96
+        },
+        {
+          "text": "number",
+          "start": 2.96,
+          "end": 3.22
+        },
+        {
+          "text": "one,",
+          "start": 3.22,
+          "end": 3.52
+        },
+        {
+          "text": "Moose!",
+          "start": 3.62,
+          "end": 3.74
+        }
+      ]
+    },
+    "m_scoring": {
+      "text": "Exactly, Chet. They're scoring more points than the other team.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-m-scoring-t4.mp4",
+        "start": 1,
+        "end": 4.55,
+        "sha256": "74793165276601b6e359a6f899875657392243e67cec62638f91b2f704cba54b",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.058,
+      "snap": {
+        "aligned": 1.2,
+        "start": 1.2,
+        "onset": 1.2,
+        "floor": -50.3
+      },
+      "words": [
+        {
+          "text": "Exactly,",
+          "start": 1.2,
+          "end": 1.72
+        },
+        {
+          "text": "Chet.",
+          "start": 1.94,
+          "end": 2.26
+        },
+        {
+          "text": "They're",
+          "start": 2.4,
+          "end": 2.62
+        },
+        {
+          "text": "scoring",
+          "start": 2.62,
+          "end": 2.88
+        },
+        {
+          "text": "more",
+          "start": 2.88,
+          "end": 3.14
+        },
+        {
+          "text": "points",
+          "start": 3.14,
+          "end": 3.54
+        },
+        {
+          "text": "than",
+          "start": 3.54,
+          "end": 3.72
+        },
+        {
+          "text": "the",
+          "start": 3.72,
+          "end": 3.86
+        },
+        {
+          "text": "other",
+          "start": 3.86,
+          "end": 4.02
+        },
+        {
+          "text": "team.",
+          "start": 4.02,
+          "end": 4.34
+        }
+      ]
+    },
+    "m_letting": {
+      "text": "See, now they're letting the other team score more points than them.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-m-letting-t1.mp4",
+        "start": 1.1,
+        "end": 4.2,
+        "sha256": "776b7b0715e8611679193c3b65615ba7ef268ed0b377d02c0c16ea6041fbe335",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.061,
+      "snap": {
+        "aligned": 1.32,
+        "start": 1.32,
+        "onset": 1.32,
+        "floor": -44.4
+      },
+      "words": [
+        {
+          "text": "See,",
+          "start": 1.32,
+          "end": 1.44
+        },
+        {
+          "text": "now",
+          "start": 1.44,
+          "end": 1.7
+        },
+        {
+          "text": "they're",
+          "start": 1.7,
+          "end": 1.92
+        },
+        {
+          "text": "letting",
+          "start": 1.92,
+          "end": 2.1
+        },
+        {
+          "text": "the",
+          "start": 2.1,
+          "end": 2.28
+        },
+        {
+          "text": "other",
+          "start": 2.28,
+          "end": 2.44
+        },
+        {
+          "text": "team",
+          "start": 2.44,
+          "end": 2.72
+        },
+        {
+          "text": "score",
+          "start": 2.72,
+          "end": 3.04
+        },
+        {
+          "text": "more",
+          "start": 3.04,
+          "end": 3.28
+        },
+        {
+          "text": "points",
+          "start": 3.28,
+          "end": 3.62
+        },
+        {
+          "text": "than",
+          "start": 3.62,
+          "end": 3.84
+        },
+        {
+          "text": "them.",
+          "start": 3.84,
+          "end": 4.02
+        }
+      ]
+    },
+    "c_clock": {
+      "text": "Forty-one seconds left, Tarpons ball. They just have to run out the clock.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-clock-t4.mp4",
+        "start": 0.75,
+        "end": 4.6,
+        "sha256": "a6be18eb29f01483fc07853ddc2102876cc2e2db44898a84cb32af39179b79dc",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.049,
+      "snap": {
+        "aligned": 0.94,
+        "start": 0.94,
+        "onset": 0.94,
+        "floor": -50
+      },
+      "words": [
+        {
+          "text": "Forty-one",
+          "start": 0.94,
+          "end": 1.41
+        },
+        {
+          "text": "seconds",
+          "start": 1.41,
+          "end": 1.75
+        },
+        {
+          "text": "left,",
+          "start": 1.75,
+          "end": 2.07
+        },
+        {
+          "text": "Tarpons",
+          "start": 2.27,
+          "end": 2.67
+        },
+        {
+          "text": "ball.",
+          "start": 2.67,
+          "end": 2.91
+        },
+        {
+          "text": "They",
+          "start": 3.09,
+          "end": 3.19
+        },
+        {
+          "text": "just",
+          "start": 3.19,
+          "end": 3.37
+        },
+        {
+          "text": "have",
+          "start": 3.37,
+          "end": 3.51
+        },
+        {
+          "text": "to",
+          "start": 3.51,
+          "end": 3.69
+        },
+        {
+          "text": "run",
+          "start": 3.69,
+          "end": 3.83
+        },
+        {
+          "text": "out",
+          "start": 3.83,
+          "end": 4.01
+        },
+        {
+          "text": "the",
+          "start": 4.01,
+          "end": 4.15
+        },
+        {
+          "text": "clock.",
+          "start": 4.15,
+          "end": 4.43
+        }
+      ]
+    },
+    "c_play": {
+      "text": "Handoff... oh! He's run over by his own man! It's loose! Icebreakers have it... touchdown!",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-play-t8.mp4",
+        "start": 0.5,
+        "end": 7.15,
+        "sha256": "496c5ce37bd6337571ade35cecc769a0ac7241ac85a70e83396e7b2cd21a171c",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.047,
+      "snap": {
+        "aligned": 0.71,
+        "start": 0.71,
+        "onset": 0.71,
+        "floor": -43.5
+      },
+      "words": [
+        {
+          "text": "Handoff...",
+          "start": 0.71,
+          "end": 1.14
+        },
+        {
+          "text": "oh!",
+          "start": 1.58,
+          "end": 1.58
+        },
+        {
+          "text": "He's",
+          "start": 2.14,
+          "end": 2.44
+        },
+        {
+          "text": "run",
+          "start": 2.44,
+          "end": 2.6
+        },
+        {
+          "text": "over",
+          "start": 2.6,
+          "end": 2.84
+        },
+        {
+          "text": "by",
+          "start": 2.84,
+          "end": 3.08
+        },
+        {
+          "text": "his",
+          "start": 3.08,
+          "end": 3.22
+        },
+        {
+          "text": "own",
+          "start": 3.22,
+          "end": 3.44
+        },
+        {
+          "text": "man!",
+          "start": 3.44,
+          "end": 3.86
+        },
+        {
+          "text": "It's",
+          "start": 4.26,
+          "end": 4.44
+        },
+        {
+          "text": "loose!",
+          "start": 4.44,
+          "end": 4.74
+        },
+        {
+          "text": "Icebreakers",
+          "start": 5.1,
+          "end": 5.58
+        },
+        {
+          "text": "have",
+          "start": 5.58,
+          "end": 5.9
+        },
+        {
+          "text": "it...",
+          "start": 5.9,
+          "end": 6.12
+        },
+        {
+          "text": "touchdown!",
+          "start": 6.38,
+          "end": 6.92
+        }
+      ]
+    },
+    "c_kick": {
+      "text": "The kick is good!",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/fb2-c-kick-t9.mp4",
+        "start": 0.45,
+        "end": 1.5,
+        "sha256": "8ec9fe217f5cb1dc8315baf0fd217cedae4ded6e32343a8b73418d9f7d2747b4",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.098,
+      "snap": {
+        "aligned": 0.45,
+        "start": 0.45,
+        "onset": 0.45,
+        "floor": -45.9
+      },
+      "words": [
+        {
+          "text": "The",
+          "start": 0.45,
+          "end": 0.55
+        },
+        {
+          "text": "kick",
+          "start": 0.55,
+          "end": 0.73
+        },
+        {
+          "text": "is",
+          "start": 0.73,
+          "end": 0.97
+        },
+        {
+          "text": "good!",
+          "start": 0.97,
+          "end": 1.19
+        }
+      ]
+    },
+    "c_close": {
+      "text": "What a thrilling come-from-behind win by the Icebreakers! Moose, what do you think sparked that comeback?",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "takes/vs-chet-t1.mp4",
+        "start": 0.55,
+        "end": 7,
+        "sha256": "e2b040029b4bb88e65538c934be2b06b07dfc64cdaf98c6672a16b7dbb300716",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.048,
+      "snap": {
+        "aligned": 0.6,
+        "start": 0.6,
+        "onset": 0.6,
+        "floor": -50.1
+      },
+      "words": [
+        {
+          "text": "What",
+          "start": 0.6,
+          "end": 1.25
+        },
+        {
+          "text": "a",
+          "start": 1.25,
+          "end": 1.47
+        },
+        {
+          "text": "thrilling",
+          "start": 1.47,
+          "end": 1.91
+        },
+        {
+          "text": "come-from-behind",
+          "start": 1.91,
+          "end": 2.87
+        },
+        {
+          "text": "win",
+          "start": 2.87,
+          "end": 3.17
+        },
+        {
+          "text": "by",
+          "start": 3.17,
+          "end": 3.39
+        },
+        {
+          "text": "the",
+          "start": 3.39,
+          "end": 3.57
+        },
+        {
+          "text": "Icebreakers!",
+          "start": 3.57,
+          "end": 4.21
+        },
+        {
+          "text": "Moose,",
+          "start": 4.63,
+          "end": 4.89
+        },
+        {
+          "text": "what",
+          "start": 5.05,
+          "end": 5.11
+        },
+        {
+          "text": "do",
+          "start": 5.11,
+          "end": 5.17
+        },
+        {
+          "text": "you",
+          "start": 5.17,
+          "end": 5.33
+        },
+        {
+          "text": "think",
+          "start": 5.33,
+          "end": 5.49
+        },
+        {
+          "text": "sparked",
+          "start": 5.49,
+          "end": 5.85
+        },
+        {
+          "text": "that",
+          "start": 5.85,
+          "end": 6.11
+        },
+        {
+          "text": "comeback?",
+          "start": 6.11,
+          "end": 6.45
+        }
+      ]
+    },
+    "m_close": {
+      "text": "They didn't tackle their own guys, Chet... they didn't tackle their own guys.",
+      "aligner": "faster-whisper-local",
+      "fingerprint": {
+        "source": "editorial/football-take2-20261020/fb2-m-close-t3-lifted.wav",
+        "start": 0.85,
+        "end": 6.14,
+        "sha256": "dc6f59fb7a9f51c3f1e505a788146f9b80c1d8e075504e82d238bdd6c1898564",
+        "snap": "speech-onset@1"
+      },
+      "loss": 0.07,
+      "snap": {
+        "aligned": 1.1,
+        "start": 1.1,
+        "onset": 1.1,
+        "floor": -48.4
+      },
+      "words": [
+        {
+          "text": "They",
+          "start": 1.1,
+          "end": 1.19
+        },
+        {
+          "text": "didn't",
+          "start": 1.19,
+          "end": 1.49
+        },
+        {
+          "text": "tackle",
+          "start": 1.49,
+          "end": 1.79
+        },
+        {
+          "text": "their",
+          "start": 1.79,
+          "end": 1.97
+        },
+        {
+          "text": "own",
+          "start": 1.97,
+          "end": 2.17
+        },
+        {
+          "text": "guys,",
+          "start": 2.17,
+          "end": 2.53
+        },
+        {
+          "text": "Chet...",
+          "start": 2.53,
+          "end": 2.89
+        },
+        {
+          "text": "they",
+          "start": 3.99,
+          "end": 4.31
+        },
+        {
+          "text": "didn't",
+          "start": 4.31,
+          "end": 4.69
+        },
+        {
+          "text": "tackle",
+          "start": 4.69,
+          "end": 4.95
+        },
+        {
+          "text": "their",
+          "start": 4.95,
+          "end": 5.15
+        },
+        {
+          "text": "own",
+          "start": 5.15,
+          "end": 5.39
+        },
+        {
+          "text": "guys.",
+          "start": 5.39,
+          "end": 5.79
+        }
+      ]
+    }
+  }
+}
