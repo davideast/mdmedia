@@ -1,0 +1,78 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "tied": {
+      "text": "Tired of being tied to the wall?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/roam-2-full-t1.mp4", "start": 1.4, "end": 4.758333, "sha256": "fbd3f10b73d8fa7cad4efc2d9dde4f15bfef7ba56cf056e51a6216ddb9c316bb", "snap": "speech-onset@1" },
+      "loss": 0.578,
+      "snap": { "aligned": 2.34, "start": 2.34, "onset": 1.4, "floor": -69 },
+      "words": [
+        { "text": "Tired", "start": 2.34, "end": 2.58, "loss": 0.684 },
+        { "text": "of", "start": 2.6, "end": 2.66, "loss": 0.408 },
+        { "text": "being", "start": 2.7, "end": 2.92, "loss": 0.475 },
+        { "text": "tied", "start": 2.96, "end": 3.2, "loss": 0.53 },
+        { "text": "to", "start": 3.22, "end": 3.28, "loss": 0.621 },
+        { "text": "the", "start": 3.32, "end": 3.4, "loss": 0.492 },
+        { "text": "wall?", "start": 3.44, "end": 3.72, "loss": 0.936 }
+      ]
+    },
+    "intro": {
+      "text": "Introducing Roam Phone, the cordless telephone!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/roam-2-full-t1.mp4", "start": 4.758333, "end": 8, "sha256": "fbd3f10b73d8fa7cad4efc2d9dde4f15bfef7ba56cf056e51a6216ddb9c316bb", "snap": "speech-onset@1" },
+      "loss": 1.127,
+      "snap": { "aligned": 5.098, "start": 5.038, "onset": 5.038, "floor": -69.2 },
+      "words": [
+        { "text": "Introducing", "start": 5.038, "end": 5.638, "loss": 1.096 },
+        { "text": "Roam", "start": 5.778, "end": 5.958, "loss": 1.27 },
+        { "text": "Phone,", "start": 6.058, "end": 6.418, "loss": 1.221 },
+        { "text": "the", "start": 6.618, "end": 6.678, "loss": 1.139 },
+        { "text": "cordless", "start": 6.818, "end": 7.158, "loss": 0.915 },
+        { "text": "telephone!", "start": 7.238, "end": 7.798, "loss": 1.214 }
+      ]
+    },
+    "chat": {
+      "text": "No, I agree. That's why we need to do it.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/roam-2-full-t1.mp4", "start": 9.3, "end": 12.458333, "sha256": "fbd3f10b73d8fa7cad4efc2d9dde4f15bfef7ba56cf056e51a6216ddb9c316bb", "snap": "speech-onset@1" },
+      "loss": 0.659,
+      "snap": { "aligned": 9.9, "start": 9.83, "onset": 9.83, "floor": -58.1 },
+      "words": [
+        { "text": "No,", "start": 9.83, "end": 10.08, "loss": 0.923 },
+        { "text": "I", "start": 10.28, "end": 10.34, "loss": 0.76 },
+        { "text": "agree.", "start": 10.4, "end": 10.8, "loss": 0.775 },
+        { "text": "That's", "start": 10.9, "end": 11.1, "loss": 0.671 },
+        { "text": "why", "start": 11.14, "end": 11.3, "loss": 0.662 },
+        { "text": "we", "start": 11.34, "end": 11.4, "loss": 0.527 },
+        { "text": "need", "start": 11.44, "end": 11.56, "loss": 0.502 },
+        { "text": "to", "start": 11.6, "end": 11.68, "loss": 0.608 },
+        { "text": "do", "start": 11.72, "end": 11.84, "loss": 0.706 },
+        { "text": "it.", "start": 11.88, "end": 12.02, "loss": 0.723 }
+      ]
+    },
+    "talk": {
+      "text": "Roam Phone. Talk anywhere.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/roam-2-full-t1.mp4", "start": 12.458333, "end": 15.058333, "sha256": "fbd3f10b73d8fa7cad4efc2d9dde4f15bfef7ba56cf056e51a6216ddb9c316bb", "snap": "speech-onset@1" },
+      "loss": 0.824,
+      "snap": { "aligned": 12.878, "start": 12.788, "onset": 12.788, "floor": -71.6 },
+      "words": [
+        { "text": "Roam", "start": 12.788, "end": 13.138, "loss": 0.844 },
+        { "text": "Phone.", "start": 13.258, "end": 13.658, "loss": 0.833 },
+        { "text": "Talk", "start": 14.018, "end": 14.278, "loss": 0.863 },
+        { "text": "anywhere.", "start": 14.438, "end": 14.918, "loss": 0.763 }
+      ]
+    },
+    "almost": {
+      "text": "Almost.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/roam-2-full-t1.mp4", "start": 15.058333, "end": 16, "sha256": "fbd3f10b73d8fa7cad4efc2d9dde4f15bfef7ba56cf056e51a6216ddb9c316bb", "snap": "speech-onset@1" },
+      "loss": 0.92,
+      "snap": { "aligned": 15.298, "start": 15.248, "onset": 15.248, "floor": -72.8 },
+      "words": [
+        { "text": "Almost.", "start": 15.248, "end": 15.838, "loss": 0.92 }
+      ]
+    }
+  }
+}

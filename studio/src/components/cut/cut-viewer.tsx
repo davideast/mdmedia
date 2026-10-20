@@ -1,7 +1,7 @@
 'use client';
 
-import { Fragment, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { Film, Minus, Pause, Play, Plus } from 'lucide-react';
+import { Fragment, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ref, type ReactNode } from 'react';
+import { Film, MessageSquare, Minus, Pause, Play, Plus } from 'lucide-react';
 import { cn } from 'cn';
 import { gainAt, type CutError, type ResolvedAudio, type ResolvedLine, type ResolvedOverlay, type ResolvedSegment, type Timeline } from 'mdmedia/cut';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
@@ -23,18 +23,22 @@ import {
   stepTenth,
   tenths,
 } from '@/lib/cut-timeline';
+import { CutViewerContext, TONE_DOT, type CommentPin, type CutViewerComments, type CutViewerControls } from './cut-viewer-context';
 
 /**
  * A read-only view of one cut: the rendered video, framed as the CRT shows it,
  * over a timeline of its lines, shots, music and overlays. The owner watches,
  * reads exact times, and sends timing notes in chat; nothing here edits.
+ *
+ * Where the video and the shot thumbnails come from is the caller's: local
+ * files on the development route, signed links on a production's cut.
  */
 
 type Frame = 'tv' | 'full';
 const ASPECT: Record<Frame, number> = { tv: 4 / 3, full: 16 / 9 };
 
 /** Row heights in pixels, shared by the track names and the tracks. */
-const ROW = { ruler: 28, lane: 72, gaps: 20, shots: 70, music: 46, overlayLane: 15 } as const;
+const ROW = { ruler: 28, pins: 22, lane: 72, gaps: 20, shots: 70, music: 46, overlayLane: 15 } as const;
 /** On a phone the timeline keeps this scale and scrolls inside its own frame. */
 const PHONE_PX_PER_SECOND = 52;
 /** Zoom steps, as multiples of the fitted width (1 fits the whole cut). */
@@ -43,11 +47,41 @@ const ZOOMS = [1, 1.5, 2, 3, 4, 6, 8] as const;
 const span = (start: number, end: number) => `${tenths(start)} → ${tenths(end)} · ${secondsLabel(end - start)}`;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-export function CutViewer({ name, timeline: cut }: { name: string; timeline: Timeline }) {
+export interface CutViewerProps {
+  timeline: Timeline;
+  /** The page's title, for its tab and header. */
+  title: string;
+  /** Drawn in the header instead of the title, such as a breadcrumb with a version switcher. */
+  titleNode?: ReactNode;
+  /** The rendered video; undefined while its link loads. With `videoRef`, the caller sets the element's source itself. */
+  video: string | undefined;
+  /** The video element, when the caller manages its source (see `useSteadySource`). */
+  videoRef?: Ref<HTMLVideoElement | null>;
+  /** Called when the video stops loading, such as when its link expired. */
+  onVideoError?: () => void;
+  /** A shot's thumbnail, or null when it has none (yet). */
+  thumbnail: (segment: ResolvedSegment) => string | null;
+  /** The note shown under Cut; the cut file's own notes by default. */
+  notes?: string;
+  /** What the cut came from, closing the details line, e.g. `night-wagon-take9.cut.json`. */
+  source?: string;
+  /** Where the playhead starts, in seconds. */
+  startAt?: number;
+  /** Set to a function that reads the playhead, so the page can carry it to another version. */
+  readPlayhead?: Ref<() => number>;
+  /** Keep this page among the workspace's routes (tabs, recent, pins). */
+  workspacePage?: boolean;
+  /** Review comments: a Comments panel beside Now and Cut, and their pins on the timeline. */
+  comments?: CutViewerComments;
+}
+
+export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRef: outerVideoRef, onVideoError, thumbnail, notes, source, startAt, readPlayhead, workspacePage = false, comments }: CutViewerProps) {
   // Lines are shown, measured and highlighted by when they're spoken, not by their whole audio.
   const timeline = useMemo(() => ({ ...cut, lines: spokenLines(cut.lines) }), [cut]);
   const { length, segments, lines, music, overlays, sfx, meta } = timeline;
   const videoRef = useRef<HTMLVideoElement>(null);
+  // A caller that manages the source gets the element too.
+  useImperativeHandle(outerVideoRef, () => videoRef.current as HTMLVideoElement, []);
   const lanesRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const playheadRef = useRef<HTMLDivElement>(null);
@@ -62,7 +96,6 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
   /** Where the playhead sat on screen before a zoom, so it stays put after. */
   const zoomAnchor = useRef<{ t: number; offset: number } | null>(null);
   const [now, setNow] = useState({ shot: -1, line: -1, music: -1 });
-  const [videoError, setVideoError] = useState(false);
 
   const scrub = useRef<{ pointerId: number; wasPlaying: boolean; t: number } | null>(null);
   const tap = useRef<{ pointerId: number; x: number; y: number } | null>(null);
@@ -71,7 +104,8 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
   const drawn = useRef({ x: -1, label: '', t: 0 });
   const followUntil = useRef(0);
 
-  const src = `/api/dev/cuts/${encodeURIComponent(name)}/video`;
+  const started = useRef(false);
+  const [videoError, setVideoError] = useState(false);
 
   // --- seeking -------------------------------------------------------------
 
@@ -93,6 +127,8 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
     // While seeking, currentTime already reports the time being sought.
     return pendingSeek.current ?? video.currentTime;
   }, []);
+
+  useImperativeHandle(readPlayhead, () => currentTime, [currentTime]);
 
   const toggle = useCallback(() => {
     const video = videoRef.current;
@@ -238,6 +274,8 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
+    // A comment's pin is a button of its own: it selects the comment and seeks to it.
+    if (event.target instanceof HTMLElement && event.target.closest('[data-pin]')) return;
     const onRuler = event.target instanceof HTMLElement && event.target.closest('[data-ruler]');
     // A finger on the tracks may be scrolling them: seek on a tap, scrub only on the ruler.
     if (event.pointerType === 'touch' && !onRuler) {
@@ -275,6 +313,9 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
   const speakers = useMemo(() => speakerLanes(lines), [lines]);
   const pxPerSecond = width > 0 ? width / length : 40;
   const aspect = ASPECT[frame];
+  const pause = useCallback(() => videoRef.current?.pause(), []);
+  const wide = useWide();
+  const controls = useMemo<CutViewerControls>(() => ({ timeline: cut, currentTime, seek, pause, video: videoRef, frame }), [cut, currentTime, seek, pause, frame]);
   const activeShot = now.shot >= 0 ? segments[now.shot] : null;
   const activeLine = now.line >= 0 ? lines[now.line] : null;
 
@@ -371,115 +412,187 @@ export function CutViewer({ name, timeline: cut }: { name: string; timeline: Tim
         <h3 className="text-[13px] font-semibold text-foreground">Cut</h3>
         <KeysButton />
       </div>
-      {meta.notes ? (
-        <Tip label={<span className="block max-w-[22rem]">{meta.notes}</span>}>
+      {(notes ?? meta.notes) ? (
+        <Tip label={<span className="block max-w-[22rem] whitespace-pre-wrap">{notes ?? meta.notes}</span>}>
           <p tabIndex={0} className="line-clamp-2 text-[13px] leading-[19px] text-ink-muted outline-none focus-visible:ring-1 focus-visible:ring-ring">
-            {meta.notes}
+            {notes ?? meta.notes}
           </p>
         </Tip>
       ) : null}
       <p className="mt-2 truncate font-mono text-[12px] leading-[19px] text-ink-faint">
-        {[`${tenths(length)} s`, `${meta.fps} fps`, `${meta.width}×${meta.height}`, `${name}.cut.json`].join(' · ')}
+        {[`${tenths(length)} s`, `${meta.fps} fps`, `${meta.width}×${meta.height}`, source].filter(Boolean).join(' · ')}
       </p>
+    </section>
+  );
+
+  // The stage: black, the picture centred in it, so a 4:3 frame is pillarboxed inside the stage
+  // rather than leaving the page around it empty. The frame toggle only changes the picture.
+  const stage = (
+    <div className="relative aspect-[4/3] max-h-[62dvh] w-full overflow-hidden rounded-[10px] bg-black ring-1 ring-white/[0.08] [container-type:size] lg:aspect-auto lg:max-h-none lg:min-w-0 lg:flex-1">
+      <div
+        className="absolute top-1/2 left-1/2 w-[min(100cqw,calc(100cqh*var(--aspect)))] -translate-x-1/2 -translate-y-1/2 overflow-hidden transition-[width] duration-300 ease-out motion-reduce:transition-none"
+        style={{ '--aspect': aspect, aspectRatio: String(aspect) } as CSSProperties}
+      >
+        <video
+          ref={videoRef}
+          src={outerVideoRef ? undefined : src}
+          preload="auto"
+          playsInline
+          onClick={toggle}
+          onPlay={() => { setPlaying(true); sample.current.media = -1; }}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+          onSeeked={() => {
+            const next = pendingSeek.current;
+            if (next !== null) { pendingSeek.current = null; seek(next, Boolean(scrub.current)); }
+          }}
+          onLoadedMetadata={(event) => {
+            // Start where the page asked, once: carried over from another version.
+            if (started.current) return;
+            started.current = true;
+            if (startAt && startAt > 0) event.currentTarget.currentTime = clamp(startAt, 0, length);
+          }}
+          onCanPlay={() => setVideoError(false)}
+          onError={() => { setVideoError(true); onVideoError?.(); }}
+          aria-label={`${meta.title} ${meta.version ?? ''}`.trim()}
+          className={cn('absolute inset-0 h-full w-full cursor-pointer', frame === 'tv' ? 'object-cover' : 'object-contain')}
+        />
+        {frame === 'full' ? (
+          <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[12.5%] right-[12.5%] border-x border-dashed border-white/30" />
+        ) : null}
+        {videoError || !src ? (
+          <p role={videoError ? 'alert' : 'status'} className="absolute inset-0 grid place-content-center p-6 text-center text-sm text-ink-muted">
+            {videoError ? 'The rendered video isn’t available.' : 'Loading video…'}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const timelineSection = (
+    <section aria-label="Timeline" className="flex-none overflow-hidden rounded-[10px] border border-border bg-surface-inset select-none">
+      <div className="flex">
+        <TrackNames
+          speakers={speakers}
+          overlayTitle={sfx.length ? 'Overlays · SFX' : 'Overlays'}
+          overlayLanes={overlayLaneCount(overlays, sfx)}
+          pins={Boolean(comments)}
+          zoom={zoom}
+          onZoom={zoomTo}
+        />
+        <div ref={scrollerRef} className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
+          <div
+            ref={lanesRef}
+            className="relative w-[calc(max(100%,var(--phone-width))*var(--zoom))] cursor-text lg:w-[calc(100%*var(--zoom))]"
+            style={{ '--phone-width': `${Math.ceil(length * PHONE_PX_PER_SECOND)}px`, '--zoom': ZOOMS[zoom] } as CSSProperties}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={(event) => endScrub(event, true)}
+            onPointerCancel={(event) => endScrub(event, false)}
+          >
+            <Tracks
+              timeline={timeline}
+              speakers={speakers}
+              pxPerSecond={pxPerSecond}
+              now={now}
+              thumbnail={thumbnail}
+              onSeek={seek}
+              pins={comments?.pins ?? null}
+              selectedPin={comments?.selected ?? null}
+              draftPin={comments?.draft ?? null}
+              onPin={comments?.onPin}
+            />
+            <div ref={playheadRef} aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-20 will-change-transform">
+              <div className="absolute inset-y-0 -left-px w-px bg-[var(--cut-now)] shadow-[0_0_0_1px_rgba(0,0,0,0.35)]" />
+              <span
+                ref={flagRef}
+                className="absolute top-[5px] left-0 rounded-[4px] bg-[var(--cut-now)] px-1.5 py-px font-mono text-[10.5px] leading-[15px] font-semibold text-[#1c1917] tabular-nums"
+              >
+                0.0
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 
   return (
     <WorkbenchPanel
       className="dark"
-      title={[meta.title, meta.version].filter(Boolean).join(' · ')}
-      icon={<Film size={13} strokeWidth={2} />}
+      title={title}
+      titleNode={titleNode}
+      icon={titleNode ? undefined : <Film size={13} strokeWidth={2} />}
       bodyClassName="p-0"
+      workspacePage={workspacePage}
     >
-      {/* Three boxes on one grid with equal gutters: the stage and the panel on top, the timeline under
-          both. The stage's left edge and the panel's right edge are the timeline's edges. */}
-      <div ref={rootRef} className="flex min-h-full flex-1 flex-col gap-4 px-4 pt-4 pb-5 lg:px-6" style={{ '--cut-now': '#f6c453' } as CSSProperties}>
-        <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row">
-          {/* The stage: black, the picture centred in it, so a 4:3 frame is pillarboxed inside the stage
-              rather than leaving the page around it empty. The frame toggle only changes the picture. */}
-          <div className="relative aspect-[4/3] max-h-[62dvh] w-full overflow-hidden rounded-[10px] bg-black ring-1 ring-white/[0.08] [container-type:size] lg:aspect-auto lg:max-h-none lg:min-w-0 lg:flex-1">
-          <div
-            className="absolute top-1/2 left-1/2 w-[min(100cqw,calc(100cqh*var(--aspect)))] -translate-x-1/2 -translate-y-1/2 overflow-hidden transition-[width] duration-300 ease-out motion-reduce:transition-none"
-            style={{ '--aspect': aspect, aspectRatio: String(aspect) } as CSSProperties}
-          >
-            <video
-              ref={videoRef}
-              src={src}
-              preload="auto"
-              playsInline
-              onClick={toggle}
-              onPlay={() => { setPlaying(true); sample.current.media = -1; }}
-              onPause={() => setPlaying(false)}
-              onEnded={() => setPlaying(false)}
-              onSeeked={() => {
-                const next = pendingSeek.current;
-                if (next !== null) { pendingSeek.current = null; seek(next, Boolean(scrub.current)); }
-              }}
-              onError={() => setVideoError(true)}
-              aria-label={`${meta.title} ${meta.version ?? ''}`.trim()}
-              className={cn('absolute inset-0 h-full w-full cursor-pointer', frame === 'tv' ? 'object-cover' : 'object-contain')}
-            />
-            {frame === 'full' ? (
-              <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[12.5%] right-[12.5%] border-x border-dashed border-white/30" />
-            ) : null}
-            {videoError ? (
-              <p role="alert" className="absolute inset-0 grid place-content-center p-6 text-center text-sm text-ink-muted">
-                The rendered video isn&apos;t in the media folder.
-              </p>
-            ) : null}
-          </div>
-          </div>
-          {/* The panel: a docked box the same as the timeline's. On a phone only the transport is here,
-              unboxed under the picture; the rest goes in a box under the timeline. */}
-          <aside className="flex min-w-0 flex-col gap-6 lg:w-[23rem] lg:flex-none lg:overflow-hidden lg:rounded-[10px] lg:border lg:border-border lg:bg-surface-inset lg:p-4 lg:[container:aside/size]">
-            {transport}
-            <div className="hidden lg:block">{nowSection}</div>
-            {/* The cut's notes only where there's room; what's playing now comes first. */}
-            <div className="mt-auto hidden [@container_aside_(min-height:360px)]:block">{cutSection}</div>
-          </aside>
-        </div>
-
-        <section aria-label="Timeline" className="flex-none overflow-hidden rounded-[10px] border border-border bg-surface-inset select-none">
-          <div className="flex">
-            <TrackNames
-              speakers={speakers}
-              overlayTitle={sfx.length ? 'Overlays · SFX' : 'Overlays'}
-              overlayLanes={overlayLaneCount(overlays, sfx)}
-              zoom={zoom}
-              onZoom={zoomTo}
-            />
-            <div ref={scrollerRef} className="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
-              <div
-                ref={lanesRef}
-                className="relative w-[calc(max(100%,var(--phone-width))*var(--zoom))] cursor-text lg:w-[calc(100%*var(--zoom))]"
-                style={{ '--phone-width': `${Math.ceil(length * PHONE_PX_PER_SECOND)}px`, '--zoom': ZOOMS[zoom] } as CSSProperties}
-                onPointerDown={onPointerDown}
-                onPointerMove={onPointerMove}
-                onPointerUp={(event) => endScrub(event, true)}
-                onPointerCancel={(event) => endScrub(event, false)}
-              >
-                <Tracks timeline={timeline} speakers={speakers} pxPerSecond={pxPerSecond} now={now} name={name} onSeek={seek} />
-                <div ref={playheadRef} aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-20 will-change-transform">
-                  <div className="absolute inset-y-0 -left-px w-px bg-[var(--cut-now)] shadow-[0_0_0_1px_rgba(0,0,0,0.35)]" />
-                  <span
-                    ref={flagRef}
-                    className="absolute top-[5px] left-0 rounded-[4px] bg-[var(--cut-now)] px-1.5 py-px font-mono text-[10.5px] leading-[15px] font-semibold text-[#1c1917] tabular-nums"
-                  >
-                    0.0
-                  </span>
-                </div>
+      <CutViewerContext.Provider value={controls}>
+        {comments ? (
+          /* With comments, the same three boxes. The panel keeps the transport at its top and scrolls what's
+             under it: Now, Comments, then Cut. The stage and the timeline keep their size. On a phone the
+             transport stays under the picture and the rest follows the timeline in one box, in the same order.
+             Only one copy is mounted, wherever the layout puts it. */
+          <div ref={rootRef} className="flex min-h-full flex-1 flex-col gap-4 px-4 pt-4 pb-5 lg:px-6" style={{ '--cut-now': '#f6c453' } as CSSProperties}>
+            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row">
+              {stage}
+              <aside className="flex min-w-0 flex-col gap-4 lg:w-[23rem] lg:flex-none lg:overflow-hidden lg:rounded-[10px] lg:border lg:border-border lg:bg-surface-inset lg:py-4">
+                <div className="lg:flex-none lg:px-4">{transport}</div>
+                {wide ? (
+                  <div data-comments-scroll className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pb-1 [scrollbar-width:thin]">
+                    {nowSection}
+                    {comments.panel}
+                    {cutSection}
+                  </div>
+                ) : null}
+              </aside>
+            </div>
+            {timelineSection}
+            {wide ? null : (
+              <div className="flex flex-col gap-6 rounded-[10px] border border-border bg-surface-inset p-4">
+                {nowSection}
+                {comments.panel}
+                {cutSection}
               </div>
+            )}
+          </div>
+        ) : (
+          /* Three boxes on one grid with equal gutters: the stage and the panel on top, the timeline under
+             both. The stage's left edge and the panel's right edge are the timeline's edges. */
+          <div ref={rootRef} className="flex min-h-full flex-1 flex-col gap-4 px-4 pt-4 pb-5 lg:px-6" style={{ '--cut-now': '#f6c453' } as CSSProperties}>
+            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row">
+              {stage}
+              {/* The panel: a docked box the same as the timeline's. On a phone only the transport is here,
+                  unboxed under the picture; the rest goes in a box under the timeline. */}
+              <aside className="flex min-w-0 flex-col gap-6 lg:w-[23rem] lg:flex-none lg:overflow-hidden lg:rounded-[10px] lg:border lg:border-border lg:bg-surface-inset lg:p-4 lg:[container:aside/size]">
+                {transport}
+                <div className="hidden lg:block">{nowSection}</div>
+                {/* The cut's notes only where there's room; what's playing now comes first. */}
+                <div className="mt-auto hidden [@container_aside_(min-height:360px)]:block">{cutSection}</div>
+              </aside>
+            </div>
+            {timelineSection}
+            <div className="flex flex-col gap-6 rounded-[10px] border border-border bg-surface-inset p-4 lg:hidden">
+              {nowSection}
+              {cutSection}
             </div>
           </div>
-        </section>
-
-        <div className="flex flex-col gap-6 rounded-[10px] border border-border bg-surface-inset p-4 lg:hidden">
-          {nowSection}
-          {cutSection}
-        </div>
-      </div>
+        )}
+      </CutViewerContext.Provider>
     </WorkbenchPanel>
   );
+}
+
+/** Whether the page is at the desktop layout (Tailwind's `lg`), where the side panel holds Now, Cut and Comments. */
+function useWide(): boolean {
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 64rem)');
+    const update = () => setWide(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return wide;
 }
 
 /** A quiet text action that opens the keyboard shortcuts. Hidden on touch-sized layouts, where there are no keys. */
@@ -526,12 +639,15 @@ function TrackNames({
   speakers,
   overlayTitle,
   overlayLanes,
+  pins,
   zoom,
   onZoom,
 }: {
   speakers: string[];
   overlayTitle: string;
   overlayLanes: number;
+  /** Whether the comments' pin row is drawn under the ruler. */
+  pins: boolean;
   zoom: number;
   onZoom: (step: number) => void;
 }) {
@@ -553,6 +669,11 @@ function TrackNames({
           </button>
         </Tip>
       </div>
+      {pins ? (
+        <div style={{ height: ROW.pins }} className="flex items-center justify-center border-b border-border text-ink-faint" title="Comments">
+          <MessageSquare size={12} strokeWidth={2} aria-label="Comments" />
+        </div>
+      ) : null}
       {speakers.map((speaker, i) => (
         <div key={speaker}>
           <div style={{ height: ROW.lane }} className={cn(name, 'items-start pt-[7px] text-foreground')}>{speaker}</div>
@@ -592,15 +713,24 @@ const Tracks = memo(function Tracks({
   speakers,
   pxPerSecond,
   now,
-  name,
+  thumbnail,
   onSeek,
+  pins,
+  selectedPin,
+  draftPin,
+  onPin,
 }: {
   timeline: Timeline;
   speakers: string[];
   pxPerSecond: number;
   now: { shot: number; line: number };
-  name: string;
+  thumbnail: (segment: ResolvedSegment) => string | null;
   onSeek: (t: number) => void;
+  /** Comments' pins, or null for a viewer without comments. */
+  pins: CommentPin[] | null;
+  selectedPin: string | null;
+  draftPin: number | null;
+  onPin?: (id: string) => void;
 }) {
   const { length, segments, lines, music, overlays, sfx } = timeline;
   const pct = (seconds: number) => `${(seconds / length) * 100}%`;
@@ -683,6 +813,36 @@ const Tracks = memo(function Tracks({
         <span className="absolute top-[7px] right-1 font-mono text-[10px] leading-none text-ink-muted tabular-nums">{tenths(length)}</span>
       </div>
 
+      {/* comments: a dot at each one's time, in its status colour; the one being written as a ring */}
+      {pins ? (
+        <div className="relative border-b border-border" style={{ height: ROW.pins }}>
+          {pins.map((pin) => (
+            <Tip key={pin.id} label={<TipBody title={pin.label} times={`${tenths(pin.time)} s`} />}>
+              <button
+                type="button"
+                data-pin
+                aria-label={`Comment at ${tenths(pin.time)} seconds: ${pin.label}`}
+                aria-pressed={selectedPin === pin.id}
+                onClick={() => { onSeek(pin.time); onPin?.(pin.id); }}
+                className="group absolute top-1/2 flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                style={{ left: pct(pin.time) }}
+              >
+                <span
+                  className={cn(
+                    'block rounded-full transition-[width,height,box-shadow] duration-150',
+                    TONE_DOT[pin.tone],
+                    selectedPin === pin.id ? 'size-[11px] shadow-[0_0_0_2px_var(--surface-inset),0_0_0_3.5px_var(--foreground)]' : 'size-[9px] group-hover:size-[11px]',
+                  )}
+                />
+              </button>
+            </Tip>
+          ))}
+          {draftPin !== null ? (
+            <span aria-hidden className="absolute top-1/2 size-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-dashed border-foreground/80" style={{ left: pct(draftPin) }} />
+          ) : null}
+        </div>
+      ) : null}
+
       {/* lines: one lane per speaker, the gaps between the first two */}
       {speakers.map((speaker, laneIndex) => (
         <div key={speaker}>
@@ -761,7 +921,7 @@ const Tracks = memo(function Tracks({
           <Shot
             key={segment.id}
             segment={segment}
-            name={name}
+            thumbnail={thumbnail(segment)}
             active={now.shot === i}
             left={pct(segment.start)}
             width={pct(segment.end - segment.start)}
@@ -869,7 +1029,7 @@ const Tracks = memo(function Tracks({
 
 function Shot({
   segment,
-  name,
+  thumbnail,
   active,
   left,
   width,
@@ -877,7 +1037,7 @@ function Shot({
   onKeyDown,
 }: {
   segment: ResolvedSegment;
-  name: string;
+  thumbnail: string | null;
   active: boolean;
   left: string;
   width: string;
@@ -885,8 +1045,8 @@ function Shot({
   pixels: number;
   onKeyDown: (event: React.KeyboardEvent) => void;
 }) {
-  const [loaded, setLoaded] = useState(false);
-  const picture = segment.src.kind === 'take' || segment.src.kind === 'file';
+  const [loaded, setLoaded] = useState<string | null>(null);
+  const picture = Boolean(thumbnail) && segment.src.kind !== 'color';
   const source = segment.src.kind === 'take' ? segment.src.name : segment.src.kind === 'color' ? segment.src.ref : null;
   return (
     <Tip
@@ -910,13 +1070,13 @@ function Shot({
           style={segment.src.kind === 'color' ? { background: segment.src.color } : undefined}
         >
           {picture ? (
-            // eslint-disable-next-line @next/next/no-img-element -- a local dev thumbnail, not an optimisable asset
+            // eslint-disable-next-line @next/next/no-img-element -- a private thumbnail, not an optimisable asset
             <img
-              src={`/api/dev/cuts/${encodeURIComponent(name)}/thumbs/${encodeURIComponent(segment.id)}`}
+              src={thumbnail!}
               alt=""
               draggable={false}
-              onLoad={() => setLoaded(true)}
-              className={cn('h-full w-full object-cover transition-opacity duration-300', loaded ? 'opacity-100' : 'opacity-0')}
+              onLoad={() => setLoaded(thumbnail)}
+              className={cn('h-full w-full object-cover transition-opacity duration-300', loaded === thumbnail ? 'opacity-100' : 'opacity-0')}
             />
           ) : null}
           {/* Drawn over the picture: a hairline where one shot meets the next, or the playhead colour round the current one. */}
@@ -937,10 +1097,25 @@ function Shot({
   );
 }
 
-/** Shown instead of the viewer when the cut file doesn't resolve. */
-export function CutProblems({ name, message, errors }: { name: string; message: string; errors: CutError[] }) {
+/** Development only: a cut file from `docs/cuts`, its video and thumbnails read from the local media folder. */
+export function DevCutViewer({ name, timeline }: { name: string; timeline: Timeline }) {
+  const base = `/api/dev/cuts/${encodeURIComponent(name)}`;
+  const thumbnail = useCallback((segment: ResolvedSegment) => (segment.src.kind === 'take' || segment.src.kind === 'file' ? `${base}/thumbs/${encodeURIComponent(segment.id)}` : null), [base]);
   return (
-    <WorkbenchPanel className="dark" title={`${name}.cut.json`} icon={<Film size={13} strokeWidth={2} />} bodyClassName="p-6">
+    <CutViewer
+      timeline={timeline}
+      title={[timeline.meta.title, timeline.meta.version].filter(Boolean).join(' · ')}
+      video={`${base}/video`}
+      thumbnail={thumbnail}
+      source={`${name}.cut.json`}
+    />
+  );
+}
+
+/** Shown instead of the viewer when the cut file doesn't resolve. */
+export function CutProblems({ title, titleNode, message, errors }: { title: string; titleNode?: ReactNode; message: string; errors: CutError[] }) {
+  return (
+    <WorkbenchPanel className="dark" title={title} titleNode={titleNode} icon={titleNode ? undefined : <Film size={13} strokeWidth={2} />} bodyClassName="p-6">
       <div className="grid max-w-[60ch] gap-4">
         <p className="text-[15px] text-foreground">{message}</p>
         <ul className="grid gap-2">

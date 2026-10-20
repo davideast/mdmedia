@@ -148,6 +148,15 @@ cast/rick/
 
 Cast is the step before `shot`, so it fits naturally with Idea 1. Built together, the whole thing is still medium.
 
+### Built: characters, first version (2026-10-20)
+See [docs/characters.md](../docs/characters.md).
+- **Character files:** `docs/characters/<id>.character.json` (`mdmedia.character@1`): name, description, look with "never" rules, reference stills with provenance (a take and a time, or a generation), a voice (provider, name or id, settings, uses), a delivery profile (register, "never" rules, reference levels measured from named approved lines), and a version with a changelog. Earlier versions are kept as `<id>@<n>.character.json`.
+- **Casts:** a production manifest's `cast` maps roles (cut speakers) to `id@version`. `cut check` holds lines to the cast's reference levels; `cut storyboard` writes in the look, "never" rules and usual delivery.
+- **CLI:** `mdmedia character new|show|list|measure|still|swap`.
+- **Studio:** characters stored per version (`/api/v1/characters`), productions link to them as their cast, and the production page shows it.
+- **Seeded:** Big Hal, Rick, Buddy, Chet and Moose, measured from approved lines in Big Hal Takes 6/7, Night Wagon Take 9 and CGL Football Take 1.
+- **Voice swap:** `mdmedia character swap` and the `swap` step in a cut's `sources` are built, but the test wasn't run: ElevenLabs was out of credits. `voiceswap/run-test.sh` in the media root runs it.
+
 ---
 
 ## Idea 3: taxonomy in Studio (agreed 2026-10-19)
@@ -190,6 +199,111 @@ Studio's media types today (`narration | image | video | music | sfx`) are all *
 
 ### Names
 Production, Cut, Shot, Take, Cast, Series, Characters; Voice replaces Narration.
+
+---
+
+## Idea 4: performance continuity (planned 2026-10-19)
+
+### The problem
+- **A cut can match and still feel wrong.** The next shot gets the scene and the person right, but the delivery is out of flow: a separate performance at a different energy, pitch or pace. It's the most common failure in these generations.
+- **Hal, Big Hal Take 5:**
+  - "…by me! PERSONALLY!" is two performances.
+  - "This one even comes with… WHEELS!" is a calm setup and a shouted reveal split across two clips, which kills a joke that only works if he says it like an ordinary selling point.
+- **Night Wagon avoided it:**
+  - Rick's lines were cut from one continuous take.
+  - His intensity never changes, so seams don't show.
+
+The general cause: each shot is generated from a still with no knowledge of what was just said, how it was said, or what comes next.
+
+### The model
+1. **Performances in the cut.** A `performances` list groups the lines that must sound like one continuous delivery:
+   - each has an intent, e.g. "setup and punchline";
+   - each has its own delivery direction, e.g. "ordinary selling point, one breath, no pause before 'wheels'".
+   - Lines can also carry delivery notes of their own.
+2. **A delivery profile on each character,** next to their voice:
+   - **Register:** for example, "proud, sincere, steady local pitchman".
+   - **"Never" rules:** for example, "never shouts".
+   - **Reference levels measured from approved lines:** loudness, pitch and speech rate, so "too loud for Hal" is a number, not a guess.
+3. **Generation context, assembled automatically.** When a shot carries part of a performance, its storyboard is given:
+   - the words just said before it, verbatim, and how they were delivered (measured and described);
+   - the delivery for this shot, from the performance and the character profile;
+   - what comes next.
+   No more fresh shots that don't know the line they're continuing.
+4. **A splitting rule:** a sentence, and a setup with its payoff, comes from **one generation**, always.
+   - Write the whole line into one storyboard; a sentence of up to about 7 s fits.
+   - If the picture must change inside it, cut the picture over that one take's continuous audio (a cutaway or insert played over it), never the voice.
+   - Never generate part of a sentence as a separate clip, and never finish one with an extend. An extend continues the picture, but its sound is a new generation, so the delivery comes back as a separate performance. Round 2's extended "Personally!" showed exactly that.
+   - Only a new sentence may start a new generation, and then it gets the delivery context (what was just said, how, and what comes next).
+5. **Checks, stored on each take and cut:**
+   - **Measured:** for every performance, loudness, pitch and speech rate per word, plus the change across each boundary between its lines. Flag jumps beyond the character's profile. Pause lengths come from word timings.
+   - **Listening check:** gemini-3.8-flash hears the clip. Its questions are generated from the performances and profile:
+     - "Do 'This one even comes with' and 'wheels' sound like one continuous delivery?";
+     - "Is any word shouted?";
+     - "Is the punchline delivered as an ordinary selling point?".
+     Give it every known time and ask about phrases, not cuts. Calibration: on Take 5 it heard "shouted 0.99, two separate deliveries 0.95, big reveal 0.99".
+   - **Ranking:** when several takes are generated, rank them by the checks, and don't offer takes that fail.
+
+### Where it lives
+- **Cut format:** `performances` and line `delivery`.
+- **Cast:** each character's delivery profile.
+- **`mdmedia cut check`:**
+  - measured prosody with continuity deltas;
+  - the listening check, with results written next to the words file;
+  - the listening check as an interface, like the aligner, so the model can change.
+- **A storyboard helper** that writes the delivery context into a shot's storyboard from the cut, the performances and the profile.
+- **Agent context bundles:** performances, profiles and check results.
+
+### Effort
+Medium overall:
+- **Small:**
+  - the format fields;
+  - the profile on characters;
+  - the listening-check wrapper (it exists as `judge.mjs`);
+  - the storyboard helper.
+- **Medium:** the measured prosody. Pitch tracking needs a small pitch detector, and reference levels need approved lines to measure.
+
+### Validated by
+The round-2 simulation on Big Hal applies all of this by hand. Its results show which parts matter most.
+
+### Built: part one (2026-10-19)
+See [docs/cut-check.md](../docs/cut-check.md) and the Performances section of [docs/cut-format.md](../docs/cut-format.md).
+- **Format:**
+  - a cut-level `performances` list (`id`, `lines`, `intent`, `delivery`, own `thresholds`);
+  - a line-level `delivery` note;
+  - `check.thresholds`.
+  
+  The resolver reports unknown lines, lines in two performances and lines out of order. It puts each splitting-rule problem on the resolved performance: separate generations, a line across an extend seam, an unknown seam, mixed speakers. An extended take's seam is the length of the take it continued, so Take 4's opening counts as one generation.
+- **`mdmedia cut check <cut> [--listen] [--json]`:**
+  - **Measured:** taken from a render of the cut's dialogue (no music or effects, the cut's own gains).
+    - Per line: BS.1770 loudness, YIN pitch (median and range) and words/s.
+    - Per boundary: deltas at the edges and the pause from word timings.
+    - Per cut inside a performance: room tone either side.
+    - Loud words.
+  - **Listening:** a `Listener` interface with `GeminiListener` (judge.mjs ported, `gemini-3.8-flash`). Questions about phrases are generated from the performances and deliveries.
+  - **Results:** written to `<name>.check.json` with fingerprints, so they go stale like words files.
+- **`mdmedia cut storyboard <cut> <id>`:** writes the house-format storyboard:
+  - the words said before, verbatim, with their measured delivery in words;
+  - the whole performance and its direction;
+  - what comes next.
+  
+  The look and framing come from the take's own storyboard.
+- **Calibration:** Big Hal Takes 5, 6 and 7 and Night Wagon Take 9 are annotated.
+  - **Measured flags and the splitting rule:** they separate Take 5's two broken performances (4 and 5 flags each) from everything the owner heard as fine (none).
+  - **The listening check:**
+    - It catches the shouted reveal and the shouted "PERSONALLY!".
+    - It calls every pair "one continuous delivery", so Take 5's "two separate deliveries 0.95" above didn't reproduce.
+    - It fails the accepted Take 6/7 punchline as shouted, though measured "wheels" is level with "comes".
+    
+    It stays a filter.
+- **Hooks for characters:**
+  - `reference: (speaker) => ReferenceLevels` in the check, which flags `outside-reference`;
+  - `character: (speaker) => CharacterDelivery` (register and "never" rules) in the storyboard helper.
+- **Left for part two and characters:**
+  - **The cast:** each character's delivery profile, and its reference levels measured from approved lines.
+  - **Ranking takes:** rank several takes by the checks, and drop those that fail.
+  - **Agent context bundles:** performances, profiles and check results.
+  - **Inside a single line:** a pitch or loudness measure that holds within a line (a reveal inside one line, as in Take 6's take, is only caught by its words).
+  - **Studio:** showing performances and checks.
 
 ---
 

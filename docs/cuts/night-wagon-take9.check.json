@@ -1,0 +1,741 @@
+{
+  "format": "mdmedia.cut-check@1",
+  "measured": {
+    "method": "dialogue-stem@1",
+    "source": "a render of the cut's dialogue: every segment's own sound and every line with its own sound, at the cut's volumes, fades and layers, without music or sound effects, mono 48 kHz",
+    "range": {
+      "from": 0,
+      "to": 26.3
+    },
+    "lines": [
+      {
+        "id": "getaway",
+        "speaker": "Rick",
+        "text": "They're getting away, Buddy.",
+        "speech": {
+          "start": 4.38,
+          "end": 5.36
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 7,
+        "loudness": -22.2,
+        "pitch": {
+          "median": 167,
+          "low": 137.6,
+          "high": 207,
+          "range": 7.1,
+          "voiced": 0.76
+        },
+        "rate": {
+          "words": 4.08,
+          "syllables": 7.14
+        },
+        "wordLevels": [
+          {
+            "text": "They're",
+            "start": 4.38,
+            "end": 4.5,
+            "loudness": -24.9
+          },
+          {
+            "text": "getting",
+            "start": 4.54,
+            "end": 4.72,
+            "loudness": -21.9
+          },
+          {
+            "text": "away,",
+            "start": 4.8,
+            "end": 5.02,
+            "loudness": -20.9
+          },
+          {
+            "text": "Buddy.",
+            "start": 5.12,
+            "end": 5.36,
+            "loudness": -22.2
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "bridge",
+        "speaker": "Buddy",
+        "text": "The bridge ahead is out, Rick.",
+        "speech": {
+          "start": 5.61,
+          "end": 7.01
+        },
+        "timedBy": "words",
+        "words": 6,
+        "syllables": 7,
+        "loudness": -25.3,
+        "pitch": {
+          "median": 147.2,
+          "low": 105.7,
+          "high": 223.3,
+          "range": 12.9,
+          "voiced": 0.53
+        },
+        "rate": {
+          "words": 4.29,
+          "syllables": 5
+        },
+        "wordLevels": [
+          {
+            "text": "The",
+            "start": 5.61,
+            "end": 5.69,
+            "loudness": -23.8
+          },
+          {
+            "text": "bridge",
+            "start": 5.79,
+            "end": 6.03,
+            "loudness": -23.4
+          },
+          {
+            "text": "ahead",
+            "start": 6.09,
+            "end": 6.31,
+            "loudness": -25.5
+          },
+          {
+            "text": "is",
+            "start": 6.35,
+            "end": 6.47,
+            "loudness": -26
+          },
+          {
+            "text": "out,",
+            "start": 6.55,
+            "end": 6.71,
+            "loudness": -28.5
+          },
+          {
+            "text": "Rick.",
+            "start": 6.79,
+            "end": 7.01,
+            "loudness": -26.9
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "jump",
+        "speaker": "Rick",
+        "text": "Then we jump it.",
+        "speech": {
+          "start": 7.23,
+          "end": 7.87
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 4,
+        "loudness": -23.9,
+        "pitch": {
+          "median": 153,
+          "low": 142.8,
+          "high": 213.2,
+          "range": 6.9,
+          "voiced": 0.72
+        },
+        "rate": {
+          "words": 6.25,
+          "syllables": 6.25
+        },
+        "wordLevels": [
+          {
+            "text": "Then",
+            "start": 7.23,
+            "end": 7.35,
+            "loudness": -24
+          },
+          {
+            "text": "we",
+            "start": 7.39,
+            "end": 7.53,
+            "loudness": -25.9
+          },
+          {
+            "text": "jump",
+            "start": 7.59,
+            "end": 7.79,
+            "loudness": -23.1
+          },
+          {
+            "text": "it.",
+            "start": 7.83,
+            "end": 7.87,
+            "loudness": -25
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "gap",
+        "speaker": "Buddy",
+        "text": "Rick, it's a forty-foot gap.",
+        "speech": {
+          "start": 8.03,
+          "end": 9.77
+        },
+        "timedBy": "words",
+        "words": 5,
+        "syllables": 7,
+        "loudness": -27,
+        "pitch": {
+          "median": 164.4,
+          "low": 121.5,
+          "high": 219.9,
+          "range": 10.3,
+          "voiced": 0.41
+        },
+        "rate": {
+          "words": 2.87,
+          "syllables": 4.02
+        },
+        "wordLevels": [
+          {
+            "text": "Rick,",
+            "start": 8.03,
+            "end": 8.29,
+            "loudness": -23.5
+          },
+          {
+            "text": "it's",
+            "start": 8.73,
+            "end": 8.83,
+            "loudness": -25.7
+          },
+          {
+            "text": "a",
+            "start": 8.87,
+            "end": 8.91,
+            "loudness": -28.2
+          },
+          {
+            "text": "forty-foot",
+            "start": 8.97,
+            "end": 9.39,
+            "loudness": -25.2
+          },
+          {
+            "text": "gap.",
+            "start": 9.51,
+            "end": 9.77,
+            "loudness": -28.9
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "boost",
+        "speaker": "Rick",
+        "text": "We need to turbo boost!",
+        "speech": {
+          "start": 9.99,
+          "end": 11.02
+        },
+        "timedBy": "words",
+        "words": 5,
+        "syllables": 6,
+        "loudness": -22.4,
+        "pitch": {
+          "median": 211.9,
+          "low": 130.5,
+          "high": 318.2,
+          "range": 15.4,
+          "voiced": 0.7
+        },
+        "rate": {
+          "words": 4.85,
+          "syllables": 5.83
+        },
+        "wordLevels": [
+          {
+            "text": "We",
+            "start": 9.99,
+            "end": 10.06,
+            "loudness": -23.1
+          },
+          {
+            "text": "need",
+            "start": 10.1,
+            "end": 10.22,
+            "loudness": -23.3
+          },
+          {
+            "text": "to",
+            "start": 10.24,
+            "end": 10.36,
+            "loudness": -25.5
+          },
+          {
+            "text": "turbo",
+            "start": 10.4,
+            "end": 10.7,
+            "loudness": -20.8
+          },
+          {
+            "text": "boost!",
+            "start": 10.78,
+            "end": 11.02,
+            "loudness": -22.8
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "cant",
+        "speaker": "Buddy",
+        "text": "Rick, we can't.",
+        "speech": {
+          "start": 11.2,
+          "end": 11.96
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 3,
+        "loudness": -26,
+        "pitch": {
+          "median": 252.2,
+          "low": 135.7,
+          "high": 297.2,
+          "range": 13.6,
+          "voiced": 0.56
+        },
+        "rate": {
+          "words": 3.95,
+          "syllables": 3.95
+        },
+        "wordLevels": [
+          {
+            "text": "Rick,",
+            "start": 11.2,
+            "end": 11.4,
+            "loudness": -23.7
+          },
+          {
+            "text": "we",
+            "start": 11.54,
+            "end": 11.62,
+            "loudness": -25.6
+          },
+          {
+            "text": "can't.",
+            "start": 11.68,
+            "end": 11.96,
+            "loudness": -24.4
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "notime",
+        "speaker": "Rick",
+        "text": "There's no time!",
+        "speech": {
+          "start": 12.18,
+          "end": 13
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 4,
+        "loudness": -21.8,
+        "pitch": {
+          "median": 342.3,
+          "low": 146,
+          "high": 358.4,
+          "range": 15.5,
+          "voiced": 0.69
+        },
+        "rate": {
+          "words": 3.66,
+          "syllables": 4.88
+        },
+        "wordLevels": [
+          {
+            "text": "There's",
+            "start": 12.18,
+            "end": 12.34,
+            "loudness": -22.9
+          },
+          {
+            "text": "no",
+            "start": 12.38,
+            "end": 12.56,
+            "loudness": -21.3
+          },
+          {
+            "text": "time!",
+            "start": 12.62,
+            "end": 13,
+            "loudness": -21.4
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "no",
+        "speaker": "Buddy",
+        "text": "Rick. No. We can't.",
+        "speech": {
+          "start": 13.18,
+          "end": 15.06
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 4,
+        "loudness": -29.5,
+        "pitch": {
+          "median": 128.9,
+          "low": 89.2,
+          "high": 155.4,
+          "range": 9.6,
+          "voiced": 0.54
+        },
+        "rate": {
+          "words": 2.13,
+          "syllables": 2.13
+        },
+        "wordLevels": [
+          {
+            "text": "Rick.",
+            "start": 13.18,
+            "end": 13.4,
+            "loudness": -25.3
+          },
+          {
+            "text": "No.",
+            "start": 13.96,
+            "end": 14.14,
+            "loudness": -25.5
+          },
+          {
+            "text": "We",
+            "start": 14.66,
+            "end": 14.74,
+            "loudness": -24
+          },
+          {
+            "text": "can't.",
+            "start": 14.8,
+            "end": 15.06,
+            "loudness": -25.2
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "turbo",
+        "speaker": "Rick",
+        "text": "TURBO... BOOST!",
+        "speech": {
+          "start": 15.56,
+          "end": 16.36
+        },
+        "timedBy": "words",
+        "words": 2,
+        "syllables": 3,
+        "loudness": -20.7,
+        "pitch": {
+          "median": 212.5,
+          "low": 136.4,
+          "high": 401.7,
+          "range": 18.7,
+          "voiced": 0.81
+        },
+        "rate": {
+          "words": 2.5,
+          "syllables": 3.75
+        },
+        "wordLevels": [
+          {
+            "text": "TURBO...",
+            "start": 15.56,
+            "end": 15.96,
+            "loudness": -19.9
+          },
+          {
+            "text": "BOOST!",
+            "start": 16.1,
+            "end": 16.36,
+            "loudness": -20.2
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "wagon",
+        "speaker": "Buddy",
+        "text": "Rick. I'm a station wagon.",
+        "speech": {
+          "start": 19.86,
+          "end": 21.44
+        },
+        "timedBy": "words",
+        "words": 5,
+        "syllables": 7,
+        "loudness": -25.1,
+        "pitch": {
+          "median": 118.5,
+          "low": 97,
+          "high": 152,
+          "range": 7.8,
+          "voiced": 0.24
+        },
+        "rate": {
+          "words": 3.16,
+          "syllables": 4.43
+        },
+        "wordLevels": [
+          {
+            "text": "Rick.",
+            "start": 19.86,
+            "end": 20.12,
+            "loudness": -24.3
+          },
+          {
+            "text": "I'm",
+            "start": 20.5,
+            "end": 20.56,
+            "loudness": -22.5
+          },
+          {
+            "text": "a",
+            "start": 20.6,
+            "end": 20.66,
+            "loudness": -24.7
+          },
+          {
+            "text": "station",
+            "start": 20.72,
+            "end": 21.04,
+            "loudness": -23.1
+          },
+          {
+            "text": "wagon.",
+            "start": 21.12,
+            "end": 21.44,
+            "loudness": -27.8
+          }
+        ],
+        "flags": []
+      }
+    ],
+    "performances": [
+      {
+        "id": "rick_argument",
+        "lines": [
+          "getaway",
+          "jump",
+          "boost",
+          "notime"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "getaway",
+            "to": "jump",
+            "between": [
+              "bridge"
+            ],
+            "pause": 1.87,
+            "before": {
+              "words": "getting away, Buddy.",
+              "start": 4.54,
+              "end": 5.36,
+              "loudness": -21.9,
+              "pitch": 181.8
+            },
+            "after": {
+              "words": "Then we jump it.",
+              "start": 7.23,
+              "end": 7.87,
+              "loudness": -23.9,
+              "pitch": 153
+            },
+            "loudness": -2,
+            "pitch": -3,
+            "rate": -0.14,
+            "flags": []
+          },
+          {
+            "from": "jump",
+            "to": "boost",
+            "between": [
+              "gap"
+            ],
+            "pause": 2.12,
+            "before": {
+              "words": "Then we jump it.",
+              "start": 7.23,
+              "end": 7.87,
+              "loudness": -23.9,
+              "pitch": 153
+            },
+            "after": {
+              "words": "We need to turbo boost!",
+              "start": 9.99,
+              "end": 11.02,
+              "loudness": -22.4,
+              "pitch": 211.9
+            },
+            "loudness": 1.5,
+            "pitch": 5.6,
+            "rate": -0.07,
+            "flags": []
+          },
+          {
+            "from": "boost",
+            "to": "notime",
+            "between": [
+              "cant"
+            ],
+            "pause": 1.16,
+            "before": {
+              "words": "need to turbo boost!",
+              "start": 10.1,
+              "end": 11.02,
+              "loudness": -22.2,
+              "pitch": 223.1
+            },
+            "after": {
+              "words": "There's no time!",
+              "start": 12.18,
+              "end": 13,
+              "loudness": -21.8,
+              "pitch": 342.3
+            },
+            "loudness": 0.4,
+            "pitch": 7.4,
+            "rate": -0.19,
+            "flags": []
+          }
+        ],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      }
+    ],
+    "fingerprints": {
+      "lines": {
+        "getaway": {
+          "from": 4.38,
+          "to": 5.36,
+          "sources": {
+            "take:nw7-rick-lines-t1": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8"
+          },
+          "digest": "443846017f00acbc946be746db5f333b528a072c20714d6d726e60806ff37162"
+        },
+        "bridge": {
+          "from": 5.61,
+          "to": 7.01,
+          "sources": {
+            "audio/tts/b2.wav": "bd34aba19d732ccbef3e5b4770051a374dac3b0922598b8dc55f2fbab59752b4",
+            "take:nw6-buddy-t2": "ac7f169afe567303f3fcca261863ce79813463b21dce8ca9bc6de88701ff1aab",
+            "take:nw7-dash-t1": "e3b1c3ea2133a86f40c2c8141a46b42c647f8826aef149ed6eec8ea3855a86a4"
+          },
+          "digest": "8428e8bbd72a6467dbbd009ff6cd10acee971263bb75529164b4eb222348e50d"
+        },
+        "jump": {
+          "from": 7.23,
+          "to": 7.87,
+          "sources": {
+            "take:nw7-rick-lines-t1": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8"
+          },
+          "digest": "df8369da904390943f2b7bfdc54b688592eac9067af96017c483f6a1ff7dd2b4"
+        },
+        "gap": {
+          "from": 8.03,
+          "to": 9.77,
+          "sources": {
+            "audio/tts/b4.wav": "4cd21f6ff5b0fb353f91ef249b0866f3fefe468b97f4e515c98fae8cda1e72eb",
+            "take:nw6-buddy-t2": "ac7f169afe567303f3fcca261863ce79813463b21dce8ca9bc6de88701ff1aab",
+            "take:nw7-dash-t1": "e3b1c3ea2133a86f40c2c8141a46b42c647f8826aef149ed6eec8ea3855a86a4"
+          },
+          "digest": "87d0e51b99803d82d3cdbad4022ca57de2e9f1248bd21abb19b7d951a6c23b8b"
+        },
+        "boost": {
+          "from": 9.99,
+          "to": 11.02,
+          "sources": {
+            "take:nw7-rick-lines-t1": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8"
+          },
+          "digest": "32a859b86992281a8e1dd3bca172fc1d6c084a0c139db9160ba5664940801bf9"
+        },
+        "cant": {
+          "from": 11.2,
+          "to": 11.96,
+          "sources": {
+            "audio/tts/b6.wav": "1e72f93f00920ab09b190bf183e42b1cd6f4e6d414e8f2977f876c4053dd1886",
+            "take:nw7-dash-t1": "e3b1c3ea2133a86f40c2c8141a46b42c647f8826aef149ed6eec8ea3855a86a4"
+          },
+          "digest": "57dbaa4dfa3452c9997831e1b9e3c15efdbb0e08700c98c900f2286c3f2c8676"
+        },
+        "notime": {
+          "from": 12.18,
+          "to": 13,
+          "sources": {
+            "take:nw7-rick-lines-t1": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8"
+          },
+          "digest": "da4f403292b4c2045bfda453fb35c6a41c78bd08c27652c823249eacb2e6907d"
+        },
+        "no": {
+          "from": 13.18,
+          "to": 15.06,
+          "sources": {
+            "audio/tts/b8.wav": "c024fd898f9355cfb74c20b84606f676d7b4a103e214fe8882a52ddeae9e8b16",
+            "take:nw7-dash-t1": "e3b1c3ea2133a86f40c2c8141a46b42c647f8826aef149ed6eec8ea3855a86a4"
+          },
+          "digest": "ae1510bc2b366dc6308b20f83376a04c6f86c04abca34b249d03d1b8d6c39aaf"
+        },
+        "turbo": {
+          "from": 15.56,
+          "to": 16.36,
+          "sources": {
+            "take:nw6-button-t1": "127034695adcd51fb2df43975b857a6fae35275c82ffecc396a4e36092004adb",
+            "take:nw7-rick-yell-t1": "f9e5576e9e98ea1fb2e84b11b00bc0bdabfbfc2a4cd7a696ddb1de7e4128fb2b"
+          },
+          "digest": "18a998196ce88b961d1e75496a4a5889ec0a1c9f094cfcf8455d1588439c57cf"
+        },
+        "wagon": {
+          "from": 19.86,
+          "to": 21.44,
+          "sources": {
+            "audio/tts/b11.wav": "8b5dbb8ff7e0df90c8a830a7dfba5c94b24bd36c3a52f6568a8ca718f2f00262",
+            "take:nw7-rick-stunned-t1": "30195545d5bc00cb428019dff986f109341c99a82d98c4815e51b92694d1b503"
+          },
+          "digest": "6a0c06ac8528d63eecaad4c5e5d00126af4d946aeaeb782f34de4c2a616c7a73"
+        }
+      },
+      "performances": {
+        "rick_argument": {
+          "from": 3.78,
+          "to": 13.6,
+          "sources": {
+            "audio/tts/b2.wav": "bd34aba19d732ccbef3e5b4770051a374dac3b0922598b8dc55f2fbab59752b4",
+            "audio/tts/b4.wav": "4cd21f6ff5b0fb353f91ef249b0866f3fefe468b97f4e515c98fae8cda1e72eb",
+            "audio/tts/b6.wav": "1e72f93f00920ab09b190bf183e42b1cd6f4e6d414e8f2977f876c4053dd1886",
+            "audio/tts/b8.wav": "c024fd898f9355cfb74c20b84606f676d7b4a103e214fe8882a52ddeae9e8b16",
+            "take:nw6-buddy-t2": "ac7f169afe567303f3fcca261863ce79813463b21dce8ca9bc6de88701ff1aab",
+            "take:nw6-taillights-t1": "2f5dd564001b7f82861db2eb481ceb6c30da5118650a3b34c99c86d7aeb1756f",
+            "take:nw7-dash-t1": "e3b1c3ea2133a86f40c2c8141a46b42c647f8826aef149ed6eec8ea3855a86a4",
+            "take:nw7-rick-lines-t1": "c8279f443e8b2867eaa91ad839140f9dab19f2251ca65af1b3b8158948b2c4a8"
+          },
+          "digest": "d50c4562899a1da889ee86ab0a7ad17010ec17a8dc0154fd52509dd62c393c62"
+        }
+      }
+    }
+  },
+  "listening": {}
+}

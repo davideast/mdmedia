@@ -1,0 +1,169 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "howdy": {
+      "text": "Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/big-hal-4ab-t2.mp4", "start": 0, "end": 5.4, "sha256": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225", "snap": "speech-onset@1" },
+      "loss": 0.864,
+      "snap": { "aligned": 0.38, "start": 0.36, "onset": 0.36, "floor": -57.7 },
+      "words": [
+        { "text": "Howdy", "start": 0.36, "end": 0.62, "loss": 0.962 },
+        { "text": "folks,", "start": 0.7, "end": 1.08, "loss": 1.077 },
+        { "text": "Big", "start": 1.42, "end": 1.56, "loss": 0.781 },
+        { "text": "Hal", "start": 1.64, "end": 1.86, "loss": 1.046 },
+        { "text": "here", "start": 1.94, "end": 2.1, "loss": 0.781 },
+        { "text": "at", "start": 2.12, "end": 2.2, "loss": 1.03 },
+        { "text": "Big", "start": 2.3, "end": 2.46, "loss": 0.711 },
+        { "text": "Hal's,", "start": 2.52, "end": 2.92, "loss": 0.996 },
+        { "text": "the", "start": 3.18, "end": 3.24, "loss": 0.8 },
+        { "text": "biggest", "start": 3.38, "end": 3.68, "loss": 0.671 },
+        { "text": "lot", "start": 3.74, "end": 3.92, "loss": 0.895 },
+        { "text": "in", "start": 3.98, "end": 4.019, "loss": 0.616 },
+        { "text": "the", "start": 4.059, "end": 4.14, "loss": 0.723 },
+        { "text": "tri-county", "start": 4.18, "end": 4.76, "loss": 0.855 },
+        { "text": "area!", "start": 4.86, "end": 5.2, "loss": 0.987 }
+      ]
+    },
+    "dealers": {
+      "text": "Now, those fancy dealerships'll charge you for all kinds of extras.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal7-extras-t3.mp4", "start": 0.67, "end": 4.47, "sha256": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98", "snap": "speech-onset@1" },
+      "loss": 0.706,
+      "snap": { "aligned": 0.87, "start": 0.86, "onset": 0.86, "floor": -49.3 },
+      "words": [
+        { "text": "Now,", "start": 0.86, "end": 0.97, "loss": 0.776 },
+        { "text": "those", "start": 1.05, "end": 1.25, "loss": 0.667 },
+        { "text": "fancy", "start": 1.35, "end": 1.69, "loss": 0.905 },
+        { "text": "dealerships'll", "start": 1.79, "end": 2.57, "loss": 0.752 },
+        { "text": "charge", "start": 2.63, "end": 2.93, "loss": 0.62 },
+        { "text": "you", "start": 2.97, "end": 3.09, "loss": 0.545 },
+        { "text": "for", "start": 3.13, "end": 3.23, "loss": 0.779 },
+        { "text": "all", "start": 3.33, "end": 3.51, "loss": 0.791 },
+        { "text": "kinds", "start": 3.65, "end": 3.95, "loss": 0.872 },
+        { "text": "of", "start": 4.01, "end": 4.09, "loss": 0.635 },
+        { "text": "extras.", "start": 4.17, "end": 4.45, "loss": 0.43 }
+      ]
+    },
+    "nothal": {
+      "text": "Not Big Hal. I keep it simple, and I pass the savings on to you.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal7-simple-t2.mp4", "start": 0.3, "end": 5.53, "sha256": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c", "snap": "speech-onset@1" },
+      "loss": 1.032,
+      "snap": { "aligned": 0.6, "start": 0.54, "onset": 0.54, "floor": -57.8 },
+      "words": [
+        { "text": "Not", "start": 0.54, "end": 0.78, "loss": 1.075 },
+        { "text": "Big", "start": 0.86, "end": 1.06, "loss": 1.012 },
+        { "text": "Hal.", "start": 1.14, "end": 1.44, "loss": 1.327 },
+        { "text": "I", "start": 2.24, "end": 2.32, "loss": 0.826 },
+        { "text": "keep", "start": 2.38, "end": 2.54, "loss": 0.8 },
+        { "text": "it", "start": 2.58, "end": 2.68, "loss": 0.819 },
+        { "text": "simple,", "start": 2.74, "end": 3.06, "loss": 0.953 },
+        { "text": "and", "start": 3.44, "end": 3.52, "loss": 0.888 },
+        { "text": "I", "start": 3.6, "end": 3.68, "loss": 1.164 },
+        { "text": "pass", "start": 3.74, "end": 4.02, "loss": 1.067 },
+        { "text": "the", "start": 4.06, "end": 4.16, "loss": 0.739 },
+        { "text": "savings", "start": 4.22, "end": 4.62, "loss": 0.946 },
+        { "text": "on", "start": 4.72, "end": 4.88, "loss": 1.355 },
+        { "text": "to", "start": 4.94, "end": 5.06, "loss": 1.01 },
+        { "text": "you.", "start": 5.16, "end": 5.36, "loss": 1.076 }
+      ]
+    },
+    "deal": {
+      "text": "That's how I can do no money down, and ninety-nine a month!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal7-price-t3.mp4", "start": 0.61, "end": 4.44, "sha256": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82", "snap": "speech-onset@1" },
+      "loss": 0.897,
+      "snap": { "aligned": 0.83, "start": 0.81, "onset": 0.81, "floor": -54.5 },
+      "words": [
+        { "text": "That's", "start": 0.81, "end": 1.03, "loss": 0.917 },
+        { "text": "how", "start": 1.07, "end": 1.21, "loss": 1.113 },
+        { "text": "I", "start": 1.31, "end": 1.37, "loss": 0.917 },
+        { "text": "can", "start": 1.41, "end": 1.53, "loss": 0.732 },
+        { "text": "do", "start": 1.57, "end": 1.69, "loss": 1.137 },
+        { "text": "no", "start": 1.81, "end": 1.93, "loss": 0.926 },
+        { "text": "money", "start": 2.01, "end": 2.25, "loss": 0.61 },
+        { "text": "down,", "start": 2.31, "end": 2.63, "loss": 1.05 },
+        { "text": "and", "start": 3.13, "end": 3.29, "loss": 0.723 },
+        { "text": "ninety-nine", "start": 3.35, "end": 3.93, "loss": 0.889 },
+        { "text": "a", "start": 3.97, "end": 4.01, "loss": 0.775 },
+        { "text": "month!", "start": 4.07, "end": 4.29, "loss": 0.928 }
+      ]
+    },
+    "inspected": {
+      "text": "And I personally hand-inspect every car.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal7-inspect2-t2.mp4", "start": 1.04, "end": 4.14, "sha256": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825", "snap": "speech-onset@1" },
+      "loss": 0.843,
+      "snap": { "aligned": 1.26, "start": 1.24, "onset": 1.24, "floor": -57 },
+      "words": [
+        { "text": "And", "start": 1.24, "end": 1.34, "loss": 0.807 },
+        { "text": "I", "start": 1.52, "end": 1.66, "loss": 0.956 },
+        { "text": "personally", "start": 1.72, "end": 2.24, "loss": 0.675 },
+        { "text": "hand-inspect", "start": 2.3, "end": 3.02, "loss": 0.889 },
+        { "text": "every", "start": 3.16, "end": 3.34, "loss": 0.812 },
+        { "text": "car.", "start": 3.46, "end": 3.78, "loss": 1.056 }
+      ]
+    },
+    "guarantee": {
+      "text": "At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal7-guarantee4-t3.mp4", "start": 0.5, "end": 7.55, "sha256": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb", "snap": "speech-onset@1" },
+      "loss": 0.987,
+      "snap": { "aligned": 0.62, "start": 0.57, "onset": 0.57, "floor": -61.9 },
+      "words": [
+        { "text": "At", "start": 0.57, "end": 0.72, "loss": 1.057 },
+        { "text": "Big", "start": 0.8, "end": 0.98, "loss": 0.945 },
+        { "text": "Hal's,", "start": 1.04, "end": 1.4, "loss": 1.064 },
+        { "text": "you're", "start": 1.48, "end": 1.66, "loss": 0.761 },
+        { "text": "guaranteed", "start": 1.7, "end": 2.24, "loss": 0.853 },
+        { "text": "to", "start": 2.28, "end": 2.36, "loss": 0.847 },
+        { "text": "get", "start": 2.4, "end": 2.62, "loss": 1.018 },
+        { "text": "four", "start": 2.98, "end": 3.18, "loss": 1.02 },
+        { "text": "doors!", "start": 3.26, "end": 3.72, "loss": 1.091 },
+        { "text": "Four", "start": 4.7, "end": 4.9, "loss": 1 },
+        { "text": "seats!", "start": 5.04, "end": 5.48, "loss": 1.126 },
+        { "text": "A", "start": 6.56, "end": 6.64, "loss": 1.26 },
+        { "text": "steering", "start": 6.74, "end": 7.08, "loss": 0.878 },
+        { "text": "wheel!", "start": 7.18, "end": 7.42, "loss": 1.042 }
+      ]
+    },
+    "thisone": {
+      "text": "And this one? This one even comes with wheels!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal6-wheels-close-t1.mp4", "start": 0.28, "end": 3.6, "sha256": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf", "snap": "speech-onset@1" },
+      "loss": 0.66,
+      "snap": { "aligned": 0.32, "start": 0.28, "onset": 0.28, "floor": -58.9 },
+      "words": [
+        { "text": "And", "start": 0.28, "end": 0.42, "loss": 0.575 },
+        { "text": "this", "start": 0.46, "end": 0.64, "loss": 0.47 },
+        { "text": "one?", "start": 0.68, "end": 0.82, "loss": 0.648 },
+        { "text": "This", "start": 1.62, "end": 1.8, "loss": 0.577 },
+        { "text": "one", "start": 1.84, "end": 1.94, "loss": 0.668 },
+        { "text": "even", "start": 2, "end": 2.22, "loss": 0.518 },
+        { "text": "comes", "start": 2.26, "end": 2.52, "loss": 0.447 },
+        { "text": "with", "start": 2.56, "end": 2.7, "loss": 0.582 },
+        { "text": "wheels!", "start": 2.74, "end": 3.24, "loss": 0.915 }
+      ]
+    },
+    "comeon": {
+      "text": "So come on down to Big Hal's and save big!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal6-wheels-close-t1.mp4", "start": 3.6, "end": 6.67, "sha256": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf", "snap": "speech-onset@1" },
+      "loss": 0.954,
+      "snap": { "aligned": 3.62, "start": 3.62, "onset": 3.62, "floor": -57.4 },
+      "words": [
+        { "text": "So", "start": 3.62, "end": 3.74, "loss": 0.822 },
+        { "text": "come", "start": 3.8, "end": 3.92, "loss": 0.659 },
+        { "text": "on", "start": 4, "end": 4.12, "loss": 1.002 },
+        { "text": "down", "start": 4.16, "end": 4.36, "loss": 0.736 },
+        { "text": "to", "start": 4.38, "end": 4.48, "loss": 0.793 },
+        { "text": "Big", "start": 4.52, "end": 4.66, "loss": 0.893 },
+        { "text": "Hal's", "start": 4.74, "end": 5.12, "loss": 1.097 },
+        { "text": "and", "start": 5.38, "end": 5.56, "loss": 0.877 },
+        { "text": "save", "start": 5.64, "end": 5.96, "loss": 1.264 },
+        { "text": "big!", "start": 6.1, "end": 6.5, "loss": 1.241 }
+      ]
+    }
+  }
+}

@@ -5,7 +5,7 @@ import type { LineReport } from '../../src/cut/align.js';
 
 const report = (overrides: Partial<LineReport>): LineReport => ({
   id: 'getaway', speaker: 'Rick', text: "They're getting away, Buddy.", status: 'aligned', loss: 0.716,
-  words: 4, textWords: 4, speech: { start: 4.38, end: 5.36 }, window: null, warnings: [], ...overrides,
+  words: 4, textWords: 4, speech: { start: 4.38, end: 5.36 }, window: null, warnings: [], approximate: false, ...overrides,
 });
 
 describe('mdmedia cut words', () => {
@@ -39,6 +39,15 @@ describe('mdmedia cut words', () => {
       '',
       'warning: turbo: its loss is high (1.029); check it by ear',
       "warning: gap: no words: can't read /m/b4.wav",
+    ]);
+  });
+
+  it('says when a line\'s words are approximate, because it is sung', () => {
+    const text = formatLineReports([report({}), report({ id: 'jingle', speaker: 'Choir', loss: 2.41, speech: { start: 25.1, end: 27.3 }, approximate: true })]);
+    expect(text.split('\n')).toEqual([
+      'id       speaker  speech (s)   loss   status',
+      'getaway  Rick     4.38–5.36    0.716  aligned',
+      'jingle   Choir    25.10–27.30  2.410  aligned, approximate (sung)',
     ]);
   });
 });

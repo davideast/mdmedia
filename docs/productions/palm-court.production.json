@@ -1,0 +1,28 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "palm-court",
+  "title": "Palm Court",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-palm-court-take2.jpg",
+  "approved": "take2",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ch-palm-court.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Midnight sitcom kitchen with a hanging lamp, palm-leaf wallpaper and a cheesecake, close-ups on the sharp one and the tiny mother, ending on the silver-haired one quietly taking the last slice; there are five women at the table instead of four, and the wide shots make the faces small through the tube.",
+      "createdAt": "2026-10-18T21:58:01.831Z"
+    },
+    {
+      "id": "take2",
+      "cut": "docs/cuts/palm-court-take2.cut.json",
+      "label": "Take 2 (with intro)",
+      "status": "approved",
+      "notes": "Transcript: back home we had a turnip festival (7.5 s) / and nobody came (11.2) / I dated the turnip king (12.6) / twice (14.5); Same night is lost under the laugh. Four women arm in arm under the palms at sunset with our own pastel Palm Court script, then the same four (exactly four) at the midnight kitchen table, the silver-haired one ending with the last slice; the scene is one wide static shot and the intro does not truly freeze.",
+      "createdAt": "2026-10-18T22:34:17.102Z"
+    }
+  ]
+}

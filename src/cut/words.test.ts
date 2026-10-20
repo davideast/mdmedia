@@ -232,7 +232,9 @@ describe('applying a words file to a cut', () => {
 
   it('calls words stale when the window moved because the cut was re-edited', () => {
     const c = cut();
-    c.segments[4] = { ...c.segments[4], out: 1.25 };
+    const yell = c.segments[4];
+    if (yell.still) throw new Error('expected a shot');
+    c.segments[4] = { ...yell, out: 1.25 };
     const merge = applyWords(c, file, { sha256: () => 'abc' });
     expect(merge.stale.map((s) => s.id)).toEqual(['turbo']);
     expect(merge.stale[0].reason).toContain('window moved');

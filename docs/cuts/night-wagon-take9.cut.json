@@ -83,5 +83,10 @@
       ] }
   ],
 
+  "performances": [
+    { "id": "rick_argument", "lines": ["getaway", "jump", "boost", "notime"], "intent": "Rick's side of the argument, from one take",
+      "delivery": "urgent, clipped and intense, the same intensity on every line" }
+  ],
+
   "picture": { "fadeOut": 0.5 }
 }

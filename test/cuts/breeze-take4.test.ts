@@ -162,6 +162,9 @@ describe('Breeze mints, Take 4', () => {
       worst = Math.max(worst, Math.abs(gainAt(jingle, t) - script(t)));
     }
     expect(worst).toBeLessThan(0.001);
+    // The announcer duck is keyed to the script's VO+2.9, past the music's end at the truck.
+    expect(jingle.volume.slice(-2)).toEqual([{ t: Number((VO + 2.9).toFixed(6)), value: 0.16 }, { t: Number((VO + 2.9).toFixed(6)), value: 0.8 }]);
+    expect(VO + 2.9).toBeGreaterThan(jingle.end);
     // Silence from the truck until the sting: crickets only.
     for (let t = MUSIC_OUT; t < STING; t += 0.01) expect(timeline.music.every((m) => gainAt(m, t) === 0)).toBe(true);
   });
@@ -230,18 +233,37 @@ describe('Breeze mints, Take 4', () => {
     const vo = byId(timeline.lines, 'vo');
     expect(vo.audio).toMatchObject({ kind: 'file', src: { path: `${ROOT}/audio/tts/br-vo.wav` }, in: 0, volume: 1.3 });
     near(vo.start, byId(timeline.segments, 'wide').start + 0.2);
-    // The sung lines are heard in the jingle and the sting, so they add no sound, and each is read from the music's own clock.
+    // The sung lines are heard in the jingle and the sting, so they add no sound, and each follows the music's own clock.
     const jingle = byId(timeline.music, 'jingle');
     const sting = byId(timeline.music, 'sting');
-    for (const id of ['wrong', 'cool1', 'cool2', 'wholeday', 'feel']) {
+    const sungIn: Record<string, number> = { wrong: 4.66, cool1: 8.4, cool2: 10.5, wholeday: 12.8, feel: 21.55 };
+    for (const [id, from] of Object.entries(sungIn)) {
       const line = byId(timeline.lines, id);
       const music = id === 'feel' ? sting : jingle;
-      expect(line.audio).toMatchObject({ kind: 'file', src: { path: `${ROOT}/audio/breeze-jingle.mp3` }, volume: 0 });
-      if (line.audio.kind !== 'file') throw new Error(`${id} has no file`);
-      near(line.audio.in - line.start, music.in - music.start);
+      expect(line.audio).toEqual({ kind: 'clip', clip: music.id });
+      expect(line.sung).toBe(true);
+      near(line.start - music.start, from - music.in);
       expect(line.start).toBeGreaterThanOrEqual(music.start);
       expect(line.end).toBeLessThanOrEqual(music.end);
     }
+    expect(vo.sung).toBe(false);
+    // Moving the jingle moves its lyrics with it.
+    const moved = structuredClone(cut) as { music: Array<{ id: string; at: number | string }> };
+    moved.music[0].at = 0.5;
+    const shifted = resolveCutJson(moved, { mediaLength });
+    if (!shifted.ok) throw new Error(shifted.errors.map((e) => e.message).join('\n'));
+    for (const id of ['wrong', 'cool1', 'cool2']) near(byId(shifted.value.lines, id).start, lines[id][2] + 0.5);
+  });
+
+  it('times the sung lines in the music, unsnapped and marked approximate', () => {
+    const words = JSON.parse(readFileSync(new URL('../../docs/cuts/breeze-take4.words.json', import.meta.url), 'utf8'));
+    for (const id of ['wrong', 'cool1', 'cool2', 'wholeday', 'feel']) {
+      expect(words.lines[id]).toMatchObject({ approximate: true, fingerprint: { source: 'audio/breeze-jingle.mp3' } });
+      expect(words.lines[id].snap).toBeUndefined();
+      expect(words.lines[id].fingerprint.snap).toBeUndefined();
+    }
+    expect(words.lines.vo.approximate).toBeUndefined();
+    expect(words.lines.vo.fingerprint.snap).toBe('speech-onset@1');
   });
 
   it('shows NEW! and BREEZE on the roll until the second hand, and the logo and line on the packshot', () => {

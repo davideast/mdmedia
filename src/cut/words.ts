@@ -1,5 +1,5 @@
 import { mediaRoot, relativeToRoot, resolveCut, type ResolveOptions } from './resolve.js';
-import type { CutFile, Line, ResolvedLine, Timeline, Word } from './types.js';
+import type { CutFile, Line, ResolvedLine, ResolvedSource, Timeline, Word } from './types.js';
 
 /**
  * Word timings for a cut's lines, kept in a companion file next to the cut
@@ -56,10 +56,11 @@ export class AlignerUnavailableError extends Error {
 /** The stretch of one audio source a line is heard in, in that source's own clock. */
 export interface LineWindow {
   lineId: string;
-  kind: 'file' | 'segment';
-  /** The source's absolute path. */
+  /** `file`: the line's own sound; `segment`: a segment's audio; `clip`: a music or sfx clip's file. */
+  kind: 'file' | 'segment' | 'clip';
+  /** The source's absolute path, or its `asset:<id>` ref for a stored asset. */
   path: string;
-  /** The source's path relative to the media root, as the words file records it. */
+  /** The source's path relative to the media root (or its `asset:<id>` ref), as the words file records it. */
   source: string;
   /** Source seconds. */
   start: number;
@@ -71,6 +72,13 @@ export interface LineWindow {
 export type LineWindowResult = { ok: true; window: LineWindow } | { ok: false; reason: string };
 
 const EPS = 1e-6;
+
+/** Where a source's sound is read from: a file's absolute path, an asset's `asset:<id>` ref, or nothing for colors and synths. */
+function soundOf(src: ResolvedSource): string | undefined {
+  if (src.kind === 'file' || src.kind === 'take') return src.path;
+  if (src.kind === 'asset') return src.ref;
+  return undefined;
+}
 
 function round6(value: number): number {
   return Math.round(value * 1e6) / 1e6;
@@ -91,29 +99,50 @@ function round3(value: number): number {
  *   length. A line that runs past its segment with `until` keeps going in the
  *   same source; when the next segments don't continue that source in step,
  *   the window says so in `warnings`.
+ * - A line heard in a clip is the clip's file in the clip's clock, for the
+ *   line's length; in a clip that is a segment's own sound, it is that
+ *   segment's audio, as for a segment line.
  */
 export function lineWindow(timeline: Timeline, line: ResolvedLine, root: string): LineWindowResult {
   const length = round6(line.end - line.start);
   if (length <= EPS) return { ok: false, reason: 'it has no length on the timeline' };
 
   if (line.audio.kind === 'file') {
-    const src = line.audio.src;
-    if (src.kind !== 'file' && src.kind !== 'take') return { ok: false, reason: 'its audio is not a file' };
+    const path = soundOf(line.audio.src);
+    if (path === undefined) return { ok: false, reason: 'its audio is not a file' };
     const start = line.audio.in;
     return {
       ok: true,
-      window: { lineId: line.id, kind: 'file', path: src.path, source: relativeToRoot(root, src.path), start, end: round6(start + length), warnings: [] },
+      window: { lineId: line.id, kind: 'file', path, source: relativeToRoot(root, path), start, end: round6(start + length), warnings: [] },
     };
   }
 
-  const segmentId = line.audio.segment;
+  if (line.audio.kind === 'clip') {
+    const clipId = line.audio.clip;
+    const clip = [...timeline.music, ...timeline.sfx].find((c) => c.id === clipId);
+    if (!clip) return { ok: false, reason: `no clip is called "${clipId}"` };
+    if (clip.segment !== null) return segmentWindow(timeline, line, clip.segment, root, length);
+    if (clip.src.kind === 'bed') return { ok: false, reason: `its clip "${clipId}" is a bed of several parts` };
+    const path = soundOf(clip.src);
+    if (path === undefined) return { ok: false, reason: `its clip "${clipId}" has no sound file` };
+    const start = round6(clip.in + (line.start - clip.start));
+    return {
+      ok: true,
+      window: { lineId: line.id, kind: 'clip', path, source: relativeToRoot(root, path), start, end: round6(start + length), warnings: [] },
+    };
+  }
+  return segmentWindow(timeline, line, line.audio.segment, root, length);
+}
+
+/** A line heard in a segment's own audio, from where the line starts in it. */
+function segmentWindow(timeline: Timeline, line: ResolvedLine, segmentId: string, root: string, length: number): LineWindowResult {
   const segment = timeline.segments.find((s) => s.id === segmentId);
   if (!segment) return { ok: false, reason: `no segment is called "${segmentId}"` };
   const audio = segment.audio;
-  if (!audio || (audio.src.kind !== 'file' && audio.src.kind !== 'take')) {
+  const path = audio ? soundOf(audio.src) : undefined;
+  if (!audio || path === undefined) {
     return { ok: false, reason: `its segment "${segmentId}" has no sound` };
   }
-  const path = audio.src.path;
   const toSource = (t: number): number => audio.in + (t - segment.start);
   const start = round6(toSource(line.start));
   const end = round6(start + length);
@@ -127,7 +156,7 @@ export function lineWindow(timeline: Timeline, line: ResolvedLine, root: string)
     for (const next of following) {
       if (next.start > covered + 1e-3) break;
       const a = next.audio;
-      const inStep = a && (a.src.kind === 'file' || a.src.kind === 'take') && a.src.path === path && Math.abs(a.in - toSource(next.start)) < 1e-3;
+      const inStep = a && soundOf(a.src) === path && Math.abs(a.in - toSource(next.start)) < 1e-3;
       if (!inStep) {
         warnings.push(`it runs past "${segmentId}" into "${next.id}", whose sound isn't the same take in step; the words are timed to the take alone`);
         covered = line.end;
@@ -207,6 +236,11 @@ export interface LineWordsEntry {
   fingerprint: WordsFingerprint;
   /** The aligner's overall loss, or null when it gives none. */
   loss: number | null;
+  /**
+   * The words are approximate: the line is sung, so its first word wasn't
+   * snapped and its loss says little. Absent for spoken lines.
+   */
+  approximate?: true;
   /** How the first word was snapped to the speech onset, when it was measured. */
   snap?: FirstWordSnap;
   /** In the source's own clock, as `Line.words`. The first word's start is the snapped one. */
@@ -233,7 +267,8 @@ function isNum(value: unknown): value is number {
 
 function readEntry(value: unknown, id: string): LineWordsEntry | string {
   if (!isObj(value)) return `lines.${id}: expected an object`;
-  const { text, aligner, fingerprint, loss, snap, words } = value;
+  const { text, aligner, fingerprint, loss, snap, words, approximate } = value;
+  if (approximate !== undefined && approximate !== true) return `lines.${id}.approximate: expected true, or nothing`;
   if (typeof text !== 'string') return `lines.${id}.text: expected a string`;
   if (typeof aligner !== 'string') return `lines.${id}.aligner: expected a string`;
   if (!isObj(fingerprint)) return `lines.${id}.fingerprint: expected an object`;
@@ -262,6 +297,7 @@ function readEntry(value: unknown, id: string): LineWordsEntry | string {
   }
   const entry: LineWordsEntry = { text, aligner, fingerprint: { source, start, end, sha256 }, loss: isNum(loss) ? loss : null, words: read };
   if (typeof method === 'string') entry.fingerprint.snap = method;
+  if (approximate === true) entry.approximate = true;
   if (snapped) entry.snap = snapped;
   return entry;
 }
@@ -298,6 +334,7 @@ export function serializeWordsFile(file: WordsFile, order: readonly string[] = [
       `      "aligner": ${JSON.stringify(e.aligner)},`,
       `      "fingerprint": { "source": ${JSON.stringify(f.source)}, "start": ${f.start}, "end": ${f.end}, "sha256": ${JSON.stringify(f.sha256)}${f.snap === undefined ? '' : `, "snap": ${JSON.stringify(f.snap)}`} },`,
       `      "loss": ${e.loss === null ? 'null' : e.loss},`,
+      ...(e.approximate ? ['      "approximate": true,'] : []),
       ...(e.snap ? [`      "snap": { "aligned": ${e.snap.aligned}, "start": ${e.snap.start}, "onset": ${e.snap.onset === null ? 'null' : e.snap.onset}, "floor": ${e.snap.floor} },`] : []),
       `      "words": ${words}`,
       '    }',
@@ -317,11 +354,12 @@ export type EntryCheck = { fresh: true } | { fresh: false; reason: string };
  * same window and, when `sha256` is given, the same file contents. With an
  * `aligner` name, a line aligned by a different aligner is not fresh either,
  * and with a `snap` method, nor is one whose first word was snapped by another
- * method or not at all.
+ * method or not at all. A `snap` of null means the line is sung: its words
+ * must be unsnapped and marked approximate.
  */
 export function checkEntry(
   entry: LineWordsEntry,
-  current: { text: string; window: LineWindow; sha256?: string; aligner?: string; snap?: string },
+  current: { text: string; window: LineWindow; sha256?: string; aligner?: string; snap?: string | null },
 ): EntryCheck {
   const f = entry.fingerprint;
   if (entry.text !== current.text) return { fresh: false, reason: 'its text changed' };
@@ -331,7 +369,9 @@ export function checkEntry(
   }
   if (current.sha256 !== undefined && f.sha256 !== current.sha256) return { fresh: false, reason: `${f.source} changed` };
   if (current.aligner !== undefined && entry.aligner !== current.aligner) return { fresh: false, reason: `it was aligned by ${entry.aligner}` };
-  if (current.snap !== undefined && f.snap !== current.snap) {
+  if (current.snap === null) {
+    if (f.snap !== undefined || entry.approximate !== true) return { fresh: false, reason: 'it is sung, so its words are approximate and its first word unsnapped' };
+  } else if (current.snap !== undefined && f.snap !== current.snap) {
     return { fresh: false, reason: f.snap === undefined ? "its first word wasn't snapped to the speech onset" : `its first word was snapped by ${f.snap}` };
   }
   return { fresh: true };
@@ -346,8 +386,8 @@ export function fingerprintOf(window: LineWindow, sha256: string, snap?: string)
 
 export interface ApplyWordsOptions extends ResolveOptions {
   /**
-   * The SHA-256 (hex) of a source file by absolute path, or undefined when it
-   * can't be read. Without it, or for an unreadable file, words are checked
+   * The SHA-256 (hex) of a source file by absolute path (or by `asset:<id>`
+   * ref for a stored asset), or undefined when it can't be read. Without it, or for an unreadable file, words are checked
    * by text, source and window only and the line is listed as `unchecked`.
    */
   sha256?: (path: string) => string | undefined;

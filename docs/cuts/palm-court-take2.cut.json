@@ -1,0 +1,51 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Palm Court",
+    "show": "palm-court",
+    "version": "Take 2 (with intro)",
+    "length": 18,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "One paid generation, extended once, with our title laid over it. The intro (palm-intro-t1, 8 s, from ch-palm-court-intro) was continued by the provider with the kitchen scene (ch-palm-court-kitchen, 10 s), which returns the source clip and its new tail as one 18 s file, palm-full-t1; its first 192 frames match the intro take (PSNR 35 dB or better on every frame) and the kitchen starts on frame 192 (8.0 s). compose.mjs then laid our pastel Palm Court script over it (gfx/palm-title.png, 6.2 s to 8.0 s, faded in over 0.5 s) and copied the sound, giving palm-full-titled, byte-identical to review/clips/ch-palm-court-take2.mp4. The two segments are the take's two scenes, in step. All the sound is the take's own: the theme under the intro, the three lines, the studio laugh. \"Same night.\" from the storyboard isn't heard: it is lost under the laugh, so the last line ends on \"Twice.\". The theme and the laugh track are in the take's own sound, so they are music and sound-effect items that label it: the theme under the opening titles, the laugh from 7.5 s into the kitchen, after \"Twice.\", to the end."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/palm-full-titled.mp4",
+
+  "segments": [
+    { "id": "intro", "label": "Opening titles: the four arm in arm under the palms at sunset, the theme", "src": "take:palm-full-t1",
+      "in": 0, "out": 8 },
+    { "id": "kitchen", "label": "The midnight kitchen, one wide: the turnip festival, then the last slice", "src": "take:palm-full-t1",
+      "in": 8, "out": 18 }
+  ],
+
+  "lines": [
+    { "id": "festival", "speaker": "The sweet one", "text": "Back home, we had a turnip festival...", "segment": "kitchen",
+      "until": "nobody" },
+    { "id": "nobody", "speaker": "The sharp one", "text": "And nobody came.", "segment": "kitchen", "at": "kitchen+3.35",
+      "until": "king" },
+    { "id": "king", "speaker": "The tiny mother", "text": "I dated the turnip king. Twice.", "segment": "kitchen", "at": "kitchen+4.5",
+      "until": "kitchen+7.5" }
+  ],
+
+  "music": [
+    { "id": "theme", "label": "The theme under the opening titles, in the take's own sound", "segment": "intro" }
+  ],
+
+  "sfx": [
+    { "id": "laugh", "label": "The studio laugh, in the take's own sound", "segment": "kitchen", "at": "kitchen+7.5", "until": "@end" }
+  ],
+
+  "overlays": [
+    { "id": "title", "label": "Our pastel Palm Court script", "src": "gfx/palm-title.png", "at": 6.2, "until": "intro.end", "fadeIn": 0.5 }
+  ],
+
+  "sources": {
+    "take:palm-full-t1": { "step": "extend", "extendedFrom": "take:palm-intro-t1", "storyboard": "ch-palm-court-kitchen" },
+    "take:palm-intro-t1": { "step": "generate", "storyboard": "ch-palm-court-intro" }
+  }
+}

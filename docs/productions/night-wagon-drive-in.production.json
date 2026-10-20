@@ -1,0 +1,23 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "night-wagon-drive-in",
+  "title": "Night Wagon: Drive-In",
+  "series": {
+    "title": "Night Wagon",
+    "slug": "night-wagon"
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-night-wagon-drive-in.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "cut": "docs/cuts/night-wagon-drive-in.cut.json",
+      "label": "Episode 2, Take 1 (Drive-In)",
+      "status": "review",
+      "notes": "Transcript: Kill the scanner, Buddy (2.6, Rick) / We're undercover (3.9, over the grille) / Undercover, Rick? (5.3, Buddy) / The handoff's at the snack bar. Nobody can know we're here (6.6) / Rick. I'm a beige station wagon at a drive-in (9.7, Buddy) / Nobody has ever known I was here (13.0) / ...Good (17.8, Rick, after the rows of identical wagons) / Hey! (22.5, off-screen) / Buddy... Buddy? (24.1, 25.7) / Go, go, go! Hit it, Buddy! (27.7, in a plain-dash family wagon) / music cut dead on the frozen family at 29.45 / Rick. I'm over here (32.65, Buddy from the watch) / one wagon's scanner flicks on and the theme slams back at 34.65 / NIGHT WAGON outro at 36.1. Opens straight on the drive-in, no title, as Take 9 does. Both scanner moments are our own glow animated in ffmpeg on locked-off shots. Buddy is ElevenLabs Bill over Take 6/7's button dash; 'Hey!' is ElevenLabs Adam. Re-rolled or rejected: wrong-car stills (one man looked like someone else and too close to a real actor; another showed the empty back seat), fixed by editing a Rick still with the back seats blacked out, then cropping it; family stills with the empty driver's seat and wheel in view, a second Rick in a white tee, and a grey interior, fixed by a reverse with the driver as a dark out-of-focus shoulder; family take 1 (the girl starts grinning at 2.25 s); family take 2 is used only from 2.1 s, after the boy's lips briefly part, with the mother's one blink and a 3.5% ffmpeg push-in, its made-up movie audio muted; watch takes 1 and 2 (their watch didn't match Rick's), re-shot from his own watch; grab take 2 (the case swung sideways with Rick's leg in shot); suit take 2 (he turns to camera at the end); opening take 2 (its scanner blinked off). Exactly one briefcase in every shot. Takes: open t1, rick-lines t2 (line 1) and t1 (line 2), grille t1, rows t1 (reveal and tag), good t2, sneak t1, suit t1, grab t1, run t1, lost t1, handle t1, wrongcar t2, family t2, watch t3, rick-watch t1. Look for: the wagon barely moves in the opening; Rick walks briskly rather than jogs in the run; the sneak is only a small lean; the tag scanner is small, helped by a push-in.",
+      "createdAt": "2026-10-19T09:11:13.128Z"
+    }
+  ]
+}

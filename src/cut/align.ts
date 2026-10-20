@@ -197,6 +197,8 @@ export interface LineReport {
   speech: { start: number; end: number } | null;
   /** How its first word was snapped to the speech onset, in the source's clock, when it was measured. */
   snap?: FirstWordSnap;
+  /** Its words are approximate: it is sung, so its first word isn't snapped and its loss isn't judged. */
+  approximate: boolean;
   window: LineWindow | null;
   warnings: string[];
 }
@@ -261,7 +263,7 @@ export async function alignCutWords(options: AlignCutOptions): Promise<AlignCutR
   for (const [i, line] of timeline.lines.entries()) {
     const report: LineReport = {
       id: line.id, speaker: line.speaker, text: line.text, status: 'stale', loss: null,
-      words: 0, textWords: countWords(line.text), speech: null, window: null, warnings: [],
+      words: 0, textWords: countWords(line.text), speech: null, window: null, warnings: [], approximate: line.sung,
     };
     reports.push(report);
     const windowResult = lineWindow(timeline, line, base);
@@ -285,7 +287,9 @@ export async function alignCutWords(options: AlignCutOptions): Promise<AlignCutR
 
     const old = existing?.lines[line.id];
     let entry: LineWordsEntry | undefined;
-    if (old && !force && checkEntry(old, { text: line.text, window, sha256, aligner: aligner.name, snap: SNAP_METHOD }).fresh) {
+    // A sung line's onset isn't speech: its words stay as aligned and are marked approximate.
+    const snapMethod = line.sung ? null : SNAP_METHOD;
+    if (old && !force && checkEntry(old, { text: line.text, window, sha256, aligner: aligner.name, snap: snapMethod }).fresh) {
       entry = old;
       report.status = 'fresh';
     } else {
@@ -296,17 +300,20 @@ export async function alignCutWords(options: AlignCutOptions): Promise<AlignCutR
         // The aligner starts first words late; move each line's first word back to the speech onset measured in the same audio.
         let snap: FirstWordSnap | null = null;
         let method: string | undefined;
-        try {
-          ({ words, snap } = snapFirstWord(words, measureOnset(audio), window.start));
-          method = SNAP_METHOD;
-        } catch (error) {
-          report.warnings.push(`couldn't measure where its speech starts, so its first word is as aligned (${error instanceof Error ? error.message : String(error)})`);
+        if (!line.sung) {
+          try {
+            ({ words, snap } = snapFirstWord(words, measureOnset(audio), window.start));
+            method = SNAP_METHOD;
+          } catch (error) {
+            report.warnings.push(`couldn't measure where its speech starts, so its first word is as aligned (${error instanceof Error ? error.message : String(error)})`);
+          }
         }
         entry = {
           text: line.text,
           aligner: aligner.name,
           fingerprint: fingerprintOf(window, sha256, method),
           loss: alignment.loss === undefined ? null : Math.round(alignment.loss * 1e3) / 1e3,
+          ...(line.sung ? { approximate: true as const } : {}),
           ...(snap ? { snap } : {}),
           words,
         };
@@ -329,7 +336,7 @@ export async function alignCutWords(options: AlignCutOptions): Promise<AlignCutR
       report.loss = entry.loss;
       report.words = entry.words.length;
       if (entry.snap) report.snap = entry.snap;
-      if (entry.loss !== null && entry.loss > HIGH_LOSS) report.warnings.push(`its loss is high (${entry.loss}); check it by ear`);
+      if (!line.sung && entry.loss !== null && entry.loss > HIGH_LOSS) report.warnings.push(`its loss is high (${entry.loss}); check it by ear`);
       if (report.words !== report.textWords) {
         report.warnings.push(`it came back with ${report.words} words, but its text has ${report.textWords}`);
       }

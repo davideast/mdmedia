@@ -1,0 +1,29 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "football",
+  "title": "CGL Football",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cast": [
+    {
+      "role": "Chet",
+      "character": "chet@1"
+    },
+    {
+      "role": "Moose",
+      "character": "moose@1"
+    }
+  ],
+  "cover": "review/posters/ch-football.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "cut": "docs/cuts/football-take1.cut.json",
+      "label": "Take 1 (Keys to the Game)",
+      "status": "review",
+      "notes": "Transcript: Chet: Good afternoon, everybody, and welcome to CGL Football (2.5 s) / Moose, what are your keys to the game? (5.35) / Moose: Key number one: score more points than the other team (7.64) / Key number two: don't let the other team score more points than you (11.3) / Key number three: don't tackle your own guys (15.75) / I've seen it, Chet. It doesn't help (19.15, after a 1.0 s beat) / Chet: Kowalski, back to throw... (21.45) / He fires... (23.25) / Caught, at the thirty! (24.35) / Haugen, up the middle... and he is brought down (26.1) / Moose: That's a big man. When a big man falls down, Chet, he's down (28.97) / Chet: Moose, the Icebreakers win it. What was the difference today? (33.68) / Moose: Chet... nobody tackled their own guys (37.95, after a 1.65 s pause over a silent booth shot). New clip. Everything is fictional: the CGL, the Duluth Icebreakers (navy and white) and the Tampa Tarpons (teal and orange). Chet is ElevenLabs Eric and Moose is Roger, with every line its own TTS file so the gaps are set in the edit. All lettering is our PNG: the CGL FOOTBALL bumper (open and close), the 4TH score strip, the KEYS TO THE GAME card (each key slides on as Moose starts it) and the FINAL 24-21 box. The theme is Lyria (fb-theme): full under the bumper, low under the welcome, and its opening fanfare as the closing sting. The ElevenLabs crowd bed runs under everything and dips under each Moose line and through the final pause. There is an early-80s tape look over the whole cut. Shots (from our own key stills): fb-stadium-t4, fb-pass-t1 (22 players, snap and throw), fb-catch-t2, fb-tackle-t2 (the big fullback goes down), fb-down-t1 (from the tackle's last frame), fb-final-t3, fb-booth-t1 (silent), fb-final-t4. The near-miss setup shot (fb-nearmiss) did not read cleanly and is left out. Runs past the 25-35 s aim because of key three and its afterthought; all beats were kept.",
+      "createdAt": "2026-10-19T09:12:34.640Z"
+    }
+  ]
+}

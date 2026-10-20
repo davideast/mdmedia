@@ -1,0 +1,25 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "n1": {
+      "text": "Introducing Roam Phone, the cordless telephone that lets you talk anywhere!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/tts/roam3-g-n1b.wav", "start": 0, "end": 4.72, "sha256": "7029c50b7d1d898722175f14394fabcd116a7932864ec8411fdd67d151477d60", "snap": "speech-onset@1" },
+      "loss": 0.944,
+      "snap": { "aligned": 0.32, "start": 0.24, "onset": 0.24, "floor": -73.5 },
+      "words": [
+        { "text": "Introducing", "start": 0.24, "end": 0.98, "loss": 0.984 },
+        { "text": "Roam", "start": 1.18, "end": 1.42, "loss": 1.235 },
+        { "text": "Phone,", "start": 1.52, "end": 1.84, "loss": 1.052 },
+        { "text": "the", "start": 1.94, "end": 2.06, "loss": 0.797 },
+        { "text": "cordless", "start": 2.12, "end": 2.46, "loss": 0.777 },
+        { "text": "telephone", "start": 2.5, "end": 2.86, "loss": 0.824 },
+        { "text": "that", "start": 2.9, "end": 3, "loss": 0.885 },
+        { "text": "lets", "start": 3.04, "end": 3.22, "loss": 0.927 },
+        { "text": "you", "start": 3.26, "end": 3.36, "loss": 0.876 },
+        { "text": "talk", "start": 3.4, "end": 3.78, "loss": 0.828 },
+        { "text": "anywhere!", "start": 3.88, "end": 4.44, "loss": 1.202 }
+      ]
+    }
+  }
+}

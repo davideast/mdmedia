@@ -1,0 +1,19 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "barnstormers",
+  "title": "Barnstormers",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-barnstormers.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "cut": "docs/cuts/barnstormers-take1.cut.json",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Welding sparks in the first second, a build montage on a pink ice-cream truck (welder, cowboy, Hawaiian shirt with the cow-catcher, grandpa with the blueprint), then it bursts through crates; the sedan only slides to a stop beside the haystack instead of rolling in, and the grandpa is swapped for a young man in the high-five.",
+      "createdAt": "2026-10-18T21:57:05.615Z"
+    }
+  ]
+}

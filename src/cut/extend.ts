@@ -15,7 +15,7 @@ import type { CutError, CutExtension, CutFile, CutResult, Segment } from './type
 export function extendCut(base: CutFile, extension: CutExtension): CutResult<CutFile> {
   const errors: CutError[] = [];
   const remove = new Set(extension.remove ?? []);
-  const lists = [base.segments, base.lines, base.music, base.sfx, base.overlays];
+  const lists = [base.segments, base.lines, base.music, base.sfx, base.overlays, base.performances];
   const baseIds = new Set(lists.flatMap((list) => (list ?? []).map((item) => item.id)));
   for (const id of remove) {
     if (!baseIds.has(id)) {
@@ -81,8 +81,16 @@ export function extendCut(base: CutFile, extension: CutExtension): CutResult<Cut
   if (optional.music) cut.music = optional.music;
   if (optional.sfx) cut.sfx = optional.sfx;
   if (optional.overlays) cut.overlays = optional.overlays;
+  const performances = merge(base.performances, extension.performances);
+  if (performances) cut.performances = performances;
+  if (base.check || extension.check) {
+    cut.check = { thresholds: { ...base.check?.thresholds, ...extension.check?.thresholds } };
+  }
   const picture = extension.picture ?? base.picture;
   if (picture) cut.picture = picture;
+  const mix = extension.mix ?? base.mix;
+  if (mix) cut.mix = mix;
+  if (base.sources || extension.sources) cut.sources = { ...base.sources, ...extension.sources };
   return { ok: true, value: cut };
 }
 

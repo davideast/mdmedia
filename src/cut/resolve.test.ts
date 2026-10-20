@@ -197,7 +197,8 @@ describe('resolution rules', () => {
     );
     if (!result.ok) throw new Error(JSON.stringify(result.errors));
     expect(result.value.at).toMatchObject({ a: 0, b: 2, l: 2.5, o: 0.25 });
-    expect(byId(result.value.overlays, 'o').end).toBe(4.5);
+    // l ends at 4.5, past the cut's end at 3, so the overlay is cut off there.
+    expect(byId(result.value.overlays, 'o')).toMatchObject({ end: 3, fadeOutEnd: 4.5 });
     expect(result.value.length).toBe(3);
   });
 
@@ -492,7 +493,8 @@ describe('a line with its own stretch of another take', () => {
     );
     const hello = byId(t.lines, 'hello');
     expect([hello.start, hello.end]).toEqual([1.95, 2.95]);
-    expect(hello.audio).toEqual({ kind: 'file', src: { kind: 'take', ref: 'take:doors', name: 'doors', path: '/media/takes/doors.mp4' }, in: 3, out: 4, volume: 1, filters: [] });
+    expect(hello.audio).toEqual({ kind: 'file', src: { kind: 'take', ref: 'take:doors', name: 'doors', path: '/media/takes/doors.mp4' }, in: 3, out: 4, volume: 1, filters: [],
+      fadeIn: 0, fadeOut: 0, fadeInStart: 1.95, fadeOutEnd: 2.95, layer: null });
     // 3.1 s in the take is 0.1 s into the line; the last word is clipped at the line's end.
     expect(hello.words).toEqual([{ text: 'Hello,', start: 2.05, end: 2.45 }, { text: 'Victoria.', start: 2.55, end: 2.95 }]);
   });

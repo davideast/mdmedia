@@ -1,0 +1,1641 @@
+{
+  "format": "mdmedia.cut-check@1",
+  "measured": {
+    "method": "dialogue-stem@1",
+    "source": "a render of the cut's dialogue: every segment's own sound and every line with its own sound, at the cut's volumes, fades and layers, without music or sound effects, mono 48 kHz",
+    "range": {
+      "from": 0,
+      "to": 36.27
+    },
+    "lines": [
+      {
+        "id": "howdy",
+        "speaker": "Big Hal",
+        "text": "Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!",
+        "speech": {
+          "start": 0.36,
+          "end": 5.2
+        },
+        "timedBy": "words",
+        "words": 15,
+        "syllables": 20,
+        "loudness": -24.5,
+        "pitch": {
+          "median": 249.7,
+          "low": 176,
+          "high": 311.1,
+          "range": 9.9,
+          "voiced": 0.72
+        },
+        "rate": {
+          "words": 3.1,
+          "syllables": 4.13
+        },
+        "wordLevels": [
+          {
+            "text": "Howdy",
+            "start": 0.36,
+            "end": 0.62,
+            "loudness": -20.7
+          },
+          {
+            "text": "folks,",
+            "start": 0.7,
+            "end": 1.08,
+            "loudness": -24
+          },
+          {
+            "text": "Big",
+            "start": 1.42,
+            "end": 1.56,
+            "loudness": -20.8
+          },
+          {
+            "text": "Hal",
+            "start": 1.64,
+            "end": 1.86,
+            "loudness": -21.1
+          },
+          {
+            "text": "here",
+            "start": 1.94,
+            "end": 2.1,
+            "loudness": -22.9
+          },
+          {
+            "text": "at",
+            "start": 2.12,
+            "end": 2.2,
+            "loudness": -30.6
+          },
+          {
+            "text": "Big",
+            "start": 2.3,
+            "end": 2.46,
+            "loudness": -21.8
+          },
+          {
+            "text": "Hal's,",
+            "start": 2.52,
+            "end": 2.92,
+            "loudness": -25.6
+          },
+          {
+            "text": "the",
+            "start": 3.18,
+            "end": 3.24,
+            "loudness": -22.3
+          },
+          {
+            "text": "biggest",
+            "start": 3.38,
+            "end": 3.68,
+            "loudness": -24.4
+          },
+          {
+            "text": "lot",
+            "start": 3.74,
+            "end": 3.92,
+            "loudness": -21.6
+          },
+          {
+            "text": "in",
+            "start": 3.98,
+            "end": 4.019,
+            "loudness": -38.7
+          },
+          {
+            "text": "the",
+            "start": 4.059,
+            "end": 4.14,
+            "loudness": -29.7
+          },
+          {
+            "text": "tri-county",
+            "start": 4.18,
+            "end": 4.76,
+            "loudness": -24.5
+          },
+          {
+            "text": "area!",
+            "start": 4.86,
+            "end": 5.2,
+            "loudness": -25.4
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "dealers",
+        "speaker": "Big Hal",
+        "text": "Now, those fancy dealerships'll charge you for all kinds of extras.",
+        "speech": {
+          "start": 5.59,
+          "end": 9.18
+        },
+        "timedBy": "words",
+        "words": 11,
+        "syllables": 15,
+        "loudness": -24.9,
+        "pitch": {
+          "median": 178.7,
+          "low": 123.7,
+          "high": 220.6,
+          "range": 10,
+          "voiced": 0.63
+        },
+        "rate": {
+          "words": 3.06,
+          "syllables": 4.18
+        },
+        "wordLevels": [
+          {
+            "text": "Now,",
+            "start": 5.59,
+            "end": 5.7,
+            "loudness": -23.2
+          },
+          {
+            "text": "those",
+            "start": 5.78,
+            "end": 5.98,
+            "loudness": -23.2
+          },
+          {
+            "text": "fancy",
+            "start": 6.08,
+            "end": 6.42,
+            "loudness": -24.5
+          },
+          {
+            "text": "dealerships'll",
+            "start": 6.52,
+            "end": 7.3,
+            "loudness": -27.1
+          },
+          {
+            "text": "charge",
+            "start": 7.36,
+            "end": 7.66,
+            "loudness": -22.9
+          },
+          {
+            "text": "you",
+            "start": 7.7,
+            "end": 7.82,
+            "loudness": -28.9
+          },
+          {
+            "text": "for",
+            "start": 7.86,
+            "end": 7.96,
+            "loudness": -27.2
+          },
+          {
+            "text": "all",
+            "start": 8.06,
+            "end": 8.24,
+            "loudness": -20
+          },
+          {
+            "text": "kinds",
+            "start": 8.38,
+            "end": 8.68,
+            "loudness": -24
+          },
+          {
+            "text": "of",
+            "start": 8.74,
+            "end": 8.82,
+            "loudness": -31.8
+          },
+          {
+            "text": "extras.",
+            "start": 8.9,
+            "end": 9.18,
+            "loudness": -31.6
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "dealers"
+            ],
+            "value": 178.7,
+            "threshold": 197.9,
+            "message": "dealers: pitch 178.7 Hz is below Big Hal's reference, 197.9 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "nothal",
+        "speaker": "Big Hal",
+        "text": "Not Big Hal. I keep it simple, and I pass the savings on to you.",
+        "speech": {
+          "start": 9.44,
+          "end": 14.26
+        },
+        "timedBy": "words",
+        "words": 15,
+        "syllables": 17,
+        "loudness": -24.2,
+        "pitch": {
+          "median": 153.6,
+          "low": 97.3,
+          "high": 204.8,
+          "range": 12.9,
+          "voiced": 0.7
+        },
+        "rate": {
+          "words": 3.11,
+          "syllables": 3.53
+        },
+        "wordLevels": [
+          {
+            "text": "Not",
+            "start": 9.44,
+            "end": 9.68,
+            "loudness": -20.8
+          },
+          {
+            "text": "Big",
+            "start": 9.76,
+            "end": 9.96,
+            "loudness": -22.6
+          },
+          {
+            "text": "Hal.",
+            "start": 10.04,
+            "end": 10.34,
+            "loudness": -23.6
+          },
+          {
+            "text": "I",
+            "start": 11.14,
+            "end": 11.22,
+            "loudness": -24.9
+          },
+          {
+            "text": "keep",
+            "start": 11.28,
+            "end": 11.44,
+            "loudness": -24
+          },
+          {
+            "text": "it",
+            "start": 11.48,
+            "end": 11.58,
+            "loudness": -30.5
+          },
+          {
+            "text": "simple,",
+            "start": 11.64,
+            "end": 11.96,
+            "loudness": -22.7
+          },
+          {
+            "text": "and",
+            "start": 12.34,
+            "end": 12.42,
+            "loudness": -28.3
+          },
+          {
+            "text": "I",
+            "start": 12.5,
+            "end": 12.58,
+            "loudness": -28.4
+          },
+          {
+            "text": "pass",
+            "start": 12.64,
+            "end": 12.92,
+            "loudness": -21.4
+          },
+          {
+            "text": "the",
+            "start": 12.96,
+            "end": 13.06,
+            "loudness": -27.9
+          },
+          {
+            "text": "savings",
+            "start": 13.12,
+            "end": 13.52,
+            "loudness": -22.8
+          },
+          {
+            "text": "on",
+            "start": 13.62,
+            "end": 13.78,
+            "loudness": -22.8
+          },
+          {
+            "text": "to",
+            "start": 13.84,
+            "end": 13.96,
+            "loudness": -26.4
+          },
+          {
+            "text": "you.",
+            "start": 14.06,
+            "end": 14.26,
+            "loudness": -27.6
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "nothal"
+            ],
+            "value": 153.6,
+            "threshold": 197.9,
+            "message": "nothal: pitch 153.6 Hz is below Big Hal's reference, 197.9 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "deal",
+        "speaker": "Big Hal",
+        "text": "That's how I can do no money down, and ninety-nine a month!",
+        "speech": {
+          "start": 14.63,
+          "end": 18.11
+        },
+        "timedBy": "words",
+        "words": 12,
+        "syllables": 16,
+        "loudness": -24.4,
+        "pitch": {
+          "median": 190.1,
+          "low": 143,
+          "high": 203.1,
+          "range": 6.1,
+          "voiced": 0.78
+        },
+        "rate": {
+          "words": 3.45,
+          "syllables": 4.6
+        },
+        "wordLevels": [
+          {
+            "text": "That's",
+            "start": 14.63,
+            "end": 14.85,
+            "loudness": -22
+          },
+          {
+            "text": "how",
+            "start": 14.89,
+            "end": 15.03,
+            "loudness": -20.4
+          },
+          {
+            "text": "I",
+            "start": 15.13,
+            "end": 15.19,
+            "loudness": -28
+          },
+          {
+            "text": "can",
+            "start": 15.23,
+            "end": 15.35,
+            "loudness": -28.8
+          },
+          {
+            "text": "do",
+            "start": 15.39,
+            "end": 15.51,
+            "loudness": -25.7
+          },
+          {
+            "text": "no",
+            "start": 15.63,
+            "end": 15.75,
+            "loudness": -22.2
+          },
+          {
+            "text": "money",
+            "start": 15.83,
+            "end": 16.07,
+            "loudness": -24.8
+          },
+          {
+            "text": "down,",
+            "start": 16.13,
+            "end": 16.45,
+            "loudness": -23.2
+          },
+          {
+            "text": "and",
+            "start": 16.95,
+            "end": 17.11,
+            "loudness": -27.5
+          },
+          {
+            "text": "ninety-nine",
+            "start": 17.17,
+            "end": 17.75,
+            "loudness": -22.7
+          },
+          {
+            "text": "a",
+            "start": 17.79,
+            "end": 17.83,
+            "loudness": -30.8
+          },
+          {
+            "text": "month!",
+            "start": 17.89,
+            "end": 18.11,
+            "loudness": -26.3
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "deal"
+            ],
+            "value": 190.1,
+            "threshold": 197.9,
+            "message": "deal: pitch 190.1 Hz is below Big Hal's reference, 197.9 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "inspected",
+        "speaker": "Big Hal",
+        "text": "And I personally hand-inspect every car.",
+        "speech": {
+          "start": 18.46,
+          "end": 21
+        },
+        "timedBy": "words",
+        "words": 6,
+        "syllables": 13,
+        "loudness": -24.6,
+        "pitch": {
+          "median": 163.2,
+          "low": 112.8,
+          "high": 196.8,
+          "range": 9.6,
+          "voiced": 0.62
+        },
+        "rate": {
+          "words": 2.36,
+          "syllables": 5.12
+        },
+        "wordLevels": [
+          {
+            "text": "And",
+            "start": 18.46,
+            "end": 18.56,
+            "loudness": -28.6
+          },
+          {
+            "text": "I",
+            "start": 18.74,
+            "end": 18.88,
+            "loudness": -29.6
+          },
+          {
+            "text": "personally",
+            "start": 18.94,
+            "end": 19.46,
+            "loudness": -24.3
+          },
+          {
+            "text": "hand-inspect",
+            "start": 19.52,
+            "end": 20.24,
+            "loudness": -25
+          },
+          {
+            "text": "every",
+            "start": 20.38,
+            "end": 20.56,
+            "loudness": -24.5
+          },
+          {
+            "text": "car.",
+            "start": 20.68,
+            "end": 21,
+            "loudness": -23.3
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "inspected"
+            ],
+            "value": 163.2,
+            "threshold": 197.9,
+            "message": "inspected: pitch 163.2 Hz is below Big Hal's reference, 197.9 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "guarantee",
+        "speaker": "Big Hal",
+        "text": "At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!",
+        "speech": {
+          "start": 21.62,
+          "end": 28.47
+        },
+        "timedBy": "words",
+        "words": 14,
+        "syllables": 17,
+        "loudness": -24.7,
+        "pitch": {
+          "median": 209.2,
+          "low": 151.9,
+          "high": 278.6,
+          "range": 10.5,
+          "voiced": 0.76
+        },
+        "rate": {
+          "words": 2.04,
+          "syllables": 2.48
+        },
+        "wordLevels": [
+          {
+            "text": "At",
+            "start": 21.62,
+            "end": 21.77,
+            "loudness": -27
+          },
+          {
+            "text": "Big",
+            "start": 21.85,
+            "end": 22.03,
+            "loudness": -23.1
+          },
+          {
+            "text": "Hal's,",
+            "start": 22.09,
+            "end": 22.45,
+            "loudness": -24.3
+          },
+          {
+            "text": "you're",
+            "start": 22.53,
+            "end": 22.71,
+            "loudness": -28.5
+          },
+          {
+            "text": "guaranteed",
+            "start": 22.75,
+            "end": 23.29,
+            "loudness": -25.4
+          },
+          {
+            "text": "to",
+            "start": 23.33,
+            "end": 23.41,
+            "loudness": -29.9
+          },
+          {
+            "text": "get",
+            "start": 23.45,
+            "end": 23.67,
+            "loudness": -26.9
+          },
+          {
+            "text": "four",
+            "start": 24.03,
+            "end": 24.23,
+            "loudness": -21.5
+          },
+          {
+            "text": "doors!",
+            "start": 24.31,
+            "end": 24.77,
+            "loudness": -25.1
+          },
+          {
+            "text": "Four",
+            "start": 25.75,
+            "end": 25.95,
+            "loudness": -19.3
+          },
+          {
+            "text": "seats!",
+            "start": 26.09,
+            "end": 26.53,
+            "loudness": -26.1
+          },
+          {
+            "text": "A",
+            "start": 27.61,
+            "end": 27.69,
+            "loudness": -27.7
+          },
+          {
+            "text": "steering",
+            "start": 27.79,
+            "end": 28.13,
+            "loudness": -20.2
+          },
+          {
+            "text": "wheel!",
+            "start": 28.23,
+            "end": 28.47,
+            "loudness": -22.7
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "thisone",
+        "speaker": "Big Hal",
+        "text": "And this one? This one even comes with wheels!",
+        "speech": {
+          "start": 28.88,
+          "end": 31.84
+        },
+        "timedBy": "words",
+        "words": 9,
+        "syllables": 11,
+        "loudness": -24,
+        "pitch": {
+          "median": 244.6,
+          "low": 141.9,
+          "high": 342.8,
+          "range": 15.3,
+          "voiced": 0.8
+        },
+        "rate": {
+          "words": 3.04,
+          "syllables": 3.72
+        },
+        "wordLevels": [
+          {
+            "text": "And",
+            "start": 28.88,
+            "end": 29.02,
+            "loudness": -27.2
+          },
+          {
+            "text": "this",
+            "start": 29.06,
+            "end": 29.24,
+            "loudness": -21.1
+          },
+          {
+            "text": "one?",
+            "start": 29.28,
+            "end": 29.42,
+            "loudness": -22.8
+          },
+          {
+            "text": "This",
+            "start": 30.22,
+            "end": 30.4,
+            "loudness": -20.3
+          },
+          {
+            "text": "one",
+            "start": 30.44,
+            "end": 30.54,
+            "loudness": -24.3
+          },
+          {
+            "text": "even",
+            "start": 30.6,
+            "end": 30.82,
+            "loudness": -27.7
+          },
+          {
+            "text": "comes",
+            "start": 30.86,
+            "end": 31.12,
+            "loudness": -22.8
+          },
+          {
+            "text": "with",
+            "start": 31.16,
+            "end": 31.3,
+            "loudness": -28.1
+          },
+          {
+            "text": "wheels!",
+            "start": 31.34,
+            "end": 31.84,
+            "loudness": -22.7
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "comeon",
+        "speaker": "Big Hal",
+        "text": "So come on down to Big Hal's and save big!",
+        "speech": {
+          "start": 32.22,
+          "end": 35.1
+        },
+        "timedBy": "words",
+        "words": 10,
+        "syllables": 10,
+        "loudness": -24.8,
+        "pitch": {
+          "median": 238.4,
+          "low": 153.6,
+          "high": 307.5,
+          "range": 12,
+          "voiced": 0.85
+        },
+        "rate": {
+          "words": 3.47,
+          "syllables": 3.47
+        },
+        "wordLevels": [
+          {
+            "text": "So",
+            "start": 32.22,
+            "end": 32.34,
+            "loudness": -25.7
+          },
+          {
+            "text": "come",
+            "start": 32.4,
+            "end": 32.52,
+            "loudness": -23.1
+          },
+          {
+            "text": "on",
+            "start": 32.6,
+            "end": 32.72,
+            "loudness": -25.7
+          },
+          {
+            "text": "down",
+            "start": 32.76,
+            "end": 32.96,
+            "loudness": -22.5
+          },
+          {
+            "text": "to",
+            "start": 32.98,
+            "end": 33.08,
+            "loudness": -28.8
+          },
+          {
+            "text": "Big",
+            "start": 33.12,
+            "end": 33.26,
+            "loudness": -21.8
+          },
+          {
+            "text": "Hal's",
+            "start": 33.34,
+            "end": 33.72,
+            "loudness": -23.9
+          },
+          {
+            "text": "and",
+            "start": 33.98,
+            "end": 34.16,
+            "loudness": -27.8
+          },
+          {
+            "text": "save",
+            "start": 34.24,
+            "end": 34.56,
+            "loudness": -23.3
+          },
+          {
+            "text": "big!",
+            "start": 34.7,
+            "end": 35.1,
+            "loudness": -25
+          }
+        ],
+        "flags": []
+      }
+    ],
+    "performances": [
+      {
+        "id": "opening",
+        "lines": [
+          "howdy"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "no_extras",
+        "lines": [
+          "dealers"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "kept_simple",
+        "lines": [
+          "nothal"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "the_price",
+        "lines": [
+          "deal"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "inspection",
+        "lines": [
+          "inspected"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "the_guarantee",
+        "lines": [
+          "guarantee"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [
+          {
+            "at": 23.175,
+            "from": "guar",
+            "to": "count1",
+            "before": null,
+            "after": -55.3,
+            "change": null,
+            "wide": true,
+            "flags": []
+          },
+          {
+            "at": 25.25,
+            "from": "count1",
+            "to": "count2",
+            "before": -54.7,
+            "after": -51.2,
+            "change": 3.5,
+            "wide": false,
+            "flags": []
+          },
+          {
+            "at": 27.05,
+            "from": "count2",
+            "to": "count3",
+            "before": -51.3,
+            "after": -50.5,
+            "change": 0.8,
+            "wide": false,
+            "flags": []
+          }
+        ],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "wheels_joke",
+        "lines": [
+          "thisone",
+          "comeon"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "thisone",
+            "to": "comeon",
+            "between": [],
+            "pause": 0.38,
+            "before": {
+              "words": "comes with wheels!",
+              "start": 30.86,
+              "end": 31.84,
+              "loudness": -23,
+              "pitch": 261.3
+            },
+            "after": {
+              "words": "So come on down to",
+              "start": 32.22,
+              "end": 33.08,
+              "loudness": -23.7,
+              "pitch": 277.3
+            },
+            "loudness": -0.7,
+            "pitch": 1,
+            "rate": -0.07,
+            "flags": []
+          }
+        ],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      }
+    ],
+    "fingerprints": {
+      "lines": {
+        "howdy": {
+          "from": 0.36,
+          "to": 5.2,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225"
+          },
+          "digest": "984882414f84f5cd872ce4305581bb2f6625d3640f50c7fefb16ecc7f5efaccd"
+        },
+        "dealers": {
+          "from": 5.59,
+          "to": 9.18,
+          "sources": {
+            "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98"
+          },
+          "digest": "dd7920465449d58d7310e99565fa2fb64ddd932c1d5e60f20a7342842a421935"
+        },
+        "nothal": {
+          "from": 9.44,
+          "to": 14.26,
+          "sources": {
+            "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+          },
+          "digest": "6d560565469d04fbf0f02e1b5911f2b1795f794a9d81ac18240fa84e532e7f54"
+        },
+        "deal": {
+          "from": 14.63,
+          "to": 18.11,
+          "sources": {
+            "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82"
+          },
+          "digest": "2d18bb078e99f09048b8214533878298c2946a385ad2bd1c4ec8ff65e5042f1f"
+        },
+        "inspected": {
+          "from": 18.46,
+          "to": 21,
+          "sources": {
+            "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825"
+          },
+          "digest": "181ff9a9eb796f75f6ed4f3a5749ca658b0b57b150c4a0ff5639ee9246ab173c"
+        },
+        "guarantee": {
+          "from": 21.62,
+          "to": 28.47,
+          "sources": {
+            "take:hal7-count-t1": "3d87ee91869da32469442ea2c78702c30433235b12f119a13f0e917a1bab7560",
+            "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb"
+          },
+          "digest": "ec49dea6abd157e746c4ceafdf63c3ef79eeba803c5fc8bf2e45759d564d91ac"
+        },
+        "thisone": {
+          "from": 28.88,
+          "to": 31.84,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "67a0bb4a50a43fea68efb774a291758db8bc36ad07af2435a8076c1da8f6615a"
+        },
+        "comeon": {
+          "from": 32.22,
+          "to": 35.1,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "75060c3715b5eb4bfef22773781ca8ca972c817137eaeb0337ddd9f9dd5f2534"
+        }
+      },
+      "performances": {
+        "opening": {
+          "from": 0,
+          "to": 5.8,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+            "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98"
+          },
+          "digest": "36baf9c9116751d2d683bcb8be6c37f84c8c9364e1b181b72b5719a871a59e5f"
+        },
+        "no_extras": {
+          "from": 4.99,
+          "to": 9.78,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+            "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98",
+            "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+          },
+          "digest": "dbdfa15f349968761f9f6b51e4c84c1c9c19db57457a9ea6d4b23f90a7aa9504"
+        },
+        "kept_simple": {
+          "from": 8.84,
+          "to": 14.86,
+          "sources": {
+            "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98",
+            "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82",
+            "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+          },
+          "digest": "229334bb43b7fa120395fe233e0da3cff9038d601a843ad5095aed1b4b895c00"
+        },
+        "the_price": {
+          "from": 14.03,
+          "to": 18.71,
+          "sources": {
+            "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825",
+            "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82",
+            "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+          },
+          "digest": "fb01ec3a2313cccfad135ace1bad939fe5202cff41f4442d0d05ed79b33a0cd9"
+        },
+        "inspection": {
+          "from": 17.86,
+          "to": 21.6,
+          "sources": {
+            "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb",
+            "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825",
+            "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82"
+          },
+          "digest": "c736d5310939070bd796173d09de6657ae89f79b0f08915e7281437da3f54d72"
+        },
+        "the_guarantee": {
+          "from": 21.02,
+          "to": 29.07,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf",
+            "take:hal7-count-t1": "3d87ee91869da32469442ea2c78702c30433235b12f119a13f0e917a1bab7560",
+            "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb",
+            "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825"
+          },
+          "digest": "756f6bce086ed8dcbf5638de455afbf95426faf54f25c9c38f84bff6e0a03da7"
+        },
+        "wheels_joke": {
+          "from": 28.28,
+          "to": 35.7,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf",
+            "take:hal7-count-t1": "3d87ee91869da32469442ea2c78702c30433235b12f119a13f0e917a1bab7560",
+            "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb"
+          },
+          "digest": "59ded0911c586ae0fc8445ecb66cd84c22f6a85dd3ad4ea34ed8c60e4716cabb"
+        }
+      }
+    }
+  },
+  "listening": {
+    "inspection": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 17.96,
+        "to": 21.5
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "inspection.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "And I personally hand-inspect every car.",
+          "why": "The sentence is delivered in a single, fluid take with seamless inflection, natural timing, and consistent room tone.",
+          "kind": "continuous",
+          "ask": "Does \"And I personally hand-inspect every car.\" (0.50–3.04 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "inspected"
+          ]
+        },
+        {
+          "id": "inspection.shouted.inspected",
+          "verdict": "no",
+          "confidence": 0.95,
+          "heard": "Big Hal speaking energetically in a standard car dealership commercial voice.",
+          "why": "Although spoken with enthusiastic salesman projection, none of the words are yelled or shouted.",
+          "kind": "shouted",
+          "ask": "Is any word in \"And I personally hand-inspect every car.\" (0.50–3.04 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "inspected"
+          ]
+        },
+        {
+          "id": "inspection.delivery",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "The line is spoken in one breath without pauses, and 'personally' is delivered at the same volume level as the rest of the sentence.",
+          "why": "There are no breaths taken mid-sentence, and vocal loudness remains steady throughout.",
+          "kind": "delivery",
+          "ask": "Is \"And I personally hand-inspect every car.\" (0.50–3.04 s) delivered like this: one sentence in one breath, \"personally\" at the same loudness as the other words? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "inspected"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 17.96,
+        "to": 21.5,
+        "sources": {
+          "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825",
+          "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82"
+        },
+        "digest": "dffe96743a936d33a57e4d71df46e3b34dfca6f86534c06fdf816b12303de0dc"
+      },
+      "heardAt": "2026-10-20T06:48:01.249Z"
+    },
+    "kept_simple": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 8.94,
+        "to": 14.76
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "kept_simple.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "Not Big Hal. I keep it simple, and I pass the savings on to you.",
+          "why": "The sentence flows naturally without any cuts, background noise shifts, or audio splices, matching the actor's continuous speech on camera.",
+          "kind": "continuous",
+          "ask": "Does \"Not Big Hal. I keep it simple, and I pass the savings on to you.\" (0.50–5.32 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "nothal"
+          ]
+        },
+        {
+          "id": "kept_simple.shouted.nothal",
+          "verdict": "no",
+          "confidence": 0.98,
+          "heard": "Not Big Hal. I keep it simple, and I pass the savings on to you.",
+          "why": "The entire line is spoken in an even, measured, folksy conversational tone with no shouting.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Not Big Hal. I keep it simple, and I pass the savings on to you.\" (0.50–5.32 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "nothal"
+          ]
+        },
+        {
+          "id": "kept_simple.delivery",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "Not Big Hal. I keep it simple, and I pass the savings on to you.",
+          "why": "He delivers the line in a proud, warm, and sincere manner at an unhurried, steady pace without raising his voice.",
+          "kind": "delivery",
+          "ask": "Is \"Not Big Hal. I keep it simple, and I pass the savings on to you.\" (0.50–5.32 s) delivered like this: proud, warm and sincere at a steady pace, without raising his voice? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "nothal"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 8.94,
+        "to": 14.76,
+        "sources": {
+          "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98",
+          "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82",
+          "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+        },
+        "digest": "73922f366321e13e76bae90ccad760cc65dd20f4cb9aa156e4e66c577a9766dd"
+      },
+      "heardAt": "2026-10-20T06:47:24.910Z"
+    },
+    "no_extras": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 5.09,
+        "to": 9.68
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "no_extras.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.98,
+          "heard": "Now, those fancy dealerships'll charge you for all kinds of extras.",
+          "why": "The sentence flows naturally without any audible cuts, changes in room tone, or splice artifacts, and matches his mouth movements in a single continuous shot.",
+          "kind": "continuous",
+          "ask": "Does \"Now, those fancy dealerships'll charge you for all kinds of extras.\" (0.50–4.09 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "dealers"
+          ]
+        },
+        {
+          "id": "no_extras.shouted.dealers",
+          "verdict": "no",
+          "confidence": 0.95,
+          "heard": "Now, those fancy dealerships'll charge you for all kinds of extras.",
+          "why": "Big Hal projects his voice in a folksy, standard commercial tone, but none of the words are yelled or shouted.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Now, those fancy dealerships'll charge you for all kinds of extras.\" (0.50–4.09 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "dealers"
+          ]
+        },
+        {
+          "id": "no_extras.delivery",
+          "verdict": "yes",
+          "confidence": 0.9,
+          "heard": "Now, those fancy dealerships'll charge you for all kinds of extras.",
+          "why": "He delivers the line in a warm, earnest, folksy manner at an even pace without shouting or sharply raising his voice.",
+          "kind": "delivery",
+          "ask": "Is \"Now, those fancy dealerships'll charge you for all kinds of extras.\" (0.50–4.09 s) delivered like this: proud, warm and sincere at a steady pace, without raising his voice? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "dealers"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 5.09,
+        "to": 9.68,
+        "sources": {
+          "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+          "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98",
+          "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+        },
+        "digest": "f9f3ce7485037f382b4a57cb3dafd341204c966113940aeddadf5c0c4501d1c4"
+      },
+      "heardAt": "2026-10-20T06:47:17.385Z"
+    },
+    "opening": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 0,
+        "to": 5.7
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "opening.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "The phrase is spoken smoothly in a single take without audible cuts, tone shifts, or spliced audio.",
+          "why": "The acoustic environment, background ambience, vocal cadence, and breath flow remain uniform and natural throughout the sentence.",
+          "kind": "continuous",
+          "ask": "Does \"Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!\" (0.36–5.20 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "howdy"
+          ]
+        },
+        {
+          "id": "opening.shouted.howdy",
+          "verdict": "no",
+          "confidence": 0.9,
+          "heard": "Big Hal projects his voice with cheerful, booming enthusiasm typical of a car commercial pitch, but does not yell or shout.",
+          "why": "The vocal delivery is projected and hearty rather than shouted or strained.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!\" (0.36–5.20 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "howdy"
+          ]
+        },
+        {
+          "id": "opening.delivery",
+          "verdict": "yes",
+          "confidence": 0.98,
+          "heard": "A friendly, confident, and steady local used-car salesman greeting the audience warmly.",
+          "why": "His tone, posture, gestures, and vocal pacing embody a classic proud and welcoming local car lot pitchman.",
+          "kind": "delivery",
+          "ask": "Is \"Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!\" (0.36–5.20 s) delivered like this: a proud, warm, steady local pitchman? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "howdy"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 0,
+        "to": 5.7,
+        "sources": {
+          "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+          "take:hal7-extras-t3": "1c6894fbd4e1bd638375538e2b4af8305d26ac52823f0f5b11f9c68ea498ac98"
+        },
+        "digest": "a65471721d216e6d2f801ea9ce51f5822743533ae694378e90d64bd08f747a1a"
+      },
+      "heardAt": "2026-10-20T06:47:10.076Z"
+    },
+    "the_guarantee": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 21.12,
+        "to": 28.97
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "the_guarantee.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "At Big Hal's, you're guaranteed to get: four doors, four seats, a steering wheel...",
+          "why": "The phrasing, room tone, and vocal acoustics flow naturally without any audible cuts, splices, or edits across the phrase.",
+          "kind": "continuous",
+          "ask": "Does \"At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!\" (0.50–7.35 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "guarantee"
+          ]
+        },
+        {
+          "id": "the_guarantee.shouted.guarantee",
+          "verdict": "no",
+          "confidence": 0.9,
+          "heard": "Big Hal speaking at a hearty, projected commercial speaking volume rather than yelling.",
+          "why": "None of the words are shouted; he speaks emphatically in an upbeat car-salesman tone at normal to moderate volume.",
+          "kind": "shouted",
+          "ask": "Is any word in \"At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!\" (0.50–7.35 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "guarantee"
+          ]
+        },
+        {
+          "id": "the_guarantee.delivery",
+          "verdict": "no",
+          "confidence": 0.95,
+          "heard": "A slow, deliberate, measured delivery punctuated by noticeable pauses as he counts on his fingers.",
+          "why": "The delivery is slow and paced out rather than brisk, with significant pauses between each listed feature as he raises fingers to count them.",
+          "kind": "delivery",
+          "ask": "Is \"At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!\" (0.50–7.35 s) delivered like this: a brisk, even list: each item at the same pitch and loudness, nothing builds, nothing shouted? Answer yes or no.",
+          "expect": "yes",
+          "reading": "no",
+          "agrees": false,
+          "lines": [
+            "guarantee"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 21.12,
+        "to": 28.97,
+        "sources": {
+          "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf",
+          "take:hal7-count-t1": "3d87ee91869da32469442ea2c78702c30433235b12f119a13f0e917a1bab7560",
+          "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb",
+          "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825"
+        },
+        "digest": "379c6f0fe1ac9e567b5459b7a294c82867986097fe572aaf16d4662bca7aa75a"
+      },
+      "heardAt": "2026-10-20T06:48:16.324Z"
+    },
+    "the_price": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 14.13,
+        "to": 18.61
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "the_price.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "That's how I can do no money down, and ninety-nine a month!",
+          "why": "The sentence flows naturally in a single take without any audible cuts, changes in ambient room tone, or splices between separate deliveries.",
+          "kind": "continuous",
+          "ask": "Does \"That's how I can do no money down, and ninety-nine a month!\" (0.50–3.98 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "deal"
+          ]
+        },
+        {
+          "id": "the_price.shouted.deal",
+          "verdict": "no",
+          "confidence": 0.95,
+          "heard": "That's how I can do no money down, and ninety-nine a month!",
+          "why": "None of the words are shouted; despite the flashy graphic popping up on screen, he delivers the entire line in a calm, even, and conversational tone.",
+          "kind": "shouted",
+          "ask": "Is any word in \"That's how I can do no money down, and ninety-nine a month!\" (0.50–3.98 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "deal"
+          ]
+        },
+        {
+          "id": "the_price.delivery",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "That's how I can do no money down, and ninety-nine a month!",
+          "why": "Big Hal delivers the line in a warm, folksy, sincere, and proud manner at an even pace without raising his voice.",
+          "kind": "delivery",
+          "ask": "Is \"That's how I can do no money down, and ninety-nine a month!\" (0.50–3.98 s) delivered like this: proud, warm and sincere at a steady pace, without raising his voice? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "deal"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 14.13,
+        "to": 18.61,
+        "sources": {
+          "take:hal7-inspect2-t2": "eee3b7746c4e5c624e3748729119ddd1dc0ff4ee80142d1e773b00add8a23825",
+          "take:hal7-price-t3": "ad3d0f89dd954f740841d5e7ede7f2f1dc18ebc4028942f720a5c5afec80bc82",
+          "take:hal7-simple-t2": "bbc914c751b2c23dc4389da2f966f495d9d9e3c058d18389092d82aa3776549c"
+        },
+        "digest": "6b199a655243e14a2cc8f124f0ec509ed987ddd54356233ce82b21d27d423fce"
+      },
+      "heardAt": "2026-10-20T06:47:49.102Z"
+    },
+    "wheels_joke": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 28.38,
+        "to": 35.6
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "wheels_joke.continuous.thisone.comeon",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "Big Hal speaking seamlessly in one continuous take on camera without edits or audio splices between sentences.",
+          "why": "The tone, ambient background sound, room tone, and visual performance flow uninterrupted between the two sentences.",
+          "kind": "continuous",
+          "ask": "Do \"And this one? This one even comes with wheels!\" (0.50–3.46 s) and \"So come on down to Big Hal's and save big!\" (3.84–6.72 s) sound like one continuous delivery by the same speaker, rather than two separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "thisone",
+            "comeon"
+          ]
+        },
+        {
+          "id": "wheels_joke.shouted.thisone",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "Big Hal shouting 'WHEELS!' at the end of the line.",
+          "why": "He delivers 'wheels' with pronounced vocal volume, punch, and projection typical of an over-the-top used car commercial shout.",
+          "kind": "shouted",
+          "ask": "Is any word in \"And this one? This one even comes with wheels!\" (0.50–3.46 s) shouted?",
+          "expect": "no",
+          "reading": "yes",
+          "agrees": false,
+          "lines": [
+            "thisone"
+          ]
+        },
+        {
+          "id": "wheels_joke.shouted.comeon",
+          "verdict": "yes",
+          "confidence": 0.9,
+          "heard": "Big Hal loudly projecting and shouting throughout 'So come on down to Big Hal's and save big!'",
+          "why": "He delivers the line in an energetic, loud, projected car salesman shout.",
+          "kind": "shouted",
+          "ask": "Is any word in \"So come on down to Big Hal's and save big!\" (3.84–6.72 s) shouted?",
+          "expect": "no",
+          "reading": "yes",
+          "agrees": false,
+          "lines": [
+            "comeon"
+          ]
+        },
+        {
+          "id": "wheels_joke.delivery",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "A dramatic punchline delivery with a distinct pause before shouting 'WHEELS!' as a comedic big reveal, followed by a loud, boisterous pitchman call to action.",
+          "why": "The delivery is intentionally staged as a dramatic, over-the-top comedic reveal with shouting and dynamic pitch variation, not a flat, ordinary selling point delivered on a single breath.",
+          "kind": "delivery",
+          "ask": "Is \"And this one? This one even comes with wheels! So come on down to Big Hal's and save big!\" (0.50–6.72 s) delivered like this: an ordinary selling point: one breath, no pause before \"wheels\", \"wheels\" at the same loudness and note as \"comes with\", never a big reveal; then a warm, friendly invitation? Answer yes or no.",
+          "expect": "yes",
+          "reading": "no",
+          "agrees": false,
+          "lines": [
+            "thisone",
+            "comeon"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 28.38,
+        "to": 35.6,
+        "sources": {
+          "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf",
+          "take:hal7-count-t1": "3d87ee91869da32469442ea2c78702c30433235b12f119a13f0e917a1bab7560",
+          "take:hal7-guarantee4-t3": "d554d2eb52b646a5c7e50748661700d784637d03bf7c158bc1cde4d776d64cbb"
+        },
+        "digest": "74fbaa827cc303a7c5eaaf45050a43bf9204c500285dbca90b8cd2aa22f35fd5"
+      },
+      "heardAt": "2026-10-20T06:48:37.961Z"
+    }
+  }
+}

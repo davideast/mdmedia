@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { existsSync, readFileSync } from 'node:fs';
-import { gainAt, opacityAt, positionAt, resolveCutJson, type ResolvedSource, type Timeline } from '../../src/cut/index';
+import { bedPartGainAt, gainAt, opacityAt, positionAt, resolveCutJson, type ResolvedSource, type Timeline } from '../../src/cut/index';
 
 /**
  * CGL Football, Take 1 (Keys to the Game), ported from football/edit.mjs. The
@@ -147,7 +147,7 @@ describe('CGL Football, Take 1', () => {
     for (const [id, [name, length]] of Object.entries(stills)) {
       const seg = byId(timeline.segments, id);
       expect(seg.src).toEqual({ kind: 'file', ref: `football/${name}.png`, path: `${ROOT}/football/${name}.png` });
-      expect([seg.in, seg.out]).toEqual([0, 0]);
+      expect([seg.still, seg.in, seg.out]).toEqual([true, 0, 0]);
       near(seg.hold, length);
       near(seg.end - seg.start, length);
       expect(seg.audio).toBeNull();
@@ -249,23 +249,35 @@ describe('CGL Football, Take 1', () => {
     };
     const script = (i: number, t: number): number => volume(t) * outer(t) * pass(i, t);
 
-    const passes = ['crowd1', 'crowd2', 'crowd3'].map((id) => byId(timeline.sfx, id));
-    passes.forEach((clip, i) => {
-      expect(clip.src).toMatchObject({ path: `${ROOT}/audio/fb-crowd.mp3` });
-      expect(clip.in).toBe(0);
-      near(clip.start, T0 + 18 * i);
+    // One bed: three passes of the file, under one volume curve.
+    const bed = byId(timeline.sfx, 'crowd');
+    expect(bed.src).toEqual({ kind: 'bed', parts: 3 });
+    near(bed.start, T0);
+    near(bed.end, OUTRO + 1.8);
+    expect([bed.fadeIn, bed.fadeOut]).toEqual([0.5, 1.2]);
+    const passes = bed.parts ?? [];
+    expect(passes).toHaveLength(3);
+    passes.forEach((part, i) => {
+      expect(part.src).toMatchObject({ path: `${ROOT}/audio/fb-crowd.mp3` });
+      expect(part.in).toBe(0);
+      near(part.start, T0 + 18 * i);
+      expect([part.fadeIn, part.fadeOut]).toEqual([i === 0 ? 0 : 2, i === 2 ? 0 : 2]);
     });
     [22, 40, OUTRO + 1.8].forEach((end, i) => near(passes[i].end, end));
+    near(passes[2].out, OUTRO + 1.8 - (T0 + 36));
+    // The volume curve's keys all belong to the one bed.
+    expect(bed.volume).toHaveLength(27);
+    const gain = (i: number, t: number): number => gainAt(bed, t) * bedPartGainAt(passes[i], t);
     let worst = 0;
     for (let k = 0; k <= END * 200; k++) {
       const t = k / 200;
       // Skip the instants the bed steps: down into the booth, and back up a little as Moose's answer starts.
       if (Math.abs(t - BOOTH) < 0.0026 || Math.abs(t - at.m5) < 0.0026) continue;
-      passes.forEach((clip, i) => (worst = Math.max(worst, Math.abs(gainAt(clip, t) - script(i, t)))));
+      passes.forEach((_, i) => (worst = Math.max(worst, Math.abs(gain(i, t) - script(i, t)))));
     }
     expect(worst).toBeLessThan(0.001);
     // About 3 dB down under Moose (0.7), and further through his answer (0.55).
-    const total = (t: number): number => passes.reduce((sum, p) => sum + gainAt(p, t), 0);
+    const total = (t: number): number => passes.reduce((sum, _, i) => sum + gain(i, t), 0);
     expect(total(9)).toBeCloseTo(0.091, 6);
     expect(total(37)).toBeCloseTo(0.091, 6);
     expect(total(39)).toBeCloseTo(0.0715, 6);
@@ -275,7 +287,7 @@ describe('CGL Football, Take 1', () => {
     // place("x_roar", ..., 0, 4, c3c+0.75, 0.2, afade out st=1.8 d=1.4) and place("x_gun", ..., 0, 3, FINAL, 0.2, afade out st=0.5 d=0.9):
     // each is silent after its fade, so its clip ends there.
     const fx: Record<string, [string, number, number, number]> = { roar: ['fb-roar', at.c3c + 0.75, 1.8, 1.4], gun: ['fb-gun', PRINTED.finA, 0.5, 0.9] };
-    expect(timeline.sfx.map((s) => s.id)).toEqual(['crowd1', 'crowd2', 'crowd3', 'roar', 'gun']);
+    expect(timeline.sfx.map((s) => s.id)).toEqual(['crowd', 'roar', 'gun']);
     for (const [id, [file, start, st, d]] of Object.entries(fx)) {
       const clip = byId(timeline.sfx, id);
       expect(clip.src).toMatchObject({ path: `${ROOT}/audio/${file}.mp3` });
@@ -355,8 +367,32 @@ describe('CGL Football, Take 1', () => {
     ]);
   });
 
+  it('gives the whole picture the early-80s tape look, and limits the mix, as the script did', () => {
+    // scale=600:338,scale=1280:720,chromashift=cbh=4:crh=-3,eq=saturation=0.84:contrast=0.94:gamma=1.05,
+    // colorbalance=rs=0.03:bs=-0.03,noise=alls=12:allf=t over everything, overlays included; alimiter=limit=0.95 on the mix.
+    expect(timeline.filters).toEqual({
+      picture: [
+        { kind: 'rescale', width: 600, height: 338 },
+        { kind: 'chroma-shift', cb: { x: 4 }, cr: { x: -3 } },
+        { kind: 'color', saturation: 0.84, contrast: 0.94, gamma: 1.05 },
+        { kind: 'color-balance', shadows: { r: 0.03, b: -0.03 } },
+        { kind: 'grain', strength: 12, moving: true },
+      ],
+      mix: [{ kind: 'limiter', limit: 0.95 }],
+    });
+    expect(timeline.picture).toEqual({ fadeIn: 0, fadeOut: 0 });
+  });
+
+  it('times the closing bumper\'s layers past the cut\'s end, as at the open, and cuts them off there', () => {
+    for (const id of ['stripes_out', 'cgl_out', 'football_out']) {
+      const o = byId(timeline.overlays, id);
+      near(o.end, END);
+      near(o.fadeOutEnd, PRINTED.outro + 2.2);
+    }
+  });
+
   it('lists every item in one timeline, sorted by start', () => {
-    expect([timeline.segments.length, timeline.lines.length, timeline.music.length, timeline.sfx.length, timeline.overlays.length]).toEqual([11, 13, 2, 5, 12]);
+    expect([timeline.segments.length, timeline.lines.length, timeline.music.length, timeline.sfx.length, timeline.overlays.length]).toEqual([11, 13, 2, 3, 12]);
     const starts = timeline.items.map((i) => i.start);
     expect(starts).toEqual([...starts].sort((a, b) => a - b));
   });

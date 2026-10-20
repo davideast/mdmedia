@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { existsSync, readFileSync } from 'node:fs';
-import { gainAt, opacityAt, positionAt, resolveCutJson, type ResolvedSource, type Timeline } from '../../src/cut/index';
+import { loadPort, speechOf } from './support';
+import { gainAt, lineGainAt, opacityAt, positionAt, resolveCutJson, segmentGainAt, zoomAt, type ResolvedSource, type Timeline } from '../../src/cut/index';
 
 /**
  * RIGG Take 5, ported from rigg5/edit.mjs. The expected times are what a copy
@@ -126,20 +127,29 @@ describe('RIGG Take 5', () => {
     expect(['l1', 'l3', 'l5', 'l6', 'l7'].every((id) => byId(timeline.segments, id).src.kind === 'take')).toBe(true);
   });
 
-  it('holds the device still under each count, silent but for its beep', () => {
+  it('holds the device still under each count, pushing in 5%, with its beep as its own sound', () => {
     const lengths = [0.8, 0.55, 0.5, 0.55, 0.6];
     COUNTS.forEach((id, i) => {
       const seg = byId(timeline.segments, id);
       expect(seg.src).toEqual({ kind: 'file', ref: 'rigg5/device.png', path: `${ROOT}/rigg5/device.png` });
+      expect([seg.still, seg.in, seg.out]).toEqual([true, 0, 0]);
       near(seg.end - seg.start, lengths[i]);
       near(seg.hold, lengths[i]);
-      expect(seg.audio).toBeNull();
-      // sine=frequency=1950:duration=0.11 (ffmpeg's sine is 1/8 amplitude), then volume=0.35, from the shot's start.
-      const beep = byId(timeline.sfx, `beep${id.slice(1)}`);
-      near(beep.start, seg.start);
-      near(beep.end, seg.start + 0.11);
-      expect(beep.src).toEqual({ kind: 'synth', synth: { kind: 'tick', period: 0.11, tones: [1950], click: 0.11, decay: 0, gain: 0.125 * 0.35 } });
+      // sine=frequency=1950:duration=0.11 (ffmpeg's sine is 1/8 amplitude), then volume=0.35, apad to the shot: the shot's own sound.
+      expect(seg.audio).toEqual({
+        src: { kind: 'synth', synth: { kind: 'tone', frequency: 1950, gain: 0.125 } }, in: 0, out: 0.11, volume: 0.35,
+        fadeIn: 0, fadeOut: 0, start: seg.start, end: Number((seg.start + 0.11).toFixed(6)),
+      });
+      expect(segmentGainAt(seg, seg.start + 0.05)).toBe(0.35);
+      expect(segmentGainAt(seg, seg.start + 0.2)).toBe(0);
+      // scale=w='1280*(1+0.05*t/dur)':eval=frame,crop=1280:720: about the middle, t from the shot's start.
+      for (const u of [0, 0.25, 0.5, 1]) {
+        const z = zoomAt(seg, seg.start + u * lengths[i]);
+        expect(z.scale).toBeCloseTo(1 + 0.05 * u, 6);
+        expect(z.focus).toEqual({ x: 640, y: 360 });
+      }
     });
+    expect(timeline.sfx).toEqual([]);
   });
 
   it('freezes Rigg\'s look for 1.7 s over the stare take\'s own sound from 0', () => {
@@ -173,19 +183,50 @@ describe('RIGG Take 5', () => {
     }
   });
 
-  it('lays the two voice-overs from Rigg\'s take over the inserts, with the script\'s fades', () => {
-    const vo: Record<string, [number, number, number]> = { wrench_snd: [3.6, 4.6, 10.98], pins_snd: [6.0, 7.95, 14.7] };
+  it('lays the two lines from Rigg\'s take over the inserts, each carrying its own stretch of it, with the script\'s fades', () => {
+    const vo: Record<string, [number, number, number]> = { wrench: [3.6, 4.6, 10.98], pins: [6.0, 7.95, 14.7] };
     for (const [id, [from, to, start]] of Object.entries(vo)) {
-      const clip = byId(timeline.sfx, id);
-      expect(clip.src).toMatchObject({ kind: 'take', name: 'rigg5-climax-t1' });
-      expect([clip.in, clip.out, clip.fadeIn, clip.fadeOut]).toEqual([from, to, 0.04, 0.06]);
-      near(clip.start, start);
-      near(clip.end, start + to - from);
+      const line = byId(timeline.lines, id);
+      if (line.audio.kind !== 'file') throw new Error(`${id} carries no sound`);
+      expect(line.audio.src).toMatchObject({ kind: 'take', name: 'rigg5-climax-t1' });
+      expect([line.audio.in, line.audio.out, line.audio.fadeIn, line.audio.fadeOut, line.audio.layer]).toEqual([from, to, 0.04, 0.06, null]);
+      near(line.start, start);
+      near(line.end, start + to - from);
       // afade=t=in:d=0.04, afade=t=out:st=(b-a-0.06):d=0.06.
-      expect(gainAt(clip, start + 0.02)).toBeCloseTo(0.5, 6);
-      expect(gainAt(clip, start + 0.5)).toBe(1);
-      expect(gainAt(clip, start + (to - from) - 0.03)).toBeCloseTo(0.5, 6);
+      expect(lineGainAt(line, start + 0.02)).toBeCloseTo(0.5, 6);
+      expect(lineGainAt(line, start + 0.5)).toBe(1);
+      expect(lineGainAt(line, start + (to - from) - 0.03)).toBeCloseTo(0.5, 6);
     }
+    // Rigg's take plays only on camera and in these two lines: no sound effects carry his voice.
+    expect(timeline.sfx).toEqual([]);
+  });
+
+  it('times the two laid-in lines in Rigg\'s take, inside where they are heard', () => {
+    // Before, as segment lines on the inserts, they were timed in the lock's and hinge's own sound, at losses of 2.59 and 3.37.
+    const port = loadPort('rigg-take5', PROBED);
+    expect(port.stale).toEqual([]);
+    const words = JSON.parse(readFileSync(new URL('../../docs/cuts/rigg-take5.words.json', import.meta.url), 'utf8'));
+    expect(words.lines.wrench.fingerprint).toMatchObject({ source: 'takes/rigg5-climax-t1.mp4', start: 3.6, end: 4.6 });
+    expect(words.lines.pins.fingerprint).toMatchObject({ source: 'takes/rigg5-climax-t1.mp4', start: 6, end: 7.95 });
+    for (const id of ['wrench', 'pins']) {
+      expect(words.lines[id].loss).toBeLessThan(0.9);
+      expect(words.lines[id].words).toHaveLength(4);
+      const line = byId(port.timeline.lines, id);
+      const [from, to] = speechOf(port.timeline, id);
+      expect(from).toBeGreaterThanOrEqual(line.start);
+      expect(to).toBeLessThanOrEqual(line.end);
+    }
+  });
+
+  it('runs the whole mix through the script\'s limiter (alimiter=limit=0.95)', () => {
+    expect(timeline.filters).toEqual({ picture: [], mix: [{ kind: 'limiter', limit: 0.95 }] });
+  });
+
+  it('records where each take came from', () => {
+    expect(timeline.sources['take:rigg5-climax-t1']).toMatchObject({
+      step: 'extend', storyboard: 'rigg5-climax', extendedFrom: { kind: 'take', name: 'rigg5-lines-t2' },
+    });
+    expect(timeline.sources['take:rigg5-lines-t2']?.firstFrame).toMatchObject({ kind: 'file', path: `${ROOT}/rigg5/mcu.png` });
   });
 
   it('reproduces the theme, the tension cue and the sting from the script', () => {
@@ -212,6 +253,9 @@ describe('RIGG Take 5', () => {
     expect(timeline.music.map((m) => m.id)).toEqual(['theme', 'tension', 'sting']);
     expect([th.start, th.end, th.in, th.out]).toEqual([0, 4.98, 1.2, 6.18]);
     expect([tn.start, tn.end, tn.in, tn.out]).toEqual([4.58, 24.43, 1.1, 20.95]);
+    // TOFF = 7.45 - (MON - C0): the cue's first big hit, 7.45 s into the file, lands on the first montage cut.
+    expect(tn.sync).toEqual({ source: 7.45, at: MON });
+    near(tn.start + (7.45 - tn.in), MON);
     expect([st.start, st.end, st.in, st.out]).toEqual([STING, END, 1.2, 3.05]);
     expect(th.src).toMatchObject({ path: `${ROOT}/audio/rigg5-theme.mp3` });
     expect(st.src).toMatchObject({ path: `${ROOT}/audio/rigg5-theme.mp3` });
@@ -245,18 +289,18 @@ describe('RIGG Take 5', () => {
     }
   });
 
-  it('shows our digits on each countdown shot', () => {
+  it('draws our digits into each countdown shot, so they push in with it', () => {
     for (const id of COUNTS) {
       const digits = byId(timeline.overlays, `d${id.slice(1)}`);
       const seg = byId(timeline.segments, id);
-      expect([digits.start, digits.end]).toEqual([seg.start, seg.end]);
+      expect([digits.start, digits.end, digits.segment]).toEqual([seg.start, seg.end, id]);
       expect(digits.src).toMatchObject({ path: `${ROOT}/rigg5/d${id.slice(1)}.png` });
       expect(digits.motion).toEqual([{ t: seg.start, x: 0, y: 0 }]);
     }
   });
 
   it('lists every item in one timeline, sorted by start', () => {
-    expect([timeline.segments.length, timeline.lines.length, timeline.music.length, timeline.sfx.length, timeline.overlays.length]).toEqual([21, 8, 3, 7, 7]);
+    expect([timeline.segments.length, timeline.lines.length, timeline.music.length, timeline.sfx.length, timeline.overlays.length]).toEqual([21, 8, 3, 0, 7]);
     const starts = timeline.items.map((i) => i.start);
     expect(starts).toEqual([...starts].sort((a, b) => a - b));
   });

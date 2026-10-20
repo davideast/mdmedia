@@ -8,7 +8,7 @@
     "fps": 24,
     "width": 1280,
     "height": 720,
-    "notes": "A title open (the warehouse, then Rigg's look under our RIGG title and glint, over the Lyria theme), the premise (our 00:30 digits on a plain-faced device still, he shoulders the door and it doesn't move), a fast montage on the lock, the hinge and the frame cut against our countdown at 00:19, 00:09, 00:03 and 00:02 under a rising tension cue, the climax line and the spray can taped to the hinge. The music cuts dead on the 00:02 beep; the door swings in toward him, pulled from outside, she is standing there with two coffees, a beat, \"Rigg. It's a pull.\", he turns to the camera, freeze and the theme as a sting. Ported from rigg5/edit.mjs. Every Rigg line is from one continuous take (rigg5-lines-t2 as extended by rigg5-climax-t1); \"Need a tension wrench.\" and \"Hinge pins. Painted shut.\" are laid from it over the lock and hinge inserts as L-cuts, so their sound is in sfx and their lines mark where they're heard. Not expressible yet, written as the closest equivalent: the 5% push-in on each countdown shot and its digits being drawn inside that push-in (here plain overlays over the still), the beeps as segment sound (here one-tick synths), and the tension cue's in-point being derived from the montage (the cue's 7.45 s hit lands on the first montage cut; here a fixed in of 1.1)."
+    "notes": "A title open (the warehouse, then Rigg's look under our RIGG title and glint, over the Lyria theme), the premise (our 00:30 digits on a plain-faced device still, he shoulders the door and it doesn't move), a fast montage on the lock, the hinge and the frame cut against our countdown at 00:19, 00:09, 00:03 and 00:02 under a rising tension cue, the climax line and the spray can taped to the hinge. The music cuts dead on the 00:02 beep; the door swings in toward him, pulled from outside, she is standing there with two coffees, a beat, \"Rigg. It's a pull.\", he turns to the camera, freeze and the theme as a sting. Ported from rigg5/edit.mjs. Every Rigg line is from one continuous take (rigg5-lines-t2 as extended by rigg5-climax-t1); \"Need a tension wrench.\" and \"Hinge pins. Painted shut.\" are laid from it over the lock and hinge inserts as L-cuts, each a line carrying its own stretch of that take. Each countdown shot is the device still held, our digits drawn into it, pushing in 5% to its end, with its beep (a 1950 Hz tone for 0.11 s) as its own sound. The tension cue is placed by its sync point: its first big hit, 7.45 s into the file, lands on the first montage cut. The whole mix runs through a limiter at 0.95."
   },
   "media": {
     "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
@@ -22,7 +22,9 @@
     { "id": "hero", "label": "Rigg looks up into the camera, under the title", "src": "take:rigg5-hero-t1", "in": 1.0, "out": 3.98,
       "audio": { "volume": 0.25 } },
 
-    { "id": "c0030", "label": "The device: 00:30", "src": "rigg5/device.png", "in": 0, "out": 0, "hold": 0.8, "audio": false },
+    { "id": "c0030", "label": "The device: 00:30", "src": "rigg5/device.png", "still": true, "duration": 0.8,
+      "audio": { "synth": { "kind": "tone", "frequency": 1950, "gain": 0.125 }, "out": 0.11, "volume": 0.35 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "c0030.end", "scale": 1.05 } ] } },
     { "id": "shove", "label": "Wide: he shoulders the door, it doesn't move", "src": "take:rigg5-shove-t1", "in": 0.7, "out": 3.0 },
     { "id": "l1", "label": "Rigg: deadbolt, steel frame, thirty seconds", "src": "take:rigg5-climax-t1", "in": 0.0, "out": 3.25 },
 
@@ -31,20 +33,28 @@
     { "id": "l3", "label": "Rigg: paperclip'll do", "src": "take:rigg5-climax-t1", "in": 4.55, "out": 5.55 },
     { "id": "lock2", "label": "Insert: the picks rake, the bolt won't turn", "src": "take:rigg5-lock-t2", "in": 2.3, "out": 3.2,
       "audio": { "volume": 0.7 } },
-    { "id": "c0019", "label": "The device: 00:19", "src": "rigg5/device.png", "in": 0, "out": 0, "hold": 0.55, "audio": false },
+    { "id": "c0019", "label": "The device: 00:19", "src": "rigg5/device.png", "still": true, "duration": 0.55,
+      "audio": { "synth": { "kind": "tone", "frequency": 1950, "gain": 0.125 }, "out": 0.11, "volume": 0.35 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "c0019.end", "scale": 1.05 } ] } },
     { "id": "hinge", "label": "Insert: a screwdriver under the hinge pin", "src": "take:rigg5-hinge-t1", "in": 1.2, "out": 3.2,
       "audio": { "volume": 0.8 } },
     { "id": "l5", "label": "Rigg: if I lever the frame", "src": "take:rigg5-climax-t1", "in": 8.45, "out": 9.75 },
     { "id": "pry", "label": "Insert: the crowbar heaves and slips", "src": "take:rigg5-pry-t2", "in": 2.5, "out": 3.85,
       "audio": { "volume": 0.9 } },
-    { "id": "c0009", "label": "The device: 00:09", "src": "rigg5/device.png", "in": 0, "out": 0, "hold": 0.5, "audio": false },
+    { "id": "c0009", "label": "The device: 00:09", "src": "rigg5/device.png", "still": true, "duration": 0.5,
+      "audio": { "synth": { "kind": "tone", "frequency": 1950, "gain": 0.125 }, "out": 0.11, "volume": 0.35 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "c0009.end", "scale": 1.05 } ] } },
 
     { "id": "l6", "label": "Rigg, sweating: only one thing left", "src": "take:rigg5-climax-t1", "in": 11.25, "out": 12.35 },
-    { "id": "c0003", "label": "The device: 00:03", "src": "rigg5/device.png", "in": 0, "out": 0, "hold": 0.55, "audio": false },
+    { "id": "c0003", "label": "The device: 00:03", "src": "rigg5/device.png", "still": true, "duration": 0.55,
+      "audio": { "synth": { "kind": "tone", "frequency": 1950, "gain": 0.125 }, "out": 0.11, "volume": 0.35 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "c0003.end", "scale": 1.05 } ] } },
     { "id": "l7", "label": "Rigg: I'll have to blow the hinges", "src": "take:rigg5-climax-t1", "in": 12.7, "out": 14.0 },
     { "id": "tape", "label": "Insert: a spray can taped to the hinge", "src": "take:rigg5-tape-t1", "in": 1.55, "out": 2.6,
       "audio": { "volume": 0.9 } },
-    { "id": "c0002", "label": "The device: 00:02, then silence", "src": "rigg5/device.png", "in": 0, "out": 0, "hold": 0.6, "audio": false },
+    { "id": "c0002", "label": "The device: 00:02, then silence", "src": "rigg5/device.png", "still": true, "duration": 0.6,
+      "audio": { "synth": { "kind": "tone", "frequency": 1950, "gain": 0.125 }, "out": 0.11, "volume": 0.35 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "c0002.end", "scale": 1.05 } ] } },
 
     { "id": "turn", "label": "The door swings open toward him; she's in the doorway", "src": "take:rigg5-turn-t3", "in": 2.0, "out": 4.05 },
     { "id": "her", "label": "Her MCU: a beat, then the line", "src": "take:rigg5-her-t2", "in": 0.6, "out": 3.6 },
@@ -54,11 +64,11 @@
 
   "lines": [
     { "id": "deadbolt", "speaker": "Rigg", "text": "Deadbolt. Steel frame. Thirty seconds.", "segment": "l1" },
-    { "id": "wrench", "speaker": "Rigg", "text": "Need a tension wrench.", "segment": "lock",
-      "at": "wrench_snd", "until": "wrench_snd.end" },
+    { "id": "wrench", "speaker": "Rigg", "text": "Need a tension wrench.", "src": "take:rigg5-climax-t1", "in": 3.6, "out": 4.6,
+      "at": "lock+0.05", "fadeIn": 0.04, "fadeOut": 0.06 },
     { "id": "paperclip", "speaker": "Rigg", "text": "Paperclip'll do.", "segment": "l3" },
-    { "id": "pins", "speaker": "Rigg", "text": "Hinge pins. Painted shut.", "segment": "hinge",
-      "at": "pins_snd", "until": "pins_snd.end" },
+    { "id": "pins", "speaker": "Rigg", "text": "Hinge pins. Painted shut.", "src": "take:rigg5-climax-t1", "in": 6.0, "out": 7.95,
+      "at": "hinge+0.02", "fadeIn": 0.04, "fadeOut": 0.06 },
     { "id": "lever", "speaker": "Rigg", "text": "If I lever the frame...", "segment": "l5" },
     { "id": "onething", "speaker": "Rigg", "text": "Only one thing left.", "segment": "l6" },
     { "id": "blow", "speaker": "Rigg", "text": "I'll have to blow the hinges.", "segment": "l7" },
@@ -69,7 +79,7 @@
     { "id": "theme", "label": "Theme under the title", "src": "audio/rigg5-theme.mp3", "in": 1.2, "at": 0, "until": "c0030+0.4",
       "volume": 0.4, "fadeOut": 0.5 },
     { "id": "tension", "label": "Tension cue: low under the premise, rising through the montage, cut dead on the last beep",
-      "src": "audio/rigg5-tension.mp3", "in": 1.1, "at": "c0030", "until": "turn", "fadeOut": 0.04,
+      "src": "audio/rigg5-tension.mp3", "at": "c0030", "sync": { "source": 7.45, "at": "lock" }, "until": "turn", "fadeOut": 0.04,
       "volume": [
         { "at": "lock", "value": 0.18 },
         { "at": "lock", "value": 0.22 },
@@ -77,23 +87,6 @@
       ] },
     { "id": "sting", "label": "Theme sting on the freeze", "src": "audio/rigg5-theme.mp3", "in": 1.2, "at": "stare+2.15", "until": "@end",
       "volume": 0.45, "fadeOut": 0.9 }
-  ],
-
-  "sfx": [
-    { "id": "beep0030", "label": "Beep", "at": "c0030", "duration": 0.11,
-      "synth": { "kind": "tick", "period": 0.11, "tones": [1950], "click": 0.11, "decay": 0, "gain": 0.04375 } },
-    { "id": "wrench_snd", "label": "\"Need a tension wrench.\" laid over the lock (Rigg's take)", "src": "take:rigg5-climax-t1",
-      "in": 3.6, "out": 4.6, "at": "lock+0.05", "fadeIn": 0.04, "fadeOut": 0.06 },
-    { "id": "beep0019", "label": "Beep", "at": "c0019", "duration": 0.11,
-      "synth": { "kind": "tick", "period": 0.11, "tones": [1950], "click": 0.11, "decay": 0, "gain": 0.04375 } },
-    { "id": "pins_snd", "label": "\"Hinge pins. Painted shut.\" laid over the hinge (Rigg's take)", "src": "take:rigg5-climax-t1",
-      "in": 6.0, "out": 7.95, "at": "hinge+0.02", "fadeIn": 0.04, "fadeOut": 0.06 },
-    { "id": "beep0009", "label": "Beep", "at": "c0009", "duration": 0.11,
-      "synth": { "kind": "tick", "period": 0.11, "tones": [1950], "click": 0.11, "decay": 0, "gain": 0.04375 } },
-    { "id": "beep0003", "label": "Beep", "at": "c0003", "duration": 0.11,
-      "synth": { "kind": "tick", "period": 0.11, "tones": [1950], "click": 0.11, "decay": 0, "gain": 0.04375 } },
-    { "id": "beep0002", "label": "Beep", "at": "c0002", "duration": 0.11,
-      "synth": { "kind": "tick", "period": 0.11, "tones": [1950], "click": 0.11, "decay": 0, "gain": 0.04375 } }
   ],
 
   "overlays": [
@@ -104,10 +97,27 @@
         { "at": "glint", "x": -330, "y": 0 },
         { "at": "glint.end", "x": 330, "y": 0 }
       ] },
-    { "id": "d0030", "label": "Countdown digits 00:30", "src": "rigg5/d0030.png", "at": "c0030", "until": "c0030.end" },
-    { "id": "d0019", "label": "Countdown digits 00:19", "src": "rigg5/d0019.png", "at": "c0019", "until": "c0019.end" },
-    { "id": "d0009", "label": "Countdown digits 00:09", "src": "rigg5/d0009.png", "at": "c0009", "until": "c0009.end" },
-    { "id": "d0003", "label": "Countdown digits 00:03", "src": "rigg5/d0003.png", "at": "c0003", "until": "c0003.end" },
-    { "id": "d0002", "label": "Countdown digits 00:02", "src": "rigg5/d0002.png", "at": "c0002", "until": "c0002.end" }
-  ]
+    { "id": "d0030", "label": "Countdown digits 00:30", "src": "rigg5/d0030.png", "segment": "c0030" },
+    { "id": "d0019", "label": "Countdown digits 00:19", "src": "rigg5/d0019.png", "segment": "c0019" },
+    { "id": "d0009", "label": "Countdown digits 00:09", "src": "rigg5/d0009.png", "segment": "c0009" },
+    { "id": "d0003", "label": "Countdown digits 00:03", "src": "rigg5/d0003.png", "segment": "c0003" },
+    { "id": "d0002", "label": "Countdown digits 00:02", "src": "rigg5/d0002.png", "segment": "c0002" }
+  ],
+
+  "mix": { "filters": [ { "kind": "limiter", "limit": 0.95 } ] },
+
+  "sources": {
+    "take:rigg5-ext-t1": { "step": "generate", "storyboard": "rigg5-ext" },
+    "take:rigg5-hero-t1": { "step": "generate", "storyboard": "rigg5-hero", "firstFrame": "rigg5/wide.png" },
+    "take:rigg5-shove-t1": { "step": "generate", "storyboard": "rigg5-shove", "firstFrame": "rigg5/wide.png" },
+    "take:rigg5-climax-t1": { "step": "extend", "extendedFrom": "take:rigg5-lines-t2", "storyboard": "rigg5-climax" },
+    "take:rigg5-lock-t2": { "step": "generate", "storyboard": "rigg5-lock" },
+    "take:rigg5-hinge-t1": { "step": "generate", "storyboard": "rigg5-hinge" },
+    "take:rigg5-pry-t2": { "step": "generate", "storyboard": "rigg5-pry" },
+    "take:rigg5-tape-t1": { "step": "generate", "storyboard": "rigg5-tape" },
+    "take:rigg5-turn-t3": { "step": "generate", "storyboard": "rigg5-turn", "firstFrame": "rigg5/shove-end.png" },
+    "take:rigg5-her-t2": { "step": "generate", "storyboard": "rigg5-her", "firstFrame": "rigg5/her.png" },
+    "take:rigg5-stare-t1": { "step": "generate", "storyboard": "rigg5-stare", "firstFrame": "rigg5/turn-end.png" },
+    "take:rigg5-lines-t2": { "step": "generate", "storyboard": "rigg5-lines", "firstFrame": "rigg5/mcu.png" }
+  }
 }

@@ -5,7 +5,8 @@ The prototype and its measurements are preserved on branch
 `prototype/studio-navigation` (stress-test commit `3f3df3f`). Production uses the
 existing Studio components and authorization, with one active route and no tab strip.
 
-- Drafts, Library, Activity, Playlists, Downloads, and Settings are stable destinations.
+- Drafts, Library, Activity, Productions, Playlists, Downloads, and Settings are stable destinations.
+  Productions and their cuts are work items (Find work, pins, Recent); see `docs/studio-productions-api.md`.
 - Create narration starts an independent draft. Drafts are saved per account on
   this browser, including narration settings; they do not sync between devices.
 - Document header pins add shortcuts to the sidebar. Each sidebar section shows

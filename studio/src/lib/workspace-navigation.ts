@@ -1,4 +1,5 @@
 import type { MediaType } from './media-types';
+import { productionRoute } from './productions';
 import { workspaceRoute, type WorkspaceSnapshot } from './workspace';
 
 export const WORK_PAGE_SIZE = 50;
@@ -12,6 +13,13 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
     const route = workspaceRoute(view.href);
     if (!route || !isWorkRoute(view.href)) continue;
     const id = route.draftId ?? view.key.split('/').pop()!.split(':').pop()!;
+    const production = productionRoute(view.key);
+    if (production) {
+      const detail = production.cutId ? 'Cut' : 'Production';
+      items.set(view.key, { key: view.key, href: view.href, title: view.title, detail,
+        search: `${view.title} ${detail} ${production.cutId ?? ''} ${production.productionId}`, pinned: view.pinned === true, visitedAt: view.visitedAt ?? 0, viewId: view.id });
+      continue;
+    }
     const type = view.key.startsWith('/music/') || view.key.startsWith('/studio/music:') ? 'music' : view.key.startsWith('/video/') || view.key.startsWith('/studio/video:') ? 'video' : view.key.startsWith('/image/') || view.key.startsWith('/studio/image:') ? 'image' : view.key.startsWith('/narration/') || view.key.startsWith('/studio:') ? 'narration' : undefined;
     const kind = route.draftId ? (type === 'music' ? 'Music draft' : type === 'video' ? 'Video draft' : type === 'image' ? 'Image draft' : 'Draft') : type === 'music' ? 'Music' : type === 'video' ? 'Video' : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
     items.set(view.key, { type, key: view.key, href: view.href, title: view.title, detail: `${kind} · ${id}`,
@@ -52,7 +60,7 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
 
 export function isWorkRoute(href: string): boolean {
   const route = workspaceRoute(href);
-  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:'));
+  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:') || productionRoute(route.key) !== null);
 }
 
 export function matchesWork(text: string, query: string): boolean {

@@ -1,0 +1,134 @@
+{
+  "format": "mdmedia.character@1",
+  "id": "rick",
+  "version": 1,
+  "name": "Rick",
+  "kind": "person",
+  "description": "The hero of Night Wagon, a 1980s TV action series: a grim, intense driver who talks to his station wagon, Buddy.",
+  "look": {
+    "description": "a mid-30s man with a big dark mullet, in a black leather jacket over a white tee, driving at night, lit by the glow of the dashboard's rows of red, yellow and green buttons",
+    "never": [
+      "any resemblance to a real actor",
+      "aviator sunglasses",
+      "a jacket in any other colour or cut",
+      "short hair"
+    ]
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "stills": [
+    {
+      "id": "driving",
+      "file": "characters/rick/driving.png",
+      "from": {
+        "take": "nw7-rick-lines-t1",
+        "at": 1
+      },
+      "note": "at the wheel, lit by the dashboard, the take all his lines in Take 9 come from"
+    }
+  ],
+  "voice": {
+    "provider": "video-model",
+    "uses": [
+      "on-camera"
+    ],
+    "notes": "Rick's voice is the video model's own, so it varies between takes; Takes 7 and 9 cut all his lines from one continuous take (nw7-rick-lines-t1). A swap voice is not chosen yet."
+  },
+  "delivery": {
+    "register": "grim and intense, getting more urgent line by line, always the same energy",
+    "never": [
+      "never jokes",
+      "never smiles while speaking",
+      "never whispers"
+    ],
+    "reference": {
+      "levels": {
+        "source": "Rick's lines in the approved Night Wagon Take 9",
+        "loudness": {
+          "min": -26.4,
+          "max": -18.2
+        },
+        "pitch": {
+          "min": 128.7,
+          "max": 407.1
+        },
+        "pitchRange": {
+          "max": 21.7
+        },
+        "rate": {
+          "min": 2,
+          "max": 7.5
+        }
+      },
+      "typical": {
+        "loudness": -22.2,
+        "pitch": 211.9,
+        "pitchRange": 15.4,
+        "rate": 4.08
+      },
+      "margins": {
+        "loudness": 2.5,
+        "pitch": 3,
+        "pitchRange": 3,
+        "rate": 0.2
+      },
+      "lines": [
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "getaway",
+          "text": "They're getting away, Buddy.",
+          "loudness": -22.2,
+          "pitch": 167,
+          "pitchRange": 7.1,
+          "rate": 4.08
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "jump",
+          "text": "Then we jump it.",
+          "loudness": -23.9,
+          "pitch": 153,
+          "pitchRange": 6.9,
+          "rate": 6.25
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "boost",
+          "text": "We need to turbo boost!",
+          "loudness": -22.4,
+          "pitch": 211.9,
+          "pitchRange": 15.4,
+          "rate": 4.85
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "notime",
+          "text": "There's no time!",
+          "loudness": -21.8,
+          "pitch": 342.3,
+          "pitchRange": 15.5,
+          "rate": 3.66
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "turbo",
+          "text": "TURBO... BOOST!",
+          "loudness": -20.7,
+          "pitch": 212.5,
+          "pitchRange": 18.7,
+          "rate": 2.5
+        }
+      ],
+      "method": "dialogue-stem@1",
+      "measuredAt": "2026-10-20T07:25:10.277Z"
+    }
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-20",
+      "changes": "First version: look from the Night Wagon storyboards and the approved Take 9; delivery from Rick's lines there. Reference levels measured from 5 approved lines (Rick's lines in the approved Night Wagon Take 9): -26.4 to -18.2 LUFS, 129 to 407 Hz, pitch range up to 21.7 st, 2.00 to 7.50 words/s."
+    }
+  ]
+}

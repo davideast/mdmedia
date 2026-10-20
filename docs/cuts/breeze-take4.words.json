@@ -4,9 +4,9 @@
     "wrong": {
       "text": "When the day goes wrong,",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 4.66, "end": 8.4, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b", "snap": "speech-onset@1" },
+      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 4.66, "end": 8.4, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b" },
       "loss": 0.904,
-      "snap": { "aligned": 6.5, "start": 6.5, "onset": 4.94, "floor": -32.3 },
+      "approximate": true,
       "words": [
         { "text": "When", "start": 6.5, "end": 6.6, "loss": 0.552 },
         { "text": "the", "start": 6.64, "end": 6.74, "loss": 0.582 },
@@ -18,9 +18,9 @@
     "cool1": {
       "text": "keep it cool, turn it round,",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 8.4, "end": 10.5, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b", "snap": "speech-onset@1" },
+      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 8.4, "end": 10.5, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b" },
       "loss": 0.849,
-      "snap": { "aligned": 8.64, "start": 8.64, "onset": 8.4, "floor": -40.5 },
+      "approximate": true,
       "words": [
         { "text": "keep", "start": 8.64, "end": 8.76, "loss": 0.562 },
         { "text": "it", "start": 8.78, "end": 8.88, "loss": 0.928 },
@@ -33,9 +33,9 @@
     "cool2": {
       "text": "keep it cool, turn it round,",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 10.5, "end": 12.8, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b", "snap": "speech-onset@1" },
+      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 10.5, "end": 12.8, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b" },
       "loss": 0.833,
-      "snap": { "aligned": 10.8, "start": 10.8, "onset": 10.52, "floor": -37.2 },
+      "approximate": true,
       "words": [
         { "text": "keep", "start": 10.8, "end": 10.92, "loss": 0.526 },
         { "text": "it", "start": 10.94, "end": 11.02, "loss": 0.8 },
@@ -48,9 +48,9 @@
     "wholeday": {
       "text": "turn your whole day around.",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 12.8, "end": 16.21, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b", "snap": "speech-onset@1" },
+      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 12.8, "end": 16.21, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b" },
       "loss": 1.269,
-      "snap": { "aligned": 12.9, "start": 12.9, "onset": null, "floor": -18.5 },
+      "approximate": true,
       "words": [
         { "text": "turn", "start": 12.9, "end": 13.04, "loss": 0.72 },
         { "text": "your", "start": 13.08, "end": 13.16, "loss": 0.505 },
@@ -80,9 +80,9 @@
     "feel": {
       "text": "Feel the Breeze!",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 21.55, "end": 25.49, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b", "snap": "speech-onset@1" },
+      "fingerprint": { "source": "audio/breeze-jingle.mp3", "start": 21.55, "end": 25.49, "sha256": "8d2a45b8df99622e6bd9452c10ba3d7e78976356c7195e2dac2b9e57eaa6f38b" },
       "loss": 1.843,
-      "snap": { "aligned": 21.57, "start": 21.57, "onset": null, "floor": -16.9 },
+      "approximate": true,
       "words": [
         { "text": "Feel", "start": 21.57, "end": 22.55, "loss": 1.699 },
         { "text": "the", "start": 22.65, "end": 23.01, "loss": 1.586 },

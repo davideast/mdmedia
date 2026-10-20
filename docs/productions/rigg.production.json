@@ -1,0 +1,59 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "rigg",
+  "title": "RIGG",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-rigg-take5.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ch-rigg.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Red countdown digits fill the first second, then the sweating mullet hero snips a wire and the bomb turns out to be a wind-up kitchen timer on a pot roast; the digits stop at 00:11 rather than 0:01.",
+      "createdAt": "2026-10-18T21:38:01.377Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ch-handy-dan.mp4",
+      "label": "Take 2 (Handy Dan)",
+      "status": "none",
+      "notes": "Redo of RIGG with a new hero, a balding suburban dad in big glasses and a mustard cardigan, defusing with a fork and kitchen scissors; the digits now freeze on 0:01 in close-up before the pot-roast reveal, though the timer in the wide shots shows stray numbers (take 1 had a white box in the top-right corner).",
+      "createdAt": "2026-10-18T21:47:04.077Z"
+    },
+    {
+      "id": "take3",
+      "rendered": "review/clips/ch-rigg-take3.mp4",
+      "label": "Take 3",
+      "status": "none",
+      "notes": "Back to the warehouse with a new hero (short sandy hair, stubble, faded denim jacket, wry and calm); the digits run 0:03, 0:02, 0:01 in the wide shots and hold 0:01 in close-up before the pot-roast reveal; a faint black rectangle sits top right from 1 to 3 s, mostly under the channel number.",
+      "createdAt": "2026-10-18T21:52:41.251Z"
+    },
+    {
+      "id": "take4",
+      "rendered": "review/clips/ch-rigg-take4.mp4",
+      "label": "Take 4 (new punchline)",
+      "status": "none",
+      "notes": "Transcript: It is a pull (whisper hears poll), from the partner at 5.0 to 6.5 s. Red digits in the first second, then the same denim-jacket hero picks the lock with a paperclip, duct-tapes and rigs a rope from the ceiling fan, and his partner in a trench coat stands in the open doorway with two coffees while he stares at the camera; we never quite see her pull the door, she is just there when it opens.",
+      "createdAt": "2026-10-18T22:24:00.234Z"
+    },
+    {
+      "id": "take5",
+      "cut": "docs/cuts/rigg-take5.cut.json",
+      "label": "Take 5 (title + montage)",
+      "status": "review",
+      "notes": "Transcript: Deadbolt. Steel frame. Thirty seconds. (7.9, Rigg) / Need a tension wrench. (11.1, over the lock) / Paperclip will do. (12.4) / Hinge pins. Painted shut. (14.6, over the hinge; whisper hears paint it shut) / If I lever the frame... (16.8) / Only one thing left. (19.9) / I will have to blow the hinges. (21.6) / Rigg. (27.0, partner) / It is a pull. (28.4; whisper hears poll, as in Take 4). New: a title open (warehouse at night, then Rigg looking into the camera under our own RIGG title and glint, over an original Lyria theme), then the premise (our 00:30 digits on a plain-faced device still, he shoulders the door and it does not move), a fast montage of 1 to 2 s shots on the lock, hinge and frame cut against our countdown at 00:19, 00:09, 00:03 and 00:02 under a rising Lyria tension cue, and the climax line before he tapes a spray can to the hinge. The music cuts dead on the 00:02 beep; the door swings in toward him, pulled from outside, she is standing there with two coffees, a beat, her line, he turns to the camera, freeze and theme sting. The clock is not seen again. All of Rigg lines are one continuous take (lines take 2 extended once), started from a Take 4 still; the turn shot is from the shove shot last frame. Shot takes: ext t1, hero t1, shove t1, lines t2 + climax t1, lock t2 (t1 had three hands), hinge t1, pry t2 (t1 had four hands), tape t1, device t1, turn t3 of 5 (the others have him touch the knob), her t2 of 4 (best eyeline), stare t1. The door is the wooden storeroom door from Take 4, not steel.",
+      "createdAt": "2026-10-19T07:56:12.343Z"
+    },
+    {
+      "id": "take6",
+      "cut": "docs/cuts/rigg-take6.cut.json",
+      "label": "Take 6 (door stays shut)",
+      "status": "review",
+      "notes": "Take 5 with your three notes fixed. The fade at the door is gone: the shove take had its own dissolve, so it now cuts straight in on the action at 5.4 s, his arm already hitting the door. The crowbar insert is new (17.6 s): the set's own door and deadbolt, shut and flush the whole time, and the bar skids out of the seam with a clang. There's no look to camera: the stare shot is gone, and it ends on her, frozen 1 s after \"It's a pull.\", with the same theme sting. Everything else is Take 5, 0.4 s earlier from the shove on; 31.2 s long. Crowbar take 3 of 3.",
+      "createdAt": "2026-10-20T07:53:50.000Z"
+    }
+  ]
+}

@@ -8,7 +8,7 @@
     "fps": 24,
     "width": 1280,
     "height": 720,
-    "notes": "Take 4's own clean opening (lines 1-4, before its first extend seam), then one new shot per line or action, each started from a still of Take 4: no extends, so no seams and no slow motion. PERSONALLY! is its own one-word take, voiced over an insert of his palm landing flat on the hood; the second thump rings on into the medium close-up. The doors close! is laid from the lines take over an insert of his hand shutting the door, so the thunk lands right after close!. A real 1.0 s held pause before Wheels!, then a 1 s freeze. Graphics are Take 4's full-frame PNGs, each landing on its word, with HAND-INSPECTED! cleared before the pat and DOORS CLOSE! raised over the door's windows. Every audio cut has 12 ms fades so none clicks. Ported from hal5/edit.mjs. PERSONALLY! and The doors close! are heard from other takes, so their sound is in sfx and their lines mark where they're heard."
+    "notes": "Take 4's own clean opening (lines 1-4, before its first extend seam), then one new shot per line or action, each started from a still of Take 4: no extends, so no seams and no slow motion. PERSONALLY! is its own one-word take, voiced over an insert of his palm landing flat on the hood; the second thump rings on into the medium close-up. The doors close! is laid from the lines take over an insert of his hand shutting the door, so the thunk lands right after close!. A real 1.0 s held pause before Wheels!, then a 1 s freeze. Graphics are Take 4's full-frame PNGs, each landing on its word, with HAND-INSPECTED! cleared before the pat and DOORS CLOSE! raised over the door's windows. Every shot's whole sound (its own audio and what is laid into it) is faded 12 ms at both ends, so no audio cut clicks. Ported from hal5/edit.mjs. PERSONALLY! and The doors close! are lines carrying their own stretch of their takes, laid into the pat and the door as layers of those shots' sound, as the script mixed them."
   },
   "media": {
     "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
@@ -18,20 +18,20 @@
 
   "segments": [
     { "id": "open", "label": "Wide: Take 4's opening pitch", "src": "take:big-hal-4ab-t2", "in": 0, "out": 9.85,
-      "audio": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "inspect", "label": "Medium by the hood: hand-inspected... by me!", "src": "take:hal5-inspect-t6", "in": 0.3, "out": 4.45,
-      "audio": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "pat", "label": "Insert: his palm lands flat on the hood, then pats again", "src": "take:hal5-pat-t1", "in": 1.07, "out": 2.5,
-      "audio": { "in": 1.15, "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "audio": { "in": 1.15 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "mcu", "label": "Medium close-up: (beat) They start!", "src": "take:hal5-lines-t1", "in": 0.3, "out": 1.55,
-      "audio": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "door", "label": "Insert: his hand pushes the door shut", "src": "take:hal5-door-t1", "in": 1.75, "out": 3.3,
-      "audio": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "hood", "label": "Medium, hand on the hood: And this one?", "src": "take:hal5-thisone-t3", "in": 0.55, "out": 3.45,
-      "audio": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
     { "id": "finish", "label": "Wide: (pause) Wheels! Come on down, then the freeze", "src": "take:hal5-wheels-t1", "in": 0.52, "out": 5.7,
       "hold": 1.0,
-      "audio": { "out": 5.8, "fadeIn": 0.012, "fadeOut": 0.15 } }
+      "audio": { "out": 5.8, "fadeOut": 0.15 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } }
   ],
 
   "lines": [
@@ -41,11 +41,11 @@
     { "id": "zero", "speaker": "Big Hal", "text": "Zero percent financing!", "segment": "open", "at": "open+6.92", "until": "month" },
     { "id": "month", "speaker": "Big Hal", "text": "Ninety-nine a month!", "segment": "open", "at": "open+8.73" },
     { "id": "every", "speaker": "Big Hal", "text": "And every car on my lot is hand-inspected... by me!", "segment": "inspect", "at": "inspect+0.13" },
-    { "id": "personally", "speaker": "Big Hal", "text": "PERSONALLY!", "segment": "pat",
-      "at": "pat+0.29", "until": "pers_snd.end" },
+    { "id": "personally", "speaker": "Big Hal", "text": "PERSONALLY!", "src": "take:hal5-personally-t2", "in": 0.55, "out": 1.63,
+      "at": "pat", "fadeOut": 0.15, "layer": "pat" },
     { "id": "theystart", "speaker": "Big Hal", "text": "They start!", "segment": "mcu", "at": "mcu+0.44" },
-    { "id": "doorsclose", "speaker": "Big Hal", "text": "The doors close!", "segment": "door",
-      "at": "door+0.41", "until": "doors_snd.end" },
+    { "id": "doorsclose", "speaker": "Big Hal", "text": "The doors close!", "src": "take:hal5-lines-t1", "in": 2.04, "out": 3.59,
+      "at": "door", "layer": "door" },
     { "id": "thisone", "speaker": "Big Hal", "text": "And this one? This one even comes with...", "segment": "hood", "at": "hood+0.32" },
     { "id": "wheels", "speaker": "Big Hal", "text": "Wheels!", "segment": "finish", "at": "finish+0.55", "until": "comeon" },
     { "id": "comeon", "speaker": "Big Hal", "text": "So come on down to Big Hal's and save big!", "segment": "finish",
@@ -53,14 +53,10 @@
   ],
 
   "sfx": [
-    { "id": "pers_snd", "label": "\"PERSONALLY!\" from its own one-word take, over the pat", "src": "take:hal5-personally-t2",
-      "in": 0.55, "out": 1.63, "at": "pat", "fadeIn": 0.012, "fadeOut": 0.15 },
     { "id": "ring", "label": "The second thump rings on over the cut", "src": "take:hal5-pat-t1",
-      "in": 2.58, "out": 2.83, "at": "mcu", "fadeIn": 0.012, "fadeOut": 0.15 },
-    { "id": "doors_snd", "label": "\"The doors close!\" from the lines take, over the door", "src": "take:hal5-lines-t1",
-      "in": 2.04, "out": 3.59, "at": "door", "fadeIn": 0.012, "fadeOut": 0.012 },
+      "in": 2.58, "out": 2.83, "at": "mcu", "fadeOut": 0.15, "layer": "mcu" },
     { "id": "freeze_room", "label": "Room tone from the top of the wheels take, under the freeze", "src": "take:hal5-wheels-t1",
-      "in": 0, "out": 1.0, "at": "finish.end-1", "fadeOut": 0.15 }
+      "in": 0, "out": 1.0, "at": "finish.end-1", "fadeOut": 0.15, "layer": "finish" }
   ],
 
   "overlays": [
@@ -70,7 +66,7 @@
       "blink": { "period": 0.5, "on": 0.3 } },
     { "id": "hand", "label": "HAND-INSPECTED! (gone before the pat)", "src": "gfx/hal4-hand.png", "at": "inspect+1.65", "until": "pat" },
     { "id": "starts", "label": "IT STARTS!* (gone before the door)", "src": "gfx/hal4-starts.png", "at": "theystart", "until": "door" },
-    { "id": "doors", "label": "DOORS CLOSE! (raised over the windows)", "src": "gfx/hal4-doors.png", "at": "doorsclose", "until": "hood",
+    { "id": "doors", "label": "DOORS CLOSE! (raised over the windows)", "src": "gfx/hal4-doors.png", "at": "door+0.41", "until": "hood",
       "y": -250 },
     { "id": "included", "label": "WHEELS INCLUDED!*", "src": "gfx/hal3-wheels.png", "at": "wheels", "until": "comeon" },
     { "id": "fine", "label": "Fine print crawls across", "src": "gfx/hal4-fine.png", "at": "wheels", "duration": 2.4,
@@ -82,5 +78,28 @@
     { "id": "phone", "label": "555-0182 (blinking)", "src": "gfx/hal3-phone.png", "at": "comeon+0.3", "until": "@end",
       "blink": { "period": 0.6, "on": 0.36 } },
     { "id": "route", "label": "BIG HAL'S · ROUTE 9", "src": "gfx/hal3-route.png", "at": "comeon+0.3", "until": "@end" }
-  ]
+  ],
+
+  "performances": [
+    { "id": "opening", "lines": ["howdy", "nomoney", "zero", "month"], "intent": "the opening pitch",
+      "delivery": "loud, proud and punchy, a steady local pitchman, every selling point at the same energy" },
+    { "id": "inspection", "lines": ["every", "personally"], "intent": "one sentence: the inspection and its tag",
+      "delivery": "one sentence at one steady, proud energy, with \"Personally!\" as loud as \"by me!\": never mumbled, never shouted or stretched" },
+    { "id": "list", "lines": ["theystart", "doorsclose"], "intent": "two items on the list",
+      "delivery": "the same proud punch for both items" },
+    { "id": "wheels_joke", "lines": ["thisone", "wheels", "comeon"], "intent": "setup and punchline, then the close",
+      "delivery": "an ordinary selling point: one breath, no pause before \"wheels\", \"wheels\" at the same loudness and note as \"comes with\", never a big reveal; then a warm, friendly invitation" }
+  ],
+
+  "sources": {
+    "take:big-hal-4ab-t2": { "step": "extend", "extendedFrom": "take:big-hal-4a-t2", "storyboard": "ad-big-hal-4b" },
+    "take:hal5-inspect-t6": { "step": "generate", "storyboard": "hal5-inspect", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:hal5-pat-t1": { "step": "generate", "storyboard": "hal5-pat", "firstFrame": "hal5/stills/hood-insert.png" },
+    "take:hal5-lines-t1": { "step": "generate", "storyboard": "hal5-lines", "firstFrame": "hal5/stills/mcu.png" },
+    "take:hal5-door-t1": { "step": "generate", "storyboard": "hal5-door" },
+    "take:hal5-thisone-t3": { "step": "generate", "storyboard": "hal5-thisone", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:hal5-wheels-t1": { "step": "generate", "storyboard": "hal5-wheels", "firstFrame": "hal5/stills/wide.png" },
+    "take:hal5-personally-t2": { "step": "generate", "storyboard": "hal5-personally", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:big-hal-4a-t2": { "step": "generate", "storyboard": "ad-big-hal-4a" }
+  }
 }

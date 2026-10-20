@@ -1,0 +1,111 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Big Hal's car lot",
+    "show": "big-hal",
+    "version": "Take 7 (the sell)",
+    "length": 36.27,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "The owner's new script (decision d13-the-sell): a sell that sets up the punchline, one generation per sentence. Line 1 is Take 5's opening (Take 4's clean source) cut 0.21 s after \"tri-county area!\", before \"No money down\". Lines 2-6 are new takes, each started from a still of the approved footage (hal5/stills): medium close-up, medium by the hood, wide, medium by the hood, medium close-up. Line 5's palm lands flat on the hood 0.39 s after \"car\"; its own thump, from the same take, is laid 0.07 s early so it lands on the contact frame and rings on into line 6. Line 6's voice is one take (hal7-guarantee4-t3) heard whole; its picture cuts, between \"guaranteed\" and \"to get\", to a silent insert of his hand counting one, two, three (hal7-count-t1), laid 1.00 s behind the voice so each finger lands on its item, because no take that showed his face counted in step (every one ran the count ahead of the words). The insert is split in the two silent gaps only to lift \"four seats\" (+2.4 dB more) and \"a steering wheel\" (+3.9 dB more) to the level of \"four doors\"; its picture runs on in step. Lines 7-8 are Take 6's accepted wc take exactly as Take 6 played it. Every shot's whole sound is faded 12 ms at both ends, as the script mixed it. Every new sentence is brought to about -22.5 dBFS speech-band RMS, Take 5's opening's level. Graphics are our PNGs on their words: NO MONEY DOWN and $99 A MONTH on line 4, FOUR DOORS!, FOUR SEATS! and STEERING WHEEL! as each is said, then Take 6's WHEELS INCLUDED!*, fine print, COME ON DOWN, phone and route. Rendered by hal7/edit.mjs."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/big-hal-take7.mp4",
+
+  "segments": [
+    { "id": "open", "label": "Wide: Take 5's opening, to just after \"tri-county area!\"", "src": "take:big-hal-4ab-t2", "in": 0, "out": 5.4,
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "extras", "label": "Medium close-up: those fancy dealerships", "src": "take:hal7-extras-t3", "in": 0.67, "out": 4.47,
+      "audio": { "volume": 1.1482 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "simple", "label": "Medium by the hood: Not Big Hal. I keep it simple", "src": "take:hal7-simple-t2", "in": 0.3, "out": 5.53,
+      "audio": { "volume": 1.7783 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "price", "label": "Wide: no money down, ninety-nine a month", "src": "take:hal7-price-t3", "in": 0.61, "out": 4.44,
+      "audio": { "volume": 1.2882 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "inspect", "label": "Medium by the hood: I personally hand-inspect every car, palm on the hood", "src": "take:hal7-inspect2-t2",
+      "in": 1.04, "out": 4.33,
+      "audio": { "out": 4.14, "volume": 1.3646, "fadeOut": 0.012 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "guar", "label": "Medium close-up: At Big Hal's, you're guaranteed", "src": "take:hal7-guarantee4-t3", "in": 0.5, "out": 2.125,
+      "audio": { "volume": 1.0593 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "count1", "label": "Insert: his hand comes up, one finger on four doors", "src": "take:hal7-count-t1", "in": 1.125, "out": 3.2,
+      "audio": { "src": "take:hal7-guarantee4-t3", "in": 2.125, "volume": 1.0593 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "count2", "label": "Insert: two fingers on four seats", "src": "take:hal7-count-t1", "in": 3.2, "out": 5.0,
+      "audio": { "src": "take:hal7-guarantee4-t3", "in": 4.2, "volume": 1.3964 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "count3", "label": "Insert: three fingers on a steering wheel", "src": "take:hal7-count-t1", "in": 5.0, "out": 6.55,
+      "audio": { "src": "take:hal7-guarantee4-t3", "in": 6.0, "volume": 1.6596 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "wc", "label": "Medium, hand on the hood: And this one? This one even comes with wheels! So come on down..., then the freeze",
+      "src": "take:hal6-wheels-close-t1", "in": 0, "out": 6.67, "hold": 1.0,
+      "audio": { "out": 3.6, "volume": 1.3335 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } }
+  ],
+
+  "lines": [
+    { "id": "howdy", "speaker": "Big Hal", "text": "Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area!", "segment": "open" },
+    { "id": "dealers", "speaker": "Big Hal", "text": "Now, those fancy dealerships'll charge you for all kinds of extras.", "segment": "extras" },
+    { "id": "nothal", "speaker": "Big Hal", "text": "Not Big Hal. I keep it simple, and I pass the savings on to you.", "segment": "simple" },
+    { "id": "deal", "speaker": "Big Hal", "text": "That's how I can do no money down, and ninety-nine a month!", "segment": "price" },
+    { "id": "inspected", "speaker": "Big Hal", "text": "And I personally hand-inspect every car.", "segment": "inspect", "until": "inspect+3.1" },
+    { "id": "guarantee", "speaker": "Big Hal", "text": "At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel!", "segment": "guar",
+      "until": "count3.end" },
+    { "id": "thisone", "speaker": "Big Hal", "text": "And this one? This one even comes with wheels!", "segment": "wc", "at": "wc+0.28", "until": "comeon" },
+    { "id": "comeon", "speaker": "Big Hal", "text": "So come on down to Big Hal's and save big!", "src": "take:hal6-wheels-close-t1",
+      "in": 3.6, "out": 6.67, "at": "wc+3.6", "layer": "wc" }
+  ],
+
+  "sfx": [
+    { "id": "thump", "label": "His palm on the hood: the take's own thump, laid two frames early onto the contact, ringing on over the cut",
+      "src": "take:hal7-inspect2-t2", "in": 4.14, "out": 4.7, "at": "inspect+3.03", "fadeIn": 0.012, "fadeOut": 0.15 },
+    { "id": "freeze_room", "label": "Room tone from the quiet tail of the wc take, under the freeze", "src": "take:hal6-wheels-close-t1",
+      "in": 6.9, "out": 7.9, "at": "wc.end-1", "fadeIn": 0.1, "fadeOut": 0.15, "layer": "wc" }
+  ],
+
+  "overlays": [
+    { "id": "nmd", "label": "NO MONEY DOWN", "src": "gfx/hal3-nmd.png", "at": "price+1.18", "until": "price+2.72" },
+    { "id": "n99", "label": "$99 A MONTH (blinking)", "src": "gfx/hal3-99.png", "at": "price+2.72", "until": "inspect",
+      "blink": { "period": 0.5, "on": 0.3 } },
+    { "id": "doors", "label": "FOUR DOORS!", "src": "gfx/hal7-doors.png", "at": "count1+0.845", "until": "wc" },
+    { "id": "seats", "label": "FOUR SEATS!", "src": "gfx/hal7-seats.png", "at": "count2+0.49", "until": "wc" },
+    { "id": "wheel", "label": "STEERING WHEEL!", "src": "gfx/hal7-wheel.png", "at": "count3+0.53", "until": "wc" },
+    { "id": "included", "label": "WHEELS INCLUDED!*", "src": "gfx/hal3-wheels.png", "at": "wc+2.68", "until": "comeon" },
+    { "id": "fine", "label": "Fine print crawls across", "src": "gfx/hal4-fine.png", "at": "wc+2.68", "duration": 2.4,
+      "motion": [
+        { "at": "fine", "x": 1085, "y": 0 },
+        { "at": "fine.end", "x": -1195, "y": 0 }
+      ] },
+    { "id": "close", "label": "COME ON DOWN & SAVE BIG!", "src": "gfx/hal3-close.png", "at": "comeon", "until": "@end" },
+    { "id": "phone", "label": "555-0182 (blinking)", "src": "gfx/hal3-phone.png", "at": "comeon+0.3", "until": "@end",
+      "blink": { "period": 0.6, "on": 0.36 } },
+    { "id": "route", "label": "BIG HAL'S · ROUTE 9", "src": "gfx/hal3-route.png", "at": "comeon+0.3", "until": "@end" }
+  ],
+
+  "performances": [
+    { "id": "opening", "lines": ["howdy"], "intent": "the opening",
+      "delivery": "a proud, warm, steady local pitchman" },
+    { "id": "no_extras", "lines": ["dealers"], "intent": "the sell: no extras",
+      "delivery": "proud, warm and sincere at a steady pace, without raising his voice" },
+    { "id": "kept_simple", "lines": ["nothal"], "intent": "the sell: kept simple",
+      "delivery": "proud, warm and sincere at a steady pace, without raising his voice" },
+    { "id": "the_price", "lines": ["deal"], "intent": "the sell: the price",
+      "delivery": "proud, warm and sincere at a steady pace, without raising his voice" },
+    { "id": "inspection", "lines": ["inspected"], "intent": "the sell: the inspection",
+      "delivery": "one sentence in one breath, \"personally\" at the same loudness as the other words" },
+    { "id": "the_guarantee", "lines": ["guarantee"], "intent": "the guarantee: three bare basics as selling points",
+      "delivery": "a brisk, even list: each item at the same pitch and loudness, nothing builds, nothing shouted" },
+    { "id": "wheels_joke", "lines": ["thisone", "comeon"], "intent": "setup and punchline, then the close",
+      "delivery": "an ordinary selling point: one breath, no pause before \"wheels\", \"wheels\" at the same loudness and note as \"comes with\", never a big reveal; then a warm, friendly invitation" }
+  ],
+
+  "sources": {
+    "take:big-hal-4ab-t2": { "step": "extend", "extendedFrom": "take:big-hal-4a-t2", "storyboard": "ad-big-hal-4b" },
+    "take:hal7-extras-t3": { "step": "generate", "storyboard": "hal7-extras", "firstFrame": "hal5/stills/mcu.png" },
+    "take:hal7-simple-t2": { "step": "generate", "storyboard": "hal7-simple", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:hal7-price-t3": { "step": "generate", "storyboard": "hal7-price", "firstFrame": "hal5/stills/wide.png" },
+    "take:hal7-inspect2-t2": { "step": "generate", "storyboard": "hal7-inspect2", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:hal7-guarantee4-t3": { "step": "generate", "storyboard": "hal7-guarantee4", "firstFrame": "hal5/stills/mcu.png" },
+    "take:hal7-count-t1": { "step": "generate", "storyboard": "hal7-count-insert", "firstFrame": "hal5/stills/hood-insert.png" },
+    "take:hal6-wheels-close-t1": { "step": "generate", "storyboard": "hal6-wheels-close", "firstFrame": "hal5/stills/medium-hood.png" },
+    "take:big-hal-4a-t2": { "step": "generate", "storyboard": "ad-big-hal-4a" }
+  }
+}

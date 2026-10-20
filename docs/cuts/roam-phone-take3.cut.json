@@ -1,0 +1,781 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Roam Phone",
+    "show": "roam-phone",
+    "version": "Take 3 (Talk anywhere*)",
+    "length": 56.98,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Talk anywhere*: a traditional 80s sell whose announcer the couple answer to the lens. Frank's confidence grows from the kitchen (Anywhere? Really? Anywhere?) to the patio, the mower and the roof, until he strolls backwards off the pool's edge. No splash shot: the fall cuts on his windmilling arms, the SPLOOSH and the fizz are heard on her red wall phone, and the punchline is him standing still, waist-deep and soaked: '...Honey?' fizz '...Anywhere?' Then our disclaimer card (fine print racing, very fast legal read) and tag card (ROAM PHONE, Talk anywhere*, $89.99, *at fine electronics stores everywhere, *almost anywhere). Every phone shot starts from the one approved handset still (roam3/stills/handset-b.png) or a still made from it; the handset is in his right hand throughout, and her red wall phone, in one locked framing, is the only cord. Each on-camera sentence is one generation; the announcer is Gemini TTS (voice Algenib). Cut by roam3/cut.mjs in the media folder from measured speech times."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/roam-phone-take3.mp4",
+  "segments": [
+    {
+      "id": "open",
+      "label": "1. Kitchen: the couple, the opened box, Frank holds the handset up",
+      "src": "take:roam3-openb-t1",
+      "in": 0.2,
+      "out": 4.05,
+      "audio": {
+        "volume": 1
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "wife",
+      "label": "Her, to the lens: \"Anywhere?\"",
+      "src": "take:roam3-wife-t1",
+      "in": 0.4,
+      "out": 3.02,
+      "audio": {
+        "volume": 2.8
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "frank",
+      "label": "Frank, to the lens, one eyebrow up: \"Really? Anywhere?\"",
+      "src": "take:roam3-frank-t1",
+      "in": 0,
+      "out": 3.98,
+      "audio": {
+        "volume": 2
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "shrug",
+      "label": "They look at each other; he shrugs: \"...Let's find out.\"",
+      "src": "take:roam3-shrug-t1",
+      "in": 0.1,
+      "out": 2.85,
+      "audio": {
+        "volume": 2.15
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "lift",
+      "label": "2. She lifts the red wall phone (her one locked framing)",
+      "src": "take:roam3-lift-t3",
+      "in": 1,
+      "out": 2.3,
+      "audio": {
+        "volume": 1
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "door",
+      "label": "He steps out the back door, carrying the handset carefully",
+      "src": "take:roam3-door-t1",
+      "in": 0.4,
+      "out": 1.7,
+      "audio": {
+        "volume": 2
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "patio",
+      "label": "3. Patio, tentative: \"Honey? ...Can you hear me?\"",
+      "src": "take:roam3-patio-t1",
+      "in": 0.7,
+      "out": 3.2,
+      "audio": {
+        "volume": 2.25
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "bell",
+      "label": "Her end: \"Clear as a bell!\"",
+      "src": "take:roam3-bell-t1",
+      "in": 0.77,
+      "out": 2.36,
+      "audio": {
+        "volume": 1.8
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "smile",
+      "label": "Frank's small smile (the patio take's tail)",
+      "src": "take:roam3-patio-t1",
+      "in": 3.55,
+      "out": 5.21,
+      "audio": {
+        "volume": 2.25
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "mow",
+      "label": "4. Lawn, already mowing: \"Honey, I'm mowing!\"",
+      "src": "take:roam3-mow-t2",
+      "in": 1.3,
+      "out": 3.3,
+      "audio": {
+        "volume": 1
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "still",
+      "label": "Her end: \"Still clear!\"",
+      "src": "take:roam3-still-t1",
+      "in": 0.77,
+      "out": 3.29,
+      "audio": {
+        "volume": 1.4
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "laugh",
+      "label": "Frank laughs, impressed (the mowing take's tail)",
+      "src": "take:roam3-mow-t2",
+      "in": 3.7,
+      "out": 5.3,
+      "audio": {
+        "volume": 0.8
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "roof",
+      "label": "5. Roof ridge, hand on hip: \"Honey, I'm on the roof!\"",
+      "src": "take:roam3-roof-t1",
+      "in": 1,
+      "out": 2.85,
+      "audio": {
+        "volume": 1.45
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "why",
+      "label": "Her end: \"...Why are you on the roof?\"",
+      "src": "take:roam3-why-t1",
+      "in": 1.36,
+      "out": 3.69,
+      "audio": {
+        "volume": 2.1
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "any",
+      "label": "Frank, beaming at the sky: \"Anywhere!\"",
+      "src": "take:roam3-any-t1",
+      "in": 0,
+      "out": 2.75,
+      "audio": {
+        "volume": 1.4
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "edge",
+      "label": "6. The pool's edge, overconfident: \"Honey, this thing is incredible! I could take it anywhere! I could take it—\"",
+      "src": "take:roam3-edge-t1",
+      "in": 1,
+      "out": 5.68,
+      "audio": {
+        "volume": 1.7
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "wobble",
+      "label": "7. His heel finds air; arms windmill (cut on the wobble)",
+      "src": "take:roam3-wobble-t1",
+      "in": 0.55,
+      "out": 2,
+      "audio": {
+        "volume": 1.2
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "splash",
+      "label": "8. Her end: she jerks the receiver away (SPLOOSH, then fizz)",
+      "src": "take:roam3-splash-t1",
+      "in": 0.85,
+      "out": 2.75,
+      "audio": {
+        "volume": 0.5
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "punch",
+      "label": "9. Waist-deep, soaked, still: \"...Honey?\" ... \"...Anywhere?\"",
+      "src": "take:roam3-punchc-t4",
+      "in": 0.95,
+      "out": 5.45,
+      "audio": {
+        "volume": 1.9
+      },
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "disc",
+      "label": "10. Disclaimer card, fine print racing past",
+      "src": "roam3/gfx/disc-bg.png",
+      "still": true,
+      "duration": 5.25,
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    },
+    {
+      "id": "tag",
+      "label": "11. Tag and price card",
+      "src": "roam3/gfx/tag-bg2.png",
+      "still": true,
+      "duration": 4.6,
+      "mix": {
+        "fadeIn": 0.012,
+        "fadeOut": 0.012
+      }
+    }
+  ],
+  "lines": [
+    {
+      "id": "n1",
+      "speaker": "Narrator",
+      "text": "Introducing Roam Phone, the cordless telephone that lets you talk anywhere!",
+      "src": "audio/tts/roam3-g-n1b.wav",
+      "at": 0.06,
+      "duration": 4.72,
+      "volume": 0.75,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n2",
+      "speaker": "Narrator",
+      "text": "Yes, anywhere.",
+      "src": "audio/tts/roam3-g-n2.wav",
+      "at": 5.35,
+      "duration": 2.32,
+      "volume": 1,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n3",
+      "speaker": "Narrator",
+      "text": "Absolutely. Give it a try.",
+      "src": "audio/tts/roam3-g-n3.wav",
+      "at": 9.48,
+      "duration": 2.8,
+      "volume": 0.85,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n4",
+      "speaker": "Narrator",
+      "text": "Crystal clear!",
+      "src": "audio/tts/roam3-g-n4.wav",
+      "at": 19.72,
+      "duration": 1.96,
+      "volume": 0.8,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n5",
+      "speaker": "Narrator",
+      "text": "Even over the mower!",
+      "src": "audio/tts/roam3-g-n5.wav",
+      "at": 24.61,
+      "duration": 2.36,
+      "volume": 1.6,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n6",
+      "speaker": "Narrator",
+      "text": "Talk from anywhere!",
+      "src": "audio/tts/roam3-g-n6e.wav",
+      "at": 31.05,
+      "duration": 2.52,
+      "volume": 1.15,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n7",
+      "speaker": "Narrator",
+      "text": "Roam Phone is not waterproof. Do not take Roam Phone into the pool. Do not take Roam Phone onto the roof. Why were you on the roof.",
+      "src": "audio/tts/roam3-g-n7.wav",
+      "at": 47.17,
+      "duration": 5.32,
+      "volume": 1.2,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "n8",
+      "speaker": "Narrator",
+      "text": "Roam Phone. Talk anywhere!",
+      "src": "audio/tts/roam3-g-n8.wav",
+      "at": 52.44,
+      "duration": 3.52,
+      "volume": 0.6,
+      "fadeOut": 0.03
+    },
+    {
+      "id": "anywhere1",
+      "speaker": "Wife",
+      "text": "Anywhere?",
+      "segment": "wife",
+      "at": 4.68,
+      "until": 5.54
+    },
+    {
+      "id": "really",
+      "speaker": "Frank",
+      "text": "Really? Anywhere?",
+      "segment": "frank",
+      "at": 7.42,
+      "until": 9.66
+    },
+    {
+      "id": "findout",
+      "speaker": "Frank",
+      "text": "...Let's find out.",
+      "segment": "shrug",
+      "at": 12.08,
+      "until": 13.06
+    },
+    {
+      "id": "hear",
+      "speaker": "Frank",
+      "text": "Honey? ...Can you hear me?",
+      "segment": "patio",
+      "at": 15.87,
+      "until": 18.27
+    },
+    {
+      "id": "bellline",
+      "speaker": "Wife",
+      "text": "Clear as a bell!",
+      "segment": "bell",
+      "at": 18.3,
+      "until": 19.89
+    },
+    {
+      "id": "mowing",
+      "speaker": "Frank",
+      "text": "Honey, I'm mowing!",
+      "segment": "mow",
+      "at": 21.63,
+      "until": 23.55
+    },
+    {
+      "id": "stillclear",
+      "speaker": "Wife",
+      "text": "Still clear!",
+      "segment": "still",
+      "at": 23.55,
+      "until": 24.76
+    },
+    {
+      "id": "onroof",
+      "speaker": "Frank",
+      "text": "Honey, I'm on the roof!",
+      "segment": "roof",
+      "at": 27.78,
+      "until": 29.45
+    },
+    {
+      "id": "whyroof",
+      "speaker": "Wife",
+      "text": "...Why are you on the roof?",
+      "segment": "why",
+      "at": 29.63,
+      "until": 31.18
+    },
+    {
+      "id": "anywhere2",
+      "speaker": "Frank",
+      "text": "Anywhere!",
+      "segment": "any",
+      "at": 33.29,
+      "until": 34.42
+    },
+    {
+      "id": "incredible",
+      "speaker": "Frank",
+      "text": "Honey, this thing is incredible! I could take it anywhere! I could take it—",
+      "segment": "edge",
+      "at": 34.69,
+      "until": 39.28
+    },
+    {
+      "id": "honey",
+      "speaker": "Frank",
+      "text": "...Honey?",
+      "segment": "punch",
+      "at": 42.83,
+      "until": 43.43
+    },
+    {
+      "id": "anywhere3",
+      "speaker": "Frank",
+      "text": "...Anywhere?",
+      "segment": "punch",
+      "at": 45.9,
+      "until": 46.63
+    }
+  ],
+  "sfx": [
+    {
+      "id": "sploosh",
+      "label": "SPLOOSH, through her receiver",
+      "src": "audio/br-splash.mp3",
+      "at": 40.81,
+      "duration": 1.48,
+      "volume": 1.4,
+      "filters": [
+        {
+          "kind": "highpass",
+          "frequency": 250
+        },
+        {
+          "kind": "lowpass",
+          "frequency": 4500
+        }
+      ]
+    },
+    {
+      "id": "fizz1",
+      "label": "Fizzing static on her end",
+      "src": "audio/roam3-fizz.wav",
+      "at": 41.58,
+      "until": "punch",
+      "volume": 0.55,
+      "fadeIn": 0.15,
+      "filters": [
+        {
+          "kind": "highpass",
+          "frequency": 400
+        },
+        {
+          "kind": "lowpass",
+          "frequency": 4000
+        }
+      ]
+    },
+    {
+      "id": "fizz2",
+      "label": "The fizz from his drowned handset",
+      "src": "audio/roam3-fizz.wav",
+      "in": 1,
+      "at": "punch",
+      "until": 45.92,
+      "volume": 0.16,
+      "fadeOut": 0.3,
+      "filters": [
+        {
+          "kind": "highpass",
+          "frequency": 600
+        },
+        {
+          "kind": "lowpass",
+          "frequency": 3500
+        },
+        {
+          "kind": "crush",
+          "bits": 8,
+          "mix": 0.3
+        }
+      ]
+    }
+  ],
+  "overlays": [
+    {
+      "id": "print",
+      "label": "Fine print racing up",
+      "src": "roam3/gfx/disc-print.png",
+      "segment": "disc",
+      "at": 0,
+      "until": 5.25,
+      "motion": [
+        {
+          "at": 0,
+          "x": 0,
+          "y": 600
+        },
+        {
+          "at": 5.25,
+          "x": 0,
+          "y": -2100
+        }
+      ]
+    },
+    {
+      "id": "head",
+      "label": "IMPORTANT INFORMATION band and frame",
+      "src": "roam3/gfx/disc-head.png",
+      "segment": "disc"
+    },
+    {
+      "id": "name",
+      "src": "roam3/gfx/tag-name2.png",
+      "segment": "tag",
+      "at": 0.05,
+      "fadeIn": 0.15
+    },
+    {
+      "id": "line",
+      "src": "roam3/gfx/tag-line2.png",
+      "segment": "tag",
+      "at": 1.45,
+      "fadeIn": 0.15
+    },
+    {
+      "id": "price",
+      "src": "roam3/gfx/tag-price2.png",
+      "segment": "tag",
+      "at": 0.6,
+      "fadeIn": 0.1
+    },
+    {
+      "id": "foot",
+      "src": "roam3/gfx/tag-foot2.png",
+      "segment": "tag",
+      "at": 0.6,
+      "fadeIn": 0.15
+    },
+    {
+      "id": "almost",
+      "label": "*almost anywhere, slapped on after the tagline",
+      "src": "roam3/gfx/tag-almost2.png",
+      "segment": "tag",
+      "at": 3.08
+    }
+  ],
+  "picture": {
+    "fadeIn": 0.25,
+    "fadeOut": 0.5,
+    "filters": [
+      {
+        "kind": "rescale",
+        "width": 880,
+        "height": 495
+      },
+      {
+        "kind": "chroma-shift",
+        "cb": {
+          "x": 2
+        },
+        "cr": {
+          "x": -2
+        }
+      },
+      {
+        "kind": "grain",
+        "strength": 5,
+        "moving": true
+      }
+    ]
+  },
+  "mix": {
+    "filters": [
+      {
+        "kind": "limiter",
+        "limit": 0.95
+      }
+    ]
+  },
+  "sources": {
+    "take:roam3-openb-t1": {
+      "step": "generate",
+      "storyboard": "roam3-openb",
+      "firstFrame": "roam3/stills/k-two-b-720.png"
+    },
+    "take:roam3-wife-t1": {
+      "step": "generate",
+      "storyboard": "roam3-wife",
+      "firstFrame": "roam3/stills/k-wife-720.png"
+    },
+    "take:roam3-frank-t1": {
+      "step": "generate",
+      "storyboard": "roam3-frank",
+      "firstFrame": "roam3/stills/k-frank-720.png"
+    },
+    "take:roam3-shrug-t1": {
+      "step": "generate",
+      "storyboard": "roam3-shrug",
+      "firstFrame": "roam3/stills/k-two-b-720.png"
+    },
+    "take:roam3-lift-t3": {
+      "step": "generate",
+      "storyboard": "roam3-lift",
+      "firstFrame": "roam3/stills/w-wall2-720.png"
+    },
+    "take:roam3-door-t1": {
+      "step": "generate",
+      "storyboard": "roam3-door",
+      "firstFrame": "roam3/stills/d-door3-720.png"
+    },
+    "take:roam3-patio-t1": {
+      "step": "generate",
+      "storyboard": "roam3-patio",
+      "firstFrame": "roam3/stills/p-patio-720.png"
+    },
+    "take:roam3-bell-t1": {
+      "step": "generate",
+      "storyboard": "roam3-bell",
+      "firstFrame": "roam3/stills/w-ear2-720.png"
+    },
+    "take:roam3-mow-t2": {
+      "step": "generate",
+      "storyboard": "roam3-mow2",
+      "firstFrame": "roam3/stills/m-mow2-720.png"
+    },
+    "take:roam3-still-t1": {
+      "step": "generate",
+      "storyboard": "roam3-still",
+      "firstFrame": "roam3/stills/w-ear2-720.png"
+    },
+    "take:roam3-roof-t1": {
+      "step": "generate",
+      "storyboard": "roam3-roof",
+      "firstFrame": "roam3/stills/r-roof-720.png"
+    },
+    "take:roam3-why-t1": {
+      "step": "generate",
+      "storyboard": "roam3-why",
+      "firstFrame": "roam3/stills/w-ear2-720.png"
+    },
+    "take:roam3-any-t1": {
+      "step": "generate",
+      "storyboard": "roam3-any",
+      "firstFrame": "roam3/stills/r-roof-720.png"
+    },
+    "take:roam3-edge-t1": {
+      "step": "generate",
+      "storyboard": "roam3-edge",
+      "firstFrame": "roam3/stills/e-edge2-720.png"
+    },
+    "take:roam3-wobble-t1": {
+      "step": "generate",
+      "storyboard": "roam3-wobble",
+      "firstFrame": "roam3/stills/e-edge2-720.png"
+    },
+    "take:roam3-splash-t1": {
+      "step": "generate",
+      "storyboard": "roam3-splash",
+      "firstFrame": "roam3/stills/w-ear2-720.png"
+    },
+    "take:roam3-punchc-t4": {
+      "step": "generate",
+      "storyboard": "roam3-punchc2",
+      "firstFrame": "roam3/stills/s-pool5-720.png"
+    },
+    "audio/tts/roam3-g-n1b.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n1"
+    },
+    "audio/tts/roam3-g-n2.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n2"
+    },
+    "audio/tts/roam3-g-n3.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n3"
+    },
+    "audio/tts/roam3-g-n4.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n4"
+    },
+    "audio/tts/roam3-g-n5.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n5"
+    },
+    "audio/tts/roam3-g-n6e.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n6"
+    },
+    "audio/tts/roam3-g-n7.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n7"
+    },
+    "audio/tts/roam3-g-n8.wav": {
+      "step": "generate",
+      "notes": "Gemini TTS, voice Algenib (the ElevenLabs key was out of credits), line n8"
+    },
+    "audio/roam3-fizz.wav": {
+      "step": "generate",
+      "notes": "ffmpeg: white and brown noise, band-limited, tremolo and a light bit-crush"
+    },
+    "audio/br-splash.mp3": {
+      "step": "generate",
+      "notes": "ElevenLabs sound effect made for Breeze Take 3, reused"
+    }
+  }
+}

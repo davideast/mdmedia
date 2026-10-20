@@ -83,11 +83,11 @@
     "personally": {
       "text": "PERSONALLY!",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "takes/hal5-pat-t1.mp4", "start": 1.44, "end": 2.23, "sha256": "627030bc8924d7bc2121cce89197207da0a3c5acc2ebb17a605b44ffe9d05080", "snap": "speech-onset@1" },
-      "loss": 2.855,
-      "snap": { "aligned": 1.52, "start": 1.52, "onset": 1.53, "floor": -56.8 },
+      "fingerprint": { "source": "takes/hal5-personally-t2.mp4", "start": 0.55, "end": 1.63, "sha256": "2fcebfb6b41de65667c0bdd185f9adc21859d818d851f603e0f03411c2f11b3e", "snap": "speech-onset@1" },
+      "loss": 1.084,
+      "snap": { "aligned": 0.87, "start": 0.83, "onset": 0.83, "floor": -52.8 },
       "words": [
-        { "text": "PERSONALLY!", "start": 1.52, "end": 2.2, "loss": 2.855 }
+        { "text": "PERSONALLY!", "start": 0.83, "end": 1.53, "loss": 1.084 }
       ]
     },
     "theystart": {
@@ -104,13 +104,13 @@
     "doorsclose": {
       "text": "The doors close!",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "takes/hal5-door-t1.mp4", "start": 2.16, "end": 3.3, "sha256": "f2abbdd81271811dfdc2525927f4c84b0ff85e1680e28c3a4bc8cab869b7262d", "snap": "speech-onset@1" },
-      "loss": 2.663,
-      "snap": { "aligned": 2.16, "start": 2.16, "onset": 3, "floor": -57.7 },
+      "fingerprint": { "source": "takes/hal5-lines-t1.mp4", "start": 2.04, "end": 3.59, "sha256": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9", "snap": "speech-onset@1" },
+      "loss": 0.956,
+      "snap": { "aligned": 2.44, "start": 2.44, "onset": 2.44, "floor": -62.3 },
       "words": [
-        { "text": "The", "start": 2.16, "end": 2.84, "loss": 3.107 },
-        { "text": "doors", "start": 2.841, "end": 3.12, "loss": 3.002 },
-        { "text": "close!", "start": 3.16, "end": 3.26, "loss": 2.09 }
+        { "text": "The", "start": 2.44, "end": 2.52, "loss": 0.653 },
+        { "text": "doors", "start": 2.56, "end": 2.86, "loss": 1.012 },
+        { "text": "close!", "start": 2.94, "end": 3.48, "loss": 1.1 }
       ]
     },
     "thisone": {

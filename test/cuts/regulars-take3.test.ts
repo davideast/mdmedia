@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { existsSync, readFileSync } from 'node:fs';
-import { gainAt, resolveCutJson, type ResolvedSource, type Timeline } from '../../src/cut/index';
+import { gainAt, resolveCutJson, segmentGainAt, type ResolvedSource, type Timeline } from '../../src/cut/index';
 
 /**
  * Regulars, Take 3 (ending fixed), ported from regulars3/edit.mjs. The
@@ -120,17 +120,34 @@ describe('Regulars, Take 3', () => {
       expect(seg.fadeIn).toBe(0);
       // Only the sit fades its picture: fade=t=out:st=2.418:d=0.5.
       expect(seg.fadeOut).toBe(seg.id === 'sit' ? 0.5 : 0);
-      // Each plays its own sound over its own in/out (atrim a:b), ramped in over 15 ms.
-      expect(seg.audio).toMatchObject({ src, in: a, out: b, fadeIn: 0.015, start: seg.start, end: seg.end });
+      // Each plays its own sound over its own in/out (atrim a:b), the shot's sound ramped over 15 ms at both ends
+      // (afade=t=in:d=0.015, afade=t=out:st=d-0.015:d=0.015).
+      expect(seg.audio).toMatchObject({ src, in: a, out: b, fadeIn: 0, start: seg.start, end: seg.end });
+      expect(seg.mix).toEqual({ fadeIn: 0.015, fadeOut: 0.015 });
       // volume=0.9 on Eddie's laugh only.
       expect(seg.audio!.volume).toBe(seg.id === 'eddie' ? 0.9 : 1);
     }
-    // afade=t=out:st=d-0.015:d=0.015 on every shot; the sit's is under the 0.7 s fade of the whole joined
-    // sound ([fx]afade=t=out:st=20.818:d=0.7), which lies inside the sit and is written as its own fade-out.
-    for (const id of ['take2', 'lines', 'eddie']) expect(byId(timeline.segments, id).audio!.fadeOut).toBe(0.015);
+    // The 0.7 s fade of the whole joined sound ([fx]afade=t=out:st=20.818:d=0.7) lies inside the sit, so it is
+    // the sit's own fade-out, under its 15 ms ramp.
+    for (const id of ['take2', 'lines', 'eddie']) expect(byId(timeline.segments, id).audio!.fadeOut).toBe(0);
     const sit = byId(timeline.segments, 'sit');
     expect(sit.audio!.fadeOut).toBe(0.7);
     near(sit.end - sit.audio!.fadeOut, 20.818);
+    // On every frame of the cut, the shots' sound gain is the script's: each ramp, times the joined fade.
+    const script = (t: number): number => {
+      const seg = timeline.segments.find((s) => t >= s.start && t < s.end);
+      if (!seg) return 0;
+      const d = seg.end - seg.start;
+      const u = t - seg.start;
+      let g = (seg.id === 'eddie' ? 0.9 : 1) * Math.min(1, u / 0.015) * Math.min(1, (d - u) / 0.015);
+      if (t > END - 0.7) g *= (END - t) / 0.7;
+      return g;
+    };
+    for (let k = 0; k < END * 24; k++) {
+      const t = k / 24 + 0.004;
+      const seg = timeline.segments.find((s) => t >= s.start && t < s.end);
+      if (seg) expect(Math.abs(segmentGainAt(seg, t) - script(t))).toBeLessThan(1e-6);
+    }
     expect(timeline.picture).toEqual({ fadeIn: 0, fadeOut: 0 });
     expect(timeline.music).toEqual([]);
     expect(timeline.overlays).toEqual([]); // the Regulars title is in Take 2's intro picture
@@ -164,7 +181,9 @@ describe('Regulars, Take 3', () => {
     // atrim=0:5.118 (to the end of the cut), adelay=16400; the file is 5.0 s, so it stops 0.118 s early.
     expect([laugh.in, laugh.out]).toEqual([0, 5]);
     expect([laugh.start, laugh.end]).toEqual([PRINTED.eddie, 21.4]);
-    // volume=0.7,afade=t=out:st=4.218:d=0.9 in the laugh's own clock: down to nothing at the cut's end.
+    // volume=0.7,afade=t=out:st=4.218:d=0.9 in the laugh's own clock: a fade timed to the cut's end, past the file's.
+    expect([laugh.fadeOut, laugh.fadeOutEnd]).toEqual([0.9, END]);
+    expect(laugh.volume).toEqual([{ t: PRINTED.eddie, value: 0.7 }]);
     const script = (t: number): number => {
       const u = t - PRINTED.eddie;
       if (u < 0 || u >= 5) return 0;

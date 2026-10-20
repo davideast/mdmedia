@@ -18,14 +18,14 @@
     "wrench": {
       "text": "Need a tension wrench.",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "takes/rigg5-lock-t2.mp4", "start": 0.75, "end": 1.75, "sha256": "a1d0398487b25594c9efe81c38e51381d14becd64583615b47dcaac507bc87c3", "snap": "speech-onset@1" },
-      "loss": 2.59,
-      "snap": { "aligned": 1.07, "start": 1.07, "onset": 0.96, "floor": -62.1 },
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 3.6, "end": 4.6, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.673,
+      "snap": { "aligned": 3.66, "start": 3.66, "onset": 3.66, "floor": -62.9 },
       "words": [
-        { "text": "Need", "start": 1.07, "end": 1.23, "loss": 3.011 },
-        { "text": "a", "start": 1.35, "end": 1.37, "loss": 2.405 },
-        { "text": "tension", "start": 1.371, "end": 1.41, "loss": 2.844 },
-        { "text": "wrench.", "start": 1.45, "end": 1.71, "loss": 2.079 }
+        { "text": "Need", "start": 3.66, "end": 3.74, "loss": 0.467 },
+        { "text": "a", "start": 3.78, "end": 3.84, "loss": 0.687 },
+        { "text": "tension", "start": 3.9, "end": 4.18, "loss": 0.71 },
+        { "text": "wrench.", "start": 4.22, "end": 4.5, "loss": 0.775 }
       ]
     },
     "paperclip": {
@@ -42,14 +42,14 @@
     "pins": {
       "text": "Hinge pins. Painted shut.",
       "aligner": "elevenlabs",
-      "fingerprint": { "source": "takes/rigg5-hinge-t1.mp4", "start": 1.22, "end": 3.17, "sha256": "d40f884ad30c31cde8adf89f1a208c7f3f31a17c510c73d01bc8eab47bb1e15e", "snap": "speech-onset@1" },
-      "loss": 3.369,
-      "snap": { "aligned": 1.94, "start": 1.94, "onset": 1.95, "floor": -73.7 },
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 6, "end": 7.95, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.864,
+      "snap": { "aligned": 6.04, "start": 6.02, "onset": 6.02, "floor": -61.8 },
       "words": [
-        { "text": "Hinge", "start": 1.94, "end": 2.08, "loss": 3.309 },
-        { "text": "pins.", "start": 2.18, "end": 2.6, "loss": 3.728 },
-        { "text": "Painted", "start": 2.601, "end": 2.78, "loss": 3.386 },
-        { "text": "shut.", "start": 3, "end": 3.12, "loss": 2.96 }
+        { "text": "Hinge", "start": 6.02, "end": 6.22, "loss": 0.534 },
+        { "text": "pins.", "start": 6.34, "end": 6.66, "loss": 0.794 },
+        { "text": "Painted", "start": 7.32, "end": 7.58, "loss": 0.876 },
+        { "text": "shut.", "start": 7.7, "end": 7.9, "loss": 0.752 }
       ]
     },
     "lever": {

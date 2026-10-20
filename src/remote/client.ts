@@ -7,6 +7,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { AgentHeartbeat, ContextBundle, Decision, DecisionSource, Message, Suggestion, SuggestionCheck, SuggestionState, Thread, ThreadStatus, TimedRef } from '../threads/types.js';
 
 export class StudioApiError extends Error {
   constructor(readonly status: number, readonly code: string, message: string) {
@@ -83,6 +84,234 @@ export interface PlaylistDetail extends PlaylistSummary {
   items: Array<{ id: string; title: string; status: string; durationMs: number; createdAt: number | null }>;
   /** Adds of items already there and removes of items not there. */
   unchanged?: string[];
+}
+
+export type CutStatus = 'review' | 'approved' | 'final' | 'none';
+export type CutKind = 'cut' | 'rendered';
+/** What a production asset is, as a cut uses it. */
+export type ProductionMediaType = 'video' | 'image' | 'voice' | 'music' | 'sfx';
+
+export interface ProductionCutSummary {
+  id: string;
+  label: string;
+  status: CutStatus;
+  kind: CutKind;
+  lengthSeconds: number | null;
+  createdAt: number;
+  order: number;
+  renderedAssetId: string | null;
+  /** A still from the finished video, for listings. */
+  posterAssetId?: string | null;
+  /** The review note, shortened for listings when `notesTruncated`. */
+  notes?: string;
+  notesTruncated?: boolean;
+  links: { self: string; rendered: string | null };
+}
+
+export interface ProductionSummary {
+  id: string;
+  slug: string;
+  title: string;
+  series: { id: string; title: string } | null;
+  coverAssetId: string | null;
+  currentCutId: string | null;
+  approvedCutId: string | null;
+  cutCount: number;
+  cuts: ProductionCutSummary[];
+  /** Who plays whom (absent from studios older than characters). */
+  cast?: ProductionCastMember[];
+  createdAt: number;
+  updatedAt: number;
+  /** The latest of its newest cut and its last review. */
+  activityAt?: number;
+  links: { self: string; cover: string | null; coverThumbnail: string | null };
+}
+
+export interface ProductionList {
+  productions: ProductionSummary[];
+  series: Array<{ id: string; title: string; slug: string; productionIds: string[] }>;
+}
+
+export interface ProductionAsset {
+  id: string;
+  mediaType: ProductionMediaType;
+  mimeType: string;
+  byteLength: number;
+  sha256: string;
+  width: number;
+  height: number;
+  durationMs?: number;
+  links: { content: string; thumbnail: string | null };
+}
+
+/** One part of a production's cast, as the studio stores it. */
+export interface ProductionCastMember {
+  role: string;
+  characterId: string;
+  slug: string;
+  version: number;
+  /** `rick@1`. */
+  ref: string;
+  name: string;
+  description: string;
+  register: string;
+  voice: string;
+  stillAssetId: string | null;
+  referenceLines: number;
+}
+
+/** The body of `POST /api/v1/productions`: create or update the production with this slug. */
+export interface ProductionUpsert {
+  slug: string;
+  title: string;
+  series?: { title: string; slug?: string } | null;
+  coverAssetId?: string | null;
+  /** Who plays whom: each character version must be stored first. Left out keeps the cast; `[]` clears it. */
+  cast?: Array<{ role: string; character: string }>;
+}
+
+/** The body of `PUT /api/v1/characters/{slug}/versions/{version}`: the character file, and the asset each still was uploaded as. */
+export interface CharacterVersionBody {
+  character: unknown;
+  stills: Record<string, string>;
+}
+
+export interface CharacterVersionResource {
+  id: string;
+  slug: string;
+  version: number;
+  ref: string;
+  character: unknown;
+  stills: Record<string, string>;
+  createdAt: number;
+  links: { self: string; character: string; stills: Record<string, { content: string; thumbnail: string }> };
+}
+
+export interface CharacterSummary {
+  id: string;
+  slug: string;
+  name: string;
+  kind: 'person' | 'thing';
+  latestVersion: number;
+  versions: Array<{ version: number; date: string; changes: string; createdAt: number }>;
+  createdAt: number;
+  updatedAt: number;
+  links: { self: string };
+}
+
+export interface ProductionPatch {
+  title?: string;
+  coverAssetId?: string | null;
+  approvedCutId?: string | null;
+  currentCutId?: string | null;
+  cuts?: Array<{ id: string; status?: CutStatus; label?: string; notes?: string }>;
+}
+
+/** The body of `PUT /api/v1/productions/{id}/cuts/{cutId}`. `cut` and `words` are JSON as the cut format defines them. */
+export interface ProductionCutBody {
+  label: string;
+  status: CutStatus;
+  kind: CutKind;
+  notes?: string;
+  order: number;
+  createdAt?: number;
+  cut?: unknown;
+  words?: unknown;
+  renderedAssetId?: string | null;
+  /** An image asset: a still from the finished video, for listings. */
+  posterAssetId?: string | null;
+  thumbs?: Record<string, string>;
+  source?: { cut?: string; rendered?: string } | null;
+  lengthSeconds?: number | null;
+}
+
+export interface ProductionCutResource extends Omit<ProductionCutBody, 'cut' | 'words'> {
+  id: string;
+  productionId: string;
+  notes: string;
+  createdAt: number;
+  updatedAt: number;
+  lengthSeconds: number | null;
+  renderedAssetId: string | null;
+  thumbs: Record<string, string>;
+  cut: unknown;
+  words: unknown;
+  /** The resolved timeline (`mdmedia/cut`'s `Timeline`), words applied; null for a rendered cut or one that doesn't resolve. */
+  timeline: unknown;
+  wordsSummary: { applied: string[]; stale: Array<{ id: string; reason: string }>; unchecked: string[] } | null;
+  errors: Array<{ code: string; message: string }>;
+  assets: Record<string, ProductionAsset>;
+  links: { self: string; production: string; rendered: string | null };
+}
+
+/** A file to upload as production media. `body` is read lazily, so a large take never has to fit in memory. */
+export interface ProductionMediaUpload {
+  sha256: string;
+  mediaType: ProductionMediaType;
+  mimeType: string;
+  byteLength: number;
+  body: Blob;
+  durationMs?: number;
+  width?: number;
+  height?: number;
+}
+
+/** A thread as the API returns it: the stored thread, its one status line, and whether an agent should pick it up. */
+export interface ThreadResource extends Thread {
+  statusLine: { tone: string; text: string };
+  needsAgent: boolean;
+  links: { self: string; context: string };
+}
+
+export interface ThreadDetail {
+  thread: ThreadResource;
+  messages: Message[];
+  suggestions: Suggestion[];
+}
+
+/** The body of a reply. `at` names a video and a time on it; a time on a cut is anchored by the studio. */
+export interface MessageBody {
+  text: string;
+  agent?: string;
+  replyTo?: string;
+  at?: { video: TimedRef['video']; time: number };
+  version?: { cutId: string };
+  keepClaim?: boolean;
+}
+
+/** One option, as an agent sends it, its previews already uploaded as production media. */
+export interface SuggestionBody {
+  title: string;
+  approach?: string;
+  steps?: string[];
+  cost?: { generations?: number; minutes?: number };
+  risks?: string[];
+  checks?: SuggestionCheck[];
+  previews?: Array<{ assetId: string; label?: string }>;
+  keeps?: string[];
+  overturns?: string[];
+  creates?: string[];
+  revises?: string;
+}
+
+export interface SuggestionsBody {
+  suggestions: SuggestionBody[];
+  /** What the agent read and recommends; it offers the options. */
+  message: string;
+  agent?: string;
+  round?: number;
+}
+
+export interface DecisionBody {
+  text: string;
+  id?: string;
+  kind?: 'decision' | 'constraint';
+  take?: string;
+  source?: DecisionSource;
+  quote?: string;
+  revised?: string;
+  threadIds?: string[];
+  cutIds?: string[];
 }
 
 export type StudioMediaType = 'image' | 'video' | 'music' | 'sfx';
@@ -373,6 +602,142 @@ export class StudioClient {
     if (matches.length > 1) throw new StudioApiError(409, 'playlist_ambiguous', `${matches.length} playlists are titled "${idOrTitle}". Use the id: ${matches.map((playlist) => playlist.id).join(', ')}.`);
     if (!matches[0]) throw new StudioApiError(404, 'playlist_not_found', `No playlist with the id or title "${idOrTitle}".`);
     return matches[0];
+  }
+
+  productions(): Promise<ProductionList> {
+    return this.request('GET', '/api/v1/productions');
+  }
+
+  production(id: string): Promise<ProductionSummary> {
+    return this.request('GET', `/api/v1/productions/${encodeURIComponent(id)}`);
+  }
+
+  /** Creates or updates the production with `body.slug`. */
+  upsertProduction(body: ProductionUpsert): Promise<ProductionSummary> {
+    return this.request('POST', '/api/v1/productions', body);
+  }
+
+  updateProduction(id: string, patch: ProductionPatch): Promise<ProductionSummary> {
+    return this.request('PATCH', `/api/v1/productions/${encodeURIComponent(id)}`, patch);
+  }
+
+  deleteProduction(id: string): Promise<void> {
+    return this.request('DELETE', `/api/v1/productions/${encodeURIComponent(id)}`);
+  }
+
+  productionCut(id: string, cutId: string): Promise<ProductionCutResource> {
+    return this.request('GET', `/api/v1/productions/${encodeURIComponent(id)}/cuts/${encodeURIComponent(cutId)}`);
+  }
+
+  /** Replaces the cut with this id, or adds it. */
+  putProductionCut(id: string, cutId: string, body: ProductionCutBody): Promise<ProductionCutResource> {
+    return this.request('PUT', `/api/v1/productions/${encodeURIComponent(id)}/cuts/${encodeURIComponent(cutId)}`, body);
+  }
+
+  deleteProductionCut(id: string, cutId: string): Promise<void> {
+    return this.request('DELETE', `/api/v1/productions/${encodeURIComponent(id)}/cuts/${encodeURIComponent(cutId)}`);
+  }
+
+  /** Your characters, by name. */
+  characters(): Promise<{ characters: CharacterSummary[] }> {
+    return this.request('GET', '/api/v1/characters');
+  }
+
+  /** Stores one version of a character (`201`), or confirms the same one is stored (`200`); another with the same version is `409 version_exists`. */
+  putCharacterVersion(slug: string, version: number, body: CharacterVersionBody): Promise<CharacterVersionResource> {
+    return this.request('PUT', `/api/v1/characters/${encodeURIComponent(slug)}/versions/${version}`, body);
+  }
+
+  /** Which of these SHA-256 hashes you already have as production media, by hash. Asks 100 at a time. */
+  async findProductionMedia(hashes: readonly string[]): Promise<Map<string, ProductionAsset>> {
+    const unique = [...new Set(hashes)];
+    const found = new Map<string, ProductionAsset>();
+    for (let i = 0; i < unique.length; i += 100) {
+      const batch = unique.slice(i, i + 100);
+      const result = await this.request<{ found: Record<string, ProductionAsset> }>('GET', `/api/v1/productions/media?sha256=${batch.join(',')}`);
+      for (const [sha, asset] of Object.entries(result.found)) found.set(sha, asset);
+    }
+    return found;
+  }
+
+  /** Uploads one production file, named by its hash. The studio streams it to storage and checks the hash. */
+  async uploadProductionMedia(upload: ProductionMediaUpload): Promise<ProductionAsset> {
+    const params = new URLSearchParams({ mediaType: upload.mediaType });
+    if (upload.durationMs !== undefined) params.set('durationMs', String(Math.round(upload.durationMs)));
+    if (upload.width !== undefined) params.set('width', String(upload.width));
+    if (upload.height !== undefined) params.set('height', String(upload.height));
+    const response = await this.send('PUT', `/api/v1/productions/media/${upload.sha256}?${params}`, {
+      body: upload.body,
+      // A Blob body carries its own Content-Length.
+      headers: { 'Content-Type': upload.mimeType },
+    });
+    return await response.json() as ProductionAsset;
+  }
+
+  // --- Comments: review threads on a production's cuts (`comments:read`, `comments:write`).
+
+  private threadPath(productionId: string, threadId?: string): string {
+    const base = `/api/v1/productions/${encodeURIComponent(productionId)}/threads`;
+    return threadId === undefined ? base : `${base}/${encodeURIComponent(threadId)}`;
+  }
+
+  /** The production's threads (or one cut's), in timeline order; `needsAgent` lists only those an agent should pick up. */
+  async threads(productionId: string, filter: { cutId?: string; needsAgent?: boolean } = {}): Promise<ThreadResource[]> {
+    const query = new URLSearchParams();
+    if (filter.cutId) query.set('cutId', filter.cutId);
+    if (filter.needsAgent) query.set('needsAgent', '1');
+    const suffix = [...query.keys()].length ? `?${query}` : '';
+    return (await this.request<{ threads: ThreadResource[] }>('GET', `${this.threadPath(productionId)}${suffix}`)).threads;
+  }
+
+  thread(productionId: string, threadId: string): Promise<ThreadDetail> {
+    return this.request('GET', this.threadPath(productionId, threadId));
+  }
+
+  /** Everything an agent needs to act on the thread, in one answer. */
+  threadContext(productionId: string, threadId: string): Promise<ContextBundle> {
+    return this.request('GET', `${this.threadPath(productionId, threadId)}/context`);
+  }
+
+  createThread(productionId: string, body: { cutId: string; time: number; text: string; agent?: string }): Promise<ThreadResource> {
+    return this.request('POST', this.threadPath(productionId), body);
+  }
+
+  setThreadStatus(productionId: string, threadId: string, status: ThreadStatus): Promise<ThreadResource> {
+    return this.request('PATCH', this.threadPath(productionId, threadId), { status });
+  }
+
+  claimThread(productionId: string, threadId: string, body: { agent: string; minutes?: number }): Promise<ThreadResource> {
+    return this.request('POST', `${this.threadPath(productionId, threadId)}/claim`, body);
+  }
+
+  releaseThread(productionId: string, threadId: string): Promise<ThreadResource> {
+    return this.request('DELETE', `${this.threadPath(productionId, threadId)}/claim`);
+  }
+
+  postMessage(productionId: string, threadId: string, body: MessageBody): Promise<Message> {
+    return this.request('POST', `${this.threadPath(productionId, threadId)}/messages`, body);
+  }
+
+  postSuggestions(productionId: string, threadId: string, body: SuggestionsBody): Promise<{ message: Message; suggestions: Suggestion[] }> {
+    return this.request('POST', `${this.threadPath(productionId, threadId)}/suggestions`, body);
+  }
+
+  setSuggestionState(productionId: string, threadId: string, suggestionId: string, body: { state: SuggestionState; appliedAs?: string; agent?: string }): Promise<Suggestion> {
+    return this.request('PATCH', `${this.threadPath(productionId, threadId)}/suggestions/${encodeURIComponent(suggestionId)}`, body);
+  }
+
+  decisions(productionId: string): Promise<{ decisions: Decision[]; constraints: Decision[] }> {
+    return this.request('GET', `/api/v1/productions/${encodeURIComponent(productionId)}/decisions`);
+  }
+
+  addDecision(productionId: string, body: DecisionBody): Promise<Decision> {
+    return this.request('POST', `/api/v1/productions/${encodeURIComponent(productionId)}/decisions`, body);
+  }
+
+  /** Says this agent is watching for comments, on one production or all of them. */
+  commentHeartbeat(body: { agent: string; productionId?: string }): Promise<AgentHeartbeat> {
+    return this.request('POST', '/api/v1/comments/heartbeat', body);
   }
 
   narration(id: string): Promise<NarrationResource> {

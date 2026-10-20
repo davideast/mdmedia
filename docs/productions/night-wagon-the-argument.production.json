@@ -1,0 +1,106 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "night-wagon-the-argument",
+  "title": "Night Wagon: The Argument",
+  "series": {
+    "title": "Night Wagon",
+    "slug": "night-wagon"
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cast": [
+    {
+      "role": "Rick",
+      "character": "rick@1"
+    },
+    {
+      "role": "Buddy",
+      "character": "buddy@1"
+    }
+  ],
+  "cover": "review/posters/ch-night-wagon-take9.jpg",
+  "approved": "take9",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ch-night-wagon.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Red scanner sweep in the first frame, hero at a blinking dashboard, then the sad hop over the cone; the hop shot jumps from night to broad daylight, and the moon sits top right under the channel number.",
+      "createdAt": "2026-10-18T21:37:00.727Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ch-night-wagon-take2.mp4",
+      "label": "Take 2",
+      "status": "none",
+      "notes": "Redo so every shot stays at night: the hop over the cone now happens on the dark road in the headlights with the scanner sweeping, and the top right is plain night sky; check that the hero (dark curly hair, leather jacket) doesn't read as a lookalike of the original show's lead.",
+      "createdAt": "2026-10-18T21:48:09.316Z"
+    },
+    {
+      "id": "take3",
+      "rendered": "review/clips/ch-night-wagon-take3.mp4",
+      "label": "Take 3",
+      "status": "none",
+      "notes": "Take 1 beats started from Take 1's own first frame (image-to-video), now all at night with the moon upper left, a stocky sandy-haired hero in aviators and a mint windbreaker, and a cut to the dashboard speaker for the car's reply; the hop over the cone is small and quite dark.",
+      "createdAt": "2026-10-18T21:51:28.853Z"
+    },
+    {
+      "id": "take4",
+      "rendered": "review/clips/ch-night-wagon-take4.mp4",
+      "label": "Take 4",
+      "status": "none",
+      "notes": "Take 1's own footage cut at 6.375 s, the last frame before daylight, then extended at night by 4 s: the same wagon hops the headlit cone at about 8.2 s with the scanner glowing; it runs 10.3 s, and the trimmed part was re-encoded with ffmpeg, so it lost Google's content-credentials record.",
+      "createdAt": "2026-10-18T22:09:54.219Z"
+    },
+    {
+      "id": "take5",
+      "rendered": "review/clips/ch-night-wagon-take5.mp4",
+      "label": "Take 5",
+      "status": "none",
+      "notes": "Transcript: Buddy, turbo boost! (4.0 s, Take 1 audio) / I am a station wagon. (5.7 to 6.8 s, whole and once). Take 1 is cut right after the hero's line, then the car says its line in full from a small dashboard screen with a smiley face, he looks down at the dashboard and then deadpan at the camera, and the same wagon makes a small nose-up hop over the headlit cone at about 9 s, all at night; the hop is subtler than Take 4's.",
+      "createdAt": "2026-10-18T23:39:21.709Z"
+    },
+    {
+      "id": "take6",
+      "rendered": "review/clips/ch-night-wagon-take6.mp4",
+      "label": "Take 6 (new script)",
+      "status": "none",
+      "notes": "Transcript: They are getting away, Buddy (6.8 s, Rick) / The bridge ahead is out, Rick (8.3, Buddy) / Then we jump it (9.8, Rick) / Rick, it is a 40-foot gap (10.7, Buddy) / Buddy, turbo boost! (12.9, Rick) / I am a station wagon (15.6, Buddy), hard cut at 16.65. Shots: hook is our own scanner glow on black with a whoom; highway shot take 1 with our chrome NIGHT WAGON and glint; tail-light POV take 1, bottom cropped so no hood shows; Rick lines take 1 and turbo push-in take 1 (from a Take 1 still); Buddy lines take 2 (take 1 said Rick three times), all three cut from one shot with only the button lights pulsing; button insert take 1; 1.0 s silent beat; reveal take 2 (take 1 was a cliff with no bridge): the wagon stops at the snapped bridge edge and the suitcase drops. Original Lyria theme, silent through the beat and the punchline. The wagon is small in the wide reveal.",
+      "createdAt": "2026-10-19T00:18:17.871Z"
+    },
+    {
+      "id": "take7",
+      "rendered": "review/clips/ch-night-wagon-take7.mp4",
+      "label": "Take 7 (the argument)",
+      "status": "none",
+      "notes": "Transcript: They are getting away, Buddy (6.9) / The bridge ahead is out, Rick (8.5) / Then we jump it (10.0) / Rick, it is a 40-foot gap (11.0) / We need to turbo boost! (12.8) / Rick, we can't (14.1) / There is no time! (15.0) / Rick. No. We can't (16.1) / TURBO BOOST! (18.5, cut to the halt at 19.2) / Rick. I am a station wagon (22.5). Buddy is one ElevenLabs voice (Bill) over silent dashboard shots where only the buttons pulse; Rick's four lines are cut from one shot from a Take 1 still, the yell is a separate push-in with an insert of his hand on the button. Halt take 3 of 4 (takes 1 and 2 left a second suitcase on the rack): it brakes with skid smoke, the one suitcase slides over the windscreen and hood and drops over the edge with a thud, rack left empty. Gap before the last line: 0.3 s after the cut back; argument gaps 0.2 to 0.4 s.",
+      "createdAt": "2026-10-19T01:56:42.894Z"
+    },
+    {
+      "id": "take8",
+      "rendered": "review/clips/ch-night-wagon-take8.mp4",
+      "label": "Take 8 (title as outro)",
+      "status": "none",
+      "notes": "Transcript: They are getting away, Buddy (5.5) / The bridge ahead is out, Rick (6.8) / Then we jump it (8.35) / Rick, it is a 40-foot gap (9.2) / We need to turbo boost! (11.1) / Rick, we can't (12.35) / There is no time! (13.3) / Rick. No. We can't (14.35) / TURBO BOOST! (16.5) / Rick. I am a station wagon (21.1). Take 7 with the title moved to the end: the cold open is now just the scanner sweep, 3 s of road (was 4.5) and the taillights, with no title, so nothing names the wagon before the punchline. After the line his stunned face holds about 0.8 s in silence, the theme comes back in full half a second before the cut, then NIGHT WAGON fades in over the road with the glint, the road fades to black under it and the whole picture fades out at 27.6 s. The argument, halt and line are untouched.",
+      "createdAt": "2026-10-19T06:44:36.481Z"
+    },
+    {
+      "id": "take9",
+      "cut": "docs/cuts/night-wagon-take9.cut.json",
+      "label": "Take 9 (opens on the road)",
+      "status": "approved",
+      "notes": "Transcript: They are getting away, Buddy (4.2) / The bridge ahead is out, Rick (5.5) / Then we jump it (7.05) / Rick, it is a 40-foot gap (7.9) / We need to turbo boost! (9.8) / Rick, we can't (11.05) / There is no time! (12.0) / Rick. No. We can't (13.05) / TURBO BOOST! (15.2) / Rick. I am a station wagon (19.8). Take 8 without the red scanner-line opening: it now starts straight on the night road under the theme (3.2 s), then the taillights, then the argument. Everything from the argument to the NIGHT WAGON outro is unchanged.",
+      "createdAt": "2026-10-19T06:55:51.502Z"
+    },
+    {
+      "id": "take10",
+      "cut": "docs/cuts/night-wagon-take10.cut.json",
+      "label": "Take 10 (the flashers)",
+      "status": "review",
+      "notes": "Transcript: as Take 9 up to TURBO BOOST! (15.2), then Rick. I am a station wagon (19.8) / And that button is for the flashers (22.4). Buddy (ElevenLabs Bill, the take with a natural 0.8 s pause after wagon) says the first half over Rick's stunned face; the cut lands on And, onto his hand still resting on the big red button. Then outside (25.05): the wagon at the snapped edge of the bridge, its scanner still sweeping and both front corner lamps blinking amber (our overlay) to a hazard-relay tick-tock in otherwise dead silence, 2.45 s, then the theme pre-laps into the NIGHT WAGON title outro.",
+      "createdAt": "2026-10-19T11:17:19.875Z"
+    }
+  ]
+}

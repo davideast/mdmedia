@@ -1,0 +1,146 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Regulars",
+    "show": "regulars",
+    "version": "Take 4 (too much else)",
+    "length": 45.208333,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Everybody knows your name, and too much else: a bar where everybody knows Walt's name turns uncanny because he has never been there. Intro (9 s): five framed sepia prints of the same four regulars (Eddie, Rita, Kenny, Dot) in an 1890s saloon, a 1920s speakeasy, a 1950s tavern, a 1970s bar and today, never ageing, crossfading on a dark backdrop, then Take 2's sepia shopfront held with a slow push under our gold Regulars title. The theme is new and original (audio/reg4-theme-d.mp3, Lyria): an upbeat mid-80s sitcom song whose lyric only evokes the old one, 'There's a place where they remember you, where the light is always on.' Scene: Take 2's approved wide (Walt comes in, the bar shouts WALT!), then one shot per line or reaction, each started from stills of the approved bar and cast. The jokes climb in five levels: WALT! and 'I've literally never been here before'; the car from the shop ('...wait.'); the colonoscopy; the frosting straight out of the can last night, a measured 1.1 s pause, then 'Standing in the dark kitchen' (same take, easy to cut: see regulars-take4-short); Eddie slides a plain white tub of frosting with a spoon standing in it, 'Your usual, Walt.' Walt's silent reactions climb with them: a puzzled half-smile, an awkward laugh, the smile drops with a glance back at the door, frozen; then 'Yeah... I'm out of here', a cutaway to Rita beaming at him, and he backs out and pulls the door shut. The laugh track grows with each level (four studio laughs, about -26, -20, -17 and -15 dBFS), then drops away for the freeze and the exit; the theme comes back as he backs out and its final band hit (59.1 s into the file) lands on 'Bye, Walt!'. Every in and out is a whole frame at 24 fps; Walt's line shots are cropped 15 % to trim regulars' shoulders at the edges, his reactions punched in 35 %, Rita's take 10 % to trim a neighbour's arm. Dialogue shots are lifted to about -20 dBFS speech level, and the near-silent room tone under the reactions and the exit matches them. Cut by reg4/edit.mjs in the media folder."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/regulars-take4.mp4",
+
+  "segments": [
+    { "id": "table", "label": "Intro: the regulars across eras, on a dark backdrop", "src": "reg4/gfx/backdrop.png", "still": true, "duration": "f166",
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "shop", "label": "Intro: Take 2's sepia shopfront and the Regulars title", "src": "reg4/gfx/shopfront.png", "still": true, "duration": "f50",
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "shop.end", "scale": 1.04 } ] },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "wide", "label": "1. Take 2's wide: Walt comes in, the bar shouts WALT!", "src": "review/clips/ch-regulars-take2.mp4", "in": "f192", "out": "f246",
+      "audio": { "out": 9.7 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "r1", "label": "Reaction 1: a puzzled half-smile", "src": "take:reg4-r1-t2", "in": "f10", "out": "f31",
+      "crop": { "x": 46, "y": 0, "width": 948, "height": 533 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "w1", "label": "Walt: how do you know my name?", "src": "take:reg4-w1b-t1", "in": "f24", "out": "f121",
+      "crop": { "x": 96, "y": 0, "width": 1088, "height": 612 }, "audio": { "volume": 2.3 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "a", "label": "2. Rita: the car from the shop", "src": "take:reg4-a-t1", "in": "f14", "out": "f76",
+      "crop": { "x": 0, "y": 0, "width": 1152, "height": 648 }, "audio": { "volume": 2.1 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "w2", "label": "Walt: it was just the... wait", "src": "take:reg4-w2b-t3", "in": "f19", "out": "f70",
+      "crop": { "x": 96, "y": 0, "width": 1088, "height": 612 }, "audio": { "volume": 2 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "r2", "label": "Reaction 2: an awkward laugh", "src": "take:reg4-r2-t1", "in": "f12", "out": "f50",
+      "crop": { "x": 46, "y": 0, "width": 948, "height": 533 }, "audio": { "volume": 1.6 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "b", "label": "3. Kenny: the colonoscopy", "src": "take:reg4-b-t1", "in": "f12", "out": "f59",
+      "audio": { "volume": 2.4 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "r3", "label": "Reaction 3: the smile drops, a glance back at the door", "src": "take:reg4-r3-t1", "in": "f11", "out": "f60",
+      "crop": { "x": 46, "y": 0, "width": 948, "height": 533 }, "audio": { "src": "take:reg4-xb-t2", "in": 0.1, "volume": 2.2 },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "c", "label": "4. Dot: the frosting, a pause, the dark kitchen", "src": "take:reg4-c-t2", "in": "f6", "out": "f149",
+      "audio": { "volume": 2.9 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "r4", "label": "Reaction 4: frozen", "src": "take:reg4-r4-t2", "in": "f17", "out": "f50",
+      "crop": { "x": 46, "y": 0, "width": 948, "height": 533 }, "audio": { "src": "take:reg4-xb-t2", "in": 0.1, "volume": 2.2 },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "e", "label": "5. Eddie slides the tub: your usual", "src": "take:reg4-e-t3", "in": "f17", "out": "f60",
+      "audio": { "volume": 2 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "w3", "label": "Walt: I'm out of here", "src": "take:reg4-w3b-t3", "in": "f12", "out": "f62",
+      "crop": { "x": 96, "y": 0, "width": 1088, "height": 612 }, "audio": { "volume": 2.2 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "smile", "label": "Rita beams at him (her take's silent tail)", "src": "take:reg4-a-t1", "in": "f78", "out": "f96",
+      "crop": { "x": 0, "y": 0, "width": 1152, "height": 648 }, "audio": { "src": "take:reg4-xb-t2", "in": 0.1, "volume": 2.2 },
+      "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "x", "label": "Reaction 5: he backs out and pulls the door shut", "src": "take:reg4-xb-t2", "in": "f24", "out": "f90",
+      "crop": { "x": 96, "y": 0, "width": 1088, "height": 612 }, "audio": { "volume": 2.2 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } },
+    { "id": "y", "label": "Bye, Walt!", "src": "take:reg4-yb-t1", "in": "f16", "out": "f95", "hold": "f18",
+      "audio": { "volume": 1.3 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } }
+  ],
+
+  "lines": [
+    { "id": "lyric", "speaker": "Theme", "text": "There's a place where they remember you, where the light is always on.", "clip": "theme", "in": 5.7, "out": 13.0, "sung": true },
+    { "id": "walt", "speaker": "The regulars", "text": "WALT!", "src": "review/clips/ch-regulars-take2.mp4", "in": 9.7, "out": 10.6, "at": "wide+1.7" },
+    { "id": "name", "speaker": "Walt", "text": "How do you know my name? I've literally never been here before.", "segment": "w1", "at": "w1+0.22" },
+    { "id": "car", "speaker": "Rita", "text": "Get the car back from the shop okay, Walt?", "segment": "a", "at": "a+0.45" },
+    { "id": "wait", "speaker": "Walt", "text": "Yeah, it was just the... wait.", "segment": "w2", "at": "w2+0.24" },
+    { "id": "colon", "speaker": "Kenny", "text": "How'd the colonoscopy go, Walt?", "segment": "b", "at": "b+0.22" },
+    { "id": "frosting", "speaker": "Dot", "text": "Saw you eat frosting straight out of the can last night, Walt.", "segment": "c", "at": "c+0.33", "until": "c+3.4" },
+    { "id": "kitchen", "speaker": "Dot", "text": "Standing in the dark kitchen.", "segment": "c", "at": "c+4.36" },
+    { "id": "usual", "speaker": "Eddie", "text": "Your usual, Walt.", "segment": "e", "at": "e+0.29" },
+    { "id": "out", "speaker": "Walt", "text": "Yeah... I'm out of here.", "segment": "w3" },
+    { "id": "bye", "speaker": "The regulars", "text": "Bye, Walt!", "segment": "y", "at": "y+0.45", "until": "y+1.7" }
+  ],
+
+  "music": [
+    { "id": "theme", "label": "The new theme, from its band hit at 4.0 s: the first two sung lines", "src": "audio/reg4-theme-d.mp3",
+      "in": 3.95, "at": 0, "until": "wide+0.4", "volume": 0.74, "fadeOut": 0.4 },
+    { "id": "outro", "label": "The theme swells as Walt backs out; its final band hit lands on 'Bye, Walt!'", "src": "audio/reg4-theme-d.mp3",
+      "at": "x+0.5", "until": "@end", "sync": { "source": 59.1, "at": "y+0.5" }, "fadeOut": 0.8,
+      "volume": [
+        { "at": "x+0.5", "value": 0.12 },
+        { "at": "y", "value": 0.45 },
+        { "at": "y+0.4", "value": 0.3 },
+        { "at": "y+1.3", "value": 0.3 },
+        { "at": "y+1.7", "value": 0.75 }
+      ] }
+  ],
+
+  "sfx": [
+    { "id": "laugh1", "label": "Level 1: a small chuckle", "src": "audio/reg4-laugh1.mp3", "at": "a-0.08", "until": "a+1.1",
+      "volume": 0.5, "fadeOut": { "duration": 0.9, "end": "a+1.1" } },
+    { "id": "laugh2", "label": "Level 2: a medium laugh", "src": "audio/reg4-laugh2.mp3", "at": "r2-0.1", "until": "b+0.3",
+      "volume": 0.42, "fadeOut": { "duration": 0.8, "end": "b+0.3" } },
+    { "id": "laugh3", "label": "Level 3: a big laugh", "src": "audio/reg4-laugh3.mp3", "at": "r3-0.1", "until": "c+0.35",
+      "volume": 0.56, "fadeOut": { "duration": 0.8, "end": "c+0.35" } },
+    { "id": "laugh4", "label": "Level 4: the biggest, dropping away as he freezes", "src": "audio/reg4-laugh4.mp3", "at": "r4-0.1", "until": "r4+1.2",
+      "volume": 0.5, "fadeOut": { "duration": 0.8, "end": "r4+1.2" } },
+    { "id": "door", "label": "The door shuts", "src": "audio/reg4-door.mp3", "at": "x+2.4", "duration": 2.0, "volume": 0.5 }
+  ],
+
+  "overlays": [
+    { "id": "p1890", "label": "1890s saloon", "src": "reg4/gfx/photo-1890.png", "at": 0, "until": 1.7, "width": 840, "height": 590,
+      "motion": [ { "at": 0, "x": 210, "y": 65 }, { "at": 1.7, "x": 230, "y": 65 } ], "fadeIn": 0.3, "fadeOut": 0.35 },
+    { "id": "p1920", "label": "1920s speakeasy", "src": "reg4/gfx/photo-1920.png", "at": 1.35, "until": 3.05, "width": 840, "height": 585,
+      "motion": [ { "at": 1.35, "x": 230, "y": 68 }, { "at": 3.05, "x": 210, "y": 68 } ], "fadeIn": 0.35, "fadeOut": 0.35 },
+    { "id": "p1950", "label": "1950s tavern", "src": "reg4/gfx/photo-1950.png", "at": 2.7, "until": 4.4, "width": 840, "height": 583,
+      "motion": [ { "at": 2.7, "x": 210, "y": 69 }, { "at": 4.4, "x": 230, "y": 69 } ], "fadeIn": 0.35, "fadeOut": 0.35 },
+    { "id": "p1970", "label": "1970s bar", "src": "reg4/gfx/photo-1970.png", "at": 4.05, "until": 5.75, "width": 840, "height": 588,
+      "motion": [ { "at": 4.05, "x": 230, "y": 66 }, { "at": 5.75, "x": 210, "y": 66 } ], "fadeIn": 0.35, "fadeOut": 0.35 },
+    { "id": "ptoday", "label": "Today", "src": "reg4/gfx/photo-today.png", "at": 5.4, "until": 7.1, "width": 840, "height": 585,
+      "motion": [ { "at": 5.4, "x": 210, "y": 68 }, { "at": 7.1, "x": 230, "y": 68 } ], "fadeIn": 0.35, "fadeOut": 0.35 },
+    { "id": "title", "label": "Our gold Regulars title", "src": "gfx/regulars-title.png", "at": "shop+0.35", "until": "shop.end-0.02", "fadeIn": 0.45 }
+  ],
+
+  "picture": { "fadeIn": 0.3, "fadeOut": 0.6 },
+  "mix": { "filters": [ { "kind": "limiter", "limit": 0.95 } ] },
+
+  "sources": {
+    "review/clips/ch-regulars-take2.mp4": { "step": "compose", "notes": "Regulars Take 2 as reviewed: its wide, frames 192-245, untouched." },
+    "reg4/gfx/shopfront.png": { "step": "compose", "notes": "Take 2's frame at 6.5 s, before its baked title fades in." },
+    "reg4/gfx/backdrop.png": { "step": "compose", "notes": "Our dark warm-brown backdrop with a vignette (reg4/photos.mjs)." },
+    "reg4/gfx/photo-1890.png": { "step": "compose", "notes": "reg4/stills/era-1890.png (an image generation from reg4/ref/four2.png, the four regulars' reference portraits) as a framed sepia print (reg4/photos.mjs)." },
+    "reg4/gfx/photo-1920.png": { "step": "compose", "notes": "reg4/stills/era-1920.png from reg4/ref/four2.png, as a framed sepia print." },
+    "reg4/gfx/photo-1950.png": { "step": "compose", "notes": "reg4/stills/era-1950.png from reg4/ref/four2.png, as a framed sepia print." },
+    "reg4/gfx/photo-1970.png": { "step": "compose", "notes": "reg4/stills/era-1970b.png (era-1970.png with its lettered signs edited out) from reg4/ref/four2.png, as a framed sepia print." },
+    "reg4/gfx/photo-today.png": { "step": "compose", "notes": "reg4/stills/era-today.png from reg4/ref/four2.png, graded to sepia, as a framed print." },
+    "take:reg4-r1-t2": { "step": "generate", "storyboard": "reg4-r1", "firstFrame": "reg4/stills/w-cu.png" },
+    "take:reg4-w1b-t1": { "step": "generate", "storyboard": "reg4-w1b", "firstFrame": "reg4/stills/w-med2-720.png" },
+    "take:reg4-a-t1": { "step": "generate", "storyboard": "reg4-a", "firstFrame": "reg4/stills/p-rita-solo.png" },
+    "take:reg4-w2b-t3": { "step": "generate", "storyboard": "reg4-w2b", "firstFrame": "reg4/stills/w-med2-720.png" },
+    "take:reg4-r2-t1": { "step": "generate", "storyboard": "reg4-r2", "firstFrame": "reg4/stills/w-cu.png" },
+    "take:reg4-b-t1": { "step": "generate", "storyboard": "reg4-b", "firstFrame": "reg4/stills/p-kenny.png" },
+    "take:reg4-r3-t1": { "step": "generate", "storyboard": "reg4-r3", "firstFrame": "reg4/stills/w-cu.png" },
+    "take:reg4-c-t2": { "step": "generate", "storyboard": "reg4-c", "firstFrame": "reg4/stills/p-dot-c2.png" },
+    "take:reg4-r4-t2": { "step": "generate", "storyboard": "reg4-r4", "firstFrame": "reg4/stills/w-cu.png" },
+    "take:reg4-e-t3": { "step": "generate", "storyboard": "reg4-e", "firstFrame": "reg4/stills/e-can.png" },
+    "take:reg4-w3b-t3": { "step": "generate", "storyboard": "reg4-w3b", "firstFrame": "reg4/stills/w-med2-720.png" },
+    "take:reg4-xb-t2": { "step": "generate", "storyboard": "reg4-xb", "firstFrame": "reg4/stills/w3b-t3-end.png", "notes": "Started from the last frame of reg4-w3b-t3." },
+    "take:reg4-yb-t1": { "step": "generate", "storyboard": "reg4-yb", "firstFrame": "reg4/stills/y-start-720.png", "notes": "The first frame is Take 2's wide at 8.1 s with Walt edited out of the door's window." },
+    "audio/reg4-theme-d.mp3": { "step": "generate", "notes": "Lyria (music.sh), reg4/audio-r2.sh: an original upbeat mid-80s sitcom theme. Passes a and b (piano ballads) were heard as too close to the Cheers theme and not used." },
+    "audio/reg4-laugh1.mp3": { "step": "generate", "notes": "ElevenLabs sound effect (sfx.sh), reg4/audio-r1.sh." },
+    "audio/reg4-laugh2.mp3": { "step": "generate", "notes": "ElevenLabs sound effect (sfx.sh), reg4/audio-r1.sh." },
+    "audio/reg4-laugh3.mp3": { "step": "generate", "notes": "ElevenLabs sound effect (sfx.sh), reg4/audio-r1.sh." },
+    "audio/reg4-laugh4.mp3": { "step": "generate", "notes": "ElevenLabs sound effect (sfx.sh), reg4/audio-r1.sh." },
+    "audio/reg4-door.mp3": { "step": "generate", "notes": "ElevenLabs sound effect (sfx.sh), reg4/audio-r1.sh." }
+  }
+}

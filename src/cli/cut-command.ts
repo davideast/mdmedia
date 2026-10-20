@@ -3,6 +3,10 @@ import { defineCommand } from 'citty';
 import { alignCutWords, type LineReport } from '../cut/align.js';
 import type { Aligner } from '../cut/words.js';
 import { ElevenLabsAligner } from '../elevenlabs/forced-alignment.js';
+import { cutCheckCommand } from './cut-check-command.js';
+import { cutMediaRootArg } from './cut-root.js';
+import { cutRenderCommand } from './cut-render-command.js';
+import { cutStoryboardCommand } from './cut-storyboard-command.js';
 
 /** Aligner names `--aligner` accepts. The first is the default. */
 export const ALIGNERS = ['elevenlabs'] as const;
@@ -13,11 +17,7 @@ export function createAligner(name: string, env: Record<string, string | undefin
   throw new Error(`--aligner must be one of ${ALIGNERS.join(', ')} (got "${name}").`);
 }
 
-/** The media root for a cut command: `--root`, else MDMEDIA_CUT_MEDIA_ROOT (as Studio reads it), else the cut's own `media.root`. */
-export function cutMediaRootArg(root: string | undefined, env: Record<string, string | undefined> = process.env): string | undefined {
-  const chosen = root ?? env.MDMEDIA_CUT_MEDIA_ROOT;
-  return chosen === undefined || chosen === '' ? undefined : path.resolve(chosen);
-}
+export { cutMediaRootArg } from './cut-root.js';
 
 function seconds(value: number): string {
   return value.toFixed(2);
@@ -32,7 +32,8 @@ export function formatLineReports(lines: readonly LineReport[]): string {
       l.speaker,
       l.speech ? `${seconds(l.speech.start)}–${seconds(l.speech.end)}` : '–',
       l.loss === null ? '–' : l.loss.toFixed(3),
-      l.status,
+      // A sung line's words are approximate: its first word isn't snapped and its loss isn't judged.
+      l.approximate ? `${l.status}, approximate (sung)` : l.status,
     ]),
   ];
   const widths = rows[0].map((_, c) => Math.max(...rows.map((row) => row[c].length)));
@@ -78,5 +79,5 @@ const wordsCommand = defineCommand({
 
 export const cutCommand = defineCommand({
   meta: { name: 'cut', description: 'Work with cut files (edits written as data)' },
-  subCommands: { words: wordsCommand },
+  subCommands: { words: wordsCommand, render: cutRenderCommand, check: cutCheckCommand, storyboard: cutStoryboardCommand },
 });

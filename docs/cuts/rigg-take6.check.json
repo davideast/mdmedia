@@ -1,0 +1,960 @@
+{
+  "format": "mdmedia.cut-check@1",
+  "measured": {
+    "method": "dialogue-stem@1",
+    "source": "a render of the cut's dialogue: every segment's own sound and every line with its own sound, at the cut's volumes, fades and layers, without music or sound effects, mono 48 kHz",
+    "range": {
+      "from": 0,
+      "to": 31.155
+    },
+    "lines": [
+      {
+        "id": "deadbolt",
+        "speaker": "Rigg",
+        "text": "Deadbolt. Steel frame. Thirty seconds.",
+        "speech": {
+          "start": 7.535,
+          "end": 10.415
+        },
+        "timedBy": "words",
+        "words": 5,
+        "syllables": 8,
+        "loudness": -29.6,
+        "pitch": {
+          "median": 126.8,
+          "low": 76,
+          "high": 425.9,
+          "range": 29.8,
+          "voiced": 0.43
+        },
+        "rate": {
+          "words": 1.74,
+          "syllables": 2.78
+        },
+        "wordLevels": [
+          {
+            "text": "Deadbolt.",
+            "start": 7.535,
+            "end": 8.035,
+            "loudness": -27.1
+          },
+          {
+            "text": "Steel",
+            "start": 8.395,
+            "end": 8.655,
+            "loudness": -28.2
+          },
+          {
+            "text": "frame.",
+            "start": 8.775,
+            "end": 9.115,
+            "loudness": -30.1
+          },
+          {
+            "text": "Thirty",
+            "start": 9.735,
+            "end": 9.935,
+            "loudness": -24.9
+          },
+          {
+            "text": "seconds.",
+            "start": 10.055,
+            "end": 10.415,
+            "loudness": -31.5
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "wrench",
+        "speaker": "Rigg",
+        "text": "Need a tension wrench.",
+        "speech": {
+          "start": 10.615,
+          "end": 11.455
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 5,
+        "loudness": -32.2,
+        "pitch": {
+          "median": 105.2,
+          "low": 88.4,
+          "high": 134.1,
+          "range": 7.2,
+          "voiced": 0.31
+        },
+        "rate": {
+          "words": 4.76,
+          "syllables": 5.95
+        },
+        "wordLevels": [
+          {
+            "text": "Need",
+            "start": 10.615,
+            "end": 10.695,
+            "loudness": -36.4
+          },
+          {
+            "text": "a",
+            "start": 10.735,
+            "end": 10.795,
+            "loudness": -42.6
+          },
+          {
+            "text": "tension",
+            "start": 10.855,
+            "end": 11.135,
+            "loudness": -30.2
+          },
+          {
+            "text": "wrench.",
+            "start": 11.175,
+            "end": 11.455,
+            "loudness": -35.6
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "paperclip",
+        "speaker": "Rigg",
+        "text": "Paperclip'll do.",
+        "speech": {
+          "start": 11.925,
+          "end": 12.645
+        },
+        "timedBy": "words",
+        "words": 2,
+        "syllables": 4,
+        "loudness": -33.9,
+        "pitch": {
+          "median": 92.9,
+          "low": 79.8,
+          "high": 140,
+          "range": 9.7,
+          "voiced": 0.41
+        },
+        "rate": {
+          "words": 2.78,
+          "syllables": 5.56
+        },
+        "wordLevels": [
+          {
+            "text": "Paperclip'll",
+            "start": 11.925,
+            "end": 12.465,
+            "loudness": -31.7
+          },
+          {
+            "text": "do.",
+            "start": 12.505,
+            "end": 12.645,
+            "loudness": -33.4
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "pins",
+        "speaker": "Rigg",
+        "text": "Hinge pins. Painted shut.",
+        "speech": {
+          "start": 14.295,
+          "end": 16.175
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 5,
+        "loudness": -28.2,
+        "pitch": {
+          "median": 128.9,
+          "low": 80.9,
+          "high": 158.3,
+          "range": 11.6,
+          "voiced": 0.35
+        },
+        "rate": {
+          "words": 2.13,
+          "syllables": 2.66
+        },
+        "wordLevels": [
+          {
+            "text": "Hinge",
+            "start": 14.295,
+            "end": 14.495,
+            "loudness": -26.8
+          },
+          {
+            "text": "pins.",
+            "start": 14.615,
+            "end": 14.935,
+            "loudness": -32
+          },
+          {
+            "text": "Painted",
+            "start": 15.595,
+            "end": 15.855,
+            "loudness": -24.9
+          },
+          {
+            "text": "shut.",
+            "start": 15.975,
+            "end": 16.175,
+            "loudness": -27.7
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "lever",
+        "speaker": "Rigg",
+        "text": "If I lever the frame...",
+        "speech": {
+          "start": 16.395,
+          "end": 17.415
+        },
+        "timedBy": "words",
+        "words": 5,
+        "syllables": 6,
+        "loudness": -28.7,
+        "pitch": {
+          "median": 142.2,
+          "low": 105.5,
+          "high": 150.6,
+          "range": 6.2,
+          "voiced": 0.62
+        },
+        "rate": {
+          "words": 4.9,
+          "syllables": 5.88
+        },
+        "wordLevels": [
+          {
+            "text": "If",
+            "start": 16.395,
+            "end": 16.455,
+            "loudness": -50.2
+          },
+          {
+            "text": "I",
+            "start": 16.535,
+            "end": 16.575,
+            "loudness": -34.8
+          },
+          {
+            "text": "lever",
+            "start": 16.635,
+            "end": 16.815,
+            "loudness": -25.7
+          },
+          {
+            "text": "the",
+            "start": 16.855,
+            "end": 16.995,
+            "loudness": -34.4
+          },
+          {
+            "text": "frame...",
+            "start": 17.055,
+            "end": 17.415,
+            "loudness": -27.7
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "onething",
+        "speaker": "Rigg",
+        "text": "Only one thing left.",
+        "speech": {
+          "start": 19.555,
+          "end": 20.485
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 5,
+        "loudness": -31.5,
+        "pitch": {
+          "median": 110.1,
+          "low": 105.8,
+          "high": 117.9,
+          "range": 1.9,
+          "voiced": 0.65
+        },
+        "rate": {
+          "words": 4.3,
+          "syllables": 5.38
+        },
+        "wordLevels": [
+          {
+            "text": "Only",
+            "start": 19.555,
+            "end": 19.765,
+            "loudness": -34.5
+          },
+          {
+            "text": "one",
+            "start": 19.805,
+            "end": 19.925,
+            "loudness": -28.5
+          },
+          {
+            "text": "thing",
+            "start": 20.005,
+            "end": 20.145,
+            "loudness": -31.3
+          },
+          {
+            "text": "left.",
+            "start": 20.245,
+            "end": 20.485,
+            "loudness": -32
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "blow",
+        "speaker": "Rigg",
+        "text": "I'll have to blow the hinges.",
+        "speech": {
+          "start": 21.265,
+          "end": 22.275
+        },
+        "timedBy": "words",
+        "words": 6,
+        "syllables": 7,
+        "loudness": -33,
+        "pitch": {
+          "median": 106.2,
+          "low": 91.3,
+          "high": 111.1,
+          "range": 3.4,
+          "voiced": 0.47
+        },
+        "rate": {
+          "words": 5.94,
+          "syllables": 6.93
+        },
+        "wordLevels": [
+          {
+            "text": "I'll",
+            "start": 21.265,
+            "end": 21.335,
+            "loudness": -31.6
+          },
+          {
+            "text": "have",
+            "start": 21.375,
+            "end": 21.455,
+            "loudness": -35.8
+          },
+          {
+            "text": "to",
+            "start": 21.495,
+            "end": 21.575,
+            "loudness": -39
+          },
+          {
+            "text": "blow",
+            "start": 21.595,
+            "end": 21.755,
+            "loudness": -28.8
+          },
+          {
+            "text": "the",
+            "start": 21.795,
+            "end": 21.855,
+            "loudness": -34.8
+          },
+          {
+            "text": "hinges.",
+            "start": 21.895,
+            "end": 22.275,
+            "loudness": -35.3
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "pull",
+        "speaker": "Partner",
+        "text": "Rigg. It's a pull.",
+        "speech": {
+          "start": 26.625,
+          "end": 28.495
+        },
+        "timedBy": "words",
+        "words": 4,
+        "syllables": 4,
+        "loudness": -32.3,
+        "pitch": {
+          "median": 206,
+          "low": 151.2,
+          "high": 232.6,
+          "range": 7.5,
+          "voiced": 0.61
+        },
+        "rate": {
+          "words": 2.14,
+          "syllables": 2.14
+        },
+        "wordLevels": [
+          {
+            "text": "Rigg.",
+            "start": 26.625,
+            "end": 26.995,
+            "loudness": -28.1
+          },
+          {
+            "text": "It's",
+            "start": 27.895,
+            "end": 27.995,
+            "loudness": -32
+          },
+          {
+            "text": "a",
+            "start": 28.035,
+            "end": 28.115,
+            "loudness": -39
+          },
+          {
+            "text": "pull.",
+            "start": 28.175,
+            "end": 28.495,
+            "loudness": -29.5
+          }
+        ],
+        "flags": []
+      }
+    ],
+    "performances": [
+      {
+        "id": "tools",
+        "lines": [
+          "wrench",
+          "paperclip"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "wrench",
+            "to": "paperclip",
+            "between": [],
+            "pause": 0.47,
+            "before": {
+              "words": "Need a tension wrench.",
+              "start": 10.615,
+              "end": 11.455,
+              "loudness": -32.2,
+              "pitch": 105.2
+            },
+            "after": {
+              "words": "Paperclip'll do.",
+              "start": 11.925,
+              "end": 12.645,
+              "loudness": -33.9,
+              "pitch": 92.9
+            },
+            "loudness": -1.7,
+            "pitch": -2.2,
+            "rate": -0.07,
+            "flags": []
+          }
+        ],
+        "cuts": [
+          {
+            "at": 11.805,
+            "from": "lock",
+            "to": "l3",
+            "before": -55.8,
+            "after": -54.4,
+            "change": 1.4,
+            "wide": true,
+            "flags": []
+          }
+        ],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "last_resort",
+        "lines": [
+          "onething",
+          "blow"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "onething",
+            "to": "blow",
+            "between": [],
+            "pause": 0.78,
+            "before": {
+              "words": "Only one thing left.",
+              "start": 19.555,
+              "end": 20.485,
+              "loudness": -31.5,
+              "pitch": 110.1
+            },
+            "after": {
+              "words": "I'll have to blow the hinges.",
+              "start": 21.265,
+              "end": 22.275,
+              "loudness": -33,
+              "pitch": 106.2
+            },
+            "loudness": -1.5,
+            "pitch": -0.6,
+            "rate": 0.29,
+            "flags": [
+              {
+                "code": "long-pause",
+                "lines": [
+                  "onething",
+                  "blow"
+                ],
+                "value": 0.78,
+                "threshold": 0.6,
+                "message": "\"Only one thing left.\" → \"I'll have to blow the hinges.\": a 0.78 s pause (over 0.6 s)"
+              }
+            ]
+          }
+        ],
+        "cuts": [
+          {
+            "at": 20.505,
+            "from": "l6",
+            "to": "c0003",
+            "before": -50,
+            "after": -120,
+            "change": -70,
+            "wide": true,
+            "flags": [
+              {
+                "code": "room-tone-jump",
+                "value": -70,
+                "threshold": 5,
+                "message": "the cut l6 → c0003 at 20.51 s: room tone drops 70 dB (over 5)"
+              }
+            ]
+          },
+          {
+            "at": 21.055,
+            "from": "c0003",
+            "to": "l7",
+            "before": -120,
+            "after": -48.1,
+            "change": 71.9,
+            "wide": false,
+            "flags": [
+              {
+                "code": "room-tone-jump",
+                "value": 71.9,
+                "threshold": 5,
+                "message": "the cut c0003 → l7 at 21.06 s: room tone rises 71.9 dB (over 5)"
+              }
+            ]
+          }
+        ],
+        "splits": [],
+        "flags": [
+          {
+            "code": "long-pause",
+            "lines": [
+              "onething",
+              "blow"
+            ],
+            "value": 0.78,
+            "threshold": 0.6,
+            "message": "\"Only one thing left.\" → \"I'll have to blow the hinges.\": a 0.78 s pause (over 0.6 s)"
+          },
+          {
+            "code": "room-tone-jump",
+            "value": -70,
+            "threshold": 5,
+            "message": "the cut l6 → c0003 at 20.51 s: room tone drops 70 dB (over 5)"
+          },
+          {
+            "code": "room-tone-jump",
+            "value": 71.9,
+            "threshold": 5,
+            "message": "the cut c0003 → l7 at 21.06 s: room tone rises 71.9 dB (over 5)"
+          }
+        ]
+      },
+      {
+        "id": "punchline",
+        "lines": [
+          "pull"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      }
+    ],
+    "fingerprints": {
+      "lines": {
+        "deadbolt": {
+          "from": 7.535,
+          "to": 10.415,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674"
+          },
+          "digest": "1eb5b2a1a57cf0319f52e6289aa20cff77aa7381fb38de5a438f7902e75c1beb"
+        },
+        "wrench": {
+          "from": 10.615,
+          "to": 11.455,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+            "take:rigg5-lock-t2": "a1d0398487b25594c9efe81c38e51381d14becd64583615b47dcaac507bc87c3"
+          },
+          "digest": "40826a4092770355f003aa7ae3ed17ef78405f1532b31ad3a56418df27a02800"
+        },
+        "paperclip": {
+          "from": 11.925,
+          "to": 12.645,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674"
+          },
+          "digest": "003bcd50f82fa5f391fbc99f412f93c385e2040e7b9d110b93463c37595b7e7f"
+        },
+        "pins": {
+          "from": 14.295,
+          "to": 16.175,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+            "take:rigg5-hinge-t1": "d40f884ad30c31cde8adf89f1a208c7f3f31a17c510c73d01bc8eab47bb1e15e"
+          },
+          "digest": "c10870f21f5ffbd081b98d7bb09c0012c1f9de3fe729b41449bc0af5adb8eb86"
+        },
+        "lever": {
+          "from": 16.395,
+          "to": 17.415,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674"
+          },
+          "digest": "5bd6920012db49b1c423c9088814ee34304f3045392b9a35d96772e5674bb301"
+        },
+        "onething": {
+          "from": 19.555,
+          "to": 20.485,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674"
+          },
+          "digest": "fc7b19d3622ee924e8b3e894859679b0026250b5537188fdc1355f5012975b50"
+        },
+        "blow": {
+          "from": 21.265,
+          "to": 22.275,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674"
+          },
+          "digest": "95d940df49ddfbd286b47b5fde1f4ad6ff3405d9505d1e25c4550e41d871d31c"
+        },
+        "pull": {
+          "from": 26.625,
+          "to": 28.495,
+          "sources": {
+            "take:rigg5-her-t2": "aca8a31c68066f27ebc4d6c4812033cf6b8b703acbc6cfa2a26fec8d326b9378"
+          },
+          "digest": "e353f2f1bd25431787fe21ebadc8845b3684ad7ec35fe4d3104ade0b6bed56a3"
+        }
+      },
+      "performances": {
+        "tools": {
+          "from": 10.015,
+          "to": 13.245,
+          "sources": {
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+            "take:rigg5-lock-t2": "a1d0398487b25594c9efe81c38e51381d14becd64583615b47dcaac507bc87c3"
+          },
+          "digest": "f835bd94fbdf341614c15c49cc735057694a00264a2377cdf21a9a3c8731e787"
+        },
+        "last_resort": {
+          "from": 18.955,
+          "to": 22.875,
+          "sources": {
+            "rigg5/device.png": "4b71618705f96e48acf644f36733a230b47eea659c63c5ca4dc56c91f1249c7d",
+            "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+            "take:rigg5-tape-t1": "4e3adccebb2843ca47518a173671aff96310ce5a834f6122242f89356a18fe74"
+          },
+          "digest": "8615b2673e6298121d7b7bb1c9e1abe18ca181d7360f2d7157b6604cf280cd43"
+        },
+        "punchline": {
+          "from": 26.025,
+          "to": 29.095,
+          "sources": {
+            "take:rigg5-her-t2": "aca8a31c68066f27ebc4d6c4812033cf6b8b703acbc6cfa2a26fec8d326b9378",
+            "take:rigg5-turn-t3": "5e865fb1695ed74261e9d7687741eb16c4caebc7679293e7275bb527a4ab4beb"
+          },
+          "digest": "68614d7aa09e8f3f420e25a6cbb6d2ddade779a320247075d4f79a731283446d"
+        }
+      }
+    }
+  },
+  "listening": {
+    "last_resort": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 19.055,
+        "to": 22.775
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "last_resort.continuous.onething.blow",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "Only one thing left... I'll have to blow the hinges.",
+          "why": "The acoustic environment, tone, cadence, and breath pattern sound like a single continuous line of thought/delivery with a natural pause between phrases rather than separate recordings.",
+          "kind": "continuous",
+          "ask": "Do \"Only one thing left.\" (0.50–1.43 s) and \"I'll have to blow the hinges.\" (2.21–3.22 s) sound like one continuous delivery by the same speaker, rather than two separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "onething",
+            "blow"
+          ]
+        },
+        {
+          "id": "last_resort.shouted.onething",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "Only one thing left.",
+          "why": "The phrase is spoken in a tense, low, muttered tone under his breath, not shouted.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Only one thing left.\" (0.50–1.43 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "onething"
+          ]
+        },
+        {
+          "id": "last_resort.shouted.blow",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "I'll have to blow the hinges.",
+          "why": "The line is spoken in a low, grim, determined murmur without any yelling or shouting.",
+          "kind": "shouted",
+          "ask": "Is any word in \"I'll have to blow the hinges.\" (2.21–3.22 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "blow"
+          ]
+        },
+        {
+          "id": "last_resort.delivery",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "Only one thing left. I'll have to blow the hinges.",
+          "why": "The vocal performance matches that exact description: tense, low, muttered grimly with determination under intense pressure.",
+          "kind": "delivery",
+          "ask": "Is \"Only one thing left. I'll have to blow the hinges.\" (0.50–3.22 s) delivered like this: through gritted teeth, low, then grim and determined; the same sweating, desperate man in one breath of time? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "onething",
+            "blow"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 19.055,
+        "to": 22.775,
+        "sources": {
+          "audio/rigg5-tension.mp3": "ed74e11717ead1f5d86065a97db7a6b7e4ffc3dccca46b7a97635fe803c30cb5",
+          "rigg5/device.png": "4b71618705f96e48acf644f36733a230b47eea659c63c5ca4dc56c91f1249c7d",
+          "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+          "take:rigg5-tape-t1": "4e3adccebb2843ca47518a173671aff96310ce5a834f6122242f89356a18fe74"
+        },
+        "digest": "e76057374b76b21e4e502cfbb131f6754db727c55feb2029cdcdb0b24022c112"
+      },
+      "heardAt": "2026-10-20T07:48:53.574Z"
+    },
+    "punchline": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 26.125,
+        "to": 28.995
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "punchline.continuous",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "Rigg. It's a pull.",
+          "why": "The phrase flows naturally in a single take with consistent background acoustics and tone.",
+          "kind": "continuous",
+          "ask": "Does \"Rigg. It's a pull.\" (0.50–2.37 s) sound like one continuous delivery all the way through, rather than pieces of separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "pull"
+          ]
+        },
+        {
+          "id": "punchline.shouted.pull",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "Rigg. It's a pull.",
+          "why": "The line is spoken in a low, flat, calm speaking voice with no shouting.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Rigg. It's a pull.\" (0.50–2.37 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "pull"
+          ]
+        },
+        {
+          "id": "punchline.delivery",
+          "verdict": "yes",
+          "confidence": 0.98,
+          "heard": "Rigg. It's a pull.",
+          "why": "The delivery is completely deadpan, dry, and flat, pausing slightly after 'Rigg' before finishing the sentence calmly.",
+          "kind": "delivery",
+          "ask": "Is \"Rigg. It's a pull.\" (0.50–2.37 s) delivered like this: flat and dry, deadpan and unimpressed: a beat after \"Rigg.\", then \"It's a pull.\" as a plain statement, never shouted? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "pull"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 26.125,
+        "to": 28.995,
+        "sources": {
+          "take:rigg5-her-t2": "aca8a31c68066f27ebc4d6c4812033cf6b8b703acbc6cfa2a26fec8d326b9378"
+        },
+        "digest": "b42520d6e2f69efd9d609187d35bfd57a584bc17caba1fa1b674abb80bb3c9bb"
+      },
+      "heardAt": "2026-10-20T07:49:00.809Z"
+    },
+    "tools": {
+      "filterOnly": true,
+      "listener": "gemini:gemini-3.8-flash",
+      "model": "gemini-3.8-flash",
+      "clip": {
+        "from": 10.115,
+        "to": 13.145
+      },
+      "canHearAudio": true,
+      "answers": [
+        {
+          "id": "tools.continuous.wrench.paperclip",
+          "verdict": "one continuous delivery",
+          "confidence": 0.95,
+          "heard": "Rigg muttered 'Need a tension wrench' followed after a brief pause by 'Paperclip'll do.'",
+          "why": "The acoustic space, vocal timbre, microphone distance, and cadence remain consistent across both lines, sounding like a single coherent voiceover take.",
+          "kind": "continuous",
+          "ask": "Do \"Need a tension wrench.\" (0.50–1.34 s) and \"Paperclip'll do.\" (1.81–2.53 s) sound like one continuous delivery by the same speaker, rather than two separately recorded deliveries?",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "wrench",
+            "paperclip"
+          ]
+        },
+        {
+          "id": "tools.shouted.wrench",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "Rigg quietly mutters 'Need a tension wrench.'",
+          "why": "The line is spoken in a low, quiet, internalized tone with no shouting.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Need a tension wrench.\" (0.50–1.34 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "wrench"
+          ]
+        },
+        {
+          "id": "tools.shouted.paperclip",
+          "verdict": "no",
+          "confidence": 1,
+          "heard": "Rigg mutters 'Paperclip'll do.'",
+          "why": "The line is delivered in a soft, dry, conversational mutter, far below shouting volume.",
+          "kind": "shouted",
+          "ask": "Is any word in \"Paperclip'll do.\" (1.81–2.53 s) shouted?",
+          "expect": "no",
+          "reading": "no",
+          "agrees": true,
+          "lines": [
+            "paperclip"
+          ]
+        },
+        {
+          "id": "tools.delivery",
+          "verdict": "yes",
+          "confidence": 0.95,
+          "heard": "Rigg states 'Need a tension wrench' and follows it quickly and dryly with 'Paperclip'll do.'",
+          "why": "Both lines share the exact same focused, dry, matter-of-fact internal monologue tone with no vocal shift between them.",
+          "kind": "delivery",
+          "ask": "Is \"Need a tension wrench. Paperclip'll do.\" (0.50–2.53 s) delivered like this: focused, then quick and dry: one train of thought, no change of voice between the two lines? Answer yes or no.",
+          "expect": "yes",
+          "reading": "yes",
+          "agrees": true,
+          "lines": [
+            "wrench",
+            "paperclip"
+          ]
+        }
+      ],
+      "fingerprint": {
+        "from": 10.115,
+        "to": 13.145,
+        "sources": {
+          "audio/rigg5-tension.mp3": "ed74e11717ead1f5d86065a97db7a6b7e4ffc3dccca46b7a97635fe803c30cb5",
+          "take:rigg5-climax-t1": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674",
+          "take:rigg5-lock-t2": "a1d0398487b25594c9efe81c38e51381d14becd64583615b47dcaac507bc87c3"
+        },
+        "digest": "473d63ad789faffd6602f8511ddc5ef62485ecb3670a0f447e124c60fc225fa6"
+      },
+      "heardAt": "2026-10-20T07:48:40.002Z"
+    }
+  }
+}

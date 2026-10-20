@@ -1,0 +1,177 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "lyric": {
+      "text": "There's a place where they remember you, where the light is always on.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "audio/reg4-theme-d.mp3", "start": 5.7, "end": 13, "sha256": "1b850173c20b50c123e16bd2ac4533038df68be110d8de68b41f9da9a3bd26b2" },
+      "loss": 1.021,
+      "approximate": true,
+      "words": [
+        { "text": "There's", "start": 6.08, "end": 6.32, "loss": 0.981 },
+        { "text": "a", "start": 6.4, "end": 6.46, "loss": 0.983 },
+        { "text": "place", "start": 6.56, "end": 7, "loss": 1.021 },
+        { "text": "where", "start": 7.08, "end": 7.3, "loss": 0.851 },
+        { "text": "they", "start": 7.38, "end": 7.56, "loss": 0.857 },
+        { "text": "remember", "start": 7.64, "end": 8.52, "loss": 1.165 },
+        { "text": "you,", "start": 8.7, "end": 8.88, "loss": 1.101 },
+        { "text": "where", "start": 10.18, "end": 10.42, "loss": 0.868 },
+        { "text": "the", "start": 10.46, "end": 10.56, "loss": 0.855 },
+        { "text": "light", "start": 10.7, "end": 11.22, "loss": 1.162 },
+        { "text": "is", "start": 11.32, "end": 11.5, "loss": 0.77 },
+        { "text": "always", "start": 11.62, "end": 12.52, "loss": 1.21 },
+        { "text": "on.", "start": 12.6, "end": 12.9, "loss": 1.447 }
+      ]
+    },
+    "walt": {
+      "text": "WALT!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "review/clips/ch-regulars-take2.mp4", "start": 9.7, "end": 10.6, "sha256": "5b54b4737371a949d093dbe30e92c359843b788dad225bf8e91afe190616557b", "snap": "speech-onset@1" },
+      "loss": 1.351,
+      "snap": { "aligned": 9.88, "start": 9.83, "onset": 9.83, "floor": -56.1 },
+      "words": [
+        { "text": "WALT!", "start": 9.83, "end": 10.42, "loss": 1.351 }
+      ]
+    },
+    "name": {
+      "text": "How do you know my name? I've literally never been here before.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-w1b-t1.mp4", "start": 1.22, "end": 5.041667, "sha256": "a3eea65e421472e92e16bf2e01bcb35e60f54fa00059dcc8ca254a9a5d84116f", "snap": "speech-onset@1" },
+      "loss": 0.743,
+      "snap": { "aligned": 1.34, "start": 1.29, "onset": 1.29, "floor": -65.7 },
+      "words": [
+        { "text": "How", "start": 1.29, "end": 1.44, "loss": 0.721 },
+        { "text": "do", "start": 1.48, "end": 1.52, "loss": 0.581 },
+        { "text": "you", "start": 1.58, "end": 1.62, "loss": 0.734 },
+        { "text": "know", "start": 1.7, "end": 1.84, "loss": 0.727 },
+        { "text": "my", "start": 1.88, "end": 2.02, "loss": 0.778 },
+        { "text": "name?", "start": 2.08, "end": 2.38, "loss": 0.805 },
+        { "text": "I've", "start": 3.18, "end": 3.36, "loss": 0.851 },
+        { "text": "literally", "start": 3.46, "end": 3.88, "loss": 0.781 },
+        { "text": "never", "start": 3.92, "end": 4.16, "loss": 0.692 },
+        { "text": "been", "start": 4.2, "end": 4.34, "loss": 0.525 },
+        { "text": "here", "start": 4.38, "end": 4.54, "loss": 0.629 },
+        { "text": "before.", "start": 4.58, "end": 4.98, "loss": 0.771 }
+      ]
+    },
+    "car": {
+      "text": "Get the car back from the shop okay, Walt?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-a-t1.mp4", "start": 1.033333, "end": 3.166667, "sha256": "52429381d2f21b8b6f55e21d2d8713a97e2960184892cd33d6bfefd363a1ff82", "snap": "speech-onset@1" },
+      "loss": 0.621,
+      "snap": { "aligned": 1.093, "start": 1.083, "onset": 1.083, "floor": -54.1 },
+      "words": [
+        { "text": "Get", "start": 1.083, "end": 1.193, "loss": 0.564 },
+        { "text": "the", "start": 1.233, "end": 1.293, "loss": 0.482 },
+        { "text": "car", "start": 1.353, "end": 1.493, "loss": 0.787 },
+        { "text": "back", "start": 1.593, "end": 1.753, "loss": 0.657 },
+        { "text": "from", "start": 1.793, "end": 1.893, "loss": 0.496 },
+        { "text": "the", "start": 1.933, "end": 2.013, "loss": 0.418 },
+        { "text": "shop", "start": 2.053, "end": 2.293, "loss": 0.652 },
+        { "text": "okay,", "start": 2.353, "end": 2.613, "loss": 0.643 },
+        { "text": "Walt?", "start": 2.713, "end": 3.013, "loss": 0.942 }
+      ]
+    },
+    "wait": {
+      "text": "Yeah, it was just the... wait.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-w2b-t3.mp4", "start": 1.031667, "end": 2.916667, "sha256": "c2c3ec1e12e412244dabcb027f25942433f5c1249c32ab402783c0f2eea55db3", "snap": "speech-onset@1" },
+      "loss": 0.907,
+      "snap": { "aligned": 1.132, "start": 1.082, "onset": 1.082, "floor": -64.1 },
+      "words": [
+        { "text": "Yeah,", "start": 1.082, "end": 1.292, "loss": 0.841 },
+        { "text": "it", "start": 1.372, "end": 1.432, "loss": 0.609 },
+        { "text": "was", "start": 1.472, "end": 1.592, "loss": 0.507 },
+        { "text": "just", "start": 1.652, "end": 1.852, "loss": 0.599 },
+        { "text": "the...", "start": 1.912, "end": 2.052, "loss": 1.385 },
+        { "text": "wait.", "start": 2.512, "end": 2.772, "loss": 1.081 }
+      ]
+    },
+    "colon": {
+      "text": "How'd the colonoscopy go, Walt?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-b-t1.mp4", "start": 0.72, "end": 2.458333, "sha256": "b75bb80156d751b974a12ef66433d8adaadb47e6af70bee79a29adeccf244eeb", "snap": "speech-onset@1" },
+      "loss": 0.743,
+      "snap": { "aligned": 0.8, "start": 0.78, "onset": 0.78, "floor": -57 },
+      "words": [
+        { "text": "How'd", "start": 0.78, "end": 0.92, "loss": 0.665 },
+        { "text": "the", "start": 0.96, "end": 1.02, "loss": 0.647 },
+        { "text": "colonoscopy", "start": 1.08, "end": 1.72, "loss": 0.791 },
+        { "text": "go,", "start": 1.8, "end": 1.9, "loss": 0.875 },
+        { "text": "Walt?", "start": 2, "end": 2.24, "loss": 0.795 }
+      ]
+    },
+    "frosting": {
+      "text": "Saw you eat frosting straight out of the can last night, Walt.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-c-t2.mp4", "start": 0.58, "end": 3.65, "sha256": "fd8647c53261bed81851d6388df624e3abb5d8307b97b5bf1c07f0cb1785ab98", "snap": "speech-onset@1" },
+      "loss": 0.658,
+      "snap": { "aligned": 0.74, "start": 0.74, "onset": 0.76, "floor": -54.9 },
+      "words": [
+        { "text": "Saw", "start": 0.74, "end": 0.9, "loss": 0.847 },
+        { "text": "you", "start": 0.96, "end": 1.02, "loss": 0.543 },
+        { "text": "eat", "start": 1.08, "end": 1.2, "loss": 0.781 },
+        { "text": "frosting", "start": 1.3, "end": 1.72, "loss": 0.772 },
+        { "text": "straight", "start": 1.86, "end": 2.04, "loss": 0.415 },
+        { "text": "out", "start": 2.08, "end": 2.16, "loss": 0.509 },
+        { "text": "of", "start": 2.18, "end": 2.22, "loss": 0.578 },
+        { "text": "the", "start": 2.26, "end": 2.34, "loss": 0.554 },
+        { "text": "can", "start": 2.4, "end": 2.64, "loss": 0.897 },
+        { "text": "last", "start": 2.7, "end": 2.92, "loss": 0.5 },
+        { "text": "night,", "start": 2.96, "end": 3.12, "loss": 0.753 },
+        { "text": "Walt.", "start": 3.22, "end": 3.52, "loss": 0.802 }
+      ]
+    },
+    "kitchen": {
+      "text": "Standing in the dark kitchen.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-c-t2.mp4", "start": 4.61, "end": 6.208333, "sha256": "fd8647c53261bed81851d6388df624e3abb5d8307b97b5bf1c07f0cb1785ab98", "snap": "speech-onset@1" },
+      "loss": 0.649,
+      "snap": { "aligned": 4.75, "start": 4.66, "onset": 4.66, "floor": -61.6 },
+      "words": [
+        { "text": "Standing", "start": 4.66, "end": 5.05, "loss": 0.523 },
+        { "text": "in", "start": 5.09, "end": 5.13, "loss": 0.841 },
+        { "text": "the", "start": 5.17, "end": 5.25, "loss": 0.44 },
+        { "text": "dark", "start": 5.29, "end": 5.55, "loss": 0.869 },
+        { "text": "kitchen.", "start": 5.59, "end": 5.99, "loss": 0.746 }
+      ]
+    },
+    "usual": {
+      "text": "Your usual, Walt.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-e-t3.mp4", "start": 0.998333, "end": 2.5, "sha256": "431d1e36d933c7be495646903448f3e7ad6995c505080db277487fa9c10d0631", "snap": "speech-onset@1" },
+      "loss": 0.804,
+      "snap": { "aligned": 1.098, "start": 1.058, "onset": 1.058, "floor": -60.3 },
+      "words": [
+        { "text": "Your", "start": 1.058, "end": 1.198, "loss": 0.679 },
+        { "text": "usual,", "start": 1.318, "end": 1.658, "loss": 0.85 },
+        { "text": "Walt.", "start": 1.758, "end": 2.078, "loss": 0.859 }
+      ]
+    },
+    "out": {
+      "text": "Yeah... I'm out of here.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-w3b-t3.mp4", "start": 0.5, "end": 2.583333, "sha256": "0775faadbd38fe5839bdae874f9388b6bbd049ad38fa56a469f6805ed379e691", "snap": "speech-onset@1" },
+      "loss": 0.945,
+      "snap": { "aligned": 0.58, "start": 0.53, "onset": 0.53, "floor": -66.4 },
+      "words": [
+        { "text": "Yeah...", "start": 0.53, "end": 0.8, "loss": 1.203 },
+        { "text": "I'm", "start": 1.84, "end": 1.94, "loss": 0.79 },
+        { "text": "out", "start": 2, "end": 2.12, "loss": 0.597 },
+        { "text": "of", "start": 2.14, "end": 2.2, "loss": 0.573 },
+        { "text": "here.", "start": 2.26, "end": 2.4, "loss": 0.822 }
+      ]
+    },
+    "bye": {
+      "text": "Bye, Walt!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/reg4-yb-t1.mp4", "start": 1.116667, "end": 2.366667, "sha256": "6bbeb1e22a759c843388290b545d00794782ba0103cf66a1f056ee7427db41f6", "snap": "speech-onset@1" },
+      "loss": 1.205,
+      "snap": { "aligned": 1.197, "start": 1.167, "onset": 1.167, "floor": -54.5 },
+      "words": [
+        { "text": "Bye,", "start": 1.167, "end": 1.537, "loss": 1.252 },
+        { "text": "Walt!", "start": 1.637, "end": 2.217, "loss": 1.231 }
+      ]
+    }
+  }
+}

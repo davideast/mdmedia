@@ -1,0 +1,48 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "festival": {
+      "text": "Back home, we had a turnip festival...",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/palm-full-t1.mp4", "start": 8, "end": 11.35, "sha256": "6c5a7d667f42b67069baed14d7b86a4e74e9353af2bb65f2137b29996e18b44f", "snap": "speech-onset@1" },
+      "loss": 0.81,
+      "snap": { "aligned": 8.48, "start": 8.48, "onset": 8, "floor": -59 },
+      "words": [
+        { "text": "Back", "start": 8.48, "end": 8.7, "loss": 0.925 },
+        { "text": "home,", "start": 8.78, "end": 9.18, "loss": 0.9 },
+        { "text": "we", "start": 9.72, "end": 9.82, "loss": 0.487 },
+        { "text": "had", "start": 9.88, "end": 10, "loss": 0.553 },
+        { "text": "a", "start": 10.06, "end": 10.14, "loss": 0.674 },
+        { "text": "turnip", "start": 10.22, "end": 10.56, "loss": 0.851 },
+        { "text": "festival...", "start": 10.68, "end": 11.24, "loss": 0.908 }
+      ]
+    },
+    "nobody": {
+      "text": "And nobody came.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/palm-full-t1.mp4", "start": 11.35, "end": 12.5, "sha256": "6c5a7d667f42b67069baed14d7b86a4e74e9353af2bb65f2137b29996e18b44f", "snap": "speech-onset@1" },
+      "loss": 0.698,
+      "snap": { "aligned": 11.65, "start": 11.62, "onset": 11.62, "floor": -67.8 },
+      "words": [
+        { "text": "And", "start": 11.62, "end": 11.75, "loss": 0.683 },
+        { "text": "nobody", "start": 11.81, "end": 12.13, "loss": 0.69 },
+        { "text": "came.", "start": 12.25, "end": 12.47, "loss": 0.642 }
+      ]
+    },
+    "king": {
+      "text": "I dated the turnip king. Twice.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/palm-full-t1.mp4", "start": 12.5, "end": 15.5, "sha256": "6c5a7d667f42b67069baed14d7b86a4e74e9353af2bb65f2137b29996e18b44f", "snap": "speech-onset@1" },
+      "loss": 0.656,
+      "snap": { "aligned": 13.24, "start": 13.24, "onset": 12.5, "floor": -67.9 },
+      "words": [
+        { "text": "I", "start": 13.24, "end": 13.32, "loss": 0.85 },
+        { "text": "dated", "start": 13.36, "end": 13.68, "loss": 0.597 },
+        { "text": "the", "start": 13.681, "end": 13.8, "loss": 0.621 },
+        { "text": "turnip", "start": 13.86, "end": 14.16, "loss": 0.643 },
+        { "text": "king.", "start": 14.26, "end": 14.54, "loss": 0.696 },
+        { "text": "Twice.", "start": 14.82, "end": 15.3, "loss": 0.702 }
+      ]
+    }
+  }
+}

@@ -4,10 +4,14 @@ import { MAX_REFERENCE_BYTES, MediaError, validMediaId } from './image-request';
 import type { AssetResource } from './media-types';
 
 export interface StoredAsset {
-  id: string; ownerUid: string; purpose: 'reference' | 'output';
-  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'music' | 'sfx'; durationMs?: number;
+  /** `production`: media a production's cuts use, uploaded once per content hash. See production-media-server.ts. */
+  id: string; ownerUid: string; purpose: 'reference' | 'output' | 'production';
+  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'voice' | 'music' | 'sfx'; durationMs?: number;
+  /** An empty `thumbnailPath` means the asset has no thumbnail. */
   path: string; thumbnailPath: string; mimeType: string;
   width: number; height: number; byteLength: number; createdAt: number;
+  /** SHA-256 of the bytes, hex. Set on production media, which is de-duplicated by it. */
+  contentSha256?: string;
 }
 export async function inspectImage(bytes: Uint8Array) {
   if (!bytes.length || bytes.length > 32 * 1024 * 1024) throw new MediaError(400, 'invalid_image', 'The image is empty or too large.');

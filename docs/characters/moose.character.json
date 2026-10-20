@@ -1,0 +1,161 @@
+{
+  "format": "mdmedia.character@1",
+  "id": "moose",
+  "version": 1,
+  "name": "Moose",
+  "kind": "person",
+  "description": "The colour man of CGL Football: a big, folksy former lineman who says obvious things as if they were hard-won insight.",
+  "look": {
+    "description": "a huge, broad-shouldered, heavyset man of about fifty with a thick neck, a ruddy round face, a short sandy crew cut and a bushy sandy moustache, squeezed into a tight tan blazer over an open-collared shirt, wearing a big padded headset with a boom microphone, in the broadcast booth on the right",
+    "never": [
+      "any resemblance to a real announcer, player or actor",
+      "a clean-shaven face",
+      "a slim build",
+      "a blazer in any other colour",
+      "lettering or a logo on his clothes or headset"
+    ]
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "stills": [
+    {
+      "id": "booth-key",
+      "file": "football/k-booth-a.png",
+      "from": {
+        "generated": {
+          "provider": "gemini image",
+          "prompt": "football/prompts/k-booth.md",
+          "at": "2026-10-19T00:21:33-07:00"
+        }
+      },
+      "note": "the key still the booth shots start from; Moose on the right"
+    },
+    {
+      "id": "booth",
+      "file": "characters/moose/booth.png",
+      "from": {
+        "take": "fb-booth-t1",
+        "at": 2.5
+      },
+      "note": "Moose on the right, in CGL Football Take 1's booth shot"
+    }
+  ],
+  "voice": {
+    "provider": "elevenlabs",
+    "name": "Roger",
+    "settings": {
+      "model": "eleven_multilingual_v2"
+    },
+    "uses": [
+      "tts",
+      "swap"
+    ],
+    "notes": "Voice-over over the plays is text-to-speech in \"Roger\"; on camera in the booth his speech is swapped to \"Roger\" (CGL Take 2)."
+  },
+  "delivery": {
+    "register": "slow, folksy and completely serious, as if passing on hard-won wisdom",
+    "never": [
+      "never jokes or winks",
+      "never laughs at his own line",
+      "never shouts"
+    ],
+    "reference": {
+      "levels": {
+        "source": "Moose's voice-over lines in CGL Football Take 1",
+        "loudness": {
+          "min": -28.4,
+          "max": -20.3
+        },
+        "pitch": {
+          "min": 77.9,
+          "max": 144.8
+        },
+        "pitchRange": {
+          "max": 18.9
+        },
+        "rate": {
+          "min": 2.22,
+          "max": 4.94
+        }
+      },
+      "typical": {
+        "loudness": -24.3,
+        "pitch": 107.8,
+        "pitchRange": 10.9,
+        "rate": 3.52
+      },
+      "margins": {
+        "loudness": 2.5,
+        "pitch": 3,
+        "pitchRange": 3,
+        "rate": 0.2
+      },
+      "lines": [
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m1",
+          "text": "Key number one: score more points than the other team.",
+          "loudness": -24.3,
+          "pitch": 98.8,
+          "pitchRange": 14.1,
+          "rate": 3.38
+        },
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m2",
+          "text": "Key number two: don't let the other team score more points than you.",
+          "loudness": -24.1,
+          "pitch": 109.7,
+          "pitchRange": 15.9,
+          "rate": 3.54
+        },
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m3",
+          "text": "Key number three: don't tackle your own guys.",
+          "loudness": -24.6,
+          "pitch": 120.1,
+          "pitchRange": 13,
+          "rate": 3.49
+        },
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m3b",
+          "text": "I've seen it, Chet. It doesn't help.",
+          "loudness": -24.4,
+          "pitch": 121.8,
+          "pitchRange": 8.7,
+          "rate": 4.12
+        },
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m4",
+          "text": "That's a big man. When a big man falls down, Chet, he's down.",
+          "loudness": -22.8,
+          "pitch": 105.8,
+          "pitchRange": 4.9,
+          "rate": 3.89
+        },
+        {
+          "cut": "docs/cuts/football-take1.cut.json",
+          "line": "m5",
+          "text": "Chet... nobody tackled their own guys.",
+          "loudness": -25.9,
+          "pitch": 92.6,
+          "pitchRange": 8.5,
+          "rate": 2.78
+        }
+      ],
+      "method": "dialogue-stem@1",
+      "measuredAt": "2026-10-20T07:25:14.963Z"
+    }
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-20",
+      "changes": "First version: look from the football booth still and storyboard, voice and register from CGL Football Take 1. Reference levels measured from 6 approved lines (Moose's voice-over lines in CGL Football Take 1): -28.4 to -20.3 LUFS, 78 to 145 Hz, pitch range up to 18.9 st, 2.22 to 4.94 words/s."
+    }
+  ]
+}

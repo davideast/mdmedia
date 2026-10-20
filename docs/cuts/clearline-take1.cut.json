@@ -1,0 +1,39 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "ClearLine long distance",
+    "show": "clearline",
+    "version": "Take 1",
+    "length": 8,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "A single paid generation, as it came: clearline-t1 (8 s, from ad-clearline), byte-identical to review/clips/ad-clearline.mp4, with nothing laid over it. The ClearLine wordmark at the end is the model's own, not ours. The segments are the take's own shots, in step, cut where the picture cuts (frame/24). All the sound is the take's own: the tink, the yell down the line and the announcer. The announcer says \"You'll hear everything.\", not the storyboard's \"You'll hear every little thing.\"; the line is what is heard."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/clearline-t1.mp4",
+
+  "segments": [
+    { "id": "pin", "label": "The quiet room: he drops the pin, the phone at his ear, and smiles", "src": "take:clearline-t1",
+      "in": 0, "out": 2.916667 },
+    { "id": "cowboy", "label": "His friend in the cowboy hat, amazed; the yell comes down the line", "src": "take:clearline-t1",
+      "in": 2.916667, "out": 4.583333 },
+    { "id": "wince", "label": "Back in the quiet room, he winces and sinks", "src": "take:clearline-t1",
+      "in": 4.583333, "out": 6.416667 },
+    { "id": "laugh", "label": "His friend laughs", "src": "take:clearline-t1", "in": 6.416667, "out": 6.916667 },
+    { "id": "card", "label": "The model's ClearLine wordmark on blue", "src": "take:clearline-t1", "in": 6.916667, "out": 8 }
+  ],
+
+  "lines": [
+    { "id": "dishes", "speaker": "Woman (off-screen)", "text": "Gordon! The dishes!", "segment": "cowboy" },
+    { "id": "tagline", "speaker": "Announcer", "text": "ClearLine long distance. You'll hear everything.", "segment": "wince",
+      "until": "@end" }
+  ],
+
+  "sources": {
+    "take:clearline-t1": { "step": "generate", "storyboard": "ad-clearline" }
+  }
+}

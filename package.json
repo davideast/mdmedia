@@ -91,6 +91,14 @@
     "./cut": {
       "types": "./dist/cut/index.d.ts",
       "import": "./dist/cut/index.js"
+    },
+    "./character": {
+      "types": "./dist/character/index.d.ts",
+      "import": "./dist/character/index.js"
+    },
+    "./threads": {
+      "types": "./dist/threads/index.d.ts",
+      "import": "./dist/threads/index.js"
     }
   },
   "bin": {

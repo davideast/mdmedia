@@ -1,0 +1,68 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "bellamy-ranch",
+  "title": "Bellamy Ranch",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-bellamy-ranch-take6.jpg",
+  "approved": "take6",
+  "current": "take6",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ch-bellamy-ranch.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Mansion aerial with oil derricks in the first second, portrait panels and a correctly spelled gold-script title, then the drawing-room threat, the champagne in his face at about 14 s and a hold on his dripping face to the end; listen for whether the freeze reads as a true freeze.",
+      "createdAt": "2026-10-18T21:44:05.236Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ch-bellamy-ranch-take2.mp4",
+      "label": "Take 2 (new ending)",
+      "status": "none",
+      "notes": "Same titles as Take 1, but the champagne throw is gone: the doors open behind her, a tanned man in a cream suit walks in from the light (Hello, Victoria), her glass shatters on the marble in a floor shot, and it holds on her stunned face to the end; the clear glass on white marble may be faint through the tube, and he is backlit rather than a true silhouette.",
+      "createdAt": "2026-10-18T21:49:59.946Z"
+    },
+    {
+      "id": "take3",
+      "rendered": "review/clips/ch-bellamy-ranch-take3.mp4",
+      "label": "Take 3",
+      "status": "none",
+      "notes": "Take 2 staging plus a mourning portrait of the same man (black ribbon, white lilies) on the mantel behind her before the doors open, and the line Rex? But we buried you!; listen for the line, and note her hand dips oddly low as the glass falls.",
+      "createdAt": "2026-10-18T21:54:16.208Z"
+    },
+    {
+      "id": "take4",
+      "rendered": "review/clips/ch-bellamy-ranch-take4.mp4",
+      "label": "Take 4 (best of 3 tries)",
+      "status": "none",
+      "notes": "Transcript: You will never see a penny of the Bellamy fortune (7.8 s) / Rex! (11.4) / You died in that plane crash. (12.3) / Did I? (17.3, off-screen over her held face; Victoria is cut off by the end). Mourning portrait and lilies in frame, she clutches her pearls, the glass falls from chest height and shatters with no hands near the floor; the earlier tries had burned-in subtitles or fire in the doorway.",
+      "createdAt": "2026-10-18T22:22:39.813Z"
+    },
+    {
+      "id": "take5",
+      "rendered": "review/clips/ch-bellamy-ranch-take5.mp4",
+      "label": "Take 5 (shot by shot)",
+      "status": "none",
+      "notes": "Every shot is take 1. Titles: Take 1 first 8 s. Shot 1 (from a Take 3 still): You will never see a penny of the Bellamy fortune, her lips moving, doors closed. Shot 2 (from shot 1 last frame): doors open, Rex in the doorway, cut at 2.5 s before she moves; his Hello, Victoria runs under shot 3 as a J-cut (14.2 s). Shot 3 (close-up cropped from shot 2): silent, she turns to look back at him. Shot 4 (reverse angle, from a Take 4 still): Rex? You died in that plane crash!, only she speaks, eyes on him. Shot 5 (no still): hand at chest height loosens, the flute drops, low-angle shatter, silent. Shot 6 (from a Take 4 still of Rex): Did I, Victoria?, only he speaks. Shot 7 (from shot 4 last frame): silent push-in, frozen for the last 2 s under an organ sting. Wardrobe drifts slightly: a brooch in shots 1 to 3, pearls in 4 and 7.",
+      "createdAt": "2026-10-18T23:10:23.235Z"
+    },
+    {
+      "id": "take6",
+      "cut": "docs/cuts/bellamy-ranch-take6.cut.json",
+      "label": "Take 6 (shot by shot)",
+      "status": "final",
+      "notes": "Transcript: You'll never see a penny of the Bellamy fortune (8.0 s) / Hello, Victoria. (13.5) / [her gasp] (14.6) / [glass shatters] (16.1) / Rex? (16.8) You died in that plane crash! (17.3) / No. (19.6) I just had to fly economy. (20.7) / [organ sting] (21.9). What changed: her reactions now run straight on. She whips round the instant he says her name (new turn shot), the reverse close-up gasps on its first frame, her hand goes slack and the flute drops right then, it shatters, and only then does she say her line. Rex has a new deadpan reply with a 0.7 s beat before it, the sting hits the moment it ends over his smirk, and then her stunned face pushes in and freezes. Wardrobe is the brooch everywhere, with no pearls; her new close-ups start from a still of Take 5 shot 3 with the doorway taken out of the background, and the glass insert is new so the jacket matches her crimson suit and shows the brooch. Shot takes: titles Take 1; threat and doors Take 5 shots 1-2 (doors cut at 2.5 s before her slow turn); turn bel6-turn-t2; gasp bel6-gasp-t1; drop bel6-drop-t1 plus Take 5 shot 5 floor; line bel6-line-t1; Rex bel6-rex-t1 (from rex.png); freeze bel6-stunned-t1 under Take 5 shot 7 organ sting. A version that freezes on Rex smirk instead is kept as takes/bellamy-take6-rex.mp4.",
+      "createdAt": "2026-10-19T07:27:33.755Z"
+    },
+    {
+      "id": "take6-rex",
+      "cut": "docs/cuts/bellamy-ranch-take6-rex.cut.json",
+      "label": "Take 6 (shot by shot, freeze on Rex)",
+      "status": "review",
+      "notes": "Take 6 with the other ending: no cut to her stunned face; the sting lands on Rex's smirk, which runs on and freezes. Ported from bellamy6/edit.mjs rex."
+    }
+  ]
+}
