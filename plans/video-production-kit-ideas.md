@@ -307,14 +307,57 @@ See [docs/cut-check.md](../docs/cut-check.md) and the Performances section of [d
 
 ---
 
-## Where things are today
+## Preservation and stabilization (2026-10-20)
 
-The working pipeline is in the satisfy.md session scratchpad under `crt/`, which is temporary:
+The durable media workspace is `~/.local/share/mdmedia/productions/crt-tv/`.
+It contains the takes, storyboards, scripts, principles and overnight handoff.
+The handoff records agent reports and review candidates, not owner acceptance.
 
-- **Generation:** `gen.sh`, `shot.sh`/`shot.mjs`, `extend.sh`/`extend.mjs`, `tts.sh`, `sfx.sh`, `voices.sh`
-- **Inspection:** `still.mjs`, `frames.mjs`, `envelope.mjs`, `stt.py` (faster-whisper)
-- **Edits and graphics:** the per-clip `edit.mjs` and `gfx.mjs` (`nw7/`, `nw9/`, `nw10/`, `bellamy6/`, `rigg5/`, `hal5/`, `br4/`, `football/`, `nwdi/`, `regulars3/`)
-- **Publishing and review:** `publish.mjs`, `review/build.mjs` (posters and light copies), `review/index.html` with `shows.json` (the review page, grouped by show and status)
-- **The method:** `PRINCIPLES.md`
+All 238 inherited changed/untracked source files are checkpointed in `6096cb2`
+on `codex/crt-stabilization`, based on `feat/cut-format` at `8ce2b09`.
+The original worktree remains untouched. The private local backup at
+`~/.local/share/mdmedia/backups/crt-takeover-20261020T185245Z/` contains both
+repositories' history bundles, source and media archives, original diffs,
+screenshots, the temporary upload helper, and a SHA-256 manifest.
+The old overnight commit script is superseded by this complete checkpoint:
+its preview mode modifies the index and its file lists omit dependencies.
 
-If this gets built, copy the method and the reusable scripts out of the scratchpad first.
+### Verified locally
+
+- 1,016 tests pass across 134 files covering cuts, characters, threads,
+  ElevenLabs clients, CLI commands, productions and Studio. Provider calls
+  are mocked; API fixtures use in-memory database/storage implementations.
+- Root build and typechecking, Studio route-type generation and typechecking,
+  and linting of 52 changed Studio source files pass.
+- The existing manifest regression caught Big Hal Take 6 dated after Take 7.
+  Take 6 now uses the preserved final render timestamp,
+  `2026-10-20T02:08:32.224Z`; the ordering assertion is unchanged.
+- Actual viewer/Comments components passed desktop and phone browser checks
+  with local data hooks: comment shortcut, acceptance confirmation, live
+  updates and page width. This did not connect to shared Studio data.
+  Screenshots and harness files are in `studio/.design/stabilization/`.
+
+Run source checks from the worktree with `bun run build`,
+`./node_modules/.bin/tsc --noEmit`, and
+`bun test src/cut src/character src/threads src/elevenlabs test/cuts test/cli test/production test/studio`.
+A fresh Studio checkout needs `next typegen` before its typecheck.
+Keep the installed Studio engine consistent with subsequent root builds.
+
+### Work remains stopped
+
+Generation, production pushes, publishing and deployment remain stopped at
+the owner's instruction. Existing services were left untouched; test servers
+and browsers were temporary. No review decision was made on the owner's behalf.
+
+- Football Take 2 stops at draft 5 in `fb2/cuts/` and `renders/fb2-d5.mp4`.
+  Its published cut, final test, manifest entry and swap-and-render helper
+  remain unfinished; `OVERNIGHT.md` gives the resume steps.
+- The character voice-swap test remains unverified. The last attempt exhausted
+  the ElevenLabs key limit; replenishment has not been confirmed.
+- Roam Phone Take 3 has word timings for only one of 21 lines. RIGG Take 6
+  reuses timings for unchanged audio. No paid alignment was attempted.
+- Breeze 5, Regulars 4, Roam Phone 3 and RIGG 6 remain review candidates.
+  Automated measurements do not replace the owner's ear and eye.
+- The satisfy.md UHF/mobile-fit work is preserved on
+  `codex/crt-uhf-validation`, based on current main. Its local validation does
+  not publish the website or replace channel clips.
