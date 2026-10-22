@@ -1,5 +1,6 @@
 import { defineCommand } from 'citty';
 import { studioCommand } from './studio-command.js';
+import { storyCommand } from './story-command.js';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
@@ -664,6 +665,7 @@ const SUBCOMMANDS = {
   sfx: sfxCommand,
   adapt: adaptCommand,
   studio: studioCommand,
+  story: storyCommand,
 } as const;
 
 /**

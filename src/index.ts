@@ -12,4 +12,4 @@ export * from './storage/index.js';
 export * from './narration/index.js';
 export * from './markdown/index.js';
 export * from './image/index.js';
-
+export * from './story/index.js';

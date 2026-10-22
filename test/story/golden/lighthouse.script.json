@@ -1,0 +1,325 @@
+{
+  "schema": "mdmedia.story.script/1",
+  "source": {
+    "path": "lighthouse.md",
+    "sha256": "9356f7bdf865e171843128904a37aeee4ae7df358be54c8ba5d14a61e553fd27"
+  },
+  "meta": {
+    "title": "The Keeper's Log",
+    "language": "en"
+  },
+  "gapMs": 400,
+  "narrator": "NARRATOR",
+  "cast": {
+    "MARA": {
+      "id": "MARA",
+      "voice": "Kore",
+      "delivery": "dry, guarded, older than she looks"
+    },
+    "ELI": {
+      "id": "ELI",
+      "voice": "Puck",
+      "delivery": "eager, a little too loud for the room"
+    },
+    "NARRATOR": {
+      "id": "NARRATOR",
+      "voice": "Charon",
+      "delivery": "warm, unhurried, a storyteller by a fire"
+    }
+  },
+  "chapters": [
+    {
+      "id": "00",
+      "index": 0,
+      "title": "The Keeper's Log",
+      "scenes": [
+        {
+          "id": "00/00",
+          "index": 0,
+          "segments": [
+            {
+              "kind": "line",
+              "id": "00/00/0001-narrator",
+              "speaker": "NARRATOR",
+              "narration": true,
+              "cue": "",
+              "text": "The storm had been circling the island for three days when the boy finally climbed the stairs. Mara heard him long before she saw him: every step on the iron spiral rang like a struck bell.",
+              "display": "The storm had been circling the island for three days when the boy finally\nclimbed the stairs. Mara heard him long before she saw him: every step on the\niron spiral rang like a struck bell.",
+              "source": {
+                "line": 17,
+                "column": 1,
+                "endLine": 19,
+                "endColumn": 37
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/00/0002-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "",
+              "text": "Are you the keeper? They said in the village you'd be up here.",
+              "display": "Are you the keeper? They said in the village you'd be up here.",
+              "source": {
+                "line": 21,
+                "column": 1,
+                "endLine": 21,
+                "endColumn": 72
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/00/0003-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "",
+              "text": "They say a lot of things in the village. Shut the hatch. You're letting the weather in.",
+              "display": "They say a lot of things in the village. Shut the hatch. You're\nletting the weather in.",
+              "source": {
+                "line": 23,
+                "column": 1,
+                "endLine": 24,
+                "endColumn": 24
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/00/0004-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "out of breath",
+              "text": "Sorry. Sorry. It's just, I've been climbing for ages. How many steps is it?",
+              "display": "Sorry. Sorry. It's just, I've been climbing for ages.\nHow many steps is it?",
+              "source": {
+                "line": 26,
+                "column": 1,
+                "endLine": 27,
+                "endColumn": 22
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/00/0005-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "",
+              "text": "Two hundred and twelve. You'll count them yourself on the way down.",
+              "display": "Two hundred and twelve. You'll count them yourself on the way down.",
+              "source": {
+                "line": 29,
+                "column": 1,
+                "endLine": 29,
+                "endColumn": 78
+              }
+            }
+          ]
+        },
+        {
+          "id": "00/01",
+          "index": 1,
+          "title": "The lamp",
+          "segments": [
+            {
+              "kind": "line",
+              "id": "00/01/0001-narrator",
+              "speaker": "NARRATOR",
+              "narration": true,
+              "cue": "",
+              "text": "She turned back to the great lens, polishing a brass fitting that was already spotless. The boy hovered at the edge of the light.",
+              "display": "She turned back to the great lens, polishing a brass fitting that was already\nspotless. The boy hovered at the edge of the light.",
+              "source": {
+                "line": 33,
+                "column": 1,
+                "endLine": 34,
+                "endColumn": 52
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0002-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "",
+              "text": "My mother says you keep a log. Every ship, every night, for forty years. She says—",
+              "display": "My mother says you keep a log. Every ship, every night, for forty years.\nShe says—",
+              "source": {
+                "line": 36,
+                "column": 1,
+                "endLine": 37,
+                "endColumn": 10
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0003-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "cutting him off, sharp",
+              "text": "Your mother talks too much.",
+              "display": "Your mother talks too much.",
+              "source": {
+                "line": 39,
+                "column": 1,
+                "endLine": 39,
+                "endColumn": 65
+              }
+            },
+            {
+              "kind": "pause",
+              "id": "00/01/0004-pause",
+              "durationMs": 0,
+              "source": {
+                "line": 41,
+                "column": 1,
+                "endLine": 43,
+                "endColumn": 4
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0005-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "stung, quieter",
+              "text": "She's sick. That's why I came.",
+              "display": "She's sick. That's why I came.",
+              "source": {
+                "line": 45,
+                "column": 1,
+                "endLine": 45,
+                "endColumn": 59
+              }
+            },
+            {
+              "kind": "pause",
+              "id": "00/01/0006-pause",
+              "durationMs": 2000,
+              "source": {
+                "line": 47,
+                "column": 1,
+                "endLine": 49,
+                "endColumn": 4
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0007-narrator",
+              "speaker": "NARRATOR",
+              "narration": true,
+              "cue": "",
+              "text": "For a long moment the only sound was the rain against the glass, and the slow grinding turn of the lamp.",
+              "display": "For a long moment the only sound was the rain against the glass, and the slow\ngrinding turn of the lamp.",
+              "source": {
+                "line": 51,
+                "column": 1,
+                "endLine": 52,
+                "endColumn": 27
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0008-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "softer, almost to herself",
+              "text": "Which ship was his?",
+              "display": "Which ship was his?",
+              "source": {
+                "line": 54,
+                "column": 1,
+                "endLine": 54,
+                "endColumn": 60
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0009-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "",
+              "text": "The Wren. Nineteen years ago. It never came back.",
+              "display": "The *Wren*. Nineteen years ago. It never came back.",
+              "source": {
+                "line": 56,
+                "column": 1,
+                "endLine": 56,
+                "endColumn": 61
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0010-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "whispering",
+              "text": "I know the night. I wrote it down.",
+              "display": "I know the night. I wrote it down.",
+              "source": {
+                "line": 58,
+                "column": 1,
+                "endLine": 58,
+                "endColumn": 60
+              }
+            },
+            {
+              "kind": "pause",
+              "id": "00/01/0011-pause",
+              "durationMs": 1500,
+              "source": {
+                "line": 60,
+                "column": 1,
+                "endLine": 62,
+                "endColumn": 4
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0012-narrator",
+              "speaker": "NARRATOR",
+              "narration": true,
+              "cue": "",
+              "text": "She set the cloth aside, crossed to the shelf, and pulled down a book whose spine had split along its length.",
+              "display": "She set the cloth aside, crossed to the shelf, and pulled down a book whose\nspine had split along its length.",
+              "source": {
+                "line": 64,
+                "column": 1,
+                "endLine": 65,
+                "endColumn": 34
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0013-mara",
+              "speaker": "MARA",
+              "narration": false,
+              "cue": "",
+              "text": "Sit. If you want the truth, you'll have to hear all of it. And you won't like the ending.",
+              "display": "Sit. If you want the truth, you'll have to hear all of it. And you\nwon't like the ending.",
+              "source": {
+                "line": 67,
+                "column": 1,
+                "endLine": 68,
+                "endColumn": 23
+              }
+            },
+            {
+              "kind": "line",
+              "id": "00/01/0014-eli",
+              "speaker": "ELI",
+              "narration": false,
+              "cue": "barely audible",
+              "text": "I didn't come up here to like it.",
+              "display": "I didn't come up here to like it.",
+              "source": {
+                "line": 70,
+                "column": 1,
+                "endLine": 70,
+                "endColumn": 62
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
