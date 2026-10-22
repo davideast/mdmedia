@@ -263,6 +263,36 @@ bun run verify
 grep -rn "from 'node:" src/story --include=*.ts | grep -v "src/story/node/" && echo "STOP" || echo "core is platform-free"
 ```
 
+## As built (2026-10-22)
+
+Committed locally on `feat/story-m1` (107a0df), not pushed.
+
+- **Mixing is pure TypeScript** (`mixClips`); the `AudioRuntime` only
+  normalizes (`master`) and encodes (`mp3`). No `probe` was needed: durations
+  come from the PCM length.
+- **`buildStory` writes through a `FileSink`**, so the core still imports
+  nothing from Node. Node adapters live in `src/story/node/` and ship as
+  `mdmedia/story/node`.
+- **The line key now includes the narration flag**, because the note says
+  "narrating" for narration.
+- **`verify-package`** imports and type-checks both story subpaths.
+- **Live run** (lunch voices, 37 lines): 110 s of audio in 2 min 10 s;
+  31/37 exact on the first take (prototype take C: 29/37); 8 retakes fixed 3
+  more; 0 refusals; 3 still flagged, each a transcriber limit rather than an
+  audio fault: "Milo" heard as "Mylow" (names), "just to Harper" heard as
+  "just a harper", and "Heh" performed as a laugh and left out of the
+  transcript.
+- **Editing a cue re-renders only that line**, not the next two: context is
+  the previous lines' words, not their cues. Editing a line's words
+  re-renders it and the next two (tested). Failing takes are never accepted,
+  so they are retried on every build.
+- **Sandbox note**: Node's `fetch` needs `NODE_USE_ENV_PROXY=1` to use the
+  sandbox proxy; without it every request fails and retries for minutes.
+- **Proposed follow-up, from this run's evidence**: give the transcriber the
+  cast names, and treat a missing interjection ("heh", "hmm") as noise when
+  the take is otherwise exact. Both would have saved the three failures and
+  most retakes here.
+
 ## Done when
 
 - Every step's tests pass, with fakes; CI needs no network.
