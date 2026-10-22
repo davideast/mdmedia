@@ -56,6 +56,10 @@ const { values, positionals } = parseArgs({
     out: { type: 'string' },
     fake: { type: 'boolean', default: false },
     'max-run': { type: 'string', default: '1500' },
+    // Verbatim models only: also tell each line what was just said.
+    context: { type: 'boolean', default: false },
+    // Run mode: cut a run into lines at its real pauses, not by character share.
+    snap: { type: 'boolean', default: false },
   },
 });
 
@@ -163,8 +167,30 @@ async function geminiKey(): Promise<string> {
 // 0 = character default plus line cue, 1 = line cue only, 2 = no cue.
 const CUE_LEVELS = ['full cue', 'line cue only', 'no cue'] as const;
 
+// Verbatim TTS models take the words and the delivery note as separate
+// fields, so a note can never be spoken. One line per call.
+const VERBATIM = new Set(['gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts']);
+const allLines = segments.filter((s): s is { kind: 'line' } & Line => s.kind === 'line');
+function contextFor(line: Line): string {
+  const i = allLines.findIndex((l) => l.id === line.id);
+  const before = allLines.slice(Math.max(0, i - 2), i);
+  if (!before.length) return '';
+  return 'Just before this, in the same scene: ' + before.map((l) => `${l.speaker} said "${l.text}"`).join(' Then ') + '.';
+}
+
 function buildRequest(model: string, lines: Lines, level: number) {
   const speakers = [...new Set(lines.map((l) => l.speaker))];
+  if (VERBATIM.has(model)) {
+    if (lines.length !== 1) throw new Error('verbatim models render one line per call; use --mode line');
+    const l = lines[0]!;
+    const style = [
+      level === 0 ? cast[l.speaker]!.delivery : '',
+      level < 2 ? l.delivery : '',
+      values.context && level === 0 ? contextFor(l) : '',
+    ].filter(Boolean).join('. ');
+    const input = [{ type: 'user_input', content: [{ type: 'text', text: l.text, ...(style ? { annotations: [{ type: 'speech_metadata', style }] } : {}) }] }];
+    return { model, input, speech_config: [{ voice: cast[l.speaker]!.voice }] };
+  }
   let input: string;
   let speech_config: Array<{ voice: string; speaker?: string }>;
   const lineCue = (l: Line) => (level < 2 ? l.delivery : '');
@@ -203,7 +229,7 @@ function geminiSpeak(model: string, apiKey: string): Speak {
         const stream = await client.interactions.create({
           model,
           input: request.input,
-          response_format: { type: 'audio' },
+          response_format: VERBATIM.has(model) ? { type: 'audio', mime_type: 'audio/l16', sample_rate: 24000 } : { type: 'audio' },
           generation_config: { speech_config: request.speech_config },
           stream: true,
         } as any);
@@ -253,6 +279,26 @@ function quietEdges(pcm: Uint8Array): { leadMs: number; tailMs: number } {
   let a = 0; while (a < s.length && !loud(s[a]!)) a++;
   let b = s.length - 1; while (b > a && !loud(s[b]!)) b--;
   return { leadMs: Math.round((a / RATE) * 1000), tailMs: Math.round(((s.length - 1 - b) / RATE) * 1000) };
+}
+
+// Quiet stretches of at least 120 ms (20 ms windows under about -38 dBFS).
+function pauses(pcm: Uint8Array): Array<{ mid: number; len: number }> {
+  const s = new Int16Array(pcm.buffer, pcm.byteOffset, pcm.byteLength >> 1);
+  const win = RATE / 50;
+  const out: Array<{ mid: number; len: number }> = [];
+  let start = -1;
+  for (let w = 0; w * win < s.length; w++) {
+    let sum = 0;
+    for (let i = w * win; i < Math.min(s.length, (w + 1) * win); i++) sum += s[i]! * s[i]!;
+    const quiet = Math.sqrt(sum / win) < 420;
+    if (quiet && start < 0) start = w;
+    if ((!quiet || (w + 1) * win >= s.length) && start >= 0) {
+      const len = (w - start) * 20;
+      if (len >= 120) out.push({ mid: (start * 20 + w * 20) / 2, len });
+      start = -1;
+    }
+  }
+  return out;
 }
 
 function wav(pcm: Uint8Array): Uint8Array {
@@ -363,12 +409,26 @@ steps.forEach((step, i) => {
   const { leadMs, tailMs } = quietEdges(audio);
   const speech = Math.max(1, length - leadMs - tailMs);
   const total = step.lines.reduce((n, l) => n + l.text.length, 0) || 1;
-  let offset = cursor + leadMs;
-  for (const l of step.lines) {
-    const share = (speech * l.text.length) / total;
-    timeline.push({ ...l, startMs: Math.round(offset), endMs: Math.round(offset + share) });
-    offset += share;
+  // Boundaries by character share, then (with --snap) moved to the middle of
+  // the nearest real pause in the audio.
+  const bounds: number[] = [];
+  let acc = leadMs;
+  for (const l of step.lines.slice(0, -1)) { acc += (speech * l.text.length) / total; bounds.push(acc); }
+  if (values.snap && bounds.length) {
+    const quiet = pauses(audio);
+    let floor = leadMs;
+    bounds.forEach((b, k) => {
+      const reach = Math.max(400, ((speech * step.lines[k]!.text.length) / total) * 0.45);
+      const near = quiet.filter((q) => q.mid > floor + 150 && Math.abs(q.mid - b) <= reach)
+        .sort((a, c) => Math.abs(a.mid - b) / a.len - Math.abs(c.mid - b) / c.len)[0];
+      if (near) bounds[k] = near.mid;
+      floor = bounds[k]!;
+    });
   }
+  const edges = [leadMs, ...bounds, length - tailMs];
+  step.lines.forEach((l, k) => {
+    timeline.push({ ...l, startMs: Math.round(cursor + edges[k]!), endMs: Math.round(cursor + edges[k + 1]!) });
+  });
   mix.push(audio);
   cursor += length;
   const next = steps[i + 1];

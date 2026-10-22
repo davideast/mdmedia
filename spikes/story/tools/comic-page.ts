@@ -27,22 +27,32 @@ for (const p of comic.panels) {
   if (r.status !== 0) throw new Error(`ffmpeg failed on ${src}`);
 }
 
-// Voices: one line per caption and balloon, in reading order (render.ts line mode).
+// Voices: one line per caption and balloon, in reading order (render.ts line
+// mode). Either one render dir, or several as "A=dir,B=dir" to compare takes.
 if (audioDir) {
-  const timeline = JSON.parse(readFileSync(join(audioDir, 'timeline.json'), 'utf8')) as { lines: Array<{ startMs: number; endMs: number }> };
-  let i = 0;
-  for (const p of comic.panels as Array<{ items: Array<{ kind: string; startMs?: number; endMs?: number }> }>) {
-    for (const item of p.items) {
-      if (item.kind === 'sfx') continue;
-      const line = timeline.lines[i++];
-      if (line) { item.startMs = line.startMs; item.endMs = line.endMs; }
+  // Each take is "id:label=dir"; a bare dir is one unlabeled take.
+  const takes = audioDir.includes('=')
+    ? audioDir.split(',').map((t) => { const [head, dir] = t.split('=') as [string, string]; const [id, label] = head.split(':') as [string, string?]; return { id, label: label ?? id, dir }; })
+    : [{ id: 'A', label: 'Voices', dir: audioDir }];
+  const versions: Array<{ id: string; label: string; file: string }> = [];
+  for (const { id, label, dir } of takes) {
+    const timeline = JSON.parse(readFileSync(join(dir, 'timeline.json'), 'utf8')) as { lines: Array<{ startMs: number; endMs: number }> };
+    let i = 0;
+    for (const p of comic.panels as Array<{ items: Array<{ kind: string; audio?: Record<string, [number, number]> }> }>) {
+      for (const item of p.items) {
+        if (item.kind === 'sfx') continue;
+        const line = timeline.lines[i++];
+        if (line) (item.audio ??= {})[id] = [line.startMs, line.endMs];
+      }
     }
+    if (i !== timeline.lines.length) throw new Error(`${id}: voice lines (${timeline.lines.length}) do not match items (${i})`);
+    const mp3 = readdirSync(dir).find((f) => f.endsWith('.mp3'))!;
+    const file = `audio-${id}.mp3`;
+    const r = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', join(dir, mp3), '-b:a', '96k', join(siteDir, file)]);
+    if (r.status !== 0) throw new Error(`ffmpeg failed on ${id}`);
+    versions.push({ id, label, file });
   }
-  if (i !== timeline.lines.length) throw new Error(`voice lines (${timeline.lines.length}) do not match items (${i})`);
-  const mp3 = readdirSync(audioDir).find((f) => f.endsWith('.mp3'))!;
-  const r = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', join(audioDir, mp3), '-b:a', '96k', join(siteDir, 'audio.mp3')]);
-  if (r.status !== 0) throw new Error('ffmpeg failed on audio');
-  (comic as { audio?: boolean }).audio = true;
+  (comic as { voices?: unknown }).voices = versions;
 }
 
 const template = readFileSync(resolve(import.meta.dir, 'comic.html'), 'utf8');

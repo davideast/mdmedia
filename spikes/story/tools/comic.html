@@ -78,10 +78,12 @@ header p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 34rem; 
 .guided[hidden] { display: none; }
 .guided .stage { display: grid; place-items: center; min-height: 0; padding: 16px; overflow: hidden; touch-action: pan-y; }
 .guided .stage .panel { position: relative; left: auto !important; top: auto !important; }
-.guided .bar { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 0.5rem; align-items: center; padding: 0.6rem 16px 0.9rem; }
+.guided .bar select { font: 700 0.85rem/1 var(--font-ui); padding: 0.55rem 0.4rem; border-radius: 0.6rem; background: #1b1f27; color: #fff; border: 2px solid #fff; }
+.tools select { font: 700 0.85rem/1 var(--font-ui); padding: 0.4rem; border-radius: 0.5rem; border: 2px solid var(--ink); background: var(--page); color: #111318; }
+.guided .bar { display: grid; grid-template-columns: auto auto 1fr auto auto auto; gap: 0.4rem; align-items: center; padding: 0.6rem 16px 0.9rem; }
 .guided .bar button {
-  font: 700 0.9rem/1 var(--font-ui); padding: 0.7rem 0.9rem; border-radius: 999px; border: 2px solid #fff;
-  background: transparent; color: #fff; cursor: pointer; min-width: 3rem;
+  font: 700 0.85rem/1 var(--font-ui); padding: 0.7rem 0.75rem; border-radius: 999px; border: 2px solid #fff;
+  background: transparent; color: #fff; cursor: pointer; white-space: nowrap;
 }
 .guided .bar button.primary { background: var(--gold); border-color: var(--gold); color: #111318; }
 .guided .bar span { font: 0.85rem/1.2 var(--font-ui); color: #a0a8b6; text-align: center; font-variant-numeric: tabular-nums; }
@@ -98,6 +100,7 @@ footer p { margin: 0; max-width: 40rem; }
     <div class="tools">
       <button id="guide" type="button">Read panel by panel</button>
       <label for="order"><input id="order" type="checkbox"> Show reading order</label>
+      <label for="voice" id="voice-label" hidden>Voices <select id="voice"></select></label>
       <span id="hint"></span>
     </div>
   </header>
@@ -111,6 +114,7 @@ footer p { margin: 0; max-width: 40rem; }
   <div class="stage" id="stage"></div>
   <div class="bar">
     <button id="g-close" type="button" aria-label="Close guided reading">Close</button>
+    <select id="g-voice" aria-label="Voices"></select>
     <span id="g-pos"></span>
     <button id="g-prev" type="button" aria-label="Previous panel">Back</button>
     <button id="g-play" type="button" class="primary">Read aloud</button>
@@ -145,8 +149,8 @@ function buildPage(page) {
       d.className = `item ${item.kind}` + (item.kind === 'balloon' && item.tone === 'small' ? ' small' : '') + (item.kind !== 'sfx' && item.text.length > 60 ? ' long' : '');
       d.textContent = item.text;
       d.dataset.who = item.who ?? '';
-      if (item.startMs !== undefined) {
-        d.dataset.start = String(item.startMs); d.dataset.end = String(item.endMs);
+      if (item.audio) {
+        d.dataset.start = '1'; d.dataset.ranges = JSON.stringify(item.audio);
         d.tabIndex = 0; d.setAttribute('role', 'button');
         d.setAttribute('aria-label', `Hear ${item.kind === 'caption' ? 'caption' : (item.who ?? '').toLowerCase()}: ${item.text}`);
       }
@@ -266,9 +270,21 @@ new ResizeObserver(letterAll).observe(pagesEl);
 $('order').addEventListener('change', (e) => document.body.classList.toggle('show-order', e.target.checked));
 
 // Audio: each caption and balloon owns a range of one voice track.
-const audio = $('audio');
-if (COMIC.audio) { audio.src = 'audio.mp3'; $('hint').textContent = 'Tap any balloon or caption to hear it.'; }
+// Voice takes: one audio file each; the chosen take is remembered per viewer.
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const voices = COMIC.voices ?? [];
+let audio = $('audio');
+const players = Object.fromEntries(voices.map((v) => { const a = new Audio(v.file); a.preload = 'auto'; return [v.id, a]; }));
+let voice = voices.find((v) => v.id === store.get('voice'))?.id ?? voices[0]?.id;
+for (const sel of [$('voice'), $('g-voice')]) {
+  for (const v of voices) { const o = document.createElement('option'); o.value = v.id; o.textContent = sel.id === 'g-voice' ? v.id : `${v.id} · ${v.label}`; sel.append(o); }
+  sel.value = voice ?? '';
+  sel.addEventListener('change', () => { stopSpeaking(); voice = sel.value; store.set('voice', voice); $('voice').value = voice; $('g-voice').value = voice; bindPlayer(); });
+}
+function bindPlayer() { audio.removeEventListener('timeupdate', onTime); audio = players[voice] ?? audio; audio.addEventListener('timeupdate', onTime); }
+if (voices.length) { $('hint').textContent = 'Tap any balloon or caption to hear it.'; }
 else { $('g-play').hidden = true; }
+$('voice-label').hidden = voices.length < 2; $('g-voice').hidden = voices.length < 2;
 let speaking = null, stopAt = 0, onDone = null;
 function stopSpeaking() {
   audio.pause(); speaking?.classList.remove('speaking'); speaking = null; onDone = null;
@@ -277,13 +293,15 @@ function speak(el, done) {
   stopSpeaking();
   if (!el?.dataset.start) { done?.(); return; }
   speaking = el; el.classList.add('speaking'); onDone = done ?? null;
-  stopAt = Number(el.dataset.end) / 1000;
-  audio.currentTime = Number(el.dataset.start) / 1000;
+  const [start, end] = JSON.parse(el.dataset.ranges)[voice] ?? [0, 0];
+  stopAt = end / 1000;
+  audio.currentTime = start / 1000;
   audio.play().catch(() => stopSpeaking());
 }
-audio.addEventListener('timeupdate', () => {
+function onTime() {
   if (speaking && audio.currentTime >= stopAt) { const done = onDone; stopSpeaking(); done?.(); }
-});
+}
+bindPlayer();
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-start]');
   if (!el) return;

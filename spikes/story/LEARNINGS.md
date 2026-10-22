@@ -242,6 +242,41 @@ captions, balloons and sound effects in reading order. 4 pages, 21 panels,
   re-letters one panel with a minimum size so it reads on a phone. Wide
   panels on a portrait phone get crowded.
 
+## Run 5: making line-by-line voices follow each other (lunch scene)
+
+Line mode renders each balloon alone, so tone resets between lines. 20 of the
+37 lines also had no cue: cues were borrowed from the story file by text match
+and the rest fell back to the character default. Four takes of the same 37
+lines (`embarrassing-day/comic-lunch-voices.md` holds the new cues):
+
+| Take | How | Lines exact by transcript* | Real problems found |
+|---|---|---|---|
+| A | line mode, borrowed cues (what was heard) | 23/37 | "Heh" dropped; an "Ugh" added before "You promised" |
+| B | line mode, a context-aware cue on every line | 27/37 | "I tried to laugh" dropped; whispered "The dancing one" garbled; "pleading" added an "Ugh" |
+| C | `gemini-3.8-flash-tts`, cue plus the two previous lines as a `speech_metadata` note | 29/37 | "Clip" dropped from "What. Clip."; "but" cut from "I know, but—"; "Heh" became a real laugh |
+| D | two-speaker runs, cut into balloons | content complete | cuts wrong: see below |
+
+*Most remaining mismatches are transcription noise ("lawnmower", "gonna",
+"Harper Black"); the problems column is the ones that hold up.
+
+- **Every line needs a cue, written with the previous line in mind.** That is
+  director work, and it is cheap. Emotion-only cues; action cues leak.
+- **The verbatim model takes notes in a separate field and never spoke them**,
+  including the context ("Just before this, June said ..."). Its text
+  fidelity was the best of the three, and it voices non-verbal sounds
+  ("Heh" as a laugh). It also clips trailing words after a dash or full stop
+  more readily ("What. Clip." -> "What?").
+- **Runs cannot be cut into balloons with what we have.** Snapping to pauses
+  put nearly every cut one segment off (9/37), because turn pauses inside a
+  run don't match line boundaries. Asking Gemini for per-line start and end
+  times fixed the first lines and then fell apart around line 20 (12/37).
+  Per-balloon clips from a run need a real forced aligner, which is a new
+  dependency, or tap-to-hear per panel instead of per balloon.
+- **Batch transcription drifts.** Sending 37 clips in one request shifted
+  answers by a clip and merged neighbours; one request per clip works.
+- **Short, quiet lines are the weak spot in every take**: whispers garble,
+  sighs get added, the filter refuses some (A needed 4 fallbacks, B 1, C 0).
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in
