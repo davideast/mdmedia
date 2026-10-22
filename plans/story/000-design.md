@@ -134,15 +134,17 @@ By lunch, things were going better than I'd imagined.
   narration (F-run 3). The Holmes case (narration as inner voice with an effect)
   builds on this later.
 - A paragraph starting `**NAME** *(cue)*:` is a line by NAME; any other
-  paragraph is narration. Inline markdown is stripped for speech and kept for
-  display.
+  paragraph is narration. A narration paragraph carries its cue at the start:
+  `*(hushed, heavy)* But at our table, everything had gone quiet.` Inline
+  markdown is stripped for speech and kept for display.
 - **Every line should carry a cue**, written with the previous line in mind, and
   about feeling, not action: action cues ("typing fast") get spoken (F-run 3,
   5). `story check` warns on lines without one; telling feeling from action is
   the director's judgment, not a check.
 - `###` or a horizontal rule starts a scene; `#` a chapter; `##` is displayed
   only.
-- ` ```pause ` replaces the default gap at that point (`1.5s`, `1500ms`, `0:02`).
+- ` ```pause ` replaces the default gap at that point (`1.5s`, `1500ms`, `0:02`);
+  `0ms` removes the gap, for an interruption.
 - ` ```music ` at the start of a scene is that scene's music cue (F-run 3).
 - Other fenced blocks are kept for display and ignored by speech.
 

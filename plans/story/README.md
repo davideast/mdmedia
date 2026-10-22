@@ -8,7 +8,7 @@ from six prototype runs on real text; the evidence is in
 | Plan | Title | Status |
 |---|---|---|
 | [000](000-design.md) | Design: principles, notation, voices, music, art, lettering, caching, CLI, output, milestones | REWRITTEN 2026-10-22 |
-| [001](001-milestone-0-parse-check.md) | Milestone 0: story file parser, schemas, `story check` | NOT STARTED |
+| [001](001-milestone-0-parse-check.md) | Milestone 0: story file parser, schemas, `story check` | DONE locally on `feat/story-m0` (9375c53), not pushed |
 | [002](002-milestone-1-voices.md) | Milestone 1: voices in context, checked, built | NOT STARTED |
 | 003 | Milestone 2: music | NOT WRITTEN |
 | 004 | Milestone 3: director (`story direct`) | NOT WRITTEN |

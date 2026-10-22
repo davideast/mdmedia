@@ -206,6 +206,19 @@ bun run verify
 grep -rn "from 'node:" src/story && echo "STOP: node import in src/story" || echo "story is platform-free"
 ```
 
+## As built (2026-10-22)
+
+- `parseStory` is async: the source hash uses Web Crypto, which has no
+  synchronous form. Callers `await` it.
+- Narration paragraphs take a leading `*(cue)*`; without it, narration could
+  not carry a cue and would always warn.
+- `parseDuration` accepts zero (`0ms`), which the prototype used to remove the
+  gap for an interruption.
+- `bun run verify` needs a writable npm cache; in the sandbox, run it with
+  `npm_config_cache=$TMPDIR/npm-cache`.
+- In a fresh worktree, three Studio tests fail until Studio's own
+  dependencies are installed (`studio/node_modules`); they pass on main.
+
 ## Done when
 
 - The three prototype fixtures produce their golden `script.json`.
