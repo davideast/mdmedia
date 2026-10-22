@@ -1,0 +1,42 @@
+{
+  "scene": "Milo has just admitted to June that he sent her private, embarrassing dance video to Harper to make himself look good. June is his best friend; she trusted him with it. This page is the moment she understands, and it hurts.",
+  "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the LEFT side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the RIGHT side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+  "rules": "Continuity for this whole page: June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+  "panels": {
+    "31": {
+      "acting": "Milo has just said 'The dancing one.' For one split second June hasn't taken it in yet: she is mid-blink, and the faint ghost of her usual dry half-smile is still on her lips, as if she might laugh. It is fragile, about to vanish.",
+      "refs": ["sheet", "staging"],
+      "check": ["Is this an extreme close-up where June's face fills nearly the whole frame?", "Does June have at most a faint, uncertain almost-smile, not a big happy grin?"]
+    },
+    "32": {
+      "edit": "31",
+      "acting": "Same panel, same face, same framing, same lighting and background. Change only her expression: the almost-smile is gone. Her face is completely blank and still, eyes open, staring at Milo, taking it in.",
+      "check": ["Is this the same framing and the same face as the previous close-up?", "Is her expression blank and still, with no smile?"]
+    },
+    "33": {
+      "edit": "32",
+      "acting": "Same panel, same face, same framing, same lighting and background. Change only her expression: her brows draw together and up, her eyes are wet and glistening, her lips press tight. She is deeply hurt, not angry.",
+      "check": ["Is this the same framing and the same face as the previous close-up?", "Does she look hurt, with brows drawn together and wet eyes?"]
+    },
+    "34": {
+      "acting": "June has just understood he betrayed her trust. She pulls back from the table in shock, both hands gripping the table edge, eyes wide, mouth open: stunned and hurt, not relaxed and not reclining. Across the table, Milo raises both palms, panicked, talking too fast.",
+      "refs": ["sheet", "staging", "prev"],
+      "check": ["Is June seated on the left side of the table and Milo seated on the right side, across from each other?", "Does June look shocked and hurt, not relaxed?", "Is Milo raising his hands defensively?"]
+    },
+    "35": {
+      "acting": "June stares down at her tray, shoulders hunched, small and hurt. Milo leans across the table toward her, hands clasped, pleading. Both stay seated.",
+      "refs": ["sheet", "staging", "prev"],
+      "check": ["Is June seated on the left side of the table and Milo seated on the right side, across from each other?", "Is June looking down and hurt?", "Is Milo leaning forward, pleading?"]
+    },
+    "36": {
+      "acting": "The emotional low point. Close on June looking straight at Milo, tears welling, chin trembling, voice catching on his name. Same face as the earlier close-ups.",
+      "refs": ["sheet", "33"],
+      "check": ["Is June shown close, with tears welling and a hurt expression?", "Does she look like the same girl as in the close-up reference?"]
+    },
+    "41": {
+      "acting": "Everyone else in the cafeteria is loud and chaotic: a grape flies through the air, a seventh grader waves a ketchup packet at a lunch monitor. In the middle of it, June and Milo sit stiff and silent across their table, not looking at each other, isolated in stillness.",
+      "refs": ["sheet", "staging"],
+      "check": ["Are June and Milo sitting still and silent across their table while the cafeteria around them is chaotic?", "Is June on the left and Milo on the right?"]
+    }
+  }
+}

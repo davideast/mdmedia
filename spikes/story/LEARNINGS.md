@@ -283,6 +283,37 @@ the previous lines passed as a delivery note. Its remaining defect (a word
 clipped after a dash or full stop) is exactly what the per-line transcript
 check catches, so verify-and-re-render stays in the pipeline.
 
+## Run 6: making panels follow each other (lunch scene, page 3 and page 4 panel 1)
+
+Each panel was drawn alone from a note that said what happens, not what it
+means, so seats moved, June lounged through "You sent my video?", and the
+three close-ups were three different faces. Seven panels in three takes
+(`embarrassing-day/art-context.json`, `tools/art-context.ts`):
+
+| Take | How | Result |
+|---|---|---|
+| A | as before: art note only | inconsistent seats, wrong tone, drifting faces |
+| B | an acting note written in context for each panel, plus the panel's and the previous panel's dialogue as context | tone right (shock, hurt, pleading); the room changed every panel (a brown table in an empty room); faces still drifted |
+| C | B plus a staging image for the scene, a screen-side rule, earlier panels as references, edit chains for the close-ups, and a yes/no vision check with up to two redraws | same table, seats and camera across panels; the three close-ups are one face with only the expression changing (identical head boxes) |
+
+- **Edit chains are the image version of passing the previous lines.**
+  "Same panel, same face; change only her expression" kept framing and
+  identity exactly across three panels.
+- **A staging image fixes the room**, and the screen-side rule (June left,
+  Milo right) keeps two-shots readable.
+- **A drifted reference spreads.** The first staging image gave June long
+  hair; every C panel copied it and the panel checks passed it. The staging
+  image now gets its own on-model check before anything is drawn from it,
+  and every panel check asks on-model questions (hair, clothes).
+- **Dialogue passed as context leaks onto the page.** One panel came back with
+  garbled drawn balloons; a "no written words" check caught it on the redraw.
+- **The vision check only catches what it is asked.** It passed long hair and
+  wrong trousers until asked about them; it reliably failed the drawn text
+  once asked. Concrete questions from the script and the character sheet,
+  never "is this good".
+- Cost for C: 1 staging image, 7 panels, one redraw; about 10 image calls and
+  9 checks.
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in

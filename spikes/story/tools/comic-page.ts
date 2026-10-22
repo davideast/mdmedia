@@ -12,20 +12,26 @@ if (!comicPath || !artDir || !siteDir) {
   process.exit(2);
 }
 const ffmpeg = resolve(import.meta.dir, '../../../node_modules/ffmpeg-static/ffmpeg');
-const comic = JSON.parse(readFileSync(comicPath, 'utf8')) as { panels: Array<{ id: number; faces?: unknown }> };
-const facesPath = join(artDir, 'faces.json');
-const faces = existsSync(facesPath) ? JSON.parse(readFileSync(facesPath, 'utf8')) : {};
-for (const p of comic.panels) p.faces = faces[p.id] ?? [];
-mkdirSync(join(siteDir, 'img'), { recursive: true });
+const comic = JSON.parse(readFileSync(comicPath, 'utf8')) as { panels: Array<{ id: number; faces?: Record<string, unknown> }>; arts?: unknown };
 
-for (const p of comic.panels) {
-  const name = String(p.id).padStart(2, '0');
-  const src = join(artDir, `panel-${name}.png`);
-  const dst = join(siteDir, 'img', `${name}.webp`);
-  if (!existsSync(src)) { console.error(`missing art for panel ${name}`); continue; }
-  const r = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', src, '-vf', 'scale=1000:-2', '-c:v', 'libwebp', '-quality', '80', dst]);
-  if (r.status !== 0) throw new Error(`ffmpeg failed on ${src}`);
+// Art: one dir, or several takes as "id:label=dir,..." to compare.
+const artTakes = artDir.includes('=')
+  ? artDir.split(',').map((t) => { const [head, dir] = t.split('=') as [string, string]; const [id, label] = head.split(':') as [string, string?]; return { id, label: label ?? id, dir }; })
+  : [{ id: 'A', label: 'Art', dir: artDir }];
+for (const take of artTakes) {
+  const facesPath = join(take.dir, 'faces.json');
+  const faces = existsSync(facesPath) ? JSON.parse(readFileSync(facesPath, 'utf8')) : {};
+  mkdirSync(join(siteDir, 'img', take.id), { recursive: true });
+  for (const p of comic.panels) {
+    (p.faces ??= {})[take.id] = faces[p.id] ?? [];
+    const name = String(p.id).padStart(2, '0');
+    const src = join(take.dir, `panel-${name}.png`);
+    if (!existsSync(src)) { console.error(`${take.id}: missing art for panel ${name}`); continue; }
+    const r = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', '-i', src, '-vf', 'scale=1000:-2', '-c:v', 'libwebp', '-quality', '80', join(siteDir, 'img', take.id, `${name}.webp`)]);
+    if (r.status !== 0) throw new Error(`ffmpeg failed on ${src}`);
+  }
 }
+comic.arts = artTakes.map(({ id, label }) => ({ id, label }));
 
 // Voices: one line per caption and balloon, in reading order (render.ts line
 // mode). Either one render dir, or several as "A=dir,B=dir" to compare takes.

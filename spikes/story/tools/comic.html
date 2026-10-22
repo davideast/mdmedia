@@ -100,6 +100,7 @@ footer p { margin: 0; max-width: 40rem; }
     <div class="tools">
       <button id="guide" type="button">Read panel by panel</button>
       <label for="order"><input id="order" type="checkbox"> Show reading order</label>
+      <label for="art" id="art-label" hidden>Art <select id="art"></select></label>
       <label for="voice" id="voice-label" hidden>Voices <select id="voice"></select></label>
       <span id="hint"></span>
     </div>
@@ -128,6 +129,12 @@ const COMIC = /*DATA*/null;
 const $ = (id) => document.getElementById(id);
 $('dek').textContent = `${COMIC.pages.length} page${COMIC.pages.length > 1 ? 's' : ''}, ${COMIC.panels.length} panels, ${COMIC.panels.reduce((n, p) => n + p.items.length, 0)} captions and balloons. Lettering is live text laid out by the page.`;
 
+// Art takes: the chosen one is remembered per viewer.
+const artStore = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const arts = COMIC.arts ?? [{ id: 'A', label: 'Art' }];
+let art = arts.find((a) => a.id === artStore.get('art'))?.id ?? arts.find((a) => a.id === 'C')?.id ?? arts[0].id;
+const artSrc = (p) => `img/${art}/${String(p.id).padStart(2, '0')}.webp`;
+
 function buildPage(page) {
   const el = document.createElement('section');
   el.className = 'page';
@@ -138,7 +145,7 @@ function buildPage(page) {
     panel.className = 'panel';
     Object.assign(panel.style, { left: `${(p.x / PW) * 100}%`, top: `${(p.y / PH) * 100}%`, width: `${(p.w / PW) * 100}%`, height: `${(p.h / PH) * 100}%` });
     const img = document.createElement('img');
-    img.alt = p.note; img.src = `img/${String(p.id).padStart(2, '0')}.webp`; img.decoding = 'async';
+    img.alt = p.note; img.src = artSrc(p); img.decoding = 'async';
     panel.append(img);
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.classList.add('tails');
@@ -174,7 +181,7 @@ function headsIn(panel, W, H) {
   const p = panel._data, img = panel.querySelector('img');
   const iw = img.naturalWidth || W, ih = img.naturalHeight || H;
   const s = Math.max(W / iw, H / ih), dx = (W - iw * s) / 2, dy = (H - ih * s) / 2;
-  return (p.faces ?? []).map((f) => {
+  return (p.faces?.[art] ?? []).map((f) => {
     const [y0, x0, y1, x1] = f.box;
     return { name: f.name, x: dx + x0 * iw * s, y: dy + y0 * ih * s, w: (x1 - x0) * iw * s, h: (y1 - y0) * ih * s };
   });
@@ -267,6 +274,15 @@ for (const page of COMIC.pages) pagesEl.append(buildPage(page));
 const letterAll = () => document.querySelectorAll('.panel').forEach(letterPanel);
 Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]).then(letterAll);
 new ResizeObserver(letterAll).observe(pagesEl);
+for (const a of arts) { const o = document.createElement('option'); o.value = a.id; o.textContent = `${a.id} · ${a.label}`; $('art').append(o); }
+$('art').value = art; $('art-label').hidden = arts.length < 2;
+$('art').addEventListener('change', async () => {
+  art = $('art').value; artStore.set('art', art);
+  const imgs = [...document.querySelectorAll('#pages .panel img')];
+  document.querySelectorAll('#pages .panel').forEach((panel) => { panel.querySelector('img').src = artSrc(panel._data); });
+  await Promise.all(imgs.map((i) => i.decode().catch(() => {})));
+  letterAll();
+});
 $('order').addEventListener('change', (e) => document.body.classList.toggle('show-order', e.target.checked));
 
 // Audio: each caption and balloon owns a range of one voice track.
@@ -275,7 +291,7 @@ const store = { get(k) { try { return localStorage.getItem(k); } catch { return 
 const voices = COMIC.voices ?? [];
 let audio = $('audio');
 const players = Object.fromEntries(voices.map((v) => { const a = new Audio(v.file); a.preload = 'auto'; return [v.id, a]; }));
-let voice = voices.find((v) => v.id === store.get('voice'))?.id ?? voices[0]?.id;
+let voice = voices.find((v) => v.id === store.get('voice'))?.id ?? voices.find((v) => v.id === 'C')?.id ?? voices[0]?.id;
 for (const sel of [$('voice'), $('g-voice')]) {
   for (const v of voices) { const o = document.createElement('option'); o.value = v.id; o.textContent = sel.id === 'g-voice' ? v.id : `${v.id} · ${v.label}`; sel.append(o); }
   sel.value = voice ?? '';
