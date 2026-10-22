@@ -288,10 +288,9 @@ Committed locally on `feat/story-m1` (107a0df), not pushed.
   so they are retried on every build.
 - **Sandbox note**: Node's `fetch` needs `NODE_USE_ENV_PROXY=1` to use the
   sandbox proxy; without it every request fails and retries for minutes.
-- **Proposed follow-up, from this run's evidence**: give the transcriber the
-  cast names, and treat a missing interjection ("heh", "hmm") as noise when
-  the take is otherwise exact. Both would have saved the three failures and
-  most retakes here.
+- **Follow-up, folded into milestone 2** ([003](003-milestone-2-music.md)):
+  give the transcriber the cast names, and treat a missing interjection ("heh",
+  "hmm") as noise when the take is otherwise exact.
 
 ## Done when
 
