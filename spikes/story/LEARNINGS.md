@@ -277,6 +277,12 @@ lines (`embarrassing-day/comic-lunch-voices.md` holds the new cues):
 - **Short, quiet lines are the weak spot in every take**: whispers garble,
   sighs get added, the filter refuses some (A needed 4 fallbacks, B 1, C 0).
 
+**Verdict (by ear): C is far better than A and B.** The build voices lines
+one at a time on a verbatim model, with a context-aware cue on every line and
+the previous lines passed as a delivery note. Its remaining defect (a word
+clipped after a dash or full stop) is exactly what the per-line transcript
+check catches, so verify-and-re-render stays in the pipeline.
+
 ## Cases for later
 
 - **Many voices (Alice, the Mad Tea-Party).** Render each voice or pair in
