@@ -1,13 +1,18 @@
 # Story plans
 
-A **story** builds one markdown document into a dramatic audio recording and,
-later, an illustrated graphic novel and an MP4 playthrough. The design comes
-first; implementation plans follow it in milestone order.
+A **story** builds an author's text into an audio drama and a graphic novel that
+share one cast and one render pipeline. The design was rewritten on 2026-10-22
+from six prototype runs on real text; the evidence is in
+[prototype-findings.md](prototype-findings.md).
 
 | Plan | Title | Status |
-| :--- | :--- | :--- |
-| [000](000-design.md) | Design: principles, notation, data model, audio runtime boundary, API, CLI, output, caching, testing | DECIDED |
-| [001](001-milestone-0-parse-schedule.md) | Milestone 0: parser, schemas, scheduler, cache keys, `story check` | NOT STARTED |
-| 002 | Milestone 1: Node runtime, render cache, two-voice build | NOT WRITTEN |
+|---|---|---|
+| [000](000-design.md) | Design: principles, notation, voices, music, art, lettering, caching, CLI, output, milestones | REWRITTEN 2026-10-22 |
+| [001](001-milestone-0-parse-check.md) | Milestone 0: story file parser, schemas, `story check` | NOT STARTED |
+| [002](002-milestone-1-voices.md) | Milestone 1: voices in context, checked, built | NOT STARTED |
+| 003 | Milestone 2: music | NOT WRITTEN |
+| 004 | Milestone 3: director (`story direct`) | NOT WRITTEN |
+| 005–007 | Milestones 4–6: comic art, pages and reader, director for comics | NOT WRITTEN |
 
-The decisions in section 15 of the design are settled.
+Plans are written one or two milestones ahead, so each starts from what the
+previous one learned.

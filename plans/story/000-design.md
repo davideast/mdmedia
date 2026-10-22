@@ -1,426 +1,439 @@
 # Story: design
 
-A **story** is a markdown document that builds into a dramatic audio recording
-(narrator, cast, and later sound effects and music) and, eventually, an
-illustrated graphic novel and an MP4 playthrough. mdmedia treats it like a build
-tool: a source file compiles to a timeline, renders are cached by content, and a
-build writes a predictable output tree.
+A **story** builds an author's text into two productions that share one cast and
+one render pipeline:
 
-This document fixes what has to be decided before implementation and leaves
-everything else to the milestone that proves it is needed. Later plans in this
-folder (`001-…`) are step-by-step implementation plans that point back here.
+- an **audio drama**: every line voiced in character, with music, as an MP3;
+- a **graphic novel**: comic pages with lettered balloons and captions, read at
+  your own pace, where any balloon can be heard.
 
-- **Status**: decisions settled 2026-10-18 (section 14); scope trimmed to what is
-  proven (section 1)
-- **Planned at**: commit `4eb8f62`, 2026-10-18
+mdmedia treats it like a build tool: source files compile to a timeline, every
+generated piece is cached by content and checked after it is made, and a build
+writes a predictable output tree.
+
+This version replaces the 2026-10-18 design. Six prototype runs on real text
+answered the questions that design guessed at; the evidence is in
+[prototype-findings.md](prototype-findings.md), cited below as **F-run N**.
+
+- **Status**: rewritten from prototype evidence, 2026-10-22
+- **Planned at**: commit `4eb8f62`
 
 ## 1. Principles
-
-These decide what gets built and what does not.
 
 1. **Code owns what is mechanical and checkable; the model owns judgment.**
 
    | Code | Model |
    |---|---|
-   | Parsing the stated notation | Turning loose prose into that notation |
-   | Hashing and the render cache | Choosing each line's delivery |
-   | Timing arithmetic: durations plus the gaps written in the script | Deciding pacing: where a beat lands, where to rush |
-   | Provider calls, mixing, encoding, loudness to a published standard | Art prompts and character consistency |
-   | The output file layout | Placing captions on an image (it can return boxes) |
-   | Machine-readable errors | Fixing a story from those errors |
+   | Parsing the notation, with exact errors | Adapting prose into the notation (the director) |
+   | The render cache, retries, refusal fallbacks | Each line's delivery cue and each panel's acting note |
+   | Comparing a transcript with the script, word by word | Transcribing a clip |
+   | Page geometry, balloon layout, tails, reading order, lettering | Where each character's head is in a panel |
+   | Mixing, music beds, loudness, encoding | Generating voices, music and art |
+   | Asking concrete yes/no questions after each image | Answering them |
 
-2. **Judgment is data, not constants.** Pacing, delivery and placement are
-   written in the script (by the author or a model) and the code applies them.
-   There are no rule tables of taste; there is one default gap.
-3. **Evidence before rules.** A check, heuristic or cleanup step is added only
-   after its failure has been seen or heard, and is removed if a model can do
-   the job instead.
-4. **Generation is not deterministic, so make it cheap to redo one piece.**
-   Content-addressed caching gives reproducible builds and lets one line, effect
-   or image be regenerated without touching the rest.
-5. **The CLI is a model's toolbox.** Commands are fast, deterministic and offer
-   `--json`, so an agent can loop: write, check, table-read, listen, adjust one
-   thing, rebuild.
-6. **Schemas grow by milestone.** Each version carries only what has been
-   built. Fields for sound effects, music, art and captions are added by the
-   milestones that build them, behind the schema version.
+2. **Judgment is data.** Cues, acting notes, staging and pauses are written in the
+   source files (by the author or the director) and the code applies them. There
+   are no rule tables of taste.
+3. **Every generated piece is checked, and checks ask concrete questions.**
+   Voices are transcribed and compared with the script; images are asked yes/no
+   questions taken from the script and the character sheet. A model asked "is
+   this good?" praised everything (F-run 2, 6); a model asked "is June's hair a
+   chin-length bob?" answers reliably.
+4. **Context makes pieces consistent.** A line voiced alone, or a panel drawn
+   alone, resets tone and drifts. Each one is generated knowing what came just
+   before: the previous lines for a voice, the staging and previous panels for an
+   image (F-run 5, 6).
+5. **Make it cheap to redo one piece.** Content-addressed caching means a fix to
+   one cue or one panel regenerates that piece and nothing else (F-run 3).
+6. **Evidence before rules.** Every rule in this document is backed by a
+   prototype finding. New checks are added only after their failure is seen or
+   heard.
+7. **The CLI is a model's toolbox.** Commands are fast, deterministic where they
+   can be, and offer `--json`, so the director can loop: write, check, build one
+   piece, read the report, adjust.
 
 ## 2. Concepts
 
 | Term | Meaning |
 |---|---|
-| **Story** | The source markdown file. |
-| **Cast** | The narrator and characters, each with a voice and default delivery. |
-| **Segment** | One unit of the script: a spoken line (narration is a line by the narrator) or a pause. Later milestones add credits, effects and music. |
-| **Scene** | A run of segments. Starts at a `###` heading or a horizontal rule. Later carries one illustration. |
-| **Chapter** | A `#` heading. |
-| **Script** | The parsed, validated story (`script.json`). Pure data, no durations. |
-| **Render** | One generated asset, cached by content hash. |
-| **Timeline** | The script plus measured durations: every segment's start and end (`timeline.json`). |
+| **Raw text** | The author's story, untouched. |
+| **Director** | The model step that adapts raw text into a story file, and a story file into a comic script. Its output is plain files a person can read and edit. |
+| **Story file** (`story.md`) | The audio drama's source: cast, scenes, lines with cues, pauses, music cues. |
+| **Comic script** (`comic.md`) | The graphic novel's source: pages, panels, art and acting notes, captions and balloons in reading order. |
+| **Cast** | Characters with a voice, a default delivery and a look. The narrator can be a cast member (first-person stories). |
+| **Line** | One spoken unit: a line of dialogue, a narration paragraph, or (in a comic) one caption or balloon. Always voiced alone, in context. |
+| **Render** | One generated asset (a line's audio, a music clip, a reference image, a panel), cached by content hash. |
+| **Check** | The verification of one render: a transcript diff for audio, yes/no questions for images. |
+| **Timeline** | Lines with measured start and end times. |
 | **Build** | One run that writes a `dist/` tree and `build.json`. |
 
-## 3. Notation
+## 3. Pipeline
 
-Plain markdown carries the story. Front matter declares the production. Nothing
-requires the tool to read.
-
-### 3.1 Front matter (milestone 0)
-
-```yaml
----
-title: The Most Embarrassing Day of My Life
-author: David East
-imprint: East Side Audio     # spoken in the opening credit (milestone 3); never defaulted
-language: en
-gap: 400ms                   # the one default pause between segments
-narrator:
-  voice: Puck                # a Gemini voice name, or { provider: elevenlabs, id: … }
-  delivery: warm, unhurried
-cast:
-  MAYA:
-    voice: Kore
-    delivery: quick, defensive
-  DAD:
-    voice: Charon
-    delivery: dry, amused
----
+```
+raw.md ──director──▶ story.md ──director──▶ comic.md
+                        │                       │
+                 parse + check           parse + check
+                        │                       │
+             voice every line (context)   reference images ─▶ panels (context)
+             check each, redo failures    check each, redo failures
+                        │                  head boxes per panel
+                  music per scene                │
+                        │                 voice every caption and balloon
+                  schedule + mix                 │
+                        ▼                 lay out pages and lettering
+              audio drama (MP3)                  ▼
+                                         graphic novel (reader site)
 ```
 
-- `title`, `narrator` and at least a `voice` per cast member are required.
-- Cast keys are names used in the text; they match case-insensitively.
-- Unknown keys are an error. A strict, explicit error is what lets a model
-  correct itself.
-- Later milestones add `credits` (3), `art` (6) and per-character `look` (A).
+The two productions share the cast, the voice pipeline and the cache. The
+graphic novel's voices are rendered from the comic script's own captions and
+balloons, which are shorter than the story's lines (F-run 4).
 
-### 3.2 Narration and lines
+## 4. Notation
 
-Any paragraph, list or block quote that is not a line is narration, spoken by
-the narrator. A paragraph that starts with a bold cast name and a colon is a
-line:
-
-```markdown
-The bus was already moving when Maya realized.
-
-**MAYA** *(whispering)*: Please tell me nobody saw that.
-
-**DAD**: Everyone saw that.
-```
-
-- An optional italic parenthetical is that line's delivery, added to the
-  character's default.
-- Inline markdown is stripped for speech and kept for display.
-- A new speaker needs a new paragraph.
-
-### 3.3 Structure and pauses
-
-- `#` heading: a chapter. `###` heading or a horizontal rule: a new scene.
-  `##` headings are displayed, not spoken.
-- Every segment is followed by the default `gap`. Anything else is written
-  explicitly:
+### 4.1 Story file
 
 ````markdown
+---
+title: The Most Embarrassing Day of My Life
+narrator: MILO                 # a cast member narrates; or { voice, delivery } for a separate narrator
+gap: 400ms
+cast:
+  MILO:
+    voice: Puck
+    delivery: a funny, quick-talking thirteen-year-old boy telling his own story
+    look: messy curly brown hair, freckles, oversized forest-green hoodie, red high-tops
+  JUNE:
+    voice: Leda
+    delivery: a smart, sarcastic thirteen-year-old girl, dry and warm
+    look: straight black chin-length bob with blunt bangs, mustard-yellow cardigan
+---
+
+# The Most Embarrassing Day of My Life
+
+### Lunch
+
+```music
+cheerful cafeteria bustle that slowly turns uneasy, light percussion
+```
+
+By lunch, things were going better than I'd imagined.
+
+**JUNE** *(flat, quietly suspicious)*: What clip?
+
+**MILO** *(barely audible, ashamed)*: The dancing one.
+
 ```pause
 1.5s
 ```
 ````
 
-  A `pause` block replaces the gap at that point. Durations are `1.5s`,
-  `1500ms` or `0:02`. Chapter and scene breaks get no special treatment; the
-  author or the director step (section 8) adds pauses where they belong.
-- Any other fenced code block is left out of the speech and kept for display.
+- Front matter: `title`, `narrator`, `cast` (each with `voice`) are required;
+  `delivery` and `look` are optional; unknown keys are errors.
+- `narrator: NAME` makes narration paragraphs that character's lines, marked as
+  narration (F-run 3). The Holmes case (narration as inner voice with an effect)
+  builds on this later.
+- A paragraph starting `**NAME** *(cue)*:` is a line by NAME; any other
+  paragraph is narration. Inline markdown is stripped for speech and kept for
+  display.
+- **Every line should carry a cue**, written with the previous line in mind, and
+  about feeling, not action: action cues ("typing fast") get spoken (F-run 3,
+  5). `story check` warns on lines without one; telling feeling from action is
+  the director's judgment, not a check.
+- `###` or a horizontal rule starts a scene; `#` a chapter; `##` is displayed
+  only.
+- ` ```pause ` replaces the default gap at that point (`1.5s`, `1500ms`, `0:02`).
+- ` ```music ` at the start of a scene is that scene's music cue (F-run 3).
+- Other fenced blocks are kept for display and ignored by speech.
 
-### 3.4 Added by later milestones
+### 4.2 Comic script
 
-Each is specified, implemented and tested in the milestone that needs it:
+````markdown
+---
+title: The Most Embarrassing Day of My Life — Lunch
+story: story.md                # cast, voices and looks come from here
+style: flat
+setting: the busy school cafeteria at lunch
+staging: >
+  Side view across one lunch table. June sits on the bench on the left, facing
+  right; Milo on the right, facing left.
+rules: Whenever both are in a panel, June is on the left and Milo on the right.
+---
 
-| Notation | Milestone |
-|---|---|
-| `credits:` front matter and credit segments | 3 |
-| ` ```sfx ` blocks and their timing relative to lines | 4 |
-| ` ```music ` blocks: fades, beds, ducking, transitions | 5 |
-| ` ```scene ` art direction, `art:` and `look:` front matter | A, 6, 7 |
-| Inline cues inside a sentence | when a story needs one |
+## Page 3
 
-### 3.5 Errors
+layout: 1 1 1 | 1 1 | 1
 
-`story check` reports only problems that would stop a build, each with file,
-line and column:
+### Panel 1
 
-| Code | Example |
-|---|---|
-| `missing-front-matter` | no front matter block |
-| `bad-yaml` | YAML syntax error |
-| `unknown-key` | `narator:` in front matter |
-| `missing-field` | no `title`, no `narrator`, or a cast member without `voice` |
-| `unknown-speaker` | `**MAYOR**:` with no `MAYOR` in the cast |
-| `bad-duration` | ` ```pause ` containing `soon` |
+> Extreme close-up: only June's face, filling the frame from her bangs to her
+> chin. Center: JUNE.
+>
+> acting: For one split second she hasn't taken it in; mid-blink, the ghost of
+> her dry half-smile still there.
 
-## 4. Data model
+For one second, I thought she'd laugh.
 
-Every file carries a `schema` field; readers reject an unknown major version.
-Later milestones add segment kinds and fields as minor versions.
+### Panel 2
 
-### 4.1 `script.json` (milestone 0)
+continue: 3.1
 
-```ts
-interface StoryScript {
-  schema: 'mdmedia.story.script/1';
-  source: { path: string; sha256: string };
-  meta: { title: string; author?: string; imprint?: string; language: string };
-  gapMs: number;
-  cast: Record<CastId, CastMember>;            // includes 'NARRATOR'
-  chapters: Chapter[];
-}
+> acting: Same face and framing. The almost-smile is gone; her face goes blank.
 
-interface CastMember { id: CastId; voice: VoiceRef; delivery: string }
-interface Chapter { id: string; index: number; title?: string; scenes: Scene[] }
-interface Scene { id: string; index: number; title?: string; segments: Segment[] }
+Not angry.
 
-type Segment =
-  | { kind: 'line'; id: string; speaker: CastId; text: string; display: string; delivery: string; source: SourceRange }
-  | { kind: 'pause'; id: string; durationMs: number; source: SourceRange };
-```
+### Panel 4
 
-### 4.2 `timeline.json` (milestone 0)
+> June pulls back from the table in shock; Milo raises both palms. Left: JUNE.
+> Right: MILO. Balloons: top.
+>
+> acting: She has just understood he betrayed her trust. Stunned and hurt, not
+> relaxed.
 
-```ts
-interface StoryTimeline {
-  schema: 'mdmedia.story.timeline/1';
-  durationMs: number;
-  chapters: { id: string; startMs: number; endMs: number }[];
-  scenes: { id: string; chapterId: string; startMs: number; endMs: number }[];
-  clips: { segmentId: string; render: string; startMs: number; endMs: number }[];
-}
-```
+**JUNE**: You sent my video?
 
-The scheduler places lines one after another: each line's duration, then the
-default gap or the pause written after it. That is all it does.
+**MILO**: It was just to Harper.
+````
 
-### 4.3 `build.json` (milestone 1)
+- `layout:` lists panel rows, `|` between rows, each number a panel's relative
+  width. Code turns it into panel slots on a 2:3 page (F-run 4).
+- The first `>` block is the art note: the shot, and `Left/Center/Right: NAME`
+  for who stands where. `Balloons: top|bottom` names the lettering zone.
+- `acting:` is the meaning of the moment, written in context (F-run 6).
+- `continue: P.N` draws this panel as an edit of panel N on page P: same face,
+  same framing, only what the acting note changes (F-run 6).
+- Plain paragraphs are captions (the narrator); `**NAME**: text` is a balloon,
+  `*(small)*` for quieter lettering, `*(off)*` for a speaker outside the panel;
+  ` ```sfx ` is a lettered sound effect. All in reading order.
+- `staging:` and `rules:` fix the room and the screen sides for the whole script
+  or, as a scene-level block, for one scene (F-run 6).
+- Balloon cues for voicing come from a matching story line or are written by the
+  director; the comic script carries them the same way as the story file.
 
-```ts
-interface StoryBuild {
-  schema: 'mdmedia.story.build/1';
-  tool: { name: 'mdmedia'; version: string };
-  source: { path: string; sha256: string };
-  ffmpeg: { path: string; version: string };
-  renders: Record<string, { segmentId: string; provider: string; model: string; durationMs: number; cached: boolean }>;
-  outputs: { path: string; sha256: string; bytes: number }[];
-}
-```
+### 4.3 Errors and warnings
 
-## 5. Pipeline
+`story check` reports, with file, line and column:
 
-```
-story.md
-  │ parseStory                 pure
-  ▼
-script.json
-  │ render each line           providers, render cache            (milestone 1)
-  ▼
-durations
-  │ scheduleStory              pure: durations + gaps
-  ▼
-timeline.json
-  │ mix, normalize, encode     audio runtime (ffmpeg)             (milestone 1)
-  ▼
-dist/
-```
+| Code | Kind | Example |
+|---|---|---|
+| `missing-front-matter`, `bad-yaml`, `unknown-key`, `missing-field` | error | no `title`; `narator:` |
+| `unknown-speaker` | error | `**MAYOR**:` with no MAYOR in the cast |
+| `bad-duration` | error | ` ```pause ` containing `soon` |
+| `misplaced-music` | error | a ` ```music ` cue after a scene's first line |
+| `layout-mismatch` | error | a page whose `layout:` has 5 slots but 6 panels |
+| `bad-continue` | error | `continue:` naming a panel that doesn't exist or comes later |
+| `missing-cue` | warning | a line or balloon with no cue (F-run 5) |
 
-Parsing and scheduling do no I/O and import nothing from Node, so they run
-unchanged in a browser (Studio's live preview, later).
+## 5. Voices
 
-## 6. The audio runtime boundary
+Settled by F-run 5 ("C is infinitely better"):
 
-All ffmpeg use lives in one module behind a small interface, so a browser
-implementation (Web Audio and Mediabunny) can replace it later. Only what
-milestone 1 uses is defined now; image, video and other interfaces are added
-with their milestones, and a capability registry only if a second runtime
-appears.
+- **One line per call, on a verbatim TTS model** (`gemini-3.8-flash-tts`).
+  The spoken text and the delivery note are separate fields, so notes are never
+  spoken. The existing `GeminiTTSProvider` already supports this.
+- **The delivery note** is the character's default delivery, the line's cue, and
+  the two previous lines in the same scene ("Just before this, June said …").
+- Two-speaker runs are not used: they sounded natural but leak notes into the
+  audio and can't be cut into per-line clips without a forced aligner (F-run 3,
+  5).
+- **Refusals fall back, never fail the build**: full note, then cue only, then
+  no note. The fallback is recorded (F-run 2, 4).
+- **Every line is checked**: transcribed alone (`gemini-3.5-flash-lite`, one
+  request per clip; batching drifts) and compared word by word with the line,
+  after normalizing numbers, contractions and compounds. A mismatch re-renders
+  with a fresh take up to twice; a line that still fails is reported for a
+  person, with what was heard (F-run 3, 5).
+- Measured once per model and recorded, not corrected yet: clips carry about
+  260 ms of silence before and 360 ms after, and audio costs 25 output tokens per
+  second (F-run 1, 2).
 
-```ts
-interface MediaHandle {
-  readonly id: string;
-  readonly mimeType: string;
-  stream(): ReadableStream<Uint8Array>;
-  readonly localPath?: string;                 // Node only, so ffmpeg reads without copying
-}
+## 6. Music
 
-interface AudioRuntime {
-  probe(input: MediaHandle): Promise<{ durationMs: number }>;
-  /** Mix the timeline's clips into one master and normalize it to the loudness target. */
-  mix(timeline: StoryTimeline, source: (renderKey: string) => MediaHandle, out: { loudnessLufs: number; truePeakDb: number }): Promise<MediaHandle>;
-  encode(input: MediaHandle, format: 'mp3' | 'wav'): Promise<MediaHandle>;
-}
+Settled by F-run 3:
 
-interface RenderCache {
-  get(key: string): Promise<MediaHandle | undefined>;
-  put(key: string, data: Uint8Array, mimeType: string): Promise<MediaHandle>;
-}
-```
+- Each ` ```music ` cue becomes one Lyria clip (`lyria-3-clip-preview`, about 30
+  s, instrumental).
+- Mix: 3 s of music alone before the scene's first line, then a bed at about
+  −10 dB fading out after 16 s; the first cue's theme returns over the ending.
+- Longer scores (crossfaded clips or full songs) wait until a story needs one.
 
-- The Node implementation spawns ffmpeg with argument arrays; it does not use
-  `fluent-ffmpeg` (deprecated).
-- ffmpeg is found in this order: `MDMEDIA_FFMPEG` (or an `ffmpegPath` option),
-  an installed `ffmpeg-static`, then `ffmpeg` on the `PATH`. `ffmpeg-static` is
-  an optional peer dependency, because it and its binary are GPL-3.0 and
-  mdmedia is MIT. A missing binary is a clear error, not a crash.
-- One contract test suite covers `AudioRuntime`; a browser implementation is
-  accepted by passing the same suite.
-- Loudness targets a published audiobook standard (−19 LUFS, −2 dBTP). Room
-  tone, silence trimming and other cleanup are added only if milestone 1's
-  renders are heard to need them.
+## 7. Art
 
-Licensing (not legal advice): running ffmpeg yourself has no GPL obligations,
-and generated media is not covered. Distributing the binary (for example a
-public Studio image) means shipping the GPL text and pointing to that build's
-source. Audio-only builds need only LGPL or BSD codecs; GPL enters with an
-H.264 encoder for video (OpenH264 is the BSD alternative).
+Settled by F-run 3, 4 and 6 (C was chosen):
 
-## 7. Public API (`mdmedia/story`)
+1. **Character sheet** per style, from the cast's `look` (one image).
+2. **Staging image** per scene, from `staging:`, drawn against the sheet and
+   **checked on model before anything is drawn from it** (a drifted staging
+   image spreads to every panel; F-run 6).
+3. **Each panel** is drawn with: the style; the art note; the acting note; the
+   panel's and the previous panel's dialogue as context, marked "do not write";
+   the rules; and references (sheet, staging, previous panel). `continue:`
+   panels are edits of the panel they continue.
+4. **Wording that works** (F-run 4): "one full-bleed illustration… no text";
+   headroom as "the top quarter shows only background scenery" (never "leave
+   space for balloons", which draws empty boxes); "extreme close-up: only her
+   face, filling the frame" for narrow close-ups.
+5. **Every image is checked** with yes/no questions: on model (hair, clothes,
+   from the cast's `look`), no written words, the staging and screen sides, and
+   the questions the acting note implies. Up to two redraws; the panel with the
+   most passes is kept and the failures reported.
+6. **Head boxes**: one vision call per finished panel returns where each named
+   character's head is, for lettering (F-run 4).
 
-Milestone 0:
+Default image model `gemini-3-pro-image`; `gemini-3.1-flash-image` is half the
+time and less faithful (F-run 3).
 
-```ts
-import { parseStory, scheduleStory, renderKey } from 'mdmedia/story';
+## 8. Pages, lettering and reading
 
-const { script, diagnostics } = parseStory(markdown, { path: 'story.md' });
-const key = await renderKey(segment, script);           // content hash, see section 9
-const timeline = scheduleStory(script, durations);      // durations by segment id
-```
+Settled by F-run 4:
 
-Milestone 1 adds:
-
-```ts
-import { buildStory, createNodeAudioRuntime, createFileRenderCache } from 'mdmedia/story';
-
-const result = await buildStory({
-  source: { path: 'story.md', markdown },
-  outDir: 'dist/the-most-embarrassing-day',
-  runtime: createNodeAudioRuntime(),
-  tts,                                   // existing ITTSProvider
-  cache: createFileRenderCache('.mdmedia/cache'),
-  tableRead: false,
-  signal,
-  onEvent,
-});
-```
-
-- Pure functions take and return plain data.
-- `buildStory` reads nothing from globals or the environment except through the
-  runtime it is given.
-- Errors are `StoryError` with a `code` and, where it applies, a `SourceRange`.
-
-## 8. The director step (after milestone 2)
-
-Rather than coding heuristics for pacing, delivery or structure, an optional
-model step turns any markdown or prose into canonical story notation, with
-explicit cast, deliveries and pauses, written to a file the author can read and
-edit:
-
-```bash
-mdmedia story direct notes.md -o story.md
-```
-
-It follows the pattern of the existing narration rewrite adapter. The parser
-stays small and strict; the model handles what is ambiguous, once and visibly.
-A model that can listen (Gemini understands audio) reviewing a table read and
-suggesting pause changes is an option to try later, not part of the plan.
+- Page geometry: a 2:3 page; rows share the height; panels share a row by
+  weight; each panel is drawn at the nearest supported aspect ratio and cropped
+  to its slot.
+- **Lettering is live text laid out by code**: caption boxes, oval balloons,
+  tails, sound effects, in a lettering face. Items take the best free spot in
+  reading order, never over a head, as high as possible, captions to the left,
+  balloons near their speaker above or beside the head. Tails end just short of
+  the speaker's head. Spelling is always exact (model lettering misspelled small
+  text, F-run 3).
+- Lettering size follows the page; the **guided view** re-letters one panel at a
+  minimum readable size for phones.
+- **Reading**: page view; guided view (one panel at a time, tap or arrow keys);
+  tap any caption or balloon to hear it; "read aloud" voices a panel in order and
+  turns to the next.
 
 ## 9. Caching
 
-A render's cache key is a SHA-256 (Web Crypto, so it also works in a browser)
-of what affects its bytes:
+A render's key is a SHA-256 (Web Crypto) of everything that affects its bytes:
 
+| Render | Key includes |
+|---|---|
+| Line audio | provider, model, voice, full delivery note **including the context lines**, spoken text, language, render version |
+| Music clip | model, prompt, render version |
+| Character sheet | model, style, looks |
+| Staging image | model, style, staging text, sheet key |
+| Panel | model, style, full prompt, reference keys (so a redrawn staging image redraws its panels) |
+| Head boxes | model, panel key |
+
+- Keys never include ids or positions; inserting a line renumbers files only.
+- Because the note includes the two previous lines in the scene, editing a line
+  re-renders it and the next two lines in that scene. That is intended: their
+  context changed.
+- A failed check never caches the take as accepted; a take that passes is kept.
+
+## 10. Runtime boundaries
+
+All ffmpeg use stays behind one small interface so a browser implementation can
+replace it later (unchanged from the previous design):
+
+```ts
+interface AudioRuntime {
+  probe(input: MediaHandle): Promise<{ durationMs: number }>;
+  mix(plan: MixPlan, out: { loudnessLufs: number; truePeakDb: number }): Promise<MediaHandle>;
+  encode(input: MediaHandle, format: 'mp3' | 'wav'): Promise<MediaHandle>;
+}
 ```
-line: provider, model, voice, delivery (default + per line), spoken text, language, render version
-```
 
-- Segment ids name files only. Keys never include ids or positions, so
-  inserting a line renumbers files without re-rendering anything.
-- A change to gaps or pauses re-mixes without re-rendering voices.
-- The cache lives in `.mdmedia/cache` next to the story; `--cache` moves it.
-- Later milestones add keys for effects, music and images in the same way.
+`MixPlan` is the timeline's clips plus music beds with their gain envelopes. Image
+conversion (PNG to WebP) uses the same runtime when the art milestone needs it.
+ffmpeg resolution and licensing notes are as before: `MDMEDIA_FFMPEG`, an
+installed `ffmpeg-static` (optional peer dependency, GPL-3.0), then `PATH`.
 
-## 10. CLI
+Providers are passed in, never read from globals: `tts`, `transcriber`, `music`,
+`image`, `vision`. Each wraps an existing mdmedia provider where one exists.
+Busy-model errors (429, 500, 503, timeouts) retry with backoff; concurrency is
+limited per provider because quota, not speed, is the practical limit (F-run 2,
+3).
+
+## 11. CLI
 
 | Command | Milestone | What it does |
 |---|---|---|
-| `mdmedia story check <file> [--json]` | 0 | Parse and validate; diagnostics as `file:line:col code message`; exit 1 on errors |
-| `mdmedia story build <file> [--out] [--table-read] [--cache] [--json]` | 1 | Render lines, schedule, mix, write `dist/` |
-| `mdmedia story direct <input> -o <story.md>` | after 2 | Model step from section 8 |
-| `cast`, `clean` | when needed | Previews and cleanup, added if real use asks for them |
+| `mdmedia story check <file> [--json]` | 0 (story), 4 (comic) | Parse and validate; `file:line:col severity code message`; exit 1 on errors |
+| `mdmedia story build <story.md> [--out] [--cache] [--json]` | 1, 2 | Voice, check, schedule, mix; write `dist/` |
+| `mdmedia story direct <raw.md> -o <story.md>` | 3 | Director: raw text to a story file, looping on `check --json` |
+| `mdmedia story draw <comic.md> [--json]` | 4 | Reference images and panels, checked; head boxes |
+| `mdmedia story comic <comic.md> [--out]` | 5 | Comic voices, pages, lettering, reader site |
+| `mdmedia story adapt <story.md> -o <comic.md>` | 6 | Director: story file to comic script |
 
-Exit codes: `0` success, `1` errors in the story, `2` provider failure, `3`
-ffmpeg missing, `130` cancelled. `story` is never chosen by extension routing.
+Exit codes: `0` success; `1` errors in the source; `2` provider failure; `3`
+ffmpeg missing; `4` built, but some renders still fail their checks (listed in
+`build.json` and the `--json` output); `130` cancelled. `story` is never chosen
+by extension routing.
 
-## 11. Output
+## 12. Output
 
 ```
 dist/<slug>/
-  build.json
-  script.json
+  build.json                       # renders, checks, fallbacks, failures, costs
+  script.json                      # parsed story
   timeline.json
   audio/
     <slug>.mp3
-    master.wav                                   # 48 kHz stereo, normalized
-    lines/<chapter>/<NNNN>-<speaker>.wav         # each line as rendered
-  text/
-    transcript.md
+    master.wav
+    lines/<scene>/<NNNN>-<speaker>.wav
+    music/<scene>.mp3
+  comic/                           # graphic novel milestones
+    comic.json                     # parsed comic script with head boxes and line timings
+    art/<style>/sheet.png, staging-<scene>.png, panel-<PNN>.png
+    voices/<NNNN>-<speaker>.wav
+  reader/                          # static site: index.html, img/, audio
+  text/transcript.md
 ```
 
-- Milestone 3 adds `audio/<slug>.m4b`, `audio/chapters/` and `text/captions.vtt`.
-  Milestones 4 and 5 add `audio/stems/` once there is more than one track.
-  Art, the reader and video add `art/`, `player/` and `video/`.
-- `slug` comes from the title; `--out` overrides it.
-- Paths are stable for a given script, so a reader or agent can rely on them.
+`build.json` lists every render with its check result: the transcript and diff for
+a line, the answers for an image, the fallback used, and attempts. A person
+reviews the failures, not the whole production.
 
-## 12. Testing
+## 13. Testing
 
 | Layer | How |
 |---|---|
-| Parser | Golden `script.json` for a few fixture stories; one test per error code |
-| Scheduler | Golden timelines from fixed durations; clips never overlap and each gap equals what the script says |
-| Cache keys | Inserting a line changes no other key; changing a delivery changes only that character's keys |
-| Audio runtime | One contract suite, run against the Node implementation; skipped with a reason when no ffmpeg is available |
-| Build | A fixture story built with a fake TTS provider that emits tones, so CI needs no network; check the output tree and durations |
-| CLI | `--json` snapshots and exit codes |
+| Parsers | Golden JSON for fixtures taken from the prototype (`story.md`, `comic-lunch.md`); one test per error and warning code |
+| Cache keys | Inserting a line changes no unrelated key; editing a line changes it and the next two; changing a look changes the sheet and everything drawn from it |
+| Transcript diff | Fixed pairs from the prototype: noise that must pass ("lawnmower" for "lawn mower", "gonna"), defects that must fail (a dropped "Clip", an added "Ugh") |
+| Balloon layout | Fixed panel sizes and head boxes; balloons never overlap a head or each other; reading order holds |
+| Audio runtime | One contract suite against the Node implementation; skipped with a reason without ffmpeg |
+| Build | Fake providers (tones for voices, a solid image for art, a scripted transcriber and vision model) so CI needs no network; check the tree, `build.json` and that a scripted transcript mismatch triggers a re-render |
 
-## 13. Milestones
+## 14. Milestones
 
 | # | Milestone | Usable at the end |
 |---|---|---|
-| 0 | Parser, schemas, scheduler, cache keys, `story check` | Write a story and get exact errors with positions; no audio |
-| 1 | Audio runtime (ffmpeg), render cache, one call per line, `story build`, table read | A two-voice scene as an MP3; edit one line and only it re-renders |
-| 2 | Any cast size, narrator between lines | Multi-character dialogue scenes |
-| D | Director step | Turn loose notes into a story file a person can edit |
-| 3 | Credits, M4B with chapters and cover, captions VTT | A standard audiobook |
-| 4 | Sound effects | Effects where the story says |
-| 5 | Music: fades, beds with ducking, transitions | A fully produced audio drama |
-| S | Studio `story` media type | Write and listen from your phone |
-| A | Prototype: character sheets and scene consistency | A go or no-go on art |
-| B | Prototype: caption placement on one image | A go or no-go on captions |
-| 6 | Art target and reader | Read and listen together |
-| 7 | Art for every scene and chapter | An illustrated production |
-| 8 | Captions with word highlighting | The graphic novel |
-| 9 | Video (ffmpeg composition) | A shareable MP4 playthrough |
+| 0 | Story file parser, `story check` with errors and warnings, schemas | Write a story file and get exact errors and cue warnings; no audio |
+| 1 | Voices: line-by-line in context, refusal fallbacks, transcript checks with re-renders, cache, schedule, mix, `story build` | An audio drama MP3 where every line is checked; edit one cue and only it and its next two lines re-render |
+| 2 | Music cues, leads, beds, theme outro | A scored audio drama, as in the prototype's run 3 |
+| 3 | Director: `story direct raw.md` writes `story.md` with cast, a cue on every line, pauses and music cues; loops on `story check --json` | Paste a story, get an editable production script |
+| 4 | Comic script parser and art: sheets, staging, panels in context, edit chains, image checks, head boxes | Drawn, checked panels for a comic script |
+| 5 | Pages, lettering, comic voices, reader (page view, guided view, tap to hear) | The graphic novel, as in the prototype's lunch scene |
+| 6 | Director for comics: `story adapt story.md` writes `comic.md` (page breakdown, art and acting notes, staging) | From a story file to a comic script you can edit |
 
-Each milestone specifies its own notation, schema fields and checks, and adds a
-rule only after hearing or seeing the problem it solves. A and B run alongside
-1 to 3.
+Open, each waiting for evidence or a key:
 
-## 14. Decisions (settled 2026-10-18)
+- **Sound effects**: untested; needs an ElevenLabs key.
+- **MP4**: a 20-minute video exceeds artifact limits; local output only, after 5.
+- **Many voices overlapping** (Alice): placed clips instead of a sequence.
+- **Narrator as inner voice** (Holmes): a per-line audio effect.
+- **Credits and M4B chapters**: from the previous design; after 2 when wanted.
+- **Studio `story` media type**: after 5.
+- **Clip edge trimming**: measured, not yet heard to matter with context voices.
 
-1. **Name: `story`** for the media type, CLI group and package subpath.
-2. **Lines: `**NAME** *(delivery)*: text`**, names matched case-insensitively.
-3. **Speech: one provider call per line by default.** ElevenLabs Text to
-   Dialogue is tried in milestone 2 and kept only if it clearly sounds better.
-4. **Master: 48 kHz stereo**, lines at their native 24 kHz mono.
-5. **ffmpeg: resolved at runtime** (`MDMEDIA_FFMPEG`, an installed
-   `ffmpeg-static`, then `PATH`); `ffmpeg-static` is an optional peer
-   dependency. Studio keeps its direct dependency.
-6. **Credits (milestone 3): default templates you can override.** Opening:
-   "{imprint} presents… {title}, by {author}. Read to you by {narrator voice}."
-   (starting at the title when there is no imprint). Closing: "This has been
-   {title}, by {author}. The End." Custom text replaces either. A real
-   publisher's name is never a default.
+## 15. Decisions
+
+Carried over from 2026-10-18: the name `story`; the line syntax
+`**NAME** *(cue)*: text`; 48 kHz stereo master; ffmpeg resolved at runtime with
+`ffmpeg-static` as an optional peer; credit templates you can override.
+
+New, from the prototype:
+
+1. **Voices: one line per call on a verbatim model, with context.** Replaces
+   "one provider call per line" and drops two-speaker runs (F-run 5).
+2. **Every render is checked**: transcript diff for audio, yes/no questions for
+   images, with bounded redos and a report (F-run 2, 3, 5, 6).
+3. **Two source files**: the story file for the audio drama and the comic script
+   for the graphic novel, both written by the director and editable by people
+   (F-run 4).
+4. **Lettering is code**, positions come from a vision pass (F-run 4).
+5. **Art consistency**: character sheet, checked staging image, acting notes,
+   previous-panel references, edit chains (F-run 6).
+6. **Music: Lyria clips per scene** with leads and beds (F-run 3).
