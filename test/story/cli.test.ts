@@ -46,3 +46,49 @@ describe('mdmedia story check', () => {
     expect(resolveSmartCliArgv(['-i', 'story.md', '-o', 'story.mp3'])[0]).toBe('music');
   });
 });
+
+describe('mdmedia story build', async () => {
+  const { runStoryBuild, EXIT } = await import('../../src/cli/story-command.js');
+  const { memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { mkdtempSync, readFileSync, existsSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+
+  const deps = (mishear?: (text: string) => string | undefined) => ({
+    speaker: toneSpeaker(),
+    transcriber: scriptedTranscriber(mishear),
+    runtime: passThroughRuntime,
+    cache: memoryCache(),
+  });
+
+  it('exits 0 and writes the build when every line passes', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-cli-'));
+    let text = '';
+    const code = await runStoryBuild({ file: fixture('lighthouse'), out }, deps(), (t) => { text += t + '\n'; });
+    expect(code).toBe(EXIT.ok);
+    expect(existsSync(joinPath(out, 'build.json'))).toBe(true);
+    expect(text).toContain('16 lines, 0 cached, 0 retakes, 0 fallbacks, 0 failing');
+  });
+
+  it('exits 4 when a line still fails its check, and lists it with --json', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-cli-'));
+    let text = '';
+    const code = await runStoryBuild(
+      { file: fixture('lighthouse'), out, json: true },
+      deps((t) => (t === 'Which ship was his?' ? 'Which ship?' : undefined)),
+      (t) => { text += t; }
+    );
+    expect(code).toBe(EXIT.failingChecks);
+    const summary = JSON.parse(text);
+    expect(summary.summary.failures).toBe(1);
+    expect(summary.failing[0]).toMatchObject({ text: 'Which ship was his?', missing: ['was', 'his'] });
+    expect(JSON.parse(readFileSync(joinPath(out, 'build.json'), 'utf8')).summary.failures).toBe(1);
+  });
+
+  it('exits 1 with the diagnostics when the story has errors', async () => {
+    let text = '';
+    const code = await runStoryBuild({ file: fixture('errors/unknown-speaker'), out: mkdtempSync(joinPath(tmpdir(), 'story-cli-')) }, deps(), (t) => { text += t; });
+    expect(code).toBe(EXIT.storyErrors);
+    expect(text).toContain('unknown-speaker');
+  });
+});

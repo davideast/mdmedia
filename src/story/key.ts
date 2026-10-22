@@ -27,6 +27,7 @@ export async function lineRenderKey(line: Line, script: StoryScript, provider: P
     provider.model,
     speaker.voice,
     speaker.delivery,
+    line.narration,
     line.cue,
     contextLines(line, script).map((l) => [l.speaker, l.text]),
     line.text,

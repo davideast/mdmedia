@@ -1,0 +1,159 @@
+import { parseStory } from './parse.js';
+import { mixClips, pcmDurationMs, wavFromPcm } from './pcm.js';
+import type { AudioRuntime, FileSink, RenderCache, Speaker, Transcriber } from './ports.js';
+import { renderLines, type LineEvent, type LineResult } from './render-lines.js';
+import { scheduleStory, type StoryTimeline } from './schedule.js';
+import type { Diagnostic, Line, StoryScript } from './types.js';
+
+export const LOUDNESS = { loudnessLufs: -19, truePeakDb: -2 } as const;
+export const MP3_KBPS = 160;
+
+export interface BuildOptions {
+  source: { path: string; markdown: string };
+  out: FileSink;
+  speaker: Speaker;
+  transcriber: Transcriber;
+  runtime: AudioRuntime;
+  cache: RenderCache;
+  tool?: { name: string; version: string };
+  concurrency?: { speak?: number; transcribe?: number };
+  signal?: AbortSignal;
+  onEvent?: (event: BuildEvent) => void;
+}
+
+export type BuildEvent = LineEvent | { type: 'mix-done'; durationMs: number } | { type: 'build-done'; summary: BuildSummary };
+
+export interface BuildSummary {
+  lines: number;
+  cached: number;
+  retakes: number;
+  fallbacks: number;
+  refused: number;
+  /** Lines whose kept take still does not match the script. */
+  failures: number;
+  audioSeconds: number;
+  wallMs: number;
+}
+
+export interface StoryBuild {
+  schema: 'mdmedia.story.build/1';
+  tool: { name: string; version: string };
+  source: { path: string; sha256: string };
+  models: { speech: { name: string; model: string }; transcription: string };
+  encoder: { path: string; version: string };
+  summary: BuildSummary;
+  lines: LineResult[];
+  outputs: Array<{ path: string; sha256: string; bytes: number }>;
+}
+
+export interface BuildResult {
+  /** Errors in the story stop the build before anything is rendered. */
+  diagnostics: Diagnostic[];
+  build?: StoryBuild;
+}
+
+/**
+ * Builds an audio drama from a story file: every line voiced in context and
+ * checked, scheduled, mixed, normalized and written to the output folder.
+ */
+export async function buildStory(options: BuildOptions): Promise<BuildResult> {
+  const started = Date.now();
+  const emit = options.onEvent ?? (() => {});
+  const { script, diagnostics } = await parseStory(options.source.markdown, { path: options.source.path });
+  if (!script) return { diagnostics };
+
+  const rendered = await renderLines(script, {
+    speaker: options.speaker,
+    transcriber: options.transcriber,
+    cache: options.cache,
+    concurrency: options.concurrency,
+    signal: options.signal,
+    onEvent: emit,
+  });
+
+  const durations = new Map([...rendered].map(([id, r]) => [id, r.result.durationMs]));
+  const renders = new Map([...rendered].map(([id, r]) => [id, r.result.key]));
+  const timeline = scheduleStory(script, durations, renders);
+  const mixed = mixClips(timeline.lines.map((l) => ({ pcm: rendered.get(l.id)!.pcm, startMs: l.startMs })), timeline.durationMs);
+  emit({ type: 'mix-done', durationMs: timeline.durationMs });
+
+  options.signal?.throwIfAborted();
+  const master = await options.runtime.master(mixed, LOUDNESS);
+  const mp3 = await options.runtime.mp3(master, MP3_KBPS);
+  const slug = slugify(script.meta.title);
+
+  const outputs: StoryBuild['outputs'] = [];
+  const write = async (path: string, data: Uint8Array | string) => {
+    await options.out.write(path, data);
+    const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+    outputs.push({ path, sha256: await sha256Bytes(bytes), bytes: bytes.byteLength });
+  };
+
+  await write('script.json', json(script));
+  await write('timeline.json', json(timeline));
+  await write(`audio/${slug}.mp3`, mp3);
+  await write('audio/master.wav', master);
+  for (const line of timeline.lines) await write(linePath(line.id), wavFromPcm(rendered.get(line.id)!.pcm));
+  await write('text/transcript.md', transcript(script, timeline));
+
+  const results = timeline.lines.map((l) => rendered.get(l.id)!.result);
+  const summary: BuildSummary = {
+    lines: results.length,
+    cached: results.filter((r) => r.cached).length,
+    retakes: results.reduce((n, r) => n + Math.max(0, r.attempts - 1), 0),
+    fallbacks: results.filter((r) => r.level > 0).length,
+    refused: results.filter((r) => r.refused).length,
+    failures: results.filter((r) => !r.ok).length,
+    audioSeconds: Math.round(pcmDurationMs(mixed) / 100) / 10,
+    wallMs: Date.now() - started,
+  };
+  const build: StoryBuild = {
+    schema: 'mdmedia.story.build/1',
+    tool: options.tool ?? { name: 'mdmedia', version: '0.0.0' },
+    source: script.source,
+    models: { speech: options.speaker.provider, transcription: options.transcriber.model },
+    encoder: await options.runtime.describe(),
+    summary,
+    lines: results,
+    outputs: [...outputs],
+  };
+  await options.out.write('build.json', json(build));
+  emit({ type: 'build-done', summary });
+  return { diagnostics, build };
+}
+
+/** `00/03/0007-june` → `audio/lines/00-03/0007-june.wav` */
+export function linePath(id: string): string {
+  const parts = id.split('/');
+  return `audio/lines/${parts.slice(0, -1).join('-')}/${parts.at(-1)}.wav`;
+}
+
+export function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'story';
+}
+
+function transcript(script: StoryScript, timeline: StoryTimeline): string {
+  const lines = new Map(script.chapters.flatMap((c) => c.scenes.flatMap((s) => s.segments)).filter((s): s is Line => s.kind === 'line').map((l) => [l.id, l]));
+  const out = [`# ${script.meta.title}`, ''];
+  for (const scene of timeline.scenes) {
+    if (scene.title) out.push(`## ${scene.title}`, '');
+    for (const t of timeline.lines.filter((l) => l.id.startsWith(`${scene.id}/`))) {
+      const line = lines.get(t.id)!;
+      out.push(line.narration ? line.display : `**${line.speaker}**: ${line.display}`, '');
+    }
+  }
+  return out.join('\n');
+}
+
+const json = (value: unknown) => JSON.stringify(value, null, 2) + '\n';
+
+async function sha256Bytes(bytes: Uint8Array): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}

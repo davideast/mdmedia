@@ -40,6 +40,10 @@
       "types": "./dist/story/index.d.ts",
       "import": "./dist/story/index.js"
     },
+    "./story/node": {
+      "types": "./dist/story/node/index.d.ts",
+      "import": "./dist/story/node/index.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
