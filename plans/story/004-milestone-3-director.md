@@ -77,18 +77,26 @@ listening reviews by a model.
 2. **The author's words are kept.** The director may drop speech tags ("I
    said", "she asked") when the voice makes the speaker clear, split a
    paragraph into lines, and add short dramatized lines; it may not reword
-   or cut sentences. Code checks this (step 5), not the model.
-3. **Additions are visible**: every line the director adds is preceded by
-   `<!-- director: added -->`, so a person can keep or cut it. The parser
-   ignores the comment.
-4. **Voices come from a fixed list** with Google's one-word descriptions
+   sentences, and it cuts one only when a dramatized line replaces it. Code
+   checks this (step 5), not the model.
+3. **Show, don't tell twice.** A dramatized line replaces the sentence that
+   describes the same thing, so it lands as a beat (the kid's "Ketchup is TOO
+   a vegetable!" lands as a punchline only without the sentence explaining the
+   argument first; you caught the double telling in milestone 2's build, and
+   the comic had already cut it).
+4. **Every change is visible**: an added line is preceded by
+   `<!-- director: added -->`, and a replaced sentence is kept in
+   `<!-- replaced: "…" -->` right where it was, so a person can restore it.
+   The parser ignores both; the fidelity check reads them. The hand-adapted
+   fixture uses the same comment for the ketchup line (5850386).
+5. **Voices come from a fixed list** with Google's one-word descriptions
    (Puck upbeat, Kore firm, Leda youthful, Charon informative, …). The cast
    pass must pick from it; code rejects anything else. Verify the list
    against Google's speech generation documentation before committing it.
-5. **Repairs are bounded**: up to 2 repair rounds per scene for check errors,
+6. **Repairs are bounded**: up to 2 repair rounds per scene for check errors,
    missing cues or fidelity gaps; anything left is reported, and the file is
    still written so a person can finish it.
-6. **Default text model `gemini-3.5-flash`**, overridable. Confirm it is
+7. **Default text model `gemini-3.5-flash`**, overridable. Confirm it is
    available with a models list call at the start of the live run; if a pro
    model is listed, record its result too.
 
@@ -167,7 +175,9 @@ transcriber; a story without `names:` behaves as before.
     beat;
   - when the text describes background speech vividly or funnily (a kid
     arguing that ketchup is a vegetable), you may add one short line for it,
-    preceded by `<!-- director: added -->`; never reword the author's lines;
+    preceded by `<!-- director: added -->`, and replace the sentence that
+    describes it with `<!-- replaced: "…" -->` so it is shown, not told twice;
+    never reword the author's lines;
   - the notation, with a short example taken from the fixture.
 
 **Verify**: `bun test test/story/direct/prompts.test.ts`: the scene
@@ -175,7 +185,7 @@ instruction contains each rule; `isVoice` accepts `Puck` and rejects `Bob`.
 
 ### 5. Fidelity (pure)
 
-`fidelityGaps(raw, script)`: words of the raw text (normalized as in
+`fidelityGaps(raw, markdown, script)`: words of the raw text (normalized as in
 `words()`) against the spoken words of the script's lines in order, by
 longest common subsequence. Returns `missing` spans (raw words not in the
 script) and `added` spans (script words not in the raw), each with the raw
@@ -183,13 +193,18 @@ sentence it falls in.
 
 - A missing span of 1 to 4 words next to a quotation (a speech tag) is
   allowed.
+- A missing span that matches the text of a `<!-- replaced: "…" -->` comment
+  in the story markdown is allowed, but only if a line marked
+  `<!-- director: added -->` follows it in the same scene.
 - Added spans inside lines marked `<!-- director: added -->` are allowed.
 - Anything else is a gap.
 
 **Verify**: `bun test test/story/direct/fidelity.test.ts`: the hand-adapted
-fixture against `raw.md` has only allowed spans (its speech tags and the
-ketchup line); deleting a sentence from the fixture yields a gap naming it;
-rewording a word yields a gap.
+fixture against `raw.md` has only allowed spans (its speech tags, the ketchup
+line and its replaced sentence; mark the ketchup line in the fixture with
+`<!-- director: added -->` for this); deleting a sentence from the fixture
+yields a gap naming it; rewording a word yields a gap; a `replaced` comment
+with no added line after it yields a gap.
 
 ### 6. Assemble (pure)
 
