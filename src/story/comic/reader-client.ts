@@ -67,13 +67,31 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
     return el;
   }
 
-  /** Letters a panel element at its current size. */
-  function letter(el: HTMLElement, fontPx: number, minFontPx?: number) {
+  /**
+   * Letters a panel element at its current size. With a `strip` (the guided
+   * view), a panel too crowded to letter clear of faces moves its captions into
+   * the strip above the art and letters only its balloons and sound effects.
+   */
+  function letter(el: HTMLElement, fontPx: number, minFontPx?: number, strip?: HTMLElement) {
     const panel = panels.find((p) => p.id === el.dataset.id)!;
     const w = el.clientWidth;
     const h = el.clientHeight;
     if (!w || !h) return;
-    const result = L.letterPanel(panel, panel.heads, w, h, measure, { fontPx, ...(minFontPx ? { minFontPx } : {}) });
+    const options = { fontPx, ...(minFontPx ? { minFontPx } : {}) };
+    let keep = panel.items.map((_, i) => i);
+    let result = L.letterPanel(panel, panel.heads, w, h, measure, options);
+    strip?.replaceChildren();
+    if (strip && result.crowded.length && panel.items.some((i) => i.kind === 'caption')) {
+      keep = keep.filter((i) => panel.items[i]!.kind !== 'caption');
+      result = L.letterPanel({ ...panel, items: keep.map((i) => panel.items[i]!) }, panel.heads, w, h, measure, options);
+      panel.items.forEach((item, i) => {
+        if (item.kind !== 'caption') return;
+        const div = itemEl(item, 'item caption');
+        div.style.fontSize = `${fontPx}px`;
+        div.textContent = item.text.toUpperCase();
+        strip.append(div);
+      });
+    }
     const svg = el.querySelector('svg')!;
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     svg.replaceChildren();
@@ -86,7 +104,24 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
     fills.setAttribute('class', 'fills');
     outlines.style.strokeWidth = String(stroke * 2);
     svg.append(outlines, fills);
-    for (const placed of result.placed) drawPlaced(panel, placed, layer, outlines, fills);
+    for (const placed of result.placed) drawPlaced(panel, { ...placed, items: placed.items.map((i) => keep[i]!) }, layer, outlines, fills);
+  }
+
+  /** An item element that plays its audio when tapped. */
+  function itemEl(item: { audio?: string }, className: string): HTMLElement {
+    const div = document.createElement('div');
+    div.className = className;
+    if (item.audio) {
+      div.dataset.audio = item.audio;
+      div.setAttribute('role', 'button');
+      div.tabIndex = 0;
+      div.addEventListener('click', (e) => {
+        e.stopPropagation();
+        stopReading();
+        play(div);
+      });
+    }
+    return div;
   }
 
   function shapeSvg(name: string, attrs: Record<string, string | number>) {
@@ -114,8 +149,7 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
     placed.shapes.forEach((s, k) => {
       const index = placed.items[k] ?? placed.items[0]!;
       const item = panel.items[index]!;
-      const div = document.createElement('div');
-      div.className = `item ${placed.kind}${placed.mark ? ` ${placed.mark}` : ''}`;
+      const div = itemEl(item, `item ${placed.kind}${placed.mark ? ` ${placed.mark}` : ''}`);
       div.style.left = `${s.x}px`;
       div.style.top = `${s.y}px`;
       div.style.width = `${s.w}px`;
@@ -124,16 +158,6 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
       for (const [i, line] of s.lines.entries()) {
         if (i) div.append(document.createElement('br'));
         div.append(line);
-      }
-      if (item.audio) {
-        div.dataset.audio = item.audio;
-        div.setAttribute('role', 'button');
-        div.tabIndex = 0;
-        div.addEventListener('click', (e) => {
-          e.stopPropagation();
-          stopReading();
-          play(div);
-        });
       }
       layer.append(div);
     });
@@ -174,17 +198,36 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
   let current = 0;
   let guided = false;
 
+  const strip = $('strip');
+
   function showGuided() {
     const panel = panels[current]!;
-    const el = panelEl(panel);
-    stage.replaceChildren(el);
-    // Fit the panel's shape into the stage.
-    const box = stage.getBoundingClientRect();
-    const scale = Math.min(box.width / panel.slot.w, box.height / panel.slot.h);
+    // Keep the panel element while it stays current, so its image isn't reloaded.
+    let el = stage.querySelector<HTMLElement>('.panel');
+    if (el?.dataset.id !== panel.id) {
+      el = panelEl(panel);
+      stage.replaceChildren(el);
+    }
+    strip.replaceChildren();
+    // Fit the panel's shape, with its border, inside the stage's padding.
+    const style = getComputedStyle(stage);
+    const border = 6;
+    const width = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - border;
+    const height = stage.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - border;
+    const scale = Math.min(width / panel.slot.w, height / panel.slot.h);
     el.style.width = `${panel.slot.w * scale}px`;
     el.style.height = `${panel.slot.h * scale}px`;
     const pageFont = (panel.slot.w * scale * comic.page.width * 0.02) / panel.slot.w;
-    letter(el, Math.max(pageFont, MIN_GUIDED_PX), MIN_GUIDED_PX);
+    letter(el, Math.max(pageFont, MIN_GUIDED_PX), MIN_GUIDED_PX, strip);
+    // The strip takes room from the stage: fit the panel again under it.
+    if (strip.childElementCount) {
+      const fit = Math.min(width / panel.slot.w, (stage.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - border) / panel.slot.h);
+      if (fit < scale - 0.001) {
+        el.style.width = `${panel.slot.w * fit}px`;
+        el.style.height = `${panel.slot.h * fit}px`;
+        letter(el, Math.max(pageFont, MIN_GUIDED_PX), MIN_GUIDED_PX, strip);
+      }
+    }
     $('where').textContent = `Page ${panel.id.split('.')[0]}, panel ${panel.id.split('.')[1]} of ${panels.filter((p) => p.id.split('.')[0] === panel.id.split('.')[0]).length}`;
   }
 
@@ -260,7 +303,7 @@ export function readerClient(comic: ReaderData, L: ReturnType<typeof Lettering>)
     reading = true;
     syncRead();
     while (reading) {
-      const root = guided ? stage : pagesEl.querySelector<HTMLElement>(`.panel[data-id="${panels[current]!.id}"]`)!;
+      const root = guided ? $('guided') : pagesEl.querySelector<HTMLElement>(`.panel[data-id="${panels[current]!.id}"]`)!;
       if (!guided) root.scrollIntoView({ behavior: 'smooth', block: 'center' });
       for (const div of root.querySelectorAll<HTMLElement>('.item[data-audio]')) {
         if (!reading) return;

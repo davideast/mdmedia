@@ -53,6 +53,7 @@ body { background: var(--surface-page); color: var(--ink-primary); font: 16px/1.
 }
 .bar h1 { margin: 0; font: 600 1.05rem/1.2 var(--font-display); letter-spacing: -0.014em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .actions { display: flex; gap: 0.5rem; }
+svg[hidden] { display: none; }
 .action {
   display: inline-flex; width: 2rem; height: 2rem; flex: none; align-items: center; justify-content: center; border: 0; border-radius: 999px;
   background: color-mix(in srgb, var(--foreground) 12%, transparent); color: var(--foreground); cursor: pointer; transition: background-color 0.15s;
@@ -90,9 +91,13 @@ body { background: var(--surface-page); color: var(--ink-primary); font: 16px/1.
 
 #guided { display: none; }
 body.guided #pages { display: none; }
-body.guided #guided { display: grid; grid-template-rows: minmax(0, 1fr) auto; height: calc(100dvh - 3.5rem); background: var(--surface-inset); }
+body.guided #guided { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: calc(100dvh - 3.5rem); background: var(--surface-inset); }
 #stage { display: grid; place-items: center; min-height: 0; padding: 1rem; overflow: hidden; touch-action: pan-y; cursor: pointer; }
 #stage .panel { position: relative; border-width: 3px; }
+#strip { display: grid; gap: 0.5rem; justify-items: start; padding: 0 1rem; }
+#strip:not(:empty) { padding-top: 1rem; }
+#strip:not(:empty) + #stage { place-items: start center; }
+#strip .caption { position: static; display: block; white-space: normal; padding: 0.35em 0.55em; cursor: pointer; }
 #where { margin: 0; padding: 0.5rem 1rem calc(0.75rem + env(safe-area-inset-bottom)); text-align: center; font-size: 0.75rem; color: var(--ink-muted); }
 `;
 
@@ -120,6 +125,7 @@ export function readerHtml(data: ReaderData): string {
 </header>
 <main id="pages" class="view"></main>
 <section id="guided" aria-label="Guided view">
+  <div id="strip"></div>
   <div id="stage"></div>
   <p id="where"></p>
 </section>
