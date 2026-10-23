@@ -41,7 +41,7 @@ describe('The Most Embarrassing Day of My Life', () => {
     const { script } = await parseStory(read('embarrassing-day'), { path: 'embarrassing-day.md' });
     const all = lines(script!);
     expect(script!.narrator).toBe('MILO');
-    expect(all).toHaveLength(289);
+    expect(all).toHaveLength(290);
     const narration = all.filter((l) => l.narration);
     expect(narration).toHaveLength(163);
     expect(narration.every((l) => l.speaker === 'MILO')).toBe(true);

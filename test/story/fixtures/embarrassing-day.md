@@ -287,6 +287,8 @@ Around us, the cafeteria continued its usual chaos. Someone launched a grape
 across the room. A seventh grader was arguing with a lunch monitor about whether
 ketchup counted as a vegetable.
 
+**KID** *(loud and indignant, far across the cafeteria)*: Ketchup is TOO a vegetable!
+
 But at our table, everything had gone quiet.
 
 **MILO** *(ashamed)*: I thought it might help me win.
