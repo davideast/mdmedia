@@ -1,12 +1,14 @@
 import { GoogleGenAI } from '@google/genai';
 import { calculateBackoffMs, delay } from '../../tts/backoff.js';
 import { GeminiTTSProvider } from '../../tts/gemini-tts-provider.js';
-import { SpeechRefused, type Speaker, type TextModel, type Transcriber } from '../ports.js';
+import { SpeechRefused, type ImageBytes, type ImageModel, type Speaker, type TextModel, type Transcriber, type Vision } from '../ports.js';
 import { StoryError } from '../types.js';
 
 export const DEFAULT_STORY_SPEECH_MODEL = 'gemini-3.8-flash-tts';
 export const DEFAULT_STORY_TRANSCRIBE_MODEL = 'gemini-3.5-flash-lite';
 export const DEFAULT_STORY_DIRECT_MODEL = 'gemini-3.5-flash';
+export const DEFAULT_STORY_IMAGE_MODEL = 'gemini-3-pro-image';
+export const DEFAULT_STORY_VISION_MODEL = 'gemini-3.5-flash';
 
 /**
  * Speech on a verbatim Gemini TTS model: the words and the delivery note go in
@@ -105,6 +107,75 @@ export function createGeminiTextModel(options: { apiKey: string; model?: string;
           await delay(calculateBackoffMs(attempt, 2000, 30_000));
         }
       }
+    },
+  };
+}
+
+const inline = (image: ImageBytes) => ({ inlineData: { mimeType: image.mimeType, data: Buffer.from(image.bytes).toString('base64') } });
+
+/** Panels and reference images on a Gemini image model; several references go in one request. */
+export function createGeminiImageModel(options: { apiKey: string; model?: string; maxRetries?: number }): ImageModel {
+  const model = options.model ?? DEFAULT_STORY_IMAGE_MODEL;
+  const client = new GoogleGenAI({ apiKey: options.apiKey });
+  const maxRetries = options.maxRetries ?? 4;
+  return {
+    model,
+    async draw({ prompt, references, aspectRatio, signal }) {
+      for (let attempt = 0; ; attempt++) {
+        signal?.throwIfAborted();
+        try {
+          const response = await client.models.generateContent({
+            model,
+            contents: [{ role: 'user', parts: [...references.map(inline), { text: prompt }] }],
+            config: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio, imageSize: '1K' }, httpOptions: { timeout: 240_000 } },
+          });
+          const image = response.candidates?.[0]?.content?.parts?.find((part) => part.inlineData?.data)?.inlineData;
+          if (!image?.data) throw new Error('Gemini returned no image.');
+          return { bytes: new Uint8Array(Buffer.from(image.data, 'base64')), mimeType: image.mimeType ?? 'image/png' };
+        } catch (error) {
+          if (attempt >= maxRetries || !(isBusy(error) || /no image/i.test(messageOf(error)))) throw error;
+          await delay(calculateBackoffMs(attempt, 3000, 45_000));
+        }
+      }
+    },
+  };
+}
+
+/** Yes/no checks and head boxes on a Gemini model that reads images. */
+export function createGeminiVision(options: { apiKey: string; model?: string; maxRetries?: number }): Vision {
+  const model = options.model ?? DEFAULT_STORY_VISION_MODEL;
+  const client = new GoogleGenAI({ apiKey: options.apiKey });
+  const maxRetries = options.maxRetries ?? 5;
+  async function json(parts: Array<Record<string, unknown>>, signal?: AbortSignal): Promise<unknown> {
+    for (let attempt = 0; ; attempt++) {
+      signal?.throwIfAborted();
+      try {
+        const response = await client.models.generateContent({ model, contents: [{ role: 'user', parts }], config: { responseMimeType: 'application/json' } });
+        return JSON.parse(response.text ?? 'null');
+      } catch (error) {
+        if (attempt >= maxRetries || !(isBusy(error) || error instanceof SyntaxError)) throw error;
+        await delay(calculateBackoffMs(attempt, 2000, 30_000));
+      }
+    }
+  }
+  return {
+    model,
+    async ask({ images, questions, signal }) {
+      const parts = images.flatMap((image) => [{ text: `${image.label}:` }, inline(image)]);
+      parts.push({ text: `Answer each question about the last image strictly, yes or no. Return JSON: an array of booleans in order.\n${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}` });
+      const answers = (await json(parts, signal)) as unknown[];
+      return questions.map((_, i) => Array.isArray(answers) && answers[i] === true);
+    },
+    async heads({ image, characters, signal }) {
+      const prompt =
+        `Find the head of each of these characters in this comic panel, if visible:\n${characters.map((c) => `- ${c.id}: ${c.look}`).join('\n')}\n` +
+        'Return JSON: [{"name": NAME, "box_2d": [ymin, xmin, ymax, xmax]}] with coordinates 0-1000, one entry per character whose head is visible, ' +
+        'the box tight around the head and hair. Ignore everyone else.';
+      const found = (await json([inline(image), { text: prompt }], signal)) as Array<{ name?: string; box_2d?: number[] }> | null;
+      const ids = new Set(characters.map((c) => c.id));
+      return (found ?? [])
+        .filter((f) => f.name && ids.has(f.name.toUpperCase()) && f.box_2d?.length === 4)
+        .map((f) => ({ id: f.name!.toUpperCase(), box: f.box_2d!.map((v) => v / 1000) as [number, number, number, number] }));
     },
   };
 }

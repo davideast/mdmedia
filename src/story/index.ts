@@ -18,3 +18,9 @@ export { directStory, validatePlan, sceneTexts, MAX_REPAIR_ROUNDS, type DirectRe
 export { assembleStory, type CastPlan, type SceneDraft } from './direct/assemble.js';
 export { fidelity, MAX_TAG_WORDS, type Fidelity, type MissingSpan, type AddedSpan } from './direct/fidelity.js';
 export { VOICES, isVoice } from './direct/voices.js';
+export { parseComic, type ComicParseResult } from './comic/parse.js';
+export { layoutSlots, nearestAspect, parseLayout, PAGE, ASPECTS } from './comic/geometry.js';
+export type { ComicScript, ComicPage, ComicPanel, ComicItem, Slot } from './comic/types.js';
+export { drawComic, imageKey, MAX_REDRAWS, STAGING_TRIES, type DrawResult, type DrawEvent, type DrawOptions, type PanelResult, type StagingResult } from './comic/draw.js';
+export { previewHtml, panelFile } from './comic/preview.js';
+export { STYLES, BLEED, panelPrompt, panelQuestions, sheetPrompt, stagingPrompt, onModelQuestions, displayName } from './comic/prompts.js';

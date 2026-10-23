@@ -3,14 +3,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, join } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { buildStory, directStory, parseStory, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, Composer, DirectEvent, Diagnostic, RenderCache, Speaker, TextModel, Transcriber } from '../story/index.js';
+import { buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
+import type { AudioRuntime, BuildEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
   createGeminiSpeaker,
+  createGeminiImageModel,
   createGeminiTextModel,
   createGeminiTranscriber,
+  createGeminiVision,
   createLyriaComposer,
   createNodeAudioRuntime,
 } from '../story/node/index.js';
@@ -32,15 +34,38 @@ export async function checkStory(file: string, json: boolean, write: (text: stri
     write(json ? JSON.stringify([{ code: 'unreadable', severity: 'error', message: String(error) }]) : `${file}: cannot read file`);
     return 1;
   }
-  const { diagnostics } = await parseStory(markdown, { path: file });
+  const { diagnostics } = isComicScript(markdown) ? await loadComic(file, markdown) : await parseStory(markdown, { path: file });
   write(json ? JSON.stringify(diagnostics, null, 2) : formatDiagnostics(file, diagnostics));
   return diagnostics.some((d) => d.severity === 'error') ? 1 : 0;
+}
+
+/** A comic script names the story it draws from in its front matter. */
+export function isComicScript(markdown: string): boolean {
+  const fm = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---/.exec(markdown);
+  return Boolean(fm && /^story:\s*\S/m.test(fm[1]!));
+}
+
+/** Parses a comic script with the cast of the story file its `story:` names, relative to the script. */
+export async function loadComic(file: string, markdown: string): Promise<{ comic?: ComicScript; story?: StoryScript; diagnostics: Diagnostic[] }> {
+  const storyPath = join(dirname(file), /^story:\s*(.+)$/m.exec(markdown)![1]!.trim());
+  let storyMarkdown: string;
+  try {
+    storyMarkdown = await readFile(storyPath, 'utf8');
+  } catch {
+    return { diagnostics: [{ code: 'missing-field', severity: 'error', message: `The story file ${storyPath} named by story: cannot be read.`, source: { line: 1, column: 1, endLine: 1, endColumn: 1 } }] };
+  }
+  const story = await parseStory(storyMarkdown, { path: storyPath });
+  if (!story.script) {
+    return { diagnostics: [{ code: 'missing-field', severity: 'error', message: `The story file ${storyPath} has errors; run story check on it.`, source: { line: 1, column: 1, endLine: 1, endColumn: 1 } }] };
+  }
+  const { comic, diagnostics } = await parseComic(markdown, { path: file, cast: story.script.cast });
+  return { comic, story: story.script, diagnostics };
 }
 
 export const storyCheckCommand = defineCommand({
   meta: {
     name: 'check',
-    description: 'Check a story file and report errors and warnings with their positions',
+    description: 'Check a story file or comic script and report errors and warnings with their positions',
   },
   args: {
     file: { type: 'positional', description: 'Story markdown file', required: true },
@@ -249,6 +274,108 @@ export const storyDirectCommand = defineCommand({
   },
 });
 
+/** Draws a comic script's panels; resolves to the exit code. `deps` replaces providers in tests. */
+export async function runStoryDraw(
+  args: { file: string; out?: string; json?: boolean; signal?: AbortSignal },
+  deps: { image: ImageModel; vision: Vision; cache: RenderCache },
+  write: (text: string) => void
+): Promise<number> {
+  let markdown: string;
+  try {
+    markdown = await readFile(args.file, 'utf8');
+  } catch {
+    write(`${args.file}: cannot read file`);
+    return EXIT.storyErrors;
+  }
+  if (!isComicScript(markdown)) {
+    write(`${args.file}: not a comic script (its front matter needs story:)`);
+    return EXIT.storyErrors;
+  }
+  const { comic, story, diagnostics } = await loadComic(args.file, markdown);
+  if (!comic || !story) {
+    write(args.json ? JSON.stringify({ diagnostics }, null, 2) : formatDiagnostics(args.file, diagnostics));
+    return EXIT.storyErrors;
+  }
+  const outDir = join(args.out ?? join('dist', slugify(comic.meta.title)), 'comic');
+  const onEvent = args.json ? undefined : (event: DrawEvent) => {
+    if (event.type === 'sheet-done') write(`✓ character sheet${event.cached ? ' (cached)' : ''}`);
+    if (event.type === 'staging-done') write(`${event.result.ok ? '✓' : '✗'} staging ${event.result.index}${event.result.cached ? ' (cached)' : ` (${event.result.attempts} take${event.result.attempts > 1 ? 's' : ''})`}`);
+    if (event.type === 'panel-done') {
+      const r = event.result;
+      const failed = r.questions.filter((_, i) => !r.answers[i]);
+      write(`${r.ok ? '✓' : '✗'} panel ${r.id}${r.cached ? ' (cached)' : ` (${r.attempts} take${r.attempts > 1 ? 's' : ''})`}${failed.length ? `  failed: ${failed.join(' | ')}` : ''}`);
+    }
+  };
+  try {
+    const started = Date.now();
+    const result = await drawComic(comic, story.cast, { ...deps, signal: args.signal, onEvent });
+    const sink = createFileSink(outDir);
+    await sink.write('art/sheet.png', result.images.get('sheet')!.bytes);
+    for (const s of result.stagings) await sink.write(`art/staging-${s.index}.png`, result.images.get(`staging-${s.index}`)!.bytes);
+    for (const p of result.panels) await sink.write(panelFile(p.id), result.images.get(p.id)!.bytes);
+    const panelsById = new Map(result.panels.map((p) => [p.id, p]));
+    const drawn = {
+      ...comic,
+      pages: comic.pages.map((page) => ({
+        ...page,
+        panels: page.panels.map((panel) => ({ ...panel, image: panelFile(panel.id), heads: panelsById.get(panel.id)!.heads, check: { ok: panelsById.get(panel.id)!.ok, attempts: panelsById.get(panel.id)!.attempts } })),
+      })),
+    };
+    await sink.write('comic.json', JSON.stringify(drawn, null, 2) + '\n');
+    const summary = {
+      panels: result.panels.length,
+      cached: result.panels.filter((p) => p.cached).length,
+      redraws: result.panels.reduce((n, p) => n + Math.max(0, p.attempts - 1), 0) + result.stagings.reduce((n, s) => n + Math.max(0, s.attempts - 1), 0),
+      failing: result.panels.filter((p) => !p.ok).length + result.stagings.filter((s) => !s.ok).length,
+      headBoxes: result.panels.reduce((n, p) => n + p.heads.length, 0),
+      wallMs: Date.now() - started,
+    };
+    await sink.write('draw.json', JSON.stringify({ schema: 'mdmedia.story.draw/1', models: { image: deps.image.model, vision: deps.vision.model }, summary, sheet: result.sheet, stagings: result.stagings, panels: result.panels }, null, 2) + '\n');
+    await sink.write('preview.html', previewHtml(comic, result));
+    write(args.json ? JSON.stringify({ outDir, summary }, null, 2) : `${summary.panels} panels, ${summary.cached} cached, ${summary.redraws} redraws, ${summary.failing} failing, ${summary.headBoxes} head boxes -> ${outDir}`);
+    return summary.failing ? EXIT.failingChecks : EXIT.ok;
+  } catch (error) {
+    if (args.signal?.aborted) return EXIT.cancelled;
+    write(`Draw failed: ${error instanceof Error ? error.message : String(error)}`);
+    return EXIT.provider;
+  }
+}
+
+export const storyDrawCommand = defineCommand({
+  meta: {
+    name: 'draw',
+    description: 'Draw a comic script: character sheet, staging, every panel in context, each checked; then head boxes for lettering',
+  },
+  args: {
+    file: { type: 'positional', description: 'Comic script', required: true },
+    out: { type: 'string', description: 'Output folder (default dist/<title>)' },
+    cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the script)' },
+    imageModel: { type: 'string', description: 'Image model (default gemini-3-pro-image)' },
+    visionModel: { type: 'string', description: 'Model for checks and head boxes (default gemini-3.5-flash)' },
+    json: { type: 'boolean', description: 'Print the summary as JSON', default: false },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const apiKey = resolveConfig({}, fileConfig, process.env).apiKey;
+    if (!apiKey) {
+      console.error('A Gemini API key is required: set GEMINI_API_KEY or apiKey in .mdmedia.json.');
+      process.exitCode = EXIT.provider;
+      return;
+    }
+    const controller = new AbortController();
+    process.once('SIGINT', () => controller.abort());
+    process.exitCode = await runStoryDraw(
+      { file: args.file, out: args.out, json: args.json, signal: controller.signal },
+      {
+        image: createGeminiImageModel({ apiKey, model: args.imageModel }),
+        vision: createGeminiVision({ apiKey, model: args.visionModel }),
+        cache: createFileRenderCache(args.cache ?? join(args.file, '..', '.mdmedia', 'cache')),
+      },
+      (text) => console.log(text)
+    );
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -258,5 +385,6 @@ export const storyCommand = defineCommand({
     check: storyCheckCommand,
     build: storyBuildCommand,
     direct: storyDirectCommand,
+    draw: storyDrawCommand,
   },
 });

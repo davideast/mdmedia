@@ -150,3 +150,51 @@ describe('mdmedia story direct', async () => {
     expect(readFileSync(joinPath(dir, 'story.md'), 'utf8')).toContain('The bus left.');
   });
 });
+
+describe('mdmedia story check on a comic script', async () => {
+  const { mkdtempSync, writeFileSync, copyFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+
+  it('checks the comic against the cast of the story it names', async () => {
+    const { code, out } = await run(fixture('comic-lunch'));
+    expect(code).toBe(0);
+    expect(out).toEndWith('no problems');
+  });
+
+  it('reports an unknown speaker at its position', async () => {
+    const dir = mkdtempSync(joinPath(tmpdir(), 'story-comic-'));
+    copyFileSync(fixture('embarrassing-day'), joinPath(dir, 'embarrassing-day.md'));
+    writeFileSync(joinPath(dir, 'comic.md'), '---\ntitle: T\nstory: embarrassing-day.md\nstyle: flat\n---\n\n## Page 1\n\nlayout: 1\n\n### Panel 1\n\n> A. Center: JUNE.\n\n**PRIYA** *(calm)*: Hi.\n');
+    const { code, out } = await run(joinPath(dir, 'comic.md'));
+    expect(code).toBe(1);
+    expect(out).toContain('comic.md:15:3 error unknown-speaker PRIYA is not in the story\'s cast.');
+  });
+});
+
+describe('mdmedia story draw', async () => {
+  const { runStoryDraw, EXIT } = await import('../../src/cli/story-command.js');
+  const { fakeImageModel, fakeVision, memoryCache } = await import('./fakes.js');
+  const { mkdtempSync, existsSync, readFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+
+  it('writes the art, comic.json, draw.json and the preview, and exits 0', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-draw-'));
+    let text = '';
+    const code = await runStoryDraw({ file: fixture('comic-lunch'), out }, { image: fakeImageModel(), vision: fakeVision(), cache: memoryCache() }, (t) => { text += t + '\n'; });
+    expect(code).toBe(EXIT.ok);
+    for (const f of ['art/sheet.png', 'art/staging-1.png', 'art/panel-3-2.png', 'comic.json', 'draw.json', 'preview.html']) expect(existsSync(joinPath(out, 'comic', f))).toBe(true);
+    const comic = JSON.parse(readFileSync(joinPath(out, 'comic', 'comic.json'), 'utf8'));
+    expect(comic.pages[2].panels[3].heads.map((h: { id: string }) => h.id)).toEqual(['JUNE', 'MILO']);
+    expect(text).toContain('21 panels, 0 cached, 0 redraws, 0 failing');
+  });
+
+  it('exits 4 when a panel still fails a check', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-draw-'));
+    const vision = fakeVision((img, q) => img.includes('Wide close-up of June') && q === 'Is the image free of speech balloons, captions and written words (apart from school signs or banners)?');
+    const code = await runStoryDraw({ file: fixture('comic-lunch'), out }, { image: fakeImageModel(), vision, cache: memoryCache() }, () => {});
+    expect(code).toBe(EXIT.failingChecks);
+    expect(readFileSync(joinPath(out, 'comic', 'preview.html'), 'utf8')).toContain('1 still failing a check');
+  });
+});

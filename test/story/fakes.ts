@@ -1,4 +1,4 @@
-import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedLine, type CachedMusic, type Composer, type FileSink, type MixPlan, type RenderCache, type SpeakRequest, type Speaker, type Transcriber } from '../../src/story/index.js';
+import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedImage, type CachedLine, type CachedMusic, type Composer, type FileSink, type ImageModel, type MixPlan, type Vision, type RenderCache, type SpeakRequest, type Speaker, type Transcriber } from '../../src/story/index.js';
 
 /**
  * A tone, 50 ms per character. The first samples carry the spoken text (its
@@ -52,12 +52,16 @@ export function scriptedTranscriber(mishear: (text: string, call: number) => str
   return self;
 }
 
-export function memoryCache(): RenderCache & { entries: Map<string, CachedLine>; music: Map<string, CachedMusic> } {
+export function memoryCache(): RenderCache & { entries: Map<string, CachedLine>; music: Map<string, CachedMusic>; images: Map<string, CachedImage> } {
   const entries = new Map<string, CachedLine>();
   const music = new Map<string, CachedMusic>();
+  const images = new Map<string, CachedImage>();
   return {
     entries,
     music,
+    images,
+    async getImage(key) { return images.get(key); },
+    async putImage(key, image) { images.set(key, image); },
     async get(key) { return entries.get(key); },
     async put(key, line) { entries.set(key, line); },
     async getMusic(key) { return music.get(key); },
@@ -90,3 +94,34 @@ export const passThroughRuntime: AudioRuntime & { lastPlan?: MixPlan } = {
   async mp3(wav) { return wav; },
   async describe() { return { path: 'fake', version: 'fake' }; },
 };
+
+/** Draws a "PNG" whose bytes name the prompt's start and the attempt, and records each request. */
+export function fakeImageModel(): ImageModel & { requests: Array<{ prompt: string; references: string[]; aspectRatio: string }> } {
+  const requests: Array<{ prompt: string; references: string[]; aspectRatio: string }> = [];
+  return {
+    model: 'fake-image',
+    requests,
+    async draw({ prompt, references, aspectRatio }) {
+      const label = `img#${requests.length + 1}:${prompt}`;
+      requests.push({ prompt, references: references.map((r) => new TextDecoder().decode(r.bytes)), aspectRatio });
+      return { bytes: new TextEncoder().encode(label), mimeType: 'image/png' };
+    },
+  };
+}
+
+/** Answers yes to everything unless `fail` says otherwise for an image and question. */
+export function fakeVision(fail: (image: string, question: string, call: number) => boolean = () => false): Vision & { asks: Array<{ labels: string[]; questions: string[] }> } {
+  const asks: Array<{ labels: string[]; questions: string[] }> = [];
+  return {
+    model: 'fake-vision',
+    asks,
+    async ask({ images, questions }) {
+      asks.push({ labels: images.map((i) => i.label), questions });
+      const target = new TextDecoder().decode(images.at(-1)!.bytes);
+      return questions.map((q) => !fail(target, q, asks.length));
+    },
+    async heads({ characters }) {
+      return characters.map((c, i) => ({ id: c.id, box: [0.2, 0.1 + i * 0.4, 0.5, 0.4 + i * 0.4] as [number, number, number, number] }));
+    },
+  };
+}

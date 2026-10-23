@@ -69,12 +69,40 @@ export interface CachedMusic {
   mimeType: string;
 }
 
-/** Content-addressed store for rendered lines and music. */
+/** An image, as bytes. */
+export interface ImageBytes {
+  bytes: Uint8Array;
+  mimeType: string;
+}
+
+/** Draws images, with reference images it should follow. */
+export interface ImageModel {
+  readonly model: string;
+  draw(request: { prompt: string; references: ImageBytes[]; aspectRatio: string; signal?: AbortSignal }): Promise<ImageBytes>;
+}
+
+/** Looks at images: strict yes/no answers, and where named characters' heads are. */
+export interface Vision {
+  readonly model: string;
+  /** One answer per question, in order. The images are shown first, each with its label. */
+  ask(request: { images: Array<ImageBytes & { label: string }>; questions: string[]; signal?: AbortSignal }): Promise<boolean[]>;
+  /** Head boxes as fractions of the image: [ymin, xmin, ymax, xmax]. */
+  heads(request: { image: ImageBytes; characters: Array<{ id: string; look: string }>; signal?: AbortSignal }): Promise<Array<{ id: string; box: [number, number, number, number] }>>;
+}
+
+/** A cached image or JSON result, with what its checks found. */
+export interface CachedImage extends ImageBytes {
+  meta: Record<string, unknown>;
+}
+
+/** Content-addressed store for rendered lines, music and images. */
 export interface RenderCache {
   get(key: string): Promise<CachedLine | undefined>;
   put(key: string, line: CachedLine): Promise<void>;
   getMusic(key: string): Promise<CachedMusic | undefined>;
   putMusic(key: string, music: CachedMusic): Promise<void>;
+  getImage(key: string): Promise<CachedImage | undefined>;
+  putImage(key: string, image: CachedImage): Promise<void>;
 }
 
 /** A music clip under the voices, with its gain over time. */

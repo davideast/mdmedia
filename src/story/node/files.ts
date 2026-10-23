@@ -46,9 +46,30 @@ export function createFileRenderCache(dir: string): RenderCache {
       }
       return undefined;
     },
+    async getImage(key) {
+      try {
+        const meta = JSON.parse(await readFile(join(dir, `${name(key)}.image.json`), 'utf8')) as { mimeType: string; meta: Record<string, unknown> };
+        return { ...meta, bytes: new Uint8Array(await readFile(join(dir, `${name(key)}.${extension(meta.mimeType)}`))) };
+      } catch {
+        return undefined;
+      }
+    },
+    async putImage(key, image) {
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, `${name(key)}.${extension(image.mimeType)}`), image.bytes);
+      await writeFile(join(dir, `${name(key)}.image.json`), JSON.stringify({ mimeType: image.mimeType, meta: image.meta }, null, 2) + '\n');
+    },
     async putMusic(key, music) {
       await mkdir(dir, { recursive: true });
       await writeFile(join(dir, `${name(key)}.${music.mimeType.includes('wav') ? 'wav' : 'mp3'}`), music.bytes);
     },
   };
+}
+
+function extension(mimeType: string): string {
+  if (mimeType.includes('png')) return 'png';
+  if (mimeType.includes('jpeg') || mimeType.includes('jpg')) return 'jpg';
+  if (mimeType.includes('webp')) return 'webp';
+  if (mimeType.includes('json')) return 'data.json';
+  return 'bin';
 }
