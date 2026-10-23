@@ -38,10 +38,10 @@ export function resolveFfmpeg(env: NodeJS.ProcessEnv = process.env): string {
 export function createNodeAudioRuntime(options: { ffmpegPath?: string } = {}): AudioRuntime {
   const ffmpeg = options.ffmpegPath ?? resolveFfmpeg();
 
-  async function convert(input: Uint8Array, args: string[], ext: string): Promise<Uint8Array> {
+  async function convert(input: Uint8Array, args: string[], ext: string, inputExt = 'wav'): Promise<Uint8Array> {
     const dir = await mkdtemp(join(tmpdir(), 'mdmedia-story-'));
     try {
-      const src = join(dir, 'in.wav');
+      const src = join(dir, `in.${inputExt}`);
       const dst = join(dir, `out.${ext}`);
       await writeFile(src, input);
       await run(ffmpeg, ['-y', '-loglevel', 'error', '-i', src, ...args, dst], { maxBuffer: 16 * 1024 * 1024 });
@@ -96,6 +96,7 @@ export function createNodeAudioRuntime(options: { ffmpegPath?: string } = {}): A
   return {
     mix,
     mp3: (wav, kbps) => convert(wav, ['-c:a', 'libmp3lame', '-b:a', `${kbps}k`], 'mp3'),
+    webp: (image, quality) => convert(image, ['-c:v', 'libwebp', '-quality', String(quality)], 'webp', image[0] === 0xff ? 'jpg' : 'png'),
     async describe() {
       const { stdout } = await run(ffmpeg, ['-version']);
       return { path: ffmpeg, version: stdout.split('\n')[0]!.trim() };

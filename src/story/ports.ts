@@ -132,6 +132,8 @@ export interface AudioRuntime {
   mix(plan: MixPlan, target: { loudnessLufs: number; truePeakDb: number }): Promise<Uint8Array>;
   /** An MP3 of a WAV file. */
   mp3(wav: Uint8Array, kbps: number): Promise<Uint8Array>;
+  /** A WebP of a PNG or JPEG image, for the reader. */
+  webp(image: Uint8Array, quality: number): Promise<Uint8Array>;
   /** Where the encoder came from, for build.json. */
   describe(): Promise<{ path: string; version: string }>;
 }

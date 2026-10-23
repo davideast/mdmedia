@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mixClips, PCM_RATE, wavFromPcm } from '../../src/story/index.js';
@@ -41,6 +41,15 @@ describe.if(Boolean(ffmpeg))('Node audio runtime', () => {
     const mp3 = await runtime.mp3(master, 160);
     expect(mp3.byteLength).toBeGreaterThan(10_000);
     expect((await runtime.describe()).version).toContain('ffmpeg version');
+  });
+
+  it('converts a PNG to WebP', async () => {
+    const runtime = createNodeAudioRuntime({ ffmpegPath: ffmpeg });
+    const dir = mkdtempSync(join(tmpdir(), 'story-runtime-'));
+    const png = join(dir, 'in.png');
+    spawnSync(ffmpeg!, ['-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc=size=320x240', '-frames:v', '1', png]);
+    const webp = await runtime.webp(new Uint8Array(readFileSync(png)), 82);
+    expect(new TextDecoder().decode(webp.slice(8, 12))).toBe('WEBP');
   });
 
   it('lays a music bed under the voice: loud for the lead, ducked after it', async () => {

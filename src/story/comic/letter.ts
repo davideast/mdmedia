@@ -278,7 +278,7 @@ function size(panel: LetterPanel, group: number[], w: number, h: number, measure
     y += sh * 0.88;
     x += sw * 0.12;
   }
-  const bounds = shapes.reduce((b, s) => union(b, s));
+  const bounds = shapes.reduce<Rect>((b, s) => union(b, s), shapes[0]!);
   return { ...bounds, fontPx: px, shapes };
 }
 

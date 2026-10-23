@@ -92,6 +92,7 @@ export function memorySink(): FileSink & { files: Map<string, Uint8Array | strin
 export const passThroughRuntime: AudioRuntime & { lastPlan?: MixPlan } = {
   async mix(plan) { passThroughRuntime.lastPlan = plan; return plan.voice; },
   async mp3(wav) { return wav; },
+  async webp(image) { return image; },
   async describe() { return { path: 'fake', version: 'fake' }; },
 };
 
