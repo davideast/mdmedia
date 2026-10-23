@@ -3,8 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, join } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision } from '../story/index.js';
+import { buildComic, buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
+import type { AudioRuntime, BuildEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
@@ -376,6 +376,117 @@ export const storyDrawCommand = defineCommand({
   },
 });
 
+/** Builds the graphic novel for a comic script; resolves to the exit code. `deps` replaces providers in tests. */
+export async function runStoryComic(
+  args: { file: string; out?: string; json?: boolean; signal?: AbortSignal },
+  deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber },
+  write: (text: string) => void
+): Promise<number> {
+  let markdown: string;
+  try {
+    markdown = await readFile(args.file, 'utf8');
+  } catch {
+    write(`${args.file}: cannot read file`);
+    return EXIT.storyErrors;
+  }
+  if (!isComicScript(markdown)) {
+    write(`${args.file}: not a comic script (its front matter needs story:)`);
+    return EXIT.storyErrors;
+  }
+  const { comic, story, diagnostics } = await loadComic(args.file, markdown);
+  if (!comic || !story) {
+    write(args.json ? JSON.stringify({ diagnostics }, null, 2) : formatDiagnostics(args.file, diagnostics));
+    return EXIT.storyErrors;
+  }
+  const outDir = args.out ?? join('dist', slugify(comic.meta.title));
+  const onEvent = args.json
+    ? undefined
+    : (event: DrawEvent | LineEvent) => {
+        if (event.type === 'panel-done' && !event.result.cached) write(`${event.result.ok ? '✓' : '✗'} panel ${event.result.id} (${event.result.attempts} take${event.result.attempts > 1 ? 's' : ''})`);
+        if (event.type === 'line-done' && !event.result.ok) write(`✗ ${event.result.id} ${event.result.speaker}: heard "${event.result.heard}"`);
+      };
+  try {
+    const started = Date.now();
+    const result = await buildComic({ comic, story, ...deps, sink: createFileSink(outDir), signal: args.signal, onEvent });
+    const lines = [...result.lines.values()].map((l) => l.result);
+    const summary = {
+      panels: result.draw.panels.length,
+      panelsFailing: result.draw.panels.filter((p) => !p.ok).length,
+      lines: lines.length,
+      linesCached: lines.filter((l) => l.cached).length,
+      retakes: lines.reduce((n, l) => n + Math.max(0, l.attempts - 1), 0),
+      linesFailing: lines.filter((l) => !l.ok).length,
+      crowded: result.crowded.filter((c) => c.view === 'page').length,
+      crowdedGuided: result.crowded.filter((c) => c.view === 'guided').length,
+      wallMs: Date.now() - started,
+    };
+    await createFileSink(join(outDir, 'comic')).write(
+      'comic-build.json',
+      JSON.stringify({ schema: 'mdmedia.story.comic-build/1', summary, panels: result.draw.panels, lines, crowded: result.crowded }, null, 2) + '\n'
+    );
+    write(
+      args.json
+        ? JSON.stringify({ outDir, summary }, null, 2)
+        : `${summary.panels} panels (${summary.panelsFailing} failing), ${summary.lines} lines (${summary.linesCached} cached, ${summary.retakes} retakes, ${summary.linesFailing} failing), ${summary.crowded} crowded (${summary.crowdedGuided} in the guided view) -> ${join(outDir, 'reader', 'index.html')}`
+    );
+    return summary.panelsFailing || summary.linesFailing || summary.crowded ? EXIT.failingChecks : EXIT.ok;
+  } catch (error) {
+    if (args.signal?.aborted) return EXIT.cancelled;
+    write(`Comic build failed: ${error instanceof Error ? error.message : String(error)}`);
+    return EXIT.provider;
+  }
+}
+
+export const storyComicCommand = defineCommand({
+  meta: {
+    name: 'comic',
+    description: 'Build the graphic novel for a comic script: draw (cached), letter, voice every caption and balloon, and write a reader',
+  },
+  args: {
+    file: { type: 'positional', description: 'Comic script', required: true },
+    out: { type: 'string', description: 'Output folder (default dist/<title>)' },
+    cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the script)' },
+    voices: { type: 'boolean', description: 'Voice captions and balloons (use --no-voices for a lettering pass)', default: true },
+    imageModel: { type: 'string', description: 'Image model (default gemini-3-pro-image)' },
+    visionModel: { type: 'string', description: 'Model for checks and head boxes (default gemini-3.5-flash)' },
+    voiceModel: { type: 'string', description: 'Speech model (default gemini-3.8-flash-tts)' },
+    transcribeModel: { type: 'string', description: 'Transcription model for checks (default gemini-3.5-flash-lite)' },
+    json: { type: 'boolean', description: 'Print the summary as JSON', default: false },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const apiKey = resolveConfig({}, fileConfig, process.env).apiKey;
+    if (!apiKey) {
+      console.error('A Gemini API key is required: set GEMINI_API_KEY or apiKey in .mdmedia.json.');
+      process.exitCode = EXIT.provider;
+      return;
+    }
+    let runtime: AudioRuntime;
+    try {
+      runtime = createNodeAudioRuntime();
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exitCode = EXIT.ffmpegMissing;
+      return;
+    }
+    const controller = new AbortController();
+    process.once('SIGINT', () => controller.abort());
+    process.exitCode = await runStoryComic(
+      { file: args.file, out: args.out, json: args.json, signal: controller.signal },
+      {
+        image: createGeminiImageModel({ apiKey, model: args.imageModel }),
+        vision: createGeminiVision({ apiKey, model: args.visionModel }),
+        cache: createFileRenderCache(args.cache ?? join(args.file, '..', '.mdmedia', 'cache')),
+        runtime,
+        ...(args.voices
+          ? { speaker: createGeminiSpeaker({ apiKey, model: args.voiceModel }), transcriber: createGeminiTranscriber({ apiKey, model: args.transcribeModel }) }
+          : {}),
+      },
+      (text) => console.log(text)
+    );
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -386,5 +497,6 @@ export const storyCommand = defineCommand({
     build: storyBuildCommand,
     direct: storyDirectCommand,
     draw: storyDrawCommand,
+    comic: storyComicCommand,
   },
 });

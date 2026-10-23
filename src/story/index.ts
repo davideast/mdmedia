@@ -23,4 +23,9 @@ export { layoutSlots, nearestAspect, parseLayout, PAGE, ASPECTS } from './comic/
 export type { ComicScript, ComicPage, ComicPanel, ComicItem, Slot } from './comic/types.js';
 export { drawComic, imageKey, MAX_REDRAWS, STAGING_TRIES, type DrawResult, type DrawEvent, type DrawOptions, type PanelResult, type StagingResult } from './comic/draw.js';
 export { previewHtml, panelFile } from './comic/preview.js';
+export { buildComic, readerImage, readerAudio, GUIDED, READER_MP3_KBPS, READER_WEBP_QUALITY, type ComicBuildOptions, type ComicBuildResult } from './comic/build.js';
+export { letterPanel, panelHeads, lettering, LETTERING, type Lettered, type Placed, type Measure, type HeadBox, type LetterPanel, type LetterItem } from './comic/letter.js';
+export { comicScript, voiceComic, itemId } from './comic/voices.js';
+export { readerHtml } from './comic/reader.js';
+export type { ReaderData } from './comic/reader-client.js';
 export { STYLES, BLEED, panelPrompt, panelQuestions, sheetPrompt, stagingPrompt, onModelQuestions, displayName } from './comic/prompts.js';

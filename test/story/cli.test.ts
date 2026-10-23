@@ -199,3 +199,45 @@ describe('mdmedia story draw', async () => {
     expect(readFileSync(joinPath(out, 'comic', 'preview.html'), 'utf8')).toContain('1 still failing a check');
   });
 });
+
+describe('mdmedia story comic', async () => {
+  const { runStoryComic, EXIT } = await import('../../src/cli/story-command.js');
+  const { fakeImageModel, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { mkdtempSync, existsSync, readFileSync, writeFileSync, copyFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber() });
+
+  it('writes the reader and comic-build.json, and exits 0', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-comic-'));
+    let text = '';
+    const code = await runStoryComic({ file: fixture('comic-lunch'), out }, deps(), (t) => { text += t + '\n'; });
+    expect(text).toContain('21 panels (0 failing)');
+    expect(code).toBe(EXIT.ok);
+    for (const f of ['reader/index.html', 'reader/img/panel-3-2.webp', 'reader/audio/1-1-0.mp3', 'comic/comic-build.json']) expect(existsSync(joinPath(out, f))).toBe(true);
+    const report = JSON.parse(readFileSync(joinPath(out, 'comic', 'comic-build.json'), 'utf8'));
+    expect(report.summary).toMatchObject({ panels: 21, panelsFailing: 0, linesFailing: 0, crowded: 0 });
+    expect(report.summary.crowdedGuided).toBeGreaterThanOrEqual(0);
+  });
+
+  it('exits 4 when a line keeps failing its transcript check', async () => {
+    const out = mkdtempSync(joinPath(tmpdir(), 'story-comic-'));
+    const transcriber = scriptedTranscriber((text) => (text === 'What clip?' ? 'What clip, Harper?' : undefined));
+    const code = await runStoryComic({ file: fixture('comic-lunch'), out }, { ...deps(), transcriber }, () => {});
+    expect(code).toBe(EXIT.failingChecks);
+  });
+
+  it('exits 4 when lettering is crowded', async () => {
+    const dir = mkdtempSync(joinPath(tmpdir(), 'story-comic-'));
+    copyFileSync(fixture('embarrassing-day'), joinPath(dir, 'embarrassing-day.md'));
+    const long = 'And that was the moment I realized the whole cafeteria had gone completely silent, every single head turned toward our table, and nobody was eating anymore. '.repeat(3);
+    writeFileSync(
+      joinPath(dir, 'comic.md'),
+      `---\ntitle: Crowded\nstory: embarrassing-day.md\nstyle: flat\n---\n\n## Page 1\n\nlayout: 1 1 1 | 1 1 1 | 1 1 1 | 1 1 1\n\n` +
+        Array.from({ length: 12 }, (_, i) => `### Panel ${i + 1}\n\n> Close-up of June. Center: JUNE.\n\n*(flat)* ${long}\n\n**JUNE** *(dry)*: ${long}\n`).join('\n')
+    );
+    const code = await runStoryComic({ file: joinPath(dir, 'comic.md'), out: joinPath(dir, 'out') }, deps(), () => {});
+    expect(code).toBe(EXIT.failingChecks);
+    expect(JSON.parse(readFileSync(joinPath(dir, 'out', 'comic', 'comic-build.json'), 'utf8')).summary.crowded).toBeGreaterThan(0);
+  });
+});
