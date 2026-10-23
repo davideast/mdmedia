@@ -284,8 +284,9 @@ Instead, her face changed. Not angry. Worse. Hurt.
 **JUNE** *(cutting him off, hurt)*: You promised, Milo.
 
 Around us, the cafeteria continued its usual chaos. Someone launched a grape
-across the room. A seventh grader was arguing with a lunch monitor about whether
-ketchup counted as a vegetable.
+across the room.
+
+<!-- replaced: "A seventh grader was arguing with a lunch monitor about whether ketchup counted as a vegetable." The kid's line shows it instead. -->
 
 **KID** *(loud and indignant, far across the cafeteria)*: Ketchup is TOO a vegetable!
 
