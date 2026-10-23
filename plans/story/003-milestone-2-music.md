@@ -242,6 +242,36 @@ npm_config_cache=$TMPDIR/npm-cache bun run verify
 grep -rn "from 'node:" src/story --include=*.ts | grep -v "src/story/node/" && echo "STOP" || echo "core is platform-free"
 ```
 
+## As built (2026-10-22)
+
+Committed locally on `feat/story-m2` (2ee60fc), not pushed.
+
+- **Loudness is two-pass**: the mix is rendered unnormalized, measured, then
+  given one fixed gain (`loudnorm ... linear=true`). The test confirms the bed
+  ducks by 9 to 12 dB (design: about 10). The prototype's one-pass `loudnorm`
+  adjusts gain as it plays; whether that alone shrank the ducking was not
+  isolated, because the first measurement leaked voice into the window.
+- **Leads are per scene** (`scheduleStory(..., { leads })`): only scenes whose
+  clip arrived get one, so a failed clip leaves no silent gap.
+- **Clips come back in scene order**, whatever order they finished in.
+- **One limiter module** (`limit.ts`) is shared by lines and music.
+- **Live lunch rebuild** (fresh cache, `--no-music`): 1 line flagged (milestone
+  1: 3) and 4 retakes (milestone 1: 8). "Milo" is now spelled right and the
+  laughed "Heh" passes. Still flagged: "It was just to Harper", heard as "just
+  a harper" in every take, here and in the prototype.
+- **Live full story** (`embarrassing-day.md`, fresh cache): 289 lines, 8 of 8
+  music clips, 18 min of audio in 5 min 33 s; 46 retakes, 0 refusals, 9 lines
+  still flagged. Seven are comparison gaps, not audio faults: two-word numbers
+  ("forty-five" vs "45", "three hundred" vs "300"), units ("feet" vs "ft"),
+  contractions ("might've" vs "might have", "he'd" heard as "he"), and a name
+  outside the cast ("Shah" heard as "Shaw"). Two need listening: "just to
+  Harper" and a one-word "Yeah?" heard as "ia". Published for listening as a
+  private artifact.
+- **Follow-up for the next milestone**: compound numbers and common units in
+  the word normalization, `'ve`/`'d` contractions, and names from the whole
+  story (not just the cast) in the transcriber's list. These likely account for
+  most of the 46 retakes, which cost a voice call and a transcription each.
+
 ## Done when
 
 - Every step's tests pass with fakes.
