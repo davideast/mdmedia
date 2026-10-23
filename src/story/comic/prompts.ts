@@ -104,14 +104,18 @@ export function onModelQuestions(ids: string[], cast: Record<string, CastMember>
     .map((id) => `Does ${displayName(id)} match this description, as far as they are visible: ${cast[id]!.look}?`);
 }
 
-export const NO_TEXT_QUESTION = 'Is the image free of speech balloons, captions and written words (apart from school signs or banners)?';
+export const NO_TEXT_QUESTION =
+  'Is the image free of speech balloons, captions and written words (apart from signs, banners and labels on objects such as milk cartons)?';
+
+/** The model sometimes draws its own panel divider inside the image (live run, panel 1.4). */
+export const ONE_IMAGE_QUESTION = 'Is this one unbroken picture, with no panel borders, frames or dividing lines drawn across it?';
 
 /**
  * The yes/no questions a drawn panel must pass. Generated from the panel and
  * the cast; a check only catches what it asks (prototype run 6).
  */
 export function panelQuestions(panel: ComicPanel, cast: Record<string, CastMember>): string[] {
-  const questions = [...onModelQuestions(Object.keys(panel.positions), cast), NO_TEXT_QUESTION];
+  const questions = [...onModelQuestions(Object.keys(panel.positions), cast), NO_TEXT_QUESTION, ONE_IMAGE_QUESTION];
   const left = Object.entries(panel.positions).filter(([, side]) => side === 'left').map(([id]) => displayName(id));
   const right = Object.entries(panel.positions).filter(([, side]) => side === 'right').map(([id]) => displayName(id));
   if (left.length && right.length) questions.push(`Is ${left.join(' and ')} on the left of the frame and ${right.join(' and ')} on the right?`);

@@ -73,6 +73,18 @@ describe('drawComic', async () => {
     expect(result.panels.every((p) => p.cached)).toBe(true);
   });
 
+  it('checks cached images again, without redrawing, when the questions change', async () => {
+    const cache = memoryCache();
+    await drawComic(comic, cast, { image: fakeImageModel(), vision: fakeVision(), cache });
+    for (const entry of cache.images.values()) if (entry.meta.questions) entry.meta.questions = ['An older question?'];
+    const again = fakeImageModel();
+    const vision = fakeVision();
+    const result = await drawComic(comic, cast, { image: again, vision, cache });
+    expect(again.requests).toHaveLength(0);
+    expect(vision.asks).toHaveLength(1 + 21);
+    expect(result.panels.every((p) => p.cached && p.ok && p.answers.length === p.questions.length)).toBe(true);
+  });
+
   it('asks a continue panel its questions with the source panel shown first', async () => {
     const vision = fakeVision();
     await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });

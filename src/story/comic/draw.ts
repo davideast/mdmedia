@@ -172,7 +172,8 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
 /**
  * Draws until every check passes or the tries run out, keeping the take with
  * the most yes answers. Only a take that passes is cached as accepted, so the
- * next build tries again.
+ * next build tries again. A cached image checked with other questions is
+ * checked again before anything is redrawn.
  */
 async function drawChecked(args: {
   key: string;
@@ -183,10 +184,20 @@ async function drawChecked(args: {
   cache: RenderCache;
 }): Promise<{ image: ImageBytes; result: Checked }> {
   const hit = await args.cache.getImage(args.key);
-  if (hit?.meta.accepted) {
+  const sameQuestions = JSON.stringify(hit?.meta.questions) === JSON.stringify(args.questions);
+  if (hit?.meta.accepted && sameQuestions) {
     return { image: hit, result: { key: args.key, cached: true, attempts: 0, questions: args.questions, answers: hit.meta.answers as boolean[], ok: true } };
   }
   let best: { image: ImageBytes; answers: boolean[] } | undefined;
+  if (hit?.meta.accepted) {
+    const image = { bytes: hit.bytes, mimeType: hit.mimeType };
+    const answers = await args.check(image);
+    if (answers.every(Boolean)) {
+      await args.cache.putImage(args.key, { ...image, meta: { questions: args.questions, answers, accepted: true } });
+      return { image, result: { key: args.key, cached: true, attempts: 0, questions: args.questions, answers, ok: true } };
+    }
+    best = { image, answers };
+  }
   let attempts = 0;
   while (attempts < args.tries) {
     attempts++;
@@ -196,7 +207,7 @@ async function drawChecked(args: {
     if (answers.every(Boolean)) break;
   }
   const ok = best!.answers.every(Boolean);
-  await args.cache.putImage(args.key, { ...best!.image, meta: { answers: best!.answers, accepted: ok } });
+  await args.cache.putImage(args.key, { ...best!.image, meta: { questions: args.questions, answers: best!.answers, accepted: ok } });
   return { image: best!.image, result: { key: args.key, cached: false, attempts, questions: args.questions, answers: best!.answers, ok } };
 }
 

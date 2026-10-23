@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseStory } from '../../../src/story/index.js';
 import { parseComic } from '../../../src/story/comic/parse.js';
-import { NO_TEXT_QUESTION, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
+import { NO_TEXT_QUESTION, ONE_IMAGE_QUESTION, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
 
 const dir = join(import.meta.dir, '..', 'fixtures');
 
@@ -18,6 +18,7 @@ describe('comic prompts and checks', async () => {
     expect(q[0]).toStartWith('Does June match this description');
     expect(q[1]).toStartWith('Does Milo match this description');
     expect(q).toContain(NO_TEXT_QUESTION);
+    expect(q).toContain(ONE_IMAGE_QUESTION);
     expect(q).toContain('Is June on the left of the frame and Milo on the right?');
     expect(q.at(-1)).toContain('June has just understood he betrayed her trust');
   });

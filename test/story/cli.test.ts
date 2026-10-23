@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { join } from 'node:path';
 import { checkStory } from '../../src/cli/story-command.js';
 import { resolveSmartCliArgv } from '../../src/cli/command.js';
+import { NO_TEXT_QUESTION } from '../../src/story/comic/prompts.js';
 
 const fixture = (name: string) => join(import.meta.dir, 'fixtures', `${name}.md`);
 
@@ -192,7 +193,7 @@ describe('mdmedia story draw', async () => {
 
   it('exits 4 when a panel still fails a check', async () => {
     const out = mkdtempSync(joinPath(tmpdir(), 'story-draw-'));
-    const vision = fakeVision((img, q) => img.includes('Wide close-up of June') && q === 'Is the image free of speech balloons, captions and written words (apart from school signs or banners)?');
+    const vision = fakeVision((img, q) => img.includes('Wide close-up of June') && q === NO_TEXT_QUESTION);
     const code = await runStoryDraw({ file: fixture('comic-lunch'), out }, { image: fakeImageModel(), vision, cache: memoryCache() }, () => {});
     expect(code).toBe(EXIT.failingChecks);
     expect(readFileSync(joinPath(out, 'comic', 'preview.html'), 'utf8')).toContain('1 still failing a check');
