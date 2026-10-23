@@ -1,5 +1,8 @@
 import { VOICES } from './voices.js';
 
+/** A dramatized line is a punchline; past this it starts explaining itself. */
+export const MAX_DRAMATIZED_WORDS = 8;
+
 /**
  * The director's instructions, as data. Every rule here comes from a
  * prototype finding (plans/story/prototype-findings.md) or a listening note.
@@ -30,7 +33,7 @@ ${VOICES.map((v) => `  ${v.name}: ${v.description}`).join('\n')}
 - "names" lists every other proper noun in the story a listener might hear (people, places, shows), spelled exactly as the story spells them.
 - "scenes" splits the story where its own breaks fall (horizontal rules, time jumps, location changes), in order. "firstWords" are the first six or more words of the scene, copied exactly, so the scene can be found in the text.
 - "music" is one line describing instrumental music for the scene's mood: instruments, tempo, feeling. Never ask for vocals.
-- "dramatize" lists the moments where the author describes someone speaking without quoting them, and the moment is funny or vivid: a seventh grader arguing that ketchup counts as a vegetable. For each, copy the "sentence" exactly, give the speaker a short "line" in their own words that shows the moment (Ketchup is TOO a vegetable!), and a "cue" about how it feels. The line replaces the sentence, so the moment lands once. Add the speaker to the cast if they are not in it. Never dramatize speech the author already quotes. Usually zero to three moments in a story; an empty list is fine.`;
+- "dramatize" lists the moments where the author describes someone speaking without quoting them, and the moment is funny or vivid: a seventh grader arguing that ketchup counts as a vegetable. For each, copy the "sentence" exactly, give the speaker a "line" that shows the moment, and a "cue" about how it feels. The line replaces the sentence, so the moment lands once. The line is a punchline: a few words, said with total conviction, never explained. Write "Ketchup is TOO a vegetable!", not "Ketchup is made from tomatoes, so it is a vegetable!": giving the reason kills the joke. No "because", no "so", at most ${MAX_DRAMATIZED_WORDS} words. Add the speaker to the cast if they are not in it. Never dramatize speech the author already quotes. Usually zero to three moments in a story; an empty list is fine.`;
 
 export const SCENE_INSTRUCTION = `You turn one scene of an author's story into the notation for an audio drama. Return only the notation for this scene, without its heading or music block.
 

@@ -16,6 +16,7 @@ describe('director instructions', () => {
     expect(REPAIR_INSTRUCTION).toContain(SCENE_INSTRUCTION);
     expect(CAST_INSTRUCTION).toContain('"dramatize"');
     expect(CAST_INSTRUCTION).toContain('Never dramatize speech the author already quotes');
+    expect(CAST_INSTRUCTION).toContain('giving the reason kills the joke');
   });
 
   it('offers every voice with its description, and only those', () => {

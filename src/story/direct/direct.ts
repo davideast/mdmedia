@@ -4,7 +4,7 @@ import type { TextModel } from '../ports.js';
 import type { Diagnostic, Line, StoryScript } from '../types.js';
 import { applyDramatization, assembleStory, sceneHeadingLines, type CastPlan, type SceneDraft } from './assemble.js';
 import { fidelity, type AddedSpan, type MissingSpan } from './fidelity.js';
-import { CAST_INSTRUCTION, REPAIR_INSTRUCTION, SCENE_INSTRUCTION } from './prompts.js';
+import { CAST_INSTRUCTION, MAX_DRAMATIZED_WORDS, REPAIR_INSTRUCTION, SCENE_INSTRUCTION } from './prompts.js';
 import { isVoice } from './voices.js';
 
 export const MAX_REPAIR_ROUNDS = 2;
@@ -158,6 +158,8 @@ export function validatePlan(plan: CastPlan, raw: string): string[] {
   for (const d of plan.dramatize ?? []) {
     if (!raw.includes(d.sentence)) problems.push(`The sentence to dramatize is not in the story word for word: "${d.sentence}".`);
     if (!plan.cast?.[d.speaker]) problems.push(`The speaker ${d.speaker} for "${d.line}" is not in the cast.`);
+    const count = d.line.trim().split(/\s+/).length;
+    if (count > MAX_DRAMATIZED_WORDS) problems.push(`The line "${d.line}" has ${count} words; a dramatized line is a punchline of at most ${MAX_DRAMATIZED_WORDS} words, with no reason given.`);
   }
   return problems;
 }

@@ -352,7 +352,7 @@ Tense, awkward cafeteria rhythm with a slowing tempo.
 
 <!-- director: added -->
 
-**SEVENTH_GRADER** *(indignant and arguing passionately)*: Ketchup is made from tomatoes, so it is TOTALLY a vegetable!
+**SEVENTH_GRADER** *(loud and indignant, far across the cafeteria)*: Ketchup is TOO a vegetable!
 
 *(heavy, hollow)* But at our table, everything had gone quiet.
 

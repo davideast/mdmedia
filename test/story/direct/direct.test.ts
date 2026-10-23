@@ -137,6 +137,18 @@ describe('directStory', () => {
     expect(markdown).toContain('*(relieved)* Ten minutes later, the next bus came.\n\n<!-- replaced: "A kid at the back was arguing that buses are boats." -->\n\n<!-- director: added -->\n\n**KID** *(indignant, far off)*: Buses are TOO boats!');
   });
 
+  it('sends back a dramatized line that explains itself instead of landing', async () => {
+    const sentence = 'A kid at the back was arguing that buses are boats.';
+    const raw = RAW.replace('Ten minutes later, the next bus came.', `Ten minutes later, the next bus came. ${sentence}`);
+    const cast = { ...PLAN.cast, KID: { voice: 'Fenrir', delivery: 'loud kid' } };
+    const wordy = { ...PLAN, cast, dramatize: [{ sentence, speaker: 'KID', cue: 'indignant', line: 'Buses float on wheels, so they are basically TOTALLY boats!' }] };
+    const punchy = { ...wordy, dramatize: [{ ...wordy.dramatize[0]!, line: 'Buses are TOO boats!' }] };
+    const w = writer({ cast: (n) => JSON.stringify(n === 0 ? wordy : punchy), scene: (s) => (s === 'two' ? `*(relieved)* Ten minutes later, the next bus came. ${sentence}` : GOOD_ONE) });
+    const { report } = await directStory(raw, { writer: w });
+    expect(w.calls[1]!.prompt).toContain('a dramatized line is a punchline of at most 8 words');
+    expect(report.additions).toEqual(['Buses are TOO boats!']);
+  });
+
   it('rejects a dramatization whose sentence is not in the story', async () => {
     const plan = { ...PLAN, dramatize: [{ sentence: 'Nobody said this.', speaker: 'MAYA', cue: 'x', line: 'y' }] };
     await expect(directStory(RAW, { writer: writer({ cast: () => JSON.stringify(plan) }) })).rejects.toThrow(/not in the story word for word/);
