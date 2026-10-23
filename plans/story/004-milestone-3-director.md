@@ -309,6 +309,14 @@ Committed locally on `feat/story-m3` (8a42b06, eb83677 and the fixtures), not pu
   by hand. Build: 21 min 13 s of audio in 6 min 36 s, 45 retakes, 4 flagged
   (transcriber slips on short narration lines), 8 music clips. Published next
   to the hand-adapted build. Kept as `test/story/fixtures/embarrassing-day.directed.md`.
+- **Punchlines, not explanations**: the director first wrote "Ketchup is made
+  from tomatoes, so it is TOTALLY a vegetable!", which you said ruins the
+  joke. The cast instruction now asks for a punchline stated with conviction
+  and no reason, with your line as the example of right and the director's as
+  the example of wrong, and code sends back any dramatized line over eight
+  words. The next live run chose "Ketchup is TOO a vegetable!" on its own.
+  The directed fixture and its published build use the punchline (370 of 377
+  lines from the cache).
 - **Observed**: the director splits narration into more, shorter lines than I
   did; short lines draw most of the transcriber's slips and retakes.
 
