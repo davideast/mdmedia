@@ -51,6 +51,13 @@ export interface CachedLine {
   accepted: boolean;
 }
 
+/** A text model, for the director. */
+export interface TextModel {
+  readonly model: string;
+  /** With `json`, the reply must be one JSON value and nothing else. */
+  generate(request: { system: string; prompt: string; json?: boolean; signal?: AbortSignal }): Promise<string>;
+}
+
 /** Writes about 30 seconds of instrumental music for a prompt. */
 export interface Composer {
   readonly model: string;

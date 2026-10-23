@@ -1,14 +1,15 @@
 import { defineCommand } from 'citty';
-import { readFile } from 'node:fs/promises';
-import { basename, extname, join } from 'node:path';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { basename, dirname, extname, join } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { buildStory, parseStory, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, Composer, Diagnostic, RenderCache, Speaker, Transcriber } from '../story/index.js';
+import { buildStory, directStory, parseStory, slugify, StoryError } from '../story/index.js';
+import type { AudioRuntime, BuildEvent, Composer, DirectEvent, Diagnostic, RenderCache, Speaker, TextModel, Transcriber } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
   createGeminiSpeaker,
+  createGeminiTextModel,
   createGeminiTranscriber,
   createLyriaComposer,
   createNodeAudioRuntime,
@@ -175,6 +176,79 @@ export const storyBuildCommand = defineCommand({
   },
 });
 
+/**
+ * Directs a raw story into a story file; resolves to the exit code. The file is
+ * written even when problems remain, so a person can finish it.
+ */
+export async function runStoryDirect(
+  args: { file: string; out: string; json?: boolean; signal?: AbortSignal },
+  writer: TextModel,
+  write: (text: string) => void
+): Promise<number> {
+  let raw: string;
+  try {
+    raw = await readFile(args.file, 'utf8');
+  } catch {
+    write(`${args.file}: cannot read file`);
+    return EXIT.storyErrors;
+  }
+  const onEvent = args.json ? undefined : (event: DirectEvent) => {
+    if (event.type === 'cast-done') {
+      const c = event.cast;
+      write(`cast: ${Object.entries(c.cast).map(([id, m]) => `${id} (${m.voice})`).join(', ')}; narrator ${'character' in c.narrator ? c.narrator.character : c.narrator.voice}; ${c.scenes.length} scenes`);
+    }
+    if (event.type === 'scene-done') write(`✓ ${event.title}`);
+    if (event.type === 'repair') write(`↻ repair round ${event.round}: ${event.scenes.join(', ')}`);
+  };
+  try {
+    const { markdown, report } = await directStory(raw, { writer, signal: args.signal, onEvent });
+    await mkdir(dirname(args.out), { recursive: true });
+    await writeFile(args.out, markdown);
+    if (args.json) write(JSON.stringify({ out: args.out, ...report }, null, 2));
+    else {
+      write(`${report.lines} lines in ${report.scenes} scenes -> ${args.out}`);
+      for (const a of report.additions) write(`+ added: ${a}`);
+      for (const r of report.replaced) write(`~ replaced: ${r}`);
+      for (const p of report.remaining) write(`✗ ${p.scene}: ${p.detail}`);
+      if (!report.remaining.length) write('no problems');
+    }
+    return report.remaining.length ? EXIT.storyErrors : EXIT.ok;
+  } catch (error) {
+    if (args.signal?.aborted) return EXIT.cancelled;
+    write(`Direct failed: ${error instanceof Error ? error.message : String(error)}`);
+    return EXIT.provider;
+  }
+}
+
+export const storyDirectCommand = defineCommand({
+  meta: {
+    name: 'direct',
+    description: 'Turn an author\'s raw story into a story file: cast, voices, scenes, music cues and a cue on every line',
+  },
+  args: {
+    file: { type: 'positional', description: 'The raw story (markdown or plain text)', required: true },
+    out: { type: 'string', alias: 'o', description: 'Story file to write', required: true },
+    model: { type: 'string', description: 'Text model (default gemini-3.5-flash)' },
+    json: { type: 'boolean', description: 'Print the report as JSON', default: false },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const apiKey = resolveConfig({}, fileConfig, process.env).apiKey;
+    if (!apiKey) {
+      console.error('A Gemini API key is required: set GEMINI_API_KEY or apiKey in .mdmedia.json.');
+      process.exitCode = EXIT.provider;
+      return;
+    }
+    const controller = new AbortController();
+    process.once('SIGINT', () => controller.abort());
+    process.exitCode = await runStoryDirect(
+      { file: args.file, out: args.out, json: args.json, signal: controller.signal },
+      createGeminiTextModel({ apiKey, model: args.model }),
+      (text) => console.log(text)
+    );
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -183,5 +257,6 @@ export const storyCommand = defineCommand({
   subCommands: {
     check: storyCheckCommand,
     build: storyBuildCommand,
+    direct: storyDirectCommand,
   },
 });

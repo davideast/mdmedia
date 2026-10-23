@@ -3,7 +3,7 @@ import { parseDuration, type SourceMap } from './source.js';
 import type { CastId, CastMember, Diagnostic, VoiceRef } from './types.js';
 
 export const DEFAULT_GAP_MS = 400;
-const TOP_KEYS = new Set(['title', 'author', 'language', 'gap', 'narrator', 'cast']);
+const TOP_KEYS = new Set(['title', 'author', 'language', 'gap', 'narrator', 'cast', 'names']);
 const MEMBER_KEYS = new Set(['voice', 'delivery', 'look']);
 const NARRATOR_KEYS = new Set(['voice', 'delivery']);
 
@@ -14,6 +14,8 @@ export interface FrontMatter {
   gapMs: number;
   narrator: CastId;
   cast: Record<CastId, CastMember>;
+  /** Other proper nouns in the story, spelled as the story spells them. */
+  names: string[];
 }
 
 export interface FrontMatterResult {
@@ -96,6 +98,18 @@ export function readFrontMatter(markdown: string, map: SourceMap): FrontMatterRe
     }
   }
 
+  const names: string[] = [];
+  const namesPair = entries.get('names');
+  if (namesPair) {
+    const node = namesPair.value as { items?: unknown[] } | null;
+    const items = Array.isArray(node?.items) ? node!.items : undefined;
+    if (!items || items.some((item) => typeof scalar(item) !== 'string')) {
+      report('missing-field', 'names must be a list of names, such as [Priya Shah, Westfield].', namesPair.value as Node);
+    } else {
+      for (const item of items) names.push(String(scalar(item)).trim());
+    }
+  }
+
   let narrator: CastId = 'NARRATOR';
   const narratorPair = entries.get('narrator');
   if (!narratorPair) {
@@ -109,7 +123,7 @@ export function readFrontMatter(markdown: string, map: SourceMap): FrontMatterRe
   }
 
   if (diagnostics.length) return { bodyStart, diagnostics };
-  return { frontMatter: { title: title!, author, language, gapMs, narrator, cast }, bodyStart, diagnostics };
+  return { frontMatter: { title: title!, author, language, gapMs, narrator, cast, names }, bodyStart, diagnostics };
 }
 
 type Report = (code: Diagnostic['code'], message: string, node?: Node | null) => void;

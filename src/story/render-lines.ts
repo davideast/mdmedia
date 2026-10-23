@@ -132,9 +132,14 @@ async function renderLine(
 
 const errorCount = (check: LineCheck) => check.missing.length + check.extra.length;
 
-/** The cast's names as a reader would write them: MILO → Milo. The narrator role is left out. */
+/**
+ * Names the transcriber should spell the story's way: the cast as a reader
+ * would write them (MILO → Milo, without the narrator role), then the
+ * story's other names from `names:`.
+ */
 export function castNames(script: StoryScript): string[] {
-  return Object.keys(script.cast)
+  const cast = Object.keys(script.cast)
     .filter((id) => id !== 'NARRATOR')
     .map((id) => id.charAt(0) + id.slice(1).toLowerCase());
+  return [...new Set([...cast, ...(script.meta.names ?? [])])];
 }

@@ -66,7 +66,7 @@ export interface Chapter {
 export interface StoryScript {
   schema: 'mdmedia.story.script/1';
   source: { path: string; sha256: string };
-  meta: { title: string; author?: string; language: string };
+  meta: { title: string; author?: string; language: string; names?: string[] };
   gapMs: number;
   /** The cast member who speaks narration: a character, or 'NARRATOR'. */
   narrator: CastId;

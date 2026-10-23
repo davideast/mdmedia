@@ -288,6 +288,8 @@ across the room.
 
 <!-- replaced: "A seventh grader was arguing with a lunch monitor about whether ketchup counted as a vegetable." The kid's line shows it instead. -->
 
+<!-- director: added -->
+
 **KID** *(loud and indignant, far across the cafeteria)*: Ketchup is TOO a vegetable!
 
 But at our table, everything had gone quiet.

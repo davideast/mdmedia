@@ -3,6 +3,8 @@ export { createFileRenderCache, createFileSink } from './files.js';
 export {
   createGeminiSpeaker,
   createGeminiTranscriber,
+  createGeminiTextModel,
+  DEFAULT_STORY_DIRECT_MODEL,
   isRefusal,
   DEFAULT_STORY_SPEECH_MODEL,
   DEFAULT_STORY_TRANSCRIBE_MODEL,

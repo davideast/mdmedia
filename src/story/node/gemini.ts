@@ -1,11 +1,12 @@
 import { GoogleGenAI } from '@google/genai';
 import { calculateBackoffMs, delay } from '../../tts/backoff.js';
 import { GeminiTTSProvider } from '../../tts/gemini-tts-provider.js';
-import { SpeechRefused, type Speaker, type Transcriber } from '../ports.js';
+import { SpeechRefused, type Speaker, type TextModel, type Transcriber } from '../ports.js';
 import { StoryError } from '../types.js';
 
 export const DEFAULT_STORY_SPEECH_MODEL = 'gemini-3.8-flash-tts';
 export const DEFAULT_STORY_TRANSCRIBE_MODEL = 'gemini-3.5-flash-lite';
+export const DEFAULT_STORY_DIRECT_MODEL = 'gemini-3.5-flash';
 
 /**
  * Speech on a verbatim Gemini TTS model: the words and the delivery note go in
@@ -67,6 +68,38 @@ export function createGeminiTranscriber(options: { apiKey: string; model?: strin
             }],
           });
           return (response.text ?? '').trim();
+        } catch (error) {
+          if (attempt >= maxRetries || !isBusy(error)) throw error;
+          await delay(calculateBackoffMs(attempt, 2000, 30_000));
+        }
+      }
+    },
+  };
+}
+
+/** The director's text model. */
+export function createGeminiTextModel(options: { apiKey: string; model?: string; temperature?: number; maxRetries?: number }): TextModel {
+  const model = options.model ?? DEFAULT_STORY_DIRECT_MODEL;
+  const client = new GoogleGenAI({ apiKey: options.apiKey });
+  const maxRetries = options.maxRetries ?? 5;
+  return {
+    model,
+    async generate({ system, prompt, json, signal }) {
+      for (let attempt = 0; ; attempt++) {
+        signal?.throwIfAborted();
+        try {
+          const response = await client.models.generateContent({
+            model,
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            config: {
+              systemInstruction: system,
+              temperature: options.temperature ?? 0.4,
+              ...(json ? { responseMimeType: 'application/json' } : {}),
+            },
+          });
+          const text = (response.text ?? '').trim();
+          if (!text) throw new Error('The text model returned nothing.');
+          return text;
         } catch (error) {
           if (attempt >= maxRetries || !isBusy(error)) throw error;
           await delay(calculateBackoffMs(attempt, 2000, 30_000));

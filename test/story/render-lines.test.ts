@@ -47,6 +47,14 @@ describe('renderLines', () => {
     expect(transcriber.names.every((n) => n.join() === 'Maya,Dad')).toBe(true);
   });
 
+  it("adds the story's other names after the cast", async () => {
+    const md = story(BODY).replace('title: Lines\n', 'title: Lines\nnames: [Priya Shah, Westfield]\n');
+    const parsed = (await parseStory(md, { path: 'lines.md' })).script!;
+    const transcriber = scriptedTranscriber();
+    await renderLines(parsed, { speaker: toneSpeaker(), transcriber, cache: memoryCache() });
+    expect(transcriber.names[0]).toEqual(['Maya', 'Dad', 'Priya Shah', 'Westfield']);
+  });
+
   it('retakes once after a mismatch, then caches the passing take', async () => {
     const speaker = toneSpeaker();
     const cache = memoryCache();

@@ -14,3 +14,7 @@ export { renderMusic, buildMixPlan, sceneLeads, musicRenderKey, LEAD_MS, OUTRO_M
 export { limiter, type Limiter } from './limit.js';
 export { castNames } from './render-lines.js';
 export { INTERJECTIONS } from './diff.js';
+export { directStory, validatePlan, sceneTexts, MAX_REPAIR_ROUNDS, type DirectReport, type DirectEvent, type DirectResult, type Problem } from './direct/direct.js';
+export { assembleStory, type CastPlan, type SceneDraft } from './direct/assemble.js';
+export { fidelity, MAX_TAG_WORDS, type Fidelity, type MissingSpan, type AddedSpan } from './direct/fidelity.js';
+export { VOICES, isVoice } from './direct/voices.js';

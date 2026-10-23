@@ -105,3 +105,48 @@ describe('mdmedia story build', async () => {
     expect(text).toContain('unknown-speaker');
   });
 });
+
+describe('mdmedia story direct', async () => {
+  const { runStoryDirect, EXIT } = await import('../../src/cli/story-command.js');
+  const { mkdtempSync, readFileSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+  const { CAST_INSTRUCTION } = await import('../../src/story/direct/prompts.js');
+
+  const raw = 'The Bus\n\nThe bus pulled away. "Wait!" Maya shouted.\n';
+  const plan = {
+    title: 'The Bus',
+    narrator: { voice: 'Charon', delivery: 'warm' },
+    cast: { MAYA: { voice: 'Kore', delivery: 'quick' } },
+    names: [],
+    scenes: [{ title: 'One', firstWords: 'The bus pulled away.', music: 'strings' }],
+  };
+  const writer = (scene: string) => ({
+    model: 'fake',
+    async generate({ system }: { system: string }) { return system === CAST_INSTRUCTION ? JSON.stringify(plan) : scene; },
+  });
+
+  it('writes the story file and exits 0 when it is clean', async () => {
+    const dir = mkdtempSync(joinPath(tmpdir(), 'story-direct-'));
+    writeFileSync(joinPath(dir, 'raw.md'), raw);
+    let text = '';
+    const code = await runStoryDirect(
+      { file: joinPath(dir, 'raw.md'), out: joinPath(dir, 'out', 'story.md') },
+      writer('*(brisk)* The bus pulled away.\n\n**MAYA** *(panicked)*: Wait!'),
+      (t) => { text += t + '\n'; }
+    );
+    expect(code).toBe(EXIT.ok);
+    expect(text).toContain('no problems');
+    expect(readFileSync(joinPath(dir, 'out', 'story.md'), 'utf8')).toContain('**MAYA** *(panicked)*: Wait!');
+  });
+
+  it('still writes the file, and exits 1, when problems remain', async () => {
+    const dir = mkdtempSync(joinPath(tmpdir(), 'story-direct-'));
+    writeFileSync(joinPath(dir, 'raw.md'), raw);
+    let text = '';
+    const code = await runStoryDirect({ file: joinPath(dir, 'raw.md'), out: joinPath(dir, 'story.md') }, writer('The bus left.'), (t) => { text += t + '\n'; });
+    expect(code).toBe(EXIT.storyErrors);
+    expect(text).toContain('✗ One:');
+    expect(readFileSync(joinPath(dir, 'story.md'), 'utf8')).toContain('The bus left.');
+  });
+});

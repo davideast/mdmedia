@@ -141,7 +141,12 @@ export async function parseStory(markdown: string, options: { path: string }): P
   const script: StoryScript = {
     schema: 'mdmedia.story.script/1',
     source: { path: options.path, sha256: await sha256(markdown) },
-    meta: { title: frontMatter.title, ...(frontMatter.author ? { author: frontMatter.author } : {}), language: frontMatter.language },
+    meta: {
+      title: frontMatter.title,
+      ...(frontMatter.author ? { author: frontMatter.author } : {}),
+      language: frontMatter.language,
+      ...(frontMatter.names.length ? { names: frontMatter.names } : {}),
+    },
     gapMs: frontMatter.gapMs,
     narrator: frontMatter.narrator,
     cast: frontMatter.cast,

@@ -65,6 +65,19 @@ describe('The Most Embarrassing Day of My Life', () => {
   });
 });
 
+describe('names', () => {
+  it('reads a list of other names into meta.names', async () => {
+    const { script, diagnostics } = await parseStory('---\ntitle: T\nnames: [Priya Shah, Westfield]\nnarrator:\n  voice: Charon\n---\n\n*(calm)* Hi.\n', { path: 't.md' });
+    expect(diagnostics).toEqual([]);
+    expect(script!.meta.names).toEqual(['Priya Shah', 'Westfield']);
+  });
+
+  it('rejects names that are not a list', async () => {
+    const { diagnostics } = await parseStory('---\ntitle: T\nnames: Priya\nnarrator:\n  voice: Charon\n---\n\n*(calm)* Hi.\n', { path: 't.md' });
+    expect(diagnostics.map((d) => [d.code, d.source?.line])).toEqual([['missing-field', 3]]);
+  });
+});
+
 describe('narration cues', () => {
   it('reads a cue at the start of a narration paragraph', async () => {
     const markdown = '---\ntitle: T\nnarrator:\n  voice: Charon\n---\n\n*(hushed, heavy)* But at our table, everything had gone quiet.\n';
