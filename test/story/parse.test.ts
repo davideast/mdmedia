@@ -163,6 +163,16 @@ describe('errors and warnings', () => {
     ]);
   });
 
+  it('placeholder-cue is an error, so the director repairs it', async () => {
+    const md = '---\ntitle: Flat\nnarrator:\n  voice: Charon\ncast:\n  MAYA:\n    voice: Kore\n---\n\n*(cue)* The bus was already moving.\n\n**MAYA** *(Delivery)*: Wait!\n\n**MAYA** *(cueing up, nervous)*: Wait!\n';
+    const { script, diagnostics } = await parseStory(md, { path: 'p.md' });
+    expect(script).toBeUndefined();
+    expect(diagnostics.map((x) => [x.code, x.severity, x.source!.line])).toEqual([
+      ['placeholder-cue', 'error', 10],
+      ['placeholder-cue', 'error', 12],
+    ]);
+  });
+
   it('returns no script when there are errors', async () => {
     const { script } = await parseStory(read('errors/unknown-speaker'), { path: 'u.md' });
     expect(script).toBeUndefined();

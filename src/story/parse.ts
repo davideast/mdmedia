@@ -11,6 +11,9 @@ export interface ParseResult {
 
 /** A line of dialogue: `**NAME** *(cue)*: text` or `**NAME**: text`. */
 const LINE = /^\*\*([^*\n]+)\*\*[ \t]*(?:\*\(([^)\n]*)\)\*)?[ \t]*:[ \t]*([\s\S]*)$/;
+/** Cues a model writes when it forgets to fill one in (the director wrote `*(cue)*`). */
+const PLACEHOLDER_CUE = /^(cue|delivery|tone|direction|emotion|\.{2,}|…|-+|_+|x+|tbd|todo)$/i;
+
 /** A narration paragraph that starts with its own cue: `*(cue)* text`. */
 const NARRATION_CUE = /^\*\(([^)\n]*)\)\*[ \t]+([\s\S]*)$/;
 
@@ -69,6 +72,13 @@ export async function parseStory(markdown: string, options: { path: string }): P
         message: narration
           ? 'Narration with no cue. Start the paragraph with *(how it is said)* so it is voiced in context.'
           : `${speaker}'s line has no cue. Add *(how it is said)* after the name so it is voiced in context.`,
+        source: line.source,
+      });
+    } else if (PLACEHOLDER_CUE.test(line.cue)) {
+      diagnostics.push({
+        code: 'placeholder-cue',
+        severity: 'error',
+        message: `"(${line.cue})" is a placeholder, not a cue. Say how the line is said, such as *(dry, brisk)*.`,
         source: line.source,
       });
     }

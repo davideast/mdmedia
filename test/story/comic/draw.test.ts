@@ -51,8 +51,8 @@ describe('drawComic', async () => {
     // The first staging take has June off model; the second is fine.
     const vision = fakeVision((img, q) => {
       if (!img.includes('They sit calmly')) return false;
-      if (q.startsWith('Does June')) stagingTakes++;
-      return q.startsWith('Does June') && stagingTakes === 1;
+      if (q.startsWith('Is June recognizably')) stagingTakes++;
+      return q.startsWith('Is June recognizably') && stagingTakes === 1;
     });
     const result = await drawComic(comic, cast, { image, vision, cache: memoryCache() });
     expect(result.stagings[0]).toMatchObject({ attempts: 2, ok: true });

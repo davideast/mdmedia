@@ -191,6 +191,8 @@ SHWIP!
 
 ### Panel 5
 
+setting: the empty Kitaguchi Station platform at sunrise, golden light, ordinary tracks
+
 > Wide shot of the empty station platform at sunrise, golden light. Akari and
 > Sora crouch side by side at the platform edge in sprinters' starting
 > positions, grinning, the tracks running ahead of them. Left: AKARI. Right:

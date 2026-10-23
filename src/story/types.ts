@@ -83,6 +83,7 @@ export type DiagnosticCode =
   | 'bad-duration'
   | 'misplaced-music'
   | 'missing-cue'
+  | 'placeholder-cue'
   | 'layout-mismatch'
   | 'bad-continue';
 

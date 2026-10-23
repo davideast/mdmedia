@@ -26,7 +26,7 @@ Rules:
 - If the story is told in the first person, the narrator is that character: use { "character": CAST_ID }.
 - Unnamed voices that speak (a kid in a crowd, a voice offstage) get short ids such as KID or VOICE.
 - "delivery" describes how the character always sounds: age, temperament, manner. It is said before every line, so keep it to one phrase.
-- "look" describes how the character looks in one phrase: hair, clothes, one distinctive detail. Leave it empty for voices nobody sees.
+- "look" describes the character so an artist can draw them the same way every time, in one sentence: age and build; hair color, length and style; main outfit with colors; one distinctive feature or prop. Leave out small details a drawing will not show. Leave it empty for voices nobody sees.
 - VOICE must be one of these Gemini voices. Match the voice to the character:
 ${VOICES.map((v) => `  ${v.name}: ${v.description}`).join('\n')}
 - Give different characters audibly different voices.

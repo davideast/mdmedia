@@ -57,6 +57,15 @@ describe('parseComic', () => {
     expect(diagnostics.map((d) => d.code)).toEqual(['layout-mismatch']);
   });
 
+  it('lets one panel replace the page setting for itself only', async () => {
+    const md = tiny(
+      `## Page 1\n\nlayout: 1 1\nsetting: a train roof\n\n### Panel 1\n\n> A. Center: JUNE.\n\n*(calm)* x\n\n` +
+        `### Panel 2\n\nsetting: an empty platform\n  at sunrise\n\n> B. Center: JUNE.\n\n*(calm)* y\n`
+    );
+    const { comic } = await parseComic(md, { path: 't.md' });
+    expect(panels(comic!.pages).map((p) => p.setting)).toEqual(['a train roof', 'an empty platform at sunrise']);
+  });
+
   it('reports a continue to a later or missing panel', async () => {
     const md = tiny(`## Page 1\n\nlayout: 1 1\n\n### Panel 1\n\ncontinue: 1.2\n\n> A. Center: JUNE.\n\n*(calm)* x\n\n### Panel 2\n\n> B. Center: JUNE.\n\n*(calm)* y\n`);
     const { diagnostics } = await parseComic(md, { path: 't.md' });

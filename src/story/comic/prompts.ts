@@ -97,11 +97,19 @@ export function panelPrompt(panel: ComicPanel, style: string, cast: Record<strin
     .join(' ');
 }
 
-/** On-model questions for the characters in an image, from their looks. */
+/**
+ * On-model questions for the characters in an image, from their looks. Only
+ * what identifies a character is judged: asking about every detail failed
+ * drawings over scraped knees and shoelaces (Midnight Line run).
+ */
 export function onModelQuestions(ids: string[], cast: Record<string, CastMember>): string[] {
   return ids
     .filter((id) => cast[id]?.look)
-    .map((id) => `Does ${displayName(id)} match this description, as far as they are visible: ${cast[id]!.look}?`);
+    .map(
+      (id) =>
+        `Is ${displayName(id)} recognizably this character, judging only hair, face and main outfit as far as they are visible ` +
+        `(ignore small details such as shoes, accessories or marks): ${cast[id]!.look}?`
+    );
 }
 
 export const NO_TEXT_QUESTION =

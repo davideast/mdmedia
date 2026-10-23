@@ -110,7 +110,8 @@ export async function parseComic(markdown: string, options: { path: string; cast
         acting: parsed.acting,
         positions: parsed.positions,
         zone: parsed.zone,
-        ...(setting ? { setting } : {}),
+        // A panel's own setting replaces the page's for that panel only.
+        ...(parsed.setting ?? setting ? { setting: parsed.setting ?? setting } : {}),
         ...(staging ? { staging } : {}),
         ...(rules ? { rules } : {}),
         items: parsed.items,
@@ -160,6 +161,7 @@ function parsePanelBody(markdown: string, start: number, end: number, map: Sourc
     positions: {} as ComicPanel['positions'],
     zone: 'top' as 'top' | 'bottom',
     continues: undefined as { target: string; start: number; end: number } | undefined,
+    setting: undefined as string | undefined,
     items: [] as ComicItem[],
   };
   const range = (s: number, e: number) => map.range(start + s, start + e);
@@ -177,6 +179,8 @@ function parsePanelBody(markdown: string, start: number, end: number, map: Sourc
   for (const p of paragraphs) {
     const continueMatch = /^continue:\s*(\S+)\s*$/.exec(p.text);
     if (continueMatch) { result.continues = { target: continueMatch[1]!, start: start + p.start, end: start + p.end }; continue; }
+    const settingMatch = /^setting:\s*([\s\S]+)$/.exec(p.text);
+    if (settingMatch) { result.setting = settingMatch[1]!.replace(/\s+/g, ' ').trim(); continue; }
     if (p.text.startsWith('>')) {
       const quoted = p.text.split('\n').map((l) => l.replace(/^>\s?/, '')).join('\n');
       const [note, ...actingParts] = quoted.split(/\n\s*\n?\s*acting:\s*/);

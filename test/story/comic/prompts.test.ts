@@ -15,8 +15,8 @@ describe('comic prompts and checks', async () => {
 
   it('asks a two-shot about both looks, text, the sides and its acting note', () => {
     const q = panelQuestions(panel('3.4'), cast);
-    expect(q[0]).toStartWith('Does June match this description');
-    expect(q[1]).toStartWith('Does Milo match this description');
+    expect(q[0]).toStartWith('Is June recognizably this character, judging only hair, face and main outfit');
+    expect(q[1]).toStartWith('Is Milo recognizably this character, judging only hair, face and main outfit');
     expect(q).toContain(NO_TEXT_QUESTION);
     expect(q).toContain(ONE_IMAGE_QUESTION);
     expect(q).toContain('Is June on the left of the frame and Milo on the right?');
