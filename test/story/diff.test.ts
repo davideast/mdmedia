@@ -45,6 +45,14 @@ describe('compareTranscript', () => {
     for (const [expected, heard] of pairs) expect(compareTranscript(expected, heard)).toMatchObject({ ok: true });
   });
 
+  it('matches spelled-out ordinals with digits', () => {
+    expect(compareTranscript('One Hundredth. Not bad, stowaway.', '100th, not bad. Stowaway.').ok).toBe(true);
+    expect(compareTranscript('One hundredth. One hundredth.', '100th 100th').ok).toBe(true);
+    expect(compareTranscript('The twentieth time, the fifth floor.', 'The 20th time, the 5th floor.').ok).toBe(true);
+    expect(compareTranscript('Wait a second.', 'Wait a second.').ok).toBe(true);
+    expect(compareTranscript('The fourth door.', 'The fifth door.').ok).toBe(false);
+  });
+
   it('keeps separate numbers apart', () => {
     expect(compareTranscript('Six out of ten.', '6 out of 10.').ok).toBe(true);
     expect(compareTranscript('Eleven! Twelve! A million!', '11, 12, a million.').ok).toBe(true);

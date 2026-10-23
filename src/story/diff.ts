@@ -22,6 +22,23 @@ const CONTRACTIONS: Array<[RegExp, string]> = [
 const UNITS: Record<string, string> = { ft: 'feet', mr: 'mister', mrs: 'missus', dr: 'doctor' };
 
 /**
+ * Ordinals as a number and a marker, so "one hundredth" matches "100th" (a
+ * transcriber writes digits). "second" is left alone: it is usually time.
+ */
+const ORDINAL_WORDS: Record<string, string> = {
+  first: 'one', third: 'three', fifth: 'five', eighth: 'eight', ninth: 'nine', twelfth: 'twelve',
+  hundredth: 'hundred', thousandth: 'thousand',
+};
+function ordinal(word: string): string[] {
+  const digits = /^(\d+)(st|nd|rd|th)$/.exec(word);
+  if (digits) return [digits[1]!, 'th'];
+  if (word in ORDINAL_WORDS) return [ORDINAL_WORDS[word]!, 'th'];
+  if (word.endsWith('ieth') && word.slice(0, -4) + 'y' in TENS) return [word.slice(0, -4) + 'y', 'th'];
+  if (word.endsWith('th') && word.slice(0, -2) in SMALL) return [word.slice(0, -2), 'th'];
+  return [word];
+}
+
+/**
  * Non-lexical sounds a voice often performs (a laugh, a sigh) instead of
  * saying, so a transcript leaves them out. Missing ones are noise; added ones
  * are not ("Ugh. You promised." was a real defect in the prototype).
@@ -37,7 +54,8 @@ export function words(text: string): string[] {
     .split(/\s+/)
     .map((w) => w.replace(/^'+|'+$/g, ''))
     .filter(Boolean)
-    .map((w) => UNITS[w] ?? w);
+    .map((w) => UNITS[w] ?? w)
+    .flatMap(ordinal);
   const out: string[] = [];
   for (let i = 0; i < tokens.length; ) {
     const number = readNumber(tokens, i);
