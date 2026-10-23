@@ -243,3 +243,63 @@ grep -rn "from 'node:" src/story --include=*.ts | grep -v "src/story/node/" && e
 - A dependency seems necessary (a bundler, a font package, a UI framework).
 - More than a fifth of comic lines still fail their transcript check after
   retakes.
+
+## As built
+
+Done on `feat/story-m5` (af89255..fb6ffbd), local only. 163 story tests pass;
+verify 13/13; core is platform-free.
+
+**Live runs** (art from the milestone 4 caches, voices fresh; all three in
+parallel, 5m37 wall):
+
+| Comic | Lines | Retakes | Lines failing | Panels failing | Crowded (page / guided) |
+| --- | --- | --- | --- | --- | --- |
+| Lunch (21 panels) | 37 | 4 | 1 | 0 | 0 / 2 |
+| Midnight Line (15) | 23 | 11 → 6 after the ordinal fix | 5 → 3 | 2 | 0 / 0 |
+| Wren Backwards (16) | 21 | 7 | 2 | 1 | 0 / 1 |
+
+Readers (private Artifacts): lunch `ASibgCu56vvDVVVnyAXXHT`, Midnight Line
+`PjxDedpHiDhGRYKSpbsyAf`, Wren Backwards `TupQakqDUZR9c5pc49sHva`.
+
+**Deviations from the plan**
+
+- The reader is one `index.html` with everything inline (styles, data, the
+  lettering and the reader script), so it opens from disk as well as from an
+  Artifact; module scripts don't load over `file://`. To inline without a
+  bundler, the whole layout lives inside `lettering()` and the reader inside
+  `readerClient()`, and the page inlines their `toString()`. A test runs the
+  inlined lettering source on its own and checks it lays out the same.
+- No Playwright (it would be a new dependency). The smoke test runs the
+  installed headless Chromium with `--dump-dom`; taps, keys and read aloud were
+  checked once over the DevTools protocol in the live step: → → ← lands on the
+  right panel and hash, a tap plays that item, read aloud plays a panel's
+  items in order and turns, the view switch keeps the position.
+- Crowding in the guided view is a warning, not exit 4. A wide panel at
+  390 px can't hold three captions and two balloons; failing on it would fail
+  most comics. Instead the guided view moves a crowded panel's captions into a
+  strip above the art and letters the balloons on it. Exit 4 still applies to
+  crowding in the page view (none in the three comics).
+
+**What looking at every page showed**
+
+- Page view: no lettering over a face in any of the 52 panels; tails end at
+  the speaker; joined balloons read as one shape; sound effects sit in free
+  space. The art's headroom (`Balloons: top`) does most of the work.
+- Two reader bugs found by screenshots and fixed: inactive header icons
+  showed (SVG ignores the `hidden` attribute without a rule), and the guided
+  panel overflowed its stage (padding not subtracted).
+- Transcript failures were mostly not voice defects: "One hundredth" vs
+  "100th" was a gap in the comparison (fixed: ordinals); "fare"/"fair",
+  "plaice"/"place" are homophones the transcriber can't separate. Possibly
+  real: "just to Harper" heard as "just a Harper", and an added "Na".
+- Panels that fail their checks are redrawn on every build, because only
+  passing takes are cached as accepted. For `story comic` that means the art
+  of a failing panel changes each run (Midnight Line 1.4 did).
+
+**Left for later**
+
+- Homophones in transcript checks: accept known pairs, or let a person mark
+  a line as heard correctly.
+- Keep a failing panel's best take between builds unless asked to redraw.
+- Lettering on page view at phone width is small by design (2% of the page);
+  the guided view is the phone reading mode.
