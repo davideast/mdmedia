@@ -3,10 +3,14 @@ export { lineRenderKey, contextLines, RENDER_VERSION, CONTEXT_LINES, type Provid
 export { parseDuration, toSourceRange } from './source.js';
 export { DEFAULT_GAP_MS } from './front-matter.js';
 export * from './types.js';
-export { buildStory, linePath, slugify, LOUDNESS, MP3_KBPS, type BuildOptions, type BuildEvent, type BuildSummary, type StoryBuild, type BuildResult } from './build.js';
+export { buildStory, linePath, musicPath, slugify, LOUDNESS, MP3_KBPS, type BuildOptions, type BuildEvent, type BuildSummary, type StoryBuild, type BuildResult } from './build.js';
 export { renderLines, MAX_RETAKES, type LineResult, type LineEvent, type RenderLinesOptions, type RenderedLine } from './render-lines.js';
 export { scheduleStory, type StoryTimeline, type TimedLine } from './schedule.js';
 export { deliveryNote, NOTE_LEVELS, type NoteLevel } from './note.js';
 export { compareTranscript, words } from './diff.js';
 export { mixClips, pcmDurationMs, wavFromPcm, pcmFromWav, silence } from './pcm.js';
 export * from './ports.js';
+export { renderMusic, buildMixPlan, sceneLeads, musicRenderKey, LEAD_MS, OUTRO_MS, BED_GAIN, MUSIC_PREFIX, type MusicResult, type MusicEvent } from './music.js';
+export { limiter, type Limiter } from './limit.js';
+export { castNames } from './render-lines.js';
+export { INTERJECTIONS } from './diff.js';

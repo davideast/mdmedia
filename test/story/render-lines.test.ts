@@ -40,6 +40,13 @@ describe('renderLines', () => {
     expect([...cache.entries.values()].every((e) => e.accepted)).toBe(true);
   });
 
+  it('tells the transcriber the cast names, without the narrator role', async () => {
+    const transcriber = scriptedTranscriber();
+    await renderLines(await script(), { speaker: toneSpeaker(), transcriber, cache: memoryCache() });
+    expect(transcriber.names).toHaveLength(4);
+    expect(transcriber.names.every((n) => n.join() === 'Maya,Dad')).toBe(true);
+  });
+
   it('retakes once after a mismatch, then caches the passing take', async () => {
     const speaker = toneSpeaker();
     const cache = memoryCache();

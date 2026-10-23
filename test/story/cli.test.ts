@@ -67,7 +67,7 @@ describe('mdmedia story build', async () => {
     const code = await runStoryBuild({ file: fixture('lighthouse'), out }, deps(), (t) => { text += t + '\n'; });
     expect(code).toBe(EXIT.ok);
     expect(existsSync(joinPath(out, 'build.json'))).toBe(true);
-    expect(text).toContain('16 lines, 0 cached, 0 retakes, 0 fallbacks, 0 failing');
+    expect(text).toContain('16 lines, 0 cached, 0 retakes, 0 fallbacks, 0 failing, 0 music clips');
   });
 
   it('exits 4 when a line still fails its check, and lists it with --json', async () => {
@@ -83,6 +83,19 @@ describe('mdmedia story build', async () => {
     expect(summary.summary.failures).toBe(1);
     expect(summary.failing[0]).toMatchObject({ text: 'Which ship was his?', missing: ['was', 'his'] });
     expect(JSON.parse(readFileSync(joinPath(out, 'build.json'), 'utf8')).summary.failures).toBe(1);
+  });
+
+  it('makes no music with --no-music', async () => {
+    const { fakeComposer } = await import('./fakes.js');
+    const composer = fakeComposer();
+    const markdown = fixture('embarrassing-day');
+    const code = await runStoryBuild(
+      { file: markdown, out: mkdtempSync(joinPath(tmpdir(), 'story-cli-')), music: false },
+      { ...deps(), composer },
+      () => {}
+    );
+    expect([EXIT.ok, EXIT.failingChecks]).toContain(code);
+    expect(composer.prompts).toHaveLength(0);
   });
 
   it('exits 1 with the diagnostics when the story has errors', async () => {

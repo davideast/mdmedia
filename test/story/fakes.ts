@@ -1,4 +1,4 @@
-import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedLine, type FileSink, type RenderCache, type SpeakRequest, type Speaker, type Transcriber } from '../../src/story/index.js';
+import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedLine, type CachedMusic, type Composer, type FileSink, type MixPlan, type RenderCache, type SpeakRequest, type Speaker, type Transcriber } from '../../src/story/index.js';
 
 /**
  * A tone, 50 ms per character. The first samples carry the spoken text (its
@@ -34,13 +34,15 @@ export function textOf(wav: Uint8Array): string {
  * Hears exactly what was spoken, unless `mishear` returns another transcript
  * for a given line text and call number (1-based, per text).
  */
-export function scriptedTranscriber(mishear: (text: string, call: number) => string | undefined = () => undefined): Transcriber & { calls: number } {
+export function scriptedTranscriber(mishear: (text: string, call: number) => string | undefined = () => undefined): Transcriber & { calls: number; names: string[][] } {
   const counts = new Map<string, number>();
   const self = {
     model: 'fake-transcriber',
     calls: 0,
-    async transcribe(wav: Uint8Array) {
+    names: [] as string[][],
+    async transcribe(wav: Uint8Array, options: { names?: string[] } = {}) {
       self.calls++;
+      self.names.push(options.names ?? []);
       const text = textOf(wav);
       const call = (counts.get(text) ?? 0) + 1;
       counts.set(text, call);
@@ -50,12 +52,30 @@ export function scriptedTranscriber(mishear: (text: string, call: number) => str
   return self;
 }
 
-export function memoryCache(): RenderCache & { entries: Map<string, CachedLine> } {
+export function memoryCache(): RenderCache & { entries: Map<string, CachedLine>; music: Map<string, CachedMusic> } {
   const entries = new Map<string, CachedLine>();
+  const music = new Map<string, CachedMusic>();
   return {
     entries,
+    music,
     async get(key) { return entries.get(key); },
     async put(key, line) { entries.set(key, line); },
+    async getMusic(key) { return music.get(key); },
+    async putMusic(key, clip) { music.set(key, clip); },
+  };
+}
+
+/** Returns a few bytes per prompt; `fail` makes chosen prompts throw. */
+export function fakeComposer(fail: (prompt: string) => boolean = () => false): Composer & { prompts: string[] } {
+  const prompts: string[] = [];
+  return {
+    model: 'fake-music',
+    prompts,
+    async compose(prompt) {
+      prompts.push(prompt);
+      if (fail(prompt)) throw new Error('composer failed');
+      return { bytes: new TextEncoder().encode(prompt), mimeType: 'audio/mpeg' };
+    },
   };
 }
 
@@ -64,9 +84,9 @@ export function memorySink(): FileSink & { files: Map<string, Uint8Array | strin
   return { files, async write(path, data) { files.set(path, data); } };
 }
 
-/** Returns its input; enough to test everything around the encoder. */
-export const passThroughRuntime: AudioRuntime = {
-  async master(pcm) { return pcm; },
+/** Returns the voice track; records the last mix plan it was given. */
+export const passThroughRuntime: AudioRuntime & { lastPlan?: MixPlan } = {
+  async mix(plan) { passThroughRuntime.lastPlan = plan; return plan.voice; },
   async mp3(wav) { return wav; },
   async describe() { return { path: 'fake', version: 'fake' }; },
 };

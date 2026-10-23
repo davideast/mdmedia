@@ -19,6 +19,16 @@ describe('compareTranscript', () => {
     });
   }
 
+  it('treats a missing interjection as noise, but keeps it in the result', () => {
+    expect(compareTranscript('Heh. Okay. Funny story.', 'Okay. Funny story.')).toMatchObject({ ok: true, missing: ['heh'], extra: [] });
+    expect(compareTranscript('Hmm. Six out of ten.', 'Six out of ten.')).toMatchObject({ ok: true, missing: ['hmm'] });
+  });
+
+  it('still fails an added interjection, or a missing word beside a missing interjection', () => {
+    expect(compareTranscript('You promised.', 'Ugh. You promised.')).toMatchObject({ ok: false, extra: ['ugh'] });
+    expect(compareTranscript('Heh. Okay. Funny story.', 'Okay. Story.')).toMatchObject({ ok: false, missing: ['heh', 'funny'] });
+  });
+
   it('reports both a dropped and an added word', () => {
     expect(compareTranscript('My faults are heavy indeed', 'My faults are')).toMatchObject({ missing: ['heavy', 'indeed'], extra: [], ok: false });
     expect(compareTranscript('Hello', '')).toMatchObject({ missing: ['hello'], ok: false });

@@ -30,8 +30,11 @@ export class SpeechRefused extends Error {
 /** Turns one clip of speech back into words, for checking. */
 export interface Transcriber {
   readonly model: string;
-  /** `wav` is a complete WAV file. */
-  transcribe(wav: Uint8Array, signal?: AbortSignal): Promise<string>;
+  /**
+   * `wav` is a complete WAV file. `names` are the cast's names, so they are
+   * spelled the way the story spells them.
+   */
+  transcribe(wav: Uint8Array, options?: { names?: string[]; signal?: AbortSignal }): Promise<string>;
 }
 
 export interface LineCheck {
@@ -48,10 +51,41 @@ export interface CachedLine {
   accepted: boolean;
 }
 
-/** Content-addressed store for rendered lines. */
+/** Writes about 30 seconds of instrumental music for a prompt. */
+export interface Composer {
+  readonly model: string;
+  compose(prompt: string, signal?: AbortSignal): Promise<{ bytes: Uint8Array; mimeType: string }>;
+}
+
+export interface CachedMusic {
+  bytes: Uint8Array;
+  mimeType: string;
+}
+
+/** Content-addressed store for rendered lines and music. */
 export interface RenderCache {
   get(key: string): Promise<CachedLine | undefined>;
   put(key: string, line: CachedLine): Promise<void>;
+  getMusic(key: string): Promise<CachedMusic | undefined>;
+  putMusic(key: string, music: CachedMusic): Promise<void>;
+}
+
+/** A music clip under the voices, with its gain over time. */
+export interface MixBed {
+  audio: Uint8Array;
+  mimeType: string;
+  /** Where the clip starts on the timeline. */
+  atMs: number;
+  /** [ms from the clip's start, gain]; linear between points, the last gain holds. */
+  envelope: Array<[number, number]>;
+}
+
+/** Everything the runtime needs to make the master. */
+export interface MixPlan {
+  /** The voice track: 24 kHz mono PCM. */
+  voice: Uint8Array;
+  beds: MixBed[];
+  durationMs: number;
 }
 
 /**
@@ -59,8 +93,8 @@ export interface RenderCache {
  * ffmpeg; a browser one can replace it.
  */
 export interface AudioRuntime {
-  /** A 48 kHz stereo WAV master from 24 kHz mono PCM, normalized to the target. */
-  master(pcm: Uint8Array, target: { loudnessLufs: number; truePeakDb: number }): Promise<Uint8Array>;
+  /** A 48 kHz stereo WAV master: the voice track with its music beds, normalized to the target. */
+  mix(plan: MixPlan, target: { loudnessLufs: number; truePeakDb: number }): Promise<Uint8Array>;
   /** An MP3 of a WAV file. */
   mp3(wav: Uint8Array, kbps: number): Promise<Uint8Array>;
   /** Where the encoder came from, for build.json. */

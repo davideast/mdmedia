@@ -4,12 +4,13 @@ import { basename, extname, join } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { buildStory, parseStory, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, Diagnostic, RenderCache, Speaker, Transcriber } from '../story/index.js';
+import type { AudioRuntime, BuildEvent, Composer, Diagnostic, RenderCache, Speaker, Transcriber } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
   createGeminiSpeaker,
   createGeminiTranscriber,
+  createLyriaComposer,
   createNodeAudioRuntime,
 } from '../story/node/index.js';
 
@@ -57,6 +58,7 @@ export interface BuildDeps {
   transcriber: Transcriber;
   runtime: AudioRuntime;
   cache: RenderCache;
+  composer?: Composer;
 }
 
 export interface BuildArgs {
@@ -64,6 +66,7 @@ export interface BuildArgs {
   out?: string;
   cache?: string;
   json?: boolean;
+  music?: boolean;
   signal?: AbortSignal;
 }
 
@@ -80,13 +83,17 @@ export async function runStoryBuild(args: BuildArgs, deps: BuildDeps, write: (te
   const onEvent = args.json ? undefined : (event: BuildEvent) => {
     if (event.type === 'line-retake') write(`↻ ${event.id} retake ${event.attempt}: missing [${event.check.missing.join(' ')}] extra [${event.check.extra.join(' ')}]`);
     if (event.type === 'line-fallback') write(`⚠ ${event.id} refused; shorter note (level ${event.level})`);
+    if (event.type === 'music-done') {
+      const m = event.result;
+      write(`${m.ok ? '♪' : '✗'} music ${m.scene}${m.cached ? ' (cached)' : ''}${m.error ? `  ${m.error}` : ''}`);
+    }
     if (event.type === 'line-done') {
       const r = event.result;
       write(`${r.refused ? '✗' : r.ok ? '✓' : '✗'} ${r.id}${r.cached ? ' (cached)' : ''}${r.ok ? '' : `  heard "${r.heard}"`}`);
     }
     if (event.type === 'build-done') {
       const s = event.summary;
-      write(`${s.lines} lines, ${s.cached} cached, ${s.retakes} retakes, ${s.fallbacks} fallbacks, ${s.failures} failing, ${s.audioSeconds} s audio -> ${outDir}`);
+      write(`${s.lines} lines, ${s.cached} cached, ${s.retakes} retakes, ${s.fallbacks} fallbacks, ${s.failures} failing, ${s.musicClips} music clips, ${s.audioSeconds} s audio -> ${outDir}`);
     }
   };
   try {
@@ -94,6 +101,7 @@ export async function runStoryBuild(args: BuildArgs, deps: BuildDeps, write: (te
       source: { path: args.file, markdown },
       out: createFileSink(outDir),
       ...deps,
+      music: args.music !== false,
       tool: { name: 'mdmedia', version: toolVersion() },
       signal: args.signal,
       onEvent,
@@ -123,7 +131,7 @@ function toolVersion(): string {
 export const storyBuildCommand = defineCommand({
   meta: {
     name: 'build',
-    description: 'Voice every line of a story in context, check each against the script, and mix an MP3',
+    description: 'Voice every line of a story in context, check each against the script, score its scenes, and mix an MP3',
   },
   args: {
     file: { type: 'positional', description: 'Story markdown file', required: true },
@@ -131,6 +139,8 @@ export const storyBuildCommand = defineCommand({
     cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the story)' },
     voiceModel: { type: 'string', description: 'Speech model (default gemini-3.8-flash-tts)' },
     transcribeModel: { type: 'string', description: 'Transcription model for checks (default gemini-3.5-flash-lite)' },
+    music: { type: 'boolean', description: 'Score scenes that have music cues (use --no-music to skip)', default: true },
+    musicModel: { type: 'string', description: 'Music model (default lyria-3-clip-preview)' },
     json: { type: 'boolean', description: 'Print the build summary as JSON', default: false },
   },
   async run({ args }) {
@@ -152,12 +162,13 @@ export const storyBuildCommand = defineCommand({
     const controller = new AbortController();
     process.once('SIGINT', () => controller.abort());
     process.exitCode = await runStoryBuild(
-      { file: args.file, out: args.out, cache: args.cache, json: args.json, signal: controller.signal },
+      { file: args.file, out: args.out, cache: args.cache, json: args.json, music: args.music, signal: controller.signal },
       {
         speaker: createGeminiSpeaker({ apiKey, model: args.voiceModel }),
         transcriber: createGeminiTranscriber({ apiKey, model: args.transcribeModel }),
         runtime,
         cache: createFileRenderCache(args.cache ?? join(args.file, '..', '.mdmedia', 'cache')),
+        composer: args.music ? createLyriaComposer({ apiKey, model: args.musicModel }) : undefined,
       },
       (text) => console.log(text)
     );

@@ -1,6 +1,7 @@
 import { parseStory } from './parse.js';
-import { mixClips, pcmDurationMs, wavFromPcm } from './pcm.js';
-import type { AudioRuntime, FileSink, RenderCache, Speaker, Transcriber } from './ports.js';
+import { mixClips, wavFromPcm } from './pcm.js';
+import { buildMixPlan, renderMusic, sceneLeads, type MusicEvent, type MusicResult } from './music.js';
+import type { AudioRuntime, CachedMusic, Composer, FileSink, RenderCache, Speaker, Transcriber } from './ports.js';
 import { renderLines, type LineEvent, type LineResult } from './render-lines.js';
 import { scheduleStory, type StoryTimeline } from './schedule.js';
 import type { Diagnostic, Line, StoryScript } from './types.js';
@@ -15,13 +16,16 @@ export interface BuildOptions {
   transcriber: Transcriber;
   runtime: AudioRuntime;
   cache: RenderCache;
+  /** Scene music; without one, or with `music: false`, the build has voices only. */
+  composer?: Composer;
+  music?: boolean;
   tool?: { name: string; version: string };
   concurrency?: { speak?: number; transcribe?: number };
   signal?: AbortSignal;
   onEvent?: (event: BuildEvent) => void;
 }
 
-export type BuildEvent = LineEvent | { type: 'mix-done'; durationMs: number } | { type: 'build-done'; summary: BuildSummary };
+export type BuildEvent = LineEvent | MusicEvent | { type: 'mix-done'; durationMs: number } | { type: 'build-done'; summary: BuildSummary };
 
 export interface BuildSummary {
   lines: number;
@@ -31,6 +35,8 @@ export interface BuildSummary {
   refused: number;
   /** Lines whose kept take still does not match the script. */
   failures: number;
+  /** Scenes that got their music clip. */
+  musicClips: number;
   audioSeconds: number;
   wallMs: number;
 }
@@ -39,10 +45,11 @@ export interface StoryBuild {
   schema: 'mdmedia.story.build/1';
   tool: { name: string; version: string };
   source: { path: string; sha256: string };
-  models: { speech: { name: string; model: string }; transcription: string };
+  models: { speech: { name: string; model: string }; transcription: string; music?: string };
   encoder: { path: string; version: string };
   summary: BuildSummary;
   lines: LineResult[];
+  music: MusicResult[];
   outputs: Array<{ path: string; sha256: string; bytes: number }>;
 }
 
@@ -71,14 +78,20 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
     onEvent: emit,
   });
 
+  const withMusic = Boolean(options.composer) && options.music !== false;
+  const { clips, results: musicResults } = withMusic
+    ? await renderMusic(script, { composer: options.composer!, cache: options.cache, signal: options.signal, onEvent: emit })
+    : { clips: new Map<string, CachedMusic>(), results: [] as MusicResult[] };
+
   const durations = new Map([...rendered].map(([id, r]) => [id, r.result.durationMs]));
   const renders = new Map([...rendered].map(([id, r]) => [id, r.result.key]));
-  const timeline = scheduleStory(script, durations, renders);
-  const mixed = mixClips(timeline.lines.map((l) => ({ pcm: rendered.get(l.id)!.pcm, startMs: l.startMs })), timeline.durationMs);
-  emit({ type: 'mix-done', durationMs: timeline.durationMs });
+  const timeline = scheduleStory(script, durations, renders, { leads: sceneLeads(clips) });
+  const voice = mixClips(timeline.lines.map((l) => ({ pcm: rendered.get(l.id)!.pcm, startMs: l.startMs })), timeline.durationMs);
+  const plan = buildMixPlan(timeline, voice, clips);
+  emit({ type: 'mix-done', durationMs: plan.durationMs });
 
   options.signal?.throwIfAborted();
-  const master = await options.runtime.master(mixed, LOUDNESS);
+  const master = await options.runtime.mix(plan, LOUDNESS);
   const mp3 = await options.runtime.mp3(master, MP3_KBPS);
   const slug = slugify(script.meta.title);
 
@@ -94,6 +107,7 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
   await write(`audio/${slug}.mp3`, mp3);
   await write('audio/master.wav', master);
   for (const line of timeline.lines) await write(linePath(line.id), wavFromPcm(rendered.get(line.id)!.pcm));
+  for (const [sceneId, clip] of clips) await write(musicPath(sceneId, clip.mimeType), clip.bytes);
   await write('text/transcript.md', transcript(script, timeline));
 
   const results = timeline.lines.map((l) => rendered.get(l.id)!.result);
@@ -104,17 +118,23 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
     fallbacks: results.filter((r) => r.level > 0).length,
     refused: results.filter((r) => r.refused).length,
     failures: results.filter((r) => !r.ok).length,
-    audioSeconds: Math.round(pcmDurationMs(mixed) / 100) / 10,
+    musicClips: clips.size,
+    audioSeconds: Math.round(plan.durationMs / 100) / 10,
     wallMs: Date.now() - started,
   };
   const build: StoryBuild = {
     schema: 'mdmedia.story.build/1',
     tool: options.tool ?? { name: 'mdmedia', version: '0.0.0' },
     source: script.source,
-    models: { speech: options.speaker.provider, transcription: options.transcriber.model },
+    models: {
+      speech: options.speaker.provider,
+      transcription: options.transcriber.model,
+      ...(withMusic ? { music: options.composer!.model } : {}),
+    },
     encoder: await options.runtime.describe(),
     summary,
     lines: results,
+    music: musicResults,
     outputs: [...outputs],
   };
   await options.out.write('build.json', json(build));
@@ -126,6 +146,11 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
 export function linePath(id: string): string {
   const parts = id.split('/');
   return `audio/lines/${parts.slice(0, -1).join('-')}/${parts.at(-1)}.wav`;
+}
+
+/** `00/03` → `audio/music/00-03.mp3` */
+export function musicPath(sceneId: string, mimeType: string): string {
+  return `audio/music/${sceneId.replace(/\//g, '-')}.${mimeType.includes('wav') ? 'wav' : 'mp3'}`;
 }
 
 export function slugify(title: string): string {

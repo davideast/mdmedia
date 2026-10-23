@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildStory, linePath, slugify } from '../../src/story/index.js';
 import type { StoryBuild, StoryTimeline } from '../../src/story/index.js';
-import { memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
+import { fakeComposer, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
 
 const markdown = readFileSync(join(import.meta.dir, 'fixtures', 'lighthouse.md'), 'utf8');
 
@@ -50,6 +50,51 @@ describe('buildStory', () => {
     expect(build!.summary).toMatchObject({ failures: 1, retakes: 2 });
     const written = JSON.parse(out.files.get('build.json') as string) as StoryBuild;
     expect(written.lines.find((l) => !l.ok)).toMatchObject({ missing: ['i', 'wrote', 'it', 'down'], attempts: 3 });
+  });
+
+  it('adds scene music: clips written, leads in the timeline, beds in the mix plan', async () => {
+    const markdown = readFileSync(join(import.meta.dir, 'fixtures', 'embarrassing-day.md'), 'utf8')
+      .split('\n### 1:45 p.m.')[0]!; // the first four scenes, each with a music cue
+    const out = memorySink();
+    const composer = fakeComposer();
+    const { build } = await buildStory({
+      source: { path: 'day.md', markdown },
+      out,
+      speaker: toneSpeaker(),
+      transcriber: scriptedTranscriber(),
+      runtime: passThroughRuntime,
+      cache: memoryCache(),
+      composer,
+    });
+    expect(composer.prompts).toHaveLength(4);
+    expect(build!.summary.musicClips).toBe(4);
+    expect(build!.models.music).toBe('fake-music');
+    expect(build!.music.every((m) => m.ok)).toBe(true);
+    expect(['audio/music/00-00.mp3', 'audio/music/00-03.mp3'].every((p) => out.files.has(p))).toBe(true);
+    const timeline = JSON.parse(out.files.get('timeline.json') as string) as StoryTimeline;
+    for (const scene of timeline.scenes) {
+      const first = timeline.lines.find((l) => l.id.startsWith(`${scene.id}/`))!;
+      expect(first.startMs - scene.startMs).toBe(3000);
+    }
+    expect(passThroughRuntime.lastPlan!.beds).toHaveLength(5); // four scenes and the outro
+    expect(Math.abs(build!.summary.audioSeconds * 1000 - (timeline.durationMs + 12_000))).toBeLessThanOrEqual(100);
+  });
+
+  it('builds voices only with music: false', async () => {
+    const composer = fakeComposer();
+    const { build } = await buildStory({
+      source: { path: 'day.md', markdown: readFileSync(join(import.meta.dir, 'fixtures', 'embarrassing-day.md'), 'utf8').split('\n### First period')[0]! },
+      out: memorySink(),
+      speaker: toneSpeaker(),
+      transcriber: scriptedTranscriber(),
+      runtime: passThroughRuntime,
+      cache: memoryCache(),
+      composer,
+      music: false,
+    });
+    expect(composer.prompts).toHaveLength(0);
+    expect(build!.summary.musicClips).toBe(0);
+    expect(passThroughRuntime.lastPlan!.beds).toEqual([]);
   });
 
   it('stops before rendering when the story has errors', async () => {

@@ -1,5 +1,6 @@
 import { compareTranscript } from './diff.js';
 import { lineRenderKey } from './key.js';
+import { limiter, type Limiter } from './limit.js';
 import { deliveryNote, NOTE_LEVELS, type NoteLevel } from './note.js';
 import { pcmDurationMs, silence, wavFromPcm } from './pcm.js';
 import { SpeechRefused, type LineCheck, type RenderCache, type Speaker, type Transcriber } from './ports.js';
@@ -115,7 +116,7 @@ async function renderLine(
       return { pcm: fill, result: { ...base, cached: false, level: 2, attempts, ...check, refused: true, durationMs: pcmDurationMs(fill) } };
     }
     attempts++;
-    const heard = await transcribeLimit(() => transcriber.transcribe(wavFromPcm(pcm!), signal));
+    const heard = await transcribeLimit(() => transcriber.transcribe(wavFromPcm(pcm!), { names: castNames(script), signal }));
     const check = compareTranscript(line.text, heard);
     if (!best || errorCount(check) < errorCount(best.check)) best = { pcm, check };
     if (check.ok) break;
@@ -131,20 +132,9 @@ async function renderLine(
 
 const errorCount = (check: LineCheck) => check.missing.length + check.extra.length;
 
-type Limiter = <T>(task: () => Promise<T>) => Promise<T>;
-
-/** Runs at most `size` tasks at once, in the order they ask. */
-function limiter(size: number): Limiter {
-  let active = 0;
-  const waiting: Array<() => void> = [];
-  return async (task) => {
-    if (active >= size) await new Promise<void>((resolve) => waiting.push(resolve));
-    active++;
-    try {
-      return await task();
-    } finally {
-      active--;
-      waiting.shift()?.();
-    }
-  };
+/** The cast's names as a reader would write them: MILO → Milo. The narrator role is left out. */
+export function castNames(script: StoryScript): string[] {
+  return Object.keys(script.cast)
+    .filter((id) => id !== 'NARRATOR')
+    .map((id) => id.charAt(0) + id.slice(1).toLowerCase());
 }

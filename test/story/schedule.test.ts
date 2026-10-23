@@ -67,6 +67,20 @@ describe('scheduleStory', async () => {
     expect(timeline.chapters).toEqual([{ id: '00', startMs: 0, endMs: 6500 }]);
   });
 
+  it('starts a scene with music where its lead starts, and its first line after the lead', () => {
+    const scene2 = script.chapters[0]!.scenes[1]!.id;
+    const led = scheduleStory(script, durations, renders, { leads: new Map([[scene2, 3000]]) });
+    // Scene 1 is unchanged; scene 2 starts after the gap, and "Later." waits out the lead.
+    expect(led.lines.slice(0, 3)).toEqual(timeline.lines.slice(0, 3));
+    expect(led.scenes[1]).toMatchObject({ title: 'Two', startMs: 5600 });
+    expect(led.lines[3]).toMatchObject({ text: 'Later.', startMs: 8600, endMs: 9900 });
+    expect(led.durationMs).toBe(9900);
+  });
+
+  it('gives the same timeline with no leads as with empty leads', () => {
+    expect(scheduleStory(script, durations, renders, { leads: new Map() })).toEqual(timeline);
+  });
+
   it('throws when a line has no duration', () => {
     expect(() => scheduleStory(script, new Map(), renders)).toThrow(/No duration/);
   });

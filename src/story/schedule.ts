@@ -22,12 +22,15 @@ export interface StoryTimeline {
 /**
  * Places lines one after another: each line's duration, then the script's gap,
  * or the pauses written after it instead (consecutive pauses add up). There is
- * no gap after the last line. Pure; durations and keys come from rendering.
+ * no gap after the last line. A scene with a lead (its music playing alone)
+ * starts where the lead starts, and its first line comes `lead` ms later.
+ * Pure; durations, keys and leads come from rendering.
  */
 export function scheduleStory(
   script: StoryScript,
   durations: ReadonlyMap<string, number>,
-  renders: ReadonlyMap<string, string>
+  renders: ReadonlyMap<string, string>,
+  options: { leads?: ReadonlyMap<string, number> } = {}
 ): StoryTimeline {
   const lines: TimedLine[] = [];
   const chapters: StoryTimeline['chapters'] = [];
@@ -40,6 +43,13 @@ export function scheduleStory(
     const chapterStart = cursor;
     for (const scene of chapter.scenes) {
       let sceneStart: number | undefined;
+      const lead = options.leads?.get(scene.id) ?? 0;
+      if (lead > 0) {
+        if (afterLine && !pauseSinceLine) cursor += script.gapMs;
+        sceneStart = cursor;
+        cursor += lead;
+        pauseSinceLine = true;
+      }
       for (const segment of scene.segments) {
         if (segment.kind === 'pause') {
           cursor += segment.durationMs;

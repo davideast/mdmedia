@@ -12,6 +12,13 @@ const CONTRACTIONS: Array<[RegExp, string]> = [
   [/\bkinda\b/g, 'kind of'],
 ];
 
+/**
+ * Non-lexical sounds a voice often performs (a laugh, a sigh) instead of
+ * saying, so a transcript leaves them out. Missing ones are noise; added ones
+ * are not ("Ugh. You promised." was a real defect in the prototype).
+ */
+export const INTERJECTIONS: ReadonlySet<string> = new Set(['heh', 'hah', 'ha', 'hmm', 'mm', 'huh', 'uh', 'um', 'er', 'ah']);
+
 /** Lower case, no punctuation, contractions spelled out, numbers as digits. */
 export function words(text: string): string[] {
   let t = text.toLowerCase().replace(/[’‘`]/g, "'");
@@ -26,8 +33,9 @@ export function words(text: string): string[] {
 
 /**
  * Compares what a line says with what was heard in its clip. Words that differ
- * only by spacing ("lawn mower" and "lawnmower") match. Returns the words the
- * clip is missing and the words it added.
+ * only by spacing ("lawn mower" and "lawnmower") match, and a missing
+ * interjection alone does not fail the line. Returns the words the clip is
+ * missing and the words it added.
  */
 export function compareTranscript(expected: string, heard: string): LineCheck {
   const want = words(expected);
@@ -50,7 +58,8 @@ export function compareTranscript(expected: string, heard: string): LineCheck {
     if (j >= got.length || (i < want.length && dp[i + 1]![j]! >= dp[i]![j + 1]!)) missing.push(want[i++]!);
     else extra.push(got[j++]!);
   }
-  return { heard, missing, extra, ok: missing.length === 0 && extra.length === 0 };
+  const onlyInterjectionsMissing = extra.length === 0 && missing.every((w) => INTERJECTIONS.has(w));
+  return { heard, missing, extra, ok: onlyInterjectionsMissing };
 }
 
 function joinedMatch(want: string[], i: number, got: string[], j: number): [number, number] | undefined {

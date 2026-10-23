@@ -15,8 +15,9 @@ export function createFileSink(root: string): FileSink {
 }
 
 /**
- * Rendered lines on disk: `<dir>/<key>.wav` (playable) and `<dir>/<key>.json`
- * (the check result and whether the take was accepted).
+ * Renders on disk. Lines: `<dir>/<key>.wav` (playable) and `<dir>/<key>.json`
+ * (the check result and whether the take was accepted). Music:
+ * `<dir>/<key>.mp3` or `.wav`.
  */
 export function createFileRenderCache(dir: string): RenderCache {
   const name = (key: string) => key.replace(/[^a-z0-9]+/gi, '-');
@@ -34,6 +35,20 @@ export function createFileRenderCache(dir: string): RenderCache {
       await mkdir(dir, { recursive: true });
       await writeFile(join(dir, `${name(key)}.wav`), wavFromPcm(line.pcm));
       await writeFile(join(dir, `${name(key)}.json`), JSON.stringify({ check: line.check, accepted: line.accepted }, null, 2) + '\n');
+    },
+    async getMusic(key) {
+      for (const [ext, mimeType] of [['mp3', 'audio/mpeg'], ['wav', 'audio/wav']] as const) {
+        try {
+          return { bytes: new Uint8Array(await readFile(join(dir, `${name(key)}.${ext}`))), mimeType };
+        } catch {
+          // Try the next format.
+        }
+      }
+      return undefined;
+    },
+    async putMusic(key, music) {
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, `${name(key)}.${music.mimeType.includes('wav') ? 'wav' : 'mp3'}`), music.bytes);
     },
   };
 }

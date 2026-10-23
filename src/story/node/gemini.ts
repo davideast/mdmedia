@@ -48,7 +48,11 @@ export function createGeminiTranscriber(options: { apiKey: string; model?: strin
   const maxRetries = options.maxRetries ?? 5;
   return {
     model,
-    async transcribe(wav, signal) {
+    async transcribe(wav, { names = [], signal } = {}) {
+      const prompt =
+        'Transcribe this clip verbatim, exactly as spoken, including any words that sound like stage directions or speaker names. ' +
+        (names.length ? `Names you may hear: ${names.join(', ')}. ` : '') +
+        'Reply with the words only, or nothing if there is no speech.';
       for (let attempt = 0; ; attempt++) {
         signal?.throwIfAborted();
         try {
@@ -58,7 +62,7 @@ export function createGeminiTranscriber(options: { apiKey: string; model?: strin
               role: 'user',
               parts: [
                 { inlineData: { mimeType: 'audio/wav', data: Buffer.from(wav).toString('base64') } },
-                { text: 'Transcribe this clip verbatim, exactly as spoken, including any words that sound like stage directions or speaker names. Reply with the words only, or nothing if there is no speech.' },
+                { text: prompt },
               ],
             }],
           });
