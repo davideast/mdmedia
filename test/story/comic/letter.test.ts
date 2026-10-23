@@ -106,6 +106,33 @@ describe('letterPanel', () => {
     expect([0, 600]).toContain(l.placed[0]!.tail!.tip.x);
   });
 
+  it('points the tail of a speaker who is not drawn in the panel out of the frame', () => {
+    const l = letterPanel(
+      panel([{ kind: 'balloon', who: 'AKARI', text: 'You can talk.' }], { positions: { TAMA: 'center' } }),
+      [{ id: 'TAMA', box: [0.55, 0.4, 0.72, 0.6] }],
+      600,
+      600,
+      measure,
+      { fontPx: 20 }
+    );
+    expect([0, 600]).toContain(l.placed[0]!.tail!.tip.x);
+  });
+
+  it('fits every line of a balloon inside its oval', () => {
+    const l = letterPanel(panel([{ kind: 'balloon', who: 'FUJI', text: "Everything you'd like to forget is tied to something you love. He takes both." }]), [], 600, 600, measure, { fontPx: 20 });
+    const s = l.placed[0]!.shapes[0]!;
+    const lh = 20 * 1.18;
+    const cx = s.x + s.w / 2;
+    const cy = s.y + s.h / 2;
+    s.lines.forEach((line, i) => {
+      const half = measure(line, 20, 'letter') / 2;
+      for (const y of [cy - (s.lines.length * lh) / 2 + i * lh, cy - (s.lines.length * lh) / 2 + (i + 1) * lh]) {
+        expect((half / (s.w / 2)) ** 2 + ((y - cy) / (s.h / 2)) ** 2).toBeLessThanOrEqual(1);
+      }
+      expect(cx).toBeGreaterThan(0);
+    });
+  });
+
   it('joins two balloons in a row by one speaker', () => {
     const l = letterPanel(
       panel([

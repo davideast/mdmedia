@@ -61,6 +61,8 @@ export interface DrawOptions {
   concurrency?: number;
   signal?: AbortSignal;
   onEvent?: (event: DrawEvent) => void;
+  /** Draw again images that failed their checks in an earlier build, instead of reusing their best take. */
+  redraw?: boolean;
 }
 
 /**
@@ -106,6 +108,7 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
       check: (img) => vision.ask({ images: [{ label: 'Image to check', ...img }], questions, signal }),
       questions,
       cache,
+      redraw: options.redraw,
     });
     images.set(`staging-${i + 1}`, checked.image);
     keys.set(`staging-${i + 1}`, checked.result.key);
@@ -153,6 +156,7 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
               }),
             questions,
             cache,
+            redraw: options.redraw,
           });
           images.set(panel.id, checked.image);
           keys.set(panel.id, checked.result.key);
@@ -171,9 +175,10 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
 
 /**
  * Draws until every check passes or the tries run out, keeping the take with
- * the most yes answers. Only a take that passes is cached as accepted, so the
- * next build tries again. A cached image checked with other questions is
- * checked again before anything is redrawn.
+ * the most yes answers. A take that still fails is cached as not accepted and
+ * reused by later builds, so its art doesn't change every run; pass `redraw`
+ * to try again. A cached image checked with other questions is checked again
+ * before anything is redrawn.
  */
 async function drawChecked(args: {
   key: string;
@@ -182,11 +187,13 @@ async function drawChecked(args: {
   check: (image: ImageBytes) => Promise<boolean[]>;
   questions: string[];
   cache: RenderCache;
+  redraw?: boolean;
 }): Promise<{ image: ImageBytes; result: Checked }> {
   const hit = await args.cache.getImage(args.key);
   const sameQuestions = JSON.stringify(hit?.meta.questions) === JSON.stringify(args.questions);
-  if (hit?.meta.accepted && sameQuestions) {
-    return { image: hit, result: { key: args.key, cached: true, attempts: 0, questions: args.questions, answers: hit.meta.answers as boolean[], ok: true } };
+  if (hit && sameQuestions && (hit.meta.accepted || !args.redraw)) {
+    const answers = hit.meta.answers as boolean[];
+    return { image: hit, result: { key: args.key, cached: true, attempts: 0, questions: args.questions, answers, ok: Boolean(hit.meta.accepted) } };
   }
   let best: { image: ImageBytes; answers: boolean[] } | undefined;
   if (hit?.meta.accepted) {
@@ -222,15 +229,23 @@ async function headBoxes(
 ): Promise<PanelResult['heads']> {
   const characters = Object.keys(panel.positions).filter((id) => cast[id]?.look).map((id) => ({ id, look: cast[id]!.look! }));
   if (!characters.length) return [];
-  const key = `heads:${await sha256(JSON.stringify([RENDER_VERSION, vision.model, panelKey]))}`;
+  // Keyed by the image itself: a panel redrawn under the same key gets its own heads.
+  const key = `heads:${await sha256(JSON.stringify([RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;
   const hit = await cache.getImage(key);
   if (hit) return hit.meta.heads as PanelResult['heads'];
-  const heads = await vision.heads({ image: img, characters, signal });
+  let heads = await vision.heads({ image: img, characters, signal });
+  // Nobody found where someone stands is usually a miss; ask once more.
+  if (!heads.length) heads = await vision.heads({ image: img, characters, signal });
   await cache.putImage(key, { bytes: new TextEncoder().encode(JSON.stringify(heads)), mimeType: 'application/json', meta: { heads } });
   return heads;
 }
 
 const yes = (answers: boolean[]) => answers.filter(Boolean).length;
+
+async function bytesHash(bytes: Uint8Array): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 export async function imageKey(model: string, prompt: string, references: string[], aspect: string): Promise<string> {
   return `image:${await sha256(JSON.stringify([RENDER_VERSION, model, prompt, references, aspect]))}`;

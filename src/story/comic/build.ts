@@ -30,6 +30,8 @@ export interface ComicBuildOptions {
   transcriber?: Transcriber;
   signal?: AbortSignal;
   onEvent?: (event: DrawEvent | LineEvent) => void;
+  /** Draw again panels that failed their checks in an earlier build. */
+  redraw?: boolean;
 }
 
 export interface ComicBuildResult {
@@ -53,7 +55,7 @@ export const readerAudio = (id: string) => `audio/${id.replace('.', '-')}.mp3`;
  */
 export async function buildComic(options: ComicBuildOptions): Promise<ComicBuildResult> {
   const { comic, story, runtime, sink, signal } = options;
-  const draw = await drawComic(comic, story.cast, { image: options.image, vision: options.vision, cache: options.cache, signal, onEvent: options.onEvent });
+  const draw = await drawComic(comic, story.cast, { image: options.image, vision: options.vision, cache: options.cache, redraw: options.redraw, signal, onEvent: options.onEvent });
   const lines =
     options.speaker && options.transcriber
       ? await voiceComic(comic, story, { speaker: options.speaker, transcriber: options.transcriber, cache: options.cache, signal, onEvent: options.onEvent })

@@ -276,7 +276,7 @@ export const storyDirectCommand = defineCommand({
 
 /** Draws a comic script's panels; resolves to the exit code. `deps` replaces providers in tests. */
 export async function runStoryDraw(
-  args: { file: string; out?: string; json?: boolean; signal?: AbortSignal },
+  args: { file: string; out?: string; json?: boolean; redraw?: boolean; signal?: AbortSignal },
   deps: { image: ImageModel; vision: Vision; cache: RenderCache },
   write: (text: string) => void
 ): Promise<number> {
@@ -308,7 +308,7 @@ export async function runStoryDraw(
   };
   try {
     const started = Date.now();
-    const result = await drawComic(comic, story.cast, { ...deps, signal: args.signal, onEvent });
+    const result = await drawComic(comic, story.cast, { ...deps, redraw: args.redraw, signal: args.signal, onEvent });
     const sink = createFileSink(outDir);
     await sink.write('art/sheet.png', result.images.get('sheet')!.bytes);
     for (const s of result.stagings) await sink.write(`art/staging-${s.index}.png`, result.images.get(`staging-${s.index}`)!.bytes);
@@ -352,6 +352,7 @@ export const storyDrawCommand = defineCommand({
     cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the script)' },
     imageModel: { type: 'string', description: 'Image model (default gemini-3-pro-image)' },
     visionModel: { type: 'string', description: 'Model for checks and head boxes (default gemini-3.5-flash)' },
+    redraw: { type: 'boolean', description: 'Draw again panels that failed their checks in an earlier build', default: false },
     json: { type: 'boolean', description: 'Print the summary as JSON', default: false },
   },
   async run({ args }) {
@@ -365,7 +366,7 @@ export const storyDrawCommand = defineCommand({
     const controller = new AbortController();
     process.once('SIGINT', () => controller.abort());
     process.exitCode = await runStoryDraw(
-      { file: args.file, out: args.out, json: args.json, signal: controller.signal },
+      { file: args.file, out: args.out, json: args.json, redraw: args.redraw, signal: controller.signal },
       {
         image: createGeminiImageModel({ apiKey, model: args.imageModel }),
         vision: createGeminiVision({ apiKey, model: args.visionModel }),
@@ -378,7 +379,7 @@ export const storyDrawCommand = defineCommand({
 
 /** Builds the graphic novel for a comic script; resolves to the exit code. `deps` replaces providers in tests. */
 export async function runStoryComic(
-  args: { file: string; out?: string; json?: boolean; signal?: AbortSignal },
+  args: { file: string; out?: string; json?: boolean; redraw?: boolean; signal?: AbortSignal },
   deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber },
   write: (text: string) => void
 ): Promise<number> {
@@ -407,7 +408,7 @@ export async function runStoryComic(
       };
   try {
     const started = Date.now();
-    const result = await buildComic({ comic, story, ...deps, sink: createFileSink(outDir), signal: args.signal, onEvent });
+    const result = await buildComic({ comic, story, ...deps, sink: createFileSink(outDir), redraw: args.redraw, signal: args.signal, onEvent });
     const lines = [...result.lines.values()].map((l) => l.result);
     const summary = {
       panels: result.draw.panels.length,
@@ -447,6 +448,7 @@ export const storyComicCommand = defineCommand({
     out: { type: 'string', description: 'Output folder (default dist/<title>)' },
     cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the script)' },
     voices: { type: 'boolean', description: 'Voice captions and balloons (use --no-voices for a lettering pass)', default: true },
+    redraw: { type: 'boolean', description: 'Draw again panels that failed their checks in an earlier build', default: false },
     imageModel: { type: 'string', description: 'Image model (default gemini-3-pro-image)' },
     visionModel: { type: 'string', description: 'Model for checks and head boxes (default gemini-3.5-flash)' },
     voiceModel: { type: 'string', description: 'Speech model (default gemini-3.8-flash-tts)' },
@@ -472,7 +474,7 @@ export const storyComicCommand = defineCommand({
     const controller = new AbortController();
     process.once('SIGINT', () => controller.abort());
     process.exitCode = await runStoryComic(
-      { file: args.file, out: args.out, json: args.json, signal: controller.signal },
+      { file: args.file, out: args.out, json: args.json, redraw: args.redraw, signal: controller.signal },
       {
         image: createGeminiImageModel({ apiKey, model: args.imageModel }),
         vision: createGeminiVision({ apiKey, model: args.visionModel }),

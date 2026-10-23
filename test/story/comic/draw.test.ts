@@ -85,6 +85,19 @@ describe('drawComic', async () => {
     expect(result.panels.every((p) => p.cached && p.ok && p.answers.length === p.questions.length)).toBe(true);
   });
 
+  it('reuses a failing best take on the next build, and draws again only with redraw', async () => {
+    const cache = memoryCache();
+    const failing = () => fakeVision((img, q) => img.includes('Wide close-up of June') && q.startsWith('Is the image free'));
+    await drawComic(comic, cast, { image: fakeImageModel(), vision: failing(), cache });
+    const again = fakeImageModel();
+    const second = await drawComic(comic, cast, { image: again, vision: failing(), cache });
+    expect(again.requests).toHaveLength(0);
+    expect(second.panels.filter((p) => !p.ok)).toHaveLength(1);
+    const redraw = fakeImageModel();
+    await drawComic(comic, cast, { image: redraw, vision: failing(), cache, redraw: true });
+    expect(redraw.requests).toHaveLength(3);
+  });
+
   it('asks a continue panel its questions with the source panel shown first', async () => {
     const vision = fakeVision();
     await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });

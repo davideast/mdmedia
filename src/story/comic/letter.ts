@@ -273,9 +273,12 @@ export function lettering() {
     for (const i of group) {
       const item = panel.items[i]!;
       const lines = balancedWrap(item.text, maxText, px, measure);
-      const textW = Math.max(...lines.map((l) => measure(l, px, 'letter')));
-      const sw = textW + 2 * padE.x * px;
-      const sh = lines.length * px * LETTERING.lineHeight + 2 * padE.y * px;
+      const widths = lines.map((l) => measure(l, px, 'letter'));
+      const textW = Math.max(...widths);
+      const { sw, sh } =
+        first.kind === 'caption'
+          ? { sw: textW + 2 * padE.x * px, sh: lines.length * px * LETTERING.lineHeight + 2 * padE.y * px }
+          : oval(widths, px);
       shapes.push({ x, y, w: sw, h: sh, lines });
       // A joined balloon steps down and a little right, overlapping slightly.
       y += sh * 0.88;
@@ -283,6 +286,30 @@ export function lettering() {
     }
     const bounds = shapes.reduce<Rect>((b, s) => union(b, s), shapes[0]!);
     return { ...bounds, fontPx: px, shapes };
+  }
+
+  /**
+   * The smallest oval that holds every line inside it, corners included:
+   * a box around the text pokes its long lines out of the ellipse.
+   */
+  function oval(widths: number[], px: number): { sw: number; sh: number } {
+    const lh = px * LETTERING.lineHeight;
+    const half = (widths.length * lh) / 2;
+    let best = { sw: 0, sh: 0, area: Infinity };
+    for (let k = 1.1; k <= 2.2; k += 0.05) {
+      const ry = half * k + px * 0.2;
+      let rx = 0;
+      widths.forEach((width, i) => {
+        // The line's edge farthest from the middle, top or bottom.
+        const top = Math.abs(i * lh - half);
+        const bottom = Math.abs((i + 1) * lh - half);
+        const far = Math.max(top, bottom);
+        rx = Math.max(rx, width / 2 / Math.sqrt(Math.max(0.05, 1 - (far / ry) ** 2)));
+      });
+      const area = rx * ry;
+      if (area < best.area) best = { sw: 2 * rx + px * 0.9, sh: 2 * ry + px * 0.5, area };
+    }
+    return { sw: best.sw, sh: best.sh };
   }
 
   /** Wraps to the narrowest width that keeps the same number of lines, so balloons stay round. */
@@ -303,7 +330,9 @@ export function lettering() {
     const cx = shape.x + shape.w / 2;
     const cy = shape.y + shape.h / 2;
     let tip: { x: number; y: number };
-    if (item.mark === 'off') tip = { x: cx < w / 2 ? 0 : w, y: cy };
+    // Off panel: marked [off], or not drawn in this panel at all. The tail points
+    // out of the frame, never at whoever happens to be in it.
+    if (item.mark === 'off' || (!head && !panel.positions[item.who])) tip = { x: cx < w / 2 ? 0 : w, y: cy };
     else if (head) {
       const short = Math.max(w, h) * 0.015;
       tip =
