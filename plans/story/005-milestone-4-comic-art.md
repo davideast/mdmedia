@@ -317,3 +317,28 @@ first try; the page 3 staging needed 2 takes in run 1.
   from it. That's fine for review; revisit if continuity drifts.
 - Consider asking about hair and clothing separately per character instead of
   one long on-model question.
+
+**Two new stories** (2026-10-23, db106eb, 78121a5): *Midnight Line* (color
+anime, 15 panels) and *Wren Backwards* (stop-motion, 16 panels), written as
+raw prose, directed with `story direct`, comic scripts by hand.
+
+| Run | Redraws | Failing | Wall |
+| --- | --- | --- | --- |
+| Wren Backwards | 14 | 2 | ~12 min, both drawn in parallel |
+| Midnight Line | 18 | 8 (over the STOP threshold) | |
+| Midnight Line, after fixes, fresh cache | 9 | 3, all acting questions | 6m40 |
+
+- Both character sheets were right first time, including a two-tailed cat, a
+  six-armed grandmother and a neat double of the heroine.
+- Most Midnight Line failures were on-model questions over small details of a
+  long look (scraped knees, shoelaces). On-model questions now judge only hair,
+  face and main outfit; after that, every character stayed on model.
+- A page's setting applied to a panel that changed scene; panels now take a
+  `setting:` line of their own.
+- The director's looks were too thin to draw from ("short black hair, track
+  uniform"), and it once wrote a literal `*(cue)*`. The cast prompt now asks for
+  drawable looks, and `story check` reports placeholder cues as errors so the
+  director repairs them.
+- Still open: drawn panel borders recur (caught by the border question); an
+  afterimage drawn as the wrong character (2.1) was caught by the acting
+  question.
