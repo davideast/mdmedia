@@ -270,3 +270,50 @@ grep -rn "from 'node:" src/story --include=*.ts | grep -v "src/story/node/" && e
 - The image model no longer accepts several reference images in one request.
 - More than a third of panels still fail their checks after two redraws.
 - A dependency seems necessary.
+
+## As built
+
+Done on `feat/story-m4` (727f57f parser, 6e275cf draw, 481f5ce check fixes),
+local only. 131 story tests pass; verify 13/13; core is platform-free.
+Preview: private Artifact `2qWuaSqzt9efF3rVS8jD3W`.
+
+**Live runs** (`comic-lunch.md`, 4 pages, 21 panels):
+
+| Run | Cached | Redraws | Failing | Head boxes | Wall |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 0 | 16 | 3 (1.4, 2.3, 4.1) | 30 | 9m03 |
+| 2, new checks, same cache | 15 | 6 | 1 (1.4) | 30 | 4m43 |
+
+Under the STOP threshold (a third of the panels) both times. The sheet came out
+first try; the page 3 staging needed 2 takes in run 1.
+
+**What looking at every panel showed**
+
+- The checker fails for the wrong reason sometimes. In run 1, panel 1.4 failed
+  "Milo on model", but Milo was fine; the real defect was a panel divider the
+  model drew across the image, which no question asked about. Added
+  `ONE_IMAGE_QUESTION`. The redraw has no divider; Harper lost her varsity
+  jacket and the check caught it correctly.
+- Too strict: 2.3 failed only for "MILK" on a carton. `NO_TEXT_QUESTION` now
+  allows labels on objects.
+- It also misses things. Run 1's 4.1 had June with long hair and a June
+  lookalike, which it caught. Run 2's 4.1 has Milo with straight hair and no
+  freckles, and it passed. On-model questions over a long `look` are weak on
+  hair texture.
+- Cached images carried answers to the old question list, so after a question
+  changed the answers no longer lined up. Cached images now store their
+  questions; a different list re-checks the image before redrawing anything.
+  Re-checking re-judges, though: 1.3, 3.4 and the staging failed a second look
+  and were redrawn. The vision answers are noisy at the margin.
+- The character sheet carries name labels despite "no text or labels". That's
+  harmless as a reference, and no panel copied them.
+- Continue chains (3.1→3.2→3.3) hold the same face and framing. Acting notes
+  land: 3.4 reads as panic against shock.
+
+**Left for later**
+
+- A panel's cache key holds its references' keys, not their images, so a
+  redrawn staging image or previous panel does not invalidate the panels drawn
+  from it. That's fine for review; revisit if continuity drifts.
+- Consider asking about hair and clothing separately per character instead of
+  one long on-model question.
