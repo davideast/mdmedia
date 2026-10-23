@@ -11,7 +11,7 @@ from six prototype runs on real text; the evidence is in
 | [001](001-milestone-0-parse-check.md) | Milestone 0: story file parser, schemas, `story check` | DONE locally on `feat/story-m0` (9375c53), not pushed |
 | [002](002-milestone-1-voices.md) | Milestone 1: voices in context, checked, built | DONE locally on `feat/story-m1` (107a0df), not pushed |
 | [003](003-milestone-2-music.md) | Milestone 2: music, and sharper line checks | DONE locally on `feat/story-m2` (2ee60fc), not pushed |
-| 004 | Milestone 3: director (`story direct`) | NOT WRITTEN |
+| [004](004-milestone-3-director.md) | Milestone 3: the director (`story direct`) | NOT STARTED |
 | 005–007 | Milestones 4–6: comic art, pages and reader, director for comics | NOT WRITTEN |
 
 Plans are written one or two milestones ahead, so each starts from what the

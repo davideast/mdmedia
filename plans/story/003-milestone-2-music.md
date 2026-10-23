@@ -267,6 +267,12 @@ Committed locally on `feat/story-m2` (2ee60fc), not pushed.
   outside the cast ("Shah" heard as "Shaw"). Two need listening: "just to
   Harper" and a one-word "Yeah?" heard as "ia". Published for listening as a
   private artifact.
+- **Checked by ear**: "just to Harper" and "Yeah?" are fine, so all nine
+  flags were checker noise.
+- **The kid's ketchup line** was added to the fixture by hand (6b69b56): the
+  comic adaptation had dramatized the narrated argument, the story file had
+  kept the narration. The rebuild rendered that line and the next two and
+  reused 278 lines from the cache.
 - **Follow-up for the next milestone**: compound numbers and common units in
   the word normalization, `'ve`/`'d` contractions, and names from the whole
   story (not just the cast) in the transcriber's list. These likely account for
