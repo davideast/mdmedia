@@ -276,6 +276,42 @@ npm_config_cache=$TMPDIR/npm-cache bun run verify
 grep -rn "from 'node:" src/story --include=*.ts | grep -v "src/story/node/" && echo "STOP" || echo "core is platform-free"
 ```
 
+## As built (2026-10-22)
+
+Committed locally on `feat/story-m3` (8a42b06, eb83677 and the fixtures), not pushed.
+
+- **The comparison fixes** shipped first (c36d9a9): compound numbers, `ft`,
+  `mr`, `%`, `'ve` and an elided `'d`. A real number reader keeps separate
+  numbers apart ("Eleven! Twelve!" is two numbers).
+- **The ketchup line lands as a punchline** in the hand-adapted fixture
+  (5850386): you heard the double telling at 7:01; the narration no longer
+  explains the argument first, and the cut sentence is kept in a `replaced`
+  comment. The rebuild rendered just the three changed lines.
+- **Fidelity found real cuts in my hand adaptation**: seven short beats
+  ("Harper continued.", "She smiled.", "I blinked.", …), the subtitle and
+  ".mp4". The fixture test pins those down.
+- **A speech tag is judged by touching a quotation**, not by sharing a
+  paragraph with one: `"Wait!" Maya shouted.` drops a tag; `Dad laughed.
+  "It left."` keeps a beat.
+- **Dramatizing moved to the cast pass.** Asked in the scene pass, the model
+  never replaced a sentence, because it conflicts with keeping every sentence.
+  Now the cast pass lists moments (exact sentence, speaker, cue, line) and code
+  applies them, with the `replaced` and `added` comments.
+- **Comments get their own paragraph** when the file is assembled; the first
+  live run had glued an `added` comment to its line.
+- **Models available**: `gemini-3.5-flash` (default) and newer
+  `gemini-3.6/3.7/3.8-flash`, `gemini-3.1-pro-preview`, and a dedicated
+  `gemini-3.5-transcribe` worth trying for line checks.
+- **Live run** (third, final): story file in 2 min 17 s, 8 scenes, 377 lines,
+  all cued (247 narration, 130 dialogue), one repair round, no fidelity gaps,
+  one dramatization ("Ketchup is made from tomatoes, so it is TOTALLY a
+  vegetable!"). Cast: Milo narrating (Puck), June (Leda), the same voices as
+  by hand. Build: 21 min 13 s of audio in 6 min 36 s, 45 retakes, 4 flagged
+  (transcriber slips on short narration lines), 8 music clips. Published next
+  to the hand-adapted build. Kept as `test/story/fixtures/embarrassing-day.directed.md`.
+- **Observed**: the director splits narration into more, shorter lines than I
+  did; short lines draw most of the transcriber's slips and retakes.
+
 ## Done when
 
 - Every step's tests pass with fakes.
