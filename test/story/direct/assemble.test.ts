@@ -44,6 +44,16 @@ describe('assembleStory', () => {
     expect(shape(a)).toEqual(shape(b));
   });
 
+  it('gives every comment its own paragraph, so it cannot swallow a line', async () => {
+    const md = assembleStory(
+      { title: 'T', narrator: { voice: 'Charon', delivery: 'warm' }, cast: { KID: { voice: 'Fenrir', delivery: 'loud' } }, names: [], scenes: [] },
+      [{ title: 'One', body: '*(calm)* It was loud.\n<!-- director: added -->\n**KID** *(gleeful)*: JUICE BOY!\n<!-- replaced: "Somebody shouted, "JUICE BOY!"" -->' }]
+    );
+    expect(md).toContain('<!-- director: added -->\n\n**KID** *(gleeful)*: JUICE BOY!\n\n<!-- replaced:');
+    const { script } = await parseStory(md, { path: 't.md' });
+    expect(script!.chapters[0]!.scenes[0]!.segments.map((s) => (s.kind === 'line' ? s.text : ''))).toEqual(['It was loud.', 'JUICE BOY!']);
+  });
+
   it('writes a separate narrator and the names list into the front matter', async () => {
     const md = assembleStory(
       { title: 'T', narrator: { voice: 'Charon', delivery: 'warm' }, cast: { MAYA: { voice: 'Kore', delivery: 'quick' } }, names: ['Westfield'], scenes: [] },

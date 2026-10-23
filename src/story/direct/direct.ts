@@ -2,7 +2,7 @@ import { limiter } from '../limit.js';
 import { parseStory } from '../parse.js';
 import type { TextModel } from '../ports.js';
 import type { Diagnostic, Line, StoryScript } from '../types.js';
-import { assembleStory, sceneHeadingLines, type CastPlan, type SceneDraft } from './assemble.js';
+import { applyDramatization, assembleStory, sceneHeadingLines, type CastPlan, type SceneDraft } from './assemble.js';
 import { fidelity, type AddedSpan, type MissingSpan } from './fidelity.js';
 import { CAST_INSTRUCTION, REPAIR_INSTRUCTION, SCENE_INSTRUCTION } from './prompts.js';
 import { isVoice } from './voices.js';
@@ -63,7 +63,7 @@ export async function directStory(
       limit(async () => {
         const body = await writer.generate({ system: SCENE_INSTRUCTION, prompt: scenePrompt(plan, texts[i]!, i > 0 ? texts[i - 1]! : ''), signal });
         emit({ type: 'scene-done', title: scene.title });
-        return { title: scene.title, music: scene.music, body: unfence(body) };
+        return { title: scene.title, music: scene.music, body: dramatize(unfence(body), plan, texts[i]!) };
       })
     )
   );
@@ -85,7 +85,7 @@ export async function directStory(
         if (!problems) return draft;
         return limit(async () => ({
           ...draft,
-          body: unfence(await writer.generate({ system: REPAIR_INSTRUCTION, prompt: repairPrompt(plan, texts[i]!, draft.body, problems), signal })),
+          body: dramatize(unfence(await writer.generate({ system: REPAIR_INSTRUCTION, prompt: repairPrompt(plan, texts[i]!, draft.body, problems), signal })), plan, texts[i]!),
         }));
       })
     );
@@ -99,7 +99,7 @@ export async function directStory(
     scenes: plan.scenes.length,
     lines: lines.length,
     additions: checked.added.filter((a) => a.allowed).map((a) => lines.find((l) => l.id === a.lineId)?.display ?? a.words.join(' ')),
-    replaced: [...markdown.matchAll(/<!--\s*replaced:\s*"([^"]+)"/g)].map((m) => m[1]!),
+    replaced: [...markdown.matchAll(/<!--\s*replaced:\s*"(.*)"[^"\n]*-->/g)].map((m) => m[1]!),
     repairRounds: rounds,
     remaining: checked.problems,
   };
@@ -127,6 +127,16 @@ async function castPass(raw: string, writer: TextModel, signal?: AbortSignal): P
   }
 }
 
+/** Applies the cast pass's dramatizations that fall in this scene, once each. */
+function dramatize(body: string, plan: CastPlan, sceneText: string): string {
+  let out = body;
+  for (const d of plan.dramatize ?? []) {
+    if (!sceneText.includes(d.sentence) || out.includes(`<!-- replaced: "${d.sentence}" -->`)) continue;
+    out = applyDramatization(out, d);
+  }
+  return out;
+}
+
 export function validatePlan(plan: CastPlan, raw: string): string[] {
   const problems: string[] = [];
   if (!plan.title) problems.push('There is no title.');
@@ -144,6 +154,10 @@ export function validatePlan(plan: CastPlan, raw: string): string[] {
   if (!plan.scenes?.length) problems.push('There are no scenes.');
   for (const scene of plan.scenes ?? []) {
     if (findStart(raw, scene.firstWords) < 0) problems.push(`The scene "${scene.title}" starts with words not found in the story: "${scene.firstWords}".`);
+  }
+  for (const d of plan.dramatize ?? []) {
+    if (!raw.includes(d.sentence)) problems.push(`The sentence to dramatize is not in the story word for word: "${d.sentence}".`);
+    if (!plan.cast?.[d.speaker]) problems.push(`The speaker ${d.speaker} for "${d.line}" is not in the cast.`);
   }
   return problems;
 }

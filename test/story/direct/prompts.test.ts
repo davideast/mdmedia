@@ -10,11 +10,12 @@ describe('director instructions', () => {
       'Every line and every narration paragraph gets a cue',
       'Never describe an action in a cue',
       'names a silence',
-      '<!-- director: added -->',
-      '<!-- replaced:',
-      'shown once, not told and then shown',
+      'Never invent lines',
+      'Speech the author already quotes is a normal line',
     ]) expect(SCENE_INSTRUCTION).toContain(rule);
     expect(REPAIR_INSTRUCTION).toContain(SCENE_INSTRUCTION);
+    expect(CAST_INSTRUCTION).toContain('"dramatize"');
+    expect(CAST_INSTRUCTION).toContain('Never dramatize speech the author already quotes');
   });
 
   it('offers every voice with its description, and only those', () => {

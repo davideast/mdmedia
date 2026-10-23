@@ -98,7 +98,7 @@ function commentMarks(markdown: string, lines: Line[]): { added: Set<string>; re
     }
   });
   sourceLines.forEach((text, i) => {
-    const match = /<!--\s*replaced:\s*"([^"]+)"/.exec(text);
+    const match = /<!--\s*replaced:\s*"(.*)"[^"]*-->/.exec(text);
     if (!match) return;
     const after = lines.filter((l) => l.source.line > i + 1).slice(0, 3);
     if (after.some((l) => added.has(l.id))) replaced.push(words(match[1]!));

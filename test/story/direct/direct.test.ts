@@ -121,21 +121,25 @@ describe('directStory', () => {
     expect(markdown).toContain('another bus arrived');
   });
 
-  it('accepts a marked added line that replaces a told sentence', async () => {
+  it('replaces a told sentence with the line the cast pass chose, visibly', async () => {
     const raw = RAW.replace('Ten minutes later, the next bus came.', 'Ten minutes later, the next bus came. A kid at the back was arguing that buses are boats.');
-    const two = `*(relieved)* Ten minutes later, the next bus came.
-
-<!-- replaced: "A kid at the back was arguing that buses are boats." -->
-
-<!-- director: added -->
-
-**KID** *(indignant, far off)*: Buses are TOO boats!`;
-    const plan = { ...PLAN, cast: { ...PLAN.cast, KID: { voice: 'Fenrir', delivery: 'loud kid' } } };
+    const two = `*(relieved)* Ten minutes later, the next bus came. A kid at the back was arguing that buses are boats.`;
+    const plan = {
+      ...PLAN,
+      cast: { ...PLAN.cast, KID: { voice: 'Fenrir', delivery: 'loud kid' } },
+      dramatize: [{ sentence: 'A kid at the back was arguing that buses are boats.', speaker: 'KID', cue: 'indignant, far off', line: 'Buses are TOO boats!' }],
+    };
     const w = writer({ cast: () => JSON.stringify(plan), scene: (s) => (s === 'two' ? two : GOOD_ONE) });
-    const { report } = await directStory(raw, { writer: w });
+    const { report, markdown } = await directStory(raw, { writer: w });
     expect(report.remaining).toEqual([]);
     expect(report.additions).toEqual(['Buses are TOO boats!']);
     expect(report.replaced).toEqual(['A kid at the back was arguing that buses are boats.']);
+    expect(markdown).toContain('*(relieved)* Ten minutes later, the next bus came.\n\n<!-- replaced: "A kid at the back was arguing that buses are boats." -->\n\n<!-- director: added -->\n\n**KID** *(indignant, far off)*: Buses are TOO boats!');
+  });
+
+  it('rejects a dramatization whose sentence is not in the story', async () => {
+    const plan = { ...PLAN, dramatize: [{ sentence: 'Nobody said this.', speaker: 'MAYA', cue: 'x', line: 'y' }] };
+    await expect(directStory(RAW, { writer: writer({ cast: () => JSON.stringify(plan) }) })).rejects.toThrow(/not in the story word for word/);
   });
 
   it('retries a cast with a voice that does not exist, then fails on a second bad answer', async () => {
