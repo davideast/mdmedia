@@ -1,16 +1,25 @@
 import type { LineCheck } from './ports.js';
 
-const NUMBERS: Record<string, string> = {
-  zero: '0', one: '1', two: '2', three: '3', four: '4', five: '5', six: '6', seven: '7', eight: '8', nine: '9', ten: '10',
-  eleven: '11', twelve: '12', thirteen: '13', fourteen: '14', fifteen: '15', sixteen: '16', seventeen: '17', eighteen: '18',
-  nineteen: '19', twenty: '20', thirty: '30', forty: '40', fifty: '50', hundred: '100',
+const SMALL: Record<string, number> = {
+  zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+  eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19,
 };
+const TENS: Record<string, number> = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+
 const CONTRACTIONS: Array<[RegExp, string]> = [
   [/\bgonna\b/g, 'going to'],
   [/\bwanna\b/g, 'want to'],
   [/\bgotta\b/g, 'got to'],
   [/\bkinda\b/g, 'kind of'],
+  [/\b([a-z]+)'ve\b/g, '$1 have'],
+  // The elided 'd ("he'd") is heard either way, so it is dropped on both sides.
+  [/\b([a-z]+)'d\b/g, '$1'],
+  [/\bper cent\b/g, 'percent'],
+  [/%/g, ' percent'],
 ];
+
+/** Abbreviations a transcriber writes for words a script spells out. */
+const UNITS: Record<string, string> = { ft: 'feet', mr: 'mister', mrs: 'missus', dr: 'doctor' };
 
 /**
  * Non-lexical sounds a voice often performs (a laugh, a sigh) instead of
@@ -23,12 +32,59 @@ export const INTERJECTIONS: ReadonlySet<string> = new Set(['heh', 'hah', 'ha', '
 export function words(text: string): string[] {
   let t = text.toLowerCase().replace(/[’‘`]/g, "'");
   for (const [pattern, replacement] of CONTRACTIONS) t = t.replace(pattern, replacement);
-  return t
+  const tokens = t
     .replace(/[^a-z0-9' ]+/g, ' ')
     .split(/\s+/)
     .map((w) => w.replace(/^'+|'+$/g, ''))
     .filter(Boolean)
-    .map((w) => NUMBERS[w] ?? w);
+    .map((w) => UNITS[w] ?? w);
+  const out: string[] = [];
+  for (let i = 0; i < tokens.length; ) {
+    const number = readNumber(tokens, i);
+    if (number) { out.push(String(number.value)); i = number.next; }
+    else out.push(tokens[i++]!);
+  }
+  return out;
+}
+
+/**
+ * Reads one spelled-out number starting at `i`: "forty five", "three
+ * hundred", "two hundred and twelve", "twelve thousand". Separate numbers stay
+ * separate ("eleven twelve" is two numbers).
+ */
+function readNumber(tokens: string[], i: number): { value: number; next: number } | undefined {
+  const below100 = (at: number): { value: number; next: number } | undefined => {
+    const w = tokens[at];
+    if (w === undefined) return undefined;
+    if (w in TENS) {
+      const unit = tokens[at + 1];
+      if (unit !== undefined && unit in SMALL && SMALL[unit]! > 0 && SMALL[unit]! < 10) return { value: TENS[w]! + SMALL[unit]!, next: at + 2 };
+      return { value: TENS[w]!, next: at + 1 };
+    }
+    if (w in SMALL) return { value: SMALL[w]!, next: at + 1 };
+    return undefined;
+  };
+  const below1000 = (at: number): { value: number; next: number } | undefined => {
+    const first = below100(at);
+    if (!first || tokens[first.next] !== 'hundred') {
+      if (tokens[at] === 'hundred') return withRest(100, at + 1);
+      return first;
+    }
+    return withRest(first.value * 100, first.next + 1);
+  };
+  const withRest = (value: number, at: number) => {
+    const skipAnd = tokens[at] === 'and' ? at + 1 : at;
+    const rest = below100(skipAnd);
+    return rest ? { value: value + rest.value, next: rest.next } : { value, next: at };
+  };
+
+  const head = below1000(i);
+  if (!head) return undefined;
+  if (tokens[head.next] !== 'thousand') return head;
+  const thousands = head.value * 1000;
+  const at = tokens[head.next + 1] === 'and' ? head.next + 2 : head.next + 1;
+  const tail = below1000(at);
+  return tail ? { value: thousands + tail.value, next: tail.next } : { value: thousands, next: head.next + 1 };
 }
 
 /**

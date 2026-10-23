@@ -29,6 +29,28 @@ describe('compareTranscript', () => {
     expect(compareTranscript('Heh. Okay. Funny story.', 'Okay. Story.')).toMatchObject({ ok: false, missing: ['heh', 'funny'] });
   });
 
+  // Milestone 2's full build: all nine flagged lines were fine by ear.
+  it('matches spelled-out numbers, units and contractions with what a transcriber writes', () => {
+    const pairs: Array<[string, string]> = [
+      ['At 1:45, I had forty-five minutes to save my friendship.', 'At 1:45, I had 45 minutes to save my friendship.'],
+      ['Three hundred heads turned toward me.', '300 heads turned toward me.'],
+      ["June's face. Twenty feet tall.", "June's face 20 ft tall."],
+      ["But I think I might've been cooler", 'But I think I might have been cooler'],
+      ["like he'd just won the Super Bowl", 'like he just won the Super Bowl'],
+      ["like you'd survived an avalanche", 'like you survived an avalanche'],
+      ['two hundred and twelve steps', '212 steps'],
+      ['the funniest twenty-three seconds', 'the funniest 23 seconds'],
+      ['Mr. Alvarez raised both arms', 'Mister Alvarez raised both arms'],
+    ];
+    for (const [expected, heard] of pairs) expect(compareTranscript(expected, heard)).toMatchObject({ ok: true });
+  });
+
+  it('keeps separate numbers apart', () => {
+    expect(compareTranscript('Six out of ten.', '6 out of 10.').ok).toBe(true);
+    expect(compareTranscript('Eleven! Twelve! A million!', '11, 12, a million.').ok).toBe(true);
+    expect(compareTranscript('forty-five', '40 5').ok).toBe(false);
+  });
+
   it('reports both a dropped and an added word', () => {
     expect(compareTranscript('My faults are heavy indeed', 'My faults are')).toMatchObject({ missing: ['heavy', 'indeed'], extra: [], ok: false });
     expect(compareTranscript('Hello', '')).toMatchObject({ missing: ['hello'], ok: false });
