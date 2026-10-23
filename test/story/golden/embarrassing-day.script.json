@@ -2,7 +2,7 @@
   "schema": "mdmedia.story.script/1",
   "source": {
     "path": "embarrassing-day.md",
-    "sha256": "9ce416e66cde5f1e8d01477582fec0b4533589fa920259ad8063360f8f83c0eb"
+    "sha256": "1b45f2877d30fd223208677e4e16dd3eba917cd734262dd44bf016b3b519ae37"
   },
   "meta": {
     "title": "The Most Embarrassing Day of My Life",
@@ -14,32 +14,38 @@
     "MILO": {
       "id": "MILO",
       "voice": "Puck",
-      "delivery": "a funny, quick-talking thirteen-year-old boy telling his own story"
+      "delivery": "a funny, quick-talking thirteen-year-old boy telling his own story",
+      "look": "a 13-year-old boy with messy curly brown hair, freckles and big expressive eyebrows; oversized forest-green hoodie with a small orange wildcat patch, blue jeans, red high-top sneakers, gray backpack"
     },
     "JUNE": {
       "id": "JUNE",
       "voice": "Leda",
-      "delivery": "a smart, sarcastic thirteen-year-old girl, dry and warm"
+      "delivery": "a smart, sarcastic thirteen-year-old girl, dry and warm",
+      "look": "a 13-year-old Korean American girl with straight black hair in a chin-length bob with blunt bangs; mustard-yellow cardigan over a white T-shirt with a small star, dark jeans, white sneakers; purple sunglasses only when dancing"
     },
     "HARPER": {
       "id": "HARPER",
       "voice": "Zephyr",
-      "delivery": "a bubbly, confident eighth-grade girl, student council president"
+      "delivery": "a bubbly, confident eighth-grade girl, student council president",
+      "look": "a tall 14-year-old girl with long wavy strawberry-blonde hair and a white headband; blue-and-gold Westfield Wildcats varsity jacket, carries a clipboard"
     },
     "ALVAREZ": {
       "id": "ALVAREZ",
       "voice": "Algenib",
-      "delivery": "a frazzled middle school technology teacher"
+      "delivery": "a frazzled middle school technology teacher",
+      "look": "a technology teacher in his forties with a thick black mustache and rectangular glasses; brown sweater vest over a checked shirt, school lanyard"
     },
     "TECHKID": {
       "id": "TECHKID",
       "voice": "Achird",
-      "delivery": "a startled tech club kid"
+      "delivery": "a startled tech club kid",
+      "look": "a skinny tech club kid with a buzz cut, oversized headphones around his neck and a black T-shirt"
     },
     "KID": {
       "id": "KID",
       "voice": "Fenrir",
-      "delivery": "a loud, excited middle schooler in a crowd"
+      "delivery": "a loud, excited middle schooler in a crowd",
+      "look": "a loud seventh grader with spiky red hair and a striped T-shirt"
     }
   },
   "chapters": [
@@ -62,9 +68,9 @@
               "text": "By Friday afternoon, I was going to be the most popular kid at Westfield Middle School.",
               "display": "By Friday afternoon, I was going to be the most popular kid at Westfield Middle\nSchool.",
               "source": {
-                "line": 33,
+                "line": 39,
                 "column": 1,
-                "endLine": 34,
+                "endLine": 40,
                 "endColumn": 8
               }
             },
@@ -77,9 +83,9 @@
               "text": "By Friday afternoon, I was also going to lose my best friend.",
               "display": "By Friday afternoon, I was also going to lose my best friend.",
               "source": {
-                "line": 36,
+                "line": 42,
                 "column": 1,
-                "endLine": 36,
+                "endLine": 42,
                 "endColumn": 62
               }
             },
@@ -92,9 +98,9 @@
               "text": "But at 7:43 that morning, I didn't know either of those things.",
               "display": "But at 7:43 that morning, I didn't know either of those things.",
               "source": {
-                "line": 38,
+                "line": 44,
                 "column": 1,
-                "endLine": 38,
+                "endLine": 44,
                 "endColumn": 64
               }
             },
@@ -107,9 +113,9 @@
               "text": "I was too busy trying to get a Pop-Tart out of a vending machine.",
               "display": "I was too busy trying to get a Pop-Tart out of a vending machine.",
               "source": {
-                "line": 40,
+                "line": 46,
                 "column": 1,
-                "endLine": 40,
+                "endLine": 46,
                 "endColumn": 66
               }
             },
@@ -122,9 +128,9 @@
               "text": "Come on. Come on!",
               "display": "Come on. Come on!",
               "source": {
-                "line": 42,
+                "line": 48,
                 "column": 1,
-                "endLine": 42,
+                "endLine": 48,
                 "endColumn": 42
               }
             },
@@ -137,9 +143,9 @@
               "text": "I slammed my palm against the glass.",
               "display": "I slammed my palm against the glass.",
               "source": {
-                "line": 44,
+                "line": 50,
                 "column": 1,
-                "endLine": 44,
+                "endLine": 50,
                 "endColumn": 37
               }
             },
@@ -152,9 +158,9 @@
               "text": "The Pop-Tart hung from its metal coil, halfway to freedom.",
               "display": "The Pop-Tart hung from its metal coil, halfway to freedom.",
               "source": {
-                "line": 46,
+                "line": 52,
                 "column": 1,
-                "endLine": 46,
+                "endLine": 52,
                 "endColumn": 59
               }
             },
@@ -167,9 +173,9 @@
               "text": "You're negotiating with a vending machine again?",
               "display": "You're negotiating with a vending machine again?",
               "source": {
-                "line": 48,
+                "line": 54,
                 "column": 1,
-                "endLine": 48,
+                "endLine": 54,
                 "endColumn": 70
               }
             },
@@ -182,9 +188,9 @@
               "text": "I turned. June Park stood behind me, holding two chocolate milks.",
               "display": "I turned. June Park stood behind me, holding two chocolate milks.",
               "source": {
-                "line": 50,
+                "line": 56,
                 "column": 1,
-                "endLine": 50,
+                "endLine": 56,
                 "endColumn": 66
               }
             },
@@ -197,9 +203,9 @@
               "text": "It's not negotiating. It's psychological warfare.",
               "display": "It's not negotiating. It's psychological warfare.",
               "source": {
-                "line": 52,
+                "line": 58,
                 "column": 1,
-                "endLine": 52,
+                "endLine": 58,
                 "endColumn": 60
               }
             },
@@ -212,9 +218,9 @@
               "text": "You're losing.",
               "display": "You're losing.",
               "source": {
-                "line": 54,
+                "line": 60,
                 "column": 1,
-                "endLine": 54,
+                "endLine": 60,
                 "endColumn": 25
               }
             },
@@ -227,9 +233,9 @@
               "text": "I'm establishing dominance.",
               "display": "I'm establishing dominance.",
               "source": {
-                "line": 56,
+                "line": 62,
                 "column": 1,
-                "endLine": 56,
+                "endLine": 62,
                 "endColumn": 60
               }
             },
@@ -242,9 +248,9 @@
               "text": "June reached around me, pressed the refund button, and the Pop-Tart dropped.",
               "display": "June reached around me, pressed the refund button, and the Pop-Tart dropped.",
               "source": {
-                "line": 58,
+                "line": 64,
                 "column": 1,
-                "endLine": 58,
+                "endLine": 64,
                 "endColumn": 77
               }
             },
@@ -257,9 +263,9 @@
               "text": "I stared at it. She handed me a chocolate milk.",
               "display": "I stared at it. She handed me a chocolate milk.",
               "source": {
-                "line": 60,
+                "line": 66,
                 "column": 1,
-                "endLine": 60,
+                "endLine": 66,
                 "endColumn": 48
               }
             },
@@ -272,9 +278,9 @@
               "text": "You're welcome, General.",
               "display": "You're welcome, General.",
               "source": {
-                "line": 62,
+                "line": 68,
                 "column": 1,
-                "endLine": 62,
+                "endLine": 68,
                 "endColumn": 47
               }
             },
@@ -287,9 +293,9 @@
               "text": "That was June. My best friend since third grade. She was smart, sarcastic, and possibly the only person alive who could beat me at Mario Kart while eating a bowl of cereal.",
               "display": "That was June. My best friend since third grade. She was smart, sarcastic, and\npossibly the only person alive who could beat me at Mario Kart while eating a\nbowl of cereal.",
               "source": {
-                "line": 64,
+                "line": 70,
                 "column": 1,
-                "endLine": 66,
+                "endLine": 72,
                 "endColumn": 16
               }
             },
@@ -302,9 +308,9 @@
               "text": "She was also the reason I was about to make the dumbest decision of my thirteen years on Earth.",
               "display": "She was also the reason I was about to make the dumbest decision of my thirteen\nyears on Earth.",
               "source": {
-                "line": 68,
+                "line": 74,
                 "column": 1,
-                "endLine": 69,
+                "endLine": 75,
                 "endColumn": 16
               }
             },
@@ -317,9 +323,9 @@
               "text": "I just didn't know it yet.",
               "display": "I just didn't know it yet.",
               "source": {
-                "line": 71,
+                "line": 77,
                 "column": 1,
-                "endLine": 71,
+                "endLine": 77,
                 "endColumn": 27
               }
             }
@@ -340,9 +346,9 @@
               "text": "The announcement came during first period.",
               "display": "The announcement came during first period.",
               "source": {
-                "line": 79,
+                "line": 85,
                 "column": 1,
-                "endLine": 79,
+                "endLine": 85,
                 "endColumn": 43
               }
             },
@@ -355,9 +361,9 @@
               "text": "Good morning, Westfield Wildcats!",
               "display": "Good morning, Westfield Wildcats!",
               "source": {
-                "line": 81,
+                "line": 87,
                 "column": 1,
-                "endLine": 81,
+                "endLine": 87,
                 "endColumn": 78
               }
             },
@@ -370,9 +376,9 @@
               "text": "The voice belonged to Harper Blake, eighth grader, student council president, and a person so popular that people actually moved out of her way in the hallway.",
               "display": "The voice belonged to Harper Blake, eighth grader, student council president,\nand a person so popular that people actually moved out of her way in the\nhallway.",
               "source": {
-                "line": 83,
+                "line": 89,
                 "column": 1,
-                "endLine": 85,
+                "endLine": 91,
                 "endColumn": 9
               }
             },
@@ -385,9 +391,9 @@
               "text": "As you know, today is our annual Friday Showcase! And this year, we'll be choosing a brand-new host for Wildcat Weekly!",
               "display": "As you know, today is our annual Friday\nShowcase! And this year, we'll be choosing a brand-new host for Wildcat Weekly!",
               "source": {
-                "line": 87,
+                "line": 93,
                 "column": 1,
-                "endLine": 88,
+                "endLine": 94,
                 "endColumn": 80
               }
             },
@@ -400,9 +406,9 @@
               "text": "I sat straight up.",
               "display": "I sat straight up.",
               "source": {
-                "line": 90,
+                "line": 96,
                 "column": 1,
-                "endLine": 90,
+                "endLine": 96,
                 "endColumn": 19
               }
             },
@@ -415,9 +421,9 @@
               "text": "Wildcat Weekly was our school's Friday video announcement show. Whoever hosted it got to interview students, make jokes, and appear on every television in the building.",
               "display": "Wildcat Weekly was our school's Friday video announcement show. Whoever hosted\nit got to interview students, make jokes, and appear on every television in the\nbuilding.",
               "source": {
-                "line": 92,
+                "line": 98,
                 "column": 1,
-                "endLine": 94,
+                "endLine": 100,
                 "endColumn": 10
               }
             },
@@ -430,9 +436,9 @@
               "text": "I'd been dreaming about that job since sixth grade.",
               "display": "I'd been dreaming about that job since sixth grade.",
               "source": {
-                "line": 96,
+                "line": 102,
                 "column": 1,
-                "endLine": 96,
+                "endLine": 102,
                 "endColumn": 52
               }
             },
@@ -445,9 +451,9 @@
               "text": "Mostly because, in sixth grade, I'd accidentally dumped an entire carton of orange juice down my pants at lunch.",
               "display": "Mostly because, in sixth grade, I'd accidentally dumped an entire carton of\norange juice down my pants at lunch.",
               "source": {
-                "line": 98,
+                "line": 104,
                 "column": 1,
-                "endLine": 99,
+                "endLine": 105,
                 "endColumn": 37
               }
             },
@@ -460,9 +466,9 @@
               "text": "People had called me Juice Boy for seven months.",
               "display": "People had called me Juice Boy for seven months.",
               "source": {
-                "line": 101,
+                "line": 107,
                 "column": 1,
-                "endLine": 101,
+                "endLine": 107,
                 "endColumn": 49
               }
             },
@@ -475,9 +481,9 @@
               "text": "I needed a rebrand.",
               "display": "I needed a rebrand.",
               "source": {
-                "line": 103,
+                "line": 109,
                 "column": 1,
-                "endLine": 103,
+                "endLine": 109,
                 "endColumn": 20
               }
             },
@@ -490,9 +496,9 @@
               "text": "Finalists, remember to submit your audition reels by lunch. We'll announce the winner at this afternoon's assembly!",
               "display": "Finalists, remember to submit your audition\nreels by lunch. We'll announce the winner at this afternoon's assembly!",
               "source": {
-                "line": 105,
+                "line": 111,
                 "column": 1,
-                "endLine": 106,
+                "endLine": 112,
                 "endColumn": 72
               }
             },
@@ -505,9 +511,9 @@
               "text": "I turned to June. She smiled.",
               "display": "I turned to June. She smiled.",
               "source": {
-                "line": 108,
+                "line": 114,
                 "column": 1,
-                "endLine": 108,
+                "endLine": 114,
                 "endColumn": 30
               }
             },
@@ -520,9 +526,9 @@
               "text": "You're going to win.",
               "display": "You're going to win.",
               "source": {
-                "line": 110,
+                "line": 116,
                 "column": 1,
-                "endLine": 110,
+                "endLine": 116,
                 "endColumn": 31
               }
             },
@@ -535,9 +541,9 @@
               "text": "You think?",
               "display": "You think?",
               "source": {
-                "line": 112,
+                "line": 118,
                 "column": 1,
-                "endLine": 112,
+                "endLine": 118,
                 "endColumn": 21
               }
             },
@@ -550,9 +556,9 @@
               "text": "Absolutely. You're the funniest person I know.",
               "display": "Absolutely. You're the funniest person I know.",
               "source": {
-                "line": 114,
+                "line": 120,
                 "column": 1,
-                "endLine": 114,
+                "endLine": 120,
                 "endColumn": 57
               }
             },
@@ -565,9 +571,9 @@
               "text": "Thank you.",
               "display": "Thank you.",
               "source": {
-                "line": 116,
+                "line": 122,
                 "column": 1,
-                "endLine": 116,
+                "endLine": 122,
                 "endColumn": 21
               }
             },
@@ -580,9 +586,9 @@
               "text": "Which is honestly pretty concerning.",
               "display": "Which is honestly pretty concerning.",
               "source": {
-                "line": 118,
+                "line": 124,
                 "column": 1,
-                "endLine": 118,
+                "endLine": 124,
                 "endColumn": 59
               }
             },
@@ -595,9 +601,9 @@
               "text": "I grinned. Then my phone buzzed. A message from Harper.",
               "display": "I grinned. Then my phone buzzed. A message from Harper.",
               "source": {
-                "line": 120,
+                "line": 126,
                 "column": 1,
-                "endLine": 120,
+                "endLine": 126,
                 "endColumn": 56
               }
             },
@@ -610,9 +616,9 @@
               "text": "Hey! Saw your audition. Really funny.",
               "display": "Hey! Saw your audition. Really funny.",
               "source": {
-                "line": 122,
+                "line": 128,
                 "column": 1,
-                "endLine": 122,
+                "endLine": 128,
                 "endColumn": 77
               }
             },
@@ -625,9 +631,9 @@
               "text": "My stomach did a backflip.",
               "display": "My stomach did a backflip.",
               "source": {
-                "line": 124,
+                "line": 130,
                 "column": 1,
-                "endLine": 124,
+                "endLine": 130,
                 "endColumn": 27
               }
             },
@@ -640,9 +646,9 @@
               "text": "Thanks!!",
               "display": "Thanks!!",
               "source": {
-                "line": 126,
+                "line": 132,
                 "column": 1,
-                "endLine": 126,
+                "endLine": 132,
                 "endColumn": 32
               }
             },
@@ -655,9 +661,9 @@
               "text": "Three dots appeared.",
               "display": "Three dots appeared.",
               "source": {
-                "line": 128,
+                "line": 134,
                 "column": 1,
-                "endLine": 128,
+                "endLine": 134,
                 "endColumn": 21
               }
             },
@@ -670,9 +676,9 @@
               "text": "One thing. We're adding a comedy montage to the assembly. Got any funny clips? Something that would really get people laughing?",
               "display": "One thing. We're adding a comedy montage to the\nassembly. Got any funny clips? Something that would really get people laughing?",
               "source": {
-                "line": 130,
+                "line": 136,
                 "column": 1,
-                "endLine": 131,
+                "endLine": 137,
                 "endColumn": 80
               }
             },
@@ -685,9 +691,9 @@
               "text": "I thought about it. I had plenty of funny videos. Mostly of myself falling off things.",
               "display": "I thought about it. I had plenty of funny videos. Mostly of myself falling off\nthings.",
               "source": {
-                "line": 133,
+                "line": 139,
                 "column": 1,
-                "endLine": 134,
+                "endLine": 140,
                 "endColumn": 8
               }
             },
@@ -700,9 +706,9 @@
               "text": "But there was one video. One spectacularly funny video.",
               "display": "But there was one video. One spectacularly funny video.",
               "source": {
-                "line": 136,
+                "line": 142,
                 "column": 1,
-                "endLine": 136,
+                "endLine": 142,
                 "endColumn": 56
               }
             },
@@ -715,9 +721,9 @@
               "text": "And it wasn't mine.",
               "display": "And it wasn't mine.",
               "source": {
-                "line": 138,
+                "line": 144,
                 "column": 1,
-                "endLine": 138,
+                "endLine": 144,
                 "endColumn": 20
               }
             }
@@ -738,9 +744,9 @@
               "text": "Two weeks earlier, June had sent me a recording.",
               "display": "Two weeks earlier, June had sent me a recording.",
               "source": {
-                "line": 146,
+                "line": 152,
                 "column": 1,
-                "endLine": 146,
+                "endLine": 152,
                 "endColumn": 49
               }
             },
@@ -753,9 +759,9 @@
               "text": "She'd been secretly practicing for the spring talent show. A dance routine. To a song she'd written herself.",
               "display": "She'd been secretly practicing for the spring talent show. A dance routine. To\na song she'd written herself.",
               "source": {
-                "line": 148,
+                "line": 154,
                 "column": 1,
-                "endLine": 149,
+                "endLine": 155,
                 "endColumn": 30
               }
             },
@@ -768,9 +774,9 @@
               "text": "And let me tell you something about June Park. She was an incredible dancer.",
               "display": "And let me tell you something about June Park. She was an incredible dancer.",
               "source": {
-                "line": 151,
+                "line": 157,
                 "column": 1,
-                "endLine": 151,
+                "endLine": 157,
                 "endColumn": 77
               }
             },
@@ -783,9 +789,9 @@
               "text": "But when she got nervous, something happened to her arms that could only be described as inflatable car dealership man.",
               "display": "But when she got nervous, something happened to her arms that could only be\ndescribed as inflatable car dealership man.",
               "source": {
-                "line": 153,
+                "line": 159,
                 "column": 1,
-                "endLine": 154,
+                "endLine": 160,
                 "endColumn": 44
               }
             },
@@ -798,9 +804,9 @@
               "text": "The video began with June wearing purple sunglasses in her bedroom.",
               "display": "The video began with June wearing purple sunglasses in her bedroom.",
               "source": {
-                "line": 156,
+                "line": 162,
                 "column": 1,
-                "endLine": 156,
+                "endLine": 162,
                 "endColumn": 68
               }
             },
@@ -813,9 +819,9 @@
               "text": "Okay. This is take seventeen. If this is bad, I'm joining the chess club.",
               "display": "Okay. This is take\nseventeen. If this is bad, I'm joining the chess club.",
               "source": {
-                "line": 158,
+                "line": 164,
                 "column": 1,
-                "endLine": 159,
+                "endLine": 165,
                 "endColumn": 55
               }
             },
@@ -828,9 +834,9 @@
               "text": "Then the music started.",
               "display": "Then the music started.",
               "source": {
-                "line": 161,
+                "line": 167,
                 "column": 1,
-                "endLine": 161,
+                "endLine": 167,
                 "endColumn": 24
               }
             },
@@ -843,9 +849,9 @@
               "text": "She spun. She slid. She attempted a move that looked like a malfunctioning helicopter.",
               "display": "She spun. She slid. She attempted a move that looked like a malfunctioning\nhelicopter.",
               "source": {
-                "line": 163,
+                "line": 169,
                 "column": 1,
-                "endLine": 164,
+                "endLine": 170,
                 "endColumn": 12
               }
             },
@@ -858,9 +864,9 @@
               "text": "And then... crash. She disappeared behind her bed.",
               "display": "And then... crash. She disappeared behind her bed.",
               "source": {
-                "line": 166,
+                "line": 172,
                 "column": 1,
-                "endLine": 166,
+                "endLine": 172,
                 "endColumn": 51
               }
             },
@@ -869,9 +875,9 @@
               "id": "00/02/0010-pause",
               "durationMs": 1500,
               "source": {
-                "line": 168,
+                "line": 174,
                 "column": 1,
-                "endLine": 170,
+                "endLine": 176,
                 "endColumn": 4
               }
             },
@@ -884,9 +890,9 @@
               "text": "For three seconds, nothing happened.",
               "display": "For three seconds, nothing happened.",
               "source": {
-                "line": 172,
+                "line": 178,
                 "column": 1,
-                "endLine": 172,
+                "endLine": 178,
                 "endColumn": 37
               }
             },
@@ -899,9 +905,9 @@
               "text": "Then one hand emerged from the floor and gave a thumbs-up.",
               "display": "Then one hand emerged from the floor and gave a thumbs-up.",
               "source": {
-                "line": 174,
+                "line": 180,
                 "column": 1,
-                "endLine": 174,
+                "endLine": 180,
                 "endColumn": 59
               }
             },
@@ -914,9 +920,9 @@
               "text": "I'd laughed so hard I couldn't breathe.",
               "display": "I'd laughed so hard I couldn't breathe.",
               "source": {
-                "line": 176,
+                "line": 182,
                 "column": 1,
-                "endLine": 176,
+                "endLine": 182,
                 "endColumn": 40
               }
             },
@@ -929,9 +935,9 @@
               "text": "But June had made me promise something.",
               "display": "But June had made me promise something.",
               "source": {
-                "line": 178,
+                "line": 184,
                 "column": 1,
-                "endLine": 178,
+                "endLine": 184,
                 "endColumn": 40
               }
             },
@@ -944,9 +950,9 @@
               "text": "Nobody sees this, Milo. Seriously. I'm already terrified of performing in front of people.",
               "display": "Nobody sees this, Milo. Seriously. I'm\nalready terrified of performing in front of people.",
               "source": {
-                "line": 180,
+                "line": 186,
                 "column": 1,
-                "endLine": 181,
+                "endLine": 187,
                 "endColumn": 52
               }
             },
@@ -959,9 +965,9 @@
               "text": "Cross my heart.",
               "display": "Cross my heart.",
               "source": {
-                "line": 183,
+                "line": 189,
                 "column": 1,
-                "endLine": 183,
+                "endLine": 189,
                 "endColumn": 26
               }
             },
@@ -974,9 +980,9 @@
               "text": "And don't send it to anyone.",
               "display": "And don't send it to anyone.",
               "source": {
-                "line": 185,
+                "line": 191,
                 "column": 1,
-                "endLine": 185,
+                "endLine": 191,
                 "endColumn": 39
               }
             },
@@ -989,9 +995,9 @@
               "text": "I won't.",
               "display": "I won't.",
               "source": {
-                "line": 187,
+                "line": 193,
                 "column": 1,
-                "endLine": 187,
+                "endLine": 193,
                 "endColumn": 19
               }
             },
@@ -1004,9 +1010,9 @@
               "text": "She'd studied my face.",
               "display": "She'd studied my face.",
               "source": {
-                "line": 189,
+                "line": 195,
                 "column": 1,
-                "endLine": 189,
+                "endLine": 195,
                 "endColumn": 23
               }
             },
@@ -1019,9 +1025,9 @@
               "text": "Promise?",
               "display": "Promise?",
               "source": {
-                "line": 191,
+                "line": 197,
                 "column": 1,
-                "endLine": 191,
+                "endLine": 197,
                 "endColumn": 31
               }
             },
@@ -1034,9 +1040,9 @@
               "text": "Promise.",
               "display": "Promise.",
               "source": {
-                "line": 193,
+                "line": 199,
                 "column": 1,
-                "endLine": 193,
+                "endLine": 199,
                 "endColumn": 31
               }
             },
@@ -1045,9 +1051,9 @@
               "id": "00/02/0022-pause",
               "durationMs": 1000,
               "source": {
-                "line": 195,
+                "line": 201,
                 "column": 1,
-                "endLine": 197,
+                "endLine": 203,
                 "endColumn": 4
               }
             },
@@ -1060,9 +1066,9 @@
               "text": "Standing in the hallway now, I opened our messages.",
               "display": "Standing in the hallway now, I opened our messages.",
               "source": {
-                "line": 199,
+                "line": 205,
                 "column": 1,
-                "endLine": 199,
+                "endLine": 205,
                 "endColumn": 52
               }
             },
@@ -1075,9 +1081,9 @@
               "text": "The thumbnail stared back at me. Purple sunglasses. Helicopter arms. The funniest twenty-three seconds ever recorded.",
               "display": "The thumbnail stared back at me. Purple sunglasses. Helicopter arms. The\nfunniest twenty-three seconds ever recorded.",
               "source": {
-                "line": 201,
+                "line": 207,
                 "column": 1,
-                "endLine": 202,
+                "endLine": 208,
                 "endColumn": 45
               }
             },
@@ -1090,9 +1096,9 @@
               "text": "I could practically hear the assembly laughing. I could picture Harper congratulating me. I could picture everyone finally forgetting Juice Boy.",
               "display": "I could practically hear the assembly laughing. I could picture Harper\ncongratulating me. I could picture everyone finally forgetting Juice Boy.",
               "source": {
-                "line": 204,
+                "line": 210,
                 "column": 1,
-                "endLine": 205,
+                "endLine": 211,
                 "endColumn": 74
               }
             },
@@ -1105,9 +1111,9 @@
               "text": "My thumb hovered over the video.",
               "display": "My thumb hovered over the video.",
               "source": {
-                "line": 207,
+                "line": 213,
                 "column": 1,
-                "endLine": 207,
+                "endLine": 213,
                 "endColumn": 33
               }
             },
@@ -1116,9 +1122,9 @@
               "id": "00/02/0027-pause",
               "durationMs": 1000,
               "source": {
-                "line": 209,
+                "line": 215,
                 "column": 1,
-                "endLine": 211,
+                "endLine": 217,
                 "endColumn": 4
               }
             },
@@ -1131,9 +1137,9 @@
               "text": "Then I forwarded it.",
               "display": "Then I forwarded it.",
               "source": {
-                "line": 213,
+                "line": 219,
                 "column": 1,
-                "endLine": 213,
+                "endLine": 219,
                 "endColumn": 21
               }
             },
@@ -1146,9 +1152,9 @@
               "text": "This one's pretty funny.",
               "display": "This one's pretty funny.",
               "source": {
-                "line": 215,
+                "line": 221,
                 "column": 1,
-                "endLine": 215,
+                "endLine": 221,
                 "endColumn": 70
               }
             },
@@ -1161,9 +1167,9 @@
               "text": "Harper responded almost immediately.",
               "display": "Harper responded almost immediately.",
               "source": {
-                "line": 217,
+                "line": 223,
                 "column": 1,
-                "endLine": 217,
+                "endLine": 223,
                 "endColumn": 37
               }
             },
@@ -1176,9 +1182,9 @@
               "text": "Oh. My. God. Milo. This is gold.",
               "display": "Oh. My. God. Milo. This is gold.",
               "source": {
-                "line": 219,
+                "line": 225,
                 "column": 1,
-                "endLine": 219,
+                "endLine": 225,
                 "endColumn": 74
               }
             },
@@ -1191,9 +1197,9 @@
               "text": "I smiled.",
               "display": "I smiled.",
               "source": {
-                "line": 221,
+                "line": 227,
                 "column": 1,
-                "endLine": 221,
+                "endLine": 227,
                 "endColumn": 10
               }
             },
@@ -1206,9 +1212,9 @@
               "text": "Then my stomach tightened. Just a little.",
               "display": "Then my stomach tightened. Just a little.",
               "source": {
-                "line": 223,
+                "line": 229,
                 "column": 1,
-                "endLine": 223,
+                "endLine": 229,
                 "endColumn": 42
               }
             }
@@ -1229,9 +1235,9 @@
               "text": "By lunch, things were going better than I'd imagined.",
               "display": "By lunch, things were going better than I'd imagined.",
               "source": {
-                "line": 231,
+                "line": 237,
                 "column": 1,
-                "endLine": 231,
+                "endLine": 237,
                 "endColumn": 54
               }
             },
@@ -1244,9 +1250,9 @@
               "text": "Harper approached our table.",
               "display": "Harper approached our table.",
               "source": {
-                "line": 233,
+                "line": 239,
                 "column": 1,
-                "endLine": 233,
+                "endLine": 239,
                 "endColumn": 29
               }
             },
@@ -1259,9 +1265,9 @@
               "text": "Milo! Dude!",
               "display": "Milo! Dude!",
               "source": {
-                "line": 235,
+                "line": 241,
                 "column": 1,
-                "endLine": 235,
+                "endLine": 241,
                 "endColumn": 38
               }
             },
@@ -1274,9 +1280,9 @@
               "text": "She gave me a high five. An actual high five. From Harper Blake. At our lunch table.",
               "display": "She gave me a high five. An actual high five. From Harper Blake. At our lunch\ntable.",
               "source": {
-                "line": 237,
+                "line": 243,
                 "column": 1,
-                "endLine": 238,
+                "endLine": 244,
                 "endColumn": 7
               }
             },
@@ -1289,9 +1295,9 @@
               "text": "Across from me, June nearly choked on a french fry.",
               "display": "Across from me, June nearly choked on a french fry.",
               "source": {
-                "line": 240,
+                "line": 246,
                 "column": 1,
-                "endLine": 240,
+                "endLine": 246,
                 "endColumn": 52
               }
             },
@@ -1304,9 +1310,9 @@
               "text": "You're definitely one of my favorites. That clip? Hilarious. We're using it in the assembly.",
               "display": "You're definitely one of my favorites. That clip? Hilarious. We're\nusing it in the assembly.",
               "source": {
-                "line": 242,
+                "line": 248,
                 "column": 1,
-                "endLine": 243,
+                "endLine": 249,
                 "endColumn": 26
               }
             },
@@ -1319,9 +1325,9 @@
               "text": "My smile froze.",
               "display": "My smile froze.",
               "source": {
-                "line": 245,
+                "line": 251,
                 "column": 1,
-                "endLine": 245,
+                "endLine": 251,
                 "endColumn": 16
               }
             },
@@ -1334,9 +1340,9 @@
               "text": "Wait. Using it?",
               "display": "Wait. Using it?",
               "source": {
-                "line": 247,
+                "line": 253,
                 "column": 1,
-                "endLine": 247,
+                "endLine": 253,
                 "endColumn": 37
               }
             },
@@ -1349,9 +1355,9 @@
               "text": "Yeah! Right before we announce the new host. It's going to kill.",
               "display": "Yeah! Right before we announce the new\nhost. It's going to kill.",
               "source": {
-                "line": 249,
+                "line": 255,
                 "column": 1,
-                "endLine": 250,
+                "endLine": 256,
                 "endColumn": 26
               }
             },
@@ -1364,9 +1370,9 @@
               "text": "She walked away. June looked at me.",
               "display": "She walked away. June looked at me.",
               "source": {
-                "line": 252,
+                "line": 258,
                 "column": 1,
-                "endLine": 252,
+                "endLine": 258,
                 "endColumn": 36
               }
             },
@@ -1379,9 +1385,9 @@
               "text": "What clip?",
               "display": "What clip?",
               "source": {
-                "line": 254,
+                "line": 260,
                 "column": 1,
-                "endLine": 254,
+                "endLine": 260,
                 "endColumn": 21
               }
             },
@@ -1394,9 +1400,9 @@
               "text": "I stared at my tray.",
               "display": "I stared at my tray.",
               "source": {
-                "line": 256,
+                "line": 262,
                 "column": 1,
-                "endLine": 256,
+                "endLine": 262,
                 "endColumn": 21
               }
             },
@@ -1409,9 +1415,9 @@
               "text": "Milo?",
               "display": "Milo?",
               "source": {
-                "line": 258,
+                "line": 264,
                 "column": 1,
-                "endLine": 258,
+                "endLine": 264,
                 "endColumn": 28
               }
             },
@@ -1424,9 +1430,9 @@
               "text": "I tried to laugh. It sounded like a lawn mower failing to start.",
               "display": "I tried to laugh. It sounded like a lawn mower failing to start.",
               "source": {
-                "line": 260,
+                "line": 266,
                 "column": 1,
-                "endLine": 260,
+                "endLine": 266,
                 "endColumn": 65
               }
             },
@@ -1439,9 +1445,9 @@
               "text": "Okay. Funny story.",
               "display": "Okay. Funny story.",
               "source": {
-                "line": 262,
+                "line": 268,
                 "column": 1,
-                "endLine": 262,
+                "endLine": 268,
                 "endColumn": 47
               }
             },
@@ -1454,9 +1460,9 @@
               "text": "June didn't smile.",
               "display": "June didn't smile.",
               "source": {
-                "line": 264,
+                "line": 270,
                 "column": 1,
-                "endLine": 264,
+                "endLine": 270,
                 "endColumn": 19
               }
             },
@@ -1469,9 +1475,9 @@
               "text": "What. Clip.",
               "display": "What. Clip.",
               "source": {
-                "line": 266,
+                "line": 272,
                 "column": 1,
-                "endLine": 266,
+                "endLine": 272,
                 "endColumn": 45
               }
             },
@@ -1484,9 +1490,9 @@
               "text": "I swallowed.",
               "display": "I swallowed.",
               "source": {
-                "line": 268,
+                "line": 274,
                 "column": 1,
-                "endLine": 268,
+                "endLine": 274,
                 "endColumn": 13
               }
             },
@@ -1499,9 +1505,9 @@
               "text": "The dancing one.",
               "display": "The dancing one.",
               "source": {
-                "line": 270,
+                "line": 276,
                 "column": 1,
-                "endLine": 270,
+                "endLine": 276,
                 "endColumn": 37
               }
             },
@@ -1514,9 +1520,9 @@
               "text": "She blinked. For one second, I thought she'd laugh.",
               "display": "She blinked. For one second, I thought she'd laugh.",
               "source": {
-                "line": 272,
+                "line": 278,
                 "column": 1,
-                "endLine": 272,
+                "endLine": 278,
                 "endColumn": 52
               }
             },
@@ -1529,9 +1535,9 @@
               "text": "Instead, her face changed. Not angry. Worse. Hurt.",
               "display": "Instead, her face changed. Not angry. Worse. Hurt.",
               "source": {
-                "line": 274,
+                "line": 280,
                 "column": 1,
-                "endLine": 274,
+                "endLine": 280,
                 "endColumn": 51
               }
             },
@@ -1544,9 +1550,9 @@
               "text": "You sent my video?",
               "display": "You sent my video?",
               "source": {
-                "line": 276,
+                "line": 282,
                 "column": 1,
-                "endLine": 276,
+                "endLine": 282,
                 "endColumn": 47
               }
             },
@@ -1559,9 +1565,9 @@
               "text": "It was just to Harper.",
               "display": "It was just to Harper.",
               "source": {
-                "line": 278,
+                "line": 284,
                 "column": 1,
-                "endLine": 278,
+                "endLine": 284,
                 "endColumn": 33
               }
             },
@@ -1574,9 +1580,9 @@
               "text": "You promised.",
               "display": "You promised.",
               "source": {
-                "line": 280,
+                "line": 286,
                 "column": 1,
-                "endLine": 280,
+                "endLine": 286,
                 "endColumn": 24
               }
             },
@@ -1589,9 +1595,9 @@
               "text": "I know, but—",
               "display": "I know, but—",
               "source": {
-                "line": 282,
+                "line": 288,
                 "column": 1,
-                "endLine": 282,
+                "endLine": 288,
                 "endColumn": 23
               }
             },
@@ -1604,9 +1610,9 @@
               "text": "You promised, Milo.",
               "display": "You promised, Milo.",
               "source": {
-                "line": 284,
+                "line": 290,
                 "column": 1,
-                "endLine": 284,
+                "endLine": 290,
                 "endColumn": 56
               }
             },
@@ -1619,9 +1625,9 @@
               "text": "Around us, the cafeteria continued its usual chaos. Someone launched a grape across the room.",
               "display": "Around us, the cafeteria continued its usual chaos. Someone launched a grape\nacross the room.",
               "source": {
-                "line": 286,
+                "line": 292,
                 "column": 1,
-                "endLine": 287,
+                "endLine": 293,
                 "endColumn": 17
               }
             },
@@ -1634,9 +1640,9 @@
               "text": "Ketchup is TOO a vegetable!",
               "display": "Ketchup is TOO a vegetable!",
               "source": {
-                "line": 293,
+                "line": 299,
                 "column": 1,
-                "endLine": 293,
+                "endLine": 299,
                 "endColumn": 86
               }
             },
@@ -1649,9 +1655,9 @@
               "text": "But at our table, everything had gone quiet.",
               "display": "But at our table, everything had gone quiet.",
               "source": {
-                "line": 295,
+                "line": 301,
                 "column": 1,
-                "endLine": 295,
+                "endLine": 301,
                 "endColumn": 45
               }
             },
@@ -1664,9 +1670,9 @@
               "text": "I thought it might help me win.",
               "display": "I thought it might help me win.",
               "source": {
-                "line": 297,
+                "line": 303,
                 "column": 1,
-                "endLine": 297,
+                "endLine": 303,
                 "endColumn": 54
               }
             },
@@ -1679,9 +1685,9 @@
               "text": "June stared at me. Then she picked up her tray.",
               "display": "June stared at me. Then she picked up her tray.",
               "source": {
-                "line": 299,
+                "line": 305,
                 "column": 1,
-                "endLine": 299,
+                "endLine": 305,
                 "endColumn": 48
               }
             },
@@ -1694,9 +1700,9 @@
               "text": "June, come on.",
               "display": "June, come on.",
               "source": {
-                "line": 301,
+                "line": 307,
                 "column": 1,
-                "endLine": 301,
+                "endLine": 307,
                 "endColumn": 38
               }
             },
@@ -1709,9 +1715,9 @@
               "text": "She stopped.",
               "display": "She stopped.",
               "source": {
-                "line": 303,
+                "line": 309,
                 "column": 1,
-                "endLine": 303,
+                "endLine": 309,
                 "endColumn": 13
               }
             },
@@ -1724,9 +1730,9 @@
               "text": "You know why I sent you that video?",
               "display": "You know why I sent you that video?",
               "source": {
-                "line": 305,
+                "line": 311,
                 "column": 1,
-                "endLine": 305,
+                "endLine": 311,
                 "endColumn": 56
               }
             },
@@ -1739,9 +1745,9 @@
               "text": "To see if the dance was good.",
               "display": "To see if the dance was good.",
               "source": {
-                "line": 307,
+                "line": 313,
                 "column": 1,
-                "endLine": 307,
+                "endLine": 313,
                 "endColumn": 40
               }
             },
@@ -1754,9 +1760,9 @@
               "text": "No.",
               "display": "No.",
               "source": {
-                "line": 309,
+                "line": 315,
                 "column": 1,
-                "endLine": 309,
+                "endLine": 315,
                 "endColumn": 14
               }
             },
@@ -1769,9 +1775,9 @@
               "text": "Her voice shook.",
               "display": "Her voice shook.",
               "source": {
-                "line": 311,
+                "line": 317,
                 "column": 1,
-                "endLine": 311,
+                "endLine": 317,
                 "endColumn": 17
               }
             },
@@ -1784,9 +1790,9 @@
               "text": "Because I was scared. And you always make scary things feel less scary.",
               "display": "Because I was scared. And you always make scary\nthings feel less scary.",
               "source": {
-                "line": 313,
+                "line": 319,
                 "column": 1,
-                "endLine": 314,
+                "endLine": 320,
                 "endColumn": 24
               }
             },
@@ -1799,9 +1805,9 @@
               "text": "She looked down.",
               "display": "She looked down.",
               "source": {
-                "line": 316,
+                "line": 322,
                 "column": 1,
-                "endLine": 316,
+                "endLine": 322,
                 "endColumn": 17
               }
             },
@@ -1814,9 +1820,9 @@
               "text": "I guess that was stupid.",
               "display": "I guess that was stupid.",
               "source": {
-                "line": 318,
+                "line": 324,
                 "column": 1,
-                "endLine": 318,
+                "endLine": 324,
                 "endColumn": 66
               }
             },
@@ -1829,9 +1835,9 @@
               "text": "She walked away.",
               "display": "She walked away.",
               "source": {
-                "line": 320,
+                "line": 326,
                 "column": 1,
-                "endLine": 320,
+                "endLine": 326,
                 "endColumn": 17
               }
             },
@@ -1840,9 +1846,9 @@
               "id": "00/03/0042-pause",
               "durationMs": 1500,
               "source": {
-                "line": 322,
+                "line": 328,
                 "column": 1,
-                "endLine": 324,
+                "endLine": 330,
                 "endColumn": 4
               }
             },
@@ -1855,9 +1861,9 @@
               "text": "I sat there holding a french fry.",
               "display": "I sat there holding a french fry.",
               "source": {
-                "line": 326,
+                "line": 332,
                 "column": 1,
-                "endLine": 326,
+                "endLine": 332,
                 "endColumn": 34
               }
             },
@@ -1870,9 +1876,9 @@
               "text": "It was probably the worst french fry of my entire life.",
               "display": "It was probably the worst french fry of my entire life.",
               "source": {
-                "line": 328,
+                "line": 334,
                 "column": 1,
-                "endLine": 328,
+                "endLine": 334,
                 "endColumn": 56
               }
             }
@@ -1893,9 +1899,9 @@
               "text": "At 1:45, I had forty-five minutes to save my friendship.",
               "display": "At 1:45, I had forty-five minutes to save my friendship.",
               "source": {
-                "line": 336,
+                "line": 342,
                 "column": 1,
-                "endLine": 336,
+                "endLine": 342,
                 "endColumn": 57
               }
             },
@@ -1908,9 +1914,9 @@
               "text": "Unfortunately, I had absolutely no idea how.",
               "display": "Unfortunately, I had absolutely no idea how.",
               "source": {
-                "line": 338,
+                "line": 344,
                 "column": 1,
-                "endLine": 338,
+                "endLine": 344,
                 "endColumn": 45
               }
             },
@@ -1923,9 +1929,9 @@
               "text": "I found Harper backstage in the auditorium, checking her notes.",
               "display": "I found Harper backstage in the auditorium, checking her notes.",
               "source": {
-                "line": 340,
+                "line": 346,
                 "column": 1,
-                "endLine": 340,
+                "endLine": 346,
                 "endColumn": 64
               }
             },
@@ -1938,9 +1944,9 @@
               "text": "Harper. Hey. Quick question.",
               "display": "Harper. Hey. Quick question.",
               "source": {
-                "line": 342,
+                "line": 348,
                 "column": 1,
-                "endLine": 342,
+                "endLine": 348,
                 "endColumn": 51
               }
             },
@@ -1953,9 +1959,9 @@
               "text": "What's up, future TV star?",
               "display": "What's up, future TV star?",
               "source": {
-                "line": 344,
+                "line": 350,
                 "column": 1,
-                "endLine": 344,
+                "endLine": 350,
                 "endColumn": 52
               }
             },
@@ -1968,9 +1974,9 @@
               "text": "About that video.",
               "display": "About that video.",
               "source": {
-                "line": 346,
+                "line": 352,
                 "column": 1,
-                "endLine": 346,
+                "endLine": 352,
                 "endColumn": 28
               }
             },
@@ -1983,9 +1989,9 @@
               "text": "So funny, right?",
               "display": "So funny, right?",
               "source": {
-                "line": 348,
+                "line": 354,
                 "column": 1,
-                "endLine": 348,
+                "endLine": 354,
                 "endColumn": 29
               }
             },
@@ -1998,9 +2004,9 @@
               "text": "Yeah, but the thing is—",
               "display": "Yeah, but the thing is—",
               "source": {
-                "line": 350,
+                "line": 356,
                 "column": 1,
-                "endLine": 350,
+                "endLine": 356,
                 "endColumn": 34
               }
             },
@@ -2013,9 +2019,9 @@
               "text": "My throat went dry. I imagined telling her the truth.",
               "display": "My throat went dry. I imagined telling her the truth.",
               "source": {
-                "line": 352,
+                "line": 358,
                 "column": 1,
-                "endLine": 352,
+                "endLine": 358,
                 "endColumn": 54
               }
             },
@@ -2028,9 +2034,9 @@
               "text": "Hey, Harper. That video I sent you? I wasn't supposed to. My best friend trusted me, and I used it to get your attention.",
               "display": "Hey, Harper. That video I sent you? I wasn't supposed to. My best friend\ntrusted me, and I used it to get your attention.",
               "source": {
-                "line": 354,
+                "line": 360,
                 "column": 1,
-                "endLine": 355,
+                "endLine": 361,
                 "endColumn": 49
               }
             },
@@ -2043,9 +2049,9 @@
               "text": "Then I imagined her face. Her disappointment. The hosting job disappearing.",
               "display": "Then I imagined her face. Her disappointment. The hosting job disappearing.",
               "source": {
-                "line": 357,
+                "line": 363,
                 "column": 1,
-                "endLine": 357,
+                "endLine": 363,
                 "endColumn": 76
               }
             },
@@ -2058,9 +2064,9 @@
               "text": "You know what? Never mind.",
               "display": "You know what? Never mind.",
               "source": {
-                "line": 359,
+                "line": 365,
                 "column": 1,
-                "endLine": 359,
+                "endLine": 365,
                 "endColumn": 54
               }
             },
@@ -2073,9 +2079,9 @@
               "text": "Actually, could you help check the montage? The tech club loaded everything already.",
               "display": "Actually, could you help check the montage? The tech club loaded\neverything already.",
               "source": {
-                "line": 361,
+                "line": 367,
                 "column": 1,
-                "endLine": 362,
+                "endLine": 368,
                 "endColumn": 20
               }
             },
@@ -2088,9 +2094,9 @@
               "text": "I glanced at the screen. There it was. A folder labeled Friday Showcase Final. Inside was a file called June Dance Final.",
               "display": "I glanced at the screen. There it was. A folder labeled Friday Showcase Final.\nInside was a file called June Dance Final.",
               "source": {
-                "line": 364,
+                "line": 370,
                 "column": 1,
-                "endLine": 365,
+                "endLine": 371,
                 "endColumn": 43
               }
             },
@@ -2103,9 +2109,9 @@
               "text": "My heart sank.",
               "display": "My heart sank.",
               "source": {
-                "line": 367,
+                "line": 373,
                 "column": 1,
-                "endLine": 367,
+                "endLine": 373,
                 "endColumn": 15
               }
             },
@@ -2118,9 +2124,9 @@
               "text": "I had two choices. Tell Harper the truth. Or somehow delete the video.",
               "display": "I had two choices. Tell Harper the truth. Or somehow delete the video.",
               "source": {
-                "line": 369,
+                "line": 375,
                 "column": 1,
-                "endLine": 369,
+                "endLine": 375,
                 "endColumn": 71
               }
             },
@@ -2133,9 +2139,9 @@
               "text": "I looked around. Nobody was watching.",
               "display": "I looked around. Nobody was watching.",
               "source": {
-                "line": 371,
+                "line": 377,
                 "column": 1,
-                "endLine": 371,
+                "endLine": 377,
                 "endColumn": 38
               }
             },
@@ -2148,9 +2154,9 @@
               "text": "I walked to the laptop. Clicked the file. Dragged it toward the trash. And...",
               "display": "I walked to the laptop. Clicked the file. Dragged it toward the trash. And...",
               "source": {
-                "line": 373,
+                "line": 379,
                 "column": 1,
-                "endLine": 373,
+                "endLine": 379,
                 "endColumn": 78
               }
             },
@@ -2163,9 +2169,9 @@
               "text": "What are you doing?",
               "display": "What are you doing?",
               "source": {
-                "line": 375,
+                "line": 381,
                 "column": 1,
-                "endLine": 375,
+                "endLine": 381,
                 "endColumn": 56
               }
             },
@@ -2178,9 +2184,9 @@
               "text": "I jumped. My elbow hit a plastic cup sitting beside the keyboard. The cup tipped. Water spread across the table. The laptop screen went black.",
               "display": "I jumped. My elbow hit a plastic cup sitting beside the keyboard. The cup\ntipped. Water spread across the table. The laptop screen went black.",
               "source": {
-                "line": 377,
+                "line": 383,
                 "column": 1,
-                "endLine": 378,
+                "endLine": 384,
                 "endColumn": 69
               }
             },
@@ -2189,9 +2195,9 @@
               "id": "00/04/0021-pause",
               "durationMs": 1500,
               "source": {
-                "line": 380,
+                "line": 386,
                 "column": 1,
-                "endLine": 382,
+                "endLine": 388,
                 "endColumn": 4
               }
             },
@@ -2204,9 +2210,9 @@
               "text": "For a moment, the world stopped.",
               "display": "For a moment, the world stopped.",
               "source": {
-                "line": 384,
+                "line": 390,
                 "column": 1,
-                "endLine": 384,
+                "endLine": 390,
                 "endColumn": 33
               }
             },
@@ -2219,9 +2225,9 @@
               "text": "Then, from somewhere behind the curtain, a voice yelled:",
               "display": "Then, from somewhere behind the curtain, a voice yelled:",
               "source": {
-                "line": 386,
+                "line": 392,
                 "column": 1,
-                "endLine": 386,
+                "endLine": 392,
                 "endColumn": 57
               }
             },
@@ -2234,9 +2240,9 @@
               "text": "Why is the projector dead?",
               "display": "Why is the projector dead?",
               "source": {
-                "line": 388,
+                "line": 394,
                 "column": 1,
-                "endLine": 388,
+                "endLine": 394,
                 "endColumn": 66
               }
             },
@@ -2249,9 +2255,9 @@
               "text": "Oh. Oh, this was bad.",
               "display": "Oh. Oh, this was bad.",
               "source": {
-                "line": 390,
+                "line": 396,
                 "column": 1,
-                "endLine": 390,
+                "endLine": 396,
                 "endColumn": 22
               }
             }
@@ -2272,9 +2278,9 @@
               "text": "At 2:25, the auditorium was packed.",
               "display": "At 2:25, the auditorium was packed.",
               "source": {
-                "line": 398,
+                "line": 404,
                 "column": 1,
-                "endLine": 398,
+                "endLine": 404,
                 "endColumn": 36
               }
             },
@@ -2287,9 +2293,9 @@
               "text": "The projector still wasn't working. Mr. Alvarez, our technology teacher, was crouched behind the stage muttering words that definitely weren't in the school handbook.",
               "display": "The projector still wasn't working. Mr. Alvarez, our technology teacher, was\ncrouched behind the stage muttering words that definitely weren't in the school\nhandbook.",
               "source": {
-                "line": 400,
+                "line": 406,
                 "column": 1,
-                "endLine": 402,
+                "endLine": 408,
                 "endColumn": 10
               }
             },
@@ -2302,9 +2308,9 @@
               "text": "Harper was pacing. The principal was looking at his watch.",
               "display": "Harper was pacing. The principal was looking at his watch.",
               "source": {
-                "line": 404,
+                "line": 410,
                 "column": 1,
-                "endLine": 404,
+                "endLine": 410,
                 "endColumn": 59
               }
             },
@@ -2317,9 +2323,9 @@
               "text": "And I was sitting in the front row, wondering whether changing my name and moving to Canada was a realistic option.",
               "display": "And I was sitting in the front row, wondering whether changing my name and\nmoving to Canada was a realistic option.",
               "source": {
-                "line": 406,
+                "line": 412,
                 "column": 1,
-                "endLine": 407,
+                "endLine": 413,
                 "endColumn": 41
               }
             },
@@ -2332,9 +2338,9 @@
               "text": "Then I saw June. Third row. Sitting alone.",
               "display": "Then I saw June. Third row. Sitting alone.",
               "source": {
-                "line": 409,
+                "line": 415,
                 "column": 1,
-                "endLine": 409,
+                "endLine": 415,
                 "endColumn": 43
               }
             },
@@ -2347,9 +2353,9 @@
               "text": "She noticed me. Looked away.",
               "display": "She noticed me. Looked away.",
               "source": {
-                "line": 411,
+                "line": 417,
                 "column": 1,
-                "endLine": 411,
+                "endLine": 417,
                 "endColumn": 29
               }
             },
@@ -2362,9 +2368,9 @@
               "text": "My stomach hurt. Not because I was nervous about winning anymore.",
               "display": "My stomach hurt. Not because I was nervous about winning anymore.",
               "source": {
-                "line": 413,
+                "line": 419,
                 "column": 1,
-                "endLine": 413,
+                "endLine": 419,
                 "endColumn": 66
               }
             },
@@ -2377,9 +2383,9 @@
               "text": "Because I realized that even if I did win, June wouldn't be sitting beside me afterward. And somehow, that made the whole thing feel pointless.",
               "display": "Because I realized that even if I did win, June wouldn't be sitting beside me\nafterward. And somehow, that made the whole thing feel pointless.",
               "source": {
-                "line": 415,
+                "line": 421,
                 "column": 1,
-                "endLine": 416,
+                "endLine": 422,
                 "endColumn": 66
               }
             },
@@ -2392,9 +2398,9 @@
               "text": "At 2:29, the projector flickered back to life. The auditorium cheered. Mr. Alvarez raised both arms like he'd just won the Super Bowl.",
               "display": "At 2:29, the projector flickered back to life. The auditorium cheered. Mr.\nAlvarez raised both arms like he'd just won the Super Bowl.",
               "source": {
-                "line": 418,
+                "line": 424,
                 "column": 1,
-                "endLine": 419,
+                "endLine": 425,
                 "endColumn": 60
               }
             },
@@ -2407,9 +2413,9 @@
               "text": "Harper stepped onto the stage.",
               "display": "Harper stepped onto the stage.",
               "source": {
-                "line": 421,
+                "line": 427,
                 "column": 1,
-                "endLine": 421,
+                "endLine": 427,
                 "endColumn": 31
               }
             },
@@ -2422,9 +2428,9 @@
               "text": "All right, Wildcats! Who's ready for our Friday Showcase?",
               "display": "All right, Wildcats! Who's\nready for our Friday Showcase?",
               "source": {
-                "line": 423,
+                "line": 429,
                 "column": 1,
-                "endLine": 424,
+                "endLine": 430,
                 "endColumn": 31
               }
             },
@@ -2437,9 +2443,9 @@
               "text": "The crowd erupted. She introduced the first video. Then the second. Then...",
               "display": "The crowd erupted. She introduced the first video. Then the second. Then...",
               "source": {
-                "line": 426,
+                "line": 432,
                 "column": 1,
-                "endLine": 426,
+                "endLine": 432,
                 "endColumn": 76
               }
             },
@@ -2452,9 +2458,9 @@
               "text": "Before we announce our next Wildcat Weekly host, we've got one last hilarious clip!",
               "display": "Before we announce our next Wildcat Weekly\nhost, we've got one last hilarious clip!",
               "source": {
-                "line": 428,
+                "line": 434,
                 "column": 1,
-                "endLine": 429,
+                "endLine": 435,
                 "endColumn": 41
               }
             },
@@ -2467,9 +2473,9 @@
               "text": "My blood turned to ice.",
               "display": "My blood turned to ice.",
               "source": {
-                "line": 431,
+                "line": 437,
                 "column": 1,
-                "endLine": 431,
+                "endLine": 437,
                 "endColumn": 24
               }
             },
@@ -2482,9 +2488,9 @@
               "text": "A purple pair of sunglasses appeared on the giant screen. June's face. Twenty feet tall.",
               "display": "A purple pair of sunglasses appeared on the giant screen. June's face. Twenty\nfeet tall.",
               "source": {
-                "line": 433,
+                "line": 439,
                 "column": 1,
-                "endLine": 434,
+                "endLine": 440,
                 "endColumn": 11
               }
             },
@@ -2497,9 +2503,9 @@
               "text": "I heard someone laugh.",
               "display": "I heard someone laugh.",
               "source": {
-                "line": 436,
+                "line": 442,
                 "column": 1,
-                "endLine": 436,
+                "endLine": 442,
                 "endColumn": 23
               }
             },
@@ -2512,9 +2518,9 @@
               "text": "Hey! That's June!",
               "display": "Hey! That's June!",
               "source": {
-                "line": 438,
+                "line": 444,
                 "column": 1,
-                "endLine": 438,
+                "endLine": 444,
                 "endColumn": 56
               }
             },
@@ -2527,9 +2533,9 @@
               "text": "The video froze before it started. Because I'd stood up.",
               "display": "The video froze before it started. Because I'd stood up.",
               "source": {
-                "line": 440,
+                "line": 446,
                 "column": 1,
-                "endLine": 440,
+                "endLine": 446,
                 "endColumn": 57
               }
             },
@@ -2542,9 +2548,9 @@
               "text": "Stop!",
               "display": "Stop!",
               "source": {
-                "line": 442,
+                "line": 448,
                 "column": 1,
-                "endLine": 442,
+                "endLine": 448,
                 "endColumn": 29
               }
             },
@@ -2553,9 +2559,9 @@
               "id": "00/05/0020-pause",
               "durationMs": 1000,
               "source": {
-                "line": 444,
+                "line": 450,
                 "column": 1,
-                "endLine": 446,
+                "endLine": 452,
                 "endColumn": 4
               }
             },
@@ -2568,9 +2574,9 @@
               "text": "Three hundred heads turned toward me.",
               "display": "Three hundred heads turned toward me.",
               "source": {
-                "line": 448,
+                "line": 454,
                 "column": 1,
-                "endLine": 448,
+                "endLine": 454,
                 "endColumn": 38
               }
             },
@@ -2583,9 +2589,9 @@
               "text": "Milo?",
               "display": "Milo?",
               "source": {
-                "line": 450,
+                "line": 456,
                 "column": 1,
-                "endLine": 450,
+                "endLine": 456,
                 "endColumn": 31
               }
             },
@@ -2598,9 +2604,9 @@
               "text": "I climbed onto the stage. I had no plan. No clever joke. No idea what I was doing.",
               "display": "I climbed onto the stage. I had no plan. No clever joke. No idea what I was\ndoing.",
               "source": {
-                "line": 452,
+                "line": 458,
                 "column": 1,
-                "endLine": 453,
+                "endLine": 459,
                 "endColumn": 7
               }
             },
@@ -2613,9 +2619,9 @@
               "text": "But I knew one thing. I wasn't going to sit there and watch my best friend get laughed at because of me.",
               "display": "But I knew one thing. I wasn't going to sit there and watch my best friend get\nlaughed at because of me.",
               "source": {
-                "line": 455,
+                "line": 461,
                 "column": 1,
-                "endLine": 456,
+                "endLine": 462,
                 "endColumn": 26
               }
             },
@@ -2628,9 +2634,9 @@
               "text": "Please don't play that video.",
               "display": "Please don't play that video.",
               "source": {
-                "line": 458,
+                "line": 464,
                 "column": 1,
-                "endLine": 458,
+                "endLine": 464,
                 "endColumn": 50
               }
             },
@@ -2643,9 +2649,9 @@
               "text": "Harper lowered the microphone.",
               "display": "Harper lowered the microphone.",
               "source": {
-                "line": 460,
+                "line": 466,
                 "column": 1,
-                "endLine": 460,
+                "endLine": 466,
                 "endColumn": 31
               }
             },
@@ -2658,9 +2664,9 @@
               "text": "Why?",
               "display": "Why?",
               "source": {
-                "line": 462,
+                "line": 468,
                 "column": 1,
-                "endLine": 462,
+                "endLine": 468,
                 "endColumn": 17
               }
             },
@@ -2673,9 +2679,9 @@
               "text": "I looked into the audience. June was staring at me. My mouth went dry.",
               "display": "I looked into the audience. June was staring at me. My mouth went dry.",
               "source": {
-                "line": 464,
+                "line": 470,
                 "column": 1,
-                "endLine": 464,
+                "endLine": 470,
                 "endColumn": 71
               }
             },
@@ -2688,9 +2694,9 @@
               "text": "Because...",
               "display": "Because...",
               "source": {
-                "line": 466,
+                "line": 472,
                 "column": 1,
-                "endLine": 466,
+                "endLine": 472,
                 "endColumn": 21
               }
             },
@@ -2703,9 +2709,9 @@
               "text": "I took a breath.",
               "display": "I took a breath.",
               "source": {
-                "line": 468,
+                "line": 474,
                 "column": 1,
-                "endLine": 468,
+                "endLine": 474,
                 "endColumn": 17
               }
             },
@@ -2718,9 +2724,9 @@
               "text": "Because I sent it without permission.",
               "display": "Because I sent it without permission.",
               "source": {
-                "line": 470,
+                "line": 476,
                 "column": 1,
-                "endLine": 470,
+                "endLine": 476,
                 "endColumn": 61
               }
             },
@@ -2733,9 +2739,9 @@
               "text": "A few people whispered.",
               "display": "A few people whispered.",
               "source": {
-                "line": 472,
+                "line": 478,
                 "column": 1,
-                "endLine": 472,
+                "endLine": 478,
                 "endColumn": 24
               }
             },
@@ -2748,9 +2754,9 @@
               "text": "It was a private video. My friend trusted me with it, and I sent it to Harper because I thought it would help me win.",
               "display": "It was a private video. My friend trusted me with it, and I sent it to\nHarper because I thought it would help me win.",
               "source": {
-                "line": 474,
+                "line": 480,
                 "column": 1,
-                "endLine": 475,
+                "endLine": 481,
                 "endColumn": 47
               }
             },
@@ -2763,9 +2769,9 @@
               "text": "Harper looked stunned.",
               "display": "Harper looked stunned.",
               "source": {
-                "line": 477,
+                "line": 483,
                 "column": 1,
-                "endLine": 477,
+                "endLine": 483,
                 "endColumn": 23
               }
             },
@@ -2778,9 +2784,9 @@
               "text": "Milo, I didn't know—",
               "display": "Milo, I didn't know—",
               "source": {
-                "line": 479,
+                "line": 485,
                 "column": 1,
-                "endLine": 479,
+                "endLine": 485,
                 "endColumn": 45
               }
             },
@@ -2793,9 +2799,9 @@
               "text": "I know. It's not your fault.",
               "display": "I know. It's not your fault.",
               "source": {
-                "line": 481,
+                "line": 487,
                 "column": 1,
-                "endLine": 481,
+                "endLine": 487,
                 "endColumn": 50
               }
             },
@@ -2808,9 +2814,9 @@
               "text": "I turned toward the audience.",
               "display": "I turned toward the audience.",
               "source": {
-                "line": 483,
+                "line": 489,
                 "column": 1,
-                "endLine": 483,
+                "endLine": 489,
                 "endColumn": 30
               }
             },
@@ -2823,9 +2829,9 @@
               "text": "I wanted everyone to think I was funny. And cool. And not...",
               "display": "I wanted everyone to think I was funny. And\ncool. And not...",
               "source": {
-                "line": 485,
+                "line": 491,
                 "column": 1,
-                "endLine": 486,
+                "endLine": 492,
                 "endColumn": 17
               }
             },
@@ -2838,9 +2844,9 @@
               "text": "I stopped. Then laughed at myself.",
               "display": "I stopped. Then laughed at myself.",
               "source": {
-                "line": 488,
+                "line": 494,
                 "column": 1,
-                "endLine": 488,
+                "endLine": 494,
                 "endColumn": 35
               }
             },
@@ -2853,9 +2859,9 @@
               "text": "Not the kid who spilled orange juice down his pants in sixth grade.",
               "display": "Not the kid who spilled orange juice down his\npants in sixth grade.",
               "source": {
-                "line": 490,
+                "line": 496,
                 "column": 1,
-                "endLine": 491,
+                "endLine": 497,
                 "endColumn": 22
               }
             },
@@ -2868,9 +2874,9 @@
               "text": "Somebody shouted.",
               "display": "Somebody shouted.",
               "source": {
-                "line": 493,
+                "line": 499,
                 "column": 1,
-                "endLine": 493,
+                "endLine": 499,
                 "endColumn": 18
               }
             },
@@ -2883,9 +2889,9 @@
               "text": "Juice Boy!",
               "display": "Juice Boy!",
               "source": {
-                "line": 495,
+                "line": 501,
                 "column": 1,
-                "endLine": 495,
+                "endLine": 501,
                 "endColumn": 48
               }
             },
@@ -2898,9 +2904,9 @@
               "text": "A few students laughed. I felt my face getting hot.",
               "display": "A few students laughed. I felt my face getting hot.",
               "source": {
-                "line": 497,
+                "line": 503,
                 "column": 1,
-                "endLine": 497,
+                "endLine": 503,
                 "endColumn": 52
               }
             },
@@ -2913,9 +2919,9 @@
               "text": "Yeah. That guy.",
               "display": "Yeah. That guy.",
               "source": {
-                "line": 499,
+                "line": 505,
                 "column": 1,
-                "endLine": 499,
+                "endLine": 505,
                 "endColumn": 42
               }
             },
@@ -2928,9 +2934,9 @@
               "text": "I looked down.",
               "display": "I looked down.",
               "source": {
-                "line": 501,
+                "line": 507,
                 "column": 1,
-                "endLine": 501,
+                "endLine": 507,
                 "endColumn": 15
               }
             },
@@ -2943,9 +2949,9 @@
               "text": "But I think I might've been cooler when I was just Juice Boy. At least back then I wasn't a terrible friend.",
               "display": "But I think I might've been cooler when I was just\nJuice Boy. At least back then I wasn't a terrible friend.",
               "source": {
-                "line": 503,
+                "line": 509,
                 "column": 1,
-                "endLine": 504,
+                "endLine": 510,
                 "endColumn": 58
               }
             },
@@ -2954,9 +2960,9 @@
               "id": "00/05/0047-pause",
               "durationMs": 1500,
               "source": {
-                "line": 506,
+                "line": 512,
                 "column": 1,
-                "endLine": 508,
+                "endLine": 514,
                 "endColumn": 4
               }
             },
@@ -2969,9 +2975,9 @@
               "text": "The auditorium went quiet. I handed Harper the microphone.",
               "display": "The auditorium went quiet. I handed Harper the microphone.",
               "source": {
-                "line": 510,
+                "line": 516,
                 "column": 1,
-                "endLine": 510,
+                "endLine": 516,
                 "endColumn": 59
               }
             },
@@ -2984,9 +2990,9 @@
               "text": "I'm sorry.",
               "display": "I'm sorry.",
               "source": {
-                "line": 512,
+                "line": 518,
                 "column": 1,
-                "endLine": 512,
+                "endLine": 518,
                 "endColumn": 32
               }
             },
@@ -2999,9 +3005,9 @@
               "text": "And I walked offstage.",
               "display": "And I walked offstage.",
               "source": {
-                "line": 514,
+                "line": 520,
                 "column": 1,
-                "endLine": 514,
+                "endLine": 520,
                 "endColumn": 23
               }
             }
@@ -3022,9 +3028,9 @@
               "text": "I didn't win. Priya Shah won.",
               "display": "I didn't win. Priya Shah won.",
               "source": {
-                "line": 522,
+                "line": 528,
                 "column": 1,
-                "endLine": 522,
+                "endLine": 528,
                 "endColumn": 30
               }
             },
@@ -3037,9 +3043,9 @@
               "text": "Which was fair. Her audition was genuinely excellent, and unlike me, she had not nearly electrocuted a laptop trying to cover up a betrayal.",
               "display": "Which was fair. Her audition was genuinely excellent, and unlike me, she had not\nnearly electrocuted a laptop trying to cover up a betrayal.",
               "source": {
-                "line": 524,
+                "line": 530,
                 "column": 1,
-                "endLine": 525,
+                "endLine": 531,
                 "endColumn": 60
               }
             },
@@ -3052,9 +3058,9 @@
               "text": "After the assembly, I sat on the steps outside the gym.",
               "display": "After the assembly, I sat on the steps outside the gym.",
               "source": {
-                "line": 527,
+                "line": 533,
                 "column": 1,
-                "endLine": 527,
+                "endLine": 533,
                 "endColumn": 56
               }
             },
@@ -3067,9 +3073,9 @@
               "text": "I was considering whether Canada had decent middle schools when someone sat beside me.",
               "display": "I was considering whether Canada had decent middle schools when someone sat\nbeside me.",
               "source": {
-                "line": 529,
+                "line": 535,
                 "column": 1,
-                "endLine": 530,
+                "endLine": 536,
                 "endColumn": 11
               }
             },
@@ -3082,9 +3088,9 @@
               "text": "June.",
               "display": "June.",
               "source": {
-                "line": 532,
+                "line": 538,
                 "column": 1,
-                "endLine": 532,
+                "endLine": 538,
                 "endColumn": 6
               }
             },
@@ -3097,9 +3103,9 @@
               "text": "For a while, neither of us said anything.",
               "display": "For a while, neither of us said anything.",
               "source": {
-                "line": 534,
+                "line": 540,
                 "column": 1,
-                "endLine": 534,
+                "endLine": 540,
                 "endColumn": 42
               }
             },
@@ -3112,9 +3118,9 @@
               "text": "Then she handed me something. A Pop-Tart.",
               "display": "Then she handed me something. A Pop-Tart.",
               "source": {
-                "line": 536,
+                "line": 542,
                 "column": 1,
-                "endLine": 536,
+                "endLine": 542,
                 "endColumn": 42
               }
             },
@@ -3127,9 +3133,9 @@
               "text": "I looked at it.",
               "display": "I looked at it.",
               "source": {
-                "line": 538,
+                "line": 544,
                 "column": 1,
-                "endLine": 538,
+                "endLine": 544,
                 "endColumn": 16
               }
             },
@@ -3142,9 +3148,9 @@
               "text": "Where'd you get this?",
               "display": "Where'd you get this?",
               "source": {
-                "line": 540,
+                "line": 546,
                 "column": 1,
-                "endLine": 540,
+                "endLine": 546,
                 "endColumn": 32
               }
             },
@@ -3157,9 +3163,9 @@
               "text": "The vending machine.",
               "display": "The vending machine.",
               "source": {
-                "line": 542,
+                "line": 548,
                 "column": 1,
-                "endLine": 542,
+                "endLine": 548,
                 "endColumn": 31
               }
             },
@@ -3172,9 +3178,9 @@
               "text": "How?",
               "display": "How?",
               "source": {
-                "line": 544,
+                "line": 550,
                 "column": 1,
-                "endLine": 544,
+                "endLine": 550,
                 "endColumn": 15
               }
             },
@@ -3187,9 +3193,9 @@
               "text": "I pressed the button like a normal person.",
               "display": "I pressed the button like a normal person.",
               "source": {
-                "line": 546,
+                "line": 552,
                 "column": 1,
-                "endLine": 546,
+                "endLine": 552,
                 "endColumn": 61
               }
             },
@@ -3202,9 +3208,9 @@
               "text": "I laughed. She didn't.",
               "display": "I laughed. She didn't.",
               "source": {
-                "line": 548,
+                "line": 554,
                 "column": 1,
-                "endLine": 548,
+                "endLine": 554,
                 "endColumn": 23
               }
             },
@@ -3217,9 +3223,9 @@
               "text": "I'm still mad at you.",
               "display": "I'm still mad at you.",
               "source": {
-                "line": 550,
+                "line": 556,
                 "column": 1,
-                "endLine": 550,
+                "endLine": 556,
                 "endColumn": 41
               }
             },
@@ -3232,9 +3238,9 @@
               "text": "I know.",
               "display": "I know.",
               "source": {
-                "line": 552,
+                "line": 558,
                 "column": 1,
-                "endLine": 552,
+                "endLine": 558,
                 "endColumn": 18
               }
             },
@@ -3247,9 +3253,9 @@
               "text": "Like, really mad.",
               "display": "Like, really mad.",
               "source": {
-                "line": 554,
+                "line": 560,
                 "column": 1,
-                "endLine": 554,
+                "endLine": 560,
                 "endColumn": 28
               }
             },
@@ -3262,9 +3268,9 @@
               "text": "I know.",
               "display": "I know.",
               "source": {
-                "line": 556,
+                "line": 562,
                 "column": 1,
-                "endLine": 556,
+                "endLine": 562,
                 "endColumn": 18
               }
             },
@@ -3277,9 +3283,9 @@
               "text": "And just because you did the right thing at the end doesn't mean what you did before was okay.",
               "display": "And just because you did the right thing at the end doesn't mean what\nyou did before was okay.",
               "source": {
-                "line": 558,
+                "line": 564,
                 "column": 1,
-                "endLine": 559,
+                "endLine": 565,
                 "endColumn": 25
               }
             },
@@ -3292,9 +3298,9 @@
               "text": "I nodded.",
               "display": "I nodded.",
               "source": {
-                "line": 561,
+                "line": 567,
                 "column": 1,
-                "endLine": 561,
+                "endLine": 567,
                 "endColumn": 10
               }
             },
@@ -3307,9 +3313,9 @@
               "text": "You're right.",
               "display": "You're right.",
               "source": {
-                "line": 563,
+                "line": 569,
                 "column": 1,
-                "endLine": 563,
+                "endLine": 569,
                 "endColumn": 36
               }
             },
@@ -3322,9 +3328,9 @@
               "text": "She peeled open her chocolate milk. A few seconds passed.",
               "display": "She peeled open her chocolate milk. A few seconds passed.",
               "source": {
-                "line": 565,
+                "line": 571,
                 "column": 1,
-                "endLine": 565,
+                "endLine": 571,
                 "endColumn": 58
               }
             },
@@ -3337,9 +3343,9 @@
               "text": "Did you really think my dance was funny?",
               "display": "Did you really think my dance was funny?",
               "source": {
-                "line": 567,
+                "line": 573,
                 "column": 1,
-                "endLine": 567,
+                "endLine": 573,
                 "endColumn": 64
               }
             },
@@ -3352,9 +3358,9 @@
               "text": "I looked at her.",
               "display": "I looked at her.",
               "source": {
-                "line": 569,
+                "line": 575,
                 "column": 1,
-                "endLine": 569,
+                "endLine": 575,
                 "endColumn": 17
               }
             },
@@ -3367,9 +3373,9 @@
               "text": "June. You fell behind a bed and gave a thumbs-up like you'd survived an avalanche.",
               "display": "June. You fell behind a bed and gave a thumbs-up\nlike you'd survived an avalanche.",
               "source": {
-                "line": 571,
+                "line": 577,
                 "column": 1,
-                "endLine": 572,
+                "endLine": 578,
                 "endColumn": 34
               }
             },
@@ -3382,9 +3388,9 @@
               "text": "Her mouth twitched.",
               "display": "Her mouth twitched.",
               "source": {
-                "line": 574,
+                "line": 580,
                 "column": 1,
-                "endLine": 574,
+                "endLine": 580,
                 "endColumn": 20
               }
             },
@@ -3397,9 +3403,9 @@
               "text": "That was artistic.",
               "display": "That was artistic.",
               "source": {
-                "line": 576,
+                "line": 582,
                 "column": 1,
-                "endLine": 576,
+                "endLine": 582,
                 "endColumn": 50
               }
             },
@@ -3412,9 +3418,9 @@
               "text": "It was historic.",
               "display": "It was historic.",
               "source": {
-                "line": 578,
+                "line": 584,
                 "column": 1,
-                "endLine": 578,
+                "endLine": 584,
                 "endColumn": 27
               }
             },
@@ -3427,9 +3433,9 @@
               "text": "She tried not to laugh. Failed. Then she got serious again.",
               "display": "She tried not to laugh. Failed. Then she got serious again.",
               "source": {
-                "line": 580,
+                "line": 586,
                 "column": 1,
-                "endLine": 580,
+                "endLine": 586,
                 "endColumn": 60
               }
             },
@@ -3442,9 +3448,9 @@
               "text": "I was going to quit the talent show.",
               "display": "I was going to quit the talent show.",
               "source": {
-                "line": 582,
+                "line": 588,
                 "column": 1,
-                "endLine": 582,
+                "endLine": 588,
                 "endColumn": 59
               }
             },
@@ -3457,9 +3463,9 @@
               "text": "What?",
               "display": "What?",
               "source": {
-                "line": 584,
+                "line": 590,
                 "column": 1,
-                "endLine": 584,
+                "endLine": 590,
                 "endColumn": 16
               }
             },
@@ -3472,9 +3478,9 @@
               "text": "After lunch. I figured if people were going to laugh at me anyway, why bother?",
               "display": "After lunch. I figured if people were going to laugh at me anyway, why\nbother?",
               "source": {
-                "line": 586,
+                "line": 592,
                 "column": 1,
-                "endLine": 587,
+                "endLine": 593,
                 "endColumn": 8
               }
             },
@@ -3487,9 +3493,9 @@
               "text": "I looked down.",
               "display": "I looked down.",
               "source": {
-                "line": 589,
+                "line": 595,
                 "column": 1,
-                "endLine": 589,
+                "endLine": 595,
                 "endColumn": 15
               }
             },
@@ -3502,9 +3508,9 @@
               "text": "I'm sorry.",
               "display": "I'm sorry.",
               "source": {
-                "line": 591,
+                "line": 597,
                 "column": 1,
-                "endLine": 591,
+                "endLine": 597,
                 "endColumn": 31
               }
             },
@@ -3517,9 +3523,9 @@
               "text": "I know.",
               "display": "I know.",
               "source": {
-                "line": 593,
+                "line": 599,
                 "column": 1,
-                "endLine": 593,
+                "endLine": 599,
                 "endColumn": 18
               }
             },
@@ -3532,9 +3538,9 @@
               "text": "She pulled out her phone.",
               "display": "She pulled out her phone.",
               "source": {
-                "line": 595,
+                "line": 601,
                 "column": 1,
-                "endLine": 595,
+                "endLine": 601,
                 "endColumn": 26
               }
             },
@@ -3547,9 +3553,9 @@
               "text": "I practiced a new ending.",
               "display": "I practiced a new ending.",
               "source": {
-                "line": 597,
+                "line": 603,
                 "column": 1,
-                "endLine": 597,
+                "endLine": 603,
                 "endColumn": 53
               }
             },
@@ -3562,9 +3568,9 @@
               "text": "What?",
               "display": "What?",
               "source": {
-                "line": 599,
+                "line": 605,
                 "column": 1,
-                "endLine": 599,
+                "endLine": 605,
                 "endColumn": 30
               }
             },
@@ -3577,9 +3583,9 @@
               "text": "For the dance. Want to see it?",
               "display": "For the dance. Want to see it?",
               "source": {
-                "line": 601,
+                "line": 607,
                 "column": 1,
-                "endLine": 601,
+                "endLine": 607,
                 "endColumn": 41
               }
             },
@@ -3592,9 +3598,9 @@
               "text": "Really?",
               "display": "Really?",
               "source": {
-                "line": 603,
+                "line": 609,
                 "column": 1,
-                "endLine": 603,
+                "endLine": 609,
                 "endColumn": 18
               }
             },
@@ -3607,9 +3613,9 @@
               "text": "Yeah. But there are rules.",
               "display": "Yeah. But there are rules.",
               "source": {
-                "line": 605,
+                "line": 611,
                 "column": 1,
-                "endLine": 605,
+                "endLine": 611,
                 "endColumn": 52
               }
             },
@@ -3622,9 +3628,9 @@
               "text": "Anything.",
               "display": "Anything.",
               "source": {
-                "line": 607,
+                "line": 613,
                 "column": 1,
-                "endLine": 607,
+                "endLine": 613,
                 "endColumn": 20
               }
             },
@@ -3637,9 +3643,9 @@
               "text": "No sharing.",
               "display": "No sharing.",
               "source": {
-                "line": 609,
+                "line": 615,
                 "column": 1,
-                "endLine": 609,
+                "endLine": 615,
                 "endColumn": 22
               }
             },
@@ -3652,9 +3658,9 @@
               "text": "Obviously.",
               "display": "Obviously.",
               "source": {
-                "line": 611,
+                "line": 617,
                 "column": 1,
-                "endLine": 611,
+                "endLine": 617,
                 "endColumn": 21
               }
             },
@@ -3667,9 +3673,9 @@
               "text": "No screenshots.",
               "display": "No screenshots.",
               "source": {
-                "line": 613,
+                "line": 619,
                 "column": 1,
-                "endLine": 613,
+                "endLine": 619,
                 "endColumn": 26
               }
             },
@@ -3682,9 +3688,9 @@
               "text": "Never.",
               "display": "Never.",
               "source": {
-                "line": 615,
+                "line": 621,
                 "column": 1,
-                "endLine": 615,
+                "endLine": 621,
                 "endColumn": 17
               }
             },
@@ -3697,9 +3703,9 @@
               "text": "And if I fall down, you are legally required to pretend it was choreography.",
               "display": "And if I fall down, you are legally required to pretend it\nwas choreography.",
               "source": {
-                "line": 617,
+                "line": 623,
                 "column": 1,
-                "endLine": 618,
+                "endLine": 624,
                 "endColumn": 18
               }
             },
@@ -3712,9 +3718,9 @@
               "text": "I nodded solemnly.",
               "display": "I nodded solemnly.",
               "source": {
-                "line": 620,
+                "line": 626,
                 "column": 1,
-                "endLine": 620,
+                "endLine": 626,
                 "endColumn": 19
               }
             },
@@ -3727,9 +3733,9 @@
               "text": "Understood.",
               "display": "Understood.",
               "source": {
-                "line": 622,
+                "line": 628,
                 "column": 1,
-                "endLine": 622,
+                "endLine": 628,
                 "endColumn": 33
               }
             },
@@ -3742,9 +3748,9 @@
               "text": "She pressed play.",
               "display": "She pressed play.",
               "source": {
-                "line": 624,
+                "line": 630,
                 "column": 1,
-                "endLine": 624,
+                "endLine": 630,
                 "endColumn": 18
               }
             },
@@ -3757,9 +3763,9 @@
               "text": "On the screen, June spun across her bedroom. She landed. She jumped. She executed a move I'd never seen before.",
               "display": "On the screen, June spun across her bedroom. She landed. She jumped. She\nexecuted a move I'd never seen before.",
               "source": {
-                "line": 626,
+                "line": 632,
                 "column": 1,
-                "endLine": 627,
+                "endLine": 633,
                 "endColumn": 39
               }
             },
@@ -3772,9 +3778,9 @@
               "text": "Then she stepped backward onto a skateboard. Her arms shot into the air. She disappeared behind the bed.",
               "display": "Then she stepped backward onto a skateboard. Her arms shot into the air. She\ndisappeared behind the bed.",
               "source": {
-                "line": 629,
+                "line": 635,
                 "column": 1,
-                "endLine": 630,
+                "endLine": 636,
                 "endColumn": 28
               }
             },
@@ -3787,9 +3793,9 @@
               "text": "Crash.",
               "display": "Crash.",
               "source": {
-                "line": 632,
+                "line": 638,
                 "column": 1,
-                "endLine": 632,
+                "endLine": 638,
                 "endColumn": 7
               }
             },
@@ -3798,9 +3804,9 @@
               "id": "00/06/0053-pause",
               "durationMs": 1500,
               "source": {
-                "line": 634,
+                "line": 640,
                 "column": 1,
-                "endLine": 636,
+                "endLine": 642,
                 "endColumn": 4
               }
             },
@@ -3813,9 +3819,9 @@
               "text": "Silence.",
               "display": "Silence.",
               "source": {
-                "line": 638,
+                "line": 644,
                 "column": 1,
-                "endLine": 638,
+                "endLine": 644,
                 "endColumn": 9
               }
             },
@@ -3828,9 +3834,9 @@
               "text": "Then one hand rose from the floor. Thumbs-up.",
               "display": "Then one hand rose from the floor. Thumbs-up.",
               "source": {
-                "line": 640,
+                "line": 646,
                 "column": 1,
-                "endLine": 640,
+                "endLine": 646,
                 "endColumn": 46
               }
             },
@@ -3843,9 +3849,9 @@
               "text": "I started laughing. So did she.",
               "display": "I started laughing. So did she.",
               "source": {
-                "line": 642,
+                "line": 648,
                 "column": 1,
-                "endLine": 642,
+                "endLine": 648,
                 "endColumn": 32
               }
             },
@@ -3858,9 +3864,9 @@
               "text": "And this time, I didn't reach for the share button.",
               "display": "And this time, I didn't reach for the share button.",
               "source": {
-                "line": 644,
+                "line": 650,
                 "column": 1,
-                "endLine": 644,
+                "endLine": 650,
                 "endColumn": 52
               }
             }
@@ -3881,9 +3887,9 @@
               "text": "Three weeks later, June Park performed at the Westfield Talent Show.",
               "display": "Three weeks later, June Park performed at the Westfield Talent Show.",
               "source": {
-                "line": 652,
+                "line": 658,
                 "column": 1,
-                "endLine": 652,
+                "endLine": 658,
                 "endColumn": 69
               }
             },
@@ -3896,9 +3902,9 @@
               "text": "She wore purple sunglasses. She danced like a maniac. And she absolutely crushed it.",
               "display": "She wore purple sunglasses. She danced like a maniac. And she absolutely\ncrushed it.",
               "source": {
-                "line": 654,
+                "line": 660,
                 "column": 1,
-                "endLine": 655,
+                "endLine": 661,
                 "endColumn": 12
               }
             },
@@ -3911,9 +3917,9 @@
               "text": "The whole auditorium cheered. I cheered louder than anyone.",
               "display": "The whole auditorium cheered. I cheered louder than anyone.",
               "source": {
-                "line": 657,
+                "line": 663,
                 "column": 1,
-                "endLine": 657,
+                "endLine": 663,
                 "endColumn": 60
               }
             },
@@ -3926,9 +3932,9 @@
               "text": "Afterward, she found me backstage.",
               "display": "Afterward, she found me backstage.",
               "source": {
-                "line": 659,
+                "line": 665,
                 "column": 1,
-                "endLine": 659,
+                "endLine": 665,
                 "endColumn": 35
               }
             },
@@ -3941,9 +3947,9 @@
               "text": "Well?",
               "display": "Well?",
               "source": {
-                "line": 661,
+                "line": 667,
                 "column": 1,
-                "endLine": 661,
+                "endLine": 667,
                 "endColumn": 41
               }
             },
@@ -3956,9 +3962,9 @@
               "text": "I pretended to think.",
               "display": "I pretended to think.",
               "source": {
-                "line": 663,
+                "line": 669,
                 "column": 1,
-                "endLine": 663,
+                "endLine": 669,
                 "endColumn": 22
               }
             },
@@ -3971,9 +3977,9 @@
               "text": "Hmm. Six out of ten.",
               "display": "Hmm. Six out of ten.",
               "source": {
-                "line": 665,
+                "line": 671,
                 "column": 1,
-                "endLine": 665,
+                "endLine": 671,
                 "endColumn": 43
               }
             },
@@ -3986,9 +3992,9 @@
               "text": "She punched my arm.",
               "display": "She punched my arm.",
               "source": {
-                "line": 667,
+                "line": 673,
                 "column": 1,
-                "endLine": 667,
+                "endLine": 673,
                 "endColumn": 20
               }
             },
@@ -4001,9 +4007,9 @@
               "text": "Ow! Kidding! Eleven! Twelve! A million!",
               "display": "Ow! Kidding! Eleven! Twelve! A million!",
               "source": {
-                "line": 669,
+                "line": 675,
                 "column": 1,
-                "endLine": 669,
+                "endLine": 675,
                 "endColumn": 72
               }
             },
@@ -4016,9 +4022,9 @@
               "text": "She grinned. Then she looked toward the auditorium.",
               "display": "She grinned. Then she looked toward the auditorium.",
               "source": {
-                "line": 671,
+                "line": 677,
                 "column": 1,
-                "endLine": 671,
+                "endLine": 677,
                 "endColumn": 52
               }
             },
@@ -4031,9 +4037,9 @@
               "text": "Hey, Milo?",
               "display": "Hey, Milo?",
               "source": {
-                "line": 673,
+                "line": 679,
                 "column": 1,
-                "endLine": 673,
+                "endLine": 679,
                 "endColumn": 32
               }
             },
@@ -4046,9 +4052,9 @@
               "text": "Yeah?",
               "display": "Yeah?",
               "source": {
-                "line": 675,
+                "line": 681,
                 "column": 1,
-                "endLine": 675,
+                "endLine": 681,
                 "endColumn": 16
               }
             },
@@ -4061,9 +4067,9 @@
               "text": "Thanks for being there.",
               "display": "Thanks for being there.",
               "source": {
-                "line": 677,
+                "line": 683,
                 "column": 1,
-                "endLine": 677,
+                "endLine": 683,
                 "endColumn": 46
               }
             },
@@ -4076,9 +4082,9 @@
               "text": "I smiled.",
               "display": "I smiled.",
               "source": {
-                "line": 679,
+                "line": 685,
                 "column": 1,
-                "endLine": 679,
+                "endLine": 685,
                 "endColumn": 10
               }
             },
@@ -4091,9 +4097,9 @@
               "text": "Wouldn't have missed it.",
               "display": "Wouldn't have missed it.",
               "source": {
-                "line": 681,
+                "line": 687,
                 "column": 1,
-                "endLine": 681,
+                "endLine": 687,
                 "endColumn": 35
               }
             },
@@ -4106,9 +4112,9 @@
               "text": "She started walking away. Then stopped.",
               "display": "She started walking away. Then stopped.",
               "source": {
-                "line": 683,
+                "line": 689,
                 "column": 1,
-                "endLine": 683,
+                "endLine": 689,
                 "endColumn": 40
               }
             },
@@ -4121,9 +4127,9 @@
               "text": "Oh, and Milo?",
               "display": "Oh, and Milo?",
               "source": {
-                "line": 685,
+                "line": 691,
                 "column": 1,
-                "endLine": 685,
+                "endLine": 691,
                 "endColumn": 24
               }
             },
@@ -4136,9 +4142,9 @@
               "text": "Yeah?",
               "display": "Yeah?",
               "source": {
-                "line": 687,
+                "line": 693,
                 "column": 1,
-                "endLine": 687,
+                "endLine": 693,
                 "endColumn": 16
               }
             },
@@ -4151,9 +4157,9 @@
               "text": "Next Friday, I'm auditioning for Wildcat Weekly.",
               "display": "Next Friday, I'm auditioning for Wildcat Weekly.",
               "source": {
-                "line": 689,
+                "line": 695,
                 "column": 1,
-                "endLine": 689,
+                "endLine": 695,
                 "endColumn": 75
               }
             },
@@ -4166,9 +4172,9 @@
               "text": "I stared at her.",
               "display": "I stared at her.",
               "source": {
-                "line": 691,
+                "line": 697,
                 "column": 1,
-                "endLine": 691,
+                "endLine": 697,
                 "endColumn": 17
               }
             },
@@ -4181,9 +4187,9 @@
               "text": "You?",
               "display": "You?",
               "source": {
-                "line": 693,
+                "line": 699,
                 "column": 1,
-                "endLine": 693,
+                "endLine": 699,
                 "endColumn": 27
               }
             },
@@ -4196,9 +4202,9 @@
               "text": "She shrugged.",
               "display": "She shrugged.",
               "source": {
-                "line": 695,
+                "line": 701,
                 "column": 1,
-                "endLine": 695,
+                "endLine": 701,
                 "endColumn": 14
               }
             },
@@ -4211,9 +4217,9 @@
               "text": "Turns out being onstage isn't so scary.",
               "display": "Turns out being onstage isn't so scary.",
               "source": {
-                "line": 697,
+                "line": 703,
                 "column": 1,
-                "endLine": 697,
+                "endLine": 703,
                 "endColumn": 50
               }
             },
@@ -4226,9 +4232,9 @@
               "text": "I grinned.",
               "display": "I grinned.",
               "source": {
-                "line": 699,
+                "line": 705,
                 "column": 1,
-                "endLine": 699,
+                "endLine": 705,
                 "endColumn": 11
               }
             },
@@ -4241,9 +4247,9 @@
               "text": "Want help making an audition video?",
               "display": "Want help making an audition video?",
               "source": {
-                "line": 701,
+                "line": 707,
                 "column": 1,
-                "endLine": 701,
+                "endLine": 707,
                 "endColumn": 46
               }
             },
@@ -4256,9 +4262,9 @@
               "text": "She narrowed her eyes.",
               "display": "She narrowed her eyes.",
               "source": {
-                "line": 703,
+                "line": 709,
                 "column": 1,
-                "endLine": 703,
+                "endLine": 709,
                 "endColumn": 23
               }
             },
@@ -4271,9 +4277,9 @@
               "text": "You're not touching the camera.",
               "display": "You're not touching the camera.",
               "source": {
-                "line": 705,
+                "line": 711,
                 "column": 1,
-                "endLine": 705,
+                "endLine": 711,
                 "endColumn": 50
               }
             },
@@ -4286,9 +4292,9 @@
               "text": "Fair.",
               "display": "Fair.",
               "source": {
-                "line": 707,
+                "line": 713,
                 "column": 1,
-                "endLine": 707,
+                "endLine": 713,
                 "endColumn": 16
               }
             },
@@ -4301,9 +4307,9 @@
               "text": "But...",
               "display": "But...",
               "source": {
-                "line": 709,
+                "line": 715,
                 "column": 1,
-                "endLine": 709,
+                "endLine": 715,
                 "endColumn": 17
               }
             },
@@ -4316,9 +4322,9 @@
               "text": "She smiled.",
               "display": "She smiled.",
               "source": {
-                "line": 711,
+                "line": 717,
                 "column": 1,
-                "endLine": 711,
+                "endLine": 717,
                 "endColumn": 12
               }
             },
@@ -4331,9 +4337,9 @@
               "text": "I could use a cohost.",
               "display": "I could use a cohost.",
               "source": {
-                "line": 713,
+                "line": 719,
                 "column": 1,
-                "endLine": 713,
+                "endLine": 719,
                 "endColumn": 41
               }
             },
@@ -4346,9 +4352,9 @@
               "text": "And just like that, I realized something.",
               "display": "And just like that, I realized something.",
               "source": {
-                "line": 715,
+                "line": 721,
                 "column": 1,
-                "endLine": 715,
+                "endLine": 721,
                 "endColumn": 42
               }
             },
@@ -4361,9 +4367,9 @@
               "text": "I'd spent months wanting the entire school to know my name.",
               "display": "I'd spent months wanting the entire school to know my name.",
               "source": {
-                "line": 717,
+                "line": 723,
                 "column": 1,
-                "endLine": 717,
+                "endLine": 723,
                 "endColumn": 60
               }
             },
@@ -4376,9 +4382,9 @@
               "text": "But somewhere along the way, I'd almost lost the one person who'd always been happy to say it.",
               "display": "But somewhere along the way, I'd almost lost the one person who'd always been\nhappy to say it.",
               "source": {
-                "line": 719,
+                "line": 725,
                 "column": 1,
-                "endLine": 720,
+                "endLine": 726,
                 "endColumn": 17
               }
             },
@@ -4391,9 +4397,9 @@
               "text": "Milo!",
               "display": "Milo!",
               "source": {
-                "line": 722,
+                "line": 728,
                 "column": 1,
-                "endLine": 722,
+                "endLine": 728,
                 "endColumn": 39
               }
             },
@@ -4406,9 +4412,9 @@
               "text": "What?",
               "display": "What?",
               "source": {
-                "line": 724,
+                "line": 730,
                 "column": 1,
-                "endLine": 724,
+                "endLine": 730,
                 "endColumn": 16
               }
             },
@@ -4421,9 +4427,9 @@
               "text": "Are you coming or not?",
               "display": "Are you coming or not?",
               "source": {
-                "line": 726,
+                "line": 732,
                 "column": 1,
-                "endLine": 726,
+                "endLine": 732,
                 "endColumn": 45
               }
             },
@@ -4436,9 +4442,9 @@
               "text": "I grabbed my backpack.",
               "display": "I grabbed my backpack.",
               "source": {
-                "line": 728,
+                "line": 734,
                 "column": 1,
-                "endLine": 728,
+                "endLine": 734,
                 "endColumn": 23
               }
             },
@@ -4451,9 +4457,9 @@
               "text": "Coming!",
               "display": "Coming!",
               "source": {
-                "line": 730,
+                "line": 736,
                 "column": 1,
-                "endLine": 730,
+                "endLine": 736,
                 "endColumn": 39
               }
             },
@@ -4466,9 +4472,9 @@
               "text": "And as I ran after her, I passed the vending machine.",
               "display": "And as I ran after her, I passed the vending machine.",
               "source": {
-                "line": 732,
+                "line": 738,
                 "column": 1,
-                "endLine": 732,
+                "endLine": 738,
                 "endColumn": 54
               }
             },
@@ -4481,9 +4487,9 @@
               "text": "A Pop-Tart hung crookedly from its coil. Halfway down. Stuck.",
               "display": "A Pop-Tart hung crookedly from its coil. Halfway down. Stuck.",
               "source": {
-                "line": 734,
+                "line": 740,
                 "column": 1,
-                "endLine": 734,
+                "endLine": 740,
                 "endColumn": 62
               }
             },
@@ -4496,9 +4502,9 @@
               "text": "I stopped. Looked at it.",
               "display": "I stopped. Looked at it.",
               "source": {
-                "line": 736,
+                "line": 742,
                 "column": 1,
-                "endLine": 736,
+                "endLine": 742,
                 "endColumn": 25
               }
             },
@@ -4511,9 +4517,9 @@
               "text": "Then kept walking.",
               "display": "Then kept walking.",
               "source": {
-                "line": 738,
+                "line": 744,
                 "column": 1,
-                "endLine": 738,
+                "endLine": 744,
                 "endColumn": 19
               }
             },
@@ -4526,9 +4532,9 @@
               "text": "Some battles just weren't worth winning.",
               "display": "Some battles just weren't worth winning.",
               "source": {
-                "line": 740,
+                "line": 746,
                 "column": 1,
-                "endLine": 740,
+                "endLine": 746,
                 "endColumn": 41
               }
             },
@@ -4537,9 +4543,9 @@
               "id": "00/07/0045-pause",
               "durationMs": 1000,
               "source": {
-                "line": 742,
+                "line": 748,
                 "column": 1,
-                "endLine": 744,
+                "endLine": 750,
                 "endColumn": 4
               }
             },
@@ -4552,9 +4558,9 @@
               "text": "The end.",
               "display": "The end.",
               "source": {
-                "line": 746,
+                "line": 752,
                 "column": 1,
-                "endLine": 746,
+                "endLine": 752,
                 "endColumn": 9
               }
             }

@@ -82,7 +82,9 @@ export type DiagnosticCode =
   | 'unknown-speaker'
   | 'bad-duration'
   | 'misplaced-music'
-  | 'missing-cue';
+  | 'missing-cue'
+  | 'layout-mismatch'
+  | 'bad-continue';
 
 export interface Diagnostic {
   code: DiagnosticCode;

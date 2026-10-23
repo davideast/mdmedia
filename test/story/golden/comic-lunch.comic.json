@@ -1,0 +1,1174 @@
+{
+  "schema": "mdmedia.story.comic/1",
+  "source": {
+    "path": "comic-lunch.md",
+    "sha256": "3effdddfff34a989383df71779ef9086bda8d29c06842f7c137fc5553f08a295"
+  },
+  "meta": {
+    "title": "The Most Embarrassing Day of My Life — Lunch",
+    "story": "embarrassing-day.md",
+    "style": "flat",
+    "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere"
+  },
+  "page": {
+    "width": 1000,
+    "height": 1500,
+    "gutter": 14
+  },
+  "pages": [
+    {
+      "index": 1,
+      "layout": [
+        [
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "panels": [
+        {
+          "id": "1.1",
+          "page": 1,
+          "index": 1,
+          "slot": {
+            "x": 14,
+            "y": 14,
+            "w": 972,
+            "h": 481.3333333333333
+          },
+          "aspect": "16:9",
+          "shot": "Wide shot of the cafeteria. Harper strides toward a lunch table, waving, other kids turning to watch her pass. Milo sits at the table on the right, June across from him with her back half to us.",
+          "acting": "Harper is the most popular girl in school and knows it; heads turn as she passes. Milo can't believe she is coming to his table.",
+          "positions": {
+            "HARPER": "left",
+            "MILO": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "warm, smug, building up the good news",
+              "text": "By lunch, things were going better than I'd imagined.",
+              "display": "By lunch, things were going better than I'd imagined.",
+              "source": {
+                "line": 22,
+                "column": 1,
+                "endLine": 22,
+                "endColumn": 96
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "HARPER",
+              "cue": "loud and delighted, calling across the cafeteria",
+              "text": "Milo! Dude!",
+              "display": "Milo! Dude!",
+              "source": {
+                "line": 24,
+                "column": 1,
+                "endLine": 24,
+                "endColumn": 77
+              }
+            }
+          ],
+          "source": {
+            "line": 12,
+            "column": 1,
+            "endLine": 12,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "1.2",
+          "page": 1,
+          "index": 2,
+          "slot": {
+            "x": 14,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Medium shot. Harper gives Milo a big high five over the table.",
+          "acting": "Milo is starstruck, grinning far too wide; Harper is breezy, as if this is nothing.",
+          "positions": {
+            "HARPER": "left",
+            "MILO": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "giddy, can't believe it",
+              "text": "An actual high five.",
+              "display": "An actual high five.",
+              "source": {
+                "line": 34,
+                "column": 1,
+                "endLine": 34,
+                "endColumn": 49
+              }
+            },
+            {
+              "kind": "caption",
+              "cue": "even more giddy, savoring the name",
+              "text": "From Harper Blake.",
+              "display": "From Harper Blake.",
+              "source": {
+                "line": 36,
+                "column": 1,
+                "endLine": 36,
+                "endColumn": 58
+              }
+            }
+          ],
+          "source": {
+            "line": 26,
+            "column": 1,
+            "endLine": 26,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "1.3",
+          "page": 1,
+          "index": 3,
+          "slot": {
+            "x": 507,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Medium shot from Milo's side of the lunch table: June sits on the bench across the table from us, her tray in front of her, mid-bite, nearly choking on a french fry, eyes wide, one hand at her throat.",
+          "acting": "Comic disbelief. June cannot believe Harper Blake is at their table.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "proud, a little smug",
+              "text": "At our lunch table.",
+              "display": "At our lunch table.",
+              "source": {
+                "line": 47,
+                "column": 1,
+                "endLine": 47,
+                "endColumn": 45
+              }
+            },
+            {
+              "kind": "sfx",
+              "text": "KAFF!",
+              "source": {
+                "line": 49,
+                "column": 1,
+                "endLine": 51,
+                "endColumn": 4
+              }
+            }
+          ],
+          "source": {
+            "line": 38,
+            "column": 1,
+            "endLine": 38,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "1.4",
+          "page": 1,
+          "index": 4,
+          "slot": {
+            "x": 14,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Harper leans on the table with one hand, pointing at Milo with the other. Milo looks up at her.",
+          "acting": "Harper gushes, delighted with the clip; Milo is flattered but a first flicker of worry crosses his face.",
+          "positions": {
+            "MILO": "left",
+            "HARPER": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "HARPER",
+              "cue": "warm, flattering",
+              "text": "You're definitely one of my favorites.",
+              "display": "You're definitely one of my favorites.",
+              "source": {
+                "line": 61,
+                "column": 1,
+                "endLine": 61,
+                "endColumn": 72
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "HARPER",
+              "cue": "gushing, excited",
+              "text": "That clip? Hilarious. We're using it in the assembly.",
+              "display": "That clip? Hilarious. We're using it in the assembly.",
+              "source": {
+                "line": 63,
+                "column": 1,
+                "endLine": 63,
+                "endColumn": 87
+              }
+            }
+          ],
+          "source": {
+            "line": 53,
+            "column": 1,
+            "endLine": 53,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "1.5",
+          "page": 1,
+          "index": 5,
+          "slot": {
+            "x": 507,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Close-up of Milo.",
+          "acting": "His grin is frozen in place while the dread arrives; a bead of sweat at his temple.",
+          "positions": {
+            "MILO": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "the fun drains out, sudden dread",
+              "text": "My smile froze.",
+              "display": "My smile froze.",
+              "source": {
+                "line": 72,
+                "column": 1,
+                "endLine": 72,
+                "endColumn": 53
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "uneasy, trying to sound casual",
+              "text": "Wait. Using it?",
+              "display": "Wait. Using it?",
+              "source": {
+                "line": 74,
+                "column": 1,
+                "endLine": 74,
+                "endColumn": 61
+              }
+            }
+          ],
+          "source": {
+            "line": 65,
+            "column": 1,
+            "endLine": 65,
+            "endColumn": 12
+          }
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "layout": [
+        [
+          1,
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "panels": [
+        {
+          "id": "2.1",
+          "page": 2,
+          "index": 1,
+          "slot": {
+            "x": 14,
+            "y": 14,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Harper walks away from the table toward the camera, waving back over her shoulder without looking. Milo and June small in the background.",
+          "acting": "Harper is already gone in her head, breezy and careless; behind her, Milo sits stiff.",
+          "positions": {
+            "HARPER": "left"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "HARPER",
+              "cue": "breezy, already leaving",
+              "text": "Yeah! Right before we announce the new host. It's going to kill!",
+              "display": "Yeah! Right before we announce the new host. It's going to kill!",
+              "source": {
+                "line": 89,
+                "column": 1,
+                "endLine": 89,
+                "endColumn": 105
+              }
+            }
+          ],
+          "source": {
+            "line": 80,
+            "column": 1,
+            "endLine": 80,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "2.2",
+          "page": 2,
+          "index": 2,
+          "slot": {
+            "x": 507,
+            "y": 14,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "June looks straight across the table at Milo, a french fry held still in her hand.",
+          "acting": "Flat and quietly suspicious; she has noticed something is wrong.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "flat, quietly suspicious",
+              "text": "What clip?",
+              "display": "What clip?",
+              "source": {
+                "line": 98,
+                "column": 1,
+                "endLine": 98,
+                "endColumn": 50
+              }
+            }
+          ],
+          "source": {
+            "line": 91,
+            "column": 1,
+            "endLine": 91,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "2.3",
+          "page": 2,
+          "index": 3,
+          "slot": {
+            "x": 14,
+            "y": 509.3333333333333,
+            "w": 972,
+            "h": 481.3333333333333
+          },
+          "aspect": "16:9",
+          "shot": "Wide shot of the table. Milo stares hard at his lunch tray, shoulders up by his ears; June watches him from across the table.",
+          "acting": "Milo is guilty and avoiding her eyes; June is waiting, patient and getting firmer.",
+          "positions": {
+            "MILO": "left",
+            "JUNE": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "guilty, avoiding",
+              "text": "I stared at my tray.",
+              "display": "I stared at my tray.",
+              "source": {
+                "line": 109,
+                "column": 1,
+                "endLine": 109,
+                "endColumn": 42
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "firmer, waiting for an answer",
+              "text": "Milo?",
+              "display": "Milo?",
+              "source": {
+                "line": 111,
+                "column": 1,
+                "endLine": 111,
+                "endColumn": 50
+              }
+            },
+            {
+              "kind": "caption",
+              "cue": "embarrassed, self-mocking",
+              "text": "I tried to laugh. It sounded like a lawn mower failing to start.",
+              "display": "I tried to laugh. It sounded like a lawn mower failing to start.",
+              "source": {
+                "line": 113,
+                "column": 1,
+                "endLine": 113,
+                "endColumn": 95
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "weak, nervous laugh",
+              "text": "Heh. Okay. Funny story.",
+              "display": "Heh. Okay. Funny story.",
+              "source": {
+                "line": 115,
+                "column": 1,
+                "endLine": 115,
+                "endColumn": 66
+              },
+              "mark": "small"
+            }
+          ],
+          "source": {
+            "line": 100,
+            "column": 1,
+            "endLine": 100,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "2.4",
+          "page": 2,
+          "index": 4,
+          "slot": {
+            "x": 14,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Close-up of June.",
+          "acting": "Not smiling at all, eyes narrowed, cold and slow.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "cold, slow, each word its own sentence",
+              "text": "What. Clip.",
+              "display": "What. Clip.",
+              "source": {
+                "line": 123,
+                "column": 1,
+                "endLine": 123,
+                "endColumn": 65
+              }
+            }
+          ],
+          "source": {
+            "line": 117,
+            "column": 1,
+            "endLine": 117,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "2.5",
+          "page": 2,
+          "index": 5,
+          "slot": {
+            "x": 507,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Close-up of Milo, shrinking down in his seat, looking away.",
+          "acting": "Ashamed, barely able to say it.",
+          "positions": {
+            "MILO": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "barely audible, ashamed",
+              "text": "The dancing one.",
+              "display": "The dancing one.",
+              "source": {
+                "line": 132,
+                "column": 1,
+                "endLine": 132,
+                "endColumn": 63
+              },
+              "mark": "small"
+            }
+          ],
+          "source": {
+            "line": 125,
+            "column": 1,
+            "endLine": 125,
+            "endColumn": 12
+          }
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "layout": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "panels": [
+        {
+          "id": "3.1",
+          "page": 3,
+          "index": 1,
+          "slot": {
+            "x": 14,
+            "y": 14,
+            "w": 314.6666666666667,
+            "h": 481.3333333333333
+          },
+          "aspect": "2:3",
+          "shot": "Extreme close-up: only June's face, filling the frame from her bangs to her chin.",
+          "acting": "Milo has just said \"The dancing one.\" For one split second June hasn't taken it in yet: she is mid-blink, and the faint ghost of her usual dry half-smile is still on her lips, as if she might laugh. It is fragile, about to vanish.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "hopeful, then unsure",
+              "text": "For one second, I thought she'd laugh.",
+              "display": "For one second, I thought she'd laugh.",
+              "source": {
+                "line": 159,
+                "column": 1,
+                "endLine": 159,
+                "endColumn": 64
+              }
+            }
+          ],
+          "source": {
+            "line": 149,
+            "column": 1,
+            "endLine": 149,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "3.2",
+          "page": 3,
+          "index": 2,
+          "slot": {
+            "x": 342.6666666666667,
+            "y": 14,
+            "w": 314.6666666666667,
+            "h": 481.3333333333333
+          },
+          "aspect": "2:3",
+          "shot": "Extreme close-up: only June's face.",
+          "acting": "Same panel, same face, same framing, same lighting and background. Change only her expression: the almost-smile is gone. Her face is completely blank and still, eyes open, staring at Milo, taking it in.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "quiet, careful",
+              "text": "Not angry.",
+              "display": "Not angry.",
+              "source": {
+                "line": 171,
+                "column": 1,
+                "endLine": 171,
+                "endColumn": 30
+              }
+            }
+          ],
+          "source": {
+            "line": 161,
+            "column": 1,
+            "endLine": 161,
+            "endColumn": 12
+          },
+          "continues": "3.1"
+        },
+        {
+          "id": "3.3",
+          "page": 3,
+          "index": 3,
+          "slot": {
+            "x": 671.3333333333334,
+            "y": 14,
+            "w": 314.6666666666667,
+            "h": 481.3333333333333
+          },
+          "aspect": "2:3",
+          "shot": "Extreme close-up: only June's face.",
+          "acting": "Same panel, same face, same framing, same lighting and background. Change only her expression: her brows draw together and up, her eyes are wet and glistening, her lips press tight. She is deeply hurt, not angry.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "heavy, quiet",
+              "text": "Worse. Hurt.",
+              "display": "Worse. Hurt.",
+              "source": {
+                "line": 183,
+                "column": 1,
+                "endLine": 183,
+                "endColumn": 30
+              }
+            }
+          ],
+          "source": {
+            "line": 173,
+            "column": 1,
+            "endLine": 173,
+            "endColumn": 12
+          },
+          "continues": "3.2"
+        },
+        {
+          "id": "3.4",
+          "page": 3,
+          "index": 4,
+          "slot": {
+            "x": 14,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "June pulls back from the table; Milo raises both palms.",
+          "acting": "June has just understood he betrayed her trust. She pulls back from the table in shock, both hands gripping the table edge, eyes wide, mouth open: stunned and hurt, not relaxed and not reclining. Across the table, Milo raises both palms, panicked, talking too fast.",
+          "positions": {
+            "JUNE": "left",
+            "MILO": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "stunned, disbelieving",
+              "text": "You sent my video?",
+              "display": "You sent my video?",
+              "source": {
+                "line": 195,
+                "column": 1,
+                "endLine": 195,
+                "endColumn": 55
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "defensive, too fast",
+              "text": "It was just to Harper.",
+              "display": "It was just to Harper.",
+              "source": {
+                "line": 197,
+                "column": 1,
+                "endLine": 197,
+                "endColumn": 57
+              }
+            }
+          ],
+          "source": {
+            "line": 185,
+            "column": 1,
+            "endLine": 185,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "3.5",
+          "page": 3,
+          "index": 5,
+          "slot": {
+            "x": 507,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "June looks down at the table; Milo leans forward.",
+          "acting": "June stares down at her tray, shoulders hunched, small and hurt. Milo leans across the table toward her, hands clasped, pleading. Both stay seated.",
+          "positions": {
+            "JUNE": "left",
+            "MILO": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "hurt, quiet",
+              "text": "You promised.",
+              "display": "You promised.",
+              "source": {
+                "line": 208,
+                "column": 1,
+                "endLine": 208,
+                "endColumn": 40
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "pleading",
+              "text": "I know, but—",
+              "display": "I know, but—",
+              "source": {
+                "line": 210,
+                "column": 1,
+                "endLine": 210,
+                "endColumn": 36
+              }
+            }
+          ],
+          "source": {
+            "line": 199,
+            "column": 1,
+            "endLine": 199,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "3.6",
+          "page": 3,
+          "index": 6,
+          "slot": {
+            "x": 14,
+            "y": 1004.6666666666666,
+            "w": 972,
+            "h": 481.3333333333333
+          },
+          "aspect": "16:9",
+          "shot": "Wide close-up of June's face.",
+          "acting": "The emotional low point. Close on June looking straight at Milo, tears welling, chin trembling, voice catching on his name. Same face as the earlier close-ups.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "June and Milo stay seated on their benches, directly across the same lunch table from each other. Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "hurt, voice catching",
+              "text": "You promised, Milo.",
+              "display": "You promised, Milo.",
+              "source": {
+                "line": 220,
+                "column": 1,
+                "endLine": 220,
+                "endColumn": 55
+              }
+            }
+          ],
+          "source": {
+            "line": 212,
+            "column": 1,
+            "endLine": 212,
+            "endColumn": 12
+          }
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "layout": [
+        [
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "panels": [
+        {
+          "id": "4.1",
+          "page": 4,
+          "index": 1,
+          "slot": {
+            "x": 14,
+            "y": 14,
+            "w": 972,
+            "h": 481.3333333333333
+          },
+          "aspect": "16:9",
+          "shot": "Wide shot: cafeteria chaos all around the table. A grape flies across the frame; behind, a seventh grader argues with a lunch monitor while holding up a ketchup packet. At the center, Milo and June sit frozen and silent.",
+          "acting": "Everyone else is loud and chaotic; June and Milo sit stiff and silent across their table, not looking at each other, isolated in stillness.",
+          "positions": {
+            "KID": "left",
+            "MILO": "center",
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "numb, distant",
+              "text": "Around us, the cafeteria continued its usual chaos.",
+              "display": "Around us, the cafeteria continued its usual chaos.",
+              "source": {
+                "line": 238,
+                "column": 1,
+                "endLine": 238,
+                "endColumn": 70
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "KID",
+              "cue": "loud and indignant, far across the cafeteria",
+              "text": "Ketchup is TOO a vegetable!",
+              "display": "Ketchup is TOO a vegetable!",
+              "source": {
+                "line": 240,
+                "column": 1,
+                "endLine": 240,
+                "endColumn": 94
+              },
+              "mark": "small"
+            },
+            {
+              "kind": "caption",
+              "cue": "hushed, heavy",
+              "text": "But at our table, everything had gone quiet.",
+              "display": "But at our table, everything had gone quiet.",
+              "source": {
+                "line": 242,
+                "column": 1,
+                "endLine": 242,
+                "endColumn": 63
+              }
+            }
+          ],
+          "source": {
+            "line": 227,
+            "column": 1,
+            "endLine": 227,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "4.2",
+          "page": 4,
+          "index": 2,
+          "slot": {
+            "x": 14,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Milo, slumped, staring at his hands.",
+          "acting": "Ashamed and small.",
+          "positions": {
+            "MILO": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "ashamed, small",
+              "text": "I thought it might help me win.",
+              "display": "I thought it might help me win.",
+              "source": {
+                "line": 250,
+                "column": 1,
+                "endLine": 250,
+                "endColumn": 61
+              }
+            }
+          ],
+          "source": {
+            "line": 244,
+            "column": 1,
+            "endLine": 244,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "4.3",
+          "page": 4,
+          "index": 3,
+          "slot": {
+            "x": 507,
+            "y": 509.3333333333333,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "June stands up holding her lunch tray, turning to go; Milo reaches toward her from his seat.",
+          "acting": "June is quiet and steady through her hurt; Milo is desperate.",
+          "positions": {
+            "JUNE": "left",
+            "MILO": "right"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "pleading, desperate",
+              "text": "June, come on.",
+              "display": "June, come on.",
+              "source": {
+                "line": 259,
+                "column": 1,
+                "endLine": 259,
+                "endColumn": 49
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "quiet, steady, hurt",
+              "text": "You know why I sent you that video?",
+              "display": "You know why I sent you that video?",
+              "source": {
+                "line": 261,
+                "column": 1,
+                "endLine": 261,
+                "endColumn": 70
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "MILO",
+              "cue": "unsure, guessing",
+              "text": "To see if the dance was good.",
+              "display": "To see if the dance was good.",
+              "source": {
+                "line": 263,
+                "column": 1,
+                "endLine": 263,
+                "endColumn": 61
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "soft, sad",
+              "text": "No.",
+              "display": "No.",
+              "source": {
+                "line": 265,
+                "column": 1,
+                "endLine": 265,
+                "endColumn": 28
+              }
+            }
+          ],
+          "source": {
+            "line": 252,
+            "column": 1,
+            "endLine": 252,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "4.4",
+          "page": 4,
+          "index": 4,
+          "slot": {
+            "x": 14,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "June, holding her tray, looking down.",
+          "acting": "Her voice shakes; her eyes are wet; she is holding back tears.",
+          "positions": {
+            "JUNE": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "voice shaking, holding back tears",
+              "text": "Because I was scared. And you always make scary things feel less scary.",
+              "display": "Because I was scared. And you always make scary things feel less scary.",
+              "source": {
+                "line": 273,
+                "column": 1,
+                "endLine": 273,
+                "endColumn": 120
+              }
+            },
+            {
+              "kind": "balloon",
+              "who": "JUNE",
+              "cue": "barely holding it together, almost a whisper",
+              "text": "I guess that was stupid.",
+              "display": "I guess that was stupid.",
+              "source": {
+                "line": 275,
+                "column": 1,
+                "endLine": 275,
+                "endColumn": 92
+              },
+              "mark": "small"
+            }
+          ],
+          "source": {
+            "line": 267,
+            "column": 1,
+            "endLine": 267,
+            "endColumn": 12
+          }
+        },
+        {
+          "id": "4.5",
+          "page": 4,
+          "index": 5,
+          "slot": {
+            "x": 507,
+            "y": 1004.6666666666666,
+            "w": 479,
+            "h": 481.3333333333333
+          },
+          "aspect": "1:1",
+          "shot": "Milo sits alone at the table holding a single limp french fry, the seat across from him empty, June walking away small in the background.",
+          "acting": "Hollow and alone, with a rueful edge.",
+          "positions": {
+            "MILO": "center"
+          },
+          "zone": "top",
+          "setting": "the busy, noisy school cafeteria at lunch, long tables, trays, kids everywhere",
+          "staging": "Side view across one cafeteria lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left side of the table, facing right, her lunch tray in front of her. Milo sits on the bench on the right side, facing left, his tray in front of him. They are directly across from each other. Other students fill the tables behind them.",
+          "rules": "Whenever both are in a panel, June is on the left of the frame and Milo on the right.",
+          "items": [
+            {
+              "kind": "caption",
+              "cue": "hollow, alone",
+              "text": "I sat there holding a french fry.",
+              "display": "I sat there holding a french fry.",
+              "source": {
+                "line": 285,
+                "column": 1,
+                "endLine": 285,
+                "endColumn": 52
+              }
+            },
+            {
+              "kind": "caption",
+              "cue": "rueful, sad but wry",
+              "text": "It was probably the worst french fry of my entire life.",
+              "display": "It was probably the worst french fry of my entire life.",
+              "source": {
+                "line": 287,
+                "column": 1,
+                "endLine": 287,
+                "endColumn": 80
+              }
+            }
+          ],
+          "source": {
+            "line": 277,
+            "column": 1,
+            "endLine": 277,
+            "endColumn": 12
+          }
+        }
+      ]
+    }
+  ]
+}

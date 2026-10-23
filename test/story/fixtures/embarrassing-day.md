@@ -5,21 +5,27 @@ cast:
   MILO:
     voice: Puck
     delivery: a funny, quick-talking thirteen-year-old boy telling his own story
+    look: a 13-year-old boy with messy curly brown hair, freckles and big expressive eyebrows; oversized forest-green hoodie with a small orange wildcat patch, blue jeans, red high-top sneakers, gray backpack
   JUNE:
     voice: Leda
     delivery: a smart, sarcastic thirteen-year-old girl, dry and warm
+    look: a 13-year-old Korean American girl with straight black hair in a chin-length bob with blunt bangs; mustard-yellow cardigan over a white T-shirt with a small star, dark jeans, white sneakers; purple sunglasses only when dancing
   HARPER:
     voice: Zephyr
     delivery: a bubbly, confident eighth-grade girl, student council president
+    look: a tall 14-year-old girl with long wavy strawberry-blonde hair and a white headband; blue-and-gold Westfield Wildcats varsity jacket, carries a clipboard
   ALVAREZ:
     voice: Algenib
     delivery: a frazzled middle school technology teacher
+    look: a technology teacher in his forties with a thick black mustache and rectangular glasses; brown sweater vest over a checked shirt, school lanyard
   TECHKID:
     voice: Achird
     delivery: a startled tech club kid
+    look: a skinny tech club kid with a buzz cut, oversized headphones around his neck and a black T-shirt
   KID:
     voice: Fenrir
     delivery: a loud, excited middle schooler in a crowd
+    look: a loud seventh grader with spiky red hair and a striped T-shirt
 ---
 
 # The Most Embarrassing Day of My Life
