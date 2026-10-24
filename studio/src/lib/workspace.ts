@@ -111,7 +111,12 @@ function readSnapshot(serialized: string | null): WorkspaceSnapshot {
         imageDrafts[id] = { kind: 'image', prompt: typeof draft.prompt === 'string' ? draft.prompt : '',
           aspectRatio: typeof draft.aspectRatio === 'string' ? draft.aspectRatio : '16:9', resolution: typeof draft.resolution === 'string' ? draft.resolution : '',
           adapt: draft.adapt === true, instructions: typeof draft.instructions === 'string' ? draft.instructions : '',
-          referenceAssetId: typeof draft.referenceAssetId === 'string' ? draft.referenceAssetId : null };
+          referenceAssetId: typeof draft.referenceAssetId === 'string' ? draft.referenceAssetId : null,
+          ...(typeof draft.model === 'string' ? { model: draft.model } : {}),
+          ...(Array.isArray(draft.referenceAssetIds) ? { referenceAssetIds: draft.referenceAssetIds.filter((x): x is string => typeof x === 'string') } : {}),
+          ...(typeof draft.videoUri === 'string' ? { videoUri: draft.videoUri } : {}),
+          ...(draft.searchGrounding && typeof draft.searchGrounding === 'object' ? { searchGrounding: { web: (draft.searchGrounding as { web?: unknown }).web === true, imageSearch: (draft.searchGrounding as { imageSearch?: unknown }).imageSearch === true } } : {}),
+          ...(draft.thinkingLevel === '' || draft.thinkingLevel === 'minimal' || draft.thinkingLevel === 'medium' || draft.thinkingLevel === 'high' ? { thinkingLevel: draft.thinkingLevel } : {}) };
       }
       const videoDrafts: Record<string, VideoDraft> = Object.create(null);
       for (const [id, value] of Object.entries(saved.videoDrafts ?? {})) {

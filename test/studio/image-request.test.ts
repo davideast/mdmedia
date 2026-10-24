@@ -11,9 +11,59 @@ describe('image request and job contract', () => {
     expect(readImageDefaults({ bad: true })).toEqual(DEFAULT_IMAGE_REQUEST);
   });
   it('rejects unsupported fields, limits, and invalid references before submission', () => {
-    for (const body of [{ prompt: '' }, { prompt: 'x'.repeat(32_001) }, { prompt: 'draw', provider: 'openai' }, { prompt: 'draw', output: { resolution: '8K' } }, { prompt: 'draw', referenceAssetId: '../other' }, { prompt: 'draw', adaptation: { enabled: 'yes' } }]) expect(() => parseImageRequest(body)).toThrow();
+    for (const body of [
+      { prompt: '' },
+      { prompt: 'x'.repeat(32_001) },
+      { prompt: 'draw', provider: 'openai' },
+      { prompt: 'draw', output: { resolution: '8K' } },
+      { prompt: 'draw', referenceAssetId: '../other' },
+      { prompt: 'draw', adaptation: { enabled: 'yes' } },
+      { prompt: 'draw', model: 'dall-e-3' },
+      { prompt: 'draw', model: 'gemini-3-pro-image', output: { aspectRatio: '1:4' } },
+      { prompt: 'draw', model: 'gemini-nano-banana-2.1', output: { resolution: '0.5K' } },
+      { prompt: 'draw', model: 'gemini-3.1-flash-lite-image', output: { resolution: '2K' } },
+      { prompt: 'draw', model: 'gemini-3.1-flash-lite-image', searchGrounding: { web: true } },
+      { prompt: 'draw', model: 'gemini-3-pro-image', searchGrounding: { imageSearch: true } },
+      { prompt: 'draw', model: 'gemini-3.1-flash-image', thinkingLevel: 'medium' },
+      { prompt: 'draw', model: 'gemini-3-pro-image', videoUri: 'https://www.youtube.com/watch?v=UTdfxFyOQTI' },
+      { prompt: 'draw', videoUri: 'ftp://bad.example/video.mp4' },
+      { prompt: 'draw', referenceAssetIds: Array.from({ length: 15 }, (_, i) => `asset_${i}`) },
+    ]) {
+      expect(() => parseImageRequest(body)).toThrow();
+    }
     expect(() => readIdempotencyKey(new Request('http://studio'))).toThrow();
     expect(readIdempotencyKey(new Request('http://studio', { headers: { 'Idempotency-Key': 'unique-request-123' } }))).toBe('unique-request-123');
+  });
+  it('accepts Gemini 3.1/Nano Banana 2.1 models, extended ratios, 0.5K, up to 14 references, grounding, thinking, videoUri, and refine actions', () => {
+    const parsed = parseImageRequest({
+      prompt: 'Poster',
+      model: 'gemini-3.1-flash-image',
+      output: { aspectRatio: '1:8', resolution: '0.5K', mimeType: 'image/jpeg' },
+      referenceAssetIds: ['ref_1', 'ref_2'],
+      videoUri: 'https://www.youtube.com/watch?v=UTdfxFyOQTI',
+      searchGrounding: { web: true, imageSearch: true },
+      thinkingLevel: 'high',
+      action: 'refine',
+      fromGenerationId: 'gen_prev',
+    });
+    expect(parsed).toMatchObject({
+      prompt: 'Poster',
+      model: 'gemini-3.1-flash-image',
+      output: { aspectRatio: '1:8', resolution: '0.5K', mimeType: 'image/jpeg' },
+      referenceAssetId: 'ref_1',
+      referenceAssetIds: ['ref_1', 'ref_2'],
+      videoUri: 'https://www.youtube.com/watch?v=UTdfxFyOQTI',
+      searchGrounding: { web: true, imageSearch: true },
+      thinkingLevel: 'high',
+      action: 'refine',
+      fromGenerationId: 'gen_prev',
+    });
+    const replaced = parseImageRequest({ prompt: 'Single ref', referenceAssetId: 'ref_3' }, parsed);
+    expect(replaced.referenceAssetId).toBe('ref_3');
+    expect(replaced.referenceAssetIds).toBeUndefined();
+    const cleared = parseImageRequest({ prompt: 'No refs', referenceAssetId: null }, parsed);
+    expect(cleared.referenceAssetId).toBeNull();
+    expect(cleared.referenceAssetIds).toBeUndefined();
   });
   it('distinguishes replay from changed-payload conflicts', () => {
     const stored = { requestHash: 'hash', itemId: 'image', generationId: 'attempt' };

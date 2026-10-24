@@ -48,12 +48,26 @@ let holdProvider: Promise<void> | null = null;
 mock.module('../../../studio/src/lib/firebase-admin', () => ({ adminDb: () => db, adminBucket: () => bucket, isAllowlisted: async () => true, verifyUser: async (header: string) => header === 'Bearer test-session' ? { uid: 'owner', email: 'owner@example.test' } : null, verifyIdToken: async () => null, adminAuth: () => ({}) }));
 // Match Studio's resolved engine whether installed locally or through the root workspace link.
 const ttsEntry = Bun.resolveSync('mdmedia/tts', fileURLToPath(new URL('../../../studio/src/lib/', import.meta.url)));
-mock.module(join(dirname(ttsEntry), 'gemini-client-factory.js'), () => ({ NodeEnvProvider: class {}, createGeminiClient: () => ({ models: { generateContent: async (request: any) => {
-  if (request.config.systemInstruction) return { text: 'Prepared visual brief' };
-  providerCalls++; if (holdProvider) await holdProvider;
-  if (failProvider) throw new Error('network failed with SECRET in its message');
-  return { candidates: [{ content: { parts: [{ inlineData: { mimeType: 'image/png', data: png.toString('base64') } }] } }] };
-} } }) }));
+let retrievalCalls = 0;
+mock.module(join(dirname(ttsEntry), 'gemini-client-factory.js'), () => ({ NodeEnvProvider: class {}, createGeminiClient: () => ({
+  interactions: {
+    get: async (id: string) => {
+      retrievalCalls++;
+      if (failProvider) throw new Error('retrieve failed with SECRET');
+      return {
+        id,
+        output_image: { data: png.toString('base64'), mime_type: 'image/png' },
+        steps: [{ type: 'thought', summary: [{ type: 'text', text: 'Recovered thought summary' }] }],
+      };
+    },
+  },
+  models: { generateContent: async (request: any) => {
+    if (request.config.systemInstruction) return { text: 'Prepared visual brief' };
+    providerCalls++; if (holdProvider) await holdProvider;
+    if (failProvider) throw new Error('network failed with SECRET in its message');
+    return { candidates: [{ content: { parts: [{ inlineData: { mimeType: 'image/png', data: png.toString('base64') } }] } }] };
+  } },
+}) }));
 process.env.GEMINI_API_KEY = 'test-only-placeholder';
 const server = await import('../../../studio/src/lib/image-server');
 const { parseImageRequest } = await import('../../../studio/src/lib/image-request');
@@ -81,18 +95,30 @@ const ready = await server.imageResource(uid, first.itemId, 'https://studio.test
 assert.equal(ready.result!.assets[0].width, 24); assert.equal(ready.result!.preparedPrompt, 'Prepared visual brief');
 assert.equal((ready as any).ownerUid, undefined);
 assert.equal(documents.get('mediaQuotas/owner')!.active.length, 0);
-// Regeneration is a new immutable attempt. Failure preserves the prior successful asset.
+// Multi-turn refinement requires an existing item and records parentGenerationId.
+await assert.rejects(server.submitImage(uid, { ...req, action: 'refine' }, 'refine-no-item-123', null, 'key'), { code: 'invalid_action' });
+// Regeneration / refinement is a new immutable attempt. Failure preserves the prior successful asset.
 failProvider = true;
-const next = await server.submitImage(uid, { ...req, prompt: 'New source' }, 'next-key-12345', first.itemId, 'key');
+const next = await server.submitImage(uid, { ...req, prompt: 'New source', action: 'refine', fromGenerationId: first.generationId }, 'next-key-12345', first.itemId, 'key');
 await server.processImageJobs(); await waitFor(next.generationId, job => job.status === 'interrupted');
 const failed = await server.imageResource(uid, first.itemId, 'https://studio.test');
 assert.equal(failed.result!.id, first.generationId); assert.equal(failed.latestGeneration!.id, next.generationId);
+assert.equal(failed.latestGeneration!.parentGenerationId, first.generationId);
 assert(!JSON.stringify(failed).includes('SECRET'));
 const replay = await server.submitImage(uid, req, 'same-key-12345', null, 'key'); assert.equal(replay.generationId, first.generationId); assert.equal(providerCalls, 2);
-// An expired provider lease is recovered without another paid submission.
-const abandoned = { ...documents.get(`mediaGenerations/${next.generationId}`)!, id: 'abandoned', status: 'generating', leaseToken: 'old', leaseUntil: 1, assetId: null };
+// An expired provider lease without an interaction receipt is marked interrupted without another paid submission.
+const abandoned = { ...documents.get(`mediaGenerations/${next.generationId}`)!, id: 'abandoned', status: 'generating', leaseToken: 'old', leaseUntil: 1, assetId: null, interactionId: null };
 documents.set('mediaGenerations/abandoned', abandoned); documents.set('mediaActivity/abandoned', { ...abandoned, href: `/image/${first.itemId}` });
 await waitFor('abandoned', job => job.status === 'interrupted'); assert.equal(documents.get('mediaGenerations/abandoned')!.status, 'interrupted'); assert.equal(providerCalls, 2);
+// An expired provider lease WITH an interactionId recovers via retrieveGeminiImage without incrementing providerCalls.
+failProvider = false;
+const abandonedWithReceipt = { ...documents.get(`mediaGenerations/${next.generationId}`)!, id: 'abandoned_receipt', status: 'generating', leaseToken: 'old', leaseUntil: 1, assetId: null, interactionId: 'int_recovered_123' };
+documents.set('mediaGenerations/abandoned_receipt', abandonedWithReceipt); documents.set('mediaActivity/abandoned_receipt', { ...abandonedWithReceipt, href: `/image/${first.itemId}` });
+await waitFor('abandoned_receipt', job => job.status === 'ready');
+assert.equal(documents.get('mediaGenerations/abandoned_receipt')!.status, 'ready');
+assert.equal(documents.get('mediaGenerations/abandoned_receipt')!.thoughtSummary, 'Recovered thought summary');
+assert.equal(retrievalCalls, 1);
+assert.equal(providerCalls, 2);
 // Foreign reference IDs and scoped catalog reads never reveal another owner's content.
 documents.set('mediaAssets/foreign', { ownerUid: 'intruder' });
 await assert.rejects(server.submitImage(uid, { ...req, referenceAssetId: 'foreign' }, 'foreign-key-123', null, 'key'), { code: 'reference_not_found' });
@@ -128,4 +154,17 @@ assert.equal(providerCalls, 2);
 assert.equal((await imageRoute.GET(new Request('https://studio.test/api/v1/images/other', { headers: { Authorization: 'Bearer test-session' } }), { params: Promise.resolve({ id: 'other' }) })).status, 404);
 assert.equal((await assetRoute.GET(new Request('https://studio.test/api/v1/assets/foreign/content', { headers: { Authorization: 'Bearer test-session' } }), { params: Promise.resolve({ id: 'foreign' }) })).status, 404);
 assert.equal((await uploadRoute.POST(new Request('https://studio.test/api/v1/assets', { method: 'POST', headers: { Authorization: 'Bearer test-session' }, body: 'not-an-image' }))).status, 400);
+const optionsRoute = await import('../../../studio/src/app/api/v1/options/route');
+const optionsRes = await optionsRoute.GET(new Request('https://studio.test/api/v1/options?media=image', { headers: { Authorization: 'Bearer test-session' } }));
+assert.equal(optionsRes.status, 200);
+const optionsJson = await optionsRes.json();
+assert.equal(optionsJson.model, 'gemini-nano-banana-2.1');
+assert.ok(Array.isArray(optionsJson.models) && optionsJson.models.includes('gemini-nano-banana-2.1'));
+assert.ok(Array.isArray(optionsJson.extendedAspectRatios) && optionsJson.extendedAspectRatios.includes('1:8'));
+assert.ok(Array.isArray(optionsJson.thinkingLevels) && optionsJson.thinkingLevels.includes('high'));
+assert.ok(Array.isArray(optionsJson.outputMimeTypes) && optionsJson.outputMimeTypes.includes('image/jpeg'));
+assert.equal(optionsJson.referenceImages, 14);
+assert.equal(optionsJson.searchGrounding, true);
+assert.equal(optionsJson.videoToImage, true);
+assert.equal(optionsJson.adaptation, true);
 console.log(JSON.stringify({ passed: true, providerCalls, assertions: 'concurrent idempotency, ownership, immutable versions, failure retention, storage metadata, interruption recovery, scoped catalog' }));

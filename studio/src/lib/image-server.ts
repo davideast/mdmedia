@@ -1,10 +1,19 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { adaptGeminiImagePrompt, generateGeminiImage, GeminiImageError, type ImageAspectRatio, type ImageResolution } from 'mdmedia/image';
-import { createGeminiClient } from 'mdmedia/tts';
+import {
+  adaptGeminiImagePrompt,
+  generateGeminiImage,
+  retrieveGeminiImage,
+  GeminiImageError,
+  type ImageAspectRatio,
+  type ImageOutput,
+  type ImageReference,
+  type ImageResolution,
+} from 'mdmedia/image';
+import { createGeminiClient, NodeEnvProvider } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
 import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, saveImageAsset, type StoredAsset } from './assets-server';
-import { MediaError, validMediaId, readImageDefaults } from './image-request';
+import { DEFAULT_IMAGE_MODEL, MediaError, collectReferenceAssetIds, readImageDefaults, validMediaId } from './image-request';
 import { decideIdempotentReplay, executeImageJob } from './image-jobs';
 import type { ImageGenerationResource, GenerationStatus, ImageRequest, ImageResource, MediaSummary } from './media-types';
 
@@ -16,15 +25,47 @@ export interface ImageGeneration {
   id: string; ownerUid: string; itemId: string; type: 'image'; title: string;
   request: ImageRequest; provider: 'gemini'; model: string; adaptationModel: string;
   status: GenerationStatus; phase: string; preparedPrompt: string | null;
-  assetId: string | null; createdAt: number; updatedAt: number;
+  assetId: string | null;
+  interactionId?: string | null;
+  parentGenerationId?: string | null;
+  thoughtSummary?: string | null;
+  grounding?: { citations: Array<{ url: string; title?: string }>; searchSuggestionsHtml?: string | null } | null;
+  createdAt: number; updatedAt: number;
   leaseUntil: number; leaseToken: string | null;
   error: { code: string; message: string } | null;
 }
-export const configuredImageModel = () => process.env.MDMEDIA_IMAGE_MODEL?.trim() || 'gemini-3-pro-image';
+const defaultImageModel = () => process.env.MDMEDIA_IMAGE_MODEL?.trim() || DEFAULT_IMAGE_MODEL;
+export const configuredImageModel = defaultImageModel;
 const titleFor = (prompt: string) => prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 100) || 'Untitled image';
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const itemRef = (id: string) => adminDb().collection('mediaItems').doc(`image_${id}`);
 const generationRef = (id: string) => adminDb().collection('mediaGenerations').doc(id);
+
+async function assertReferenceAsset(uid: string, refId: string) {
+  const reference = await adminDb().collection('mediaAssets').doc(refId).get();
+  if (
+    !reference.exists ||
+    reference.data()?.ownerUid !== uid ||
+    !String(reference.data()?.mimeType).startsWith('image/') ||
+    ['video', 'music'].includes(String(reference.data()?.mediaType))
+  ) {
+    throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+  }
+}
+
+async function readReferenceAsset(uid: string, id: string): Promise<ImageReference> {
+  const asset = await loadOwnedAsset(uid, id);
+  const [bytes] = await adminBucket().file(asset.path).download();
+  return { bytes: new Uint8Array(bytes), mimeType: asset.mimeType };
+}
+
+async function readGeneratedAssetAsReference(uid: string, assetId: string): Promise<ImageReference> {
+  return readReferenceAsset(uid, assetId);
+}
+
+async function saveGeneratedAsset(ownerUid: string, itemId: string, generationId: string, bytes: Uint8Array): Promise<StoredAsset> {
+  return saveImageAsset(ownerUid, bytes, 'output', generationId, itemId);
+}
 
 export async function imageDefaults(uid: string): Promise<ImageRequest> {
   const user = await adminDb().collection('users').doc(uid).get();
@@ -45,6 +86,9 @@ export async function loadImageGeneration(uid: string, id: string): Promise<Imag
 
 /** Persist acceptance, quota, and idempotency together before dispatching any paid work. */
 export async function submitImage(uid: string, request: ImageRequest, key: string, existingItemId: string | null, apiKeyId: string | null, submittedBody: unknown = request) {
+  if ((request.action === 'refine' || request.fromGenerationId) && !existingItemId) {
+    throw new MediaError(400, 'invalid_action', 'Refining requires an existing image item.');
+  }
   const target = existingItemId ?? 'new';
   const canonical = (value: unknown): unknown => value && typeof value === 'object' && !Array.isArray(value)
     ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, canonical(child)]))
@@ -55,19 +99,28 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
   const itemId = existingItemId ?? adminDb().collection('mediaItems').doc().id;
   const generationId = adminDb().collection('mediaGenerations').doc().id;
   const now = Date.now();
+  for (const refId of collectReferenceAssetIds(request)) {
+    await assertReferenceAsset(uid, refId);
+  }
   const accepted = await adminDb().runTransaction(async tx => {
     const replay = await tx.get(replayRef);
     const decision = decideIdempotentReplay(replay.exists ? replay.data() as { requestHash: string; itemId: string; generationId: string } : null, requestHash);
     if (decision.kind === 'conflict') throw new MediaError(409, 'idempotency_conflict', 'That key was already used with different image settings.');
     if (decision.kind === 'replay') return { itemId: decision.itemId, generationId: decision.generationId, replayed: true };
     if (!process.env.GEMINI_API_KEY) throw new MediaError(503, 'provider_unavailable', 'Gemini image generation is not configured on this Studio.');
-    const itemSnapshot = await tx.get(itemRef(itemId));
-    const previous = itemSnapshot.data() as ImageItem | undefined;
+    const currentItem = await tx.get(itemRef(itemId));
+    const previous = currentItem.data() as ImageItem | undefined;
     if (existingItemId && (!previous || previous.ownerUid !== uid)) throw new MediaError(404, 'not_found', 'That image is not available to you.');
     if (previous && ['queued', 'generating'].includes(previous.status)) throw new MediaError(409, 'generation_in_progress', 'This image already has a generation in progress.');
-    if (request.referenceAssetId) {
-      const reference = await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId));
-      if (!reference.exists || reference.data()?.ownerUid !== uid || !String(reference.data()?.mimeType).startsWith('image/') || ['video', 'music'].includes(String(reference.data()?.mediaType))) throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+    let parentGenerationId: string | null = null;
+    if (request.action === 'refine' || request.fromGenerationId) {
+      const parentId = request.fromGenerationId ?? currentItem?.data()?.latestSuccessfulGenerationId ?? null;
+      if (!parentId) throw new MediaError(409, 'no_parent_generation', 'Wait for an image generation to finish before refining it.');
+      const parentSnap = await tx.get(adminDb().collection('mediaGenerations').doc(parentId));
+      if (!parentSnap.exists || parentSnap.data()?.ownerUid !== uid || parentSnap.data()?.itemId !== itemId) {
+        throw new MediaError(404, 'not_found', 'That generation is not available to you.');
+      }
+      parentGenerationId = parentId;
     }
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};
@@ -80,13 +133,16 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
     const nextHourly = Object.fromEntries(Object.entries(hourly ?? {}).filter(([, value]) => now - value.since < 3_600_000));
     if (apiKeyId) nextHourly[apiKeyId] = { ...current, count: current.count + 1 };
     const title = previous?.title ?? titleFor(request.prompt);
+    const model = request.model || defaultImageModel();
     const item: ImageItem = { id: itemId, type: 'image', ownerUid: uid, title, status: 'queued', visibility: 'private',
       ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/image/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
       thumbnailAssetId: previous?.thumbnailAssetId ?? null, request, latestGenerationId: generationId,
       latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null };
     const generation: ImageGeneration = { id: generationId, ownerUid: uid, itemId, type: 'image', title, request,
-      provider: 'gemini', model: configuredImageModel(), adaptationModel: process.env.MDMEDIA_IMAGE_ADAPTATION_MODEL || 'gemini-3.5-flash-lite',
-      status: 'queued', phase: 'queued', preparedPrompt: null, assetId: null, createdAt: now, updatedAt: now, leaseUntil: 0, leaseToken: null, error: null };
+      provider: 'gemini', model, adaptationModel: process.env.MDMEDIA_IMAGE_ADAPTATION_MODEL || 'gemini-3.5-flash-lite',
+      status: 'queued', phase: 'queued', preparedPrompt: null, assetId: null,
+      ...(parentGenerationId ? { parentGenerationId } : {}),
+      createdAt: now, updatedAt: now, leaseUntil: 0, leaseToken: null, error: null };
     tx.set(itemRef(itemId), item);
     tx.set(generationRef(generationId), generation);
     tx.set(adminDb().collection('mediaActivity').doc(generationId), { id: generationId, itemId, ownerUid: uid, type: 'image', title, status: 'queued', phase: 'queued', createdAt: now, updatedAt: now, href: `/image/${itemId}` });
@@ -99,13 +155,17 @@ export async function submitImage(uid: string, request: ImageRequest, key: strin
   return accepted;
 }
 
-export async function generationResource(generation: ImageGeneration, origin: string): Promise<ImageGenerationResource> {
-  const asset = generation.assetId ? await loadOwnedAsset(generation.ownerUid, generation.assetId) : null;
-  return { id: generation.id, itemId: generation.itemId, type: 'image', title: generation.title, status: generation.status,
-    phase: generation.phase, createdAt: generation.createdAt, updatedAt: generation.updatedAt, request: generation.request,
-    preparedPrompt: generation.preparedPrompt, provider: generation.provider, model: generation.model,
-    assets: asset ? [assetResource(asset, origin)] : [], error: generation.error,
-    links: { self: `${origin}/api/v1/generations/${generation.id}`, web: `${origin}/image/${generation.itemId}` } };
+export async function generationResource(job: ImageGeneration, origin: string): Promise<ImageGenerationResource> {
+  const asset = job.assetId ? await loadOwnedAsset(job.ownerUid, job.assetId) : null;
+  return { id: job.id, itemId: job.itemId, type: 'image', title: job.title, status: job.status,
+    phase: job.phase, createdAt: job.createdAt, updatedAt: job.updatedAt, request: job.request,
+    preparedPrompt: job.preparedPrompt, provider: job.provider, model: job.model,
+    ...(job.interactionId !== undefined ? { interactionId: job.interactionId } : {}),
+    ...(job.parentGenerationId !== undefined ? { parentGenerationId: job.parentGenerationId } : {}),
+    ...(job.thoughtSummary !== undefined ? { thoughtSummary: job.thoughtSummary } : {}),
+    ...(job.grounding !== undefined ? { grounding: job.grounding } : {}),
+    assets: asset ? [assetResource(asset, origin)] : [], error: job.error,
+    links: { self: `${origin}/api/v1/generations/${job.id}`, web: `${origin}/image/${job.itemId}` } };
 }
 export async function imageResource(uid: string, id: string, origin: string): Promise<ImageResource> {
   const item = await loadImageItem(uid, id);
@@ -117,7 +177,7 @@ export async function imageResource(uid: string, id: string, origin: string): Pr
     links: { self: `${origin}/api/v1/images/${id}`, web: `${origin}/image/${id}`, generations: `${origin}/api/v1/images/${id}/generations` } };
 }
 
-async function finishGeneration(job: ImageGeneration, token: string, asset: StoredAsset | null, error: ImageGeneration['error'], status: GenerationStatus) {
+async function finishGeneration(job: ImageGeneration, token: string, asset: StoredAsset | null, error: ImageGeneration['error'], status: GenerationStatus, extra?: Partial<ImageGeneration>) {
   const quotaRef = adminDb().collection('mediaQuotas').doc(job.ownerUid);
   await adminDb().runTransaction(async tx => {
     const snapshot = await tx.get(generationRef(job.id));
@@ -126,7 +186,7 @@ async function finishGeneration(job: ImageGeneration, token: string, asset: Stor
     const item = await tx.get(itemRef(job.itemId));
     const quota = await tx.get(quotaRef);
     const now = Date.now();
-    tx.update(generationRef(job.id), { status, phase: status, error, assetId: asset?.id ?? null, leaseUntil: 0, updatedAt: now });
+    tx.update(generationRef(job.id), { status, phase: status, error, assetId: asset?.id ?? null, leaseUntil: 0, updatedAt: now, ...extra });
     tx.update(adminDb().collection('mediaActivity').doc(job.id), { status, phase: status, updatedAt: now });
     if (item.data()?.latestGenerationId === job.id) tx.update(itemRef(job.itemId), {
       status, updatedAt: now, ...(asset ? { latestSuccessfulGenerationId: job.id, thumbnailAssetId: asset.id } : {}),
@@ -137,11 +197,12 @@ async function finishGeneration(job: ImageGeneration, token: string, asset: Stor
 
 async function runJob(id: string) {
   const token = randomUUID();
+  const ref = generationRef(id);
   const job = await adminDb().runTransaction(async tx => {
-    const snapshot = await tx.get(generationRef(id));
+    const snapshot = await tx.get(ref);
     const data = snapshot.data() as ImageGeneration | undefined;
     if (!data || data.type !== 'image' || data.status !== 'queued') return null;
-    tx.update(generationRef(id), { status: 'generating', phase: 'starting', leaseToken: token, leaseUntil: Date.now() + 90_000, updatedAt: Date.now() });
+    tx.update(ref, { status: 'generating', phase: 'starting', leaseToken: token, leaseUntil: Date.now() + 90_000, updatedAt: Date.now() });
     tx.update(itemRef(data.itemId), { status: 'generating', updatedAt: Date.now() });
     tx.update(adminDb().collection('mediaActivity').doc(id), { status: 'generating', phase: 'starting', updatedAt: Date.now() });
     return data;
@@ -149,36 +210,65 @@ async function runJob(id: string) {
   if (!job) return;
   const heartbeat = setInterval(() => {
     void adminDb().runTransaction(async tx => {
-      const current = await tx.get(generationRef(id));
-      if (current.data()?.leaseToken === token && current.data()?.status === 'generating') tx.update(generationRef(id), { leaseUntil: Date.now() + 90_000 });
+      const current = await tx.get(ref);
+      if (current.data()?.leaseToken === token && current.data()?.status === 'generating') tx.update(ref, { leaseUntil: Date.now() + 90_000 });
     }).catch(() => {});
   }, 20_000);
   heartbeat.unref();
   let providerSubmitted = false;
+  let generatedOutput: ImageOutput | null = null;
   try {
     const client = createGeminiClient();
     await executeImageJob(job.request, {
       prepare: (source, instructions) => adaptGeminiImagePrompt(client, source, instructions, job.adaptationModel),
       async checkpoint(phase, preparedPrompt) {
         await adminDb().runTransaction(async tx => {
-          const current = await tx.get(generationRef(id));
+          const current = await tx.get(ref);
           if (current.data()?.leaseToken !== token || current.data()?.status !== 'generating') throw new Error('Generation lease expired');
-          tx.update(generationRef(id), { phase, ...(preparedPrompt === undefined ? {} : { preparedPrompt }), updatedAt: Date.now() });
+          tx.update(ref, { phase, ...(preparedPrompt === undefined ? {} : { preparedPrompt }), updatedAt: Date.now() });
           tx.update(adminDb().collection('mediaActivity').doc(id), { phase, updatedAt: Date.now() });
         });
       },
-      async generate(prompt, request) {
-        const reference = request.referenceAssetId ? await loadOwnedAsset(job.ownerUid, request.referenceAssetId) : null;
-        const bytes = reference ? new Uint8Array((await adminBucket().file(reference.path).download())[0]) : null;
+      async generate(prompt) {
+        const refIds = collectReferenceAssetIds(job.request);
+        const references = await Promise.all(refIds.map(refId => readReferenceAsset(job.ownerUid, refId)));
+        let previousInteractionId: string | undefined;
+        if (job.parentGenerationId) {
+          const parent = await loadImageGeneration(job.ownerUid, job.parentGenerationId);
+          if (parent.interactionId) {
+            previousInteractionId = parent.interactionId;
+          } else if (parent.assetId) {
+            const parentRef = await readGeneratedAssetAsReference(job.ownerUid, parent.assetId);
+            references.unshift(parentRef);
+          }
+        }
         providerSubmitted = true;
-        const output = await generateGeminiImage(client, { prompt, model: job.model, aspectRatio: request.output.aspectRatio as ImageAspectRatio,
-          ...(request.output.resolution ? { resolution: request.output.resolution as ImageResolution } : {}),
-          ...(reference && bytes ? { reference: { bytes, mimeType: reference.mimeType } } : {}) });
-        return output.bytes;
+        generatedOutput = await generateGeminiImage(client, {
+          prompt,
+          model: job.model,
+          aspectRatio: job.request.output.aspectRatio as ImageAspectRatio,
+          resolution: (job.request.output.resolution ?? undefined) as ImageResolution | undefined,
+          mimeType: job.request.output.mimeType ?? undefined,
+          reference: references[0],
+          references: references.length ? references : undefined,
+          video: job.request.videoUri ? { uri: job.request.videoUri } : undefined,
+          previousInteractionId,
+          searchGrounding: job.request.searchGrounding,
+          thinkingLevel: job.request.thinkingLevel ?? undefined,
+          onInteraction: async (interactionId) => {
+            job.interactionId = interactionId;
+            await ref.update({ interactionId, updatedAt: Date.now() });
+          },
+        });
+        return generatedOutput.bytes;
       },
       async save(bytes) {
-        const asset = await saveImageAsset(job.ownerUid, bytes, 'output', job.id, job.itemId);
-        await finishGeneration(job, token, asset, null, 'ready');
+        const asset = await saveGeneratedAsset(job.ownerUid, job.itemId, job.id, bytes);
+        await finishGeneration(job, token, asset, null, 'ready', {
+          interactionId: generatedOutput?.interactionId ?? job.interactionId ?? null,
+          thoughtSummary: generatedOutput?.thoughtSummary ?? null,
+          grounding: generatedOutput?.grounding ?? null,
+        });
       },
     });
   } catch (error) {
@@ -190,14 +280,35 @@ async function runJob(id: string) {
 }
 async function recoverJob(job: ImageGeneration, token: string) {
   let asset: StoredAsset | null = null;
+  let recoveredOutput: ImageOutput | null = null;
   try { asset = await loadOwnedAsset(job.ownerUid, `image_${job.id}`); } catch { /* Storage may have completed before its database checkpoint. */ }
   if (!asset) {
     try {
       const [bytes] = await adminBucket().file(`media/${job.ownerUid}/image_${job.id}/original`).download();
-      asset = await saveImageAsset(job.ownerUid, new Uint8Array(bytes), 'output', job.id, job.itemId);
+      asset = await saveGeneratedAsset(job.ownerUid, job.itemId, job.id, new Uint8Array(bytes));
     } catch { /* An absent output must not trigger another provider request. */ }
   }
-  await finishGeneration(job, token, asset, asset ? null : { code: 'generation_interrupted', message: 'This attempt did not complete. Its provider outcome may be unknown. Generating again starts a new request.' }, asset ? 'ready' : 'interrupted');
+  if (!asset && !job.assetId && job.interactionId) {
+    try {
+      const recovered = await retrieveGeminiImage(createGeminiClient(new NodeEnvProvider()), job.interactionId);
+      recoveredOutput = recovered;
+      asset = await saveGeneratedAsset(job.ownerUid, job.itemId, job.id, recovered.bytes);
+    } catch { /* Fall through to marking interrupted if retrieval fails. */ }
+  }
+  await finishGeneration(
+    job,
+    token,
+    asset,
+    asset ? null : { code: 'generation_interrupted', message: 'This attempt did not complete. Its provider outcome may be unknown. Generating again starts a new request.' },
+    asset ? 'ready' : 'interrupted',
+    recoveredOutput
+      ? {
+          interactionId: recoveredOutput.interactionId ?? job.interactionId ?? null,
+          thoughtSummary: recoveredOutput.thoughtSummary ?? job.thoughtSummary ?? null,
+          grounding: recoveredOutput.grounding ?? job.grounding ?? null,
+        }
+      : undefined,
+  );
 }
 
 type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
