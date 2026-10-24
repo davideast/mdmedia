@@ -36,12 +36,13 @@ type Call = { method: string; path: string; headers: Headers; body: RequestInit[
 /** A studio that accepts anything and answers each GET of an item as `ready`, with one asset. */
 function fakeStudio(type: string) {
   const calls: Call[] = [];
+  let refCount = 0;
   const origin = 'http://localhost:3000';
   const asset = { id: 'out1', mimeType: 'image/png', links: { content: `${origin}/api/v1/assets/out1/content`, thumbnail: '' } };
   const generation = { id: 'gen1', itemId: 'item1', type, status: 'ready', phase: 'ready', assets: [asset], error: null };
   const fetchStub = (async (url: URL, init: RequestInit) => {
     calls.push({ method: init.method ?? 'GET', path: `${url.pathname}${url.search}`, headers: new Headers(init.headers), body: init.body });
-    if (url.pathname === '/api/v1/assets') return Response.json({ id: 'ref1' }, { status: 201 });
+    if (url.pathname === '/api/v1/assets') return Response.json({ id: `ref${++refCount}` }, { status: 201 });
     if (url.pathname.endsWith('/content')) return new Response(new Uint8Array([7, 8, 9]), { headers: { 'Content-Type': 'image/png' } });
     const links = { self: `${origin}${url.pathname}`, web: `${origin}/${type}/item1`, generations: '' };
     if (init.method === 'POST') return Response.json({ id: 'item1', type, generation: { ...generation, status: 'queued', assets: [] }, links, replayed: false }, { status: 202 });
@@ -71,10 +72,66 @@ describe('studio image arguments', () => {
 
   it('rejects bad values before any request is made', () => {
     expect(() => imageBody('x', { aspect: '7:3' })).toThrow('--aspect must be one of 1:1, 2:3');
-    expect(() => imageBody('x', { resolution: '8K' })).toThrow('--resolution must be one of 1K, 2K, 4K (got "8K")');
+    expect(() => imageBody('x', { resolution: '8K' })).toThrow('--resolution must be one of 1K, 2K, 4K');
     expect(() => imageBody('  ', {})).toThrow('The prompt is empty.');
     expect(() => imageBody('x'.repeat(32_001), {})).toThrow('the limit is 32,000');
     expect(() => imageBody('x', { instructions: 'y'.repeat(4001) })).toThrow('--instructions is limited to 4,000 characters.');
+  });
+
+  it('maps model, extended ratios, 0.5k resolution, grounding, thinking, video, refine, and from-generation', () => {
+    expect(
+      imageBody('Poster', {
+        model: 'gemini-3.1-flash-image',
+        aspect: '1:4',
+        resolution: '0.5k',
+        search: true,
+        imageSearch: true,
+        thinking: 'high',
+        video: 'https://example.com/clip.mp4',
+        refine: true,
+        fromGeneration: 'gen1',
+      }),
+    ).toEqual({
+      prompt: 'Poster',
+      model: 'gemini-3.1-flash-image',
+      output: { aspectRatio: '1:4', resolution: '0.5K' },
+      searchGrounding: { web: true, imageSearch: true },
+      thinkingLevel: 'high',
+      videoUri: 'https://example.com/clip.mp4',
+      action: 'refine',
+      fromGenerationId: 'gen1',
+    });
+    expect(imageBody('Poster', { fromGeneration: 'gen1' })).toEqual({
+      prompt: 'Poster',
+      action: 'refine',
+      fromGenerationId: 'gen1',
+    });
+    expect(imageBody('Poster', { refine: true })).toEqual({
+      prompt: 'Poster',
+      action: 'refine',
+    });
+    expect(imageBody('Poster', { search: true })).toEqual({
+      prompt: 'Poster',
+      searchGrounding: { web: true },
+    });
+    expect(imageBody('Poster', { imageSearch: true })).toEqual({
+      prompt: 'Poster',
+      searchGrounding: { imageSearch: true },
+    });
+  });
+
+  it('rejects invalid model and per-model feature combinations', () => {
+    expect(() => imageBody('x', { model: 'dall-e-3' })).toThrow('--model must be one of gemini-nano-banana-2.1');
+    expect(() => imageBody('x', { model: 'gemini-3-pro-image', aspect: '1:4' })).toThrow('1:4');
+    expect(() => imageBody('x', { model: 'gemini-nano-banana-2.1', resolution: '0.5k' })).toThrow('0.5K');
+    expect(() => imageBody('x', { model: 'gemini-3.1-flash-lite-image', resolution: '2K' })).toThrow('1K');
+    expect(() => imageBody('x', { model: 'gemini-3.1-flash-lite-image', search: true })).toThrow('gemini-3.1-flash-lite-image');
+    expect(() => imageBody('x', { model: 'gemini-2.5-flash-image', search: true })).toThrow('gemini-2.5-flash-image');
+    expect(() => imageBody('x', { model: 'gemini-3-pro-image', imageSearch: true })).toThrow('image-search');
+    expect(() => imageBody('x', { model: 'gemini-3.1-flash-image', thinking: 'medium' })).toThrow('minimal, high');
+    expect(() => imageBody('x', { model: 'gemini-3-pro-image', thinking: 'high' })).toThrow('gemini-3-pro-image');
+    expect(() => imageBody('x', { video: 'http://example.com/clip.mp4' })).toThrow('https');
+    expect(() => imageBody('x', { model: 'gemini-3-pro-image', video: 'https://example.com/clip.mp4' })).toThrow('gemini-3-pro-image');
   });
 });
 
@@ -218,6 +275,44 @@ describe('studio commands end to end', () => {
     expect(calls).toHaveLength(0);
     expect(JSON.parse(logs[0]!).error.message).toBe('--type must be one of narration, image, video, music, sfx (got "podcast").');
   });
+
+  it('studio image maps model, search, thinking, video, item, and refine flags to the request', async () => {
+    await runCommand(studioCommand, {
+      rawArgs: [
+        'image',
+        '-p',
+        'Poster',
+        '--model',
+        'gemini-3.1-flash-image',
+        '--aspect',
+        '1:4',
+        '--resolution',
+        '0.5k',
+        '--search',
+        '--image-search',
+        '--thinking',
+        'high',
+        '--video',
+        'https://example.com/clip.mp4',
+        '--item',
+        'item1',
+        '--refine',
+        '--from-generation',
+        'gen0',
+      ],
+    });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['POST /api/v1/images/item1/generations']);
+    expect(JSON.parse(String(calls[0]!.body))).toEqual({
+      prompt: 'Poster',
+      model: 'gemini-3.1-flash-image',
+      output: { aspectRatio: '1:4', resolution: '0.5K' },
+      searchGrounding: { web: true, imageSearch: true },
+      thinkingLevel: 'high',
+      videoUri: 'https://example.com/clip.mp4',
+      action: 'refine',
+      fromGenerationId: 'gen0',
+    });
+  });
 });
 
 describe('studio media references', () => {
@@ -247,6 +342,56 @@ describe('studio media flow', () => {
     expect(calls[0]!.headers.get('content-type')).toBe('image/png');
     expect(JSON.parse(String(calls[1]!.body))).toEqual({ prompt: 'A lighthouse', referenceAssetId: 'ref1' });
     expect(JSON.parse(logs[0]!).id).toBe('item1');
+  });
+
+  it('uploads multiple comma-separated --reference files for image and sends referenceAssetIds', async () => {
+    const dir = tempDir();
+    const ref1 = path.join(dir, 'ref1.png');
+    const ref2 = path.join(dir, 'ref2.jpg');
+    fs.writeFileSync(ref1, new Uint8Array([137, 80, 78, 71]));
+    fs.writeFileSync(ref2, new Uint8Array([255, 216, 255]));
+    const { calls, client } = fakeStudio('image');
+    await runMediaCommand(client, 'image', { prompt: 'A lighthouse' }, { reference: `${ref1}, ${ref2}`, json: true });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'POST /api/v1/assets?media=image',
+      'POST /api/v1/assets?media=image',
+      'POST /api/v1/images',
+    ]);
+    expect(calls[0]!.headers.get('content-type')).toBe('image/png');
+    expect(calls[1]!.headers.get('content-type')).toBe('image/jpeg');
+    expect(JSON.parse(String(calls[2]!.body))).toEqual({
+      prompt: 'A lighthouse',
+      referenceAssetId: 'ref1',
+      referenceAssetIds: ['ref1', 'ref2'],
+    });
+  });
+
+  it('reads all comma-separated --reference files before uploading any and enforces max 14 references', async () => {
+    const dir = tempDir();
+    const valid = path.join(dir, 'ref1.png');
+    const invalid = path.join(dir, 'bad.gif');
+    fs.writeFileSync(valid, new Uint8Array([1]));
+    fs.writeFileSync(invalid, new Uint8Array([1]));
+    const { calls, client } = fakeStudio('image');
+    await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { reference: `${valid}, ${invalid}` })).rejects.toThrow('--reference must be');
+    expect(calls).toHaveLength(0);
+
+    const tooMany = Array.from({ length: 15 }, () => valid).join(',');
+    await expect(runMediaCommand(client, 'image', { prompt: 'x' }, { reference: tooMany })).rejects.toThrow('14');
+    expect(calls).toHaveLength(0);
+  });
+
+  it('with --item, creates a new generation on the existing image item', async () => {
+    const { calls, client } = fakeStudio('image');
+    await runMediaCommand(client, 'image', imageBody('Warmer sky', { refine: true }), { item: 'item1', json: true });
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(['POST /api/v1/images/item1/generations']);
+    expect(JSON.parse(String(calls[0]!.body))).toEqual({ prompt: 'Warmer sky', action: 'refine' });
+  });
+
+  it('rejects --refine when neither --item nor --from-generation is provided', async () => {
+    const { calls, client } = fakeStudio('image');
+    await expect(runMediaCommand(client, 'image', imageBody('Warmer sky', { refine: true }), {})).rejects.toThrow('--refine requires --item');
+    expect(calls).toHaveLength(0);
   });
 
   it('with --output, waits, downloads the result, and saves it', async () => {

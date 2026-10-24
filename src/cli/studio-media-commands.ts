@@ -4,6 +4,7 @@ import { defineCommand } from 'citty';
 import {
   isFinished,
   mediaStatus,
+  type CreatedMedia,
   type ImageRequestBody,
   type MusicRequestBody,
   type ReferenceMediaType,
@@ -21,7 +22,29 @@ const REFERENCE_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': '
 const MAX_REFERENCE_BYTES = 10 * 1024 * 1024;
 const MAX_INSTRUCTIONS = 4000;
 
-export const IMAGE_ASPECTS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'] as const;
+export const IMAGE_ASPECTS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9', '1:4', '4:1', '1:8', '8:1'] as const;
+export const IMAGE_RATIOS = IMAGE_ASPECTS;
+export const EXTENDED_IMAGE_RATIOS = ['1:4', '4:1', '1:8', '8:1'] as const;
+export const IMAGE_RESOLUTIONS = ['1K', '2K', '4K', '0.5K'] as const;
+export const IMAGE_MODELS = [
+  'gemini-nano-banana-2.1',
+  'gemini-3-pro-image',
+  'gemini-3.1-flash-image',
+  'gemini-3.1-flash-lite-image',
+  'gemini-2.5-flash-image',
+] as const;
+export const IMAGE_THINKING_LEVELS = ['minimal', 'medium', 'high'] as const;
+export const MAX_IMAGE_REFERENCES = 14;
+
+const EXTENDED_RATIO_MODELS = new Set<string>(['gemini-nano-banana-2.1', 'gemini-3.1-flash-image']);
+const RESOLUTION_1K_ONLY_MODELS = new Set<string>(['gemini-3.1-flash-lite-image', 'gemini-2.5-flash-image']);
+const IMAGE_SEARCH_MODELS = new Set<string>(['gemini-nano-banana-2.1', 'gemini-3.1-flash-image']);
+const VIDEO_INPUT_MODELS = new Set<string>(['gemini-nano-banana-2.1', 'gemini-3.1-flash-image', 'gemini-3.1-flash-lite-image']);
+const MODEL_THINKING_LEVELS: Record<string, readonly (typeof IMAGE_THINKING_LEVELS)[number][]> = {
+  'gemini-nano-banana-2.1': ['minimal', 'medium', 'high'],
+  'gemini-3.1-flash-image': ['minimal', 'high'],
+  'gemini-3.1-flash-lite-image': ['minimal', 'high'],
+};
 
 /** The prompt from `--prompt`, `--input <file>` (`-` for stdin), or piped stdin. */
 export const readPrompt = (input: string | undefined, prompt: string | undefined) => readSource(input, prompt, { flag: '--prompt', what: 'the prompt' });
@@ -112,6 +135,7 @@ export function describeMedia(resource: StudioMediaResource): string {
 
 export interface MediaRunOptions {
   reference?: string;
+  item?: string;
   wait?: boolean;
   output?: string;
   timeout?: string;
@@ -121,6 +145,28 @@ export interface MediaRunOptions {
 async function withReference<T extends StudioMediaType>(client: StudioClient, type: T, body: StudioMediaBodies[T], file: string | undefined): Promise<StudioMediaBodies[T]> {
   if (file === undefined) return body;
   if (type === 'sfx') throw new Error('Sound effects do not take a reference image.');
+  if (type === 'image') {
+    const files = file.split(',').map((entry) => entry.trim()).filter(Boolean);
+    if (files.length === 0) throw new Error('--reference must name at least one image file.');
+    const model = (body as ImageRequestBody).model;
+    const maxRefs = model === 'gemini-2.5-flash-image' ? 3 : MAX_IMAGE_REFERENCES;
+    if (files.length > maxRefs) {
+      throw new Error(`--reference accepts at most ${maxRefs} images (got ${files.length}).`);
+    }
+    const prepared: Array<{ bytes: Uint8Array; mimeType: string }> = [];
+    for (const refFile of files) {
+      prepared.push(await readReference(refFile));
+    }
+    const ids: string[] = [];
+    for (const { bytes, mimeType } of prepared) {
+      const asset = await client.uploadReference('image', bytes, mimeType);
+      ids.push(asset.id);
+    }
+    if (ids.length === 1) {
+      return { ...body, referenceAssetId: ids[0] };
+    }
+    return { ...body, referenceAssetId: ids[0], referenceAssetIds: ids } as StudioMediaBodies[T];
+  }
   const { bytes, mimeType } = await readReference(file);
   const asset = await client.uploadReference(type as ReferenceMediaType, bytes, mimeType);
   return { ...body, referenceAssetId: asset.id };
@@ -133,7 +179,16 @@ async function withReference<T extends StudioMediaType>(client: StudioClient, ty
 export async function runMediaCommand<T extends StudioMediaType>(client: StudioClient, type: T, body: StudioMediaBodies[T], options: MediaRunOptions): Promise<void> {
   const timeoutMs = (numberIn('--timeout', options.timeout, 1, Infinity) ?? 900) * 1000;
   const output = options.output === undefined ? undefined : await checkOutput(options.output);
-  const created = await client.createMedia(type, await withReference(client, type, body, options.reference));
+  if (type === 'image') {
+    const imgBody = body as ImageRequestBody;
+    if (imgBody.action === 'refine' && !options.item && !imgBody.fromGenerationId) {
+      throw new Error('--refine requires --item <id> or --from-generation <id>.');
+    }
+  }
+  const payload = await withReference(client, type, body, options.reference);
+  const created = type === 'image' && options.item
+    ? (await client.createImageGeneration(options.item, payload as ImageRequestBody) as CreatedMedia<T>)
+    : await client.createMedia(type, payload);
   if (!options.wait && !options.output) {
     if (options.json) console.log(JSON.stringify(created, null, 2));
     else console.log(`${LABELS[type]} started: ${created.links.web}`);
@@ -195,13 +250,108 @@ const runArgs = {
   json: { type: 'boolean', description: 'Print JSON' },
 } as const;
 
-export function imageBody(prompt: string, args: { aspect?: string; resolution?: string; adapt?: boolean; instructions?: string }): ImageRequestBody {
+export interface ImageBodyArgs {
+  model?: string;
+  aspect?: string;
+  resolution?: string;
+  adapt?: boolean;
+  instructions?: string;
+  search?: boolean;
+  imageSearch?: boolean;
+  'image-search'?: boolean;
+  thinking?: string;
+  video?: string;
+  refine?: boolean;
+  fromGeneration?: string;
+  'from-generation'?: string;
+}
+
+export function imageBody(prompt: string, args: ImageBodyArgs): ImageRequestBody {
   const body: ImageRequestBody = { prompt: checkPrompt(prompt, 32_000) };
-  const aspectRatio = oneOf('--aspect', args.aspect, IMAGE_ASPECTS);
-  const resolution = oneOf('--resolution', args.resolution, ['1K', '2K', '4K'] as const);
-  if (aspectRatio || resolution) body.output = { ...(aspectRatio ? { aspectRatio } : {}), ...(resolution ? { resolution } : {}) };
+  const model = oneOf('--model', args.model, IMAGE_MODELS);
+  if (model) body.model = model;
+
+  const aspectRatio = oneOf('--aspect', args.aspect, IMAGE_RATIOS);
+  if (aspectRatio && model && (EXTENDED_IMAGE_RATIOS as readonly string[]).includes(aspectRatio) && !EXTENDED_RATIO_MODELS.has(model)) {
+    throw new Error(`--aspect ${aspectRatio} is only supported on gemini-nano-banana-2.1 and gemini-3.1-flash-image.`);
+  }
+
+  const resolution = oneOf('--resolution', args.resolution, IMAGE_RESOLUTIONS);
+  if (resolution === '0.5K' && model && model !== 'gemini-3.1-flash-image') {
+    throw new Error('--resolution 0.5K is only supported on gemini-3.1-flash-image.');
+  }
+  if ((resolution === '2K' || resolution === '4K') && model && RESOLUTION_1K_ONLY_MODELS.has(model)) {
+    throw new Error(`Model ${model} only supports 1K resolution.`);
+  }
+
+  if (aspectRatio || resolution) {
+    body.output = { ...(aspectRatio ? { aspectRatio } : {}), ...(resolution ? { resolution } : {}) };
+  }
+
   const adaptation = adaptationFrom(args);
   if (adaptation) body.adaptation = adaptation;
+
+  const search = args.search;
+  const imageSearch = args.imageSearch ?? args['image-search'];
+  if (search || imageSearch) {
+    if (model && (model === 'gemini-3.1-flash-lite-image' || model === 'gemini-2.5-flash-image')) {
+      throw new Error(`--search is not supported on ${model}.`);
+    }
+    if (imageSearch && model && !IMAGE_SEARCH_MODELS.has(model)) {
+      throw new Error('--image-search is only supported on gemini-nano-banana-2.1 and gemini-3.1-flash-image.');
+    }
+    body.searchGrounding = {
+      ...(search ? { web: true } : {}),
+      ...(imageSearch ? { imageSearch: true } : {}),
+    };
+  }
+
+  const thinkingLevel = oneOf('--thinking', args.thinking, IMAGE_THINKING_LEVELS);
+  if (thinkingLevel) {
+    if (model) {
+      const allowed = MODEL_THINKING_LEVELS[model];
+      if (!allowed || !allowed.includes(thinkingLevel)) {
+        throw new Error(
+          allowed
+            ? `Model ${model} only supports thinking levels: ${allowed.join(', ')}.`
+            : `--thinking is not supported on ${model}.`,
+        );
+      }
+    }
+    body.thinkingLevel = thinkingLevel;
+  }
+
+  if (args.video !== undefined) {
+    const trimmedVideo = args.video.trim();
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(trimmedVideo);
+    } catch {
+      throw new Error('--video must be a valid https:// URL.');
+    }
+    if (parsedUrl.protocol !== 'https:' || trimmedVideo.length > 2048) {
+      throw new Error('--video must be a valid https:// URL.');
+    }
+    if (model && !VIDEO_INPUT_MODELS.has(model)) {
+      throw new Error(`--video is not supported on ${model}.`);
+    }
+    body.videoUri = trimmedVideo;
+  }
+
+  const fromGeneration = args.fromGeneration ?? args['from-generation'];
+  if (fromGeneration !== undefined) {
+    const trimmedGen = fromGeneration.trim();
+    if (!trimmedGen || !/^[A-Za-z0-9_-]{1,128}$/.test(trimmedGen)) {
+      throw new Error('--from-generation must be a valid generation id.');
+    }
+    body.fromGenerationId = trimmedGen;
+    body.action = 'refine';
+  }
+
+  if (args.refine) {
+    body.action = 'refine';
+  }
+
   return body;
 }
 
@@ -209,8 +359,16 @@ export const imageCommand = defineCommand({
   meta: { name: 'image', description: 'Create a private image in your studio' },
   args: {
     ...promptArgs,
-    aspect: { type: 'string', description: `Shape: ${IMAGE_ASPECTS.join(', ')} (default: your studio default, 16:9 unless changed)` },
-    resolution: { type: 'string', description: '1K, 2K, or 4K (default: your studio default, the model\'s unless changed)' },
+    model: { type: 'string', alias: 'm', description: `Image model: ${IMAGE_MODELS.join(', ')}` },
+    aspect: { type: 'string', description: `Shape: ${IMAGE_RATIOS.join(', ')} (default: your studio default, 16:9 unless changed)` },
+    resolution: { type: 'string', description: '0.5K, 1K, 2K, or 4K (default: your studio default, the model\'s unless changed)' },
+    search: { type: 'boolean', description: 'Ground with Google web search' },
+    imageSearch: { type: 'boolean', description: 'Ground with Google image search' },
+    thinking: { type: 'string', description: `Thinking level: ${IMAGE_THINKING_LEVELS.join(', ')}` },
+    video: { type: 'string', description: 'HTTPS video URL for video-to-image generation' },
+    item: { type: 'string', description: 'Existing image item id to add a generation to' },
+    refine: { type: 'boolean', description: 'Refine an existing image generation' },
+    fromGeneration: { type: 'string', description: 'Generation id to refine from' },
     ...referenceArg,
     ...adaptArgs,
     ...runArgs,
@@ -222,6 +380,8 @@ export const imageCommand = defineCommand({
     });
   },
 });
+
+export const studioImageCommand = imageCommand;
 
 export function videoBody(prompt: string, args: {
   aspect?: string; resolution?: string; duration?: string; reference?: string; firstFrame?: boolean; adapt?: boolean; instructions?: string;
