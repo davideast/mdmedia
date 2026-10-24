@@ -76,9 +76,11 @@ Generate video with explicit image tags or command-line reference images:
 mdmedia video -i script.md -o action.mp4 --firstFrame start.png --ref character.png
 ```
 
-`mdmedia image` takes `--size 1K|2K|4K` for the output resolution (the model's default is 1K):
+`mdmedia image` uses the Gemini Interactions API (`gemini-nano-banana-2.1` by default) and supports `--size 0.5K|1K|2K|4K`, 14 aspect ratios (including `1:4`, `4:1`, `1:8`, `8:1`), up to 14 comma-separated `--ref` reference images, stateful multi-turn editing via `--interactionId`, Google Web Search (`--search`) and Image Search (`--image-search`) grounding, `--thinking minimal|medium|high`, `--video <https-url>`, and Markdown visual adaptation (`--adapt` / `--instructions`):
 ```bash
 mdmedia image -p "A pixel art village square" -a 3:2 --size 4K -o village.png
+mdmedia image -p "Turn the sky into twilight" --interactionId v1_img123 -o village-twilight.png
+mdmedia image -i article.md --adapt --instructions "Editorial watercolor" --search -o cover.jpg
 ```
 
 #### Stateful Iterative Video Editing

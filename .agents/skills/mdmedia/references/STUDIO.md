@@ -50,8 +50,12 @@ mdmedia studio sfx   -p "<prompt>" --json
 
 Options, only when asked:
 
-- `image`: `--aspect` (1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9),
-  `--resolution` (1K, 2K, 4K), `--reference <image>`.
+- `image`: `--model` (`gemini-nano-banana-2.1`, `gemini-3.1-flash-image`,
+  `gemini-3.1-flash-lite-image`, `gemini-3-pro-image`, `gemini-2.5-flash-image`),
+  `--aspect` (1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9, 1:4, 4:1, 1:8, 8:1),
+  `--resolution` (0.5K, 1K, 2K, 4K), `--reference a.png,b.png` (up to 14 images),
+  `--search`, `--image-search`, `--thinking minimal|medium|high`, `--video <https-url>`,
+  `--item <id>` with `--refine` / `--from-generation <genId>` for multi-turn editing.
 - `video`: `--aspect` (16:9, 9:16), `--resolution` (360p, 720p, 1080p, 4k),
   `--duration` (3–10 whole seconds), `--reference <image>`, plus `--first-frame`
   to start the clip from that image.

@@ -105,9 +105,20 @@ interface Adaptation { enabled?: boolean; instructions?: string }
 /** Create bodies: only `prompt` is required; omitted options resolve from the account's defaults. */
 export interface ImageRequestBody {
   prompt: string;
+  model?: string | null;
   adaptation?: Adaptation;
-  output?: { aspectRatio?: string; resolution?: '1K' | '2K' | '4K' | null };
+  output?: {
+    aspectRatio?: string;
+    resolution?: '0.5K' | '1K' | '2K' | '4K' | null;
+    mimeType?: 'image/png' | 'image/jpeg' | null;
+  };
   referenceAssetId?: string | null;
+  referenceAssetIds?: string[];
+  videoUri?: string | null;
+  searchGrounding?: { web?: boolean; imageSearch?: boolean } | null;
+  thinkingLevel?: 'minimal' | 'medium' | 'high' | null;
+  action?: 'initial' | 'refine' | 'regenerate';
+  fromGenerationId?: string | null;
 }
 
 export interface VideoRequestBody {
@@ -159,7 +170,15 @@ interface GenerationBase<T extends StudioMediaType> {
   links: { self: string; web: string };
 }
 
-export type ImageGeneration = GenerationBase<'image'>;
+export interface ImageGeneration extends GenerationBase<'image'> {
+  interactionId?: string | null;
+  parentGenerationId?: string | null;
+  thoughtSummary?: string | null;
+  grounding?: {
+    citations: Array<{ url: string; title?: string }>;
+    searchSuggestionsHtml?: string | null;
+  } | null;
+}
 export interface VideoGeneration extends GenerationBase<'video'> {
   action: 'initial' | 'continue' | 'regenerate_latest';
   parentGenerationId: string | null;
@@ -403,6 +422,29 @@ export class StudioClient {
 
   createImage(body: ImageRequestBody, idempotencyKey?: string): Promise<CreatedMedia<'image'>> {
     return this.createMedia('image', body, idempotencyKey);
+  }
+
+  async createImageGeneration(
+    itemId: string,
+    body: ImageRequestBody,
+    idempotencyKey: string = randomUUID(),
+    retryDelaysMs: readonly number[] = [1000, 4000],
+  ): Promise<CreatedMedia<'image'>> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.request<CreatedMedia<'image'>>(
+          'POST',
+          `/api/v1/images/${encodeURIComponent(itemId)}/generations`,
+          body,
+          true,
+          { 'Idempotency-Key': idempotencyKey },
+        );
+      } catch (error) {
+        const delay = retryDelaysMs[attempt];
+        if (delay === undefined || !lostAnswer(error)) throw error;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
   }
 
   createVideo(body: VideoRequestBody, idempotencyKey?: string): Promise<CreatedMedia<'video'>> {

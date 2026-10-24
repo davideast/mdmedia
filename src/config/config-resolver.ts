@@ -1,12 +1,14 @@
 import type { AspectRatio, DeliveryMode, MediaType, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import type {
+  ImageConfig,
   MdMediaConfig,
   MusicConfig,
   NarrationConfig,
   SoundEffectsConfig,
   VideoConfig,
 } from './file-config.js';
+import { DEFAULT_IMAGE_MODEL } from '../image/index.js';
 import { DEFAULT_ELEVENLABS_SFX_MODEL } from '../sfx/elevenlabs-sfx-provider.js';
 import { resolveTTSSelection } from '../tts/provider-registry.js';
 import { normalizeTTSProviderName } from '../tts/provider-name.js';
@@ -29,6 +31,21 @@ export interface ResolvedVideoConfig {
   readonly firstFrame?: string;
   readonly previousInteractionId?: string;
 }
+
+export interface ResolvedImageConfig {
+  readonly model: string;
+  readonly aspectRatio?: string;
+  readonly resolution?: string;
+  readonly thinkingLevel?: 'minimal' | 'medium' | 'high';
+  readonly adapt?: boolean;
+  readonly instructions?: string;
+  readonly search?: boolean;
+  readonly imageSearch?: boolean;
+}
+
+export const DEFAULT_IMAGE_CONFIG: ResolvedImageConfig = {
+  model: DEFAULT_IMAGE_MODEL,
+};
 
 export interface ResolvedNarrationConfig {
   readonly enabled: boolean;
@@ -54,6 +71,7 @@ export interface ResolvedConfig {
   readonly mode: MediaType;
   readonly audio: ResolvedAudioConfig;
   readonly video: ResolvedVideoConfig;
+  readonly image: ResolvedImageConfig;
   readonly music: ResolvedMusicConfig;
   readonly sfx: ResolvedSoundEffectsConfig;
   readonly narration: ResolvedNarrationConfig;
@@ -78,6 +96,14 @@ export interface CLIArgs {
   referenceImages?: string[];
   firstFrame?: string;
   previousInteractionId?: string;
+  imageModel?: string;
+  imageAspectRatio?: string;
+  imageResolution?: string;
+  imageThinkingLevel?: 'minimal' | 'medium' | 'high';
+  imageAdapt?: boolean;
+  imageInstructions?: string;
+  imageSearch?: boolean;
+  imageImageSearch?: boolean;
   musicModel?: string;
   outputFormat?: 'mp3' | 'wav';
   musicReferenceImages?: string[];
@@ -99,6 +125,7 @@ export function resolveConfig(
   const mode = cliArgs.mode ?? fileConfig.mode ?? 'audio';
 
   const videoConfig: VideoConfig = fileConfig.video ?? {};
+  const imageConfig: ImageConfig = fileConfig.image ?? {};
   const musicConfig: MusicConfig = fileConfig.music ?? {};
   const sfxConfig: SoundEffectsConfig = fileConfig.sfx ?? {};
   const narrationConfig: NarrationConfig = fileConfig.narration ?? {};
@@ -135,6 +162,19 @@ export function resolveConfig(
     previousInteractionId: cliArgs.previousInteractionId ?? videoConfig.previousInteractionId,
   };
 
+  const resolvedImage: ResolvedImageConfig = {
+    ...DEFAULT_IMAGE_CONFIG,
+    ...imageConfig,
+    model: cliArgs.imageModel ?? imageConfig.model ?? DEFAULT_IMAGE_CONFIG.model,
+    ...(cliArgs.imageAspectRatio !== undefined ? { aspectRatio: cliArgs.imageAspectRatio } : {}),
+    ...(cliArgs.imageResolution !== undefined ? { resolution: cliArgs.imageResolution } : {}),
+    ...(cliArgs.imageThinkingLevel !== undefined ? { thinkingLevel: cliArgs.imageThinkingLevel } : {}),
+    ...(cliArgs.imageAdapt !== undefined ? { adapt: cliArgs.imageAdapt } : {}),
+    ...(cliArgs.imageInstructions !== undefined ? { instructions: cliArgs.imageInstructions } : {}),
+    ...(cliArgs.imageSearch !== undefined ? { search: cliArgs.imageSearch } : {}),
+    ...(cliArgs.imageImageSearch !== undefined ? { imageSearch: cliArgs.imageImageSearch } : {}),
+  };
+
   const resolvedMusic: ResolvedMusicConfig = {
     model: cliArgs.musicModel ?? musicConfig.model ?? 'lyria-3.5',
     outputFormat: cliArgs.outputFormat ?? musicConfig.outputFormat ?? 'mp3',
@@ -159,6 +199,7 @@ export function resolveConfig(
     mode,
     audio: resolvedAudio,
     video: resolvedVideo,
+    image: resolvedImage,
     music: resolvedMusic,
     sfx: resolvedSfx,
     narration: resolvedNarration,

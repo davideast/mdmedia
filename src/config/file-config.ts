@@ -41,10 +41,22 @@ export interface SoundEffectsConfig {
   readonly loop?: boolean;
 }
 
+export interface ImageConfig {
+  readonly model?: string;
+  readonly aspectRatio?: string;
+  readonly resolution?: string;
+  readonly thinkingLevel?: 'minimal' | 'medium' | 'high';
+  readonly adapt?: boolean;
+  readonly instructions?: string;
+  readonly search?: boolean;
+  readonly imageSearch?: boolean;
+}
+
 export interface MdMediaConfig {
   readonly mode?: MediaType;
   readonly audio?: AudioConfig;
   readonly video?: VideoConfig;
+  readonly image?: ImageConfig;
   readonly music?: MusicConfig;
   readonly sfx?: SoundEffectsConfig;
   readonly narration?: NarrationConfig;
@@ -52,3 +64,5 @@ export interface MdMediaConfig {
   readonly maxRetries?: number;
   readonly apiKey?: string;
 }
+
+export type MdmediaConfig = MdMediaConfig;

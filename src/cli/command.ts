@@ -1,10 +1,28 @@
 import { defineCommand } from 'citty';
 import { studioCommand } from './studio-command.js';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import os from 'node:os';
 import path from 'node:path';
+import type { GoogleGenAI } from '@google/genai';
 import type { AspectRatio, DeliveryMode, VideoTask } from '../types/media.js';
 import type { VoiceName } from '../types/voice.js';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
+import {
+  DEFAULT_IMAGE_MODEL,
+  IMAGE_ASPECT_RATIOS,
+  IMAGE_RESOLUTIONS,
+  THINKING_LEVELS,
+  adaptGeminiImagePrompt,
+  generateGeminiImage,
+  type GeminiImageClient,
+  type ImageAspectRatio,
+  type ImageOutput,
+  type ImageReference,
+  type ImageResolution,
+  type ImageThinkingLevel,
+} from '../image/index.js';
 import {
   runAudioSynthesis,
   runNarrationAdaptation,
@@ -320,21 +338,289 @@ export const adaptCommand = defineCommand({
 
 /** The image request's config: aspect ratio, and the output size when one is asked for. */
 export function imageGenerationConfig(
-  aspectRatio: string,
+  aspectRatio?: string | null,
   size?: string,
-): { aspectRatio: string; imageSize?: '1K' | '2K' | '4K' } {
-  if (size === undefined || size.trim() === '') return { aspectRatio };
+  options?: { hasReference?: boolean; hasInteractionId?: boolean },
+): { aspectRatio: ImageAspectRatio | null; imageSize?: ImageResolution } {
+  const trimmedAspect = typeof aspectRatio === 'string' ? aspectRatio.trim() : aspectRatio;
+  const resolvedAspect: ImageAspectRatio | null =
+    trimmedAspect === null
+      ? null
+      : trimmedAspect
+        ? (() => {
+            if (!(IMAGE_ASPECT_RATIOS as readonly string[]).includes(trimmedAspect)) {
+              throw new Error(
+                `--aspect must be one of ${IMAGE_ASPECT_RATIOS.join(', ')} (got ${aspectRatio})`,
+              );
+            }
+            return trimmedAspect as ImageAspectRatio;
+          })()
+        : options?.hasReference || options?.hasInteractionId
+          ? null
+          : '16:9';
+
+  if (size === undefined || size.trim() === '') return { aspectRatio: resolvedAspect };
   const imageSize = size.trim().toUpperCase();
-  if (imageSize !== '1K' && imageSize !== '2K' && imageSize !== '4K') {
-    throw new Error(`--size must be 1K, 2K or 4K (got ${size})`);
+  if (!(IMAGE_RESOLUTIONS as readonly string[]).includes(imageSize)) {
+    throw new Error(`--size must be 0.5K, 1K, 2K or 4K (got ${size})`);
   }
-  return { aspectRatio, imageSize };
+  return { aspectRatio: resolvedAspect, imageSize: imageSize as ImageResolution };
+}
+
+export function inferImageOutputMimeType(outputPath: string): 'image/png' | 'image/jpeg' {
+  const ext = path.extname(outputPath).toLowerCase();
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  return 'image/png';
+}
+
+function detectActualImageFormat(bytes: Uint8Array): 'png' | 'jpeg' | 'webp' | null {
+  if (bytes.byteLength >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+    return 'png';
+  }
+  if (bytes.byteLength >= 4 && bytes[0] === 0xff && bytes[1] === 0xd8) {
+    return 'jpeg';
+  }
+  if (
+    bytes.byteLength >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return 'webp';
+  }
+  return null;
+}
+
+function convertImageFile(sourcePath: string, targetPath: string, targetFormat: 'png' | 'jpeg' | 'webp'): void {
+  if (process.platform === 'darwin') {
+    execFileSync('sips', ['-s', 'format', targetFormat, sourcePath, '--out', targetPath]);
+    return;
+  }
+  for (const cmd of ['magick', 'convert']) {
+    try {
+      execFileSync(cmd, [sourcePath, targetPath], { stdio: 'ignore' });
+      if (fs.existsSync(targetPath)) return;
+    } catch {}
+  }
+  try {
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', sourcePath, targetPath], { stdio: 'ignore' });
+    if (fs.existsSync(targetPath)) return;
+  } catch {}
+  throw new Error(
+    `Image format conversion to ${targetFormat.toUpperCase()} requires sips (macOS), ImageMagick (magick/convert), or ffmpeg.`,
+  );
+}
+
+export function readReferenceImage(filePath: string): ImageReference {
+  const trimmed = filePath.trim();
+  if (!fs.existsSync(trimmed)) {
+    throw new Error(`Reference image not found: ${trimmed}`);
+  }
+  let refPath = trimmed;
+  let ext = path.extname(refPath).toLowerCase();
+  let tmpPng: string | undefined;
+  if (ext === '.avif') {
+    tmpPng = path.join(os.tmpdir(), `mdmedia_ref_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`);
+    convertImageFile(refPath, tmpPng, 'png');
+    refPath = tmpPng;
+    ext = '.png';
+  }
+  const mimeType =
+    ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
+  const refBytes = fs.readFileSync(refPath);
+  if (tmpPng) {
+    try {
+      fs.unlinkSync(tmpPng);
+    } catch {}
+  }
+  return {
+    bytes: new Uint8Array(refBytes),
+    mimeType,
+  };
+}
+
+export interface RunImageCommandArgs {
+  prompt?: string;
+  input?: string;
+  ref?: string;
+  output: string;
+  model?: string;
+  aspectRatio?: string;
+  size?: string;
+  interactionId?: string;
+  search?: boolean;
+  imageSearch?: boolean;
+  thinking?: string;
+  video?: string;
+  adapt?: boolean;
+  instructions?: string;
+  apiKey?: string;
+}
+
+export async function runImageGeneration(
+  args: RunImageCommandArgs,
+  deps?: {
+    cwd?: string;
+    client?: GeminiImageClient & Partial<Pick<GoogleGenAI, 'models'>>;
+    env?: Record<string, string | undefined>;
+  },
+): Promise<ImageOutput> {
+  const cwd = deps?.cwd ?? process.cwd();
+  let promptText = args.prompt || '';
+  if (!promptText && args.input) {
+    promptText = fs.readFileSync(path.resolve(cwd, args.input), 'utf8').trim();
+  }
+  if (!promptText) {
+    throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
+  }
+
+  const fileConfig = await loadConfigFile(cwd);
+  const thinkingRaw = args.thinking ?? fileConfig.image?.thinkingLevel;
+  let thinkingLevel: ImageThinkingLevel | undefined;
+  if (thinkingRaw !== undefined && thinkingRaw.trim() !== '') {
+    const normalized = thinkingRaw.trim().toLowerCase();
+    if (!(THINKING_LEVELS as readonly string[]).includes(normalized)) {
+      throw new Error(
+        `--thinking must be one of ${THINKING_LEVELS.join(', ')} (got "${thinkingRaw}")`,
+      );
+    }
+    thinkingLevel = normalized as ImageThinkingLevel;
+  }
+
+  const resolved = resolveConfig(
+    {
+      mode: 'image',
+      imageModel: args.model,
+      imageAspectRatio: args.aspectRatio,
+      imageResolution: args.size,
+      imageThinkingLevel: thinkingLevel,
+      imageAdapt: args.adapt,
+      imageInstructions: args.instructions,
+      imageSearch: args.search,
+      imageImageSearch: args.imageSearch,
+      apiKey: args.apiKey,
+    },
+    fileConfig,
+    deps?.env ?? process.env,
+  );
+
+  const refPaths = args.ref
+    ? args.ref
+        .split(',')
+        .map((p) => p.trim())
+        .filter(Boolean)
+    : [];
+  if (refPaths.length > 14) {
+    throw new Error(`At most 14 reference images are supported (got ${refPaths.length}).`);
+  }
+  const references = refPaths.map((filePath) => readReferenceImage(filePath));
+
+  const interactionId = args.interactionId?.trim() || undefined;
+  const imageConfig = imageGenerationConfig(
+    resolved.image.aspectRatio,
+    resolved.image.resolution,
+    {
+      hasReference: references.length > 0,
+      hasInteractionId: Boolean(interactionId),
+    },
+  );
+
+  const apiKey = resolved.apiKey;
+  if (!apiKey && !deps?.client) {
+    throw new Error('GEMINI_API_KEY environment variable is required.');
+  }
+
+  const client =
+    deps?.client ??
+    await (async () => {
+      const { GoogleGenAI } = await import('@google/genai');
+      return new GoogleGenAI({ apiKey: apiKey! });
+    })();
+
+  const instructions = resolved.image.instructions;
+  const shouldAdapt =
+    args.adapt !== undefined
+      ? args.adapt || args.instructions !== undefined
+      : Boolean(
+          args.instructions !== undefined ||
+            resolved.image.adapt ||
+            resolved.image.instructions,
+        );
+  if (shouldAdapt) {
+    if (!client.models) {
+      throw new Error('Gemini client must provide models.generateContent for prompt adaptation.');
+    }
+    promptText = await adaptGeminiImagePrompt(
+      client as Pick<GoogleGenAI, 'models'>,
+      promptText,
+      instructions ?? '',
+    );
+  }
+
+  const mimeType = inferImageOutputMimeType(args.output);
+  const webSearch = Boolean(resolved.image.search);
+  const imgSearch = Boolean(resolved.image.imageSearch);
+  const videoUri = args.video?.trim() || undefined;
+
+  const image = await generateGeminiImage(client, {
+    prompt: promptText,
+    model: resolved.image.model,
+    aspectRatio: imageConfig.aspectRatio,
+    ...(imageConfig.imageSize ? { resolution: imageConfig.imageSize } : {}),
+    mimeType,
+    ...(references.length === 1 ? { reference: references[0] } : {}),
+    ...(references.length > 0 ? { references } : {}),
+    ...(videoUri ? { video: { uri: videoUri } } : {}),
+    ...(interactionId ? { previousInteractionId: interactionId } : {}),
+    ...(webSearch || imgSearch
+      ? {
+          searchGrounding: {
+            ...(webSearch ? { web: true } : {}),
+            ...(imgSearch ? { imageSearch: true } : {}),
+          },
+        }
+      : {}),
+    ...(resolved.image.thinkingLevel ? { thinkingLevel: resolved.image.thinkingLevel } : {}),
+  });
+
+  const outPath = path.resolve(cwd, args.output);
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  const actualFormat = detectActualImageFormat(image.bytes);
+  const outExt = path.extname(outPath).toLowerCase();
+  const desiredFormat: 'png' | 'jpeg' | 'webp' | null =
+    outExt === '.png' ? 'png' : outExt === '.webp' ? 'webp' : outExt === '.jpg' || outExt === '.jpeg' ? 'jpeg' : null;
+  if (actualFormat && desiredFormat && actualFormat !== desiredFormat) {
+    const tmpSource = path.join(
+      os.tmpdir(),
+      `mdmedia_out_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${actualFormat === 'jpeg' ? 'jpg' : actualFormat}`,
+    );
+    try {
+      fs.writeFileSync(tmpSource, Buffer.from(image.bytes));
+      convertImageFile(tmpSource, outPath, desiredFormat);
+    } finally {
+      try {
+        fs.unlinkSync(tmpSource);
+      } catch {}
+    }
+  } else {
+    fs.writeFileSync(outPath, Buffer.from(image.bytes));
+  }
+  console.log(`Saved image to ${outPath}`);
+  if (image.interactionId) {
+    console.log(`Interaction ID: ${image.interactionId}`);
+  }
+  return image;
 }
 
 export const imageCommand = defineCommand({
   meta: {
     name: 'image',
-    description: 'Generate high-fidelity art & UI images from prompts via Gemini 3.1 Flash Image',
+    description: 'Generate high-fidelity art & UI images from prompts via Gemini Nano Banana',
   },
   args: {
     prompt: {
@@ -350,7 +636,7 @@ export const imageCommand = defineCommand({
     ref: {
       type: 'string',
       alias: 'r',
-      description: 'Optional reference image path for exact artistic style/tone matching',
+      description: 'Optional comma-separated reference image paths (up to 14 files)',
     },
     output: {
       type: 'string',
@@ -361,19 +647,45 @@ export const imageCommand = defineCommand({
     model: {
       type: 'string',
       alias: 'm',
-      description: 'Gemini image model name (Nano Banana Pro 2)',
-      default: 'gemini-3-pro-image',
+      description: `Gemini image model name (defaults to ${DEFAULT_IMAGE_MODEL})`,
     },
     aspectRatio: {
       type: 'string',
       alias: ['a', 'aspect'],
-      description: 'Aspect ratio (e.g., 16:9, 1:1, 4:3, 3:2)',
-      default: '16:9',
+      description: `Aspect ratio (${IMAGE_ASPECT_RATIOS.join(', ')})`,
     },
     size: {
       type: 'string',
       alias: ['s', 'image-size', 'imageSize', 'resolution'],
-      description: 'Output resolution: 1K, 2K or 4K (defaults to the model choice, 1K)',
+      description: 'Output resolution: 0.5K, 1K, 2K or 4K (defaults to the model choice, 1K)',
+    },
+    interactionId: {
+      type: 'string',
+      description: 'Previous interaction ID for multi-turn image editing',
+    },
+    search: {
+      type: 'boolean',
+      description: 'Ground image generation with Google Web Search',
+    },
+    imageSearch: {
+      type: 'boolean',
+      description: 'Ground image generation with Google Image Search',
+    },
+    thinking: {
+      type: 'string',
+      description: 'Thinking level: minimal, medium, or high',
+    },
+    video: {
+      type: 'string',
+      description: 'HTTPS or YouTube video URL for video-to-image generation',
+    },
+    adapt: {
+      type: 'boolean',
+      description: 'Adapt Markdown notes into a visual brief before generating',
+    },
+    instructions: {
+      type: 'string',
+      description: 'Visual adaptation instructions (implies --adapt)',
     },
     apiKey: {
       type: 'string',
@@ -382,79 +694,7 @@ export const imageCommand = defineCommand({
     },
   },
   async run({ args }) {
-    const fs = await import('node:fs');
-    const { execFileSync } = await import('node:child_process');
-    const { GoogleGenAI } = await import('@google/genai');
-
-    let promptText = args.prompt || '';
-    if (!promptText && args.input) {
-      promptText = fs.readFileSync(args.input, 'utf8').trim();
-    }
-    if (!promptText) {
-      throw new Error('Either --prompt (-p) or --input (-i) must be provided.');
-    }
-
-    const fileConfig = await loadConfigFile(process.cwd());
-    const resolved = resolveConfig({ apiKey: args.apiKey }, fileConfig);
-    const apiKey = resolved.apiKey;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is required.');
-    }
-
-    const imageConfig = imageGenerationConfig(args.aspectRatio, args.size);
-
-    const contents: any[] = [];
-    if (args.ref && !fs.existsSync(args.ref)) {
-      throw new Error(`Reference image not found: ${args.ref}`);
-    }
-    if (args.ref) {
-      let refPath = args.ref;
-      let ext = path.extname(refPath).toLowerCase();
-      let tmpPng: string | undefined;
-      if (ext === '.avif') {
-        const os = await import('node:os');
-        if (process.platform !== 'darwin') {
-          throw new Error('AVIF reference image conversion requires macOS (sips). Convert the image to PNG or JPEG first.');
-        }
-        tmpPng = path.join(os.tmpdir(), `mdmedia_ref_${Date.now()}.png`);
-        execFileSync('sips', ['-s', 'format', 'png', refPath, '--out', tmpPng]);
-        refPath = tmpPng;
-        ext = '.png';
-      }
-      const mimeType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
-      const refBytes = fs.readFileSync(refPath);
-      contents.push({
-        inlineData: {
-          data: refBytes.toString('base64'),
-          mimeType,
-        },
-      });
-      if (tmpPng) {
-        try { fs.unlinkSync(tmpPng); } catch {}
-      }
-    }
-    contents.push({ text: promptText });
-
-    const ai = new GoogleGenAI({ apiKey });
-    console.log(`🎨 Generating image (${args.model}, ${args.aspectRatio}${imageConfig.imageSize ? `, ${imageConfig.imageSize}` : ''}${args.ref ? `, ref=${path.basename(args.ref)}` : ''})...`);
-    const res = await ai.models.generateContent({
-      model: args.model,
-      contents: contents.length === 1 ? contents[0].text : contents,
-      config: {
-        responseModalities: ['IMAGE'],
-        imageConfig,
-      },
-    });
-
-    const part = res.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData);
-    if (!part?.inlineData?.data) {
-      throw new Error('No image data returned from Gemini model.');
-    }
-
-    const outPath = path.resolve(process.cwd(), args.output);
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, Buffer.from(part.inlineData.data, 'base64'));
-    console.log(`✅ Saved generated image to: ${outPath}`);
+    await runImageGeneration(args);
   },
 });
 

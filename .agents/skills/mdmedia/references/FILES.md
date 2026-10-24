@@ -49,9 +49,15 @@ Flags:
 ## image
 
 - `-p "<prompt>"` or `-i prompt.md`.
-- `-r style.png`: match the style of a reference image.
-- `-a 16:9|1:1|4:3|3:2`.
-- `-s, --size 1K|2K|4K` (or `--image-size`, `--resolution`).
+- `-m, --model`: `gemini-nano-banana-2.1` (default), `gemini-3.1-flash-image`, `gemini-3.1-flash-lite-image`, `gemini-3-pro-image`, or `gemini-2.5-flash-image`.
+- `-r a.png,b.png`: up to 14 comma-separated reference images.
+- `-a 16:9|1:1|4:3|3:2|2:3|3:4|4:5|5:4|9:16|21:9|1:4|4:1|1:8|8:1`.
+- `-s, --size 0.5K|1K|2K|4K` (or `--image-size`, `--resolution`).
+- `--interactionId <id>`: continue editing a previous image interaction turn-by-turn.
+- `--search` / `--image-search`: ground generation with Google Web Search and/or Google Image Search.
+- `--thinking minimal|medium|high`: control reasoning effort on supported Gemini 3.1 / Nano Banana 2.1 models.
+- `--video <https-url>`: generate an image conditioned on a YouTube or HTTPS video.
+- `--adapt` and `--instructions "<text>"`: rewrite Markdown notes into a visual brief first.
 
 ## music
 
