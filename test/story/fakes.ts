@@ -1,4 +1,4 @@
-import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedImage, type CachedLine, type CachedMusic, type Composer, type FileSink, type ImageModel, type MixPlan, type Vision, type RenderCache, type SpeakRequest, type Speaker, type Transcriber } from '../../src/story/index.js';
+import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedImage, type CachedLine, type CachedMusic, type Composer, type FileSink, type ImageModel, type MixPlan, type Vision, type RenderCache, type SpeakRequest, type Speaker, type Transcriber, type VoiceJudge } from '../../src/story/index.js';
 
 /**
  * A tone, 50 ms per character. The first samples carry the spoken text (its
@@ -123,6 +123,27 @@ export function fakeVision(fail: (image: string, question: string, call: number)
     },
     async heads({ characters }) {
       return characters.map((c, i) => ({ id: c.id, box: [0.2, 0.1 + i * 0.4, 0.5, 0.4 + i * 0.4] as [number, number, number, number] }));
+    },
+  };
+}
+
+/** A tone speaker that writes the voice into its clip as `voice:text`, for fakeJudge. */
+export function castingSpeaker(): Speaker & { calls: SpeakRequest[] } {
+  const inner = toneSpeaker();
+  return { ...inner, speak: (req) => inner.speak({ ...req, text: `${String(req.voice)}:${req.text}` }) };
+}
+
+/** Scores an audition by a table of voice → fit (unknown voices score 1), reading the voice castingSpeaker wrote. */
+export function fakeJudge(fits: Record<string, number> = {}): VoiceJudge & { calls: Array<{ voice: string; brief: string }> } {
+  const calls: Array<{ voice: string; brief: string }> = [];
+  return {
+    model: 'fake-judge',
+    calls,
+    async score({ wav, brief }) {
+      const voice = textOf(wav).split(':')[0]!;
+      calls.push({ voice, brief });
+      const fit = fits[voice] ?? 1;
+      return { who: fit, accent: fit, texture: fit, fit, note: `${voice} heard` };
     },
   };
 }

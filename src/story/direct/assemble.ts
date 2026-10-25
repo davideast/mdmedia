@@ -4,8 +4,8 @@ import { stringify } from 'yaml';
 export interface CastPlan {
   title: string;
   author?: string;
-  narrator: { character: string } | { voice: string; delivery: string };
-  cast: Record<string, { voice: string; delivery: string; look?: string }>;
+  narrator: { character: string } | { delivery: string; brief: string; voice?: string };
+  cast: Record<string, { delivery: string; brief: string; look?: string; voice?: string }>;
   names: string[];
   scenes: Array<{ title: string; firstWords: string; music: string }>;
   /** Moments the author tells that are better shown: the exact sentence and the line that replaces it. */
@@ -27,11 +27,14 @@ export interface SceneDraft {
 export function assembleStory(plan: CastPlan, scenes: SceneDraft[]): string {
   const frontMatter: Record<string, unknown> = { title: plan.title };
   if (plan.author) frontMatter.author = plan.author;
-  frontMatter.narrator = 'character' in plan.narrator ? plan.narrator.character : { voice: plan.narrator.voice, delivery: plan.narrator.delivery };
+  frontMatter.narrator =
+    'character' in plan.narrator
+      ? plan.narrator.character
+      : { ...(plan.narrator.voice ? { voice: plan.narrator.voice } : {}), delivery: plan.narrator.delivery, brief: plan.narrator.brief };
   frontMatter.cast = Object.fromEntries(
     Object.entries(plan.cast).map(([id, member]) => [
       id,
-      { voice: member.voice, delivery: member.delivery, ...(member.look ? { look: member.look } : {}) },
+      { ...(member.voice ? { voice: member.voice } : {}), delivery: member.delivery, brief: member.brief, ...(member.look ? { look: member.look } : {}) },
     ])
   );
   if (plan.names.length) frontMatter.names = plan.names;

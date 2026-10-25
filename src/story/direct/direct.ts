@@ -144,12 +144,14 @@ export function validatePlan(plan: CastPlan, raw: string): string[] {
   if (!ids.length) problems.push('The cast is empty.');
   for (const id of ids) {
     if (!/^[A-Z][A-Z0-9_]*$/.test(id)) problems.push(`Cast id ${id} must be capital letters.`);
-    if (!isVoice(plan.cast[id]!.voice)) problems.push(`${id}'s voice "${plan.cast[id]!.voice}" is not one of the Gemini voices.`);
+    const member = plan.cast[id]!;
+    if (!member.brief?.trim()) problems.push(`${id} needs a performance brief.`);
+    if (member.voice && !plan.cast[member.voice] && !isVoice(member.voice)) problems.push(`${id}'s voice "${member.voice}" is neither a cast member nor a Gemini voice.`);
   }
   if (plan.narrator && 'character' in plan.narrator) {
     if (!plan.cast?.[plan.narrator.character]) problems.push(`The narrator ${plan.narrator.character} is not in the cast.`);
-  } else if (!plan.narrator || !isVoice(plan.narrator.voice)) {
-    problems.push('The narrator needs a character or a Gemini voice.');
+  } else if (!plan.narrator || !plan.narrator.brief?.trim()) {
+    problems.push('The narrator needs a character, or a performance brief.');
   }
   if (!plan.scenes?.length) problems.push('There are no scenes.');
   for (const scene of plan.scenes ?? []) {

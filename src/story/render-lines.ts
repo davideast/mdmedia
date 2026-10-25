@@ -4,6 +4,7 @@ import { limiter, type Limiter } from './limit.js';
 import { deliveryNote, NOTE_LEVELS, type NoteLevel } from './note.js';
 import { pcmDurationMs, silence, wavFromPcm } from './pcm.js';
 import { SpeechRefused, type LineCheck, type RenderCache, type Speaker, type Transcriber } from './ports.js';
+import { heardAsWritten, requireVoice, spokenText } from './pronounce.js';
 import type { Line, StoryScript } from './types.js';
 
 export const MAX_RETAKES = 2;
@@ -89,7 +90,8 @@ async function renderLine(
     return { pcm: hit.pcm, result: { ...base, cached: true, level: 0, attempts: 0, ...hit.check, durationMs: pcmDurationMs(hit.pcm) } };
   }
 
-  const voice = script.cast[line.speaker]!.voice;
+  const voice = requireVoice(script, line.speaker);
+  const say = spokenText(line.text, script.meta.pronounce);
   let level: NoteLevel = 0;
   let best: { pcm: Uint8Array; check: LineCheck } | undefined;
   let attempts = 0;
@@ -101,7 +103,7 @@ async function renderLine(
     for (const candidate of NOTE_LEVELS.filter((l) => l >= level)) {
       try {
         const note = deliveryNote(line, script, candidate);
-        pcm = await speakLimit(() => speaker.speak({ text: line.text, voice, note, signal }));
+        pcm = await speakLimit(() => speaker.speak({ text: say, voice, note, signal }));
         level = candidate;
         break;
       } catch (error) {
@@ -117,7 +119,7 @@ async function renderLine(
     }
     attempts++;
     const heard = await transcribeLimit(() => transcriber.transcribe(wavFromPcm(pcm!), { names: castNames(script), signal }));
-    const check = compareTranscript(line.text, heard);
+    const check = compareTranscript(line.text, heardAsWritten(heard, script.meta.pronounce));
     if (!best || errorCount(check) < errorCount(best.check)) best = { pcm, check };
     if (check.ok) break;
     if (attempts <= MAX_RETAKES) emit({ type: 'line-retake', id: line.id, attempt: attempts + 1, check });

@@ -3,9 +3,9 @@ import { parseDuration, type SourceMap } from './source.js';
 import type { CastId, CastMember, Diagnostic, VoiceRef } from './types.js';
 
 export const DEFAULT_GAP_MS = 400;
-const TOP_KEYS = new Set(['title', 'author', 'language', 'gap', 'narrator', 'cast', 'names']);
-const MEMBER_KEYS = new Set(['voice', 'delivery', 'look']);
-const NARRATOR_KEYS = new Set(['voice', 'delivery']);
+const TOP_KEYS = new Set(['title', 'author', 'language', 'gap', 'narrator', 'cast', 'names', 'pronounce']);
+const MEMBER_KEYS = new Set(['voice', 'delivery', 'brief', 'look']);
+const NARRATOR_KEYS = new Set(['voice', 'delivery', 'brief']);
 
 export interface FrontMatter {
   title: string;
@@ -16,6 +16,8 @@ export interface FrontMatter {
   cast: Record<CastId, CastMember>;
   /** Other proper nouns in the story, spelled as the story spells them. */
   names: string[];
+  /** Words the voice says from a respelling: `Nerw: Nur-oo`. */
+  pronounce: Record<string, string>;
 }
 
 export interface FrontMatterResult {
@@ -110,6 +112,17 @@ export function readFrontMatter(markdown: string, map: SourceMap): FrontMatterRe
     }
   }
 
+  const pronounce: Record<string, string> = {};
+  const pronouncePair = entries.get('pronounce');
+  if (pronouncePair) {
+    if (!isMap(pronouncePair.value)) report('missing-field', 'pronounce must map words to respellings, such as Nerw: Nur-oo.', pronouncePair.value as Node);
+    else for (const [word, pair] of pairs(pronouncePair.value)) {
+      const say = stringValue(pair);
+      if (word && say) pronounce[word] = say;
+      else report('missing-field', `pronounce: ${word || 'a word'} needs a respelling.`, pair.key as Node);
+    }
+  }
+
   let narrator: CastId = 'NARRATOR';
   const narratorPair = entries.get('narrator');
   if (!narratorPair) {
@@ -123,14 +136,21 @@ export function readFrontMatter(markdown: string, map: SourceMap): FrontMatterRe
   }
 
   if (diagnostics.length) return { bodyStart, diagnostics };
-  return { frontMatter: { title: title!, author, language, gapMs, narrator, cast, names }, bodyStart, diagnostics };
+  // A voice may name another cast member, to share their voice; it must exist.
+  for (const member of Object.values(cast)) {
+    if (typeof member.voice === 'string' && /^[A-Z][A-Z0-9_]*$/.test(member.voice) && !cast[member.voice]) {
+      report('unknown-speaker', `${member.id}'s voice ${member.voice} is not in the cast.`);
+    }
+  }
+  if (diagnostics.length) return { bodyStart, diagnostics };
+  return { frontMatter: { title: title!, author, language, gapMs, narrator, cast, names, pronounce }, bodyStart, diagnostics };
 }
 
 type Report = (code: Diagnostic['code'], message: string, node?: Node | null) => void;
 
 function readMember(id: CastId, pair: Pair, allowed: Set<string>, report: Report): CastMember | undefined {
   if (!isMap(pair.value)) {
-    report('missing-field', `${id} needs a voice.`, pair.key as Node);
+    report('missing-voice', `${id} needs a brief: to cast a voice from, or a voice:.`, pair.key as Node);
     return undefined;
   }
   const fields = pairs(pair.value);
@@ -138,14 +158,16 @@ function readMember(id: CastId, pair: Pair, allowed: Set<string>, report: Report
     if (!allowed.has(key)) report('unknown-key', `Unknown key "${key}" for ${id}. Allowed: ${[...allowed].join(', ')}.`, field.key as Node);
   }
   const voice = voiceValue(fields.get('voice'));
-  if (!voice) {
-    report('missing-field', `${id} needs a voice.`, pair.key as Node);
+  const brief = stringValue(fields.get('brief'));
+  if (!voice && !brief) {
+    report('missing-voice', `${id} needs a brief: to cast a voice from, or a voice:.`, pair.key as Node);
     return undefined;
   }
   return {
     id,
-    voice,
+    ...(voice ? { voice } : {}),
     delivery: stringValue(fields.get('delivery')) ?? '',
+    ...(brief ? { brief } : {}),
     ...(stringValue(fields.get('look')) ? { look: stringValue(fields.get('look')) } : {}),
   };
 }

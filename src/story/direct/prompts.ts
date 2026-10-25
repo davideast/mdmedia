@@ -1,5 +1,3 @@
-import { VOICES } from './voices.js';
-
 /** A dramatized line is a punchline; past this it starts explaining itself. */
 export const MAX_DRAMATIZED_WORDS = 8;
 
@@ -14,8 +12,8 @@ Read the whole story and return JSON with this shape:
 {
   "title": string,
   "author"?: string,
-  "narrator": { "character": CAST_ID } | { "voice": VOICE, "delivery": string },
-  "cast": { CAST_ID: { "voice": VOICE, "delivery": string, "look": string } },
+  "narrator": { "character": CAST_ID } | { "delivery": string, "brief": string },
+  "cast": { CAST_ID: { "delivery": string, "brief": string, "look": string, "voice"?: CAST_ID } },
   "names": string[],
   "scenes": [{ "title": string, "firstWords": string, "music": string }],
   "dramatize": [{ "sentence": string, "speaker": CAST_ID, "cue": string, "line": string }]
@@ -25,11 +23,19 @@ Rules:
 - CAST_ID is the character's name in capitals, one word if possible (MILO, JUNE, MR_ALVAREZ becomes ALVAREZ).
 - If the story is told in the first person, the narrator is that character: use { "character": CAST_ID }.
 - Unnamed voices that speak (a kid in a crowd, a voice offstage) get short ids such as KID or VOICE.
-- "delivery" describes how the character always sounds: age, temperament, manner. It is said before every line, so keep it to one phrase.
+- "delivery" sums up how the character sounds in one phrase, for the scene writer.
+- "brief" is the voice actor's performance brief, and it is what makes each voice different. Invent specifics even where the story doesn't need them, written as direction, not a list of adjectives. Cover, in a paragraph:
+  - who they are, for the voice: age, gender, where they grew up, what their life has done to their voice;
+  - an accent from a real, named place (Whitby in North Yorkshire, Peckham in south London), not just "English";
+  - the instrument: pitch and range; texture (gravel, breath, rasp, vocal fry); resonance (nasal, chesty, front of the mouth); what their teeth or lungs do to their consonants;
+  - rhythm: pace, pauses, how their sentences end;
+  - how they laugh, exactly;
+  - habits: tongue clicks, sniffs, sighs, little sounds;
+  - how emotion changes this particular voice (fondness, fear, anger);
+  - what the performance must never become.
+  A child is a real child's voice, never an adult pitching up; say so. Example for a gruff grandmother: "Eighty-one, born in Whitby and never left. A low, dry alto deep in her chest, with a smoker's rasp that catches on the first word of every sentence; loose dentures make her consonants wet and clicky. Broad North Yorkshire, h's dropped. Two or three words, then a dead stop. Laughs once, a rattling 'hah' that is half a cough. Clicks her tongue before she disapproves. Fondness makes her gruffer, never softer. Never sweet, never quavery, never a pantomime witch."
+- "voice" is only for a character who must share another character's voice (a reflection, a twin, the same person disguised): give that character's CAST_ID. Voices are otherwise cast from the brief.
 - "look" describes the character so an artist can draw them the same way every time, in one sentence: age and build; hair color, length and style; main outfit with colors; one distinctive feature or prop. Leave out small details a drawing will not show. Leave it empty for voices nobody sees.
-- VOICE must be one of these Gemini voices. Match the voice to the character:
-${VOICES.map((v) => `  ${v.name}: ${v.description}`).join('\n')}
-- Give different characters audibly different voices.
 - "names" lists every other proper noun in the story a listener might hear (people, places, shows), spelled exactly as the story spells them.
 - "scenes" splits the story where its own breaks fall (horizontal rules, time jumps, location changes), in order. "firstWords" are the first six or more words of the scene, copied exactly, so the scene can be found in the text.
 - "music" is one line describing instrumental music for the scene's mood: instruments, tempo, feeling. Never ask for vocals.

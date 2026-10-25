@@ -1,8 +1,9 @@
 import { sha256 } from './parse.js';
+import { spokenText, voiceOf } from './pronounce.js';
 import type { Line, StoryScript } from './types.js';
 
 /** Bump when a change to rendering should invalidate every cached line. */
-export const RENDER_VERSION = 1;
+export const RENDER_VERSION = 2;
 
 /** How many earlier lines in the scene go into a line's delivery note. */
 export const CONTEXT_LINES = 2;
@@ -25,12 +26,12 @@ export async function lineRenderKey(line: Line, script: StoryScript, provider: P
     RENDER_VERSION,
     provider.name,
     provider.model,
-    speaker.voice,
-    speaker.delivery,
+    voiceOf(script, line.speaker) ?? null,
+    speaker.brief ?? speaker.delivery,
     line.narration,
     line.cue,
     contextLines(line, script).map((l) => [l.speaker, l.text]),
-    line.text,
+    spokenText(line.text, script.meta.pronounce),
     script.meta.language,
   ];
   return `line:${await sha256(JSON.stringify(payload))}`;

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildStory, linePath, slugify } from '../../src/story/index.js';
 import type { StoryBuild, StoryTimeline } from '../../src/story/index.js';
-import { fakeComposer, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
+import { castingSpeaker, fakeComposer, fakeJudge, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
 
 const markdown = readFileSync(join(import.meta.dir, 'fixtures', 'lighthouse.md'), 'utf8');
 
@@ -35,6 +35,30 @@ describe('buildStory', () => {
     const transcript = out.files.get('text/transcript.md') as string;
     expect(transcript).toContain('# The Keeper\'s Log');
     expect(transcript).toContain('**MARA**: Your mother talks too much.');
+  });
+
+  it('casts a character with a brief and no voice, and records the auditions in build.json', async () => {
+    const briefed = markdown.replace(/(  MARA:\n)    voice: \S+\n/, "$1    brief: Mara, seventy, a lighthouse keeper's widow from Stromness in Orkney; a low, salt-cured voice.\n");
+    expect(briefed).not.toBe(markdown);
+    const out = memorySink();
+    const { build } = await buildStory({
+      source: { path: 'lighthouse.md', markdown: briefed },
+      out,
+      speaker: castingSpeaker(),
+      transcriber: { model: 'any', transcribe: async () => '' },
+      judge: fakeJudge({ Gacrux: 9 }),
+      runtime: passThroughRuntime,
+      cache: memoryCache(),
+    });
+    expect(build!.casting.map((c) => [c.id, c.voice])).toEqual([['MARA', 'Gacrux']]);
+    expect(build!.casting[0]!.ranked).toHaveLength(30);
+  });
+
+  it('stops before voicing anything when a character needs casting and there is no judge', async () => {
+    const briefed = markdown.replace(/(  MARA:\n)    voice: \S+\n/, '$1    brief: Mara, seventy, from Stromness.\n');
+    await expect(
+      buildStory({ source: { path: 'l.md', markdown: briefed }, out: memorySink(), speaker: toneSpeaker(), transcriber: scriptedTranscriber(), runtime: passThroughRuntime, cache: memoryCache() })
+    ).rejects.toThrow('MARA need a voice');
   });
 
   it('records a line that still fails its check after retakes', async () => {

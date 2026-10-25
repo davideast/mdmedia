@@ -46,7 +46,7 @@ describe('assembleStory', () => {
 
   it('gives every comment its own paragraph, so it cannot swallow a line', async () => {
     const md = assembleStory(
-      { title: 'T', narrator: { voice: 'Charon', delivery: 'warm' }, cast: { KID: { voice: 'Fenrir', delivery: 'loud' } }, names: [], scenes: [] },
+      { title: 'T', narrator: { delivery: 'warm', brief: 'A warm storyteller from Bath.' }, cast: { KID: { delivery: 'loud', brief: 'A loud seventh grader from Leeds.' } }, names: [], scenes: [] },
       [{ title: 'One', body: '*(calm)* It was loud.\n<!-- director: added -->\n**KID** *(gleeful)*: JUICE BOY!\n<!-- replaced: "Somebody shouted, "JUICE BOY!"" -->' }]
     );
     expect(md).toContain('<!-- director: added -->\n\n**KID** *(gleeful)*: JUICE BOY!\n\n<!-- replaced:');
@@ -56,7 +56,7 @@ describe('assembleStory', () => {
 
   it('writes a separate narrator and the names list into the front matter', async () => {
     const md = assembleStory(
-      { title: 'T', narrator: { voice: 'Charon', delivery: 'warm' }, cast: { MAYA: { voice: 'Kore', delivery: 'quick' } }, names: ['Westfield'], scenes: [] },
+      { title: 'T', narrator: { delivery: 'warm', brief: 'A warm storyteller from Bath.' }, cast: { MAYA: { delivery: 'quick', brief: 'Maya, eleven, from Cardiff.' } }, names: ['Westfield'], scenes: [] },
       [{ title: 'One', music: 'soft piano', body: '*(calm)* Hello.\n\n**MAYA** *(bright)*: Hi!' }]
     );
     const { script, diagnostics } = await parseStory(md, { path: 't.md' });
@@ -64,5 +64,7 @@ describe('assembleStory', () => {
     expect(script!.narrator).toBe('NARRATOR');
     expect(script!.meta.names).toEqual(['Westfield']);
     expect(script!.chapters[0]!.scenes[0]!.music).toBe('soft piano');
+    expect(script!.cast.MAYA!.brief).toBe('Maya, eleven, from Cardiff.');
+    expect(script!.cast.MAYA!.voice).toBeUndefined();
   });
 });

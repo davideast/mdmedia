@@ -4,7 +4,7 @@ import { basename, dirname, extname, join } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
 import { buildComic, buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision } from '../story/index.js';
+import type { AudioRuntime, BuildEvent, CastEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision, VoiceJudge } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
@@ -13,6 +13,7 @@ import {
   createGeminiTextModel,
   createGeminiTranscriber,
   createGeminiVision,
+  createGeminiVoiceJudge,
   createLyriaComposer,
   createNodeAudioRuntime,
 } from '../story/node/index.js';
@@ -85,6 +86,7 @@ export interface BuildDeps {
   runtime: AudioRuntime;
   cache: RenderCache;
   composer?: Composer;
+  judge?: VoiceJudge;
 }
 
 export interface BuildArgs {
@@ -107,6 +109,7 @@ export async function runStoryBuild(args: BuildArgs, deps: BuildDeps, write: (te
   }
   const outDir = args.out ?? join('dist', slugify(basename(args.file, extname(args.file))));
   const onEvent = args.json ? undefined : (event: BuildEvent) => {
+    if (event.type === 'cast-done') write(castLine(event));
     if (event.type === 'line-retake') write(`↻ ${event.id} retake ${event.attempt}: missing [${event.check.missing.join(' ')}] extra [${event.check.extra.join(' ')}]`);
     if (event.type === 'line-fallback') write(`⚠ ${event.id} refused; shorter note (level ${event.level})`);
     if (event.type === 'music-done') {
@@ -144,6 +147,13 @@ export async function runStoryBuild(args: BuildArgs, deps: BuildDeps, write: (te
     write(`Build failed: ${error instanceof Error ? error.message : String(error)}`);
     return EXIT.provider;
   }
+}
+
+/** `♫ ODILE cast as Autonoe (9/10): an elderly Northern woman's voice, dry rasp` */
+function castLine(event: CastEvent): string {
+  const r = event.result;
+  const top = r.ranked[0];
+  return `♫ ${r.id} cast as ${r.voice}${r.cached ? ' (cached)' : top ? ` (${top.fit}/10 of ${r.ranked.length} auditions): ${top.note}` : ''}`;
 }
 
 function toolVersion(): string {
@@ -195,6 +205,7 @@ export const storyBuildCommand = defineCommand({
         runtime,
         cache: createFileRenderCache(args.cache ?? join(args.file, '..', '.mdmedia', 'cache')),
         composer: args.music ? createLyriaComposer({ apiKey, model: args.musicModel }) : undefined,
+        judge: createGeminiVoiceJudge({ apiKey }),
       },
       (text) => console.log(text)
     );
@@ -380,7 +391,7 @@ export const storyDrawCommand = defineCommand({
 /** Builds the graphic novel for a comic script; resolves to the exit code. `deps` replaces providers in tests. */
 export async function runStoryComic(
   args: { file: string; out?: string; json?: boolean; redraw?: boolean; signal?: AbortSignal },
-  deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber },
+  deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber; judge?: VoiceJudge },
   write: (text: string) => void
 ): Promise<number> {
   let markdown: string;
@@ -402,7 +413,8 @@ export async function runStoryComic(
   const outDir = args.out ?? join('dist', slugify(comic.meta.title));
   const onEvent = args.json
     ? undefined
-    : (event: DrawEvent | LineEvent) => {
+    : (event: DrawEvent | LineEvent | CastEvent) => {
+        if (event.type === 'cast-done') write(castLine(event));
         if (event.type === 'panel-done' && !event.result.cached) write(`${event.result.ok ? '✓' : '✗'} panel ${event.result.id} (${event.result.attempts} take${event.result.attempts > 1 ? 's' : ''})`);
         if (event.type === 'line-done' && !event.result.ok) write(`✗ ${event.result.id} ${event.result.speaker}: heard "${event.result.heard}"`);
       };
@@ -423,7 +435,7 @@ export async function runStoryComic(
     };
     await createFileSink(join(outDir, 'comic')).write(
       'comic-build.json',
-      JSON.stringify({ schema: 'mdmedia.story.comic-build/1', summary, panels: result.draw.panels, lines, crowded: result.crowded }, null, 2) + '\n'
+      JSON.stringify({ schema: 'mdmedia.story.comic-build/1', summary, casting: result.casting, panels: result.draw.panels, lines, crowded: result.crowded }, null, 2) + '\n'
     );
     write(
       args.json
@@ -481,7 +493,11 @@ export const storyComicCommand = defineCommand({
         cache: createFileRenderCache(args.cache ?? join(args.file, '..', '.mdmedia', 'cache')),
         runtime,
         ...(args.voices
-          ? { speaker: createGeminiSpeaker({ apiKey, model: args.voiceModel }), transcriber: createGeminiTranscriber({ apiKey, model: args.transcribeModel }) }
+          ? {
+              speaker: createGeminiSpeaker({ apiKey, model: args.voiceModel }),
+              transcriber: createGeminiTranscriber({ apiKey, model: args.transcribeModel }),
+              judge: createGeminiVoiceJudge({ apiKey }),
+            }
           : {}),
       },
       (text) => console.log(text)

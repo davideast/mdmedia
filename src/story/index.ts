@@ -4,6 +4,8 @@ export { parseDuration, toSourceRange } from './source.js';
 export { DEFAULT_GAP_MS } from './front-matter.js';
 export * from './types.js';
 export { buildStory, linePath, musicPath, slugify, LOUDNESS, MP3_KBPS, type BuildOptions, type BuildEvent, type BuildSummary, type StoryBuild, type BuildResult } from './build.js';
+export { castVoices, type CastingResult, type CastEvent, type CastOptions, type Audition } from './cast.js';
+export { spokenText, heardAsWritten, voiceOf } from './pronounce.js';
 export { renderLines, MAX_RETAKES, type LineResult, type LineEvent, type RenderLinesOptions, type RenderedLine } from './render-lines.js';
 export { scheduleStory, type StoryTimeline, type TimedLine } from './schedule.js';
 export { deliveryNote, NOTE_LEVELS, type NoteLevel } from './note.js';

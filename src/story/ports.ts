@@ -37,6 +37,26 @@ export interface Transcriber {
   transcribe(wav: Uint8Array, options?: { names?: string[]; signal?: AbortSignal }): Promise<string>;
 }
 
+/** How well an audition clip matches a performance brief, each 0 to 10. */
+export interface VoiceScore {
+  /** Apparent gender and age. */
+  who: number;
+  accent: number;
+  /** Texture, resonance and rhythm. */
+  texture: number;
+  /** Overall: would you cast this voice. */
+  fit: number;
+  /** One sentence on what was heard. */
+  note: string;
+}
+
+/** Listens to an audition and scores it against a brief, for casting. */
+export interface VoiceJudge {
+  readonly model: string;
+  /** `wav` is a complete WAV file. */
+  score(request: { wav: Uint8Array; brief: string; signal?: AbortSignal }): Promise<VoiceScore>;
+}
+
 export interface LineCheck {
   heard: string;
   missing: string[];

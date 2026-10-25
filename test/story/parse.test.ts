@@ -119,11 +119,11 @@ describe('errors and warnings', () => {
     expect(d[0]!.message).toContain('narator');
   });
 
-  it('missing-field, for a missing title and a cast member without a voice', async () => {
+  it('missing-field for a missing title, missing-voice for a cast member with neither a voice nor a brief', async () => {
     const d = await check('missing-field');
-    expect(d.map((x) => x.code)).toEqual(['missing-field', 'missing-field']);
+    expect(d.map((x) => x.code).sort()).toEqual(['missing-field', 'missing-voice']);
     expect(d.some((x) => x.message.includes('title'))).toBe(true);
-    expect(d.some((x) => x.message.includes('MAYA needs a voice') && x.source!.line === 5)).toBe(true);
+    expect(d.some((x) => x.message.includes('MAYA needs a brief') && x.source!.line === 5)).toBe(true);
   });
 
   it('missing-field, for a missing narrator', async () => {

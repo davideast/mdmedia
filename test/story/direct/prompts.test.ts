@@ -19,9 +19,9 @@ describe('director instructions', () => {
     expect(CAST_INSTRUCTION).toContain('giving the reason kills the joke');
   });
 
-  it('offers every voice with its description, and only those', () => {
-    expect(VOICES).toHaveLength(30);
-    for (const v of VOICES) expect(CAST_INSTRUCTION).toContain(`${v.name}: ${v.description}`);
+  it('asks for a performance brief to cast from, not a voice name', () => {
+    for (const part of ['"brief"', 'a real, named place', 'how they laugh', 'what the performance must never become', 'never an adult pitching up']) expect(CAST_INSTRUCTION).toContain(part);
+    for (const v of VOICES) expect(CAST_INSTRUCTION).not.toContain(`${v.name}: ${v.description}`);
     expect(isVoice('Puck')).toBe(true);
     expect(isVoice('Bob')).toBe(false);
   });

@@ -9,8 +9,9 @@ export type NoteLevel = 0 | 1 | 2;
 export const NOTE_LEVELS: readonly NoteLevel[] = [0, 1, 2];
 
 /**
- * The delivery note for one line: the character's usual delivery, the line's
- * cue, and what was said just before it in the same scene. It is sent apart
+ * The delivery note for one line: the character's performance brief (or their
+ * usual delivery when there is none), the line's cue, and what was said just
+ * before it in the same scene. It is sent apart
  * from the words, so it is never spoken.
  */
 export function deliveryNote(line: Line, script: StoryScript, level: NoteLevel): string {
@@ -21,7 +22,7 @@ export function deliveryNote(line: Line, script: StoryScript, level: NoteLevel):
   const context = before.length
     ? 'Just before this, in the same scene: ' + before.map((l) => `${l.speaker} said "${l.text}"`).join(' Then ') + '.'
     : '';
-  return [speaker?.delivery ?? '', line.narration ? 'narrating' : '', line.cue, context]
+  return [speaker?.brief ?? speaker?.delivery ?? '', line.narration ? 'narrating' : '', line.cue, context]
     .map((part) => part.trim().replace(/\.$/, ''))
     .filter(Boolean)
     .join('. ');

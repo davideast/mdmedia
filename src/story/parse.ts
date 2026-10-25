@@ -156,6 +156,7 @@ export async function parseStory(markdown: string, options: { path: string }): P
       ...(frontMatter.author ? { author: frontMatter.author } : {}),
       language: frontMatter.language,
       ...(frontMatter.names.length ? { names: frontMatter.names } : {}),
+      ...(Object.keys(frontMatter.pronounce).length ? { pronounce: frontMatter.pronounce } : {}),
     },
     gapMs: frontMatter.gapMs,
     narrator: frontMatter.narrator,

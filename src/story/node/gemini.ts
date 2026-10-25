@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { calculateBackoffMs, delay } from '../../tts/backoff.js';
 import { GeminiTTSProvider } from '../../tts/gemini-tts-provider.js';
-import { SpeechRefused, type ImageBytes, type ImageModel, type Speaker, type TextModel, type Transcriber, type Vision } from '../ports.js';
+import { SpeechRefused, type ImageBytes, type ImageModel, type Speaker, type TextModel, type Transcriber, type Vision, type VoiceJudge } from '../ports.js';
 import { StoryError } from '../types.js';
 
 export const DEFAULT_STORY_SPEECH_MODEL = 'gemini-3.8-flash-tts';
@@ -9,6 +9,7 @@ export const DEFAULT_STORY_TRANSCRIBE_MODEL = 'gemini-3.5-flash-lite';
 export const DEFAULT_STORY_DIRECT_MODEL = 'gemini-3.5-flash';
 export const DEFAULT_STORY_IMAGE_MODEL = 'gemini-3-pro-image';
 export const DEFAULT_STORY_VISION_MODEL = 'gemini-3.5-flash';
+export const DEFAULT_STORY_JUDGE_MODEL = 'gemini-3.5-flash';
 
 /**
  * Speech on a verbatim Gemini TTS model: the words and the delivery note go in
@@ -40,6 +41,43 @@ export function createGeminiSpeaker(options: { apiKey: string; model?: string; m
       for (const c of chunks) { out.set(c, offset); offset += c.byteLength; }
       if (!out.byteLength) throw new Error('Gemini returned no audio for a line.');
       return out;
+    },
+  };
+}
+
+/**
+ * Scores an audition against a performance brief, for casting. In the voice
+ * audition its scores ran 0 to 10 and its notes named what it heard ("a raspy
+ * adult male" for a voice asked to be an eleven-year-old girl).
+ */
+export function createGeminiVoiceJudge(options: { apiKey: string; model?: string; maxRetries?: number }): VoiceJudge {
+  const model = options.model ?? DEFAULT_STORY_JUDGE_MODEL;
+  const client = new GoogleGenAI({ apiKey: options.apiKey });
+  const maxRetries = options.maxRetries ?? 5;
+  return {
+    model,
+    async score({ wav, brief, signal }) {
+      const prompt =
+        `You are casting a voice actor. Here is the performance brief:\n\n${brief}\n\nListen to the audition clip. Score each from 0 to 10, strictly:\n` +
+        '- "who": does the apparent gender and age match the brief?\n- "accent": does the accent match?\n' +
+        '- "texture": does the voice have the texture, resonance and rhythm described?\n- "fit": overall, would you cast this voice for this character?\n' +
+        'Return JSON: {"who": n, "accent": n, "texture": n, "fit": n, "note": "one short sentence on what you hear"}.';
+      for (let attempt = 0; ; attempt++) {
+        signal?.throwIfAborted();
+        try {
+          const response = await client.models.generateContent({
+            model,
+            contents: [{ role: 'user', parts: [{ inlineData: { mimeType: 'audio/wav', data: Buffer.from(wav).toString('base64') } }, { text: prompt }] }],
+            config: { responseMimeType: 'application/json' },
+          });
+          const r = JSON.parse(response.text ?? '{}') as Record<string, unknown>;
+          const n = (k: string) => (typeof r[k] === 'number' ? (r[k] as number) : 0);
+          return { who: n('who'), accent: n('accent'), texture: n('texture'), fit: n('fit'), note: String(r.note ?? '') };
+        } catch (error) {
+          if (attempt >= maxRetries || !(isBusy(error) || error instanceof SyntaxError)) throw error;
+          await delay(calculateBackoffMs(attempt, 2000, 30_000));
+        }
+      }
     },
   };
 }

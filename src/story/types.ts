@@ -14,9 +14,20 @@ export interface SourceRange {
 
 export interface CastMember {
   id: CastId;
-  voice: VoiceRef;
-  /** How this character usually sounds; every line's delivery note starts with it. */
+  /**
+   * The voice, when the author picked one: a Gemini voice name, or another
+   * character's id to share their voice. Without one, the build casts a voice
+   * from the brief.
+   */
+  voice?: VoiceRef;
+  /** How this character usually sounds, in a phrase; used when there is no brief. */
   delivery: string;
+  /**
+   * The performance brief: who they are, an accent from a real place, pitch,
+   * texture and resonance, rhythm, laugh, habits, how emotion changes the
+   * voice, what it must never become. Every line's delivery note starts with it.
+   */
+  brief?: string;
   /** How this character looks; used by the art milestones. */
   look?: string;
 }
@@ -66,7 +77,7 @@ export interface Chapter {
 export interface StoryScript {
   schema: 'mdmedia.story.script/1';
   source: { path: string; sha256: string };
-  meta: { title: string; author?: string; language: string; names?: string[] };
+  meta: { title: string; author?: string; language: string; names?: string[]; pronounce?: Record<string, string> };
   gapMs: number;
   /** The cast member who speaks narration: a character, or 'NARRATOR'. */
   narrator: CastId;
@@ -84,6 +95,7 @@ export type DiagnosticCode =
   | 'misplaced-music'
   | 'missing-cue'
   | 'placeholder-cue'
+  | 'missing-voice'
   | 'layout-mismatch'
   | 'bad-continue';
 

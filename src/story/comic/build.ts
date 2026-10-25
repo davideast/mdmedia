@@ -1,6 +1,7 @@
-import { LOUDNESS } from '../build.js';
+import { castCast, LOUDNESS } from '../build.js';
+import type { CastEvent, CastingResult } from '../cast.js';
 import { limiter } from '../limit.js';
-import type { AudioRuntime, FileSink, ImageModel, RenderCache, Speaker, Transcriber, Vision } from '../ports.js';
+import type { AudioRuntime, FileSink, ImageModel, RenderCache, Speaker, Transcriber, Vision, VoiceJudge } from '../ports.js';
 import type { LineEvent, RenderedLine } from '../render-lines.js';
 import type { StoryScript } from '../types.js';
 import { drawComic, type DrawEvent, type DrawResult } from './draw.js';
@@ -28,8 +29,10 @@ export interface ComicBuildOptions {
   /** Without a speaker and transcriber, the reader has no audio. */
   speaker?: Speaker;
   transcriber?: Transcriber;
+  /** Casts voices for cast members who have a brief and no voice. */
+  judge?: VoiceJudge;
   signal?: AbortSignal;
-  onEvent?: (event: DrawEvent | LineEvent) => void;
+  onEvent?: (event: DrawEvent | LineEvent | CastEvent) => void;
   /** Draw again panels that failed their checks in an earlier build. */
   redraw?: boolean;
 }
@@ -37,6 +40,7 @@ export interface ComicBuildOptions {
 export interface ComicBuildResult {
   draw: DrawResult;
   lines: Map<string, RenderedLine>;
+  casting: CastingResult[];
   /** Panels whose lettering may not fit clear of faces, estimated at page size and in the guided view. */
   crowded: Array<{ panel: string; view: 'page' | 'guided'; items: number[] }>;
   data: ReaderData;
@@ -56,9 +60,12 @@ export const readerAudio = (id: string) => `audio/${id.replace('.', '-')}.mp3`;
 export async function buildComic(options: ComicBuildOptions): Promise<ComicBuildResult> {
   const { comic, story, runtime, sink, signal } = options;
   const draw = await drawComic(comic, story.cast, { image: options.image, vision: options.vision, cache: options.cache, redraw: options.redraw, signal, onEvent: options.onEvent });
+  // Cast from the story file, so the comic and the audio drama audition the same line.
+  const { script: cast, casting } =
+    options.speaker && options.transcriber ? await castCast(story, { ...options, speaker: options.speaker }, options.onEvent ?? (() => {})) : { script: story, casting: [] };
   const lines =
     options.speaker && options.transcriber
-      ? await voiceComic(comic, story, { speaker: options.speaker, transcriber: options.transcriber, cache: options.cache, signal, onEvent: options.onEvent })
+      ? await voiceComic(comic, cast, { speaker: options.speaker, transcriber: options.transcriber, cache: options.cache, signal, onEvent: options.onEvent })
       : new Map<string, RenderedLine>();
 
   const encode = limiter(4);
@@ -104,5 +111,5 @@ export async function buildComic(options: ComicBuildOptions): Promise<ComicBuild
     const guided = letterPanel(panel, panel.heads, GUIDED.widthPx, panel.slot.h * k, estimate, { fontPx: GUIDED.minFontPx, minFontPx: GUIDED.minFontPx });
     if (guided.crowded.length) crowded.push({ panel: panel.id, view: 'guided', items: guided.crowded });
   }
-  return { draw, lines, crowded, data };
+  return { draw, lines, casting, crowded, data };
 }

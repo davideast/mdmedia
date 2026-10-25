@@ -1,10 +1,11 @@
+import { castVoices, type CastEvent, type CastingResult } from './cast.js';
 import { parseStory } from './parse.js';
 import { mixClips, wavFromPcm } from './pcm.js';
 import { buildMixPlan, renderMusic, sceneLeads, type MusicEvent, type MusicResult } from './music.js';
-import type { AudioRuntime, CachedMusic, Composer, FileSink, RenderCache, Speaker, Transcriber } from './ports.js';
+import type { AudioRuntime, CachedMusic, Composer, FileSink, RenderCache, Speaker, Transcriber, VoiceJudge } from './ports.js';
 import { renderLines, type LineEvent, type LineResult } from './render-lines.js';
 import { scheduleStory, type StoryTimeline } from './schedule.js';
-import type { Diagnostic, Line, StoryScript } from './types.js';
+import { StoryError, type Diagnostic, type Line, type StoryScript } from './types.js';
 
 export const LOUDNESS = { loudnessLufs: -19, truePeakDb: -2 } as const;
 export const MP3_KBPS = 160;
@@ -16,6 +17,8 @@ export interface BuildOptions {
   transcriber: Transcriber;
   runtime: AudioRuntime;
   cache: RenderCache;
+  /** Casts voices for cast members who have a brief and no voice. */
+  judge?: VoiceJudge;
   /** Scene music; without one, or with `music: false`, the build has voices only. */
   composer?: Composer;
   music?: boolean;
@@ -25,7 +28,7 @@ export interface BuildOptions {
   onEvent?: (event: BuildEvent) => void;
 }
 
-export type BuildEvent = LineEvent | MusicEvent | { type: 'mix-done'; durationMs: number } | { type: 'build-done'; summary: BuildSummary };
+export type BuildEvent = CastEvent | LineEvent | MusicEvent | { type: 'mix-done'; durationMs: number } | { type: 'build-done'; summary: BuildSummary };
 
 export interface BuildSummary {
   lines: number;
@@ -48,6 +51,8 @@ export interface StoryBuild {
   models: { speech: { name: string; model: string }; transcription: string; music?: string };
   encoder: { path: string; version: string };
   summary: BuildSummary;
+  /** Voices cast from briefs in this build, with every audition's score. */
+  casting: CastingResult[];
   lines: LineResult[];
   music: MusicResult[];
   outputs: Array<{ path: string; sha256: string; bytes: number }>;
@@ -66,8 +71,10 @@ export interface BuildResult {
 export async function buildStory(options: BuildOptions): Promise<BuildResult> {
   const started = Date.now();
   const emit = options.onEvent ?? (() => {});
-  const { script, diagnostics } = await parseStory(options.source.markdown, { path: options.source.path });
-  if (!script) return { diagnostics };
+  const parsed = await parseStory(options.source.markdown, { path: options.source.path });
+  const diagnostics = parsed.diagnostics;
+  if (!parsed.script) return { diagnostics };
+  const { script, casting } = await castCast(parsed.script, options, emit);
 
   const rendered = await renderLines(script, {
     speaker: options.speaker,
@@ -133,6 +140,7 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
     },
     encoder: await options.runtime.describe(),
     summary,
+    casting,
     lines: results,
     music: musicResults,
     outputs: [...outputs],
@@ -140,6 +148,18 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
   await options.out.write('build.json', json(build));
   emit({ type: 'build-done', summary });
   return { diagnostics, build };
+}
+
+/** Casts the cast members who need a voice, or explains what is missing. */
+export async function castCast(
+  script: StoryScript,
+  options: { speaker: Speaker; judge?: VoiceJudge; cache: RenderCache; signal?: AbortSignal },
+  emit: (event: CastEvent) => void
+): Promise<{ script: StoryScript; casting: CastingResult[] }> {
+  const uncast = Object.values(script.cast).filter((m) => !m.voice);
+  if (!uncast.length) return { script, casting: [] };
+  if (!options.judge) throw new StoryError('uncast', `${uncast.map((m) => m.id).join(', ')} need a voice: give them a voice:, or build with a judge to cast from their briefs.`);
+  return castVoices(script, { speaker: options.speaker, judge: options.judge, cache: options.cache, signal: options.signal, onEvent: emit });
 }
 
 /** `00/03/0007-june` → `audio/lines/00-03/0007-june.wav` */

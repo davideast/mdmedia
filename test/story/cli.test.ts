@@ -117,8 +117,8 @@ describe('mdmedia story direct', async () => {
   const raw = 'The Bus\n\nThe bus pulled away. "Wait!" Maya shouted.\n';
   const plan = {
     title: 'The Bus',
-    narrator: { voice: 'Charon', delivery: 'warm' },
-    cast: { MAYA: { voice: 'Kore', delivery: 'quick' } },
+    narrator: { delivery: 'warm', brief: 'A warm storyteller from Bath.' },
+    cast: { MAYA: { delivery: 'quick', brief: 'Maya, eleven, from Cardiff.' } },
     names: [],
     scenes: [{ title: 'One', firstWords: 'The bus pulled away.', music: 'strings' }],
   };

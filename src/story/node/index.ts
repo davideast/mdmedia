@@ -6,6 +6,8 @@ export {
   createGeminiTextModel,
   createGeminiImageModel,
   createGeminiVision,
+  createGeminiVoiceJudge,
+  DEFAULT_STORY_JUDGE_MODEL,
   DEFAULT_STORY_IMAGE_MODEL,
   DEFAULT_STORY_VISION_MODEL,
   DEFAULT_STORY_DIRECT_MODEL,
