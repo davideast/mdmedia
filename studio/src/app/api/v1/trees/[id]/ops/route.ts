@@ -10,7 +10,7 @@ import {
 
 export const runtime = 'nodejs';
 
-type Context = { params: Promise<{ id: string }> | { id: string } };
+type Context = { params: Promise<{ id: string }> };
 
 /**
  * POST /api/v1/trees/[id]/ops — accepts `{ ops: TreeOp[], expectedRevision?: number }`

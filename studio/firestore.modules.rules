@@ -136,6 +136,59 @@ service cloud.firestore {
       allow delete: if isAllowlisted() && isOwner(resource.data.ownerUid);
     }
 
+    // Productions, their cuts, and the series that group them. Owner-only
+    // reads, like playlists: a listing must carry where('ownerUid', '==', uid).
+    //
+    // DELIBERATE: no client writes. Productions are written through /api/v1
+    // with the Admin SDK, which checks that every asset a cut names is the
+    // owner's and that the cut resolves; Rules cannot check either, so a
+    // client-authored cut could point at media it doesn't own.
+    match /productions/{productionId} {
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      allow write: if false;
+
+      match /cuts/{cutId} {
+        allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+        allow write: if false;
+      }
+
+      // Review comments: threads, their messages and options, and the
+      // decision log. Read live by the owner; written only through /api/v1,
+      // which anchors a comment on the resolved cut, checks that previews
+      // are the owner's media, and keeps each thread's status in step.
+      match /threads/{threadId} {
+        allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+        allow write: if false;
+
+        match /messages/{messageId} {
+          allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+          allow write: if false;
+        }
+
+        match /suggestions/{suggestionId} {
+          allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+          allow write: if false;
+        }
+      }
+
+      match /decisions/{decisionId} {
+        allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+        allow write: if false;
+      }
+    }
+
+    // Agents' heartbeats, so the cut viewer can say when comments wait for
+    // an agent. Written only by /api/v1/comments/heartbeat.
+    match /commentAgents/{agentId} {
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      allow write: if false;
+    }
+
+    match /series/{seriesId} {
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      allow write: if false;
+    }
+
 
     function hasVerifiedEmail() {
       return isAuthenticated()

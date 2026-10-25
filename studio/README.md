@@ -1,6 +1,6 @@
 ## Local development
 
-Studio runs on Next.js with a local Pyric Node hosted sandbox. Node 22.15+, Bun, npm, and the local Pyric checkout are required. From the repository root:
+Studio runs on Next.js with a local Pyric Node hosted sandbox. Node 22.15+, Bun, and npm are required. Pyric can come from a local checkout or the pinned npm archives below. From the repository root:
 
 ```bash
 bun install
@@ -333,3 +333,36 @@ gcloud run deploy studio \
 # 5. Deploy Firebase Hosting rewrite
 firebase deploy --only hosting
 ```
+
+## Productions: checkout and deployment
+
+The production viewer, CLI, character registry, and comment APIs are source code.
+The cuts, word timings, character records, and selected check reports under
+`docs/` also serve as regression fixtures; they do not automatically populate
+Studio. Their media roots use `~/.local/share/mdmedia/productions/crt-tv`.
+A fresh checkout can run the core tests without that media; disk/audio checks
+that require it are skipped. Regulars character records have visual references
+but no measured voice profiles.
+
+Keep generated videos, extracted stills, audio, renders, provider responses,
+credentials, `.pyric/` databases, `.pyric-local/` archives, and `.next*` builds
+out of Git. Preserve your production media outside the repository. Do not
+commit local environment variants; `.env.local.example` contains placeholders.
+
+For a multi-instance deployment, configure `MDMEDIA_MEDIA_LINK_SECRET` with the
+same secret of at least 32 characters on every instance. Otherwise development
+uses a process-local key, and signed links will not survive server restarts.
+Deploy the checked-in Firestore rules and indexes with the app's normal
+deployment process before using production queries. Compiled rules belong in
+Git alongside their module sources. See [the productions API](../docs/studio-productions-api.md)
+for upload and ownership behavior.
+
+The standard production build uses webpack, matching hosted builds; Next
+16.3.5 Turbopack currently fails resolving its generated Google Font modules.
+The existing fonts require network access at build time.
+
+CI builds the root package, fetches the four pinned Pyric archives from npm,
+installs Studio, generates Next route types, checks TypeScript and the structural-rule fixtures,
+and builds Studio plus its offline worker. No API keys, paid media generations,
+or running personal sandbox are required. Keep the Pyric versions in the CI
+workflow and `package.json` synchronized when upgrading.

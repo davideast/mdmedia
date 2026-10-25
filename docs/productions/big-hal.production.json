@@ -1,0 +1,73 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "big-hal",
+  "title": "Big Hal's car lot",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cast": [
+    {
+      "role": "Big Hal",
+      "character": "big-hal@1"
+    }
+  ],
+  "cover": "review/posters/ad-big-hal-take5.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ad-big-hal.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Jolly man in a huge white cowboy hat strides up through bunches of primary-colour balloons and boxy sedans, arms wide, then shakes the camera's hand so the picture jiggles; a small garbled sign shows on a distant building in the first second.",
+      "createdAt": "2026-10-18T22:03:13.780Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ad-big-hal-take2.mp4",
+      "label": "Take 2",
+      "status": "none",
+      "notes": "Transcript: Come on down to Big Hal's. No money down. (0.0 to 3.4 s), said once. Big Hal strides up through the balloons and sedans, then shakes the camera's hand; our graphics: a big yellow NO MONEY DOWN! from 3.2 s, $99 A MONTH flashing from 4.4 s and 555-0182 blinking from 5 s; still 8 s, with no voiceover pitch or separate packshot, since it was briefed as a regenerate plus graphics.",
+      "createdAt": "2026-10-18T22:55:10.074Z"
+    },
+    {
+      "id": "take3",
+      "rendered": "review/clips/ad-big-hal-take3.mp4",
+      "label": "Take 3",
+      "status": "none",
+      "notes": "Transcript (every line once, in order): Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area (0.0 s) / No money down (6.5) / Zero percent financing (7.9) / Every car on the lot, 99 a month (9.5) / Bad credit? No credit? No problem! (12.5) / Heck, this one even comes with wheels (14.9) / So come on down to Big Hal's and save big (17.2). One locked-off shot with no cuts or handshake; he slaps the sedan's hood on the wheels joke. Our graphics land on their words: NO MONEY DOWN!, 0% APR!, $99 A MONTH! flashing, NO CREDIT? NO PROBLEM!, WHEELS INCLUDED!*, fine print zipping along the bottom from 16.7 s, then COME ON DOWN & SAVE BIG! with 555-0182 blinking and BIG HAL'S · ROUTE 9. It runs 20 s, a little over the 16 to 18 asked.",
+      "createdAt": "2026-10-18T23:58:44.929Z"
+    },
+    {
+      "id": "take4",
+      "rendered": "review/clips/ad-big-hal-take4.mp4",
+      "label": "Take 4 (new script)",
+      "status": "none",
+      "notes": "Transcript: Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area (0.0 s) / No money down (5.8) / zero percent financing (7.1) / 99 a month (8.8) / And every car on my lot is hand-inspected by me, personally (10.2) / They start! (14.3) / The doors close! (15.1) / And this one? This one even comes with... wheels! (16.4, wheels at 19.8 after a 1 s pause) / So come on down to Big Hal's and save big! (21.0). Powder-blue suit with white piping; he pats the sedan's hood on personally (13.0 to 13.4 s); one camera, no cuts or handshake, no lettered signs. Graphics land within 0.1 s of their words. The hubcap gag was tried and dropped (the hubcap appeared from nowhere); the pause before wheels was stretched to 1 s in the edit; one take of the finish had burned-in subtitles and was redone.",
+      "createdAt": "2026-10-19T00:32:15.271Z"
+    },
+    {
+      "id": "take5",
+      "cut": "docs/cuts/big-hal-take5.cut.json",
+      "label": "Take 5 (shot by shot)",
+      "status": "review",
+      "notes": "Transcript: Howdy folks, Big Hal here at Big Hal's, the biggest lot in the tri-county area (0.4 s) / No money down (5.7) / zero percent financing (6.9) / 99 a month (8.7) / And every car on my lot is hand-inspected (10.0)... by me! (13.4) / PERSONALLY! (14.3) / They start! (15.9) / The doors close! (17.1) / And this one? (18.6) This one even comes with... (19.6) / Wheels! (21.7, after a 1.0 s pause) / So come on down to Big Hal's and save big! (22.9). What changed: Take 4's air swat (12.6 to 13.7 s, his palm flapping above the hood) is replaced by a close insert where his palm lands flat on the hood on PER-sonally and pats it again, with the thumps synced to the contacts. The extend seams are gone: Take 4 clicked and clipped close! at 16.0 s and smeared the wh- of wheels through a 2.5x slow-mo pause. Every line after 99 a month is now its own shot from a Take 4 still, so there's no seam or slow motion anywhere. Timing: a 0.9 s beat with a pat in it before They start!, 0.6 s before The doors close! (heard over an insert of his hand shutting the door, thunk right after close!), 0.5 s before And this one?, and a real 1.0 s held pause before Wheels!. Shots: opening is Take 4's own first 9.85 s, which is clean. Then a medium by the hood (inspect take 6), the one-word PERSONALLY! take 2 voiced over the hood-pat insert take 1, a medium close-up of They start! (lines take 1), the door insert take 1, And this one? take 3 (his hand resting on the hood), and the wide Wheels!/finish take 1 with a 1 s end freeze. Inspect takes 1 and 2 were rejected: both said by me after a pause and then a late, quiet personally. So personally became its own one-word shot. And this one? takes 1 and 2 were rejected for a 1.3 s gap and a lifted hand. Graphics are Take 4's, each landing on its word, with HAND-INSPECTED cleared before the pat and DOORS CLOSE! raised over the door's windows. No handshake, no lettered signs.",
+      "createdAt": "2026-10-19T09:12:48.225Z"
+    },
+    {
+      "id": "take6",
+      "cut": "docs/cuts/big-hal-take6.cut.json",
+      "label": "Take 6 (wheels in one breath)",
+      "status": "review",
+      "notes": "Take 5 with the punchline fixed (thread t2-wheels, your accepted s4). \"And this one? This one even comes with wheels! So come on down to Big Hal's and save big!\" is now one take in the medium by the hood (18.2 s to the end), so the punchline and the close are one performance: no cut and no pause between with and wheels (0.00 s measured), \"wheels\" level with \"comes with\" and said like any selling point, his hand resting on the hood; arms open only on \"So come on down\". The punchline is lifted 2.5 dB to the level of \"They start!\". The wide finish with the held pause and the arms-wide WHEELS! is gone, so it ends on the medium; 25.9 s instead of 27.3. Everything before 18.2 s is Take 5 unchanged (the PERSONALLY! fix is not in it yet).",
+      "createdAt": "2026-10-20T02:08:32.224Z"
+    },
+    {
+      "id": "take7",
+      "cut": "docs/cuts/big-hal-take7.cut.json",
+      "label": "Take 7 (the sell)",
+      "status": "review",
+      "notes": "Your new script, one take per sentence: Howdy folks... (0.4 s) / Now, those fancy dealerships'll charge you for all kinds of extras. (5.6) / Not Big Hal. I keep it simple, and I pass the savings on to you. (9.4) / That's how I can do no money down, and ninety-nine a month! (14.6) / And I personally hand-inspect every car. (18.5) / At Big Hal's, you're guaranteed to get four doors! Four seats! A steering wheel! (21.6) / And this one? This one even comes with wheels! (28.9) / So come on down to Big Hal's and save big! (32.2). What changed: the opening now sells (no extras, so the low price; hand-inspected; a guarantee of bare basics), which sets up 'even comes with wheels'. Line 1 is Take 5's opening; lines 7-8 are Take 6's accepted take unchanged; lines 2-6 are new, each from a still of the approved footage. His palm lands on the hood just after 'car' with its own thump on the contact. On line 6 his hand counts one, two, three on the three items in a close insert over that one take's voice, because no take that showed his face counted in step. 0.26 to 0.41 s between sentences, except 0.62 s after 'car' (the hood thump is in it). New graphics: NO MONEY DOWN and $99 A MONTH on line 4; FOUR DOORS!, FOUR SEATS!, STEERING WHEEL! as each is said; then Take 6's.",
+      "createdAt": "2026-10-20T03:22:44.000Z"
+    }
+  ]
+}

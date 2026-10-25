@@ -1,0 +1,111 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "deadbolt": {
+      "text": "Deadbolt. Steel frame. Thirty seconds.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 0, "end": 3.25, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.618,
+      "snap": { "aligned": 0.28, "start": 0.28, "onset": 0.28, "floor": -66.7 },
+      "words": [
+        { "text": "Deadbolt.", "start": 0.28, "end": 0.78, "loss": 0.638 },
+        { "text": "Steel", "start": 1.14, "end": 1.4, "loss": 0.612 },
+        { "text": "frame.", "start": 1.52, "end": 1.86, "loss": 0.756 },
+        { "text": "Thirty", "start": 2.48, "end": 2.68, "loss": 0.45 },
+        { "text": "seconds.", "start": 2.8, "end": 3.16, "loss": 0.602 }
+      ]
+    },
+    "wrench": {
+      "text": "Need a tension wrench.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 3.6, "end": 4.6, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.673,
+      "snap": { "aligned": 3.66, "start": 3.66, "onset": 3.66, "floor": -62.9 },
+      "words": [
+        { "text": "Need", "start": 3.66, "end": 3.74, "loss": 0.467 },
+        { "text": "a", "start": 3.78, "end": 3.84, "loss": 0.687 },
+        { "text": "tension", "start": 3.9, "end": 4.18, "loss": 0.71 },
+        { "text": "wrench.", "start": 4.22, "end": 4.5, "loss": 0.775 }
+      ]
+    },
+    "paperclip": {
+      "text": "Paperclip'll do.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 4.55, "end": 5.55, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.959,
+      "snap": { "aligned": 4.69, "start": 4.67, "onset": 4.67, "floor": -63.5 },
+      "words": [
+        { "text": "Paperclip'll", "start": 4.67, "end": 5.21, "loss": 0.911 },
+        { "text": "do.", "start": 5.25, "end": 5.39, "loss": 1.14 }
+      ]
+    },
+    "pins": {
+      "text": "Hinge pins. Painted shut.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 6, "end": 7.95, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.864,
+      "snap": { "aligned": 6.04, "start": 6.02, "onset": 6.02, "floor": -61.8 },
+      "words": [
+        { "text": "Hinge", "start": 6.02, "end": 6.22, "loss": 0.534 },
+        { "text": "pins.", "start": 6.34, "end": 6.66, "loss": 0.794 },
+        { "text": "Painted", "start": 7.32, "end": 7.58, "loss": 0.876 },
+        { "text": "shut.", "start": 7.7, "end": 7.9, "loss": 0.752 }
+      ]
+    },
+    "lever": {
+      "text": "If I lever the frame...",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 8.45, "end": 9.75, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.835,
+      "snap": { "aligned": 8.59, "start": 8.59, "onset": 8.64, "floor": -60.6 },
+      "words": [
+        { "text": "If", "start": 8.59, "end": 8.65, "loss": 0.706 },
+        { "text": "I", "start": 8.73, "end": 8.77, "loss": 0.902 },
+        { "text": "lever", "start": 8.83, "end": 9.01, "loss": 0.704 },
+        { "text": "the", "start": 9.05, "end": 9.19, "loss": 0.677 },
+        { "text": "frame...", "start": 9.25, "end": 9.61, "loss": 1.047 }
+      ]
+    },
+    "onething": {
+      "text": "Only one thing left.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 11.25, "end": 12.35, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.74,
+      "snap": { "aligned": 11.43, "start": 11.4, "onset": 11.4, "floor": -55.4 },
+      "words": [
+        { "text": "Only", "start": 11.4, "end": 11.61, "loss": 0.673 },
+        { "text": "one", "start": 11.65, "end": 11.77, "loss": 0.951 },
+        { "text": "thing", "start": 11.85, "end": 11.99, "loss": 0.674 },
+        { "text": "left.", "start": 12.09, "end": 12.33, "loss": 0.661 }
+      ]
+    },
+    "blow": {
+      "text": "I'll have to blow the hinges.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-climax-t1.mp4", "start": 12.7, "end": 14, "sha256": "ceadd06fdfb203da79aebb54f356bcc55a1ceef25acde2eecff7f00cad1bc674", "snap": "speech-onset@1" },
+      "loss": 0.821,
+      "snap": { "aligned": 12.92, "start": 12.91, "onset": 12.91, "floor": -55.8 },
+      "words": [
+        { "text": "I'll", "start": 12.91, "end": 12.98, "loss": 0.726 },
+        { "text": "have", "start": 13.02, "end": 13.1, "loss": 0.851 },
+        { "text": "to", "start": 13.14, "end": 13.22, "loss": 0.773 },
+        { "text": "blow", "start": 13.24, "end": 13.4, "loss": 0.763 },
+        { "text": "the", "start": 13.44, "end": 13.5, "loss": 0.768 },
+        { "text": "hinges.", "start": 13.54, "end": 13.92, "loss": 0.962 }
+      ]
+    },
+    "pull": {
+      "text": "Rigg. It's a pull.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/rigg5-her-t2.mp4", "start": 0.6, "end": 3.6, "sha256": "aca8a31c68066f27ebc4d6c4812033cf6b8b703acbc6cfa2a26fec8d326b9378", "snap": "speech-onset@1" },
+      "loss": 0.93,
+      "snap": { "aligned": 1.22, "start": 1.17, "onset": 1.17, "floor": -66.4 },
+      "words": [
+        { "text": "Rigg.", "start": 1.17, "end": 1.54, "loss": 0.941 },
+        { "text": "It's", "start": 2.44, "end": 2.54, "loss": 0.47 },
+        { "text": "a", "start": 2.58, "end": 2.66, "loss": 0.724 },
+        { "text": "pull.", "start": 2.72, "end": 3.04, "loss": 1.167 }
+      ]
+    }
+  }
+}

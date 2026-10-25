@@ -1,0 +1,1120 @@
+{
+  "format": "mdmedia.cut-check@1",
+  "measured": {
+    "method": "dialogue-stem@1",
+    "source": "a render of the cut's dialogue: every segment's own sound and every line with its own sound, at the cut's volumes, fades and layers, without music or sound effects, mono 48 kHz",
+    "range": {
+      "from": 0,
+      "to": 25.9
+    },
+    "lines": [
+      {
+        "id": "howdy",
+        "speaker": "Big Hal",
+        "text": "Howdy folks! Big Hal here, at Big Hal's, the biggest lot in the tri-county area!",
+        "speech": {
+          "start": 0.36,
+          "end": 5.2
+        },
+        "timedBy": "words",
+        "words": 15,
+        "syllables": 20,
+        "loudness": -24.5,
+        "pitch": {
+          "median": 249.7,
+          "low": 173.5,
+          "high": 311.1,
+          "range": 10.1,
+          "voiced": 0.72
+        },
+        "rate": {
+          "words": 3.1,
+          "syllables": 4.13
+        },
+        "wordLevels": [
+          {
+            "text": "Howdy",
+            "start": 0.36,
+            "end": 0.62,
+            "loudness": -20.7
+          },
+          {
+            "text": "folks!",
+            "start": 0.7,
+            "end": 1.08,
+            "loudness": -24
+          },
+          {
+            "text": "Big",
+            "start": 1.42,
+            "end": 1.56,
+            "loudness": -20.8
+          },
+          {
+            "text": "Hal",
+            "start": 1.64,
+            "end": 1.86,
+            "loudness": -21.1
+          },
+          {
+            "text": "here,",
+            "start": 1.94,
+            "end": 2.08,
+            "loudness": -23.3
+          },
+          {
+            "text": "at",
+            "start": 2.12,
+            "end": 2.22,
+            "loudness": -31.6
+          },
+          {
+            "text": "Big",
+            "start": 2.3,
+            "end": 2.46,
+            "loudness": -21.8
+          },
+          {
+            "text": "Hal's,",
+            "start": 2.52,
+            "end": 2.9,
+            "loudness": -25.4
+          },
+          {
+            "text": "the",
+            "start": 3.18,
+            "end": 3.24,
+            "loudness": -22.3
+          },
+          {
+            "text": "biggest",
+            "start": 3.36,
+            "end": 3.66,
+            "loudness": -24
+          },
+          {
+            "text": "lot",
+            "start": 3.74,
+            "end": 3.92,
+            "loudness": -21.6
+          },
+          {
+            "text": "in",
+            "start": 3.98,
+            "end": 4.019,
+            "loudness": -38.7
+          },
+          {
+            "text": "the",
+            "start": 4.059,
+            "end": 4.14,
+            "loudness": -29.7
+          },
+          {
+            "text": "tri-county",
+            "start": 4.18,
+            "end": 4.76,
+            "loudness": -24.5
+          },
+          {
+            "text": "area!",
+            "start": 4.86,
+            "end": 5.2,
+            "loudness": -25.4
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "nomoney",
+        "speaker": "Big Hal",
+        "text": "No money down!",
+        "speech": {
+          "start": 5.65,
+          "end": 6.55
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 4,
+        "loudness": -24.6,
+        "pitch": {
+          "median": 245,
+          "low": 194.1,
+          "high": 293.6,
+          "range": 7.2,
+          "voiced": 0.93
+        },
+        "rate": {
+          "words": 3.33,
+          "syllables": 4.44
+        },
+        "wordLevels": [
+          {
+            "text": "No",
+            "start": 5.65,
+            "end": 5.85,
+            "loudness": -22.7
+          },
+          {
+            "text": "money",
+            "start": 5.93,
+            "end": 6.13,
+            "loudness": -23.9
+          },
+          {
+            "text": "down!",
+            "start": 6.23,
+            "end": 6.55,
+            "loudness": -26.1
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "zero",
+        "speaker": "Big Hal",
+        "text": "Zero percent financing!",
+        "speech": {
+          "start": 7.02,
+          "end": 8.42
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 7,
+        "loudness": -25.6,
+        "pitch": {
+          "median": 235.4,
+          "low": 129.1,
+          "high": 303.9,
+          "range": 14.8,
+          "voiced": 0.74
+        },
+        "rate": {
+          "words": 2.14,
+          "syllables": 5
+        },
+        "wordLevels": [
+          {
+            "text": "Zero",
+            "start": 7.02,
+            "end": 7.3,
+            "loudness": -20.5
+          },
+          {
+            "text": "percent",
+            "start": 7.4,
+            "end": 7.72,
+            "loudness": -27.7
+          },
+          {
+            "text": "financing!",
+            "start": 7.82,
+            "end": 8.42,
+            "loudness": -27
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "month",
+        "speaker": "Big Hal",
+        "text": "Ninety-nine a month!",
+        "speech": {
+          "start": 8.73,
+          "end": 9.73
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 6,
+        "loudness": -25.1,
+        "pitch": {
+          "median": 260.1,
+          "low": 190.3,
+          "high": 278.4,
+          "range": 6.6,
+          "voiced": 0.72
+        },
+        "rate": {
+          "words": 3,
+          "syllables": 6
+        },
+        "wordLevels": [
+          {
+            "text": "Ninety-nine",
+            "start": 8.73,
+            "end": 9.27,
+            "loudness": -23.5
+          },
+          {
+            "text": "a",
+            "start": 9.31,
+            "end": 9.37,
+            "loudness": -29
+          },
+          {
+            "text": "month!",
+            "start": 9.41,
+            "end": 9.73,
+            "loudness": -28
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "every",
+        "speaker": "Big Hal",
+        "text": "And every car on my lot is hand-inspected... by me!",
+        "speech": {
+          "start": 9.98,
+          "end": 13.84
+        },
+        "timedBy": "words",
+        "words": 10,
+        "syllables": 15,
+        "loudness": -25.8,
+        "pitch": {
+          "median": 211.5,
+          "low": 131.8,
+          "high": 260.5,
+          "range": 11.8,
+          "voiced": 0.71
+        },
+        "rate": {
+          "words": 2.59,
+          "syllables": 3.89
+        },
+        "wordLevels": [
+          {
+            "text": "And",
+            "start": 9.98,
+            "end": 10.18,
+            "loudness": -28.8
+          },
+          {
+            "text": "every",
+            "start": 10.28,
+            "end": 10.48,
+            "loudness": -26.2
+          },
+          {
+            "text": "car",
+            "start": 10.6,
+            "end": 10.84,
+            "loudness": -22.6
+          },
+          {
+            "text": "on",
+            "start": 10.88,
+            "end": 11,
+            "loudness": -26.8
+          },
+          {
+            "text": "my",
+            "start": 11.04,
+            "end": 11.22,
+            "loudness": -22.7
+          },
+          {
+            "text": "lot",
+            "start": 11.28,
+            "end": 11.52,
+            "loudness": -23
+          },
+          {
+            "text": "is",
+            "start": 11.66,
+            "end": 11.8,
+            "loudness": -35.7
+          },
+          {
+            "text": "hand-inspected...",
+            "start": 11.86,
+            "end": 12.88,
+            "loudness": -28.8
+          },
+          {
+            "text": "by",
+            "start": 13.34,
+            "end": 13.5,
+            "loudness": -20.6
+          },
+          {
+            "text": "me!",
+            "start": 13.62,
+            "end": 13.84,
+            "loudness": -27.2
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "personally",
+        "speaker": "Big Hal",
+        "text": "PERSONALLY!",
+        "speech": {
+          "start": 14.28,
+          "end": 14.98
+        },
+        "timedBy": "words",
+        "words": 1,
+        "syllables": 4,
+        "loudness": -23.6,
+        "pitch": {
+          "median": 240.7,
+          "low": 185.2,
+          "high": 362.2,
+          "range": 11.6,
+          "voiced": 0.46
+        },
+        "rate": {
+          "words": 1.43,
+          "syllables": 5.71
+        },
+        "wordLevels": [
+          {
+            "text": "PERSONALLY!",
+            "start": 14.28,
+            "end": 14.98,
+            "loudness": -23.2
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "personally"
+            ],
+            "value": 1.43,
+            "threshold": 1.71,
+            "message": "personally: speech rate 1.43 words/s is below Big Hal's reference, 1.71 words/s (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "theystart",
+        "speaker": "Big Hal",
+        "text": "They start!",
+        "speech": {
+          "start": 15.87,
+          "end": 16.61
+        },
+        "timedBy": "words",
+        "words": 2,
+        "syllables": 2,
+        "loudness": -23.7,
+        "pitch": {
+          "median": 334.3,
+          "low": 232.9,
+          "high": 364.8,
+          "range": 7.8,
+          "voiced": 0.53
+        },
+        "rate": {
+          "words": 2.7,
+          "syllables": 2.7
+        },
+        "wordLevels": [
+          {
+            "text": "They",
+            "start": 15.87,
+            "end": 15.99,
+            "loudness": -22.1
+          },
+          {
+            "text": "start!",
+            "start": 16.17,
+            "end": 16.61,
+            "loudness": -23.8
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "theystart"
+            ],
+            "value": 334.3,
+            "threshold": 309.3,
+            "message": "theystart: pitch 334.3 Hz is above Big Hal's reference, 309.3 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "doorsclose",
+        "speaker": "Big Hal",
+        "text": "The doors close!",
+        "speech": {
+          "start": 17.08,
+          "end": 18.12
+        },
+        "timedBy": "words",
+        "words": 3,
+        "syllables": 3,
+        "loudness": -25.6,
+        "pitch": {
+          "median": 193.9,
+          "low": 108.5,
+          "high": 260.2,
+          "range": 15.1,
+          "voiced": 0.63
+        },
+        "rate": {
+          "words": 2.88,
+          "syllables": 2.88
+        },
+        "wordLevels": [
+          {
+            "text": "The",
+            "start": 17.08,
+            "end": 17.16,
+            "loudness": -30.4
+          },
+          {
+            "text": "doors",
+            "start": 17.2,
+            "end": 17.5,
+            "loudness": -23.4
+          },
+          {
+            "text": "close!",
+            "start": 17.58,
+            "end": 18.12,
+            "loudness": -25.9
+          }
+        ],
+        "flags": [
+          {
+            "code": "outside-reference",
+            "lines": [
+              "doorsclose"
+            ],
+            "value": 193.9,
+            "threshold": 197.9,
+            "message": "doorsclose: pitch 193.9 Hz is below Big Hal's reference, 197.9 Hz (big-hal@1, from 6 approved lines)"
+          }
+        ]
+      },
+      {
+        "id": "thisone",
+        "speaker": "Big Hal",
+        "text": "And this one? This one even comes with wheels!",
+        "speech": {
+          "start": 18.51,
+          "end": 21.47
+        },
+        "timedBy": "words",
+        "words": 9,
+        "syllables": 11,
+        "loudness": -24,
+        "pitch": {
+          "median": 244.6,
+          "low": 141.9,
+          "high": 342.8,
+          "range": 15.3,
+          "voiced": 0.8
+        },
+        "rate": {
+          "words": 3.04,
+          "syllables": 3.72
+        },
+        "wordLevels": [
+          {
+            "text": "And",
+            "start": 18.51,
+            "end": 18.65,
+            "loudness": -27.2
+          },
+          {
+            "text": "this",
+            "start": 18.69,
+            "end": 18.87,
+            "loudness": -21.1
+          },
+          {
+            "text": "one?",
+            "start": 18.91,
+            "end": 19.05,
+            "loudness": -22.8
+          },
+          {
+            "text": "This",
+            "start": 19.85,
+            "end": 20.03,
+            "loudness": -20.3
+          },
+          {
+            "text": "one",
+            "start": 20.07,
+            "end": 20.17,
+            "loudness": -24.3
+          },
+          {
+            "text": "even",
+            "start": 20.23,
+            "end": 20.45,
+            "loudness": -27.7
+          },
+          {
+            "text": "comes",
+            "start": 20.49,
+            "end": 20.75,
+            "loudness": -22.8
+          },
+          {
+            "text": "with",
+            "start": 20.79,
+            "end": 20.93,
+            "loudness": -28.1
+          },
+          {
+            "text": "wheels!",
+            "start": 20.97,
+            "end": 21.47,
+            "loudness": -22.7
+          }
+        ],
+        "flags": []
+      },
+      {
+        "id": "comeon",
+        "speaker": "Big Hal",
+        "text": "So come on down to Big Hal's and save big!",
+        "speech": {
+          "start": 21.85,
+          "end": 24.73
+        },
+        "timedBy": "words",
+        "words": 10,
+        "syllables": 10,
+        "loudness": -24.8,
+        "pitch": {
+          "median": 238.4,
+          "low": 151.8,
+          "high": 307.3,
+          "range": 12.2,
+          "voiced": 0.87
+        },
+        "rate": {
+          "words": 3.47,
+          "syllables": 3.47
+        },
+        "wordLevels": [
+          {
+            "text": "So",
+            "start": 21.85,
+            "end": 21.97,
+            "loudness": -25.7
+          },
+          {
+            "text": "come",
+            "start": 22.03,
+            "end": 22.15,
+            "loudness": -23.1
+          },
+          {
+            "text": "on",
+            "start": 22.23,
+            "end": 22.35,
+            "loudness": -25.7
+          },
+          {
+            "text": "down",
+            "start": 22.39,
+            "end": 22.59,
+            "loudness": -22.5
+          },
+          {
+            "text": "to",
+            "start": 22.61,
+            "end": 22.71,
+            "loudness": -28.8
+          },
+          {
+            "text": "Big",
+            "start": 22.75,
+            "end": 22.89,
+            "loudness": -21.8
+          },
+          {
+            "text": "Hal's",
+            "start": 22.97,
+            "end": 23.35,
+            "loudness": -23.9
+          },
+          {
+            "text": "and",
+            "start": 23.61,
+            "end": 23.79,
+            "loudness": -27.8
+          },
+          {
+            "text": "save",
+            "start": 23.87,
+            "end": 24.19,
+            "loudness": -23.3
+          },
+          {
+            "text": "big!",
+            "start": 24.33,
+            "end": 24.73,
+            "loudness": -25
+          }
+        ],
+        "flags": []
+      }
+    ],
+    "performances": [
+      {
+        "id": "opening",
+        "lines": [
+          "howdy",
+          "nomoney",
+          "zero",
+          "month"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "howdy",
+            "to": "nomoney",
+            "between": [],
+            "pause": 0.45,
+            "before": {
+              "words": "tri-county area!",
+              "start": 4.18,
+              "end": 5.2,
+              "loudness": -25,
+              "pitch": 251.1
+            },
+            "after": {
+              "words": "No money down!",
+              "start": 5.65,
+              "end": 6.55,
+              "loudness": -24.6,
+              "pitch": 245
+            },
+            "loudness": 0.4,
+            "pitch": -0.4,
+            "rate": 0.08,
+            "flags": []
+          },
+          {
+            "from": "nomoney",
+            "to": "zero",
+            "between": [],
+            "pause": 0.47,
+            "before": {
+              "words": "No money down!",
+              "start": 5.65,
+              "end": 6.55,
+              "loudness": -24.6,
+              "pitch": 245
+            },
+            "after": {
+              "words": "Zero percent financing!",
+              "start": 7.02,
+              "end": 8.42,
+              "loudness": -25.6,
+              "pitch": 235.4
+            },
+            "loudness": -1,
+            "pitch": -0.7,
+            "rate": 0.13,
+            "flags": []
+          },
+          {
+            "from": "zero",
+            "to": "month",
+            "between": [],
+            "pause": 0.31,
+            "before": {
+              "words": "percent financing!",
+              "start": 7.4,
+              "end": 8.42,
+              "loudness": -26.7,
+              "pitch": 221.9
+            },
+            "after": {
+              "words": "Ninety-nine a month!",
+              "start": 8.73,
+              "end": 9.73,
+              "loudness": -25.1,
+              "pitch": 260.1
+            },
+            "loudness": 1.6,
+            "pitch": 2.7,
+            "rate": 0.2,
+            "flags": []
+          }
+        ],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "inspection",
+        "lines": [
+          "every",
+          "personally"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "every",
+            "to": "personally",
+            "between": [],
+            "pause": 0.44,
+            "before": {
+              "words": "hand-inspected... by me!",
+              "start": 11.86,
+              "end": 13.84,
+              "loudness": -26.6,
+              "pitch": 189.9
+            },
+            "after": {
+              "words": "PERSONALLY!",
+              "start": 14.28,
+              "end": 14.98,
+              "loudness": -23.6,
+              "pitch": 240.7
+            },
+            "loudness": 3,
+            "pitch": 4.1,
+            "rate": 0.47,
+            "flags": [
+              {
+                "code": "loudness-jump",
+                "lines": [
+                  "every",
+                  "personally"
+                ],
+                "value": 3,
+                "threshold": 2.5,
+                "message": "\"hand-inspected... by me!\" → \"PERSONALLY!\": loudness jumps up 3 LU (over 2.5)"
+              },
+              {
+                "code": "rate-jump",
+                "lines": [
+                  "every",
+                  "personally"
+                ],
+                "value": 0.47,
+                "threshold": 0.4,
+                "message": "every → personally: speech rate speeds up 47 % (over 40 %)"
+              }
+            ]
+          }
+        ],
+        "cuts": [
+          {
+            "at": 14,
+            "from": "inspect",
+            "to": "pat",
+            "before": -50.1,
+            "after": -44.4,
+            "change": 5.7,
+            "wide": false,
+            "flags": [
+              {
+                "code": "room-tone-jump",
+                "value": 5.7,
+                "threshold": 5,
+                "message": "the cut inspect → pat at 14 s: room tone rises 5.7 dB (over 5)"
+              }
+            ]
+          }
+        ],
+        "splits": [
+          {
+            "code": "separate-generations",
+            "lines": [
+              "every",
+              "personally"
+            ],
+            "message": "its lines come from 2 generations (every from take:hal5-inspect-t6; personally from take:hal5-personally-t2); a sentence, and a setup with its payoff, should be one"
+          }
+        ],
+        "flags": [
+          {
+            "code": "splitting-rule",
+            "lines": [
+              "every",
+              "personally"
+            ],
+            "message": "splitting rule (separate-generations): its lines come from 2 generations (every from take:hal5-inspect-t6; personally from take:hal5-personally-t2); a sentence, and a setup with its payoff, should be one"
+          },
+          {
+            "code": "loudness-jump",
+            "lines": [
+              "every",
+              "personally"
+            ],
+            "value": 3,
+            "threshold": 2.5,
+            "message": "\"hand-inspected... by me!\" → \"PERSONALLY!\": loudness jumps up 3 LU (over 2.5)"
+          },
+          {
+            "code": "rate-jump",
+            "lines": [
+              "every",
+              "personally"
+            ],
+            "value": 0.47,
+            "threshold": 0.4,
+            "message": "every → personally: speech rate speeds up 47 % (over 40 %)"
+          },
+          {
+            "code": "room-tone-jump",
+            "value": 5.7,
+            "threshold": 5,
+            "message": "the cut inspect → pat at 14 s: room tone rises 5.7 dB (over 5)"
+          }
+        ]
+      },
+      {
+        "id": "list",
+        "lines": [
+          "theystart",
+          "doorsclose"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "theystart",
+            "to": "doorsclose",
+            "between": [],
+            "pause": 0.47,
+            "before": {
+              "words": "They start!",
+              "start": 15.87,
+              "end": 16.61,
+              "loudness": -23.7,
+              "pitch": 334.3
+            },
+            "after": {
+              "words": "The doors close!",
+              "start": 17.08,
+              "end": 18.12,
+              "loudness": -25.6,
+              "pitch": 193.9
+            },
+            "loudness": -1.9,
+            "pitch": -9.4,
+            "rate": null,
+            "flags": []
+          }
+        ],
+        "cuts": [
+          {
+            "at": 16.68,
+            "from": "mcu",
+            "to": "door",
+            "before": -52.8,
+            "after": -48.3,
+            "change": 4.5,
+            "wide": true,
+            "flags": []
+          }
+        ],
+        "splits": [],
+        "flags": []
+      },
+      {
+        "id": "wheels_joke",
+        "lines": [
+          "thisone",
+          "comeon"
+        ],
+        "thresholds": {
+          "loudness": 2.5,
+          "pitch": 10,
+          "rate": 0.4,
+          "pause": 0.6,
+          "roomTone": 5,
+          "word": 6
+        },
+        "boundaries": [
+          {
+            "from": "thisone",
+            "to": "comeon",
+            "between": [],
+            "pause": 0.38,
+            "before": {
+              "words": "comes with wheels!",
+              "start": 20.49,
+              "end": 21.47,
+              "loudness": -23,
+              "pitch": 261.3
+            },
+            "after": {
+              "words": "So come on down to",
+              "start": 21.85,
+              "end": 22.71,
+              "loudness": -23.7,
+              "pitch": 279.1
+            },
+            "loudness": -0.7,
+            "pitch": 1.1,
+            "rate": -0.07,
+            "flags": []
+          }
+        ],
+        "cuts": [],
+        "splits": [],
+        "flags": []
+      }
+    ],
+    "fingerprints": {
+      "lines": {
+        "howdy": {
+          "from": 0.36,
+          "to": 5.2,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225"
+          },
+          "digest": "b12927753bf47fa944269c323471fe525e015e183a1f90383f24227fdde207ba"
+        },
+        "nomoney": {
+          "from": 5.65,
+          "to": 6.55,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225"
+          },
+          "digest": "a3e7bfc6cb1766c8c679126a1da3eb7a98a08e0246175a989b09f266aea8e6aa"
+        },
+        "zero": {
+          "from": 7.02,
+          "to": 8.42,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225"
+          },
+          "digest": "6495aa800687732dde1241bf4624d330eea36bc5272b4a7ac847f97cc07c16cb"
+        },
+        "month": {
+          "from": 8.73,
+          "to": 9.73,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225"
+          },
+          "digest": "1a20194b66d512899a93a2be41ab1f19b76597567f0ba8b98625b8b071ec31cc"
+        },
+        "every": {
+          "from": 9.98,
+          "to": 13.84,
+          "sources": {
+            "take:hal5-inspect-t6": "903de5c437dc0ba7cb827ba8599491e721025e366a5b680d1316aaeff1145974"
+          },
+          "digest": "11e7f167ebba57fcb06cf4eac86fe80da39aca97de30983a05e903fe302ad145"
+        },
+        "personally": {
+          "from": 14.28,
+          "to": 14.98,
+          "sources": {
+            "take:hal5-pat-t1": "627030bc8924d7bc2121cce89197207da0a3c5acc2ebb17a605b44ffe9d05080",
+            "take:hal5-personally-t2": "2fcebfb6b41de65667c0bdd185f9adc21859d818d851f603e0f03411c2f11b3e"
+          },
+          "digest": "1308121dce883578df0f395c88b481592ea3f085efd436d088da2697e36e1cfd"
+        },
+        "theystart": {
+          "from": 15.87,
+          "to": 16.61,
+          "sources": {
+            "take:hal5-lines-t1": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9"
+          },
+          "digest": "f7dc1b50d791e3c331172234d697814921ea4353baa7b49dc19cd73597d6f167"
+        },
+        "doorsclose": {
+          "from": 17.08,
+          "to": 18.12,
+          "sources": {
+            "take:hal5-door-t1": "f2abbdd81271811dfdc2525927f4c84b0ff85e1680e28c3a4bc8cab869b7262d",
+            "take:hal5-lines-t1": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9"
+          },
+          "digest": "ed6b0ac8d0c11d4f298a859790c661366672d3a4e9fb672ba4b87797b7e184b1"
+        },
+        "thisone": {
+          "from": 18.51,
+          "to": 21.47,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "15f0668d6fa574b1d8eb87f9113279968cfdeea9602b2500b5ede0abdf4ca541"
+        },
+        "comeon": {
+          "from": 21.85,
+          "to": 24.73,
+          "sources": {
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "eb20434b24a430c6ddd1160a7fa6fdc7f1e10c1232c2993dca1bc03f058cc95f"
+        }
+      },
+      "performances": {
+        "opening": {
+          "from": 0,
+          "to": 10.33,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+            "take:hal5-inspect-t6": "903de5c437dc0ba7cb827ba8599491e721025e366a5b680d1316aaeff1145974"
+          },
+          "digest": "08814c75f8101d2b6e44ebfab394dbd17dd9778994c40d32b4198d02961aa324"
+        },
+        "inspection": {
+          "from": 9.38,
+          "to": 15.58,
+          "sources": {
+            "take:big-hal-4ab-t2": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225",
+            "take:hal5-inspect-t6": "903de5c437dc0ba7cb827ba8599491e721025e366a5b680d1316aaeff1145974",
+            "take:hal5-lines-t1": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9",
+            "take:hal5-pat-t1": "627030bc8924d7bc2121cce89197207da0a3c5acc2ebb17a605b44ffe9d05080",
+            "take:hal5-personally-t2": "2fcebfb6b41de65667c0bdd185f9adc21859d818d851f603e0f03411c2f11b3e"
+          },
+          "digest": "3c7099d85e765b62e34e38dd054b8e6940de8e78b7d51be72161554892f6aee4"
+        },
+        "list": {
+          "from": 15.27,
+          "to": 18.72,
+          "sources": {
+            "take:hal5-door-t1": "f2abbdd81271811dfdc2525927f4c84b0ff85e1680e28c3a4bc8cab869b7262d",
+            "take:hal5-lines-t1": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9",
+            "take:hal5-pat-t1": "627030bc8924d7bc2121cce89197207da0a3c5acc2ebb17a605b44ffe9d05080",
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "7337d728d482cf52661984c77c538c3681f6f1e888025e8238b26b0dede4aa95"
+        },
+        "wheels_joke": {
+          "from": 17.91,
+          "to": 25.33,
+          "sources": {
+            "take:hal5-door-t1": "f2abbdd81271811dfdc2525927f4c84b0ff85e1680e28c3a4bc8cab869b7262d",
+            "take:hal5-lines-t1": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9",
+            "take:hal6-wheels-close-t1": "cd6066208dda783797015f4951a75ceb2a82ac0021d608fc47934bdd9b268abf"
+          },
+          "digest": "da59da75269c744018e6a1885cf2f09bebacd7f376acb6e25716a7e0341e6d71"
+        }
+      }
+    }
+  },
+  "listening": {}
+}

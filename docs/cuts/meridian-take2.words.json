@@ -1,0 +1,57 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "hail": {
+      "text": "This is Captain Halloran of the starship Meridian. You have crossed into protected space.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/meridian-full-t2.mp4", "start": 3.5, "end": 7.958333, "sha256": "412fafb9da51201b6fb48654b0fe29406f6dce188be6187abf7a406d20de079e", "snap": "speech-onset@1" },
+      "loss": 0.754,
+      "snap": { "aligned": 3.64, "start": 3.62, "onset": 3.62, "floor": -48.9 },
+      "words": [
+        { "text": "This", "start": 3.62, "end": 3.74, "loss": 0.635 },
+        { "text": "is", "start": 3.78, "end": 3.9, "loss": 0.685 },
+        { "text": "Captain", "start": 3.94, "end": 4.2, "loss": 0.648 },
+        { "text": "Halloran", "start": 4.28, "end": 4.64, "loss": 0.804 },
+        { "text": "of", "start": 4.68, "end": 4.74, "loss": 0.873 },
+        { "text": "the", "start": 4.78, "end": 4.86, "loss": 0.613 },
+        { "text": "starship", "start": 4.92, "end": 5.34, "loss": 0.804 },
+        { "text": "Meridian.", "start": 5.38, "end": 5.82, "loss": 0.759 },
+        { "text": "You", "start": 6.12, "end": 6.18, "loss": 0.638 },
+        { "text": "have", "start": 6.22, "end": 6.34, "loss": 0.856 },
+        { "text": "crossed", "start": 6.4, "end": 6.68, "loss": 0.688 },
+        { "text": "into", "start": 6.74, "end": 6.9, "loss": 0.756 },
+        { "text": "protected", "start": 6.94, "end": 7.34, "loss": 0.821 },
+        { "text": "space.", "start": 7.48, "end": 7.84, "loss": 0.973 }
+      ]
+    },
+    "borders": {
+      "text": "Your borders mean nothing to the Vorrek.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/meridian-full-t2.mp4", "start": 7.958333, "end": 10.916667, "sha256": "412fafb9da51201b6fb48654b0fe29406f6dce188be6187abf7a406d20de079e", "snap": "speech-onset@1" },
+      "loss": 0.948,
+      "snap": { "aligned": 8.378, "start": 8.348, "onset": 8.348, "floor": -47.2 },
+      "words": [
+        { "text": "Your", "start": 8.348, "end": 8.478, "loss": 0.92 },
+        { "text": "borders", "start": 8.598, "end": 9.038, "loss": 1.017 },
+        { "text": "mean", "start": 9.078, "end": 9.298, "loss": 0.986 },
+        { "text": "nothing", "start": 9.378, "end": 9.758, "loss": 0.917 },
+        { "text": "to", "start": 9.798, "end": 9.878, "loss": 0.779 },
+        { "text": "the", "start": 9.918, "end": 9.978, "loss": 0.866 },
+        { "text": "Vorrek.", "start": 10.058, "end": 10.518, "loss": 1.008 }
+      ]
+    },
+    "shields": {
+      "text": "Shields up. Red alert.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/meridian-full-t2.mp4", "start": 10.916667, "end": 13.216667, "sha256": "412fafb9da51201b6fb48654b0fe29406f6dce188be6187abf7a406d20de079e", "snap": "speech-onset@1" },
+      "loss": 0.811,
+      "snap": { "aligned": 11.337, "start": 11.287, "onset": 11.287, "floor": -47.2 },
+      "words": [
+        { "text": "Shields", "start": 11.287, "end": 11.657, "loss": 0.786 },
+        { "text": "up.", "start": 11.737, "end": 11.937, "loss": 1.042 },
+        { "text": "Red", "start": 12.397, "end": 12.517, "loss": 0.621 },
+        { "text": "alert.", "start": 12.557, "end": 12.897, "loss": 0.913 }
+      ]
+    }
+  }
+}

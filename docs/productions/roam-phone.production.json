@@ -1,0 +1,35 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "roam-phone",
+  "title": "Roam Phone",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ad-roam-phone-take2.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ad-roam-phone.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Dad in an orange polo pulls up a long antenna, wanders out through the patio door, across the lawn along the hedge and up to the neighbour at his barbecue; oddly the handset has a coiled cord to its base, and the neighbour is also in a yellow polo, so they blur together.",
+      "createdAt": "2026-10-18T22:00:22.577Z"
+    },
+    {
+      "id": "take2",
+      "cut": "docs/cuts/roam-phone-take2.cut.json",
+      "label": "Take 2 (commercial structure)",
+      "status": "none",
+      "notes": "Transcript: Tired of being tied to the wall? (2.0 s) / Introducing Roam Phone, the cordless telephone. (5.1) / the dad chatting (9.9) / Roam Phone. Talk anywhere. Almost. (13.0). Wall-phone cord knocks the fruit over, he hangs it up for a cordless handset with a long antenna, strolls to the neighbour's barbecue, then a truly cordless packshot with our ROAM PHONE and tagline graphics; a thin cord still flickers in at 5.5 s (on the base) and 10.7 s (on the walk), and his polo changes from dark to cream stripes at the cut.",
+      "createdAt": "2026-10-18T22:46:15.802Z"
+    },
+    {
+      "id": "take3",
+      "cut": "docs/cuts/roam-phone-take3.cut.json",
+      "label": "Take 3 (Talk anywhere*)",
+      "status": "review",
+      "notes": "Transcript: Introducing Roam Phone, the cordless telephone that lets you talk anywhere! / Anywhere? / Yes, anywhere. / Really? Anywhere? / Absolutely. Give it a try. / ...Let's find out. / Honey? ...Can you hear me? / Clear as a bell! / Crystal clear! / Honey, I'm mowing! / Still clear! / Even over the mower! / Honey, I'm on the roof! / ...Why are you on the roof? / Talk from anywhere! / Anywhere! / Honey, this thing is incredible! I could take it anywhere! I could take it— / ...Honey? / ...Anywhere? / the fast disclaimer / Roam Phone. Talk anywhere! The approved plan shot by shot: the couple answer the announcer to the lens and Frank's confidence climbs from patio to mower to roof until he backs off the pool's edge. No splash shot: SPLOOSH and fizz on her red wall phone, then him waist-deep and still. One approved handset still, always in his right hand; her wall phone is the only cord. 57.0 s, longer than the 42 s aimed for. The announcer is Gemini TTS because the ElevenLabs credits ran out, so there is no words file yet.",
+      "createdAt": "2026-10-20T07:20:00.000Z"
+    }
+  ]
+}

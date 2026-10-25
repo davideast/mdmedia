@@ -1,0 +1,98 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Night Wagon",
+    "show": "night-wagon",
+    "version": "Take 10 (the flashers)",
+    "length": 31.1,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Take 9 with the longer punchline. The first half plays over Rick's stunned face, the second over his hand still on the red button, then the wagon at the edge with its hazards blinking to a relay tick-tock, then the title outro. Ported from crt/nw10/edit.mjs."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/night-wagon-take10.mp4",
+
+  "segments": [
+    { "id": "hw", "label": "Night road, cold open", "src": "take:nw6-highway-t1", "in": 0.2, "out": 3.4 },
+    { "id": "pov", "label": "Taillights ahead", "src": "take:nw6-taillights-t1", "in": 0.2, "out": 1.2,
+      "crop": { "x": 192, "y": 0, "width": 896, "height": 504 } },
+
+    { "id": "r1", "label": "Rick: getting away", "src": "take:nw7-rick-lines-t1", "in": 0.45, "out": 1.75 },
+    { "id": "b2", "label": "Buddy's dash: the bridge", "src": "take:nw6-buddy-t2", "in": 1.0, "out": 2.55,
+      "audio": { "src": "take:nw7-dash-t1", "in": 0, "volume": 0.7 } },
+    { "id": "r3", "label": "Rick: jump it", "src": "take:nw7-rick-lines-t1", "in": 2.65, "out": 3.5 },
+    { "id": "b4", "label": "Buddy's dash: the gap", "src": "take:nw6-buddy-t2", "in": 6.45, "out": 8.35,
+      "audio": { "src": "take:nw7-dash-t1", "in": 1.55, "volume": 0.7 } },
+    { "id": "r5", "label": "Rick: turbo boost", "src": "take:nw7-rick-lines-t1", "in": 4.95, "out": 6.2 },
+    { "id": "b6", "label": "Buddy's dash: we can't", "src": "take:nw7-dash-t1", "in": 1.6, "out": 2.55,
+      "audio": { "src": "take:nw7-dash-t1", "in": 3.45, "volume": 0.7 } },
+    { "id": "r7", "label": "Rick: no time", "src": "take:nw7-rick-lines-t1", "in": 7.45, "out": 8.5 },
+    { "id": "b8", "label": "Buddy's dash: no", "src": "take:nw7-dash-t1", "in": 7.3, "out": 9.45,
+      "audio": { "src": "take:nw7-dash-t1", "in": 4.4, "volume": 0.7 } },
+    { "id": "yell", "label": "Rick yells TURBO", "src": "take:nw7-rick-yell-t1", "in": 1.75, "out": 2.45 },
+    { "id": "press", "label": "Hand slams the button", "src": "take:nw6-button-t1", "in": 0.85, "out": 1.35,
+      "audio": { "src": "take:nw7-rick-yell-t1", "in": 2.45 } },
+
+    { "id": "halt", "label": "The wagon halts", "src": "take:nw7-halt-t3", "in": 0.3, "out": 3.3 },
+    { "id": "stun", "label": "Rick, stunned", "src": "take:nw7-rick-stunned-t1", "in": 0.5, "out": 3.45 },
+    { "id": "btn", "label": "Hand still on the button", "src": "take:nw6-button-t1", "in": 1.4, "out": 3.0,
+      "end": "flashers+5.25", "audio": { "volume": 0.3 } },
+    { "id": "haz", "label": "The wagon at the edge, hazards on", "src": "take:nw7-halt-t3", "in": 3.0, "out": 4.0,
+      "loop": "pingpong", "duration": 2.45, "audio": { "volume": 0.4 } },
+
+    { "id": "out", "label": "Title over the road", "src": "take:nw6-highway-t1", "in": 1.4, "out": 5.0, "fadeOut": 0.7,
+      "audio": { "volume": 0.5 } }
+  ],
+
+  "lines": [
+    { "id": "getaway", "speaker": "Rick", "text": "They're getting away, Buddy.", "segment": "r1" },
+    { "id": "bridge", "speaker": "Buddy", "text": "The bridge ahead is out, Rick.", "src": "audio/tts/b2.wav",
+      "at": "b2+0.05", "until": "b2.end", "duration": 1.8576 },
+    { "id": "jump", "speaker": "Rick", "text": "Then we jump it.", "segment": "r3" },
+    { "id": "gap", "speaker": "Buddy", "text": "Rick, it's a forty-foot gap.", "src": "audio/tts/b4.wav",
+      "at": "b4+0.05", "until": "b4.end", "duration": 2.1827 },
+    { "id": "boost", "speaker": "Rick", "text": "We need to turbo boost!", "segment": "r5" },
+    { "id": "cant", "speaker": "Buddy", "text": "Rick, we can't.", "src": "audio/tts/b6.wav",
+      "at": "b6+0.05", "until": "b6.end", "duration": 1.0217 },
+    { "id": "notime", "speaker": "Rick", "text": "There's no time!", "segment": "r7" },
+    { "id": "no", "speaker": "Buddy", "text": "Rick. No. We can't.", "src": "audio/tts/b8.wav",
+      "at": "b8+0.05", "until": "b8.end", "duration": 2.2755 },
+    { "id": "turbo", "speaker": "Rick", "text": "TURBO... BOOST!", "segment": "yell", "until": "press.end" },
+    { "id": "flashers", "speaker": "Buddy", "text": "Rick. I'm a station wagon. ... And that button is for the flashers.",
+      "src": "audio/tts/b12b.wav", "at": "stun+0.4", "duration": 5.1548 }
+  ],
+
+  "music": [
+    { "id": "bed", "label": "Theme bed", "src": "audio/nw6-theme.mp3", "at": 0, "until": "halt", "fadeOut": 0.12,
+      "volume": [
+        { "at": "r1-0.5", "value": 1 },
+        { "at": "r1", "value": 0.18 },
+        { "at": "r5", "value": 0.18 },
+        { "at": "halt", "value": 0.35 }
+      ] },
+    { "id": "sting", "label": "Theme sting", "src": "audio/nw6-theme.mp3", "at": "out-0.5", "until": "@end", "fadeOut": 0.9 }
+  ],
+
+  "sfx": [
+    { "id": "tick", "label": "Hazard relay tick-tock", "at": "haz", "until": "haz.end", "fadeOut": 0.15,
+      "synth": { "kind": "tick", "period": 0.35, "tones": [2300, 1700], "click": 0.03, "decay": 180, "gain": 0.35 } }
+  ],
+
+  "overlays": [
+    { "id": "hazard", "label": "Hazard lamps", "src": "nw10/hazard.png", "at": "haz", "until": "haz.end",
+      "blink": { "period": 0.7, "on": 0.35 } },
+    { "id": "title", "label": "NIGHT WAGON title", "src": "nw6/title.png", "at": "out+0.25", "until": "@end",
+      "fadeIn": 0.35, "fadeOut": 0.45 },
+    { "id": "glint", "label": "Glint across the title", "src": "nw6/glint.png", "at": "title+0.6", "duration": 0.7,
+      "motion": [
+        { "at": "glint", "x": -430, "y": 0 },
+        { "at": "glint.end", "x": 431, "y": 0 }
+      ] }
+  ],
+
+  "picture": { "fadeOut": 0.5 }
+}

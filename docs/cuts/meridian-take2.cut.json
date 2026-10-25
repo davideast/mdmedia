@@ -1,0 +1,53 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Starship Meridian",
+    "show": "meridian",
+    "version": "Take 2 of the extension",
+    "length": 16,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "One paid generation, extended twice from the same first half, the second extension kept. meridian-1-t1 (8 s, from ch-meridian-1) was continued by the provider with ch-meridian-2 (8 s), which returns the source clip and its new tail as one 16 s file; take 1 of that (meridian-full-t1) put a badge on the captain, so it was run again as meridian-full-t2, which is byte-identical to review/clips/ch-meridian.mp4. Nothing was laid over it. Its first 191 frames match meridian-1-t1 and the Vorrek starts on frame 191 (7.958 s). The segments are the take's own shots, in step, cut where the picture cuts (frame/24), down to the take's own cut to black on frame 371 (15.458 s; the review note says 15.7). All the sound is the take's own: the lines and the klaxon. The klaxon is in the take's own sound, so it is a sound-effect item that labels it, from the red alert through the cut to black."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/meridian-full-t2.mp4",
+
+  "segments": [
+    { "id": "ship", "label": "The viewscreen: the spiky green warship", "src": "take:meridian-full-t2",
+      "in": 0, "out": 1.958333 },
+    { "id": "rise", "label": "The bridge: the captain rises and tugs his tunic down", "src": "take:meridian-full-t2",
+      "in": 1.958333, "out": 3.5 },
+    { "id": "hailing", "label": "The captain hails the warship", "src": "take:meridian-full-t2",
+      "in": 3.5, "out": 7.958333 },
+    { "id": "sneer", "label": "The viewscreen: the fin-crested Vorrek sneers", "src": "take:meridian-full-t2",
+      "in": 7.958333, "out": 10.916667 },
+    { "id": "quiet", "label": "The captain, quietly", "src": "take:meridian-full-t2",
+      "in": 10.916667, "out": 12.916667 },
+    { "id": "red", "label": "Red alert: the klaxon, the bridge floods red", "src": "take:meridian-full-t2",
+      "in": 12.916667, "out": 15.458333 },
+    { "id": "black", "label": "Hard cut to black in the middle of the alarm", "src": "take:meridian-full-t2",
+      "in": 15.458333, "out": 16 }
+  ],
+
+  "lines": [
+    { "id": "hail", "speaker": "Captain Halloran",
+      "text": "This is Captain Halloran of the starship Meridian. You have crossed into protected space.",
+      "segment": "hailing" },
+    { "id": "borders", "speaker": "Vorrek commander", "text": "Your borders mean nothing to the Vorrek.", "segment": "sneer" },
+    { "id": "shields", "speaker": "Captain Halloran", "text": "Shields up. Red alert.", "segment": "quiet",
+      "until": "red+0.3" }
+  ],
+
+  "sfx": [
+    { "id": "klaxon", "label": "The red-alert klaxon, in the take's own sound", "segment": "red", "until": "@end" }
+  ],
+
+  "sources": {
+    "take:meridian-full-t2": { "step": "extend", "extendedFrom": "take:meridian-1-t1", "storyboard": "ch-meridian-2" },
+    "take:meridian-1-t1": { "step": "generate", "storyboard": "ch-meridian-1" }
+  }
+}

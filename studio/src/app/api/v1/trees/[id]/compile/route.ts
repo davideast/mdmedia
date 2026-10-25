@@ -5,7 +5,7 @@ import { decodeParam, getTreeStore, requireTreeAuth, treeErrorResponse } from '.
 
 export const runtime = 'nodejs';
 
-type Context = { params: Promise<{ id: string }> | { id: string } };
+type Context = { params: Promise<{ id: string }> };
 
 /**
  * POST /api/v1/trees/[id]/compile — accepts `TreeCompileRequest`; returns `{ result: TreeCompileResult }`.

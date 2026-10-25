@@ -1,0 +1,19 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "meridian",
+  "title": "Starship Meridian",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-meridian.jpg",
+  "cuts": [
+    {
+      "id": "take2",
+      "cut": "docs/cuts/meridian-take2.cut.json",
+      "label": "Take 2 of the extension",
+      "status": "none",
+      "notes": "Spiky green warship in the first frame, the captain hails, a fin-crested Vorrek sneers, red alert and a hard cut to black at 15.7 s; take 1 of the second half put a delta-like badge on the captain, so it was redone, and the alien still has pointed ears.",
+      "createdAt": "2026-10-18T21:41:36.563Z"
+    }
+  ]
+}

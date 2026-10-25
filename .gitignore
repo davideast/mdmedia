@@ -5,7 +5,10 @@
 node_modules/
 *.wav
 dist/
-.env
+# Local credentials and environment variants; only sanitized examples belong in Git.
+.env*
+!.env.example
+!.env.local.example
 .DS_Store
 .agents/*
 !.agents/skills/
@@ -18,7 +21,6 @@ examples/
 .design/
 .loop/
 *.tsbuildinfo
-.env*.local
 .dev.pid
 .dev.log
 studio/vendor/

@@ -97,3 +97,27 @@ describe('bounded library browsing', () => {
     expect(page.nextCursor).toBeNull();
   });
 });
+
+
+describe('Trees and Productions share the work navigation', () => {
+  it('restores both kinds of pinned work without losing their route or category', () => {
+    const data = new Map<string, string>();
+    const storage = { getItem: (key: string) => data.get(key) ?? null, setItem: (key: string, value: string) => { data.set(key, value); } };
+    const store = new WorkspaceStore('integration');
+    store.restore(storage);
+    for (const href of ['/productions/pr1/cuts/take1', '/trees/tr1?node=doc1']) {
+      const view = store.visit(href)!;
+      store.togglePin(view.id);
+    }
+    store.flush();
+    const restored = new WorkspaceStore('integration');
+    restored.restore(storage);
+    const items = workspaceItems(restored.getSnapshot());
+    expect(items).toHaveLength(2);
+    expect(items.every(item => item.pinned)).toBe(true);
+    expect(items.find(item => item.detail === 'Cut')?.href).toBe('/productions/pr1/cuts/take1');
+    expect(items.find(item => item.detail.startsWith('Tree doc'))?.href).toBe('/trees/tr1?node=doc1');
+    store.dispose();
+    restored.dispose();
+  });
+});

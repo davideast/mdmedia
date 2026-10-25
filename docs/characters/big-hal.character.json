@@ -1,0 +1,154 @@
+{
+  "format": "mdmedia.character@1",
+  "id": "big-hal",
+  "version": 1,
+  "name": "Big Hal",
+  "kind": "person",
+  "description": "The owner of Big Hal's car lot, who stars in his own local TV commercials: a proud, sincere pitchman who reads out bare basics as if they were selling points.",
+  "look": {
+    "description": "a big heavyset man of about fifty in a huge white cowboy hat, a powder-blue western suit with white piping, a white shirt and a bolo tie, on a sunny used-car lot with bunches of red, yellow and blue balloons and boxy 1980s sedans",
+    "never": [
+      "any resemblance to a real actor",
+      "a hat in any other colour or shape",
+      "sunglasses",
+      "a suit in any other colour",
+      "lettering on his clothes"
+    ]
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "stills": [
+    {
+      "id": "medium",
+      "file": "characters/big-hal/medium.png",
+      "from": {
+        "take": "hal6-wheels-close-t1",
+        "at": 1
+      },
+      "note": "medium by the hood, the accepted one-breath punchline take (Takes 6 and 7)"
+    },
+    {
+      "id": "wide",
+      "file": "characters/big-hal/wide.png",
+      "from": {
+        "take": "big-hal-4ab-t2",
+        "at": 1.5
+      },
+      "note": "full figure among the balloons and sedans, the opening heard as fine (Takes 5 to 7)"
+    }
+  ],
+  "voice": {
+    "provider": "video-model",
+    "uses": [
+      "on-camera"
+    ],
+    "notes": "Hal's voice is the video model's own, so each sentence is one generation and his takes start from stills of approved ones. No swap voice is chosen yet."
+  },
+  "delivery": {
+    "register": "a proud, warm, sincere local pitchman at a steady, even pace, as if reading out real selling points",
+    "never": [
+      "never shouts",
+      "never winks",
+      "never builds to a big reveal",
+      "never waits before a punchline"
+    ],
+    "reference": {
+      "levels": {
+        "source": "approved lines in Big Hal Takes 6 and 7: the opening heard as fine, and the accepted one-breath punchline and close",
+        "loudness": {
+          "min": -28.1,
+          "max": -21.5
+        },
+        "pitch": {
+          "min": 197.9,
+          "max": 309.3
+        },
+        "pitchRange": {
+          "max": 18.3
+        },
+        "rate": {
+          "min": 1.71,
+          "max": 4.16
+        }
+      },
+      "typical": {
+        "loudness": -24.7,
+        "pitch": 244.8,
+        "pitchRange": 11.1,
+        "rate": 3.07
+      },
+      "margins": {
+        "loudness": 2.5,
+        "pitch": 3,
+        "pitchRange": 3,
+        "rate": 0.2
+      },
+      "lines": [
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "howdy",
+          "text": "Howdy folks! Big Hal here, at Big Hal's, the biggest lot in the tri-county area!",
+          "loudness": -24.5,
+          "pitch": 249.7,
+          "pitchRange": 10.1,
+          "rate": 3.1
+        },
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "nomoney",
+          "text": "No money down!",
+          "loudness": -24.6,
+          "pitch": 245,
+          "pitchRange": 7.2,
+          "rate": 3.33
+        },
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "zero",
+          "text": "Zero percent financing!",
+          "loudness": -25.6,
+          "pitch": 235.4,
+          "pitchRange": 14.8,
+          "rate": 2.14
+        },
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "month",
+          "text": "Ninety-nine a month!",
+          "loudness": -25.1,
+          "pitch": 260.1,
+          "pitchRange": 6.6,
+          "rate": 3
+        },
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "thisone",
+          "text": "And this one? This one even comes with wheels!",
+          "loudness": -24,
+          "pitch": 244.6,
+          "pitchRange": 15.3,
+          "rate": 3.04
+        },
+        {
+          "cut": "docs/cuts/big-hal-take6.cut.json",
+          "line": "comeon",
+          "text": "So come on down to Big Hal's and save big!",
+          "loudness": -24.8,
+          "pitch": 238.4,
+          "pitchRange": 12.2,
+          "rate": 3.47
+        }
+      ],
+      "method": "dialogue-stem@1",
+      "measuredAt": "2026-10-20T07:25:08.951Z"
+    }
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-20",
+      "changes": "First version: look from the Take 5 to 7 storyboards, delivery from the owner's notes on Take 5 (no shouting, no reveal) and the accepted one-breath punchline in Take 6. Reference levels measured from 6 approved lines (approved lines in Big Hal Takes 6 and 7: the opening heard as fine, and the accepted one-breath punchline and close): -28.1 to -21.5 LUFS, 198 to 309 Hz, pitch range up to 18.3 st, 1.71 to 4.16 words/s."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Regulars",
+    "show": "regulars",
+    "version": "Take 3 (ending fixed)",
+    "length": 21.518,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Take 2 untouched up to 13.042 s (frame 313): the sepia intro with the Regulars title baked into its picture, the wide where Walt comes in silent and the bar shouts WALT!, Eddie's close shot (\"What's the story, Walt?\") and Walt's walk up to the bar, cut before the walk shot drifts. Then the rebuilt ending, three single shots started from stills of that footage: Walt's two lines in one locked-off take with a beat between them (from Take 2's 13.0 s frame, its first frame skipped since it repeats Take 2's last), a cutaway to Eddie's approved close shot cracking up (from Take 2's 11.9 s frame), and back on the wide as Walt settles onto his different stool while the picture fades. The shots keep their own laughter; a studio-audience laugh runs under them from the cut to Eddie, fading with the picture. Every audio splice has 15 ms ramps (each shot's sound faded at both ends). No music. Ported from regulars3/edit.mjs. The script fades the shots' whole joined sound over the last 0.7 s, which lies inside the sit shot, so it is that shot's own fade-out, under its 15 ms ramp. The laugh's 0.9 s fade is timed to end with the cut, past the end of its 5.0 s file, so the file stops 0.13 of the way down the fade, as rendered."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/regulars-take3.mp4",
+
+  "segments": [
+    { "id": "take2", "label": "Take 2: the sepia intro and title, WALT!, Eddie's close shot, Walt's walk to the bar",
+      "src": "review/clips/ch-regulars-take2.mp4", "in": 0, "out": 13.042,
+      "mix": { "fadeIn": 0.015, "fadeOut": 0.015 } },
+    { "id": "lines", "label": "Walt at the end of the bar: same as yesterday, a beat, different stool", "src": "take:reg3-walt-lines-t2",
+      "in": 0.042, "out": 3.4,
+      "mix": { "fadeIn": 0.015, "fadeOut": 0.015 } },
+    { "id": "eddie", "label": "Eddie's close shot: he cracks up", "src": "take:reg3-eddie-laugh-t1", "in": 0.3, "out": 2.5,
+      "audio": { "volume": 0.9 }, "mix": { "fadeIn": 0.015, "fadeOut": 0.015 } },
+    { "id": "sit", "label": "Wide: Walt settles onto his different stool, the picture fades", "src": "take:reg3-walt-sit-t3",
+      "in": 0.042, "out": 2.96, "fadeOut": 0.5,
+      "audio": { "fadeOut": 0.7 }, "mix": { "fadeIn": 0.015, "fadeOut": 0.015 } }
+  ],
+
+  "lines": [
+    { "id": "walt", "speaker": "The regulars", "text": "WALT!", "segment": "take2", "at": "take2+9.75", "until": "story" },
+    { "id": "story", "speaker": "Eddie", "text": "What's the story, Walt?", "segment": "take2", "at": "take2+10.7" },
+    { "id": "same", "speaker": "Walt", "text": "Same as yesterday, Eddie.", "segment": "lines", "at": "lines+0.5", "until": "stool" },
+    { "id": "stool", "speaker": "Walt", "text": "Different stool.", "segment": "lines", "at": "lines+2.3" }
+  ],
+
+  "sfx": [
+    { "id": "laugh", "label": "Studio-audience laugh under the shots' own laughter, from the cut to Eddie", "src": "audio/reg3-laugh.mp3",
+      "at": "eddie", "until": "@end", "duration": 5.0, "volume": 0.7, "fadeOut": { "duration": 0.9, "end": "@end" } }
+  ],
+
+  "sources": {
+    "take:reg3-walt-lines-t2": { "step": "generate", "storyboard": "reg3-walt-lines", "firstFrame": "regulars3/s-1300.png" },
+    "take:reg3-eddie-laugh-t1": { "step": "generate", "storyboard": "reg3-eddie-laugh", "firstFrame": "regulars3/s-1190.png" },
+    "take:reg3-walt-sit-t3": { "step": "generate", "storyboard": "reg3-walt-sit", "firstFrame": "regulars3/lines-t2-end.png" }
+  }
+}

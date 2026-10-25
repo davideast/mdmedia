@@ -1,0 +1,147 @@
+{
+  "format": "mdmedia.character@1",
+  "id": "buddy",
+  "version": 1,
+  "name": "Buddy",
+  "kind": "thing",
+  "description": "Rick's talking station wagon in Night Wagon: calm, wise and literal. His face is the dashboard's buttons, which pulse when he speaks.",
+  "look": {
+    "description": "a boxy beige 1980s American station wagon with wood-panelled sides and a red scanner light sweeping across its front grille; inside, a dashboard with rows of chunky lit red, yellow and green buttons and one big red button",
+    "never": [
+      "a screen, display or monitor",
+      "a face, smiley, voice bar or waveform",
+      "any lettering on the car or dashboard",
+      "a different car"
+    ]
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "stills": [
+    {
+      "id": "exterior",
+      "file": "characters/buddy/exterior.png",
+      "from": {
+        "take": "nw7-halt-t3",
+        "at": 3
+      },
+      "note": "three-quarter front at the broken bridge, scanner on the grille (Take 9's halt)"
+    },
+    {
+      "id": "dashboard",
+      "file": "characters/buddy/dashboard.png",
+      "from": {
+        "take": "nw7-dash-t1",
+        "at": 2
+      },
+      "note": "his face: the dashboard buttons, Rick's hands on the wheel behind (Take 9)"
+    }
+  ],
+  "voice": {
+    "provider": "elevenlabs",
+    "name": "Bill - Wise, Mature, Balanced",
+    "settings": {
+      "model": "eleven_multilingual_v2"
+    },
+    "uses": [
+      "tts"
+    ],
+    "notes": "Voice-only: his lines are text-to-speech over shots where only the dashboard lights move."
+  },
+  "delivery": {
+    "register": "calm, measured and wise, gently literal, never alarmed",
+    "never": [
+      "never shouts",
+      "never sounds robotic on purpose",
+      "never hurries"
+    ],
+    "reference": {
+      "levels": {
+        "source": "Buddy's lines in the approved Night Wagon Take 9",
+        "loudness": {
+          "min": -32,
+          "max": -22.6
+        },
+        "pitch": {
+          "min": 99.6,
+          "max": 299.9
+        },
+        "pitchRange": {
+          "max": 16.6
+        },
+        "rate": {
+          "min": 1.7,
+          "max": 5.15
+        }
+      },
+      "typical": {
+        "loudness": -26,
+        "pitch": 147.2,
+        "pitchRange": 10.3,
+        "rate": 3.16
+      },
+      "margins": {
+        "loudness": 2.5,
+        "pitch": 3,
+        "pitchRange": 3,
+        "rate": 0.2
+      },
+      "lines": [
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "bridge",
+          "text": "The bridge ahead is out, Rick.",
+          "loudness": -25.3,
+          "pitch": 147.2,
+          "pitchRange": 12.9,
+          "rate": 4.29
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "gap",
+          "text": "Rick, it's a forty-foot gap.",
+          "loudness": -27,
+          "pitch": 164.4,
+          "pitchRange": 10.3,
+          "rate": 2.87
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "cant",
+          "text": "Rick, we can't.",
+          "loudness": -26,
+          "pitch": 252.2,
+          "pitchRange": 13.6,
+          "rate": 3.95
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "no",
+          "text": "Rick. No. We can't.",
+          "loudness": -29.5,
+          "pitch": 128.9,
+          "pitchRange": 9.6,
+          "rate": 2.13
+        },
+        {
+          "cut": "docs/cuts/night-wagon-take9.cut.json",
+          "line": "wagon",
+          "text": "Rick. I'm a station wagon.",
+          "loudness": -25.1,
+          "pitch": 118.5,
+          "pitchRange": 7.8,
+          "rate": 3.16
+        }
+      ],
+      "method": "dialogue-stem@1",
+      "measuredAt": "2026-10-20T07:25:11.695Z"
+    }
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-20",
+      "changes": "First version: look from the Night Wagon storyboards, voice from gens.log (every Buddy line is \"Bill - Wise, Mature, Balanced\"). Reference levels measured from 5 approved lines (Buddy's lines in the approved Night Wagon Take 9): -32.0 to -22.6 LUFS, 100 to 300 Hz, pitch range up to 16.6 st, 1.70 to 5.15 words/s."
+    }
+  ]
+}

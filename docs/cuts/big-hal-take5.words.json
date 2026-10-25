@@ -1,0 +1,163 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "howdy": {
+      "text": "Howdy folks! Big Hal here, at Big Hal's, the biggest lot in the tri-county area!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/big-hal-4ab-t2.mp4", "start": 0, "end": 5.65, "sha256": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225", "snap": "speech-onset@1" },
+      "loss": 0.735,
+      "snap": { "aligned": 0.38, "start": 0.36, "onset": 0.36, "floor": -57.5 },
+      "words": [
+        { "text": "Howdy", "start": 0.36, "end": 0.62, "loss": 0.912 },
+        { "text": "folks!", "start": 0.7, "end": 1.08, "loss": 0.933 },
+        { "text": "Big", "start": 1.42, "end": 1.56, "loss": 0.625 },
+        { "text": "Hal", "start": 1.64, "end": 1.86, "loss": 0.902 },
+        { "text": "here,", "start": 1.94, "end": 2.08, "loss": 0.688 },
+        { "text": "at", "start": 2.12, "end": 2.22, "loss": 0.994 },
+        { "text": "Big", "start": 2.3, "end": 2.46, "loss": 0.629 },
+        { "text": "Hal's,", "start": 2.52, "end": 2.9, "loss": 0.843 },
+        { "text": "the", "start": 3.18, "end": 3.24, "loss": 0.706 },
+        { "text": "biggest", "start": 3.36, "end": 3.66, "loss": 0.55 },
+        { "text": "lot", "start": 3.74, "end": 3.92, "loss": 0.772 },
+        { "text": "in", "start": 3.98, "end": 4.019, "loss": 0.351 },
+        { "text": "the", "start": 4.059, "end": 4.14, "loss": 0.664 },
+        { "text": "tri-county", "start": 4.18, "end": 4.76, "loss": 0.721 },
+        { "text": "area!", "start": 4.86, "end": 5.2, "loss": 0.771 }
+      ]
+    },
+    "nomoney": {
+      "text": "No money down!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/big-hal-4ab-t2.mp4", "start": 5.65, "end": 6.92, "sha256": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225", "snap": "speech-onset@1" },
+      "loss": 0.689,
+      "snap": { "aligned": 5.73, "start": 5.65, "onset": 5.65, "floor": -54.4 },
+      "words": [
+        { "text": "No", "start": 5.65, "end": 5.85, "loss": 0.699 },
+        { "text": "money", "start": 5.93, "end": 6.13, "loss": 0.586 },
+        { "text": "down!", "start": 6.23, "end": 6.55, "loss": 0.747 }
+      ]
+    },
+    "zero": {
+      "text": "Zero percent financing!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/big-hal-4ab-t2.mp4", "start": 6.92, "end": 8.73, "sha256": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225", "snap": "speech-onset@1" },
+      "loss": 0.756,
+      "snap": { "aligned": 7.02, "start": 7.02, "onset": 7.02, "floor": -54.6 },
+      "words": [
+        { "text": "Zero", "start": 7.02, "end": 7.3, "loss": 0.866 },
+        { "text": "percent", "start": 7.4, "end": 7.72, "loss": 0.637 },
+        { "text": "financing!", "start": 7.82, "end": 8.42, "loss": 0.801 }
+      ]
+    },
+    "month": {
+      "text": "Ninety-nine a month!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/big-hal-4ab-t2.mp4", "start": 8.73, "end": 9.85, "sha256": "f5be3311ebc65d47dd4421da88be2b85c2075f8f81592e36fec5cde723373225", "snap": "speech-onset@1" },
+      "loss": 0.982,
+      "snap": { "aligned": 8.79, "start": 8.73, "onset": 8.73, "floor": -56 },
+      "words": [
+        { "text": "Ninety-nine", "start": 8.73, "end": 9.27, "loss": 1.05 },
+        { "text": "a", "start": 9.31, "end": 9.37, "loss": 0.821 },
+        { "text": "month!", "start": 9.41, "end": 9.73, "loss": 0.963 }
+      ]
+    },
+    "every": {
+      "text": "And every car on my lot is hand-inspected... by me!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-inspect-t6.mp4", "start": 0.43, "end": 4.45, "sha256": "903de5c437dc0ba7cb827ba8599491e721025e366a5b680d1316aaeff1145974", "snap": "speech-onset@1" },
+      "loss": 0.899,
+      "snap": { "aligned": 0.47, "start": 0.43, "onset": 0.43, "floor": -57.1 },
+      "words": [
+        { "text": "And", "start": 0.43, "end": 0.63, "loss": 0.772 },
+        { "text": "every", "start": 0.73, "end": 0.93, "loss": 0.737 },
+        { "text": "car", "start": 1.05, "end": 1.29, "loss": 0.885 },
+        { "text": "on", "start": 1.33, "end": 1.45, "loss": 0.861 },
+        { "text": "my", "start": 1.49, "end": 1.67, "loss": 0.606 },
+        { "text": "lot", "start": 1.73, "end": 1.97, "loss": 0.951 },
+        { "text": "is", "start": 2.11, "end": 2.25, "loss": 0.61 },
+        { "text": "hand-inspected...", "start": 2.31, "end": 3.33, "loss": 0.975 },
+        { "text": "by", "start": 3.79, "end": 3.95, "loss": 1.134 },
+        { "text": "me!", "start": 4.07, "end": 4.29, "loss": 1.191 }
+      ]
+    },
+    "personally": {
+      "text": "PERSONALLY!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-personally-t2.mp4", "start": 0.55, "end": 1.63, "sha256": "2fcebfb6b41de65667c0bdd185f9adc21859d818d851f603e0f03411c2f11b3e", "snap": "speech-onset@1" },
+      "loss": 1.084,
+      "snap": { "aligned": 0.87, "start": 0.83, "onset": 0.83, "floor": -52.8 },
+      "words": [
+        { "text": "PERSONALLY!", "start": 0.83, "end": 1.53, "loss": 1.084 }
+      ]
+    },
+    "theystart": {
+      "text": "They start!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-lines-t1.mp4", "start": 0.74, "end": 1.55, "sha256": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9", "snap": "speech-onset@1" },
+      "loss": 0.848,
+      "snap": { "aligned": 0.76, "start": 0.74, "onset": 0.74, "floor": -62.4 },
+      "words": [
+        { "text": "They", "start": 0.74, "end": 0.86, "loss": 0.787 },
+        { "text": "start!", "start": 1.04, "end": 1.48, "loss": 0.864 }
+      ]
+    },
+    "doorsclose": {
+      "text": "The doors close!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-lines-t1.mp4", "start": 2.04, "end": 3.59, "sha256": "977a9fc748cbb3f49dc5cd87fe0b9801dbd74b5ed454565d880044924885edd9", "snap": "speech-onset@1" },
+      "loss": 0.956,
+      "snap": { "aligned": 2.44, "start": 2.44, "onset": 2.44, "floor": -62.3 },
+      "words": [
+        { "text": "The", "start": 2.44, "end": 2.52, "loss": 0.653 },
+        { "text": "doors", "start": 2.56, "end": 2.86, "loss": 1.012 },
+        { "text": "close!", "start": 2.94, "end": 3.48, "loss": 1.1 }
+      ]
+    },
+    "thisone": {
+      "text": "And this one? This one even comes with...",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-thisone-t3.mp4", "start": 0.87, "end": 3.45, "sha256": "6410fc73b464e05e629e097a867697591fff6275a58e90546cdaf513cdae19d3", "snap": "speech-onset@1" },
+      "loss": 0.702,
+      "snap": { "aligned": 0.87, "start": 0.87, "onset": 0.87, "floor": -57.7 },
+      "words": [
+        { "text": "And", "start": 0.87, "end": 0.97, "loss": 0.418 },
+        { "text": "this", "start": 1.03, "end": 1.19, "loss": 0.602 },
+        { "text": "one?", "start": 1.25, "end": 1.39, "loss": 0.887 },
+        { "text": "This", "start": 1.83, "end": 2.01, "loss": 0.616 },
+        { "text": "one", "start": 2.05, "end": 2.13, "loss": 0.674 },
+        { "text": "even", "start": 2.19, "end": 2.41, "loss": 0.629 },
+        { "text": "comes", "start": 2.47, "end": 2.77, "loss": 0.628 },
+        { "text": "with...", "start": 2.83, "end": 3.11, "loss": 0.971 }
+      ]
+    },
+    "wheels": {
+      "text": "Wheels!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-wheels-t1.mp4", "start": 1.07, "end": 2.27, "sha256": "2f4f04ff6a8db33c0144a6b0a499ff2fe9eb928282039f55ff907d32240dfdfc", "snap": "speech-onset@1" },
+      "loss": 1.201,
+      "snap": { "aligned": 1.15, "start": 1.07, "onset": 1.07, "floor": -52.5 },
+      "words": [
+        { "text": "Wheels!", "start": 1.07, "end": 1.81, "loss": 1.201 }
+      ]
+    },
+    "comeon": {
+      "text": "So come on down to Big Hal's and save big!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/hal5-wheels-t1.mp4", "start": 2.27, "end": 5.7, "sha256": "2f4f04ff6a8db33c0144a6b0a499ff2fe9eb928282039f55ff907d32240dfdfc", "snap": "speech-onset@1" },
+      "loss": 1.022,
+      "snap": { "aligned": 2.31, "start": 2.31, "onset": 2.32, "floor": -53.2 },
+      "words": [
+        { "text": "So", "start": 2.31, "end": 2.47, "loss": 1.005 },
+        { "text": "come", "start": 2.53, "end": 2.67, "loss": 0.628 },
+        { "text": "on", "start": 2.75, "end": 2.89, "loss": 1.063 },
+        { "text": "down", "start": 2.95, "end": 3.19, "loss": 0.764 },
+        { "text": "to", "start": 3.23, "end": 3.29, "loss": 1.01 },
+        { "text": "Big", "start": 3.41, "end": 3.59, "loss": 0.974 },
+        { "text": "Hal's", "start": 3.69, "end": 4.13, "loss": 1.154 },
+        { "text": "and", "start": 4.41, "end": 4.53, "loss": 0.97 },
+        { "text": "save", "start": 4.69, "end": 4.99, "loss": 1.344 },
+        { "text": "big!", "start": 5.15, "end": 5.55, "loss": 1.274 }
+      ]
+    }
+  }
+}

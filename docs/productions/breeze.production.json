@@ -1,0 +1,51 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "breeze",
+  "title": "Breeze mints",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ad-breeze-take4.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ad-breeze.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Permed teen and a boy in pastels on a mall escalator with foam headphones, a sky-blue mint roll, a grin at camera and a cheesy dance with shoppers clapping; the tangled cord barely reads, and the store neon behind is squiggly pseudo-lettering.",
+      "createdAt": "2026-10-18T21:59:25.643Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ad-breeze-take2.mp4",
+      "label": "Take 2 (commercial structure)",
+      "status": "none",
+      "notes": "Transcript: Having one of those days? (0.0 s) / Introducing Breeze! (4.0) / Breeze mints. Fresh breath, fresh start. (7.9); the sung Feel the Breeze! jingle is not picked up by the transcriber, so listen for it. Chewed tape and orange soda stain, the mint, the tape plays and the boy smiles, she grins at camera, then a clean blue-roll packshot with our BREEZE and Feel the Breeze! graphics; the boy looks a few years younger than her.",
+      "createdAt": "2026-10-18T22:40:26.636Z"
+    },
+    {
+      "id": "take3",
+      "rendered": "review/clips/ad-breeze-take3.mp4",
+      "label": "Take 3 (The Fountain)",
+      "status": "none",
+      "notes": "Transcript: hummed intro (0 s) / When the day goes wrong, keep it cool, turn it round (5.9) / Keep it cool, turn it round, turn your whole day around (10.8) / announcer: Breeze, the fresh mint that turns your day around (18.2) / sung: Feel the Breeze! (22.2). Shots, all take 1 unless noted: hook (zoomed in past two shop signs); the cannonball splash flattens his hair, water only, jacket stays white; roll insert with our NEW! starburst and BREEZE label; he pops a mint and smiles; comb slick-back as the women swoon and the guard nods; thumbs up, wink, applause; punchline take 4 of 4 (earlier takes had people multiplying, climbing back out, or lettering on the rolls): four onlookers jump in and stand knee-deep with thumbs up and plain blue rolls; packshot with our BREEZE logo and Turn your day around!. The punchline is from a different angle on a plainer fountain, and the onlookers differ from the first shots.",
+      "createdAt": "2026-10-19T02:36:55.084Z"
+    },
+    {
+      "id": "take4",
+      "cut": "docs/cuts/breeze-take4.cut.json",
+      "label": "Take 4 (The Blowout)",
+      "status": "review",
+      "notes": "Transcript: hummed intro (0 s) / BANG, our sound (3.2) / When the day goes wrong, keep it cool, turn it round (3.9) / keep it cool, turn it round, turn your whole day around (9.1) / announcer: Breeze, the fresh mint that turns your day around (14.7) / music out, crickets only, no dialogue (17.4 to 26.7) / sung: Feel the Breeze! (27.3; the transcriber misses it, so listen for it). What changed from Take 3: a new situation, The Blowout, with no water anywhere. The couple, the car and the trucker were each generated once as stills and every shot starts from a still of them; the punchline shots chain from each other so the parked tow truck stays behind them. The product is split the way you asked: a hands-only insert (started from Take 3's own roll-in-hand frame, re-dressed in his turquoise sleeve and the sunset field) where a mint rises out of the plain roll and his other hand takes it, with our NEW! burst and BREEZE label overlaid before that hand comes in; then a separate face shot, already chewing, grin and wink. No shot shows a mint going into a mouth. The punchline is timed like Night Wagon: the music cuts out on the tow truck, the trucker stares deadpan for a beat, walks over and sits on the hood, holds out his palm without looking, gets a Breeze, and as his head lands on the hero's other shoulder (the stronger tag, mirroring the date) the sung sting comes in, then Take 3's packshot with our BREEZE logo and Turn your day around!. Shot takes: hook t1 (its own second angle), blowout t1, flat t1, her t2, roll t3 of 5 (t1 and t2 started from a still with the mint already showing), him t2, blanket t1, hood t2, wide t1, truck t1, trucker t1, sit t4 of 6 (t1 to t3 lost the parked truck, so it was redone from the truck shot's last frame), palm t2, give t1, tag t1, packshot br3-s7-t1. Our sounds: bang, tyre hiss, tow truck, crickets. Look for: the flat-tyre insert barely moves (it reads as already flat), the trucker's shirt is a touch greyer once he sits, and the give insert shows his hand by the hood rather than seated.",
+      "createdAt": "2026-10-19T08:20:05.728Z"
+    },
+    {
+      "id": "take5",
+      "cut": "docs/cuts/breeze-take5.cut.json",
+      "label": "Take 5 (the mint turns everyone around)",
+      "status": "review",
+      "notes": "Transcript: hummed intro (0 s) / BANG, our sound (1.8) / When the day goes wrong, keep it cool, turn it round (4.0) / keep it cool, turn it round, turn your whole day around (8.3) / announcer: Breeze, the fresh mint that turns your day around (18.4) / music out, crickets, no dialogue (20.8 to 32.3) / sung: Feel the Breeze! (32.3). The rule of three: both faces fall at the bang and she folds her arms; after his mint and wink he gets out, pops the trunk and pulls out a blanket and two bottles of pop; still sulking, she takes a Breeze, her frown melts and her head settles on his shoulder. The tow truck pulls up and both turn to look; the driver climbs out tired and kind-eyed and sighs; the hero holds out the roll without a word; the trucker's face softens as hers did, he sits and rests his head on the hero's other shoulder, and she opens one eye. 37 s, longer than the ~30 s aim (ten beats, one action per shot). Look at: the tyre insert (2.9 s: the car sinks but the tyre stays round), the one-eye peek (33.3 s, subtle, pushed in), and one jingle bar repeated under the announcer (18.7 s).",
+      "createdAt": "2026-10-20T04:38:25.000Z"
+    }
+  ]
+}

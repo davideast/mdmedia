@@ -1,0 +1,52 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Roam Phone",
+    "show": "roam-phone",
+    "version": "Take 2 (commercial structure)",
+    "length": 16,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "One paid generation, extended once, with our graphics laid over it. roam-2a-t2 (8 s, from ad-roam-2a; t1 was rejected) was continued by the provider with ad-roam-2b (8 s), which returns the source clip and its new tail as one 16 s file, roam-2-full-t1; its first 192 frames match roam-2a-t2 and the lawn starts on frame 192 (8.0 s). compose.mjs then laid our ROAM PHONE (12.4 s, faded in over 0.25 s, so it starts a frame before the packshot) and Talk anywhere. Almost. (14.0 s, faded in over 0.25 s) over it, each to 16.1 s (past the end, so the cut ends them), and copied the sound, giving roam-2-final, byte-identical to review/clips/ad-roam-phone-take2.mp4. The segments are the take's own shots, in step, cut where the picture cuts (frame/24). All the sound is the take's own: the announcer and the dad on the phone, whose words are the transcriber's (the storyboard gives him none)."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/roam-2-final.mp4",
+
+  "segments": [
+    { "id": "kitchen", "label": "The kitchen: the wall phone's cord knocks the fruit over", "src": "take:roam-2-full-t1",
+      "in": 0, "out": 3.958333 },
+    { "id": "hangup", "label": "He hangs the wall phone up for good", "src": "take:roam-2-full-t1",
+      "in": 3.958333, "out": 5.166667 },
+    { "id": "handset", "label": "Close: the cordless handset off its base, the antenna up, a grin", "src": "take:roam-2-full-t1",
+      "in": 5.166667, "out": 8 },
+    { "id": "lawn", "label": "Still on the phone, he strolls across the lawns to the neighbour's barbecue", "src": "take:roam-2-full-t1",
+      "in": 8, "out": 12.458333 },
+    { "id": "pack", "label": "Packshot: the handset in its base on sky blue", "src": "take:roam-2-full-t1",
+      "in": 12.458333, "out": 16 }
+  ],
+
+  "lines": [
+    { "id": "tied", "speaker": "Announcer", "text": "Tired of being tied to the wall?", "segment": "kitchen", "at": "kitchen+1.4",
+      "until": "intro" },
+    { "id": "intro", "speaker": "Announcer", "text": "Introducing Roam Phone, the cordless telephone!", "segment": "hangup",
+      "at": "hangup+0.8", "until": "handset.end" },
+    { "id": "chat", "speaker": "Dad", "text": "No, I agree. That's why we need to do it.", "segment": "lawn", "at": "lawn+1.3",
+      "until": "pack" },
+    { "id": "talk", "speaker": "Announcer", "text": "Roam Phone. Talk anywhere.", "segment": "pack", "until": "almost" },
+    { "id": "almost", "speaker": "Announcer", "text": "Almost.", "segment": "pack", "at": "pack+2.6", "until": "@end" }
+  ],
+
+  "overlays": [
+    { "id": "name", "label": "ROAM PHONE", "src": "gfx/roam-name.png", "at": 12.4, "until": 16.1, "fadeIn": 0.25 },
+    { "id": "tagline", "label": "Talk anywhere. Almost.", "src": "gfx/roam-tag.png", "at": 14, "until": 16.1, "fadeIn": 0.25 }
+  ],
+
+  "sources": {
+    "take:roam-2-full-t1": { "step": "extend", "extendedFrom": "take:roam-2a-t2", "storyboard": "ad-roam-2b" },
+    "take:roam-2a-t2": { "step": "generate", "storyboard": "ad-roam-2a" }
+  }
+}

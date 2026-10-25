@@ -1,0 +1,28 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "clap-lite",
+  "title": "Clap-Lite",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ad-clap-lite-take2.jpg",
+  "approved": "take2",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ad-clap-lite.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Man in blue pyjamas claps the lamp off, the shaggy dog brings it back on, several toggles, then the pillow over his face; a second lamp on the right never goes off, so the off moments are only half-dark, and the jingle is Clap-Lite! Lights that listen! rather than the real Clapper line.",
+      "createdAt": "2026-10-18T22:02:18.408Z"
+    },
+    {
+      "id": "take2",
+      "cut": "docs/cuts/clap-lite-take2.cut.json",
+      "label": "Take 2 (commercial structure)",
+      "status": "approved",
+      "notes": "Transcript: Tired of stumbling in the dark? (2.0 s) / Introducing Clap-Lite. (4.7) / Clap-Lite. Lights that listen. Order yours today. (11.8). Grandma stubs her toe in the dark, claps the one lamp on, then quick demos (dad claps the TV on, a boy claps his lamp on) and a glowing-dome packshot with our CLAP-LITE, ONLY $19.95 and blinking CALL NOW 555-0147; an unlit second lamp shape is faintly visible in the dark opening shot (only one ever lights).",
+      "createdAt": "2026-10-18T22:53:01.446Z"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "format": "mdmedia.cut@1",
+  "extends": "big-hal-take5",
+  "meta": {
+    "version": "Take 6 (wheels in one breath)",
+    "length": 25.9,
+    "notes": "Take 5 with the punchline and the close as one performance (thread t2-wheels, suggestion s4, accepted as preview r2-t2-wheels-15). The hood shot (\"...comes with...\") and the wide finish (a held 1.0 s pause, then an arms-wide \"Wheels!\") are replaced by one 8 s medium shot, hal6-wheels-close-t1, generated knowing the list before it: \"And this one? This one even comes with wheels! So come on down to Big Hal's and save big!\", his hand resting on the hood through the punchline and his arms opening only for the close. No cut and no pause between \"with\" and \"wheels\" (measured 0.00 s); \"wheels\" is level with \"comes with\". The take's sound up to \"So\" is lifted 2.5 dB, so the punchline sits at the level of \"They start!\". The freeze is held over this take's own room tone. The shot's whole sound (its own audio, the close and the room tone laid into it) is faded 12 ms at both ends. WHEELS INCLUDED! and the fine print land on \"wheels\"; COME ON DOWN, the phone and the route sign on \"So\". Everything before 18.23 s is Take 5 unchanged. Rendered by the round-2 preview renderer (a port of hal5/edit.mjs), mode split."
+  },
+  "output": "takes/big-hal-take6.mp4",
+  "remove": ["hood", "finish", "wheels"],
+
+  "segments": [
+    { "id": "wc", "label": "Medium, hand on the hood: And this one? This one even comes with wheels! So come on down..., then the freeze",
+      "after": "door", "src": "take:hal6-wheels-close-t1", "in": 0, "out": 6.67, "hold": 1.0,
+      "audio": { "out": 3.6, "volume": 1.3335 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } }
+  ],
+
+  "lines": [
+    { "id": "thisone", "speaker": "Big Hal", "text": "And this one? This one even comes with wheels!", "segment": "wc", "at": "wc+0.28", "until": "comeon" },
+    { "id": "comeon", "speaker": "Big Hal", "text": "So come on down to Big Hal's and save big!", "src": "take:hal6-wheels-close-t1",
+      "in": 3.6, "out": 6.67, "at": "wc+3.6", "layer": "wc" }
+  ],
+
+  "sfx": [
+    { "id": "freeze_room", "label": "Room tone from the quiet tail of the same take, under the freeze", "src": "take:hal6-wheels-close-t1",
+      "in": 6.9, "out": 7.9, "at": "wc.end-1", "fadeIn": 0.1, "fadeOut": 0.15, "layer": "wc" }
+  ],
+
+  "overlays": [
+    { "id": "doors", "label": "DOORS CLOSE! (raised over the windows)", "src": "gfx/hal4-doors.png", "at": "door+0.41", "until": "wc",
+      "y": -250 },
+    { "id": "included", "label": "WHEELS INCLUDED!*", "src": "gfx/hal3-wheels.png", "at": "wc+2.68", "until": "comeon" },
+    { "id": "fine", "label": "Fine print crawls across", "src": "gfx/hal4-fine.png", "at": "wc+2.68", "duration": 2.4,
+      "motion": [
+        { "at": "fine", "x": 1085, "y": 0 },
+        { "at": "fine.end", "x": -1195, "y": 0 }
+      ] }
+  ],
+
+  "performances": [
+    { "id": "wheels_joke", "lines": ["thisone", "comeon"], "intent": "setup and punchline, then the close",
+      "delivery": "an ordinary selling point: one breath, no pause before \"wheels\", \"wheels\" at the same loudness and note as \"comes with\", never a big reveal; then a warm, friendly invitation" }
+  ],
+
+  "sources": {
+    "take:hal6-wheels-close-t1": { "step": "generate", "storyboard": "hal6-wheels-close", "firstFrame": "hal5/stills/medium-hood.png" }
+  }
+}

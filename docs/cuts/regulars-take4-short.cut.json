@@ -1,0 +1,15 @@
+{
+  "format": "mdmedia.cut@1",
+  "extends": "regulars-take4",
+  "meta": {
+    "version": "Take 4 (too much else, without the dark kitchen)",
+    "length": 42.833333,
+    "notes": "Take 4 with \"Standing in the dark kitchen.\" cut, for comparison: Dot's frosting shot ends 0.26 s after \"Walt.\" (frame 92 of reg4-c-t2) instead of after the kitchen line, so everything after it starts 2.375 s earlier; the biggest laugh, the theme's return and its hit on 'Bye, Walt!' move with it. Same take, same delivery; nothing else changes. Cut by reg4/edit.mjs --short."
+  },
+  "output": "takes/regulars-take4-short.mp4",
+  "remove": ["kitchen"],
+  "segments": [
+    { "id": "c", "label": "4. Dot: the frosting", "src": "take:reg4-c-t2", "in": "f6", "out": "f92",
+      "audio": { "volume": 2.9 }, "mix": { "fadeIn": 0.012, "fadeOut": 0.012 } }
+  ]
+}

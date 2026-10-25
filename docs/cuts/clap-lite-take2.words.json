@@ -1,0 +1,56 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "tired": {
+      "text": "Tired of stumbling in the dark?",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clap-2-full-t1.mp4", "start": 1.2, "end": 4.525, "sha256": "7c7c17a34ac62efbe3ad56b9751839f4805ac50be024411830cb8409bb33d3c4", "snap": "speech-onset@1" },
+      "loss": 0.772,
+      "snap": { "aligned": 2.54, "start": 2.54, "onset": 1.31, "floor": -49.5 },
+      "words": [
+        { "text": "Tired", "start": 2.54, "end": 2.84, "loss": 0.935 },
+        { "text": "of", "start": 2.88, "end": 2.96, "loss": 0.796 },
+        { "text": "stumbling", "start": 3.1, "end": 3.46, "loss": 0.662 },
+        { "text": "in", "start": 3.5, "end": 3.56, "loss": 0.843 },
+        { "text": "the", "start": 3.6, "end": 3.7, "loss": 0.627 },
+        { "text": "dark?", "start": 3.74, "end": 4.06, "loss": 0.846 }
+      ]
+    },
+    "intro": {
+      "text": "Introducing Clap-Lite!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clap-2-full-t1.mp4", "start": 4.525, "end": 7.958333, "sha256": "7c7c17a34ac62efbe3ad56b9751839f4805ac50be024411830cb8409bb33d3c4", "snap": "speech-onset@1" },
+      "loss": 0.803,
+      "snap": { "aligned": 4.645, "start": 4.585, "onset": 4.585, "floor": -45.1 },
+      "words": [
+        { "text": "Introducing", "start": 4.585, "end": 5.285, "loss": 0.759 },
+        { "text": "Clap-Lite!", "start": 5.685, "end": 6.485, "loss": 0.834 }
+      ]
+    },
+    "jingle": {
+      "text": "Clap-Lite! Lights that listen!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clap-2-full-t1.mp4", "start": 11.5, "end": 14.85, "sha256": "7c7c17a34ac62efbe3ad56b9751839f4805ac50be024411830cb8409bb33d3c4" },
+      "loss": 0.956,
+      "approximate": true,
+      "words": [
+        { "text": "Clap-Lite!", "start": 12.26, "end": 13.04, "loss": 0.977 },
+        { "text": "Lights", "start": 13.7, "end": 14.02, "loss": 0.804 },
+        { "text": "that", "start": 14.06, "end": 14.2, "loss": 0.714 },
+        { "text": "listen!", "start": 14.24, "end": 14.66, "loss": 0.921 }
+      ]
+    },
+    "order": {
+      "text": "Order yours today!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clap-2-full-t1.mp4", "start": 14.85, "end": 16, "sha256": "7c7c17a34ac62efbe3ad56b9751839f4805ac50be024411830cb8409bb33d3c4", "snap": "speech-onset@1" },
+      "loss": 0.887,
+      "snap": { "aligned": 15.03, "start": 14.99, "onset": 14.99, "floor": -65.9 },
+      "words": [
+        { "text": "Order", "start": 14.99, "end": 15.25, "loss": 0.794 },
+        { "text": "yours", "start": 15.33, "end": 15.61, "loss": 1.007 },
+        { "text": "today!", "start": 15.67, "end": 15.95, "loss": 0.858 }
+      ]
+    }
+  }
+}

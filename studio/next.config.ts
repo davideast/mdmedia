@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   distDir: process.env.MDMEDIA_DIST_DIR ?? (process.env.PYRIC_SANDBOX_FORCE === '1' ? '.next-hosted' : '.next'),
   allowedDevOrigins: (process.env.MDMEDIA_ALLOWED_DEV_ORIGINS ?? '')
     .split(',').map((host) => host.trim()).filter(Boolean),
+  // Signed media links carry their signature in the URL; the dev request log must not print them.
+  logging: { incomingRequests: { ignore: [/[?&]sig=/] } },
   async redirects() {
     return [
       {

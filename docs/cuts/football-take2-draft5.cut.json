@@ -1,0 +1,1007 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "CGL Football",
+    "show": "football",
+    "version": "Take 2 (voices not yet swapped)",
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "The come-from-behind win. The booth bookends it; the middle is the game, with the announcers' voices over the plays. Every line is an on-camera booth generation by its speaker (one speaker, one sentence or one turn per take, started from a frame of Take 1's booth shot), laid as a line carrying its own stretch of that take; the booth shots show those same takes in step, Moose alone as a crop of the two-shot. The voice-over lines are the booth takes' own audio with the plays cut over it. The voices are the video model's own and not yet swapped to Eric and Roger (ElevenLabs had no credits): see the football-take2-swapped variant and fb2/swap-and-render.sh. Our graphics in Take 1's style: the bumper, the KEYS card (each key on Moose's first word), the score strips 3RD 14-13, 4TH 14-20, 4TH 0:41 14-20, 20-20 and 21-20, and the FINAL 21-20 box. Take 1's crowd bed, roars and gun, theme and sting, and its early-80s tape look."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/football-take2.mp4",
+  "segments": [
+    {
+      "id": "bump",
+      "label": "Our CGL FOOTBALL bumper",
+      "src": "football/g-bumper-bg.png",
+      "still": true,
+      "duration": 1.5
+    },
+    {
+      "id": "open",
+      "label": "Booth: Chet's welcome, cut to the card on \"keys\"",
+      "src": "take:fb2-c-open-t5",
+      "in": 0.5,
+      "out": 5.06,
+      "audio": false
+    },
+    {
+      "id": "card",
+      "label": "KEYS TO THE GAME card: Moose's three keys",
+      "src": "football/g-keys-bg.png",
+      "still": true,
+      "end": "m_k3+3.22"
+    },
+    {
+      "id": "echo",
+      "label": "Booth: Chet, doubtful",
+      "src": "take:fb2-c-echo-t8",
+      "in": 0.45,
+      "out": 2.35,
+      "audio": false
+    },
+    {
+      "id": "eff",
+      "label": "Moose alone: \"not effective\"",
+      "src": "take:vs-moose2-t3",
+      "in": 1,
+      "out": 4.6,
+      "crop": {
+        "x": 540,
+        "y": 20,
+        "width": 760,
+        "height": 428
+      },
+      "audio": false
+    },
+    {
+      "id": "icetd",
+      "label": "A. The Icebreakers' touchdown run",
+      "src": "take:fb2-icetd-t3",
+      "in": 0.1,
+      "out": 4.95,
+      "audio": {
+        "volume": 0.3
+      }
+    },
+    {
+      "id": "widea",
+      "label": "The stands, the score 14-13",
+      "src": "take:fb-stadium-t3",
+      "in": 1,
+      "out": 4.02,
+      "audio": false
+    },
+    {
+      "id": "tartd",
+      "label": "B. The Tarpons' touchdown run",
+      "src": "take:fb2-tartd-t1",
+      "in": 0.05,
+      "out": 2.95,
+      "audio": {
+        "volume": 0.3
+      }
+    },
+    {
+      "id": "widec",
+      "label": "C. The stadium wide: 0:41 left, Tarpons ball",
+      "src": "take:fb-stadium-t4",
+      "in": 0.3,
+      "out": 4.95,
+      "audio": false
+    },
+    {
+      "id": "handoff",
+      "label": "The Tarpons' handoff",
+      "src": "take:fb2-handoff-t3",
+      "in": 0.6,
+      "out": 2,
+      "audio": {
+        "volume": 0.3
+      }
+    },
+    {
+      "id": "collide",
+      "label": "Run over by his own lineman: the ball comes loose",
+      "src": "take:fb2-collide-t3",
+      "in": 0.85,
+      "out": 3.19,
+      "audio": {
+        "volume": 0.6
+      }
+    },
+    {
+      "id": "scoop",
+      "label": "The Icebreakers scoop it up and run it back",
+      "src": "take:fb2-scoop-t3",
+      "in": 0.65,
+      "out": 3.45,
+      "crop": {
+        "x": 120,
+        "y": 135,
+        "width": 1040,
+        "height": 585
+      },
+      "audio": {
+        "volume": 0.3
+      }
+    },
+    {
+      "id": "kick",
+      "label": "The extra point is good",
+      "src": "take:fb2-kick-t4",
+      "in": 0.2,
+      "out": 3,
+      "audio": {
+        "volume": 0.35
+      }
+    },
+    {
+      "id": "final",
+      "label": "Final: Icebreakers celebrating, Tarpons walking off",
+      "src": "take:fb-final-t3",
+      "in": 0,
+      "out": 1.8,
+      "audio": {
+        "volume": 0.35
+      }
+    },
+    {
+      "id": "close",
+      "label": "Booth: Chet's thrilled question",
+      "src": "take:vs-chet-t1",
+      "in": 0.55,
+      "out": 7.03,
+      "audio": false
+    },
+    {
+      "id": "mclose",
+      "label": "Moose alone: the callback",
+      "src": "take:fb2-m-close-t3",
+      "in": 0.85,
+      "out": 6.14,
+      "crop": {
+        "x": 540,
+        "y": 20,
+        "width": 760,
+        "height": 428
+      },
+      "audio": false
+    },
+    {
+      "id": "outro",
+      "label": "The CGL FOOTBALL bumper again",
+      "src": "football/g-bumper-bg.png",
+      "still": true,
+      "duration": 1.6
+    }
+  ],
+  "lines": [
+    {
+      "id": "c_open",
+      "speaker": "Chet",
+      "text": "Good afternoon, everybody, and welcome to CGL Football! Moose, what are your keys to the game?",
+      "src": "take:fb2-c-open-t5",
+      "in": 0.5,
+      "out": 5.95,
+      "at": "open",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "bright, warm network welcome; the question to Moose ordinary and friendly"
+    },
+    {
+      "id": "m_k1",
+      "speaker": "Moose",
+      "text": "Key number one: score more points than the other team.",
+      "src": "take:fb2-m-k1-t5",
+      "in": 1.1,
+      "out": 4.4,
+      "at": "c_open+5.55",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "steady, matter-of-fact and sincere, as if it were real inside knowledge"
+    },
+    {
+      "id": "m_k2",
+      "speaker": "Moose",
+      "text": "Key number two: don't let the other team score more points than you.",
+      "src": "take:fb2-m-k2-t7",
+      "in": 1.05,
+      "out": 5.15,
+      "at": "m_k1+3.33",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "the same steady, sincere delivery as key one"
+    },
+    {
+      "id": "m_k3",
+      "speaker": "Moose",
+      "text": "Key number three: don't tackle your own guys.",
+      "src": "take:fb2-m-k3-t5",
+      "in": 0.8,
+      "out": 3.85,
+      "at": "m_k2+4.27",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "the same steady, sincere delivery as keys one and two"
+    },
+    {
+      "id": "c_echo",
+      "speaker": "Chet",
+      "text": "...Don't tackle your own guys?",
+      "src": "take:fb2-c-echo-t8",
+      "in": 0.45,
+      "out": 2.3,
+      "at": "echo",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "a little doubtful, quiet, a real question; never mocking"
+    },
+    {
+      "id": "m_effective",
+      "speaker": "Moose",
+      "text": "Yeah, Chet. I've seen it, and it is not effective.",
+      "src": "take:vs-moose2-t3",
+      "in": 1,
+      "out": 4.6,
+      "at": "eff",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "low, steady and completely serious"
+    },
+    {
+      "id": "c_td",
+      "speaker": "Chet",
+      "text": "Touchdown, Icebreakers! That's key number one, Moose!",
+      "src": "take:fb2-c-td-t9",
+      "in": 0.4,
+      "out": 3.95,
+      "at": "icetd+0.67",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "an excited touchdown call, then pleased, to Moose"
+    },
+    {
+      "id": "m_scoring",
+      "speaker": "Moose",
+      "text": "Exactly, Chet. They're scoring more points than the other team.",
+      "src": "take:fb2-m-scoring-t4",
+      "in": 1,
+      "out": 4.55,
+      "at": "c_td+3.6",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "approving, deadpan"
+    },
+    {
+      "id": "m_letting",
+      "speaker": "Moose",
+      "text": "See, now they're letting the other team score more points than them.",
+      "src": "take:fb2-m-letting-t1",
+      "in": 1.1,
+      "out": 4.2,
+      "at": "tartd+0.5",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "a little disappointed, deadpan"
+    },
+    {
+      "id": "c_clock",
+      "speaker": "Chet",
+      "text": "Forty-one seconds left, Tarpons ball. They just have to run out the clock.",
+      "src": "take:fb2-c-clock-t4",
+      "in": 0.75,
+      "out": 4.6,
+      "at": "m_letting+3.15",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "measured and a little tense"
+    },
+    {
+      "id": "c_play",
+      "speaker": "Chet",
+      "text": "Handoff... oh! He's run over by his own man! It's loose! Icebreakers have it... touchdown!",
+      "src": "take:fb2-c-play-t8",
+      "in": 0.5,
+      "out": 7.15,
+      "at": "handoff+0.19",
+      "volume": 1.25,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "live play-by-play that builds to the touchdown, excited, never a scream"
+    },
+    {
+      "id": "c_kick",
+      "speaker": "Chet",
+      "text": "The kick is good!",
+      "src": "take:fb2-c-kick-t9",
+      "in": 0.45,
+      "out": 1.5,
+      "at": "kick+0.84",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "a bright, quick call"
+    },
+    {
+      "id": "c_close",
+      "speaker": "Chet",
+      "text": "What a thrilling come-from-behind win by the Icebreakers! Moose, what do you think sparked that comeback?",
+      "src": "take:vs-chet-t1",
+      "in": 0.55,
+      "out": 7,
+      "at": "close",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "thrilled but polished; the question ordinary and friendly"
+    },
+    {
+      "id": "m_close",
+      "speaker": "Moose",
+      "text": "They didn't tackle their own guys, Chet... they didn't tackle their own guys.",
+      "src": "take:fb2-m-close-t3",
+      "in": 0.85,
+      "out": 6.14,
+      "at": "mclose",
+      "volume": 1.5,
+      "fadeIn": 0.04,
+      "fadeOut": 0.08,
+      "delivery": "slow and sincere, a thoughtful pause, then the repeat softer, almost reverent"
+    }
+  ],
+  "music": [
+    {
+      "id": "bed",
+      "label": "Theme: full under the bumper, gone under Chet's welcome",
+      "src": "audio/fb-theme.mp3",
+      "in": 0.33,
+      "at": "@start",
+      "until": "c_open+0.27",
+      "fadeOut": 0.6,
+      "volume": [
+        {
+          "at": "open",
+          "value": 0.6
+        },
+        {
+          "at": "open+0.25",
+          "value": 0.18
+        }
+      ]
+    },
+    {
+      "id": "sting",
+      "label": "The theme's opening fanfare as the sting",
+      "src": "audio/fb-theme.mp3",
+      "in": 0.33,
+      "at": "outro",
+      "until": "@end",
+      "volume": 0.6,
+      "fadeOut": 0.7
+    }
+  ],
+  "sfx": [
+    {
+      "id": "crowd",
+      "label": "Crowd bed: four passes of Take 1's, low in the booth, up under the plays, dipped under the lines",
+      "at": "open",
+      "until": "@end",
+      "fadeIn": 0.5,
+      "fadeOut": 1.2,
+      "parts": [
+        {
+          "src": "audio/fb-crowd.mp3",
+          "in": 0,
+          "out": 20
+        },
+        {
+          "src": "audio/fb-crowd.mp3",
+          "in": 0,
+          "out": 20,
+          "crossfade": 2
+        },
+        {
+          "src": "audio/fb-crowd.mp3",
+          "in": 0,
+          "out": 20,
+          "crossfade": 2
+        },
+        {
+          "src": "audio/fb-crowd.mp3",
+          "in": 0,
+          "out": 20,
+          "crossfade": 2
+        }
+      ],
+      "volume": [
+        {
+          "at": "open",
+          "value": 0.07
+        },
+        {
+          "at": "icetd-0.3",
+          "value": 0.07
+        },
+        {
+          "at": "icetd",
+          "value": 0.13
+        },
+        {
+          "at": "c_td-0.02",
+          "value": 0.13
+        },
+        {
+          "at": "c_td+0.13",
+          "value": 0.091
+        },
+        {
+          "at": "c_td+3.35",
+          "value": 0.091
+        },
+        {
+          "at": "c_td+3.6",
+          "value": 0.13
+        },
+        {
+          "at": "m_scoring+0.05",
+          "value": 0.13
+        },
+        {
+          "at": "m_scoring+0.2",
+          "value": 0.091
+        },
+        {
+          "at": "m_scoring+3.34",
+          "value": 0.091
+        },
+        {
+          "at": "m_scoring+3.59",
+          "value": 0.13
+        },
+        {
+          "at": "m_letting+0.07",
+          "value": 0.13
+        },
+        {
+          "at": "m_letting+0.22",
+          "value": 0.091
+        },
+        {
+          "at": "m_letting+2.89",
+          "value": 0.091
+        },
+        {
+          "at": "m_letting+3.14",
+          "value": 0.13
+        },
+        {
+          "at": "c_clock+0.04",
+          "value": 0.13
+        },
+        {
+          "at": "c_clock+0.19",
+          "value": 0.091
+        },
+        {
+          "at": "c_clock+3.67",
+          "value": 0.091
+        },
+        {
+          "at": "c_clock+3.92",
+          "value": 0.13
+        },
+        {
+          "at": "c_play+0.06",
+          "value": 0.13
+        },
+        {
+          "at": "c_play+0.21",
+          "value": 0.091
+        },
+        {
+          "at": "c_play+6.5",
+          "value": 0.091
+        },
+        {
+          "at": "c_play+6.75",
+          "value": 0.13
+        },
+        {
+          "at": "c_kick+0.01",
+          "value": 0.13
+        },
+        {
+          "at": "c_kick+0.16",
+          "value": 0.091
+        },
+        {
+          "at": "c_kick+0.78",
+          "value": 0.091
+        },
+        {
+          "at": "c_kick+1.03",
+          "value": 0.13
+        },
+        {
+          "at": "close-0.3",
+          "value": 0.13
+        },
+        {
+          "at": "close",
+          "value": 0.07
+        }
+      ]
+    },
+    {
+      "id": "roar_a",
+      "label": "Roar: the Icebreakers score",
+      "src": "audio/fb-roar.mp3",
+      "at": "icetd+0.7",
+      "out": 3.2,
+      "volume": 0.2,
+      "fadeOut": 1.4
+    },
+    {
+      "id": "roar_b",
+      "label": "Roar: the Tarpons score",
+      "src": "audio/fb-roar.mp3",
+      "at": "tartd+0.3",
+      "out": 2.8,
+      "volume": 0.14,
+      "fadeOut": 1.2
+    },
+    {
+      "id": "roar_c",
+      "label": "Roar: the return for a touchdown",
+      "src": "audio/fb-roar.mp3",
+      "at": "scoop+1.2",
+      "out": 4,
+      "volume": 0.22,
+      "fadeOut": 1.6
+    },
+    {
+      "id": "roar_d",
+      "label": "Roar: the kick is good",
+      "src": "audio/fb-roar.mp3",
+      "at": "kick+1.0",
+      "out": 3.2,
+      "volume": 0.2,
+      "fadeOut": 1.4
+    },
+    {
+      "id": "gun",
+      "label": "The final gun",
+      "src": "audio/fb-gun.mp3",
+      "at": "final",
+      "out": 1.4,
+      "volume": 0.2,
+      "fadeOut": 0.9
+    }
+  ],
+  "overlays": [
+    {
+      "id": "stripes_in",
+      "label": "Bumper stripes sweep in",
+      "src": "football/g-bumper-stripes.png",
+      "at": "bump+0.05",
+      "until": "bump.end",
+      "motion": [
+        {
+          "at": "stripes_in",
+          "x": -1280,
+          "y": 0
+        },
+        {
+          "at": "stripes_in+0.4",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "cgl_in",
+      "label": "CGL drops in",
+      "src": "football/g-bumper-cgl.png",
+      "at": "bump+0.35",
+      "until": "bump.end",
+      "motion": [
+        {
+          "at": "cgl_in",
+          "x": 0,
+          "y": -140
+        },
+        {
+          "at": "cgl_in+0.2",
+          "y": 0
+        }
+      ]
+    },
+    {
+      "id": "football_in",
+      "label": "FOOTBALL slides on",
+      "src": "football/g-bumper-football.png",
+      "at": "bump+0.6",
+      "until": "bump.end",
+      "motion": [
+        {
+          "at": "football_in",
+          "x": 1280,
+          "y": 0
+        },
+        {
+          "at": "football_in+0.25",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "k1",
+      "label": "1 SCORE MORE POINTS THAN THE OTHER TEAM",
+      "src": "football/g-keys-1.png",
+      "at": "m_k1+0.18",
+      "until": "card.end",
+      "fadeIn": 0.15,
+      "motion": [
+        {
+          "at": "k1",
+          "x": -50,
+          "y": 0
+        },
+        {
+          "at": "k1+0.15",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "k2",
+      "label": "2 DON'T LET THE OTHER TEAM SCORE MORE POINTS THAN YOU",
+      "src": "football/g-keys-2.png",
+      "at": "m_k2+0.16",
+      "until": "card.end",
+      "fadeIn": 0.15,
+      "motion": [
+        {
+          "at": "k2",
+          "x": -50,
+          "y": 0
+        },
+        {
+          "at": "k2+0.15",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "k3",
+      "label": "3 DON'T TACKLE YOUR OWN GUYS",
+      "src": "football/g-keys-3.png",
+      "at": "m_k3+0.14",
+      "until": "card.end",
+      "fadeIn": 0.15,
+      "motion": [
+        {
+          "at": "k3",
+          "x": -50,
+          "y": 0
+        },
+        {
+          "at": "k3+0.15",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "strip_a",
+      "label": "3RD: Icebreakers 14, Tarpons 13",
+      "src": "fb2/g-strip-3rd-14-13.png",
+      "at": "icetd+1.5",
+      "until": "tartd",
+      "fadeIn": 0.2
+    },
+    {
+      "id": "strip_b",
+      "label": "4TH: Icebreakers 14, Tarpons 20",
+      "src": "fb2/g-strip-4th-14-20.png",
+      "at": "tartd+0.6",
+      "until": "c_clock+0.19",
+      "fadeIn": 0.2
+    },
+    {
+      "id": "strip_clock",
+      "label": "4TH 0:41: Icebreakers 14, Tarpons 20",
+      "src": "fb2/g-strip-4th-041-14-20.png",
+      "at": "c_clock+0.19",
+      "until": "collide"
+    },
+    {
+      "id": "strip_tie",
+      "label": "4TH: Icebreakers 20, Tarpons 20",
+      "src": "fb2/g-strip-4th-20-20.png",
+      "at": "c_play+5.76",
+      "until": "kick+0.2",
+      "fadeIn": 0.15,
+      "fadeOut": 0.15
+    },
+    {
+      "id": "strip_win",
+      "label": "4TH: Icebreakers 21, Tarpons 20",
+      "src": "fb2/g-strip-4th-21-20.png",
+      "at": "kick+2.2",
+      "until": "final",
+      "fadeIn": 0.15
+    },
+    {
+      "id": "fin",
+      "label": "FINAL box: Icebreakers 21, Tarpons 20",
+      "src": "fb2/g-final-21-20.png",
+      "at": "final+0.3",
+      "until": "close",
+      "fadeIn": 0.2
+    },
+    {
+      "id": "stripes_out",
+      "label": "Bumper stripes sweep in",
+      "src": "football/g-bumper-stripes.png",
+      "at": "outro+0.05",
+      "until": "@end",
+      "motion": [
+        {
+          "at": "stripes_out",
+          "x": -1280,
+          "y": 0
+        },
+        {
+          "at": "stripes_out+0.4",
+          "x": 0
+        }
+      ]
+    },
+    {
+      "id": "cgl_out",
+      "label": "CGL drops in",
+      "src": "football/g-bumper-cgl.png",
+      "at": "outro+0.35",
+      "until": "@end",
+      "motion": [
+        {
+          "at": "cgl_out",
+          "x": 0,
+          "y": -140
+        },
+        {
+          "at": "cgl_out+0.2",
+          "y": 0
+        }
+      ]
+    },
+    {
+      "id": "football_out",
+      "label": "FOOTBALL slides on",
+      "src": "football/g-bumper-football.png",
+      "at": "outro+0.6",
+      "until": "@end",
+      "motion": [
+        {
+          "at": "football_out",
+          "x": 1280,
+          "y": 0
+        },
+        {
+          "at": "football_out+0.25",
+          "x": 0
+        }
+      ]
+    }
+  ],
+  "picture": {
+    "filters": [
+      {
+        "kind": "rescale",
+        "width": 600,
+        "height": 338
+      },
+      {
+        "kind": "chroma-shift",
+        "cb": {
+          "x": 4
+        },
+        "cr": {
+          "x": -3
+        }
+      },
+      {
+        "kind": "color",
+        "saturation": 0.84,
+        "contrast": 0.94,
+        "gamma": 1.05
+      },
+      {
+        "kind": "color-balance",
+        "shadows": {
+          "r": 0.03,
+          "b": -0.03
+        }
+      },
+      {
+        "kind": "grain",
+        "strength": 12,
+        "moving": true
+      }
+    ]
+  },
+  "mix": {
+    "filters": [
+      {
+        "kind": "limiter",
+        "limit": 0.95
+      }
+    ]
+  },
+  "sources": {
+    "take:fb2-c-open-t5": {
+      "step": "generate",
+      "storyboard": "fb2-c-open",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-m-k1-t5": {
+      "step": "generate",
+      "storyboard": "fb2-m-k1",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-m-k2-t7": {
+      "step": "generate",
+      "storyboard": "fb2-m-k2-b",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:fb2-m-k3-t5": {
+      "step": "generate",
+      "storyboard": "fb2-m-k3-c",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:fb2-c-echo-t8": {
+      "step": "generate",
+      "storyboard": "fb2-c-echo-c",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-c-td-t9": {
+      "step": "generate",
+      "storyboard": "fb2-c-td",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:fb2-m-scoring-t4": {
+      "step": "generate",
+      "storyboard": "fb2-m-scoring-b",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-m-letting-t1": {
+      "step": "generate",
+      "storyboard": "fb2-m-letting",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:fb2-c-clock-t4": {
+      "step": "generate",
+      "storyboard": "fb2-c-clock-b",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-c-play-t8": {
+      "step": "generate",
+      "storyboard": "fb2-c-play-c",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-c-kick-t9": {
+      "step": "generate",
+      "storyboard": "fb2-c-kick-s",
+      "firstFrame": "fb2/stills/booth-soft-0.3.png"
+    },
+    "take:fb2-m-close-t3": {
+      "step": "generate",
+      "storyboard": "fb2-m-close-b",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:vs-chet-t1": {
+      "step": "generate",
+      "storyboard": "../../voiceswap/vs-chet",
+      "firstFrame": "football/k-booth-a.png"
+    },
+    "take:vs-moose2-t3": {
+      "step": "generate",
+      "storyboard": "../../voiceswap/vs-moose2",
+      "firstFrame": "voiceswap/s-fb-booth-t1-0.3.png"
+    },
+    "take:fb2-icetd-t3": {
+      "step": "generate",
+      "storyboard": "fb2-icetd",
+      "firstFrame": "fb2/stills/k-icetd-b.png"
+    },
+    "take:fb2-tartd-t1": {
+      "step": "generate",
+      "storyboard": "fb2-tartd",
+      "firstFrame": "fb2/stills/k-tartd-a.png"
+    },
+    "take:fb2-handoff-t3": {
+      "step": "generate",
+      "storyboard": "fb2-handoff",
+      "firstFrame": "fb2/stills/k-handoff2-a-flip.png"
+    },
+    "take:fb2-collide-t3": {
+      "step": "generate",
+      "storyboard": "fb2-collide",
+      "firstFrame": "fb2/stills/k-collide-b.png"
+    },
+    "take:fb2-scoop-t3": {
+      "step": "generate",
+      "storyboard": "fb2-scoop",
+      "firstFrame": "fb2/stills/k-scoop-b.png"
+    },
+    "take:fb2-kick-t4": {
+      "step": "generate",
+      "storyboard": "fb2-kick",
+      "firstFrame": "fb2/stills/k-kick2-a-crop.png"
+    },
+    "take:fb-stadium-t3": {
+      "step": "generate",
+      "storyboard": "fb-stadium-zoom",
+      "firstFrame": "football/k-stadium-a.png"
+    },
+    "take:fb-stadium-t4": {
+      "step": "generate",
+      "storyboard": "fb-stadium-zoom",
+      "firstFrame": "football/k-stadium-a.png"
+    },
+    "take:fb-final-t3": {
+      "step": "generate",
+      "storyboard": "fb-final",
+      "firstFrame": "football/k-final-a.png"
+    }
+  },
+  "performances": [
+    {
+      "id": "welcome",
+      "lines": [
+        "c_open"
+      ],
+      "intent": "the welcome and the hand-off to Moose, one turn",
+      "delivery": "bright, warm network welcome; the question to Moose ordinary and friendly"
+    },
+    {
+      "id": "the_call",
+      "lines": [
+        "c_play"
+      ],
+      "intent": "the last play, called as it happens",
+      "delivery": "live play-by-play that builds to the touchdown, excited, never a scream"
+    },
+    {
+      "id": "the_question",
+      "lines": [
+        "c_close"
+      ],
+      "intent": "the thrilled wrap and the question",
+      "delivery": "thrilled but polished; the question ordinary and friendly"
+    },
+    {
+      "id": "callback",
+      "lines": [
+        "m_close"
+      ],
+      "intent": "setup and payoff: the answer and its repeat",
+      "delivery": "slow and sincere, a thoughtful pause, then the repeat softer, almost reverent"
+    }
+  ]
+}

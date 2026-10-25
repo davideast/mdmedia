@@ -1,0 +1,57 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Clap-Lite",
+    "show": "clap-lite",
+    "version": "Take 2 (commercial structure)",
+    "length": 16,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "One paid generation, extended once, with our graphics laid over it. clap-2a-t2 (8 s, from ad-clap-2a; t1 was rejected) was continued by the provider with ad-clap-2b (8 s), which returns the source clip and its new tail as one 16 s file, clap-2-full-t1; its first 191 frames match clap-2a-t2 and the demos start on frame 191 (7.958 s). compose.mjs then laid our CLAP-LITE (12.0 s, faded in over 0.2 s), ONLY $19.95 (13.0 s) and blinking CALL NOW 555-0147 (13.6 s, on for the first 0.42 s of every 0.7 s) over the packshot, each to 16.1 s (past the end, so the cut ends them), and copied the sound, giving clap-2-final, byte-identical to review/clips/ad-clap-lite-take2.mp4. The segments are the take's own shots, in step, cut where the picture cuts (frame/24). All the sound is the take's own: the announcer, the sung jingle, the claps. The storyboard's \"Ow!\" from Grandma isn't transcribed, so it isn't a line. The jingle is sung in the take's own sound, so it is a music item that labels it, with its words as a sung line heard in it."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/clap-2-final.mp4",
+
+  "segments": [
+    { "id": "dark", "label": "The dark bedroom: Grandma shuffles across and stubs her toe", "src": "take:clap-2-full-t1",
+      "in": 0, "out": 4.375 },
+    { "id": "lamp", "label": "Closer: she claps, the one lamp snaps on, she beams", "src": "take:clap-2-full-t1",
+      "in": 4.375, "out": 7.958333 },
+    { "id": "tv", "label": "Demo: Dad in his recliner claps the TV on", "src": "take:clap-2-full-t1",
+      "in": 7.958333, "out": 10 },
+    { "id": "boy", "label": "Demo: a little boy claps his lamp on and giggles", "src": "take:clap-2-full-t1",
+      "in": 10, "out": 12 },
+    { "id": "pack", "label": "Packshot: the glowing orange dome on navy", "src": "take:clap-2-full-t1",
+      "in": 12, "out": 16 }
+  ],
+
+  "lines": [
+    { "id": "tired", "speaker": "Announcer", "text": "Tired of stumbling in the dark?", "segment": "dark", "at": "dark+1.2",
+      "until": "intro" },
+    { "id": "intro", "speaker": "Announcer", "text": "Introducing Clap-Lite!", "segment": "lamp", "at": "lamp+0.15",
+      "until": "lamp.end" },
+    { "id": "jingle", "speaker": "Jingle", "text": "Clap-Lite! Lights that listen!", "clip": "clap_jingle", "sung": true },
+    { "id": "order", "speaker": "Announcer", "text": "Order yours today!", "segment": "pack", "at": "pack+2.85",
+      "until": "@end" }
+  ],
+
+  "music": [
+    { "id": "clap_jingle", "label": "The sung jingle, in the take's own sound", "segment": "boy", "at": "boy+1.5", "until": "order" }
+  ],
+
+  "overlays": [
+    { "id": "name", "label": "CLAP-LITE", "src": "gfx/clap-name.png", "at": "pack", "until": 16.1, "fadeIn": 0.2 },
+    { "id": "price", "label": "ONLY $19.95", "src": "gfx/clap-price.png", "at": "pack+1", "until": 16.1 },
+    { "id": "phone", "label": "CALL NOW 555-0147, blinking", "src": "gfx/clap-phone.png", "at": "pack+1.6", "until": 16.1,
+      "blink": { "period": 0.7, "on": 0.42 } }
+  ],
+
+  "sources": {
+    "take:clap-2-full-t1": { "step": "extend", "extendedFrom": "take:clap-2a-t2", "storyboard": "ad-clap-2b" },
+    "take:clap-2a-t2": { "step": "generate", "storyboard": "ad-clap-2a" }
+  }
+}

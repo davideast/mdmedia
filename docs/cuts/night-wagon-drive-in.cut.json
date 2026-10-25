@@ -1,0 +1,145 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Night Wagon",
+    "show": "night-wagon",
+    "version": "Episode 2, Take 1 (Drive-In)",
+    "length": 38.65,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "Episode 2, shaped like Take 9: straight onto the drive-in under the theme, no title. Rick has Buddy kill the scanner (our glow sweeps once and dies on the grille), Buddy is sure nobody notices a beige station wagon, the rows of identical wagons, the briefcase job, Rick lost among the wagons and into the wrong one, the theme cut dead on the frozen family, Buddy from the watch, then one far wagon's scanner flicks on and the NIGHT WAGON title outro. Ported from nwdi/edit.mjs. The grille and tag glows are drawn into their shots, the tag's before its push-in, so the glow zooms with the picture."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/night-wagon-drive-in-t1.mp4",
+
+  "segments": [
+    { "id": "open", "label": "The drive-in, Buddy noses in", "src": "take:nwdi-open-t1", "in": 0.3, "out": 2.7,
+      "audio": { "volume": 0.8 } },
+    { "id": "r1", "label": "Rick, binoculars up: kill the scanner", "src": "take:nwdi-rick-lines-t2", "in": 0.55, "out": 2.0 },
+    { "id": "grille", "label": "The grille: our scanner sweeps once and dies", "src": "take:nwdi-grille-t1", "in": 0.6, "out": 2.0,
+      "audio": { "src": "take:nwdi-rick-lines-t2", "in": 2.0 } },
+
+    { "id": "b1", "label": "Buddy's dash: undercover?", "src": "take:nw7-dash-t1", "in": 1.6, "out": 2.9,
+      "audio": { "src": "take:nw7-dash-t1", "in": 0, "volume": 0.7 } },
+    { "id": "r2", "label": "Rick: the handoff", "src": "take:nwdi-rick-lines-t1", "in": 4.55, "out": 7.65 },
+    { "id": "b2", "label": "Buddy's dash: a beige station wagon", "src": "take:nw6-buddy-t2", "in": 1.0, "out": 4.1,
+      "audio": { "src": "take:nw7-dash-t1", "in": 1.3, "volume": 0.7 } },
+    { "id": "b3", "label": "Buddy's dash: nobody has ever known", "src": "take:nw7-dash-t1", "in": 7.0, "out": 9.1,
+      "audio": { "src": "take:nw7-dash-t1", "in": 4.4, "volume": 0.7 } },
+
+    { "id": "rows", "label": "The reveal: rows of identical wagons", "src": "take:nwdi-rows-t1", "in": 0.3, "out": 1.9,
+      "audio": { "volume": 0.6 } },
+    { "id": "good", "label": "Rick lowers the binoculars: good", "src": "take:nwdi-rick-good-t2", "in": 1.35, "out": 3.15 },
+
+    { "id": "sneak", "label": "Rick peers over a tailgate", "src": "take:nwdi-sneak-t1", "in": 1.7, "out": 2.65,
+      "audio": { "volume": 0.6 } },
+    { "id": "suit", "label": "White Suit sets the briefcase down", "src": "take:nwdi-suit-t1", "in": 1.0, "out": 2.45,
+      "audio": { "volume": 0.6 } },
+    { "id": "grab", "label": "A hand lifts the briefcase", "src": "take:nwdi-grab-t1", "in": 1.2, "out": 2.95,
+      "audio": { "volume": 0.8 } },
+    { "id": "run", "label": "Rick runs down the aisle", "src": "take:nwdi-run-t1", "in": 0.6, "out": 2.2,
+      "audio": { "volume": 0.7 } },
+    { "id": "lost", "label": "Rick lost among the wagons", "src": "take:nwdi-lost-t1", "in": 0.95, "out": 3.15 },
+
+    { "id": "handle", "label": "His hand on a door handle", "src": "take:nwdi-handle-t1", "in": 0.8, "out": 1.5,
+      "audio": { "volume": 0.8 } },
+    { "id": "wc", "label": "The wrong wagon: hit it, Buddy", "src": "take:nwdi-wrongcar-t2", "in": 0.1, "out": 2.65 },
+    { "id": "fam", "label": "The family, frozen (dead silence)", "src": "take:nwdi-family-t2", "in": 2.1, "out": 3.85,
+      "audio": { "src": "audio/di-movie.mp3", "in": 1.0, "volume": 0.7 },
+      "zoom": { "keys": [ { "at": 0, "scale": 1 }, { "at": "fam.end", "scale": 1.035 } ] } },
+    { "id": "watch", "label": "The watch crackles", "src": "take:nwdi-watch-t3", "in": 0.9, "out": 1.85,
+      "audio": { "src": "audio/di-movie.mp3", "in": 2.9, "volume": 0.25 } },
+    { "id": "rw", "label": "Rick looks at the watch: I'm over here", "src": "take:nwdi-rick-watch-t1", "in": 0.6, "out": 2.7,
+      "audio": { "src": "audio/di-movie.mp3", "in": 4.05, "out": 6.0, "volume": 0.2 } },
+
+    { "id": "tag", "label": "Tag: one far wagon's scanner flicks on", "src": "take:nwdi-rows-t1", "in": 1.9, "out": 3.5,
+      "audio": { "volume": 0.4 },
+      "zoom": { "focus": { "x": 872, "y": 243 }, "keys": [ { "at": 0.4, "scale": 1 }, { "at": "tag.end", "scale": 1.2 } ] } },
+    { "id": "out", "label": "Title over the road", "src": "take:nw6-highway-t1", "in": 1.4, "out": 4.2, "fadeOut": 0.7,
+      "audio": { "volume": 0.4 } }
+  ],
+
+  "lines": [
+    { "id": "kill", "speaker": "Rick", "text": "Kill the scanner, Buddy. We're undercover.", "segment": "r1", "until": "grille.end" },
+    { "id": "undercover", "speaker": "Buddy", "text": "Undercover, Rick?", "src": "audio/tts/di-b1.wav",
+      "at": "b1+0.05", "until": "b1.end", "duration": 1.3003 },
+    { "id": "handoff", "speaker": "Rick", "text": "The handoff's at the snack bar. Nobody can know we're here.", "segment": "r2" },
+    { "id": "beige", "speaker": "Buddy", "text": "Rick. I'm a beige station wagon at a drive-in.", "src": "audio/tts/di-b2e.wav",
+      "at": "b2+0.05", "until": "b2.end", "duration": 3.1688 },
+    { "id": "known", "speaker": "Buddy", "text": "Nobody has ever known I was here.", "src": "audio/tts/di-b3.wav",
+      "at": "b3+0.25", "until": "b3.end", "duration": 2.0434 },
+    { "id": "approve", "speaker": "Rick", "text": "...Good.", "segment": "good" },
+    { "id": "hey", "speaker": "Voice (off-screen)", "text": "Hey!", "src": "audio/tts/di-hey.wav",
+      "at": "run+0.12", "until": "run.end", "duration": 0.6037, "volume": 0.8,
+      "filters": [ { "kind": "echo", "inGain": 0.8, "outGain": 0.6, "delay": 0.06, "decay": 0.3 } ] },
+    { "id": "calling", "speaker": "Rick", "text": "Buddy... Buddy?", "segment": "lost" },
+    { "id": "hitit", "speaker": "Rick", "text": "Go, go, go! Hit it, Buddy!", "segment": "wc" },
+    { "id": "overhere", "speaker": "Buddy", "text": "Rick. I'm over here.", "src": "audio/tts/di-b4.wav",
+      "at": "rw+0.3", "until": "rw.end", "duration": 1.4861, "volume": 1.5,
+      "filters": [
+        { "kind": "highpass", "frequency": 500 },
+        { "kind": "lowpass", "frequency": 3200 },
+        { "kind": "crush", "bits": 10, "mix": 0.25 }
+      ] }
+  ],
+
+  "music": [
+    { "id": "bedA", "label": "Theme bed, from the top", "src": "audio/nw6-theme.mp3", "at": 0, "until": "rows+0.6", "fadeOut": 0.6,
+      "volume": [
+        { "at": "r1-0.5", "value": 1 },
+        { "at": "r1", "value": 0.18 }
+      ] },
+    { "id": "bedB", "label": "Theme bed, rising through the job", "src": "audio/nw6-theme.mp3", "in": 6, "at": "rows", "until": "fam",
+      "fadeIn": 0.6, "fadeOut": 0.04,
+      "volume": [
+        { "at": "sneak", "value": 0.18 },
+        { "at": "sneak", "value": 0.3 },
+        { "at": "lost", "value": 0.7002 },
+        { "at": "lost", "value": 0.42 }
+      ] },
+    { "id": "sting", "label": "Theme slams back", "src": "audio/nw6-theme.mp3", "at": "tag+0.4", "until": "@end", "fadeOut": 0.9 }
+  ],
+
+  "sfx": [
+    { "id": "grilleRoom", "label": "The grille shot's own sound", "src": "take:nwdi-grille-t1", "in": 0.6, "at": "grille",
+      "until": "grille.end", "volume": 0.5 },
+    { "id": "powerdown", "label": "Scanner powers down", "src": "audio/di-powerdown.mp3", "at": "grille+0.9", "until": "grille.end",
+      "volume": 0.9 },
+    { "id": "rowsMovie", "label": "Faint movie over the rows", "src": "audio/di-movie.mp3", "at": "rows", "until": "rows.end",
+      "volume": 0.25 },
+    { "id": "crackle", "label": "Watch crackle", "src": "audio/di-crackle.mp3", "at": "watch+0.05", "until": "watch.end",
+      "volume": 0.9 },
+    { "id": "powerup", "label": "Scanner powers up", "src": "audio/di-powerup.mp3", "at": "tag+0.35", "until": "tag.end",
+      "volume": 0.8 }
+  ],
+
+  "overlays": [
+    { "id": "grilleGlow", "label": "Our scanner glow sweeps once, flickers and dies", "src": "nwdi/grille-glow.png",
+      "segment": "grille", "until": 1.28, "y": 65, "fadeOut": 0.3,
+      "wave": { "x": { "shape": "cos", "center": 52, "amplitude": -250, "period": 1 } },
+      "opacity": [
+        { "at": 1.04, "value": 1 }, { "at": 1.04, "value": 0 },
+        { "at": 1.1, "value": 0 }, { "at": 1.1, "value": 1 }
+      ] },
+    { "id": "tagGlow", "label": "The far wagon's scanner flicks on and sweeps hopefully", "src": "nwdi/tag-glow.png",
+      "segment": "tag", "at": 0.4, "y": -45, "width": 1024, "height": 576,
+      "wave": { "x": { "center": 360, "amplitude": 6, "period": 1, "phase": 0.52 } },
+      "opacity": [
+        { "at": 0.45, "value": 1 }, { "at": 0.45, "value": 0 },
+        { "at": 0.52, "value": 0 }, { "at": 0.52, "value": 1 }
+      ] },
+    { "id": "title", "label": "NIGHT WAGON title", "src": "nw6/title.png", "at": "out+0.25", "until": "@end",
+      "fadeIn": 0.35, "fadeOut": 0.45 },
+    { "id": "glint", "label": "Glint across the title", "src": "nw6/glint.png", "at": "title+0.6", "duration": 0.7,
+      "motion": [
+        { "at": "glint", "x": -430, "y": 0 },
+        { "at": "glint.end", "x": 431, "y": 0 }
+      ] }
+  ],
+
+  "picture": { "fadeOut": 0.5 }
+}

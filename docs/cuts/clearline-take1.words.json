@@ -1,0 +1,32 @@
+{
+  "format": "mdmedia.cut-words@1",
+  "lines": {
+    "dishes": {
+      "text": "Gordon! The dishes!",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clearline-t1.mp4", "start": 2.916667, "end": 4.583333, "sha256": "881a75e4c7604d76d61ad09c6111399fd1393b323c22632b941d6af56a1e1da7", "snap": "speech-onset@1" },
+      "loss": 0.993,
+      "snap": { "aligned": 3.137, "start": 3.127, "onset": 3.127, "floor": -73.4 },
+      "words": [
+        { "text": "Gordon!", "start": 3.127, "end": 3.517, "loss": 0.972 },
+        { "text": "The", "start": 3.597, "end": 3.657, "loss": 0.83 },
+        { "text": "dishes!", "start": 3.757, "end": 4.297, "loss": 1.058 }
+      ]
+    },
+    "tagline": {
+      "text": "ClearLine long distance. You'll hear everything.",
+      "aligner": "elevenlabs",
+      "fingerprint": { "source": "takes/clearline-t1.mp4", "start": 4.583333, "end": 8, "sha256": "881a75e4c7604d76d61ad09c6111399fd1393b323c22632b941d6af56a1e1da7", "snap": "speech-onset@1" },
+      "loss": 0.92,
+      "snap": { "aligned": 5.063, "start": 5.013, "onset": 5.013, "floor": -68.5 },
+      "words": [
+        { "text": "ClearLine", "start": 5.013, "end": 5.643, "loss": 0.937 },
+        { "text": "long", "start": 5.743, "end": 5.963, "loss": 0.953 },
+        { "text": "distance.", "start": 6.043, "end": 6.523, "loss": 0.858 },
+        { "text": "You'll", "start": 7.003, "end": 7.143, "loss": 0.838 },
+        { "text": "hear", "start": 7.183, "end": 7.363, "loss": 0.893 },
+        { "text": "everything.", "start": 7.423, "end": 7.883, "loss": 0.911 }
+      ]
+    }
+  }
+}

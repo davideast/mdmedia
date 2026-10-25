@@ -1,0 +1,51 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "regulars",
+  "title": "Regulars",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ch-regulars-take3.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "rendered": "review/clips/ch-regulars.mp4",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Transcript: WALT! (9.4 s) / What is the story, Walt? (10.9) / Same as yesterday, Eddie. (13.1) / Different stool. (14.8), all correct. Calm sepia cross-fades of the bar and its regulars, then our own gold-script Regulars title fading in over a sign-free shopfront, then a cut to the colour bar scene; the scene was generated on its own and joined, because extending from the sepia intro was blocked twice.",
+      "createdAt": "2026-10-18T22:30:03.297Z"
+    },
+    {
+      "id": "take2",
+      "rendered": "review/clips/ch-regulars-take2.mp4",
+      "label": "Take 2",
+      "status": "none",
+      "notes": "Transcript: WALT! (9.6 s) / What is the story, Walt? (10.7) / Same as yesterday, Eddie. (13.2) / Different stool. (15.0). Same sepia intro and Regulars title; in the new scene Walt walks in silent and tips his cap, the regulars and Eddie turn and shout WALT! while his mouth stays closed, then the lines and the laugh.",
+      "createdAt": "2026-10-18T22:48:09.908Z"
+    },
+    {
+      "id": "take3",
+      "cut": "docs/cuts/regulars-take3.cut.json",
+      "label": "Take 3 (ending fixed)",
+      "status": "review",
+      "notes": "Transcript: WALT! (9.6 s) / What is the story, Walt? (10.7) / Same as yesterday, Eddie. (13.6) / Different stool. (15.4), all correct, then a studio laugh. Take 2 is untouched up to 13.04 s, the end of Walt walking up to the bar. After that, Take 2 drifted: the camera slid left while signs with lettering and a new man appeared, then cut at 14.85 s to a crisp, modern-looking two-shot with a recast Walt and a rebuilt back bar (regulars3/NOTES.md). The new ending is three single shots started from stills of the approved footage. First, Walt at the end of the bar delivers both lines with a beat between them, in one locked-off take that continues seamlessly from Take 2 frame 312 (reg3-walt-lines-t2). Then a cutaway to the approved close shot of Eddie cracking up (reg3-eddie-laugh-t1). Then back on the wide as Walt settles onto his different stool and the picture fades (reg3-walt-sit-t3). The shots keep their own laughter, with an ElevenLabs studio-audience laugh (audio/reg3-laugh.mp3) underneath from the cut to Eddie. Edit: regulars3/edit.mjs.",
+      "createdAt": "2026-10-19T07:35:54.082Z"
+    },
+    {
+      "id": "take4",
+      "cut": "docs/cuts/regulars-take4.cut.json",
+      "label": "Take 4 (too much else)",
+      "status": "review",
+      "notes": "Transcript: There's a place where they remember you, where the light is always on (sung, 2.1 s) / WALT! (10.8) / How do you know my name? I've literally never been here before. (12.4) / Get the car back from the shop okay, Walt? (16.7) / Yeah, it was just the... wait. (19.0) / How'd the colonoscopy go, Walt? (22.7) / Saw you eat frosting straight out of the can last night, Walt. (27.0) / Standing in the dark kitchen. (30.9) / Your usual, Walt. (34.1) / Yeah... I'm out of here. (35.6) / Bye, Walt! (41.7), all correct. New sepia intro of the same four regulars in five eras, never ageing, under a new original theme; then five joke levels, one shot per line or reaction, with Walt's reactions climbing and the laugh growing, then dropping away for his freeze and exit. 45.2 s. Compare Take 4 without the dark kitchen. Edit: reg4/edit.mjs.",
+      "createdAt": "2026-10-20T06:34:00.000Z"
+    },
+    {
+      "id": "take4-short",
+      "cut": "docs/cuts/regulars-take4-short.cut.json",
+      "label": "Take 4 (too much else, no dark kitchen)",
+      "status": "review",
+      "notes": "Transcript: as Take 4 (too much else) without \"Standing in the dark kitchen.\": the frosting line ends on \"...last night, Walt.\" (27.0 s) and Eddie's \"Your usual, Walt.\" follows at 31.8. Same takes and timing otherwise; everything after the frosting comes 2.375 s earlier. 42.8 s. Edit: reg4/edit.mjs --short.",
+      "createdAt": "2026-10-20T06:34:01.000Z"
+    }
+  ]
+}

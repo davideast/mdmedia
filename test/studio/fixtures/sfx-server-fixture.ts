@@ -1,5 +1,6 @@
 // Executed in an isolated process so SDK and fetch mocks cannot affect other tests.
 import { mock } from 'bun:test';
+import { Readable } from 'node:stream';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import ffmpeg from 'ffmpeg-static';
@@ -50,7 +51,10 @@ const db = { collection: (name: string) => new Query(name), async runTransaction
   try { const result = await run({ get: (ref: Ref) => { assert(!writing, 'Read after write in transaction'); return ref.get(); }, set: (ref: Ref, data: Data) => { writing = true; writes.push(() => ref.set(data)); }, update: (ref: Ref, data: Data) => { writing = true; writes.push(() => ref.update(data)); } }); for (const write of writes) await write(); return result; }
   finally { release(); }
 } };
-const bucket = { file(path: string) { return { async save(bytes: Buffer) { files.set(path, Buffer.from(bytes)); }, async download() { assert(files.has(path), 'Missing storage object'); return [files.get(path)]; } }; } };
+const bucket = { file(path: string) { return { async save(bytes: Buffer) { files.set(path, Buffer.from(bytes)); }, async download() { assert(files.has(path), 'Missing storage object'); return [files.get(path)]; },
+  // The asset route streams video and audio, honouring byte ranges.
+  async getMetadata() { assert(files.has(path), 'Missing storage object'); return [{ size: String(files.get(path)!.length) }]; },
+  createReadStream(range: { start?: number; end?: number } = {}) { return Readable.from([files.get(path)!.subarray(range.start ?? 0, range.end === undefined ? undefined : range.end + 1)]); } }; } };
 
 const directory = await mkdtemp(join(tmpdir(), 'mdmedia-sfx-test-'));
 let mp3: Buffer, pcm: Buffer;

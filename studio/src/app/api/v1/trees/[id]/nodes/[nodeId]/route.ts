@@ -5,7 +5,7 @@ import { decodeParam, getTreeStore, requireTreeAuth, treeErrorResponse } from '.
 export const runtime = 'nodejs';
 
 type Context = {
-  params: Promise<{ id: string; nodeId: string }> | { id: string; nodeId: string };
+  params: Promise<{ id: string; nodeId: string }>;
 };
 
 /**

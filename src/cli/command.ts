@@ -1,5 +1,9 @@
 import { defineCommand } from 'citty';
 import { studioCommand } from './studio-command.js';
+import { cutCommand } from './cut-command.js';
+import { productionCommand } from './production-command.js';
+import { commentsCommand } from './comments-command.js';
+import { characterCommand } from './character-command.js';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -904,6 +908,10 @@ const SUBCOMMANDS = {
   sfx: sfxCommand,
   adapt: adaptCommand,
   studio: studioCommand,
+  cut: cutCommand,
+  production: productionCommand,
+  comments: commentsCommand,
+  character: characterCommand,
 } as const;
 
 /**

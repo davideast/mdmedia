@@ -1,5 +1,5 @@
 import { studioJson } from './media-client';
-import { formatMediaMarkdownRef } from './tree-fakes';
+import { formatMediaMarkdownRef } from './tree-helpers';
 import type {
   MediaRemixKind,
   MediaRemixRequest,

@@ -1,0 +1,47 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Barnstormers",
+    "show": "barnstormers",
+    "version": "Take 1",
+    "length": 16,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "One paid generation, extended once. barnstormers-1-t1 (8 s, from ch-barnstormers-1) was continued by the provider with ch-barnstormers-2 (8 s), which returns the source clip and its new tail as one 16 s file, barnstormers-full-t1, byte-identical to review/clips/ch-barnstormers.mp4. Nothing was laid over it. Its first 192 frames match barnstormers-1-t1 and the barn doors burst open on frame 192 (8.0 s). The segments are the take's own shots, in step, cut where the picture cuts (frame/24). Nobody speaks: the sound is the take's own action-synth music, welding, hammering and the crash through the crates. The music is in the take's own sound, so it is a music item that labels it, from the first frame to the last."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/barnstormers-full-t1.mp4",
+
+  "segments": [
+    { "id": "sparks", "label": "Welding sparks blaze on black", "src": "take:barnstormers-full-t1", "in": 0, "out": 0.958333 },
+    { "id": "weld", "label": "She lowers her mask and welds plate onto the pink ice-cream truck", "src": "take:barnstormers-full-t1",
+      "in": 0.958333, "out": 2.291667 },
+    { "id": "hammer", "label": "The cowboy hammers a dented plate", "src": "take:barnstormers-full-t1",
+      "in": 2.291667, "out": 3.416667 },
+    { "id": "catcher", "label": "The Hawaiian shirt bolts on the cow-catcher", "src": "take:barnstormers-full-t1",
+      "in": 3.416667, "out": 4.625 },
+    { "id": "rivets", "label": "Rivets pop in", "src": "take:barnstormers-full-t1", "in": 4.625, "out": 5.75 },
+    { "id": "blueprint", "label": "Grandpa with the blueprint: thumbs up", "src": "take:barnstormers-full-t1",
+      "in": 5.75, "out": 6.958333 },
+    { "id": "team", "label": "The team with the armoured truck", "src": "take:barnstormers-full-t1", "in": 6.958333, "out": 8 },
+    { "id": "burst", "label": "The truck bursts out of the barn through the crates", "src": "take:barnstormers-full-t1",
+      "in": 8, "out": 11 },
+    { "id": "sedan", "label": "The bad guys' sedan slides to a stop by the haystack; they climb out", "src": "take:barnstormers-full-t1",
+      "in": 11, "out": 13.958333 },
+    { "id": "highfive", "label": "The team leaps and high-fives by the truck", "src": "take:barnstormers-full-t1",
+      "in": 13.958333, "out": 16 }
+  ],
+
+  "music": [
+    { "id": "music", "label": "The action-synth music, in the take's own sound", "segment": "sparks", "until": "@end" }
+  ],
+
+  "sources": {
+    "take:barnstormers-full-t1": { "step": "extend", "extendedFrom": "take:barnstormers-1-t1", "storyboard": "ch-barnstormers-2" },
+    "take:barnstormers-1-t1": { "step": "generate", "storyboard": "ch-barnstormers-1" }
+  }
+}

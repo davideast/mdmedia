@@ -1,0 +1,157 @@
+{
+  "format": "mdmedia.cut@1",
+  "meta": {
+    "title": "Breeze mints",
+    "show": "breeze",
+    "version": "Take 5 (the mint turns everyone around)",
+    "length": 37,
+    "fps": 24,
+    "width": 1280,
+    "height": 720,
+    "notes": "The rule of three: the date's own turnaround is the setup the trucker mirrors. Cruising under the hummed jingle; BANG (our sound), both faces fall, the car sinks onto the flat, she folds her arms as \"When the day goes wrong\" comes in; Take 4's hands-only roll insert under our NEW! burst and BREEZE label and his grin and wink on \"keep it cool, turn it round\"; he gets out, pops the trunk and pulls out a checked blanket and two bottles of pop; the blanket goes over the hood (Take 4's shot), her hand takes a mint, her frown melts and her head settles on his shoulder; Take 4's sunset wide under the announcer. The music drops out as the tow truck pulls up and both turn to look; the driver climbs down tired and sighs; without a word the hero holds out the roll; the trucker's hand takes a mint and his face softens as hers did; he sits down, rests his head on the hero's other shoulder as the sung \"Feel the Breeze!\" comes in, she opens one eye (pushed in on her face), and Take 3's packshot with our BREEZE logo and Turn your day around!. Cut by br5/edit.mjs in the media folder; every in and out point is a whole frame. Nobody speaks on camera: the only voice is the announcer (br-vo.wav), and the lyrics are sung in the jingle. The jingle's bed after its lyrics runs out before the truck, so one bar (2.146 s, measured) repeats at a bar line under the announcer duck: the jingle is two music clips with a 10 ms crossfade and the same volume keys (a bed with parts would say it as one sound, but a line heard in a bed can't carry word timings). Our sounds: bang, tyre hiss, the truck's engine and door, crickets; the driver's sigh is his take's own sound, run on under the next shot."
+  },
+  "media": {
+    "root": "/home/david/.local/share/mdmedia/productions/crt-tv",
+    "takes": "takes/{name}.mp4"
+  },
+  "output": "takes/breeze-take5.mp4",
+
+  "segments": [
+    { "id": "hook", "label": "1. Cruising at sunset (Take 4's camera car)", "src": "take:br4-hook-t1", "in": "f60", "out": "f91",
+      "audio": { "volume": 0.3 } },
+    { "id": "blow", "label": "2. BANG: both faces fall, shoulders sag", "src": "take:br5-bang-t2", "in": "f13", "out": "f52",
+      "audio": { "volume": 0.3 } },
+    { "id": "slump", "label": "2. The car sinks onto the flat", "src": "take:br5-tyre-t1", "in": "f44", "out": "f66",
+      "audio": { "volume": 0.3 } },
+    { "id": "arms", "label": "2. She huffs and folds her arms", "src": "take:br5-arms-t1", "in": "f24", "out": "f55",
+      "audio": { "volume": 0.3 } },
+    { "id": "roll", "label": "3. Hands only: a mint out of the roll (Take 4's insert)", "src": "take:br4-roll-t3", "in": "f31", "out": "f76",
+      "audio": { "volume": 0.3 } },
+    { "id": "grin", "label": "3. Already chewing: the grin and the wink (Take 4's)", "src": "take:br4-him-t2", "in": "f55", "out": "f91",
+      "audio": { "volume": 0.3 } },
+    { "id": "out", "label": "4. He gets out", "src": "take:br5-out-t2", "in": "f46", "out": "f77",
+      "audio": { "volume": 0.3 } },
+    { "id": "trunk", "label": "4. He pops the trunk", "src": "take:br5-trunk-t2", "in": "f41", "out": "f64",
+      "audio": { "volume": 0.3 } },
+    { "id": "pull", "label": "4. A checked blanket and two bottles of pop", "src": "take:br5-pull-t1", "in": "f60", "out": "f92",
+      "audio": { "volume": 0.3 } },
+    { "id": "spread", "label": "5. The blanket over the hood (Take 4's)", "src": "take:br4-blanket-t1", "in": "f29", "out": "f58",
+      "audio": { "volume": 0.3 } },
+    { "id": "offer", "label": "5. Hands only: still sulking, she takes a Breeze", "src": "take:br5-offer-t2", "in": "f37", "out": "f78",
+      "audio": { "volume": 0.3 } },
+    { "id": "melt", "label": "5. Already chewing, her frown melts", "src": "take:br5-melt2-t2", "in": "f44", "out": "f88",
+      "audio": { "volume": 0.3 } },
+    { "id": "lean", "label": "5. Her head on his shoulder", "src": "take:br5-lean-t1", "in": "f24", "out": "f55",
+      "audio": { "volume": 0.3 } },
+    { "id": "wide", "label": "6. Sunset wide (Take 4's), the announcer", "src": "take:br4-wide-t1", "in": "f5", "out": "f70",
+      "audio": { "volume": 0.25 } },
+
+    { "id": "truck", "label": "7. Music out: the tow truck pulls up, both turn to look", "src": "take:br5-truck-t3", "in": "f48", "out": "f94",
+      "audio": { "volume": 0.6 } },
+    { "id": "climb", "label": "7. The driver climbs down, slumps and sighs", "src": "take:br5-climb-t3", "in": "f32", "out": "f91",
+      "audio": { "volume": 0.8 } },
+    { "id": "hold", "label": "8. Without a word, the hero holds out the roll", "src": "take:br5-hold2-t3", "in": "f49", "out": "f77",
+      "audio": { "volume": 0.6 } },
+    { "id": "take", "label": "9. Hands only: the trucker takes a Breeze", "src": "take:br5-take-t2", "in": "f38", "out": "f79",
+      "audio": { "volume": 0.6 } },
+    { "id": "soften", "label": "9. Already chewing, his face softens", "src": "take:br5-soften-t5", "in": "f42", "out": "f85",
+      "audio": { "volume": 0.6 } },
+    { "id": "sit", "label": "10. He sits down beside the hero", "src": "take:br5-sit-t1", "in": "f37", "out": "f80",
+      "audio": { "volume": 0.6 } },
+    { "id": "rest", "label": "10. His head on the hero's other shoulder; the hero grins", "src": "take:br5-rest-t1", "in": "f43", "out": "f82",
+      "audio": { "volume": 0.6 } },
+    { "id": "eye", "label": "10. She opens one eye (pushed in)", "src": "take:br5-eye2-t1", "in": "f22", "out": "f53",
+      "audio": { "volume": 0.6 },
+      "zoom": { "focus": { "x": 360, "y": 250 }, "keys": [ { "at": 0, "scale": 1 }, { "at": "eye.end", "scale": 1.3 } ] } },
+    { "id": "pack", "label": "Take 3's packshot", "src": "take:br3-s7-t1", "in": "f0", "out": "f58", "audio": false }
+  ],
+
+  "lines": [
+    { "id": "wrong", "speaker": "Jingle", "text": "When the day goes wrong,", "clip": "jingle", "in": 4.66, "out": 8.4, "sung": true },
+    { "id": "cool1", "speaker": "Jingle", "text": "keep it cool, turn it round,", "clip": "jingle", "in": 8.4, "out": 10.5, "sung": true },
+    { "id": "cool2", "speaker": "Jingle", "text": "keep it cool, turn it round,", "clip": "jingle", "in": 10.5, "out": 12.8, "sung": true },
+    { "id": "wholeday", "speaker": "Jingle", "text": "turn your whole day around.", "clip": "jingle", "in": 12.8, "out": 16.21, "sung": true },
+    { "id": "vo", "speaker": "Announcer", "text": "Breeze. The fresh mint that turns your day around.", "src": "audio/tts/br-vo.wav",
+      "at": "wide+0.2", "duration": 2.74, "volume": 1.3 },
+    { "id": "feel", "speaker": "Jingle", "text": "Feel the Breeze!", "clip": "sting", "in": 21.55, "out": 25.49, "sung": true }
+  ],
+
+  "music": [
+    { "id": "jingle", "label": "The jingle: \"When the day goes wrong\" lands as she folds her arms; ducked under the bang and the announcer",
+      "src": "audio/breeze-jingle.mp3", "at": 0, "sync": { "source": 6.5, "at": "arms+0.15" }, "out": 21.242, "fadeOut": 0.01,
+      "volume": [
+        { "at": "bang-0.03", "value": 0.8 },
+        { "at": "bang-0.03", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.16 },
+        { "at": "vo+2.9", "value": 0.16 },
+        { "at": "vo+2.9", "value": 0.8 }
+      ] },
+    { "id": "jingle2", "label": "One bar again (from the bar line at 19.086 s), under the announcer; out on the truck",
+      "src": "audio/breeze-jingle.mp3", "in": 19.086, "at": "jingle.end-0.01", "until": "truck", "fadeIn": 0.01, "fadeOut": 0.12,
+      "volume": [
+        { "at": "bang-0.03", "value": 0.8 },
+        { "at": "bang-0.03", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.35 },
+        { "at": "bang+0.5", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.8 },
+        { "at": "vo-0.6", "value": 0.16 },
+        { "at": "vo+2.9", "value": 0.16 },
+        { "at": "vo+2.9", "value": 0.8 }
+      ] },
+    { "id": "sting", "label": "Sung \"Feel the Breeze!\" as the trucker's head lands", "src": "audio/breeze-jingle.mp3",
+      "in": 21.55, "at": "rest+0.658333", "until": "@end", "volume": 0.85, "fadeIn": 0.05, "fadeOut": 0.5 }
+  ],
+
+  "sfx": [
+    { "id": "bang", "label": "BANG", "src": "audio/br4-bang.mp3", "at": "blow+0.538333", "duration": 1.48, "volume": 1.3 },
+    { "id": "hiss", "label": "Tyre hiss", "src": "audio/br4-hiss.mp3", "at": "slump+0.05", "duration": 2.0, "volume": 0.5 },
+    { "id": "engine", "label": "The tow truck pulls up and stops", "src": "audio/br5-engine.mp3", "at": "truck+0.05", "duration": 3.0,
+      "volume": 0.7, "fadeOut": 0.4 },
+    { "id": "door", "label": "The truck door and his boots on the gravel", "src": "audio/br5-door.mp3", "at": "climb+0.05", "duration": 2.48,
+      "volume": 0.6 },
+    { "id": "sigh", "label": "His sigh, run on from his take under the roll held out", "src": "take:br5-climb-t3", "in": "f91", "out": 4.6,
+      "at": "climb.end", "volume": 0.8, "fadeOut": 0.2 },
+    { "id": "crickets", "label": "Crickets through the quiet, until the sting", "src": "audio/br4-crickets.mp3",
+      "at": "truck+0.4", "until": "sting+0.3", "volume": 0.55, "fadeIn": 0.6, "fadeOut": 0.3 }
+  ],
+
+  "overlays": [
+    { "id": "neww", "label": "NEW! burst", "src": "br4/new.png", "segment": "roll", "at": 0.058333, "until": 1.058333,
+      "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "label", "label": "BREEZE label, off before the second hand comes in", "src": "br4/label.png", "segment": "roll",
+      "at": 0.158333, "until": 1.058333, "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "logo", "label": "BREEZE logo", "src": "br3/logo.png", "segment": "pack", "at": 0.15, "fadeIn": 0.12, "fadeOut": 0.1 },
+    { "id": "tagline", "label": "Turn your day around!", "src": "br3/tag.png", "segment": "pack", "at": 0.9, "fadeIn": 0.12, "fadeOut": 0.1 }
+  ],
+
+  "picture": { "fadeOut": 0.35 },
+
+  "sources": {
+    "take:br4-hook-t1": { "step": "generate", "storyboard": "br4-hook", "firstFrame": "br4/stills/k1-wide.png", "notes": "Reused from Take 4." },
+    "take:br5-bang-t2": { "step": "generate", "storyboard": "br5-bang", "firstFrame": "br5/stills/k5-drive.png" },
+    "take:br5-tyre-t1": { "step": "generate", "storyboard": "br5-tyre", "firstFrame": "br5/stills/k5-tyre.png" },
+    "take:br5-arms-t1": { "step": "generate", "storyboard": "br5-arms", "firstFrame": "br5/stills/t4-her0.png" },
+    "take:br4-roll-t3": { "step": "generate", "storyboard": "br4-roll", "firstFrame": "br4/stills/k-roll3.png", "notes": "Reused from Take 4." },
+    "take:br4-him-t2": { "step": "generate", "storyboard": "br4-him", "firstFrame": "br4/stills/k-him.png", "notes": "Reused from Take 4." },
+    "take:br5-out-t2": { "step": "generate", "storyboard": "br5-out", "firstFrame": "br5/stills/t4-him0.png" },
+    "take:br5-trunk-t2": { "step": "generate", "storyboard": "br5-trunk", "firstFrame": "br5/stills/k5-trunk.png" },
+    "take:br5-pull-t1": { "step": "generate", "storyboard": "br5-pull", "firstFrame": "br5/stills/trunk-t2-end.png" },
+    "take:br4-blanket-t1": { "step": "generate", "storyboard": "br4-blanket", "firstFrame": "br4/stills/k-blanket.png", "notes": "Reused from Take 4." },
+    "take:br5-offer-t2": { "step": "generate", "storyboard": "br5-offer", "firstFrame": "br5/stills/t4-roll-up.png" },
+    "take:br5-melt2-t2": { "step": "generate", "storyboard": "br5-melt2", "firstFrame": "br5/stills/k5-her-mcu.png" },
+    "take:br5-lean-t1": { "step": "generate", "storyboard": "br5-lean", "firstFrame": "br5/stills/k5-hood.png" },
+    "take:br4-wide-t1": { "step": "generate", "storyboard": "br4-wide", "firstFrame": "br4/stills/k-silhouette.png", "notes": "Reused from Take 4." },
+    "take:br5-truck-t3": { "step": "generate", "storyboard": "br5-truck", "firstFrame": "br5/stills/lean-t1-end.png" },
+    "take:br5-climb-t3": { "step": "generate", "storyboard": "br5-climb", "firstFrame": "br5/stills/k5-cab.png" },
+    "take:br5-hold2-t3": { "step": "generate", "storyboard": "br5-hold2", "firstFrame": "br5/stills/k5-sit1.png" },
+    "take:br5-take-t2": { "step": "generate", "storyboard": "br5-take", "firstFrame": "br5/stills/t4-roll-up.png" },
+    "take:br5-soften-t5": { "step": "generate", "storyboard": "br5-soften", "firstFrame": "br5/stills/k5-trucker-mcu2.png" },
+    "take:br5-sit-t1": { "step": "generate", "storyboard": "br5-sit", "firstFrame": "br5/stills/k5-sit1.png" },
+    "take:br5-rest-t1": { "step": "generate", "storyboard": "br5-rest", "firstFrame": "br5/stills/sit-t1-end.png" },
+    "take:br5-eye2-t1": { "step": "generate", "storyboard": "br5-eye2", "firstFrame": "br5/stills/rest-t1-end.png" },
+    "take:br3-s7-t1": { "step": "generate", "storyboard": "br3-s7", "notes": "Take 3's packshot." }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "format": "mdmedia.cut@1",
+  "extends": "rigg-take5",
+  "meta": {
+    "version": "Take 6 (door stays shut)",
+    "length": 31.155,
+    "notes": "Take 5 with the owner's three notes fixed. (1) The shove no longer opens on the take's own dissolve: rigg5-shove-t1 cross-dissolves between two framings from 0.83 to 1.08 s, and Take 5 cut in at 0.7, so the dissolve played at 5.51-5.76 s as he hit the door. It now cuts straight from the 00:30 device on the action, at 1.125 s, his arm already swinging into the door; both thuds (1.35 and 2.10 s in the take) stay, and the shot is 0.425 s shorter. (2) The crowbar insert is regenerated as rigg6-pry-t3, started from a still of the set's own door (a crop of Take 5's approved shove frame, rigg5/shove-end.png, with the crowbar and his hands added by a Gemini image edit): the door stays shut and flush the whole shot (its seam measured at x = 425-427 px in every frame, never lit), the bar strains and its tip skids out of the seam with a clang at 3.2 s, leaving a gouge. Its sound is lifted to 1.25 to sit at Take 5's crowbar level (-30.2 against -30.1 LUFS). (3) No look to camera: the stare shot (he turns to the camera from 1.4 s of rigg5-stare-t1) is gone. The cut ends on her: her shot runs 0.96 s past \"It's a pull.\" with her eyes on him, freezes for 1.7 s, and the theme sting starts 0.15 s before the freeze, as it did in Take 5. Everything else is Take 5 unchanged, 0.425 s earlier from the shove on. The performances are new: they mark Rigg's two setup-and-payoff pairs and her line for mdmedia cut check; each pair is one generation."
+  },
+  "output": "takes/rigg-take6.mp4",
+  "remove": ["stare"],
+
+  "segments": [
+    { "id": "shove", "label": "Wide: he shoulders the door, it doesn't move (cut on the action, past the take's dissolve)",
+      "src": "take:rigg5-shove-t1", "in": 1.125, "out": 3.0 },
+    { "id": "pry", "label": "Insert: the crowbar strains and skids out of the seam; the door stays shut",
+      "src": "take:rigg6-pry-t3", "in": 2.3, "out": 3.65,
+      "audio": { "volume": 1.25 } },
+    { "id": "her", "label": "Her MCU: a beat, the line, a beat, then frozen on her",
+      "src": "take:rigg5-her-t2", "in": 0.6, "out": 4.0, "hold": 1.7,
+      "audio": { "out": 5.0, "fadeOut": 0.3 } }
+  ],
+
+  "lines": [
+    { "id": "pull", "speaker": "Partner", "text": "Rigg. It's a pull.", "segment": "her", "until": "her+3.0" }
+  ],
+
+  "music": [
+    { "id": "sting", "label": "Theme sting on the freeze", "src": "audio/rigg5-theme.mp3", "in": 1.2, "at": "her+3.25", "until": "@end",
+      "volume": 0.45, "fadeOut": 0.9 }
+  ],
+
+  "performances": [
+    { "id": "tools", "lines": ["wrench", "paperclip"], "intent": "a setup and its payoff: the missing tool, then the improvised one",
+      "delivery": "focused, then quick and dry: one train of thought, no change of voice between the two lines" },
+    { "id": "last_resort", "lines": ["onething", "blow"], "intent": "a setup and its payoff: the last option",
+      "delivery": "through gritted teeth, low, then grim and determined; the same sweating, desperate man in one breath of time" },
+    { "id": "punchline", "lines": ["pull"], "intent": "the punchline",
+      "delivery": "flat and dry, deadpan and unimpressed: a beat after \"Rigg.\", then \"It's a pull.\" as a plain statement, never shouted" }
+  ],
+
+  "sources": {
+    "take:rigg6-pry-t3": { "step": "generate", "storyboard": "rigg6-pry-c", "firstFrame": "rigg6/stills/pry-insert-a-720.png",
+      "notes": "First frame: rigg5/shove-end.png cropped to the door seam (rigg6/stills/seam-crop.png), with the crowbar and two hands added by a Gemini image edit (rigg6/stills/pry-insert-a.png), scaled to 1280x720. Takes t1 (rigg6-pry-a) and t2 (rigg6-pry-b) also kept the door shut; t1's clang comes 0.4 s before the bar slips, t2's bar never bends and its seam drifts 3 px as it strains." }
+  }
+}

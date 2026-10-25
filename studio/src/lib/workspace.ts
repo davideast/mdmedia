@@ -37,7 +37,7 @@ const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
   '/studio': 'Draft', '/studio/image': 'Image draft', '/studio/video': 'Video draft', '/studio/music': 'Music draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
-  '/playlists': 'Playlists', '/trees': 'Trees', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
+  '/playlists': 'Playlists', '/productions': 'Productions', '/trees': 'Trees', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
 
 export function treeNodeWorkspaceId(treeId: string, nodeId: string): string {
@@ -69,7 +69,7 @@ export function workspaceRoute(href: string): { href: string; key: string; title
   return {
     href: `${path}${url.search}${url.hash}`,
     key: entity ? `${path}:${entity}` : path,
-    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/video/') ? 'Video' : path.startsWith('/music/') ? 'Music' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
+    title: PAGE_TITLES[path] ?? (path.startsWith('/narration/') ? 'Narration' : path.startsWith('/image/') ? 'Image' : path.startsWith('/video/') ? 'Video' : path.startsWith('/music/') ? 'Music' : /^\/productions\/[^/]+\/cuts\//.test(path) ? 'Cut' : path.startsWith('/productions/') ? 'Production' : path.startsWith('/profile/') ? 'Profile' : path.split('/').pop() || 'Page'),
     draftId,
   };
 }

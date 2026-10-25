@@ -1,0 +1,19 @@
+{
+  "format": "mdmedia.production@1",
+  "slug": "clearline",
+  "title": "ClearLine long distance",
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "cover": "review/posters/ad-clearline.jpg",
+  "cuts": [
+    {
+      "id": "take1",
+      "cut": "docs/cuts/clearline-take1.cut.json",
+      "label": "Take 1",
+      "status": "none",
+      "notes": "Man in a cardigan drops a pin on the phone, his cowboy friend hears it amazed, then the man winces at the off-screen yell; it ends on an unrequested big ClearLine wordmark on blue (spelled right), and the pin is too thin to see through the tube, so muted it relies on faces.",
+      "createdAt": "2026-10-18T22:01:20.716Z"
+    }
+  ]
+}
