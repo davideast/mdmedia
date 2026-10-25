@@ -14,6 +14,7 @@ from six prototype runs on real text; the evidence is in
 | [004](004-milestone-3-director.md) | Milestone 3: the director (`story direct`) | DONE locally on `feat/story-m3`, not pushed |
 | [005](005-milestone-4-comic-art.md) | Milestone 4: comic scripts and checked art (`story draw`) | DONE |
 | [006](006-milestone-5-graphic-novel.md) | Milestone 5: pages, lettering, comic voices and the reader (`story comic`) | DONE |
+| [007](007-voices-briefs-casting.md) | Performance briefs, voice casting and lettering fixes | DONE |
 | 006–007 | Milestones 5–6: pages, lettering and reader; director for comics | NOT WRITTEN |
 
 Plans are written one or two milestones ahead, so each starts from what the
