@@ -232,7 +232,8 @@ async function headBoxes(
   // Keyed by the image itself: a panel redrawn under the same key gets its own heads.
   const key = `heads:${await sha256(JSON.stringify([RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;
   const hit = await cache.getImage(key);
-  if (hit) return hit.meta.heads as PanelResult['heads'];
+  // An empty result from before empty answers were retried is asked again.
+  if (hit && (hit.meta.heads as PanelResult['heads']).length) return hit.meta.heads as PanelResult['heads'];
   let heads = await vision.heads({ image: img, characters, signal });
   // Nobody found where someone stands is usually a miss; ask once more.
   if (!heads.length) heads = await vision.heads({ image: img, characters, signal });
