@@ -429,6 +429,8 @@ export async function runStoryComic(
       linesCached: lines.filter((l) => l.cached).length,
       retakes: lines.reduce((n, l) => n + Math.max(0, l.attempts - 1), 0),
       linesFailing: lines.filter((l) => !l.ok).length,
+      // Panels with someone placed in them but no head found: lettering there can't avoid faces.
+      headsMissing: result.draw.panels.filter((p) => !p.heads.length && Object.keys(comic.pages.flatMap((pg) => pg.panels).find((x) => x.id === p.id)!.positions).length).length,
       crowded: result.crowded.filter((c) => c.view === 'page').length,
       crowdedGuided: result.crowded.filter((c) => c.view === 'guided').length,
       wallMs: Date.now() - started,
@@ -440,7 +442,7 @@ export async function runStoryComic(
     write(
       args.json
         ? JSON.stringify({ outDir, summary }, null, 2)
-        : `${summary.panels} panels (${summary.panelsFailing} failing), ${summary.lines} lines (${summary.linesCached} cached, ${summary.retakes} retakes, ${summary.linesFailing} failing), ${summary.crowded} crowded (${summary.crowdedGuided} in the guided view) -> ${join(outDir, 'reader', 'index.html')}`
+        : `${summary.panels} panels (${summary.panelsFailing} failing), ${summary.lines} lines (${summary.linesCached} cached, ${summary.retakes} retakes, ${summary.linesFailing} failing), ${summary.crowded} crowded (${summary.crowdedGuided} in the guided view), ${summary.headsMissing} panels without head boxes -> ${join(outDir, 'reader', 'index.html')}`
     );
     return summary.panelsFailing || summary.linesFailing || summary.crowded ? EXIT.failingChecks : EXIT.ok;
   } catch (error) {

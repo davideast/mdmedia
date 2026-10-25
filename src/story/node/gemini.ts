@@ -189,7 +189,9 @@ export function createGeminiVision(options: { apiKey: string; model?: string; ma
       signal?.throwIfAborted();
       try {
         const response = await client.models.generateContent({ model, contents: [{ role: 'user', parts }], config: { responseMimeType: 'application/json' } });
-        return JSON.parse(response.text ?? 'null');
+        // An empty answer happens now and then; it is a failed call, not "nothing found".
+        if (!response.text) throw new SyntaxError(`empty response (${response.candidates?.[0]?.finishReason ?? 'no candidate'})`);
+        return JSON.parse(response.text);
       } catch (error) {
         if (attempt >= maxRetries || !(isBusy(error) || error instanceof SyntaxError)) throw error;
         await delay(calculateBackoffMs(attempt, 2000, 30_000));
