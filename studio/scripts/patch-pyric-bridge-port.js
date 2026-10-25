@@ -158,3 +158,43 @@ if (fs.existsSync(sandboxBackendPath)) {
     console.log('[patch] Patched pyric sandbox-backend.js to synthesize email and email_verified claims');
   }
 }
+
+// 7. Patch @pyric/cli/dist/register/index.js to fall back to nextResolve(specifier, context) for unmirrored subpaths (e.g. firebase-admin/app-check)
+const registerIndexPath = path.join(cliDist, 'register', 'index.js');
+if (fs.existsSync(registerIndexPath)) {
+  let content = fs.readFileSync(registerIndexPath, 'utf8');
+  const targetBlock = `                        const url = resolveEsmOnlyForRequire(mapped);
+                        if (url)
+                            return { url, shortCircuit: true };
+                    }`;
+  const replacementBlock = `                        const url = resolveEsmOnlyForRequire(mapped);
+                        if (url)
+                            return { url, shortCircuit: true };
+                        return nextResolve(specifier, context);
+                    }`;
+  if (content.includes(targetBlock)) {
+    content = content.replace(targetBlock, replacementBlock);
+    fs.writeFileSync(registerIndexPath, content, 'utf8');
+    console.log('[patch] Patched @pyric/cli/dist/register/index.js to fall back for unmirrored firebase-admin subpaths');
+  }
+}
+
+// 8. Patch @pyric/cli/dist/serve/server.js so Next.js dev proxy requests (e.g. POST /__pyric/diagnostics from localhost:3080 to Pyric on :3473/:3480) pass isAllowedOrigin on allowed hosts
+const serveServerPath = path.join(cliDist, 'serve', 'server.js');
+if (fs.existsSync(serveServerPath)) {
+  let content = fs.readFileSync(serveServerPath, 'utf8');
+  const targetOriginCheck = `    const allowedHost = isAllowedHost(hostname, boundHost, extra);
+    if (!allowedHost)
+        return false;`;
+  const replacementOriginCheck = `    const allowedHost = isAllowedHost(hostname, boundHost, extra);
+    if (!allowedHost)
+        return false;
+    if (allowedHost)
+        return true;`;
+  if (content.includes(targetOriginCheck) && !content.includes('if (allowedHost)\n        return true;')) {
+    content = content.replace(targetOriginCheck, replacementOriginCheck);
+    fs.writeFileSync(serveServerPath, content, 'utf8');
+    console.log('[patch] Patched @pyric/cli/dist/serve/server.js isAllowedOrigin to allow proxied dev port origins');
+  }
+}
+

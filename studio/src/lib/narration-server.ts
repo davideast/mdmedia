@@ -39,6 +39,8 @@ import {
   classifyNarrationError,
   type ClassifiedNarrationError,
 } from "./narration-errors";
+import { clearNarrationReferences } from "./trees-server";
+import { buildTranscriptSourceMap } from "./markdown-word-aligner";
 
 const MAX_CHUNK_CHARS = 400;
 const NARRATION_MODEL = "gemini-3.5-flash-lite";
@@ -273,6 +275,13 @@ export async function purgeNarrationData(
     ]);
   } catch (err) {
     console.error(`[narration] storage cleanup failed for ${id}:`, err);
+  }
+
+  // 5. Clear references on any tree nodes pointing to this narration
+  try {
+    await clearNarrationReferences(uid, id);
+  } catch (err) {
+    console.error(`[narration] tree reference cleanup failed for ${id}:`, err);
   }
 
   await syncNarrationCatalog(id);
@@ -515,6 +524,16 @@ export function createNarrationStream({
       }
 
       const { transcript, offsets } = buildTranscript(documentChunks);
+      const sourceMap = !request.rewriteForNarration
+        ? buildTranscriptSourceMap(
+            sourceMarkdown,
+            {
+              preserveHeadings: true,
+              verbalizeDiagrams: request.verbalizeDiagrams,
+            },
+            transcript,
+          ).sourceMap
+        : undefined;
       const title = deriveTitle(sourceMarkdown, transcript);
 
       await docRef.update({
@@ -626,6 +645,7 @@ export function createNarrationStream({
           chunks: [...alignedChunks],
           sourceMarkdown,
           adapted: request.rewriteForNarration,
+          ...(sourceMap ? { sourceMap } : {}),
         };
         // A view over the WAV: copying it again would hold the whole recording twice.
         const audioBuffer = Buffer.from(wav.buffer, wav.byteOffset, wav.byteLength);

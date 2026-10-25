@@ -37,8 +37,12 @@ const ORIGIN = 'https://workspace.local';
 export const EMPTY_WORKSPACE: WorkspaceSnapshot = { version: 1, tabs: [], activeId: null, drafts: {} };
 const PAGE_TITLES: Record<string, string> = {
   '/studio': 'Draft', '/studio/image': 'Image draft', '/studio/video': 'Video draft', '/studio/music': 'Music draft', '/drafts': 'Drafts', '/pinned': 'Pinned', '/recent': 'Recent', '/library': 'Library', '/queue': 'Activity',
-  '/playlists': 'Playlists', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
+  '/playlists': 'Playlists', '/trees': 'Trees', '/downloads': 'Downloads', '/settings': 'Settings', '/connect': 'Connect app',
 };
+
+export function treeNodeWorkspaceId(treeId: string, nodeId: string): string {
+  return `${treeId}:${nodeId}`;
+}
 
 /** Persisted v1 `tabs` are a cache of route state, not open UI tabs. Keep the schema
  * compatible so upgrading navigation never discards drafts or unfinished edits. */
@@ -47,6 +51,19 @@ export function workspaceRoute(href: string): { href: string; key: string; title
   const url = new URL(href, ORIGIN);
   if (url.origin !== ORIGIN || url.pathname === '/' || /^\/(api|_next)(\/|$)/.test(url.pathname)) return null;
   const path = url.pathname.replace(/\/$/, '');
+  if (path.startsWith('/trees/')) {
+    const rest = path.slice('/trees/'.length).split('/').filter(Boolean);
+    const treeId = decodeURIComponent(rest[0] ?? '');
+    const nodeParam = url.searchParams.get('node');
+    const pathTail = rest.slice(1).map((seg) => decodeURIComponent(seg)).join('/');
+    const nodeKey = nodeParam || pathTail || 'root';
+    const lastSeg = rest.length > 1 ? decodeURIComponent(rest[rest.length - 1]!).replace(/\.md$/i, '') : 'Tree';
+    return {
+      href: `${path}${url.search}${url.hash}`,
+      key: `/trees/${treeNodeWorkspaceId(treeId, nodeKey)}`,
+      title: lastSeg || 'Tree',
+    };
+  }
   const draftId = (path === '/studio' || path === '/studio/image' || path === '/studio/video' || path === '/studio/music') ? url.searchParams.get('draft') || 'default' : undefined;
   const entity = draftId ?? url.searchParams.get('playlist') ?? url.searchParams.get('track');
   return {

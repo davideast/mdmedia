@@ -42,13 +42,15 @@ const itemRef = (id: string) => adminDb().collection('mediaItems').doc(`image_${
 const generationRef = (id: string) => adminDb().collection('mediaGenerations').doc(id);
 
 async function assertReferenceAsset(uid: string, refId: string) {
-  const reference = await adminDb().collection('mediaAssets').doc(refId).get();
-  if (
-    !reference.exists ||
-    reference.data()?.ownerUid !== uid ||
-    !String(reference.data()?.mimeType).startsWith('image/') ||
-    ['video', 'music'].includes(String(reference.data()?.mediaType))
-  ) {
+  try {
+    const reference = await loadOwnedAsset(uid, refId);
+    if (
+      !String(reference.mimeType).startsWith('image/') ||
+      ['video', 'music'].includes(String(reference.mediaType))
+    ) {
+      throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+    }
+  } catch {
     throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
   }
 }
