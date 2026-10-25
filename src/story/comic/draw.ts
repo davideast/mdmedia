@@ -5,6 +5,7 @@ import type { ImageBytes, ImageModel, RenderCache, Vision } from '../ports.js';
 import type { CastMember } from '../types.js';
 import {
   NO_TEXT_QUESTION,
+  visualLook,
   namedIn,
   onModelQuestions,
   panelPrompt,
@@ -227,7 +228,7 @@ async function headBoxes(
   cache: RenderCache,
   signal?: AbortSignal
 ): Promise<PanelResult['heads']> {
-  const characters = Object.keys(panel.positions).filter((id) => cast[id]?.look).map((id) => ({ id, look: cast[id]!.look! }));
+  const characters = Object.keys(panel.positions).filter((id) => cast[id]?.look).map((id) => ({ id, look: visualLook(cast[id]!.look!) }));
   if (!characters.length) return [];
   // Keyed by the image itself: a panel redrawn under the same key gets its own heads.
   const key = `heads:${await sha256(JSON.stringify([RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;

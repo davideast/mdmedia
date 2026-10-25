@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseStory } from '../../../src/story/index.js';
 import { parseComic } from '../../../src/story/comic/parse.js';
-import { NO_TEXT_QUESTION, ONE_IMAGE_QUESTION, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
+import { NO_TEXT_QUESTION, ONE_IMAGE_QUESTION, visualLook, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
 
 const dir = join(import.meta.dir, '..', 'fixtures');
 
@@ -46,5 +46,13 @@ describe('comic prompts and checks', async () => {
 
   it('draws the sheet from every character with a look', () => {
     expect(sheetPrompt('flat', cast)).toContain('6 characters standing side by side');
+  });
+
+  it('describes characters to the checker without ages or body details', () => {
+    expect(
+      visualLook('a wiry 14-year-old Japanese girl with spiky short black hair in a stubby ponytail; red track jacket over a navy school uniform, scraped knees, white running shoes')
+    ).toBe('a Japanese girl with spiky short black hair in a stubby ponytail; red track jacket over a navy school uniform, white running shoes');
+    expect(visualLook('a small, skinny eleven-year-old English girl with a frizzy copper bob')).toBe('a English girl with a frizzy copper bob');
+    for (const q of panelQuestions(panel('3.4'), cast)) expect(q).not.toMatch(/year-old/);
   });
 });

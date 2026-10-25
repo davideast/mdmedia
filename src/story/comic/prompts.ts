@@ -97,6 +97,27 @@ export function panelPrompt(panel: ComicPanel, style: string, cast: Record<strin
     .join(' ');
 }
 
+const NUMBER_WORDS = 'one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen';
+
+/**
+ * A look as a checker needs it: hair, clothes and props, without ages or body
+ * details. Gemini blocks a request (PROHIBITED_CONTENT) that describes a
+ * fourteen-year-old's age and body ("wiry", "scraped knees") beside an image
+ * of her; the same request asking only for her hair and jacket answers
+ * (Midnight Line, panels 1.1 and 2.4). Recognizing someone needs neither.
+ */
+export function visualLook(look: string): string {
+  return look
+    .replace(new RegExp(`\\b(?:\\d+|${NUMBER_WORDS})-year-old\\b`, 'gi'), '')
+    .replace(/\b(?:scraped|bare|skinned) (?:knees|legs)\b,?/gi, '')
+    .replace(/\b(?:wiry|skinny|small|tiny|lanky|tall|bony|thin)\b(?=[\s,])/gi, '')
+    .replace(/\s+([,;])/g, '$1')
+    .replace(/,(?:\s*,)+/g, ',')
+    .replace(/\b(an?),\s*/gi, '$1 ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 /**
  * On-model questions for the characters in an image, from their looks. Only
  * what identifies a character is judged: asking about every detail failed
@@ -108,7 +129,7 @@ export function onModelQuestions(ids: string[], cast: Record<string, CastMember>
     .map(
       (id) =>
         `Is ${displayName(id)} recognizably this character, judging only hair, face and main outfit as far as they are visible ` +
-        `(ignore small details such as shoes, accessories or marks): ${cast[id]!.look}?`
+        `(ignore small details such as shoes, accessories or marks): ${visualLook(cast[id]!.look!)}?`
     );
 }
 

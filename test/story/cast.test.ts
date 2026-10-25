@@ -61,6 +61,21 @@ describe('castVoices', () => {
     expect(judge.calls.filter((c) => c.brief.includes('Peckham'))).toHaveLength(3);
   });
 
+  it('gives each character a voice of their own, the most confident cast choosing first', async () => {
+    const two = STORY.replace('  ODILE:\n    voice: Sulafat\n', '  ODILE:\n');
+    const script = (await parseStory(two, { path: 'm.md' })).script!;
+    // Everyone's favourite is Aoede; only one can have it.
+    const { casting } = await castVoices(script, { speaker: castingSpeaker(), judge: fakeJudge({ Aoede: 9, Leda: 7, Kore: 6 }), cache: memoryCache(), voices: ['Aoede', 'Leda', 'Kore'] });
+    const voices = casting.map((c) => c.voice);
+    expect(new Set(voices).size).toBe(voices.length);
+    expect(voices.sort()).toEqual(['Aoede', 'Kore', 'Leda']);
+  });
+
+  it('keeps voices the author wrote for themselves', async () => {
+    const { casting } = await castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge({ Sulafat: 9, Aoede: 5 }), cache: memoryCache(), voices: ['Sulafat', 'Aoede', 'Leda'] });
+    expect(casting.map((c) => c.voice)).not.toContain('Sulafat');
+  });
+
   it('auditions with the brief as the delivery note and casts again only when the brief changes', async () => {
     const cache = memoryCache();
     const speaker = castingSpeaker();

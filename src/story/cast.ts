@@ -81,9 +81,21 @@ export async function castVoices(script: StoryScript, options: CastOptions): Pro
       const meta = { voice: result.voice, sample, ranked };
       await options.cache.putImage(key, { bytes: new TextEncoder().encode(JSON.stringify(meta)), mimeType: 'application/json', meta });
     }
-    cast[member.id] = { ...member, voice: result.voice };
-    options.onEvent?.({ type: 'cast-done', result });
     return result;
   }));
-  return { script: { ...script, cast }, casting: results.filter((r): r is CastingResult => Boolean(r)) };
+
+  // One voice per character: the most confident casts choose first, and
+  // everyone else takes their best voice no one has yet. Voices the author
+  // wrote are taken from the start; a shared voice (voice: WREN) follows its
+  // character.
+  const casting = results.filter((r): r is CastingResult => Boolean(r));
+  const taken = new Set(Object.values(script.cast).map((m) => m.voice).filter((v): v is string => typeof v === 'string' && !script.cast[v]));
+  for (const result of [...casting].sort((a, b) => (b.ranked[0]?.fit ?? 0) - (a.ranked[0]?.fit ?? 0))) {
+    const pick = result.ranked.find((a) => !taken.has(a.voice)) ?? result.ranked[0]!;
+    result.voice = pick.voice;
+    taken.add(pick.voice);
+    cast[result.id] = { ...cast[result.id]!, voice: pick.voice };
+  }
+  for (const result of casting) options.onEvent?.({ type: 'cast-done', result });
+  return { script: { ...script, cast }, casting };
 }
