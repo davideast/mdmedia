@@ -1,10 +1,23 @@
 import { describe, expect, it } from 'bun:test';
-import { createElement } from 'react';
-import { renderToStaticMarkup } from '../../studio/node_modules/react-dom/server';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { createElement, type ReactElement } from 'react';
 import {
   DocumentMediaCard,
   resolvePrivateMediaContentPath,
 } from '../../studio/src/components/reader/document-media-card';
+
+const studioReactDomServer = resolve(
+  import.meta.dir,
+  '../../studio/node_modules/react-dom/server.js',
+);
+const { renderToStaticMarkup } = (await import(
+  existsSync(studioReactDomServer)
+    ? '../../studio/node_modules/react-dom/server'
+    : 'react-dom/server'
+)) as {
+  renderToStaticMarkup: (element: ReactElement) => string;
+};
 import { TooltipProvider } from '../../studio/src/components/ui/tooltip';
 import {
   buildMediaRemixApiPayload,
