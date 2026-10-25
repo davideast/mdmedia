@@ -43,7 +43,7 @@ import {
 } from "@/lib/narration-document";
 import { watchNarration } from "@/lib/narrations";
 import { buildTreeNodeHref, normalizeVirtualPath } from "@/lib/tree-client";
-import { resolveTreeNode } from "@/lib/tree-fakes";
+import { resolveTreeNode } from "@/lib/tree-helpers";
 import type {
   MediaRemixRequest,
   MediaRemixResult,

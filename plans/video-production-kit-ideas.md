@@ -314,7 +314,7 @@ It contains the takes, storyboards, scripts, principles and overnight handoff.
 The handoff records agent reports and review candidates, not owner acceptance.
 
 All 238 inherited changed/untracked source files are checkpointed in `6096cb2`
-on `codex/crt-stabilization`, based on `feat/cut-format` at `8ce2b09`.
+on the stabilization checkpoint branch, based on `feat/cut-format` at `8ce2b09`.
 The original worktree remains untouched. The private local backup at
 `~/.local/share/mdmedia/backups/crt-takeover-20261020T185245Z/` contains both
 repositories' history bundles, source and media archives, original diffs,
@@ -359,5 +359,5 @@ and browsers were temporary. No review decision was made on the owner's behalf.
 - Breeze 5, Regulars 4, Roam Phone 3 and RIGG 6 remain review candidates.
   Automated measurements do not replace the owner's ear and eye.
 - The satisfy.md UHF/mobile-fit work is preserved on
-  `codex/crt-uhf-validation`, based on current main. Its local validation does
+  a separate validation branch, based on current main. Its local validation does
   not publish the website or replace channel clips.

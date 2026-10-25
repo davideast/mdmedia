@@ -3,7 +3,7 @@ import { decodeParam, getTreeStore, requireTreeAuth, treeErrorResponse } from '.
 
 export const runtime = 'nodejs';
 
-type Context = { params: Promise<{ id: string }> | { id: string } };
+type Context = { params: Promise<{ id: string }> };
 
 /** GET /api/v1/trees/[id] — returns `{ tree: TreeDetail }`. */
 export async function GET(request: Request, { params }: Context): Promise<Response> {

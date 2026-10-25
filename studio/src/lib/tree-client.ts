@@ -8,7 +8,7 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { auth, currentIdToken, db } from './firebase';
-import { normalizeVirtualPath, resolveTreeNode, walkTreeOrder } from './tree-fakes';
+import { normalizeVirtualPath, resolveTreeNode, walkTreeOrder } from './tree-helpers';
 
 export { normalizeVirtualPath };
 import {
