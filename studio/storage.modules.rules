@@ -30,6 +30,11 @@ service firebase.storage {
       allow write: if false;
     }
 
+    match /trees/{ownerUid}/{allPaths=**} {
+      allow read: if isOwner(ownerUid);
+      allow write: if false;
+    }
+
     // Any other object path is denied outright.
     match /{allPaths=**} {
       allow read, write: if false;

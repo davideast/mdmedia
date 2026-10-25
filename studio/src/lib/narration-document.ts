@@ -1,5 +1,6 @@
 import type { Narration } from './types';
 import type { NarrationTimingsFile } from './wav';
+import type { TranscriptSourceMap } from './tree-types';
 
 export interface NarrationDocument {
   id: string;
@@ -9,6 +10,7 @@ export interface NarrationDocument {
   sourceMarkdown: string | null;
   adapted: boolean;
   chunks: NarrationTimingsFile['chunks'];
+  sourceMap?: TranscriptSourceMap;
   status: 'loading' | 'streaming' | 'ready' | 'error';
   errorMessage: string | null;
 }
@@ -21,6 +23,7 @@ export interface PlaybackSlice<TPlayer = unknown> {
   sourceMarkdown: string | null;
   adapted: boolean;
   chunks: NarrationTimingsFile['chunks'];
+  sourceMap?: TranscriptSourceMap;
   status: 'idle' | 'loading' | 'starting' | 'streaming' | 'ready' | 'error';
   errorMessage: string | null;
   player: TPlayer | null;
@@ -38,6 +41,7 @@ export interface NarrationViewProjection<TPlayer = unknown> {
   sourceMarkdown: string | null;
   adapted: boolean;
   chunks: NarrationTimingsFile['chunks'];
+  sourceMap?: TranscriptSourceMap;
   status: 'idle' | 'loading' | 'starting' | 'streaming' | 'ready' | 'error';
   errorMessage: string | null;
   player: TPlayer | null;
@@ -68,6 +72,7 @@ export function projectNarrationView<TPlayer = unknown>(
       sourceMarkdown: document?.sourceMarkdown ?? null,
       adapted: document?.adapted ?? false,
       chunks: document?.chunks ?? [],
+      sourceMap: document?.sourceMap,
       status: document?.status ?? 'loading',
       errorMessage: document?.errorMessage ?? null,
       player: null,
@@ -96,6 +101,7 @@ export function projectNarrationView<TPlayer = unknown>(
     sourceMarkdown: playback.sourceMarkdown ?? document?.sourceMarkdown ?? null,
     adapted: playback.adapted || (document?.adapted ?? false),
     chunks,
+    sourceMap: playback.sourceMap ?? document?.sourceMap,
     status,
     errorMessage: playback.errorMessage ?? document?.errorMessage ?? null,
     player: playback.player,
@@ -151,12 +157,18 @@ export function observeNarrationDocument(id: string, source: DocumentSource, rec
     checkpoint = nextCheckpoint;
     const request = ++revision;
     void source.timings(id, controller.signal).then((timings) => {
-      if (controller.signal.aborted || request !== revision || !timings) return;
+      if (controller.signal.aborted || request !== revision) return;
+      if (!timings) {
+        if (checkpoint === nextCheckpoint) checkpoint = '';
+        return;
+      }
       document = { ...document, chunks: [...timings.chunks].sort((a, b) => a.index - b.index),
         transcript: document.transcript || timings.transcript || '',
-        sourceMarkdown: document.sourceMarkdown ?? timings.sourceMarkdown ?? null };
+        sourceMarkdown: document.sourceMarkdown ?? timings.sourceMarkdown ?? null,
+        sourceMap: timings.sourceMap ?? document.sourceMap };
       publish();
     }).catch(() => {
+      if (checkpoint === nextCheckpoint) checkpoint = '';
       // Text remains readable if a checkpoint is unavailable. Playback reports audio errors separately.
     });
   }, (error) => {

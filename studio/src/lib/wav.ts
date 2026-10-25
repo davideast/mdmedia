@@ -8,6 +8,7 @@
  */
 
 import { SAMPLE_RATE, WAV_HEADER_BYTES, type AlignedChunk } from "./types";
+import type { TranscriptSourceMap } from "./tree-types";
 
 const DEFAULT_CHANNELS = 1;
 const DEFAULT_BIT_DEPTH = 16;
@@ -115,4 +116,5 @@ export interface NarrationTimingsFile {
   chunks: AlignedChunk[];
   sourceMarkdown?: string;
   adapted?: boolean;
+  sourceMap?: TranscriptSourceMap;
 }

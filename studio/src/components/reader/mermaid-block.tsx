@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useTheme } from "next-themes";
 import {
   Check,
@@ -25,6 +33,8 @@ import { highlightCode } from "@/lib/highlight";
 export interface MermaidBlockProps {
   code: string;
   className?: string;
+  headerActions?: ReactNode;
+  footer?: ReactNode;
 }
 
 const DIAGRAM_TYPE_MAP: Record<string, string> = {
@@ -56,7 +66,12 @@ function detectDiagramType(code: string): string {
  * modal with zoom/pan controls, canonical copy button, strict security sandbox,
  * and zero-layout-shift error recovery.
  */
-export function MermaidBlock({ code, className }: MermaidBlockProps) {
+export function MermaidBlock({
+  code,
+  className,
+  headerActions,
+  footer,
+}: MermaidBlockProps) {
   const { resolvedTheme } = useTheme();
   const [svgHtml, setSvgHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -534,6 +549,8 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
               {copied ? "Copied!" : "Copy diagram source"}
             </TooltipContent>
           </Tooltip>
+
+          {headerActions}
         </div>
       </div>
 
@@ -567,6 +584,8 @@ export function MermaidBlock({ code, className }: MermaidBlockProps) {
           ) : null}
         </div>
       )}
+
+      {footer}
 
       {/* Lightbox / Full Screen Modal */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>

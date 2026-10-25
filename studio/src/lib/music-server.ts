@@ -71,8 +71,14 @@ export async function submitMusic(uid: string, request: MusicRequest, key: strin
     if (existingItemId && (!previous || previous.type !== 'music' || previous.ownerUid !== uid)) throw new MediaError(404, 'not_found', 'That music is not available to you.');
     if (previous && ['queued', 'generating'].includes(previous.status)) throw new MediaError(409, 'generation_in_progress', 'This music already has a generation in progress.');
     if (request.referenceAssetId) {
-      const reference = await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId));
-      if (!reference.exists || reference.data()?.ownerUid !== uid || !String(reference.data()?.mimeType).startsWith('image/') || reference.data()?.mediaType !== 'music' || reference.data()?.purpose !== 'reference') throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+      const reference = await loadOwnedAsset(uid, request.referenceAssetId).catch(() => null);
+      const validMusicRef =
+        reference &&
+        String(reference.mimeType).startsWith('image/') &&
+        ((reference.mediaType === 'music' && reference.purpose === 'reference') ||
+          reference.mediaType === 'image');
+      if (!validMusicRef) throw new MediaError(404, 'reference_not_found', 'That reference image is not available to you.');
+      request = { ...request, referenceAssetId: reference.id };
     }
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};

@@ -1,5 +1,7 @@
 import type { MediaType } from './media-types';
-import { workspaceRoute, type WorkspaceSnapshot } from './workspace';
+import { treeNodeWorkspaceId, workspaceRoute, type WorkspaceSnapshot } from './workspace';
+
+export { treeNodeWorkspaceId };
 
 export const WORK_PAGE_SIZE = 50;
 export const FIND_LIMIT = 20;
@@ -12,8 +14,9 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
     const route = workspaceRoute(view.href);
     if (!route || !isWorkRoute(view.href)) continue;
     const id = route.draftId ?? view.key.split('/').pop()!.split(':').pop()!;
+    const isTree = view.key.startsWith('/trees/');
     const type = view.key.startsWith('/music/') || view.key.startsWith('/studio/music:') ? 'music' : view.key.startsWith('/video/') || view.key.startsWith('/studio/video:') ? 'video' : view.key.startsWith('/image/') || view.key.startsWith('/studio/image:') ? 'image' : view.key.startsWith('/narration/') || view.key.startsWith('/studio:') ? 'narration' : undefined;
-    const kind = route.draftId ? (type === 'music' ? 'Music draft' : type === 'video' ? 'Video draft' : type === 'image' ? 'Image draft' : 'Draft') : type === 'music' ? 'Music' : type === 'video' ? 'Video' : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
+    const kind = route.draftId ? (type === 'music' ? 'Music draft' : type === 'video' ? 'Video draft' : type === 'image' ? 'Image draft' : 'Draft') : isTree ? 'Tree doc' : type === 'music' ? 'Music' : type === 'video' ? 'Video' : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
     items.set(view.key, { type, key: view.key, href: view.href, title: view.title, detail: `${kind} · ${id}`,
       search: `${view.title} ${id}`, pinned: view.pinned === true, visitedAt: view.visitedAt ?? 0, viewId: view.id, draftId: route.draftId });
   }
@@ -52,7 +55,7 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
 
 export function isWorkRoute(href: string): boolean {
   const route = workspaceRoute(href);
-  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:'));
+  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:') || route.key.startsWith('/trees/'));
 }
 
 export function matchesWork(text: string, query: string): boolean {
