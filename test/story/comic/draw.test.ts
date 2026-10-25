@@ -98,6 +98,12 @@ describe('drawComic', async () => {
     expect(redraw.requests).toHaveLength(3);
   });
 
+  it('draws on without head boxes when the vision model fails to find them', async () => {
+    const vision = { ...fakeVision(), heads: async () => { throw new Error('empty response'); } };
+    const result = await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });
+    expect(result.panels.every((p) => p.heads.length === 0)).toBe(true);
+  });
+
   it('asks a continue panel its questions with the source panel shown first', async () => {
     const vision = fakeVision();
     await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });

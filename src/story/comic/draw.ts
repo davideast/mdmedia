@@ -234,9 +234,17 @@ async function headBoxes(
   const hit = await cache.getImage(key);
   // An empty result from before empty answers were retried is asked again.
   if (hit && (hit.meta.heads as PanelResult['heads']).length) return hit.meta.heads as PanelResult['heads'];
-  let heads = await vision.heads({ image: img, characters, signal });
-  // Nobody found where someone stands is usually a miss; ask once more.
-  if (!heads.length) heads = await vision.heads({ image: img, characters, signal });
+  let heads: PanelResult['heads'];
+  try {
+    heads = await vision.heads({ image: img, characters, signal });
+    // Nobody found where someone stands is usually a miss; ask once more.
+    if (!heads.length) heads = await vision.heads({ image: img, characters, signal });
+  } catch (error) {
+    // Head boxes help lettering but aren't worth failing a build over: the
+    // panel is reported without them and asked again next build.
+    if (signal?.aborted) throw error;
+    return [];
+  }
   await cache.putImage(key, { bytes: new TextEncoder().encode(JSON.stringify(heads)), mimeType: 'application/json', meta: { heads } });
   return heads;
 }
