@@ -3,13 +3,15 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseStory } from '../../../src/story/index.js';
 import { parseComic } from '../../../src/story/comic/parse.js';
+import { castVoices } from '../../../src/story/cast.js';
 import { comicScript, voiceComic } from '../../../src/story/comic/voices.js';
-import { memoryCache, scriptedTranscriber, toneSpeaker } from '../fakes.js';
+import { castingSpeaker, fakeJudge, memoryCache, scriptedTranscriber, toneSpeaker } from '../fakes.js';
 
 const dir = join(import.meta.dir, '..', 'fixtures');
 
 describe('comic voices', async () => {
-  const story = (await parseStory(readFileSync(join(dir, 'embarrassing-day.md'), 'utf8'), { path: 's.md' })).script!;
+  const uncast = (await parseStory(readFileSync(join(dir, 'embarrassing-day.md'), 'utf8'), { path: 's.md' })).script!;
+  const { script: story } = await castVoices(uncast, { speaker: castingSpeaker(), judge: fakeJudge(), cache: memoryCache(), voices: ['Puck', 'Kore', 'Leda'] });
   const comic = (await parseComic(readFileSync(join(dir, 'comic-lunch.md'), 'utf8'), { path: 'c.md', cast: story.cast })).comic!;
   const items = comic.pages.flatMap((p) => p.panels.flatMap((panel) => panel.items.map((item, i) => ({ panel, item, i }))));
   const voiced = items.filter((x) => x.item.kind !== 'sfx');

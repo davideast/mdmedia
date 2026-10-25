@@ -3,28 +3,60 @@ title: The Most Embarrassing Day of My Life
 narrator: MILO
 cast:
   MILO:
-    voice: Puck
     delivery: a funny, quick-talking thirteen-year-old boy telling his own story
+    brief: >-
+      Milo, a thirteen-year-old boy from Columbus, Ohio, telling the story of his own disaster. A real
+      kid's voice on the edge of breaking, never an adult pitching up: a light tenor that cracks up an
+      octave when he panics. General Midwestern, flat a's, quick. He talks from the front of his
+      mouth, words tumbling over each other when he's excited, dropping to a mumble when he's guilty,
+      and breathes in loudly before a big confession. Laugh: a nervous 'heh' that sputters like a lawn
+      mower failing to start. Habits: clears his throat, little groans, a hopeful 'right?'.
+      Embarrassment makes him faster; shame makes him slow and quiet. Never a sitcom voice.
     look: a 13-year-old boy with messy curly brown hair, freckles and big expressive eyebrows; oversized forest-green hoodie with a small orange wildcat patch, blue jeans, red high-top sneakers, gray backpack
   JUNE:
-    voice: Leda
     delivery: a smart, sarcastic thirteen-year-old girl, dry and warm
+    brief: >-
+      June Park, a thirteen-year-old Korean American girl from Fort Lee, New Jersey, Milo's best
+      friend since second grade. A real teenage girl's voice, never an adult pitching up: a cool,
+      lowish alto for her age, dry as toast, with a slight Jersey bite on her vowels. Deadpan by
+      default, each word placed precisely, sentences ending flat; when she's amused it shows only as a
+      tiny upward curl at the end of a line. Laugh: one short exhale through her nose. Habits: a small
+      'hm', a pause before a cutting line. Hurt makes her very quiet and very even, the words
+      carefully held; she never shouts. Never bubbly, never a cartoon nerd.
     look: a 13-year-old Korean American girl with straight black hair in a chin-length bob with blunt bangs; mustard-yellow cardigan over a white T-shirt with a small star, dark jeans, white sneakers; purple sunglasses only when dancing
   HARPER:
-    voice: Zephyr
     delivery: a bubbly, confident eighth-grade girl, student council president
+    brief: >-
+      Harper Blake, fourteen, eighth-grade student council president from Scottsdale, Arizona. A
+      bright, polished teenage girl's voice, never an adult: higher, with a sunny vocal fry at the end
+      of her phrases and upspeak on half her sentences. She projects as if she's always at a podium,
+      speaks fast, stresses random words for excitement, and says 'Dude' as a compliment. Laugh: a
+      bright 'ha-ha!' that's half performance. Habits: a little gasp before good news. Nothing dents
+      her; she breezes past everyone. Never mean on purpose.
     look: a tall 14-year-old girl with long wavy strawberry-blonde hair and a white headband; blue-and-gold Westfield Wildcats varsity jacket, carries a clipboard
   ALVAREZ:
-    voice: Algenib
     delivery: a frazzled middle school technology teacher
+    brief: >-
+      Mr. Alvarez, a middle school technology teacher in his forties from El Paso, Texas. A warm
+      baritone worn thin by stress, a light Texan lilt with rounded Spanish vowels underneath. Talks
+      in bursts while doing three things at once, a little breathless, repeating 'okay, okay' to
+      himself. Laugh: a tired chuckle through the nose. Frazzled, his pitch climbs and the words stack
+      up; stern, he goes slow and low. Never a cartoon, never a comic accent.
     look: a technology teacher in his forties with a thick black mustache and rectangular glasses; brown sweater vest over a checked shirt, school lanyard
   TECHKID:
-    voice: Achird
     delivery: a startled tech club kid
+    brief: >-
+      A skinny twelve-year-old tech club kid from Pittsburgh: a real boy's voice before it drops, thin
+      and a little nasal, with Pittsburgh vowels. He startles easily: words jump out high and fast,
+      then trail off. Laugh: a squeaky snort. Never an adult.
     look: a skinny tech club kid with a buzz cut, oversized headphones around his neck and a black T-shirt
   KID:
-    voice: Fenrir
     delivery: a loud, excited middle schooler in a crowd
+    brief: >-
+      A loud seventh-grade boy from Boston showing off to a crowded cafeteria: a real kid's voice,
+      scratchy and far too loud, broad Boston vowels and dropped r's. He talks as if everything is the
+      best thing ever, shouting over the noise with total conviction. Laugh: a cackle. Never an adult,
+      never menacing.
     look: a loud seventh grader with spiky red hair and a striped T-shirt
 ---
 

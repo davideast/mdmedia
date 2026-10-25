@@ -7,7 +7,7 @@ import { parseStory } from '../../../src/story/index.js';
 import { buildComic } from '../../../src/story/comic/build.js';
 import { lettering, letterPanel, type Measure } from '../../../src/story/comic/letter.js';
 import { parseComic } from '../../../src/story/comic/parse.js';
-import { fakeImageModel, fakeVision, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from '../fakes.js';
+import { fakeImageModel, fakeJudge, fakeVision, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from '../fakes.js';
 
 const dir = join(import.meta.dir, '..', 'fixtures');
 const story = (await parseStory(readFileSync(join(dir, 'embarrassing-day.md'), 'utf8'), { path: 's.md' })).script!;
@@ -23,7 +23,7 @@ const build = async (voices = true) => {
     cache: memoryCache(),
     runtime: passThroughRuntime,
     sink,
-    ...(voices ? { speaker: toneSpeaker(), transcriber: scriptedTranscriber() } : {}),
+    ...(voices ? { speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge() } : {}),
   });
   return { sink, result };
 };

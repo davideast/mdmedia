@@ -1,29 +1,80 @@
 ---
 title: Wren Backwards
 narrator:
-  voice: Schedar
   delivery: Calm, warm storyteller with crisp, engaging articulation
+  brief: >-
+    The narrator of a stop-motion fairy tale: a woman in her sixties from Edinburgh, a soft, clear
+    Scottish voice, warm with a dry wit underneath, like a favourite librarian reading at bedtime.
+    Mid-low pitch, a gentle breath, crisp consonants. Unhurried, savouring odd details, leaning in
+    conspiratorially before the uncanny parts and dropping almost to a whisper for the eerie lines.
+    Laugh: a soft, amused breath. Never a booming storyteller, never sing-song.
 cast:
   WREN:
-    voice: Leda
     delivery: Feisty, energetic eleven-year-old girl with an enthusiastic tone
+    brief: >-
+      Wren Pickett, an eleven-year-old girl, small for her age, from Peckham in south London, sent
+      north for the summer against her will. A real child's voice, as if recorded with a child actor,
+      never an adult pitching up: high and thin, with a sandpaper scratch from shouting over three
+      older brothers. The gap in her front teeth puts a soft whistle on every s and sh. Accent: south
+      London kid: glottal stops on t, 'fink' for think, vowels pushed to the front of the mouth. She
+      talks from the front of her face and goes nasal when she whines. Rhythm: fast and tumbling; she
+      runs out of breath halfway through a sentence and gulps air; her pitch leaps up when she's
+      indignant. Asides come out under her breath at half volume. Laugh: a loud goose honk out of her
+      nose, then a wheezy embarrassed giggle as she tries to stop it. Habits: huffs, a grumpy 'ugh'.
+      Crossness makes her louder and faster; sadness makes her voice crack, small and croaky. Never
+      polished, never stagey, never grown-up.
     look: a small, skinny 11-year-old English girl with a frizzy copper bob, a crooked fringe and a gap in her front teeth; yellow raincoat over a red-and-cream striped jumper, green wellies
   NERW:
-    voice: Autonoe
+    voice: WREN
     delivery: Prismatically sweet, unnervingly polite, and smooth tone
+    brief: >-
+      Nerw, Wren's reflection: an eleven-year-old girl with exactly Wren's pitch, but nothing out of
+      place. No breath noise at all, no scratch, no whistle on the s: unnaturally clean, as if she has
+      rehearsed every word in a mirror for eleven years. Accent: careful received pronunciation, every
+      t crisp, vowels rounded and polished. Rhythm: a perfectly steady tempo, like a metronome; each
+      word set down like a teacup on a saucer. She smiles on every vowel, so the sound is slightly
+      spread and bright, and each sentence ends with a small upward lift, as if offering you a cake.
+      Her volume never changes, even when she threatens. Laugh: three tiny, even notes, 'hm, hm, hm'.
+      The uncanniness is that nothing is wrong. Never a villain growl, never deep, never cartoonish.
     look: a small, skinny 11-year-old English girl who looks exactly like Wren but perfectly neat, with a smooth, glossy copper bob parted on the opposite side, silver eyes, a spotless yellow raincoat buttoned to the very top, clean green wellies
   ODILE:
-    voice: Gacrux
     delivery: Gruff, brisk elderly woman with a sharp, no-nonsense bark
+    brief: >-
+      Odile Pickett, eighty-one, a woman. Born in Gullmouth, a fishing town on the North Yorkshire
+      coast, and never left; sixty years repairing clocks and mirrors in a shop of brass polish and
+      sea damp. Accent: broad North Yorkshire: short flat vowels, 'oop' for up, h's dropped, the end
+      of 'Pickett' bitten off. The instrument: a low, dry alto that sits deep in her chest, with a
+      smoker's rasp from the pipe she claims she gave up; the rasp catches on the first word of every
+      sentence and frays into a little vocal fry at the end. Loose dentures make her consonants
+      slightly wet and clicky. She speaks out of one side of her mouth, never above medium volume, and
+      breathes in sharply through her nose before she speaks. Rhythm: two or three words, then a dead
+      stop, like setting a tool down on the bench. Laugh: a single rattling 'hah' that is half a
+      cough. Habits: a disapproving click of the tongue; a short exhale through the nose when
+      something amuses her. Fondness makes her more clipped and gruffer, never softer; worry makes her
+      slow and very quiet. Never sweet, never quavery, never a pantomime witch, never posh, never a
+      man.
     look: a tall, bony old woman with grey hair in a messy bun stuck with pencils, a brass magnifying loupe on a chain, a moth-eaten mustard cardigan and a carved wooden cane
   GILBERT:
-    voice: Achernar
     delivery: Soft-spoken, threadbare toy rabbit with a gentle voice
+    brief: >-
+      Gilbert, the reflection of a threadbare stuffed rabbit Wren lost when she was five: a soft,
+      small, worried voice, a child of no particular age, slightly muffled as if speaking through
+      felt. A gentle Somerset burr on his r's. He speaks hesitantly and often trails off, with a
+      little sniff before anything sad. Laugh: a tiny wheezy squeak, like the squeaker in a toy. Loyal
+      and anxious; his brave lines come out shaky but firm. Never a cartoon bunny, never squeaky on
+      purpose.
     look: a small threadbare brown stuffed rabbit with one black button eye and one stitched-cross eye, one ear held on with a safety pin
   PIM:
-    voice: Puck
     delivery: Cheeky, upbeat fishmonger lad with a jovial tone
+    brief: >-
+      Pim, a twelve-year-old fishmonger's boy in Gullmouth on the North Yorkshire coast: a real boy's
+      voice on the edge of breaking, bright and cheeky, with the same broad local accent as the old
+      fishermen, flat vowels and 'aye'. He talks fast and grins through every word; he tells terrible
+      puns and lands them with total conviction, pausing before the punchline. Laugh: a big, honking,
+      unselfconscious bray. Habits: a whistle through his teeth. Never an adult, never a pirate voice.
     look: a lanky 12-year-old boy with freckles, a navy knitted cap, a too-big cream fisherman's sweater and a black rubber apron
+pronounce:
+  Nerw: Nur-oo
 names:
   - Gullmouth
   - Wren Pickett

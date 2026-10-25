@@ -85,6 +85,7 @@ describe('buildStory', () => {
       source: { path: 'day.md', markdown },
       out,
       speaker: toneSpeaker(),
+      judge: fakeJudge(),
       transcriber: scriptedTranscriber(),
       runtime: passThroughRuntime,
       cache: memoryCache(),
@@ -108,8 +109,10 @@ describe('buildStory', () => {
     const composer = fakeComposer();
     const { build } = await buildStory({
       source: { path: 'day.md', markdown: readFileSync(join(import.meta.dir, 'fixtures', 'embarrassing-day.md'), 'utf8').split('\n### First period')[0]! },
+      judge: fakeJudge(),
       out: memorySink(),
       speaker: toneSpeaker(),
+      judge: fakeJudge(),
       transcriber: scriptedTranscriber(),
       runtime: passThroughRuntime,
       cache: memoryCache(),

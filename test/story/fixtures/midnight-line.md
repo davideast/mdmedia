@@ -3,28 +3,65 @@ title: Midnight Line
 narrator: AKARI
 cast:
   AKARI:
-    voice: Leda
     delivery: Youthful, determined, and breathless
+    brief: >-
+      Akari Mori, a fourteen-year-old girl, a sprinter raised in Osaka, now in Tokyo; performed like
+      the lead of an English-language anime dub. Athlete's lungs, so the voice carries. Bright, with a
+      sandpaper rasp in the upper middle from shouting split times across a track; her 'eh' vowels go
+      nasal when she's annoyed. Accent: American English, anime-dub punch on every consonant. Rhythm:
+      clipped staccato; sarcasm drops into a lower, flatter, deadpan register; when she's running she
+      gasps between words. Laugh: one snort she tries to swallow. Habits: a sharp 'tch' sucked through
+      her teeth when frustrated; a little exhale before she says something stubborn. Stubbornness
+      drops her to a hard near-whisper rather than a shout; real shouting cracks at the top. Never
+      babyish, never breathy-cute, never an adult woman.
     look: a wiry 14-year-old Japanese girl with spiky short black hair in a stubby ponytail; red track jacket over a navy school uniform, scraped knees, white running shoes with mismatched red and yellow laces
   SORA:
-    voice: Schedar
     delivery: Even, calm, and soft-spoken
+    brief: >-
+      Sora Hayashi, a fourteen-year-old boy, a sprinter from Sapporo, performed in an English-language
+      anime dub. A real teenage boy's voice, newly settled into a soft tenor, clean and cool, with a
+      slight breathiness he can't hide. American dub English, even and unhurried. He speaks in short,
+      polite, flat sentences; on the train he is hollow, as if half asleep, the words drifting with no
+      stress at all. When he comes alive, the voice opens up, loud and bright, almost laughing. Laugh:
+      a quiet, surprised breath, rare. Never a grown man, never brooding and gravelly.
     look: a tall 14-year-old Japanese boy with neat silver-grey hair and a calm face; blue track jacket, white T-shirt, a gold medal on a red ribbon around his neck
   TAMA:
-    voice: Despina
     delivery: Smooth, sarcastic, and sharp-witted
+    brief: >-
+      Tama, a two-tailed calico cat who has punched tickets on a ghost train for three hundred years,
+      voiced by a woman in her fifties who has seen everything. A smoky, low mezzo with gravel at the
+      bottom and a purr rumbling underneath; a slight nasal Brooklyn twang. She drawls, stretching her
+      vowels, especially the o's, and lets lines hang before the sting. A little rolling purr shows up
+      on her r's and at the ends of lines. Laugh: a low 'heh' that melts into a purr. Habits: a
+      disdainful click of the tongue; a faint hiss on the s when she's annoyed; a small 'mrrp' before
+      a sentence when impatient. Never cute, never kitten-like, never says meow.
     look: a round calico cat (white, orange and black patches) with two tails and one torn ear; a tiny navy conductor's cap and a brass ticket punch on a cord
   STATIONMASTER:
-    voice: Algieba
     delivery: Smooth, eerily polite, and quiet
+    brief: >-
+      The Stationmaster, a lonely old god in a station master's coat: ageless, a man. A soft, velvety
+      bass-baritone that never rises above a murmur, as if speaking in a library at midnight, with a
+      faint echo of an empty shrine around it. Precise, old-fashioned English, slightly formal, like a
+      gentleman of the 1920s. Slow and kind; every sentence ends gently downward. He smiles audibly,
+      and the kindness is the menace. Laugh: a low, delighted 'hm-hm'. Crossed, his voice drops lower
+      and quieter, never louder. Never a cackling villain, never a growl.
     look: a very tall, thin man in a long navy coat with brass buttons, white gloves and a peaked navy cap pulled low so his eyes are shadowed; holds a glowing pocket watch with no hands
   FUJI:
-    voice: Sulafat
     delivery: Warm, gentle, and slow
+    brief: >-
+      Grandma Fuji, a centuries-old spider grandmother who rides the ghost train knitting: a tiny old
+      woman, warm and creaky, high and thin with age, a small tremble on held vowels, cosy as a cup of
+      tea. English with a soft Kyoto lilt in the rhythm. She speaks slowly, pausing as if counting
+      stitches, and says 'mm' before she answers. Laugh: a papery 'hee-hee' that ends in a tiny click,
+      the only hint that she's a spider. Fond and knowing; when she says something serious the warmth
+      drops away and she is suddenly clear and cold. Never witchy, never shrill.
     look: a tiny hunched old woman with six thin arms, round glasses, grey hair in a bun and a purple shawl, knitting a long glowing silver scarf
   CROW:
-    voice: Algenib
     delivery: Gravelly, harsh, and shrieking
+    brief: >-
+      The Ticket Crows, a flock of crows in conductor caps, voiced as one harsh, scraping caw of a
+      voice: a grown man shrieking at the top of a ragged, grating register, like a rusty whistle.
+      Rapid-fire, the words chopped short and barked, every r a rattle. Never cute, never friendly.
     look: a big glossy black crow wearing a tiny navy conductor's cap, with brass buttons down its chest
 names:
   - Akari Mori
