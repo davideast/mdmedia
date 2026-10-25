@@ -111,6 +111,33 @@ describe('studio media', () => {
     expect(calls[0]!.headers.get('content-type')).toBe('application/json');
   });
 
+  it('creates a new generation on an existing image item with an Idempotency-Key and retries lost answers', async () => {
+    const answers = [
+      () => { throw new TypeError('fetch failed'); },
+      () => Response.json({ id: 'item/1', type: 'image', generation: generation('queued'), links: {}, replayed: true }, { status: 202 }),
+    ];
+    const { calls, client } = recording(() => answers.shift()!());
+    const created = await client.createImageGeneration(
+      'item/1',
+      { prompt: 'Make the sky sunset orange', action: 'refine', fromGenerationId: 'gen0' },
+      undefined,
+      [1],
+    );
+    expect(created.replayed).toBe(true);
+    expect(calls.map((call) => `${call.method} ${new URL(call.url).pathname}`)).toEqual([
+      'POST /api/v1/images/item%2F1/generations',
+      'POST /api/v1/images/item%2F1/generations',
+    ]);
+    expect(JSON.parse(String(calls[0]!.body))).toEqual({
+      prompt: 'Make the sky sunset orange',
+      action: 'refine',
+      fromGenerationId: 'gen0',
+    });
+    const keys = calls.map((call) => call.headers.get('idempotency-key'));
+    expect(keys[0]).toMatch(/^[A-Za-z0-9_-]{10,128}$/);
+    expect(keys[0]).toBe(keys[1]);
+  });
+
   it('reuses an Idempotency-Key the caller passes, so a retry cannot start a second attempt', async () => {
     const { calls, client } = recording(() => Response.json({ id: 'item1', replayed: true }, { status: 202 }));
     await client.createMusic({ prompt: 'A waltz' }, 'retry-key-123');

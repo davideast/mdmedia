@@ -96,11 +96,20 @@ Content-Type: application/json
 
 Omitted options resolve from the person's image defaults. On regeneration,
 omitted options resolve from that item's current request. Prompt is always
-explicit. Initial defaults are direct generation, wide 16:9, model-default
-resolution, and no reference. Supported resolutions are 1K/2K/4K; supported
-ratios are exposed through options. Provider/model overrides, filesystem paths,
-visibility, unknown fields, and narration-specific controls are rejected.
-Prompt limit: 32,000 characters; adaptation instructions: 4,000 characters.
+explicit. Initial defaults are direct generation (`gemini-nano-banana-2.1`),
+wide 16:9, model-default resolution, and no reference. Supported models are
+`gemini-nano-banana-2.1`, `gemini-3-pro-image`, `gemini-3.1-flash-image`,
+`gemini-3.1-flash-lite-image`, and `gemini-2.5-flash-image`. Supported
+resolutions are `0.5K` (`gemini-3.1-flash-image` only), `1K`, `2K`, and `4K`;
+supported aspect ratios include all 10 standard shapes plus `1:4`, `4:1`, `1:8`,
+and `8:1` on `gemini-nano-banana-2.1` and `gemini-3.1-flash-image`. Requests
+may also specify `referenceAssetIds` (up to 14 owned reference images),
+`videoUri` (HTTPS/YouTube video-to-image input), `searchGrounding` (`web` and
+`imageSearch`), `thinkingLevel` (`minimal`, `medium`, `high`), and `action: "refine"`
+with `fromGenerationId` for multi-turn editing via the Gemini Interactions API.
+Filesystem paths, visibility, unknown fields, and narration-specific controls
+are rejected. Prompt limit: 32,000 characters; adaptation instructions: 4,000
+characters.
 
 Adaptation uses a dedicated visual-brief step. Original source, custom
 instructions, prepared prompt, and resolved generator/model are retained with

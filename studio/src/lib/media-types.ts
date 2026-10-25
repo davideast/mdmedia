@@ -24,20 +24,50 @@ export interface MediaSummary {
   /** When this item expires, set on the item itself. Null or absent means its type's default applies. */
   expiresAt?: number | null;
 }
+export type ImageThinkingLevel = 'minimal' | 'medium' | 'high';
+export type ImageAction = 'initial' | 'refine' | 'regenerate';
+export interface ImageSearchGrounding {
+  web: boolean;
+  imageSearch: boolean;
+}
+export interface ImageGroundingCitation {
+  url: string;
+  title?: string;
+}
+export interface ImageGroundingMetadata {
+  citations: ImageGroundingCitation[];
+  searchSuggestionsHtml?: string | null;
+}
 export interface ImageDraft {
   kind: 'image';
   prompt: string;
+  model?: string;
   aspectRatio: string;
   resolution: string;
   adapt: boolean;
   instructions: string;
   referenceAssetId: string | null;
+  referenceAssetIds?: string[];
+  videoUri?: string;
+  searchGrounding?: ImageSearchGrounding;
+  thinkingLevel?: '' | ImageThinkingLevel;
 }
 export interface ImageRequest {
   prompt: string;
+  model?: string;
   adaptation: { enabled: boolean; instructions: string };
-  output: { aspectRatio: string; resolution: string | null };
+  output: {
+    aspectRatio: string;
+    resolution: string | null;
+    mimeType?: 'image/png' | 'image/jpeg' | null;
+  };
   referenceAssetId: string | null;
+  referenceAssetIds?: string[];
+  videoUri?: string | null;
+  searchGrounding?: ImageSearchGrounding;
+  thinkingLevel?: ImageThinkingLevel | null;
+  action?: ImageAction;
+  fromGenerationId?: string | null;
 }
 export interface AssetResource {
   durationMs?: number;
@@ -73,7 +103,14 @@ export interface ImageResource extends MediaSummary {
   links: { self: string; web: string; generations: string };
 }
 
-export interface ImageGenerationResource extends GenerationBase { type: 'image'; request: ImageRequest }
+export interface ImageGenerationResource extends GenerationBase {
+  type: 'image';
+  request: ImageRequest;
+  interactionId?: string | null;
+  parentGenerationId?: string | null;
+  thoughtSummary?: string | null;
+  grounding?: ImageGroundingMetadata | null;
+}
 export type GenerationResource = ImageGenerationResource | VideoGenerationResource | MusicGenerationResource | SfxGenerationResource;
 export interface VideoRequest {
   prompt: string;

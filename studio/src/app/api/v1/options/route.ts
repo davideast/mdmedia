@@ -1,4 +1,16 @@
 import { apiError, authenticate, forbiddenScope, hasScope, unauthorized } from "@/lib/api-auth";
+import {
+  DEFAULT_IMAGE_MODEL,
+  EXTENDED_IMAGE_RATIOS,
+  IMAGE_MIME_TYPES,
+  IMAGE_MODELS,
+  IMAGE_RATIOS,
+  IMAGE_RESOLUTIONS,
+  IMAGE_THINKING_LEVELS,
+  MAX_IMAGE_PROMPT,
+  MAX_IMAGE_REFERENCES,
+  MAX_REFERENCE_BYTES,
+} from "@/lib/image-request";
 import { MAX_MARKDOWN_CHARS } from "@/lib/narration-api";
 import { selectedPresetId } from "@/lib/presets";
 import { loadUserSettings } from "@/lib/user-settings-server";
@@ -23,13 +35,46 @@ export async function GET(request: Request): Promise<Response> {
   if (!caller) return unauthorized();
   if (!hasScope(caller, "options:read")) return forbiddenScope("options:read");
 
+  const imageMetadata = () => ({
+    model: process.env.MDMEDIA_IMAGE_MODEL?.trim() || DEFAULT_IMAGE_MODEL,
+    models: IMAGE_MODELS,
+    aspectRatios: IMAGE_RATIOS,
+    extendedAspectRatios: EXTENDED_IMAGE_RATIOS,
+    resolutions: IMAGE_RESOLUTIONS,
+    thinkingLevels: IMAGE_THINKING_LEVELS,
+    outputMimeTypes: IMAGE_MIME_TYPES,
+    referenceImages: MAX_IMAGE_REFERENCES,
+    searchGrounding: true,
+    videoToImage: true,
+    adaptation: true,
+  });
+
   const media = new URL(request.url).searchParams.get('media');
   if (media === 'image') {
-    const { imageDefaults, configuredImageModel } = await import('@/lib/image-server');
-    const { IMAGE_RATIOS, IMAGE_RESOLUTIONS, MAX_REFERENCE_BYTES, MAX_IMAGE_PROMPT } = await import('@/lib/image-request');
-    return Response.json({ type: 'image', available: Boolean(process.env.GEMINI_API_KEY), provider: 'gemini', model: configuredImageModel(),
-      defaults: await imageDefaults(caller.uid), capabilities: { aspectRatios: IMAGE_RATIOS, resolutions: IMAGE_RESOLUTIONS, adaptation: true, referenceImages: 1 },
-      limits: { promptChars: MAX_IMAGE_PROMPT, referenceBytes: MAX_REFERENCE_BYTES }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+    const { imageDefaults } = await import('@/lib/image-server');
+    const meta = imageMetadata();
+    return Response.json({
+      type: 'image',
+      available: Boolean(process.env.GEMINI_API_KEY),
+      provider: 'gemini',
+      ...meta,
+      image: meta,
+      defaults: await imageDefaults(caller.uid),
+      capabilities: {
+        models: IMAGE_MODELS,
+        aspectRatios: IMAGE_RATIOS,
+        extendedAspectRatios: EXTENDED_IMAGE_RATIOS,
+        resolutions: IMAGE_RESOLUTIONS,
+        thinkingLevels: IMAGE_THINKING_LEVELS,
+        outputMimeTypes: IMAGE_MIME_TYPES,
+        adaptation: true,
+        referenceImages: MAX_IMAGE_REFERENCES,
+        searchGrounding: true,
+        videoToImage: true,
+      },
+      limits: { promptChars: MAX_IMAGE_PROMPT, referenceBytes: MAX_REFERENCE_BYTES, referenceImages: MAX_IMAGE_REFERENCES },
+      visibility: ['private'],
+    }, { headers: { 'Cache-Control': 'no-store' } });
   }
   if (media === 'video') {
     const { videoDefaults, configuredVideoModel } = await import('@/lib/video-server');
@@ -81,6 +126,7 @@ export async function GET(request: Request): Promise<Response> {
       elevenlabs,
     },
     models: TTS_MODELS,
+    image: imageMetadata(),
     visibility: caller.kind === "apiKey" ? ["private"] : ["private", "shared", "public"],
     presets: {
       delivery: delivery.map(({ id, name, text }) => ({ id, name, text })),
