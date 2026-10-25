@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
-import { createElement, type ReactElement } from 'react';
+import React, { createElement, type ReactElement } from 'react';
 import {
   parseMarkdownToSpeakableParagraphs,
   parseMarkdownToSpeakableSegments,
@@ -11,6 +12,17 @@ const studioReactDomServer = resolve(
   import.meta.dir,
   '../../studio/node_modules/react-dom/server.js',
 );
+if (!existsSync(studioReactDomServer)) {
+  const req = createRequire(import.meta.url);
+  const reactDomPkg = req('react-dom/package.json') as { version?: string };
+  if (reactDomPkg.version && React.version !== reactDomPkg.version) {
+    Object.defineProperty(React, 'version', {
+      value: reactDomPkg.version,
+      configurable: true,
+      writable: true,
+    });
+  }
+}
 const { renderToStaticMarkup } = (await import(
   existsSync(studioReactDomServer)
     ? '../../studio/node_modules/react-dom/server'
