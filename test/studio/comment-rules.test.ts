@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-// Studio's own copy of Pyric evaluates the compiled rules in process, with no sandbox.
-import { firestoreRules, type FirestoreCase } from '../../studio/node_modules/pyric/dist/rules/index.js';
+// Pyric evaluates the compiled rules in process, with no sandbox.
+import { firestoreRules, type FirestoreCase } from 'pyric/rules';
 
 /**
  * Review comments (threads, their messages and options), the decision log and

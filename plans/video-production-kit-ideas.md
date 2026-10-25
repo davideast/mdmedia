@@ -271,7 +271,7 @@ See [docs/cut-check.md](../docs/cut-check.md) and the Performances section of [d
   - a cut-level `performances` list (`id`, `lines`, `intent`, `delivery`, own `thresholds`);
   - a line-level `delivery` note;
   - `check.thresholds`.
-  
+
   The resolver reports unknown lines, lines in two performances and lines out of order. It puts each splitting-rule problem on the resolved performance: separate generations, a line across an extend seam, an unknown seam, mixed speakers. An extended take's seam is the length of the take it continued, so Take 4's opening counts as one generation.
 - **`mdmedia cut check <cut> [--listen] [--json]`:**
   - **Measured:** taken from a render of the cut's dialogue (no music or effects, the cut's own gains).
@@ -285,7 +285,7 @@ See [docs/cut-check.md](../docs/cut-check.md) and the Performances section of [d
   - the words said before, verbatim, with their measured delivery in words;
   - the whole performance and its direction;
   - what comes next.
-  
+
   The look and framing come from the take's own storyboard.
 - **Calibration:** Big Hal Takes 5, 6 and 7 and Night Wagon Take 9 are annotated.
   - **Measured flags and the splitting rule:** they separate Take 5's two broken performances (4 and 5 flags each) from everything the owner heard as fine (none).
@@ -293,7 +293,7 @@ See [docs/cut-check.md](../docs/cut-check.md) and the Performances section of [d
     - It catches the shouted reveal and the shouted "PERSONALLY!".
     - It calls every pair "one continuous delivery", so Take 5's "two separate deliveries 0.95" above didn't reproduce.
     - It fails the accepted Take 6/7 punchline as shouted, though measured "wheels" is level with "comes".
-    
+
     It stays a filter.
 - **Hooks for characters:**
   - `reference: (speaker) => ReferenceLevels` in the check, which flags `outside-reference`;

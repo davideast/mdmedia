@@ -1,5 +1,7 @@
 import {describe,it,expect} from 'bun:test';
 import {readFileSync,existsSync} from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {resolveCutJson} from '../../src/cut/index';
 const read=(n:string)=>JSON.parse(readFileSync(new URL('../../docs/cuts/'+n,import.meta.url),'utf8'));
@@ -25,7 +27,7 @@ describe('Football editorial pass: preserve the performances',()=>{
  it('lifts only the repetition, leaving the first delivery and its pause intact',()=>{
   const ff=new URL('../../node_modules/ffmpeg-static/ffmpeg',import.meta.url).pathname;
   const decode=(p:string)=>{const r=spawnSync(ff,['-v','error','-i',p,'-vn','-ac','1','-ar','48000','-f','f32le','pipe:1'],{maxBuffer:8000000});expect(r.status).toBe(0);return r.stdout};
-  const originalPath='/home/david/.local/share/mdmedia/productions/crt-tv/takes/fb2-m-close-t3.mp4',liftedPath='/home/david/.local/share/mdmedia/productions/crt-tv/editorial/football-take2-20261020/fb2-m-close-t3-lifted.wav';
+  const originalPath=path.join(os.homedir(),'.local/share/mdmedia/productions/crt-tv/takes/fb2-m-close-t3.mp4'),liftedPath=path.join(os.homedir(),'.local/share/mdmedia/productions/crt-tv/editorial/football-take2-20261020/fb2-m-close-t3-lifted.wav');
   if(existsSync(originalPath)&&existsSync(liftedPath)){const original=decode(originalPath),lifted=decode(liftedPath);
   expect(lifted.length).toBe(original.length);
   for(const [start,end,gain] of [[0,3.5,1],[4.05,6,10**(2/20)]]){let maxError=0;for(let i=Math.ceil(start*48000);i<end*48000;i++)maxError=Math.max(maxError,Math.abs(lifted.readFloatLE(i*4)-original.readFloatLE(i*4)*gain));expect(maxError).toBeLessThan(0.000001)}

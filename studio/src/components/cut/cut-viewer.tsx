@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ref, type ReactNode } from 'react';
-import { Film, MessageSquare, Minus, Pause, Play, Plus } from 'lucide-react';
+import { Film, Maximize, Minimize, MessageSquare, Minus, Pause, Play, Plus } from 'lucide-react';
 import { cn } from 'cn';
 import { gainAt, type CutError, type ResolvedAudio, type ResolvedLine, type ResolvedOverlay, type ResolvedSegment, type Timeline } from 'mdmedia/cut';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
@@ -23,6 +23,7 @@ import {
   stepTenth,
   tenths,
 } from '@/lib/cut-timeline';
+import { useCutPreview } from './use-cut-preview';
 import { CutViewerContext, TONE_DOT, type CommentPin, type CutViewerComments, type CutViewerControls } from './cut-viewer-context';
 
 /**
@@ -80,6 +81,10 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   const timeline = useMemo(() => ({ ...cut, lines: spokenLines(cut.lines) }), [cut]);
   const { length, segments, lines, music, overlays, sfx, meta } = timeline;
   const videoRef = useRef<HTMLVideoElement>(null);
+  const {
+    stageRef, buttonRef: fullscreenButtonRef, id: previewId, height: previewHeight,
+    fullscreen: previewFullscreen, fallback: previewFallback, toggleFullscreen, separator: previewSeparator,
+  } = useCutPreview(videoRef);
   // A caller that manages the source gets the element too.
   useImperativeHandle(outerVideoRef, () => videoRef.current as HTMLVideoElement, []);
   const lanesRef = useRef<HTMLDivElement>(null);
@@ -232,9 +237,9 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
 
   useEffect(() => {
     const ignored = (element: EventTarget | null) =>
-      element instanceof HTMLElement && Boolean(element.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [role="menu"], [role="listbox"]'));
+      element instanceof HTMLElement && Boolean(element.closest('[data-fullscreen-preview], input, textarea, select, [contenteditable="true"], [role="dialog"], [role="menu"], [role="listbox"]'));
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || ignored(event.target)) return;
+      if (previewFullscreen || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || ignored(event.target)) return;
       if (event.code === 'Space' || event.key === ' ') {
         event.preventDefault();
         if (!event.repeat) toggle();
@@ -254,7 +259,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
     };
     // Space on a focused button would also click it; the shortcut wins.
     const onKeyUp = (event: KeyboardEvent) => {
-      if ((event.code === 'Space' || event.key === ' ') && !ignored(event.target)) event.preventDefault();
+      if (!previewFullscreen && (event.code === 'Space' || event.key === ' ') && !ignored(event.target)) event.preventDefault();
     };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
@@ -262,7 +267,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [currentTime, seek, toggle, zoom, zoomTo]);
+  }, [currentTime, seek, toggle, zoom, zoomTo, previewFullscreen]);
 
   // --- pointer: click or drag anywhere on the timeline to seek ---------------
 
@@ -428,7 +433,20 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   // The stage: black, the picture centred in it, so a 4:3 frame is pillarboxed inside the stage
   // rather than leaving the page around it empty. The frame toggle only changes the picture.
   const stage = (
-    <div className="relative aspect-[4/3] max-h-[62dvh] w-full overflow-hidden rounded-[10px] bg-black ring-1 ring-white/[0.08] [container-type:size] lg:aspect-auto lg:max-h-none lg:min-w-0 lg:flex-1">
+    <div
+      ref={stageRef} id={previewId}
+      className="relative aspect-[4/3] max-h-[62dvh] w-full overflow-hidden rounded-[10px] bg-black ring-1 ring-white/[0.08] [container-type:size] lg:aspect-auto lg:max-h-none lg:min-w-0 lg:flex-1"
+      style={previewFullscreen ? { ...(previewFallback ? { position: 'fixed', inset: 0, zIndex: 100 } as const : {}), width: '100%', height: '100dvh', maxHeight: 'none', borderRadius: 0, flex: 'none' } : !wide && previewHeight !== null ? { height: previewHeight, maxHeight: 'none', aspectRatio: 'auto', flex: 'none' } : undefined}
+    >
+      <button
+        ref={fullscreenButtonRef} type="button" data-fullscreen-preview
+        aria-label={previewFullscreen ? 'Exit fullscreen preview' : 'Enter fullscreen preview'}
+        title={previewFullscreen ? 'Exit fullscreen preview' : 'Fullscreen preview'}
+        onClick={() => void toggleFullscreen()}
+        className="absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-md bg-black/60 text-white hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-white"
+      >
+        {previewFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+      </button>
       <div
         className="absolute top-1/2 left-1/2 w-[min(100cqw,calc(100cqh*var(--aspect)))] -translate-x-1/2 -translate-y-1/2 overflow-hidden transition-[width] duration-300 ease-out motion-reduce:transition-none"
         style={{ '--aspect': aspect, aspectRatio: String(aspect) } as CSSProperties}
@@ -438,7 +456,9 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
           src={outerVideoRef ? undefined : src}
           preload="auto"
           playsInline
-          onClick={toggle}
+          controls={previewFullscreen}
+          controlsList="nofullscreen"
+          onClick={previewFullscreen ? undefined : toggle}
           onPlay={() => { setPlaying(true); sample.current.media = -1; }}
           onPause={() => setPlaying(false)}
           onEnded={() => setPlaying(false)}
@@ -457,7 +477,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
           aria-label={`${meta.title} ${meta.version ?? ''}`.trim()}
           className={cn('absolute inset-0 h-full w-full cursor-pointer', frame === 'tv' ? 'object-cover' : 'object-contain')}
         />
-        {frame === 'full' ? (
+        {frame === 'full' && !previewFullscreen ? (
           <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[12.5%] right-[12.5%] border-x border-dashed border-white/30" />
         ) : null}
         {videoError || !src ? (
@@ -533,7 +553,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
              transport stays under the picture and the rest follows the timeline in one box, in the same order.
              Only one copy is mounted, wherever the layout puts it. */
           <div ref={rootRef} className="flex min-h-full flex-1 flex-col gap-4 px-4 pt-4 pb-5 lg:px-6" style={{ '--cut-now': '#f6c453' } as CSSProperties}>
-            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row">
+            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row" style={wide && previewHeight !== null ? { height: previewHeight, minHeight: 200, flex: 'none' } : undefined}>
               {stage}
               <aside className="flex min-w-0 flex-col gap-4 lg:w-[23rem] lg:flex-none lg:overflow-hidden lg:rounded-[10px] lg:border lg:border-border lg:bg-surface-inset lg:py-4">
                 <div className="lg:flex-none lg:px-4">{transport}</div>
@@ -546,6 +566,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
                 ) : null}
               </aside>
             </div>
+            {previewSeparator}
             {timelineSection}
             {wide ? null : (
               <div className="flex flex-col gap-6 rounded-[10px] border border-border bg-surface-inset p-4">
@@ -559,7 +580,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
           /* Three boxes on one grid with equal gutters: the stage and the panel on top, the timeline under
              both. The stage's left edge and the panel's right edge are the timeline's edges. */
           <div ref={rootRef} className="flex min-h-full flex-1 flex-col gap-4 px-4 pt-4 pb-5 lg:px-6" style={{ '--cut-now': '#f6c453' } as CSSProperties}>
-            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row">
+            <div className="flex flex-col gap-4 lg:min-h-[340px] lg:flex-1 lg:flex-row" style={wide && previewHeight !== null ? { height: previewHeight, minHeight: 200, flex: 'none' } : undefined}>
               {stage}
               {/* The panel: a docked box the same as the timeline's. On a phone only the transport is here,
                   unboxed under the picture; the rest goes in a box under the timeline. */}
@@ -570,6 +591,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
                 <div className="mt-auto hidden [@container_aside_(min-height:360px)]:block">{cutSection}</div>
               </aside>
             </div>
+            {previewSeparator}
             {timelineSection}
             <div className="flex flex-col gap-6 rounded-[10px] border border-border bg-surface-inset p-4 lg:hidden">
               {nowSection}

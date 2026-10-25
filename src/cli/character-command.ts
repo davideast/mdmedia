@@ -328,4 +328,3 @@ export const characterCommand = defineCommand({
   meta: { name: 'character', description: 'Characters: versioned look, voice and delivery, shared across productions (docs/characters.md)' },
   subCommands: { new: create, show, list, measure, still, swap },
 });
-

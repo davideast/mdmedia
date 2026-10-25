@@ -1,0 +1,56 @@
+{
+  "format": "mdmedia.character@1",
+  "id": "regulars-kenny",
+  "version": 1,
+  "name": "Kenny",
+  "kind": "person",
+  "description": "Kenny, one of the three seated regulars in Regulars.",
+  "look": {
+    "description": "Older balding man with wire-frame glasses and a small grey moustache; blue plaid button-down shirt and brown trousers. Preserve the accepted fresh Seedance facial identity.",
+    "never": []
+  },
+  "media": {
+    "root": "~/.local/share/mdmedia/productions/crt-tv"
+  },
+  "stills": [
+    {
+      "id": "sharp-closeup",
+      "file": "characters/regulars/kenny-sharp.png",
+      "from": {
+        "generated": {
+          "provider": "Runway / nano-banana-pro",
+          "ref": "049378f3-73af-4be6-a5e2-5e3e19d3f0b1"
+        }
+      },
+      "note": "Existing sharp setup reused unchanged. Reuse established by current task and accepted downstream performances; old image-request review status was not updated, and no independent historic still-approval event is asserted. Walt is visible in the left foreground: identity/close-up setup reference, not authority to move Walt closer in the master layout."
+    },
+    {
+      "id": "accepted-ensemble",
+      "file": "characters/regulars/accepted-entrance-4s.png",
+      "from": {
+        "take": "editorial/regulars-entrance-20261021/seedance-natural-20261021/entrance-natural-review.mp4",
+        "at": 4
+      },
+      "note": "Local unmodified frame extraction from accepted entrance; accepted-source reference, not independently approved new image. Shared identity/wardrobe and room-placement evidence. Do not inherit greeting gestures as a required starting pose. Dot faces away; unsuitable as detailed face reference or magnified close-up."
+    }
+  ],
+  "voice": {
+    "provider": "video-model",
+    "uses": [
+      "on-camera"
+    ],
+    "notes": "Native Seedance performance. No measured voice profile, standalone voice reference or provider voice ID has been established. Text register does not guarantee voice identity."
+  },
+  "delivery": {
+    "register": "Warm, casual, conversational concern and easy familiarity.",
+    "never": [],
+    "reference": null
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-21",
+      "changes": "First fresh-Seedance reference record from existing accepted-source ensemble and established sharp setups. No new model media. Story-specific emotional states and staging are separate. Pending parent review; not bound into any production."
+    }
+  ]
+}

@@ -20,24 +20,33 @@ const REPO = path.resolve(import.meta.dir, '../..');
 const DIR = path.join(REPO, 'docs/characters');
 const MEDIA = path.join(os.homedir(), '.local/share/mdmedia/productions/crt-tv');
 const hasMedia = existsSync(path.join(MEDIA, 'takes'));
+const measuredIds = ['big-hal', 'buddy', 'chet', 'moose', 'rick'];
+const regularsIds = ['regulars-dot', 'regulars-eddie', 'regulars-kenny', 'regulars-rita', 'regulars-walt'];
 
 describe('the seeded characters', () => {
-  it('are Big Hal, Buddy, Chet, Moose and Rick, each at version 1 with measured levels', async () => {
+  it('retain the five measured characters and five unmeasured Regulars references', async () => {
     const all = await listCharacters(DIR);
-    expect(all.map((c) => formatCharacterRef(c.character))).toEqual(['big-hal@1', 'buddy@1', 'chet@1', 'moose@1', 'rick@1']);
-    for (const { character } of all) {
+    expect(all.map((c) => formatCharacterRef(c.character)).sort()).toEqual([...measuredIds, ...regularsIds].sort().map((id) => `${id}@1`));
+    const measured = all.filter(({ character }) => measuredIds.includes(character.id));
+    for (const { character } of measured) {
       expect(character.delivery.reference?.lines.length).toBeGreaterThan(4);
       expect(character.stills.length).toBeGreaterThan(0);
       expect(character.look.never.length).toBeGreaterThan(0);
     }
-    const voices = Object.fromEntries(all.map((c) => [c.character.id, c.character.voice.name ?? c.character.voice.provider]));
+    const voices = Object.fromEntries(measured.map((c) => [c.character.id, c.character.voice.name ?? c.character.voice.provider]));
     expect(voices).toEqual({ 'big-hal': 'video-model', buddy: 'Bill - Wise, Mature, Balanced', chet: 'Eric', moose: 'Roger', rick: 'video-model' });
+    for (const { character } of all.filter(({ character }) => regularsIds.includes(character.id))) {
+      expect(character.stills.length).toBeGreaterThan(0);
+      expect(character.media.root).toBe('~/.local/share/mdmedia/productions/crt-tv');
+      expect(character.voice.provider).toBe('video-model');
+      expect(character.delivery.reference).toBeNull();
+    }
     expect(readdirSync(DIR).every((f) => f.endsWith('.character.json'))).toBe(true);
   });
 
   it("were measured from their own lines in their productions' cuts", async () => {
     const cuts = new Map<string, Awaited<ReturnType<typeof loadCutForCheck>> | null>();
-    for (const { character } of await listCharacters(DIR)) {
+    for (const { character } of (await listCharacters(DIR)).filter(({ character }) => measuredIds.includes(character.id))) {
       for (const line of character.delivery.reference!.lines) {
         if (!cuts.has(line.cut)) cuts.set(line.cut, await loadCutForCheck(path.join(REPO, line.cut)).catch(() => null));
         const loaded = cuts.get(line.cut);

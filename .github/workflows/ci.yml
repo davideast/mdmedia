@@ -44,3 +44,33 @@ jobs:
 
       - name: Run Complete Verification & Packaging Sandbox Harness
         run: bun run verify
+
+  studio:
+    name: Verify Studio from a Fresh Checkout
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - name: Build the local mdmedia package
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+          npm pack --ignore-scripts
+      - name: Prepare pinned Pyric archives and install Studio
+        run: |
+          mkdir -p studio/.pyric-local
+          npm pack @pyric/cli@0.1.0-alpha.24 pyric@0.1.0-alpha.24 pyric-admin@0.1.0-alpha.24 create-pyric@0.1.0-alpha.24 --pack-destination studio/.pyric-local --ignore-scripts
+          npm --prefix studio install --no-audit --no-fund
+      - name: Check hosted connection readiness
+        run: bun test test/studio/hosted-connection-check.test.ts
+      - name: Check Studio types and structural-rule fixtures
+        working-directory: studio
+        run: |
+          npx next typegen
+          npx tsc --noEmit --incremental false
+          npm run test:checks
+      - name: Build Studio and its offline worker
+        run: npm --prefix studio run build
