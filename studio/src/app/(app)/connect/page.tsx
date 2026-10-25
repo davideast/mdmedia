@@ -88,7 +88,7 @@ function ConnectApproval() {
             <ul className="grid list-disc gap-1 pl-5 text-[0.85rem] text-ink-muted">
               <li>It can create private narrations, images, videos, and music as you, using your Settings.</li>
               <li>It can read permitted narrations and your private images, videos, and music, download results, and upload reference images.</li>
-              <li>It can create, edit, and delete your playlists. Deleting a playlist never deletes its narrations.</li>
+              <li>It can create, edit, and delete your playlists and document trees. Deleting a playlist or tree never deletes its narrations.</li>
               <li>It cannot delete, share, or publish narrations, or change your Settings.</li>
             </ul>
             <div className="flex gap-2">

@@ -106,7 +106,7 @@ export function AppShell({
     next: !offline && queue && queue.index + 1 < queue.tracks.length ? nextTrack : undefined,
   });
   const breakpoints = useResponsiveBreakpoints();
-  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/");
+  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/");
   const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);

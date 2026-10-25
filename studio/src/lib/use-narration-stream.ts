@@ -17,6 +17,7 @@ import { getMediaStore } from './media-store';
 import { StreamingPcmPlayer } from './pcm-player';
 import { streamWavInto } from './wav-stream';
 import type { AlignedChunk, AlignedWord, StreamEvent, Visibility, VoiceName } from './types';
+import type { TranscriptSourceMap } from './tree-types';
 import type { NarrationTimingsFile } from './wav';
 
 export interface NarrationStreamState {
@@ -26,6 +27,7 @@ export interface NarrationStreamState {
   voice: VoiceName | null;
   transcript: string;
   chunks: AlignedChunk[];
+  sourceMap?: TranscriptSourceMap;
   status: 'idle' | 'loading' | 'starting' | 'streaming' | 'ready' | 'error';
   errorMessage: string | null;
   player: StreamingPcmPlayer | null;
@@ -173,6 +175,7 @@ export function useNarrationStream(): NarrationStreamState {
   const [voice, setVoice] = useState<VoiceName | null>(null);
   const [transcript, setTranscript] = useState('');
   const [chunks, setChunks] = useState<AlignedChunk[]>([]);
+  const [sourceMap, setSourceMap] = useState<TranscriptSourceMap | undefined>(undefined);
   const [sourceMarkdown, setSourceMarkdown] = useState<string | null>(null);
   const [adapted, setAdapted] = useState<boolean>(false);
   const [status, setStatus] = useState<NarrationStreamState['status']>('idle');
@@ -250,6 +253,7 @@ export function useNarrationStream(): NarrationStreamState {
       setSourceMarkdown(input.markdown);
       setAdapted(input.rewriteForNarration);
       setChunks([]);
+      setSourceMap(undefined);
       setErrorMessage(null);
       setStatus('starting');
 
@@ -435,6 +439,7 @@ export function useNarrationStream(): NarrationStreamState {
         setSourceMarkdown(null);
         setAdapted(false);
         setChunks([]);
+        setSourceMap(undefined);
       }
       setErrorMessage(null);
       setStatus('loading');
@@ -453,6 +458,7 @@ export function useNarrationStream(): NarrationStreamState {
           setAdapted(offlineTrack.timings.adapted);
         }
         setChunks([...offlineTrack.timings.chunks].sort((a, b) => a.index - b.index));
+        setSourceMap(offlineTrack.timings.sourceMap);
 
         const objectUrl = URL.createObjectURL(offlineTrack.audioBlob);
         const activePlayer = ensurePlayer();
@@ -569,6 +575,7 @@ export function useNarrationStream(): NarrationStreamState {
           setAdapted(latestDocRef.current.adapted);
         }
         setChunks([...timingsFile.chunks].sort((a, b) => a.index - b.index));
+        setSourceMap(timingsFile.sourceMap);
       };
 
       const startRequestedPlayback = async (activePlayer: StreamingPcmPlayer) => {
@@ -776,6 +783,7 @@ export function useNarrationStream(): NarrationStreamState {
     voice,
     transcript,
     chunks,
+    sourceMap,
     status,
     errorMessage,
     player,

@@ -10,7 +10,12 @@ import { randomUUID } from 'node:crypto';
 import type { AgentHeartbeat, ContextBundle, Decision, DecisionSource, Message, Suggestion, SuggestionCheck, SuggestionState, Thread, ThreadStatus, TimedRef } from '../threads/types.js';
 
 export class StudioApiError extends Error {
-  constructor(readonly status: number, readonly code: string, message: string) {
+  constructor(
+    readonly status: number,
+    readonly code: string,
+    message: string,
+    readonly details?: Record<string, unknown>,
+  ) {
     super(message);
     this.name = 'StudioApiError';
   }
@@ -314,6 +319,128 @@ export interface DecisionBody {
   cutIds?: string[];
 }
 
+export type TreeId = string;
+export type TreeNodeId = string;
+export type TreeDocId = string;
+
+export interface TreeMediaRef {
+  type: StudioMediaType | 'asset' | 'mermaid';
+  id: string;
+  generationId?: string;
+}
+
+export interface TreeNodeMeta {
+  id: TreeNodeId;
+  kind: 'folder' | 'doc';
+  name: string;
+  path: string;
+  previousPaths: string[];
+  parentId: TreeNodeId | null;
+  childIds: TreeNodeId[];
+  docId: TreeDocId | null;
+  narrationId: string | null;
+  narrationStatus: 'unvoiced' | 'streaming' | 'ready' | 'error';
+  narrationContentHash: string | null;
+  updatedAt: number;
+}
+
+export interface TreeSelectionSet {
+  id: string;
+  title: string;
+  nodeIds: TreeNodeId[];
+  instructions?: string;
+  updatedAt: number;
+}
+
+export interface TreeSummary {
+  id: TreeId;
+  title: string;
+  description: string;
+  nodeCount: number;
+  docCount: number;
+  selectedCount: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface TreeDetail extends TreeSummary {
+  rootIds: TreeNodeId[];
+  nodes: Record<TreeNodeId, TreeNodeMeta>;
+  selectedNodeIds: TreeNodeId[];
+  selectionSets: Record<string, TreeSelectionSet>;
+  pathAssets: Record<string, TreeMediaRef>;
+  revision: number;
+}
+
+export interface TreeDocument {
+  id: TreeDocId;
+  treeId: TreeId;
+  nodeId: TreeNodeId;
+  path: string;
+  title: string;
+  markdown: string;
+  contentHash: string;
+  narrationId: string | null;
+  narrationStatus: 'unvoiced' | 'streaming' | 'ready' | 'error';
+  narrationStale: boolean;
+  updatedAt: number;
+}
+
+export type TreePosition = 'start' | 'end' | { before: TreeNodeId } | { after: TreeNodeId };
+
+export interface TreeOrganizeEntry {
+  path: string;
+  nodeId?: TreeNodeId;
+  target?: string;
+  title?: string;
+  children?: TreeOrganizeEntry[];
+}
+
+export type TreeOp =
+  | {
+      op: 'put_doc';
+      path: string;
+      title?: string;
+      markdown: string;
+      at?: TreePosition;
+      nodeId?: TreeNodeId;
+    }
+  | { op: 'mkdir'; path: string; at?: TreePosition; nodeId?: TreeNodeId }
+  | { op: 'move'; target: string; toPath: string; at?: TreePosition }
+  | { op: 'reorder'; folderPath: string; childOrder: string[] }
+  | { op: 'remove'; targets: string[]; recursive?: boolean }
+  | { op: 'select'; targets: string[]; mode: 'set' | 'add' | 'remove' | 'clear' }
+  | { op: 'save_selection_set'; id?: string; title: string; targets: string[]; instructions?: string }
+  | { op: 'delete_selection_set'; id: string }
+  | { op: 'bind_asset'; virtualPath: string; ref: TreeMediaRef }
+  | {
+      op: 'replace_media_ref';
+      nodeId: TreeNodeId;
+      from: TreeMediaRef;
+      to: TreeMediaRef;
+      placement: 'replace' | 'insert_below';
+    }
+  | { op: 'organize'; entries: TreeOrganizeEntry[] };
+
+export interface TreeCompileRequest {
+  targets?: string[];
+  preset?: string;
+  mode?: 'concat' | 'synthesize';
+  title?: string;
+  instructions?: string;
+  saveAsPath?: string;
+  narrate?: boolean;
+  voice?: string;
+}
+
+export interface TreeCompileResult {
+  title: string;
+  markdown: string;
+  sourceNodeIds: TreeNodeId[];
+  savedNode?: TreeNodeMeta;
+  narrationId?: string;
+}
+
 export type StudioMediaType = 'image' | 'video' | 'music' | 'sfx';
 /** Media that accept an uploaded reference image. */
 export type ReferenceMediaType = Exclude<StudioMediaType, 'sfx'>;
@@ -546,8 +673,8 @@ export class StudioClient {
     const text = await response.text();
     let parsed: unknown = null;
     try { parsed = text ? JSON.parse(text) : null; } catch { /* Not JSON. */ }
-    const error = (parsed as { error?: { code?: string; message?: string } } | null)?.error;
-    throw new StudioApiError(response.status, error?.code ?? `http_${response.status}`, error?.message ?? `The studio answered ${response.status}.`);
+    const error = (parsed as { error?: { code?: string; message?: string; details?: Record<string, unknown> } } | null)?.error;
+    throw new StudioApiError(response.status, error?.code ?? `http_${response.status}`, error?.message ?? `The studio answered ${response.status}.`, error?.details);
   }
 
   private async request<T>(method: string, route: string, body?: unknown, authorized = true, headers: Record<string, string> = {}): Promise<T> {
@@ -757,6 +884,74 @@ export class StudioClient {
   /** Says this agent is watching for comments, on one production or all of them. */
   commentHeartbeat(body: { agent: string; productionId?: string }): Promise<AgentHeartbeat> {
     return this.request('POST', '/api/v1/comments/heartbeat', body);
+  }
+
+  async listTrees(): Promise<TreeSummary[]> {
+    const res = await this.request<{ trees: TreeSummary[] }>('GET', '/api/v1/trees');
+    return res.trees;
+  }
+
+  async getTree(idOrTitle: string): Promise<TreeDetail> {
+    const res = await this.request<{ tree: TreeDetail }>('GET', `/api/v1/trees/${encodeURIComponent(idOrTitle)}`);
+    return res.tree;
+  }
+
+  async createTree(input: {
+    title: string;
+    description?: string;
+    ops?: TreeOp[];
+    idempotencyKey?: string;
+  }): Promise<TreeDetail> {
+    const { idempotencyKey, ...body } = input;
+    const headers: Record<string, string> = idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {};
+    const res = await this.request<{ tree: TreeDetail }>('POST', '/api/v1/trees', body, true, headers);
+    return res.tree;
+  }
+
+  async updateTree(id: string, patch: { title?: string; description?: string }): Promise<TreeDetail> {
+    const res = await this.request<{ tree: TreeDetail }>('PATCH', `/api/v1/trees/${encodeURIComponent(id)}`, patch);
+    return res.tree;
+  }
+
+  deleteTree(id: string): Promise<{ deleted: boolean; id: string }> {
+    return this.request<{ deleted: boolean; id: string }>('DELETE', `/api/v1/trees/${encodeURIComponent(id)}`);
+  }
+
+  async applyTreeOps(
+    id: string,
+    ops: TreeOp[],
+    options?: { expectedRevision?: number; idempotencyKey?: string },
+  ): Promise<TreeDetail> {
+    const headers: Record<string, string> = options?.idempotencyKey ? { 'Idempotency-Key': options.idempotencyKey } : {};
+    const body: { ops: TreeOp[]; expectedRevision?: number } = {
+      ops,
+      ...(options?.expectedRevision !== undefined ? { expectedRevision: options.expectedRevision } : {}),
+    };
+    const res = await this.request<{ tree: TreeDetail }>(
+      'POST',
+      `/api/v1/trees/${encodeURIComponent(id)}/ops`,
+      body,
+      true,
+      headers,
+    );
+    return res.tree;
+  }
+
+  async getTreeDocument(treeId: string, nodeIdOrPath: string): Promise<TreeDocument> {
+    const res = await this.request<{ document: TreeDocument }>(
+      'GET',
+      `/api/v1/trees/${encodeURIComponent(treeId)}/nodes/${encodeURIComponent(nodeIdOrPath)}`,
+    );
+    return res.document;
+  }
+
+  async compileTreeSelection(treeId: string, request: TreeCompileRequest): Promise<TreeCompileResult> {
+    const res = await this.request<{ result: TreeCompileResult }>(
+      'POST',
+      `/api/v1/trees/${encodeURIComponent(treeId)}/compile`,
+      request,
+    );
+    return res.result;
   }
 
   narration(id: string): Promise<NarrationResource> {

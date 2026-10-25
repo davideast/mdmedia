@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import {
   Clapperboard,
   FileText,
+  FolderTree,
   Download,
   Library,
   ListMusic,
@@ -24,6 +25,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
 import { useActiveImageCount } from "@/components/media/media-activity-provider";
+import { TreeExplorer } from "@/components/tree/tree-explorer";
 import { CreateMenu } from "./create-menu";
 import { FindWork, SidebarWork } from "./work-navigation";
 import { useWorkspace } from "./workspace-provider";
@@ -43,6 +45,7 @@ const NAV: readonly NavItem[] = [
   { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
   { href: "/productions", label: "Productions", icon: Clapperboard },
   { href: "/playlists", label: "Playlists", icon: ListMusic },
+  { href: "/trees", label: "Trees", icon: FolderTree },
   { href: "/downloads", label: "Downloads", icon: Download },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -121,73 +124,79 @@ export function NavRail({
       </div>
 
       <div className={cn("min-h-0 overflow-y-auto pb-4", docked ? "px-2" : "px-3")} >
-      <div className="py-2"><FindWork compact={docked} onNavigate={onNavigate} /></div>
-      <div className="mb-2"><CreateMenu compact={docked} onNavigate={onNavigate} /></div>
-      <ul className={cn("flex flex-col gap-1 py-2")}>
-        {NAV.map((item) => {
-          const active = isActive(pathname, item);
-          const Icon = item.icon;
-          const isQueue = item.href === "/queue";
-          const showBadge = isQueue && activeCount > 0;
-          const disabled = offline && item.href !== '/downloads';
+      {pathname.startsWith("/trees/") && !docked ? (
+        <TreeExplorer docked={false} onNavigate={onNavigate} />
+      ) : (
+        <>
+          <div className="py-2"><FindWork compact={docked} onNavigate={onNavigate} /></div>
+          <div className="mb-2"><CreateMenu compact={docked} onNavigate={onNavigate} /></div>
+          <ul className={cn("flex flex-col gap-1 py-2")}>
+            {NAV.map((item) => {
+              const active = isActive(pathname, item);
+              const Icon = item.icon;
+              const isQueue = item.href === "/queue";
+              const showBadge = isQueue && activeCount > 0;
+              const disabled = offline && item.href !== '/downloads';
 
-          const link = (
-            <div
-              className={cn(
-                "flex h-[30px] items-center rounded-md text-[13px] transition-colors",
-                docked ? "w-full justify-center" : "gap-2 px-2",
-                disabled && "cursor-not-allowed opacity-40",
-                active
-                  ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                  : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-              )}
-            >
-              <div className="relative flex flex-none items-center justify-center">
-                <Icon size={16} strokeWidth={2} className="flex-none" />
-                {docked && showBadge ? (
-                  <span className="absolute -top-1 -right-1 flex size-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex size-2 rounded-full bg-primary" />
-                  </span>
-                ) : null}
-              </div>
-              {docked ? null : (
-                <>
-                  <span className="truncate">{item.label}</span>
-                  {showBadge ? (
-                    <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-semibold text-primary-foreground">
-                      {activeCount}
-                    </span>
-                  ) : null}
-                </>
-              )}
-            </div>
-          );
+              const link = (
+                <div
+                  className={cn(
+                    "flex h-[30px] items-center rounded-md text-[13px] transition-colors",
+                    docked ? "w-full justify-center" : "gap-2 px-2",
+                    disabled && "cursor-not-allowed opacity-40",
+                    active
+                      ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                      : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <div className="relative flex flex-none items-center justify-center">
+                    <Icon size={16} strokeWidth={2} className="flex-none" />
+                    {docked && showBadge ? (
+                      <span className="absolute -top-1 -right-1 flex size-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                        <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                      </span>
+                    ) : null}
+                  </div>
+                  {docked ? null : (
+                    <>
+                      <span className="truncate">{item.label}</span>
+                      {showBadge ? (
+                        <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-semibold text-primary-foreground">
+                          {activeCount}
+                        </span>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+              );
 
-          const itemControl = disabled ? (
-            <div aria-disabled="true" title={`${item.label} requires Studio connection`}>{link}</div>
-          ) : (
-            <Link href={state.tabs.find((view) => view.key === item.href)?.href ?? item.href} onClick={onNavigate} aria-current={active ? "page" : undefined}>{link}</Link>
-          );
-
-          const tooltipLabel =
-            isQueue && activeCount > 0 ? `${item.label} (${activeCount} active)` : item.label;
-
-          return (
-            <li key={item.href}>
-              {docked && !disabled ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>{itemControl}</TooltipTrigger>
-                  <TooltipContent side="right">{tooltipLabel}</TooltipContent>
-                </Tooltip>
+              const itemControl = disabled ? (
+                <div aria-disabled="true" title={`${item.label} requires Studio connection`}>{link}</div>
               ) : (
-                itemControl
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      {!docked && <SidebarWork onNavigate={onNavigate} />}
+                <Link href={state.tabs.find((view) => view.key === item.href)?.href ?? item.href} onClick={onNavigate} aria-current={active ? "page" : undefined}>{link}</Link>
+              );
+
+              const tooltipLabel =
+                isQueue && activeCount > 0 ? `${item.label} (${activeCount} active)` : item.label;
+
+              return (
+                <li key={item.href}>
+                  {docked && !disabled ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>{itemControl}</TooltipTrigger>
+                      <TooltipContent side="right">{tooltipLabel}</TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    itemControl
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          {!docked && <SidebarWork onNavigate={onNavigate} />}
+        </>
+      )}
       </div>
 
       <div

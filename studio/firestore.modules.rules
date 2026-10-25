@@ -69,6 +69,21 @@ service cloud.firestore {
     match /mediaQuotas/{id} { allow read, write: if false; }
     match /mediaCatalogMigrations/{id} { allow read, write: if false; }
 
+    match /trees/{treeId} {
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      allow write: if false;
+
+      match /state/{stateId} {
+        allow get, list: if isAllowlisted() && isOwner(get(/databases/$(database)/documents/trees/$(treeId)).data.ownerUid);
+        allow write: if false;
+      }
+    }
+
+    match /treeDocs/{docId} {
+      allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
+      allow write: if false;
+    }
+
     match /narrations/{narrationId} {
 
       // Reads are authorized per document. For a query (`list`), Firestore

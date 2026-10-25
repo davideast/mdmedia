@@ -84,8 +84,14 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
       request = { ...request, referenceRole: 'reference' };
     }
     if (request.referenceAssetId) {
-      const reference = (await tx.get(adminDb().collection('mediaAssets').doc(request.referenceAssetId))).data() as StoredAsset | undefined;
-      if (!reference || reference.ownerUid !== uid || reference.mediaType !== 'video' || reference.purpose !== 'reference' || !reference.mimeType.startsWith('image/')) throw new MediaError(404, 'reference_not_found', 'Upload a reference image for this video.');
+      const reference = await loadOwnedAsset(uid, request.referenceAssetId).catch(() => null);
+      const validVideoRef =
+        reference &&
+        reference.mimeType.startsWith('image/') &&
+        ((reference.mediaType === 'video' && reference.purpose === 'reference') ||
+          reference.mediaType === 'image');
+      if (!validVideoRef) throw new MediaError(404, 'reference_not_found', 'Upload a reference image for this video.');
+      request = { ...request, referenceAssetId: reference.id };
     }
     const quota = (await tx.get(quotaRef)).data() ?? {};
     const active = (quota.active ?? []) as string[];

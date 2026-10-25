@@ -42,10 +42,64 @@ export async function saveImageAsset(uid: string, bytes: Uint8Array, purpose: St
   return asset;
 }
 export async function loadOwnedAsset(uid: string, id: string): Promise<StoredAsset> {
-  const snapshot = validMediaId(id) ? await adminDb().collection('mediaAssets').doc(id).get() : null;
-  const asset = snapshot?.data() as StoredAsset | undefined;
-  if (!asset || asset.ownerUid !== uid) throw new MediaError(404, 'not_found', 'That asset is not available to you.');
-  return asset;
+  if (!validMediaId(id)) {
+    throw new MediaError(404, 'not_found', 'That asset is not available to you.');
+  }
+  const direct = await adminDb().collection('mediaAssets').doc(id).get();
+  const directAsset = direct.data() as StoredAsset | undefined;
+  if (directAsset && directAsset.ownerUid === uid) {
+    return directAsset;
+  }
+
+  for (const prefix of ['image_', 'video_', 'music_', 'sfx_']) {
+    if (!id.startsWith(prefix)) {
+      const prefixed = await adminDb().collection('mediaAssets').doc(`${prefix}${id}`).get();
+      const prefixedAsset = prefixed.data() as StoredAsset | undefined;
+      if (prefixedAsset && prefixedAsset.ownerUid === uid) {
+        return prefixedAsset;
+      }
+    }
+  }
+
+  const genSnap = await adminDb().collection('mediaGenerations').doc(id).get();
+  const genData = genSnap.data() as { ownerUid?: string; assetId?: string | null } | undefined;
+  if (genData && genData.ownerUid === uid && genData.assetId) {
+    const fromGen = await adminDb().collection('mediaAssets').doc(genData.assetId).get();
+    const fromGenAsset = fromGen.data() as StoredAsset | undefined;
+    if (fromGenAsset && fromGenAsset.ownerUid === uid) {
+      return fromGenAsset;
+    }
+  }
+
+  for (const prefix of ['image_', 'video_', 'music_', 'sfx_']) {
+    const itemId = id.startsWith(prefix) ? id : `${prefix}${id}`;
+    const itemSnap = await adminDb().collection('mediaItems').doc(itemId).get();
+    const itemData = itemSnap.data() as {
+      ownerUid?: string;
+      thumbnailAssetId?: string | null;
+      latestSuccessfulGenerationId?: string | null;
+      latestGenerationId?: string | null;
+    } | undefined;
+    if (itemData && itemData.ownerUid === uid) {
+      const candidateGenId = itemData.latestSuccessfulGenerationId ?? itemData.latestGenerationId;
+      if (candidateGenId) {
+        const candidateAssetSnap = await adminDb().collection('mediaAssets').doc(`${prefix}${candidateGenId}`).get();
+        const candidateAsset = candidateAssetSnap.data() as StoredAsset | undefined;
+        if (candidateAsset && candidateAsset.ownerUid === uid) {
+          return candidateAsset;
+        }
+      }
+      if (itemData.thumbnailAssetId) {
+        const thumbSnap = await adminDb().collection('mediaAssets').doc(itemData.thumbnailAssetId).get();
+        const thumbAsset = thumbSnap.data() as StoredAsset | undefined;
+        if (thumbAsset && thumbAsset.ownerUid === uid) {
+          return thumbAsset;
+        }
+      }
+    }
+  }
+
+  throw new MediaError(404, 'not_found', 'That asset is not available to you.');
 }
 export function assetResource(asset: StoredAsset, origin: string): AssetResource {
   return { id: asset.id, mimeType: asset.mimeType, width: asset.width, height: asset.height, byteLength: asset.byteLength, ...(asset.durationMs === undefined ? {} : { durationMs: asset.durationMs }),

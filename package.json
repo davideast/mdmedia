@@ -60,6 +60,10 @@
       "types": "./dist/chunker/index.d.ts",
       "import": "./dist/chunker/index.js"
     },
+    "./chunker/markdown-parser": {
+      "types": "./dist/chunker/markdown-parser.d.ts",
+      "import": "./dist/chunker/markdown-parser.js"
+    },
     "./pipeline": {
       "types": "./dist/pipeline/index.d.ts",
       "import": "./dist/pipeline/index.js"
