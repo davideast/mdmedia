@@ -1,6 +1,6 @@
 import type { CastMember } from '../types.js';
 import { placed, type SceneAdaptation, type SceneLines } from './assemble.js';
-import { MAX_ITEMS_PER_PANEL, PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
+import { MAX_CAPTION_WORDS, MAX_ITEMS_PER_PANEL, PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
 
 /** Quotes and spaces as a comparison sees them. */
 const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
@@ -55,6 +55,7 @@ export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLine
           problems.push(`${at}: the text for ${item.line} is not an exact part of the line. Copy whole sentences from: "${line.display}"`);
           continue;
         }
+        if (line.narration && text.split(' ').length > MAX_CAPTION_WORDS) problems.push(`${at}: the caption from ${item.line} is ${text.split(' ').length} words; keep its best sentences, at most ${MAX_CAPTION_WORDS} words, with "text", and let the picture show the rest.`);
         const lineIndex = order.indexOf(item.line);
         if (lineIndex < last.line || (lineIndex === last.line && index < last.at)) problems.push(`${at}: ${item.line} comes out of story order.`);
         last = { line: lineIndex, at: index };

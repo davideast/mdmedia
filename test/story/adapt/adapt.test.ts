@@ -133,6 +133,13 @@ describe('adaptationProblems', () => {
     expect(problems).toContain('missing: "i\'m going mad"');
   });
 
+  it('sends back a caption that is a paragraph', async () => {
+    const long = STORY.replace('The shop sold mirrors. Most of them were old.', 'The shop sold mirrors. ' + 'Round ones and tall ones and ones in gold frames carved like seaweed. '.repeat(3));
+    const lines = sceneLineIds((await parseStory(long, { path: 'm.md' })).script!.chapters[0]!.scenes[0]!.segments.filter((s): s is Line => s.kind === 'line'));
+    const whole: SceneAdaptation = { ...SHOP, pages: [{ ...SHOP.pages[0]!, panels: [{ ...SHOP.pages[0]!.panels[0]!, items: [{ line: 'L1' }, { line: 'L2' }] }, ...SHOP.pages[0]!.panels.slice(1)] }] };
+    expect(adaptationProblems(whole, lines, (await script()).cast).join('\n')).toContain('words; keep its best sentences, at most 30 words');
+  });
+
   it('sends back a panel with more lettering than fits', async () => {
     const lines = await linesOf('Shop');
     const crowded: SceneAdaptation = { ...SHOP, pages: [{ ...SHOP.pages[0]!, panels: [{ ...SHOP.pages[0]!.panels[0]!, items: [{ line: 'L1' }, { line: 'L2' }, { line: 'L3' }, { line: 'L4' }] }, ...SHOP.pages[0]!.panels.slice(1).map((p) => ({ ...p, items: [] }))] }] };

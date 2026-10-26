@@ -9,6 +9,8 @@ export const PANELS_PER_PAGE = { min: 3, max: 7 } as const;
 export const PANELS_PER_ROW = { min: 1, max: 3 } as const;
 /** Lettered items in one panel; more crowd the art (the hand-lettered lunch scene used at most four, with lettering crowded at four). */
 export const MAX_ITEMS_PER_PANEL = 3;
+/** A caption longer than this is a paragraph, not a caption; the hand-written scripts' longest was 22 words. */
+export const MAX_CAPTION_WORDS = 30;
 
 export const ADAPT_INSTRUCTION = `You adapt one scene of a story into a comic script, page by page and panel by panel, as a comics writer would for an artist.
 
@@ -33,7 +35,7 @@ You get the cast (who can be drawn, with how they look), the scene's lines, numb
 
 Adapting:
 - Narration that only says what can be seen becomes the picture, and is cut: "She walked away." under a panel of her walking away, "I stared at my tray." over a close-up of him staring at it, "He sat down." These are stage directions for the artist, not captions.
-- The narrator's voice stays as captions: what the picture can't show. Jokes and asides ("It sounded like a lawn mower failing to start."), opinions and exaggeration ("An actual high five. From the most popular girl in school."), a jump in time, a beat of feeling ("Not angry. Worse. Hurt."), what the narrator didn't know yet. In a first-person story this voice is the story's personality; keep all of it. Take the best sentences of a long narration line with "text".
+- The narrator's voice stays as captions: what the picture can't show. Jokes and asides ("It sounded like a lawn mower failing to start."), opinions and exaggeration ("An actual high five. From the most popular girl in school."), a jump in time, a beat of feeling ("Not angry. Worse. Hurt."), what the narrator didn't know yet. In a first-person story this voice is the story's personality; keep all of it. A caption is at most ${MAX_CAPTION_WORDS} words: take the best sentences of a long narration line with "text".
 - Every line of dialogue stays, in order, as balloons. A long speech may be split across panels; never drop or reword its words.
 - A caption or balloon uses the story's words exactly. With "text", copy an exact part of the line (whole sentences); without it, the whole line is used.
 - Items stay in story order, across panels and pages.
