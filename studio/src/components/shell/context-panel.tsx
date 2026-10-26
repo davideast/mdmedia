@@ -31,6 +31,8 @@ import { PresetField } from "@/components/studio/preset-field";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { NarrationSettings } from "@/components/narration/narration-settings";
 import { useNarration } from "@/components/shell/narration-provider";
+import { InspectorSlot } from "@/components/shell/inspector-slot";
+import { storyboardRoute } from "@/lib/storyboard";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import type { HeaderActions } from "@/components/shell/header-action";
 import { KeepSection } from "@/components/shell/keep-section";
@@ -478,7 +480,8 @@ export function ContextPanel({
   const isStudio = pathname.startsWith("/studio");
   const isNarration = pathname.startsWith("/narration/");
   const isTree = pathname.startsWith("/trees/");
-  const sectionLabel = isStudio ? "Voice" : isTree ? "Details" : "Sharing";
+  const isStoryboard = storyboardRoute(pathname) !== null;
+  const sectionLabel = isStoryboard ? "Story details" : isStudio ? "Voice" : isTree ? "Details" : "Sharing";
   const SectionIcon = isStudio ? SlidersHorizontal : Info;
 
   if (docked) {
@@ -522,6 +525,8 @@ export function ContextPanel({
     onToggleDock === undefined
       ? undefined
       : [{ icon: PanelRightClose, label: `Collapse ${sectionLabel.toLowerCase()}`, onClick: onToggleDock, expanded: true }];
+
+  if (isStoryboard) return <WorkbenchPanel title="Story details" icon={<Info size={13} />} actions={collapseAction} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
 
   if (isStudio) return <ComposerSettings actions={collapseAction} />;
 

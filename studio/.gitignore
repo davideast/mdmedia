@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-pr-check/
 /.next-hosted/
 /.next-hosted-staged/
 /.next-hosted-release/

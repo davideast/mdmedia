@@ -1,5 +1,6 @@
 import type { MediaType } from './media-types';
 import { productionRoute } from './productions';
+import { storyboardRoute } from './storyboard';
 import { treeNodeWorkspaceId, workspaceRoute, type WorkspaceSnapshot } from './workspace';
 
 export { treeNodeWorkspaceId };
@@ -15,6 +16,11 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
     const route = workspaceRoute(view.href);
     if (!route || !isWorkRoute(view.href)) continue;
     const id = route.draftId ?? view.key.split('/').pop()!.split(':').pop()!;
+    const storyboard = storyboardRoute(view.key);
+    if (storyboard) {
+      items.set(view.key, { key: view.key, href: view.href, title: view.title, detail: 'Storyboard', search: `${view.title} Storyboard ${storyboard}`, pinned: view.pinned === true, visitedAt: view.visitedAt ?? 0, viewId: view.id });
+      continue;
+    }
     const production = productionRoute(view.key);
     if (production) {
       const detail = production.cutId ? 'Cut' : 'Production';
@@ -63,7 +69,7 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
 
 export function isWorkRoute(href: string): boolean {
   const route = workspaceRoute(href);
-  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:') || productionRoute(route.key) !== null || route.key.startsWith('/trees/'));
+  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:') || productionRoute(route.key) !== null || storyboardRoute(route.key) !== null || route.key.startsWith('/trees/'));
 }
 
 export function matchesWork(text: string, query: string): boolean {

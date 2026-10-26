@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "premise": "Your UI Doesn’t Need Another Gradient. It Needs Art Direction. A sample screencast redesigns a fictional virtual-card landing page using an intaglio-inspired visual language, then tests where the ornament should stop. Concept visuals and draft narration are editable planning material.",
+  "beats": [
+    {
+      "id": "hook",
+      "title": "The hook",
+      "purpose": "Give the viewer a reason to see the redesign.",
+      "script": "This page looks pretty good. The type is clear, the card floats nicely, and that gradient is doing exactly what we expect a gradient to do. But cover up the name for a second. What do you actually remember about it? I want to try a different direction for this same product, using a visual language that already has a connection to money.",
+      "visual": "Start on the modern hero. Briefly cover the logo, then preview the engraved card without revealing the whole redesign.",
+      "notes": "Try the reveal early. Does it create curiosity before we explain the style?",
+      "status": "draft",
+      "estimatedSeconds": 25,
+      "image": "/assets/storyboard/modern.png"
+    },
+    {
+      "id": "starting-point",
+      "title": "The starting point",
+      "purpose": "Make the product and the redesign constraints understandable.",
+      "script": "I'm calling this fictional product Veil. It gives you virtual cards for online purchases, with control over where a card works and how much it can spend. The idea is inspired by services like Privacy.com. For this exercise, the promise stays the same: your card, your rules. I'm keeping the basic page structure too, so we can see what the art direction actually changes.",
+      "visual": "Show the complete starting page, then point to the headline and three feature cards.",
+      "notes": "This is an illustrative product, not a claim about an existing service. Keep functionality identical in both versions.",
+      "status": "draft",
+      "estimatedSeconds": 26,
+      "image": "/assets/storyboard/modern.png"
+    },
+    {
+      "id": "brief",
+      "title": "What should this feel like?",
+      "purpose": "Connect visual choices to the product promise.",
+      "script": "Before I touch the colors, I need a better brief than make it look different. You're trusting this product with payments, but you're also using it to keep control. I want it to feel deliberate and dependable without feeling like a bank form. That gives me something to judge the design against. If a decoration makes a control harder to find, it isn't helping.",
+      "visual": "Use the controls concept as a brief preview. On-screen notes: deliberate, dependable, in your control.",
+      "notes": "Proposed overlay in the eventual recording; not baked into the concept image.",
+      "status": "draft",
+      "estimatedSeconds": 24,
+      "image": "/assets/storyboard/controls.png"
+    },
+    {
+      "id": "reference",
+      "title": "Borrow a visual language",
+      "purpose": "Introduce the intaglio-inspired direction through visible details.",
+      "script": "The reference I'm borrowing is the look of engraved printing: fine lines, dense patterns, and shapes built from marks instead of soft lighting. I'm using intaglio as an art-direction reference here, not pretending a screen is a printing press. Look at the card border and those repeating curves. They give me a way to make something intricate while working with a very small color palette.",
+      "visual": "Move from the full specimen to the card border and overlapping lines. Let the viewer inspect the marks.",
+      "notes": "Avoid a long history lesson. The reference only needs to explain the choices we make next.",
+      "status": "draft",
+      "estimatedSeconds": 28,
+      "image": "/assets/storyboard/engraving.png"
+    },
+    {
+      "id": "foundation",
+      "title": "Change the foundation",
+      "purpose": "Give the transformation a readable first step.",
+      "script": "First, I'll change the foundation. The bright white becomes a warmer paper color, and the purple becomes a deep green. Then I'll try a serif for the headline while keeping the smaller interface text plain. The headline can have personality. The instructions still need to be easy to read. Already, the page feels different, and I haven't changed what it's asking the visitor to do.",
+      "visual": "In the eventual screencast, show color and type changes as separate steps. Use the redesign concept as the target frame.",
+      "notes": "Concept artwork shows the destination. Intermediate changes still need to be recorded; do not imply this is existing footage.",
+      "status": "draft",
+      "estimatedSeconds": 27,
+      "image": "/assets/storyboard/intaglio.png"
+    },
+    {
+      "id": "hero",
+      "title": "Make the card the centerpiece",
+      "purpose": "Make the central visual support the product story.",
+      "script": "Now the card can carry the detailed artwork. Instead of floating over a colored glow, it has a border and a field of engraved lines. I like that connection: a digital card borrowing some of the visual care of a printed financial object. But the number and the name still need quiet space. I'm going to keep the detail around them rather than asking the text to compete with it.",
+      "visual": "Focus on the card. Show the border, then the number area. Return to the whole hero so the hierarchy is visible.",
+      "notes": "The generated target is deliberately ornate. Simplify any linework that competes with the card information during implementation.",
+      "status": "draft",
+      "estimatedSeconds": 28,
+      "image": "/assets/storyboard/intaglio.png"
+    },
+    {
+      "id": "overdo",
+      "title": "Where the idea goes too far",
+      "purpose": "Introduce a real design tension instead of a frictionless makeover.",
+      "script": "Here's where I could get carried away. This reference sheet is lovely, but it would be exhausting as an interface. Every corner wants your attention. If I bring all of that into the page, the visitor has to work out which shape is a button and which is just a flourish. So the next step is taking some of the idea away, even though those details are what got me excited in the first place.",
+      "visual": "Show the dense specimen sheet, then cut to the cleaner settings panel. Do not fabricate a usability test.",
+      "notes": "A useful place for a small visual joke: briefly spotlight one unnecessary flourish, then remove it.",
+      "status": "draft",
+      "estimatedSeconds": 25,
+      "image": "/assets/storyboard/engraving.png"
+    },
+    {
+      "id": "controls",
+      "title": "Keep the controls ordinary",
+      "purpose": "Demonstrate where the style should stop.",
+      "script": "On the settings panel, I want to know the merchant, the spending limit, and whether the card is active. Those answers should be immediate. So this part gets simple rows, plain labels, and a clear pause button. The engraving stays on the card beside it. That gives me a relationship between the expressive part of the brand and the practical part of the product, without decorating every action.",
+      "visual": "Read through merchant, monthly limit, and active status. Highlight Pause card without claiming a working interaction in this concept.",
+      "notes": "During recording, demonstrate a real pause state only after that UI exists. No pretend clicks on a static image.",
+      "status": "draft",
+      "estimatedSeconds": 28,
+      "image": "/assets/storyboard/controls.png"
+    },
+    {
+      "id": "scale",
+      "title": "Check it at everyday size",
+      "purpose": "Make the design earn its detail beyond a large hero.",
+      "script": "I also need to see this at the size someone will actually use it. Fine lines can look wonderful in a close-up and turn into noise when the card gets smaller. I'll shrink the artwork, check the labels, and simplify the border if it stops reading. The goal isn't to preserve every line. It's to preserve the character of the design when there's less room for it.",
+      "visual": "Scale the concept down in the editing canvas. Compare the full-size card with a smaller card, then inspect the controls.",
+      "notes": "This is a planned check, not a completed accessibility or responsive review. Capture actual outcomes later.",
+      "status": "draft",
+      "estimatedSeconds": 24,
+      "image": "/assets/storyboard/controls.png"
+    },
+    {
+      "id": "comparison",
+      "title": "Same promise, different character",
+      "purpose": "Pay off the hook with a fair before-and-after comparison.",
+      "script": "Let's put the two versions beside each other. The first one feels bright, fast, and familiar. The second feels more deliberate, with a stronger connection to the idea of money and ownership. You might prefer either one. What matters to me is that I can explain why this version looks the way it does, and that explanation comes from the product rather than a collection of effects I happen to like.",
+      "visual": "Compare the original and redesigned hero at equal scale, using the same headline and primary action.",
+      "notes": "Use a clean split-screen in the rough cut. Avoid implying that aesthetics alone establish security or trust.",
+      "status": "draft",
+      "estimatedSeconds": 28,
+      "image": "/assets/storyboard/intaglio.png"
+    },
+    {
+      "id": "takeaway",
+      "title": "The art direction is the decision",
+      "purpose": "Give the audience a reusable idea and a clear ending.",
+      "script": "So this isn't a reason to stop using gradients. It's a reason to give the design a point of view before choosing the effects. For this virtual-card product, engraving gave me a useful starting point. Another product might need something completely different. Next time a page feels generic, try finding a visual reference with a connection to what the product does, then see how much of it the interface actually needs.",
+      "visual": "End on the full redesign. Brief final on-screen phrase: Start with a point of view.",
+      "notes": "Leave a short visual hold for the ending. Optional music can enter here, below narration; the rough cut works without it.",
+      "status": "draft",
+      "estimatedSeconds": 25,
+      "image": "/assets/storyboard/intaglio.png"
+    }
+  ]
+}

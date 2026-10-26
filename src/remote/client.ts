@@ -9,6 +9,9 @@
 import { randomUUID } from 'node:crypto';
 import type { AgentHeartbeat, ContextBundle, Decision, DecisionSource, Message, Suggestion, SuggestionCheck, SuggestionState, Thread, ThreadStatus, TimedRef } from '../threads/types.js';
 
+import type { StoryboardDocument, StoryboardResource, StoryboardSummary, StoryboardNarrationRequest } from './storyboard-types.js';
+export type { StoryBeat, StoryboardDocument, StoryboardResource, StoryboardSummary } from './storyboard-types.js';
+
 export class StudioApiError extends Error {
   constructor(
     readonly status: number,
@@ -686,6 +689,31 @@ export class StudioClient {
     if (response.status === 204) return undefined as T;
     const text = await response.text();
     try { return (text ? JSON.parse(text) : null) as T; } catch { return null as T; }
+  }
+
+  listStoryboards(): Promise<{ storyboards: StoryboardSummary[] }> {
+    return this.request('GET', '/api/v1/storyboards');
+  }
+
+  getStoryboard(id: string): Promise<StoryboardResource> {
+    return this.request('GET', `/api/v1/storyboards/${encodeURIComponent(id)}`);
+  }
+
+  createStoryboard(body: { title: string; document?: StoryboardDocument }): Promise<StoryboardResource> {
+    return this.request('POST', '/api/v1/storyboards', body);
+  }
+
+  updateStoryboard(id: string, body: { expectedRevision: number; title?: string; document: StoryboardDocument }): Promise<StoryboardResource> {
+    return this.request('PUT', `/api/v1/storyboards/${encodeURIComponent(id)}`, body);
+  }
+
+  deleteStoryboard(id: string): Promise<void> {
+    return this.request('DELETE', `/api/v1/storyboards/${encodeURIComponent(id)}`);
+  }
+
+  narrateStoryboard(id: string, body: StoryboardNarrationRequest): Promise<{ id: string }> {
+    // One submission only: the server caches identical requests. Do not blindly retry a lost answer.
+    return this.request('POST', `/api/v1/storyboards/${encodeURIComponent(id)}/narration`, body);
   }
 
   startDevice(clientName: string): Promise<DeviceStart> {
