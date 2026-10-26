@@ -1,3 +1,4 @@
+import { StudioApiError } from '../remote/client.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
@@ -388,7 +389,52 @@ const heartbeat = defineCommand({
   },
 });
 
+const watch = defineCommand({
+  meta: { name: 'watch', description: 'Stream review snapshots and changes as newline-delimited JSON' },
+  args: { production: { type: 'positional', required: true }, cut: { type: 'string' }, json: jsonArg },
+  async run({ args }) {
+    await guarded(true, async () => {
+      const client = connectedClient();
+      const production = await resolveProduction(client, args.production);
+      const abort = new AbortController();
+      const stop = () => abort.abort();
+      process.once('SIGINT', stop);
+      process.once('SIGTERM', stop);
+      try {
+        let delay = 1000;
+        while (!abort.signal.aborted) {
+          try {
+            for await (const event of client.watchComments(production.id, args.cut, abort.signal)) {
+              console.log(JSON.stringify(event));
+              delay = 1000;
+            }
+          } catch (e) {
+            if (abort.signal.aborted) break;
+            if (e instanceof StudioApiError && e.status >= 400 && e.status < 500) throw e;
+            console.error('Review connection interrupted; reconnecting.');
+          }
+          if (!abort.signal.aborted)
+            await new Promise<void>((resolve) => {
+              const done = () => {
+                clearTimeout(timer);
+                abort.signal.removeEventListener('abort', done);
+                resolve();
+              };
+              const timer = setTimeout(done, delay);
+              abort.signal.addEventListener('abort', done, { once: true });
+            });
+          delay = Math.min(30000, delay * 2);
+        }
+      } finally {
+        stop();
+        process.removeListener('SIGINT', stop);
+        process.removeListener('SIGTERM', stop);
+      }
+    });
+  },
+});
+
 export const commentsCommand = defineCommand({
   meta: { name: 'comments', description: 'Work the review comments on a production\'s cuts in your studio, as an agent' },
-  subCommands: { list, show, context, claim, reply, suggest, state, decide, heartbeat },
+  subCommands: { watch, list, show, context, claim, reply, suggest, state, decide, heartbeat },
 });

@@ -1,3 +1,4 @@
+import type { Assembly, AssemblyDraft } from '../assembly/index.js';
 /**
  * A client for a connected mdmedia studio's `/api/v1`.
  *
@@ -95,7 +96,7 @@ export interface PlaylistDetail extends PlaylistSummary {
 }
 
 export type CutStatus = 'review' | 'approved' | 'final' | 'none';
-export type CutKind = 'cut' | 'rendered';
+export type CutKind = 'cut' | 'rendered' | 'assembly';
 /** What a production asset is, as a cut uses it. */
 export type ProductionMediaType = 'video' | 'image' | 'voice' | 'music' | 'sfx';
 
@@ -117,6 +118,7 @@ export interface ProductionCutSummary {
 }
 
 export interface ProductionSummary {
+  assemblyManaged?: boolean;
   id: string;
   slug: string;
   title: string;
@@ -234,6 +236,7 @@ export interface ProductionCutBody {
 }
 
 export interface ProductionCutResource extends Omit<ProductionCutBody, 'cut' | 'words'> {
+  assembly?: AssemblyDraft;
   id: string;
   productionId: string;
   notes: string;
@@ -799,6 +802,31 @@ export class StudioClient {
     return this.request('DELETE', `/api/v1/productions/${encodeURIComponent(id)}`);
   }
 
+  createAssemblyProduction(body: {
+    storyboardId: string;
+    title?: string;
+    idempotencyKey: string;
+  }): Promise<{ id: string; assembly: AssemblyDraft }> {
+    return this.request('POST', '/api/v1/productions/from-storyboard', body);
+  }
+  assembly(id: string): Promise<AssemblyDraft & { assets: Record<string, ProductionAsset> }> {
+    return this.request('GET', `/api/v1/productions/${encodeURIComponent(id)}/assembly`);
+  }
+  updateAssembly(id: string, body: { expectedRevision: number; document: Assembly }): Promise<AssemblyDraft> {
+    return this.request('PUT', `/api/v1/productions/${encodeURIComponent(id)}/assembly`, body);
+  }
+  publishAssembly(
+    id: string,
+    body: {
+      expectedRevision: number;
+      assemblyHash: string;
+      renderedAssetId: string;
+      idempotencyKey: string;
+      label?: string;
+    },
+  ): Promise<ProductionCutResource> {
+    return this.request('POST', `/api/v1/productions/${encodeURIComponent(id)}/publish`, body);
+  }
   productionCut(id: string, cutId: string): Promise<ProductionCutResource> {
     return this.request('GET', `/api/v1/productions/${encodeURIComponent(id)}/cuts/${encodeURIComponent(cutId)}`);
   }
@@ -850,6 +878,59 @@ export class StudioClient {
 
   // --- Comments: review threads on a production's cuts (`comments:read`, `comments:write`).
 
+  /** Reconnect at the caller; every connection yields a fresh complete snapshot. */
+  async *watchComments(productionId: string, cutId?: string, signal?: AbortSignal): AsyncGenerator<unknown> {
+    if (!this.apiKey) throw new StudioApiError(401, 'not_logged_in', 'Connect to Studio first.');
+    const route = `/api/v1/productions/${encodeURIComponent(productionId)}/comments/watch${cutId ? `?cut=${encodeURIComponent(cutId)}` : ''}`;
+    const response = await this.fetchImpl(new URL(route, this.base), {
+      headers: { Authorization: `Bearer ${this.apiKey}`, Accept: 'text/event-stream' },
+      signal,
+    });
+    if (!response.ok) {
+      let data: { error?: { code?: string; message?: string } } = {};
+      try {
+        data = (await response.json()) as typeof data;
+      } catch {}
+      throw new StudioApiError(
+        response.status,
+        data.error?.code ?? 'watch_failed',
+        data.error?.message ?? 'Could not watch comments.',
+      );
+    }
+    if (!response.body) throw new StudioApiError(502, 'watch_failed', 'No event stream returned.');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer = (buffer + decoder.decode(value, { stream: true })).replace(/\r\n/g, '\n');
+        let end: number;
+        while ((end = buffer.indexOf('\n\n')) >= 0) {
+          const block = buffer.slice(0, end);
+          buffer = buffer.slice(end + 2);
+          const event = block
+            .split('\n')
+            .find((x) => x.startsWith('event:'))
+            ?.slice(6)
+            .trim();
+          const data = block
+            .split('\n')
+            .filter((x) => x.startsWith('data:'))
+            .map((x) => x.slice(5).trimStart())
+            .join('\n');
+          if (!data) continue;
+          const parsed = JSON.parse(data);
+          if (event === 'error') throw new StudioApiError(503, parsed.code, parsed.message);
+          yield { event, ...parsed };
+        }
+      }
+    } finally {
+      await reader.cancel().catch(() => {});
+      reader.releaseLock();
+    }
+  }
   private threadPath(productionId: string, threadId?: string): string {
     const base = `/api/v1/productions/${encodeURIComponent(productionId)}/threads`;
     return threadId === undefined ? base : `${base}/${encodeURIComponent(threadId)}`;

@@ -1,5 +1,6 @@
 'use client';
 
+import { ProductionAssemblyDraft } from './assembly-view';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Clapperboard, Play } from 'lucide-react';
@@ -88,6 +89,7 @@ export function ProductionPage({ id }: { id: string }) {
             <h1 className="t-h2 text-foreground">{production.title}</h1>
           </header>
 
+          {production.assemblyManaged ? <ProductionAssemblyDraft productionId={production.id}/> : null}
           {featured ? <Featured production={production} cut={featured} picture={picture(featured)} /> : null}
 
           {cast.length > 0 ? (

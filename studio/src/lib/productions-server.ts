@@ -1,3 +1,5 @@
+import { assemblyReviewTimeline } from 'mdmedia/assembly';
+import type { AssemblyDraft } from 'mdmedia/assembly';
 /**
  * Productions for `/api/v1`, through the Admin SDK and scoped to one owner.
  *
@@ -46,7 +48,7 @@ import { loadOwnedAssets, productionAssetResource, type ProductionAssetResource 
 
 export const CUT_STATUSES = ['review', 'approved', 'final', 'none'] as const;
 export type CutStatus = (typeof CUT_STATUSES)[number];
-export const CUT_KINDS = ['cut', 'rendered'] as const;
+export const CUT_KINDS = ['cut', 'rendered', 'assembly'] as const;
 export type CutKind = (typeof CUT_KINDS)[number];
 
 const MAX_TITLE = 200;
@@ -80,6 +82,7 @@ const ERROR_STATUS: Record<string, number> = {
   asset_not_found: 400,
   invalid_cut: 422,
   conflicting_status: 409,
+  immutable_assembly: 409,
   too_many_cuts: 409,
   cut_too_large: 413,
   character_not_found: 400,
@@ -129,6 +132,7 @@ export interface CutSummary {
 }
 
 interface StoredProduction {
+  assemblyManaged?: boolean;
   ownerUid: string;
   title: string;
   slug: string;
@@ -154,6 +158,7 @@ export interface CutSource {
 }
 
 interface StoredCut {
+  assembly?: AssemblyDraft;
   ownerUid: string;
   productionId: string;
   label: string;
@@ -186,6 +191,7 @@ export interface ProductionCutSummary extends CutSummary {
 }
 
 export interface ProductionSummary {
+  assemblyManaged?: boolean;
   id: string;
   slug: string;
   title: string;
@@ -225,6 +231,7 @@ export interface WordsSummary {
 }
 
 export interface ProductionCutResource {
+  assembly?: AssemblyDraft;
   id: string;
   productionId: string;
   label: string;
@@ -316,6 +323,7 @@ function fitSummaries(cuts: CutSummary[]): CutSummary[] {
 function stored(data: FirebaseFirestore.DocumentData | undefined): StoredProduction {
   return {
     ownerUid: str(data?.ownerUid, ''),
+    ...(data?.assemblyManaged ? {assemblyManaged:true} : {}),
     title: str(data?.title, 'Untitled production'),
     slug: str(data?.slug, ''),
     seriesId: idOrNull(data?.seriesId),
@@ -334,6 +342,7 @@ function stored(data: FirebaseFirestore.DocumentData | undefined): StoredProduct
 function storedCut(data: FirebaseFirestore.DocumentData | undefined): StoredCut {
   return {
     ownerUid: str(data?.ownerUid, ''),
+    ...(data?.assembly ? {assembly:data.assembly as AssemblyDraft} : {}),
     productionId: str(data?.productionId, ''),
     label: str(data?.label, ''),
     status: isStatus(data?.status) ? data.status : 'none',
@@ -401,6 +410,7 @@ function summarize(id: string, production: StoredProduction, origin: string): Pr
   return {
     id,
     slug: production.slug,
+    assemblyManaged: production.assemblyManaged === true,
     title: production.title,
     series: production.seriesId ? { id: production.seriesId, title: production.seriesTitle ?? '' } : null,
     coverAssetId: production.coverAssetId,
@@ -616,6 +626,7 @@ export async function upsertProduction(uid: string, body: Record<string, unknown
     const [snapshot, seriesSnapshot] = await Promise.all([tx.get(ref), seriesRef ? tx.get(seriesRef) : Promise.resolve(null)]);
     const existing = snapshot.exists ? stored(snapshot.data()) : null;
     if (existing && existing.ownerUid !== uid) throw notFound();
+    if (existing?.assemblyManaged) throw new ProductionError('immutable_assembly','Use assembly commands for this production.');
     if (series && seriesRef) {
       const before = seriesSnapshot?.data();
       tx.set(seriesRef, { ownerUid: uid, title: series.title, slug: series.slug, createdAt: num(before?.createdAt, now), updatedAt: now });
@@ -731,6 +742,7 @@ export async function deleteProduction(uid: string, id: string): Promise<void> {
   const cuts = await cutsOf(id).get();
   await Promise.all(cuts.docs.map((doc) => cutsOf(id).doc(doc.id).delete()));
   await deleteProductionComments(id);
+  await adminDb().collection(`productions/${id}/assembly`).doc('draft').delete();
   await ref.delete();
 }
 
@@ -738,9 +750,9 @@ export async function deleteProduction(uid: string, id: string): Promise<void> {
 // Cuts
 
 async function cutResource(uid: string, productionId: string, cutId: string, cut: StoredCut, origin: string): Promise<ProductionCutResource> {
-  const sourceIds = cut.cut ? cutAssetIds(cut.cut) : [];
+  const sourceIds = cut.assembly ? cut.assembly.document.placements.map(p=>p.assetId) : cut.cut ? cutAssetIds(cut.cut) : [];
   const assets = await loadOwnedAssets(uid, [...sourceIds, ...(cut.renderedAssetId ? [cut.renderedAssetId] : []), ...(cut.posterAssetId ? [cut.posterAssetId] : []), ...Object.values(cut.thumbs)]);
-  const resolved = cut.cut ? resolveStoredCut(cut.cut, cut.words, assets) : { timeline: null, words: null, errors: [] };
+  const resolved = cut.assembly ? {timeline:assemblyReviewTimeline(cut.assembly.document,cut.label),words:null,errors:[]} : cut.cut ? resolveStoredCut(cut.cut, cut.words, assets) : { timeline: null, words: null, errors: [] };
   const links = cutLinks(origin, productionId, { id: cutId, renderedAssetId: cut.renderedAssetId });
   return {
     id: cutId,
@@ -748,10 +760,11 @@ async function cutResource(uid: string, productionId: string, cutId: string, cut
     label: cut.label,
     status: cut.status,
     kind: cut.kind,
+    ...(cut.assembly ? {assembly:cut.assembly} : {}),
     notes: cut.notes,
     order: cut.order,
     createdAt: cut.createdAt,
-    updatedAt: cut.updatedAt,
+    updatedAt: cut.assembly ? cut.createdAt : cut.updatedAt,
     lengthSeconds: cut.lengthSeconds,
     renderedAssetId: cut.renderedAssetId,
     posterAssetId: cut.posterAssetId,
@@ -783,6 +796,7 @@ export async function getProductionCut(uid: string, id: string, cutId: string, o
  */
 export async function putProductionCut(uid: string, id: string, cutId: string, body: Record<string, unknown>, origin: string): Promise<{ cut: ProductionCutResource; created: boolean }> {
   if (!CUT_ID_PATTERN.test(cutId)) throw new ProductionError('invalid_cut_id', 'A cut id is letters, digits, "_" and "-", at most 80 characters.');
+  if(body.kind==='assembly') throw new ProductionError('immutable_assembly','Use the publish endpoint.');
   const input = parseCutInput(body);
   await ownedProduction(uid, id);
   const assets = await checkAssets(uid, input);
@@ -801,6 +815,7 @@ export async function putProductionCut(uid: string, id: string, cutId: string, b
     const { ref, production } = await ownedProduction(uid, id, tx);
     const cutRef = cutsOf(id).doc(cutId);
     const before = await tx.get(cutRef);
+    if(production.assemblyManaged) throw new ProductionError('immutable_assembly', 'Use assembly update and publish for this production.');
     const previous = before.exists ? storedCut(before.data()) : null;
     const now = Date.now();
     const doc: StoredCut = {
@@ -828,6 +843,7 @@ export async function deleteProductionCut(uid: string, id: string, cutId: string
   await adminDb().runTransaction(async (tx) => {
     const { ref, production } = await ownedProduction(uid, id, tx);
     if (!production.cuts.some((cut) => cut.id === cutId)) throw cutNotFound(cutId);
+    if(production.assemblyManaged) throw new ProductionError('immutable_assembly', 'Published assembly versions cannot be deleted through legacy cut operations.');
     tx.delete(cutsOf(id).doc(cutId));
     tx.update(ref, { ...settle({ ...production, cuts: production.cuts.filter((cut) => cut.id !== cutId) }), updatedAt: Date.now() });
   });

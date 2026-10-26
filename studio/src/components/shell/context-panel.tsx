@@ -480,8 +480,9 @@ export function ContextPanel({
   const isStudio = pathname.startsWith("/studio");
   const isNarration = pathname.startsWith("/narration/");
   const isTree = pathname.startsWith("/trees/");
+  const isProduction = /^\/productions\/[^/]+(?:\/cuts\/[^/]+)?$/.test(pathname);
   const isStoryboard = storyboardRoute(pathname) !== null;
-  const sectionLabel = isStoryboard ? "Story details" : isStudio ? "Voice" : isTree ? "Details" : "Sharing";
+  const sectionLabel = isProduction ? "Production details" : isStoryboard ? "Story details" : isStudio ? "Voice" : isTree ? "Details" : "Sharing";
   const SectionIcon = isStudio ? SlidersHorizontal : Info;
 
   if (docked) {
@@ -525,6 +526,8 @@ export function ContextPanel({
     onToggleDock === undefined
       ? undefined
       : [{ icon: PanelRightClose, label: `Collapse ${sectionLabel.toLowerCase()}`, onClick: onToggleDock, expanded: true }];
+
+  if (isProduction) return <WorkbenchPanel title="Production details" icon={<Info size={13} />} actions={collapseAction} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
 
   if (isStoryboard) return <WorkbenchPanel title="Story details" icon={<Info size={13} />} actions={collapseAction} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
 

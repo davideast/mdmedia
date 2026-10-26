@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowDown, ArrowUp, BookOpen, LayoutGrid, Plus, Play, Pause, Square, Save, Trash2, Undo2 } from 'lucide-react';
 import styles from './storyboard-page.module.css';
 import { InspectorContent } from '@/components/shell/inspector-slot';
@@ -41,6 +41,9 @@ export function StoryboardPage({ id }: { id: string }) {
 function StoryboardEditor({ resource, path, onSaved }: { resource: StoryboardResource; path: string; onSaved: (resource: StoryboardResource) => void }) {
   const { store, storageUnavailable } = useWorkspace();
   const search = useSearchParams();
+  const router = useRouter();
+  const [creationKey, setCreationKey] = useState(() => crypto.randomUUID());
+  const [creating, setCreating] = useState(false);
   const shell = useOptionalShell();
   const { draft, setDraft } = useNarration();
   const id = resource.id;
@@ -120,6 +123,25 @@ function StoryboardEditor({ resource, path, onSaved }: { resource: StoryboardRes
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
+
+  async function createProduction() {
+    setCreating(true);
+    setError('');
+    try {
+      const result = await studioJson<{ id: string }>('/api/v1/productions/from-storyboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyboardId: id, idempotencyKey: creationKey }),
+      });
+      setCreationKey(crypto.randomUUID());
+      primeStudioResource('/api/v1/productions', null);
+      router.push(`/productions/${result.id}`);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setCreating(false);
+    }
+  }
 
   async function save() {
     setSaving(true); setError('');
@@ -223,6 +245,7 @@ function StoryboardEditor({ resource, path, onSaved }: { resource: StoryboardRes
           </ol>}
       </main>
       <InspectorContent><aside id="beat-details" aria-label="Beat details" className="grid gap-6">
+        <Button variant="outline" disabled={dirty || saving || creating} onClick={createProduction}>Create production</Button>
         <div className="grid gap-2"><Label htmlFor="storyboard-reader" className="t-label">Reader</Label><VoicePicker id="storyboard-reader" value={draft.voice} onChange={voice => { stop(); setDraft({ voice }); }} /></div>
         {selected ? <>
           {selected.image ? <div className="overflow-hidden border border-border">

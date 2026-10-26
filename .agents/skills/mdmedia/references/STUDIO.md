@@ -183,3 +183,7 @@ Minimal whole-document input (supply authored content rather than these examples
 A beat-add input is one object from `beats`. A beat-update input contains only
 changed fields, for example `{"script":"Revised narration."}`. `image` is an
 optional local `/assets/storyboard/<name>.png` (or `.webp`/`.jpg`) path on a beat; status is `draft` or `decided`.
+
+### Production assembly
+
+Use `mdmedia studio production` for storyboard handoff and agent-authored multitrack assemblies. `create --from-storyboard ID --idempotency-key KEY` copies saved beats into untimed scenes. `media add FILE` registers sources. `assembly export ID` returns the draft revision/hash and assets; add `--download-dir DIR` for bytes. Edit the document externally, then `assembly update ID --file FILE --expected-revision N`. Render with external tools and `publish ID --render FILE --expected-revision N --assembly-hash HASH --idempotency-key KEY`. Reuse keys only when retrying the same operation. Published renders are immutable; a new render needs a new publication. `comments watch ID` emits NDJSON snapshots and changes, reconnecting after interruption; fetch full conversations with `comments context`. No paid generation is implicit in these commands. See `docs/productions/assembly.md` in the source checkout for the schema and complete workflow.

@@ -1,3 +1,4 @@
+import { studioProductionCommand } from './studio-production-commands.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -411,5 +412,5 @@ const installSkillCommand = defineCommand({
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations, images, video, music, and sound effects in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, sfx: sfxCommand, status, narrations, playlist, tree: treeCommand, storyboard: storyboardCommand, 'install-skill': installSkillCommand },
+  subCommands: { production: studioProductionCommand, login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, sfx: sfxCommand, status, narrations, playlist, tree: treeCommand, storyboard: storyboardCommand, 'install-skill': installSkillCommand },
 });

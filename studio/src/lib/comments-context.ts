@@ -232,6 +232,7 @@ export async function threadContext(uid: string, productionId: string, threadId:
 
   return {
     format: 'mdmedia.thread-context@2',
+    ...(cut?.assembly ? {assembly:cut.assembly} : {}),
     thread: stored,
     messages,
     suggestions,
