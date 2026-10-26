@@ -4,8 +4,8 @@ import { parseStory } from '../parse.js';
 import type { TextModel } from '../ports.js';
 import type { Diagnostic, Line, Scene, StoryScript } from '../types.js';
 import { assembleComic, markOffPanel, sceneLineIds, type SceneAdaptation, type SceneLines } from './assemble.js';
-import { adaptationProblems } from './fidelity.js';
-import { ADAPT_INSTRUCTION, ADAPT_REPAIR_INSTRUCTION } from './prompts.js';
+import { adaptationProblems, goodCaption } from './fidelity.js';
+import { ADAPT_INSTRUCTION, ADAPT_REPAIR_INSTRUCTION, TRIM_CAPTION_INSTRUCTION } from './prompts.js';
 
 export const MAX_ADAPT_REPAIR_ROUNDS = 2;
 
@@ -76,7 +76,7 @@ export async function adaptStory(markdown: string, options: AdaptOptions): Promi
         const previous = all[all.indexOf(scene) - 1];
         const reply = await options.writer.generate({ system: ADAPT_INSTRUCTION, prompt: scenePrompt(script, scene, lines, previous), json: true, signal: options.signal });
         emit({ type: 'scene-done', title: scene.title ?? scene.id });
-        return review({ scene, lines, reply, problems: [] }, script);
+        return fixCaptions(review({ scene, lines, reply, problems: [] }, script), script, options);
       })
     )
   );
@@ -94,7 +94,7 @@ export async function adaptStory(markdown: string, options: AdaptOptions): Promi
         d.problems.length
           ? limit(async () => {
               const reply = await options.writer.generate({ system: ADAPT_REPAIR_INSTRUCTION, prompt: repairPrompt(script, d, all), json: true, signal: options.signal });
-              return review({ ...d, reply, problems: [] }, script);
+              return fixCaptions(review({ ...d, reply, problems: [] }, script), script, options);
             })
           : Promise.resolve(d)
       )
@@ -137,6 +137,35 @@ export async function adaptStory(markdown: string, options: AdaptOptions): Promi
   };
   emit({ type: 'adapt-done', report });
   return { markdown: assembled.markdown, diagnostics: assembled.diagnostics, report };
+}
+
+/**
+ * Repairs captions one at a time: a caption that rewords its line or runs
+ * to a paragraph is chosen again from the line alone, a small question a
+ * model answers far more reliably than a whole-scene repair. One that still
+ * isn't right is dropped; captions are optional, and the art carries the
+ * moment.
+ */
+async function fixCaptions(draft: Draft, script: StoryScript, options: AdaptOptions): Promise<Draft> {
+  if (!draft.adaptation) return draft;
+  let changed = false;
+  for (const page of draft.adaptation.pages) {
+    for (const panel of page.panels) {
+      const kept: typeof panel.items = [];
+      for (const item of panel.items) {
+        const line = 'line' in item ? draft.lines.get(item.line) : undefined;
+        if (!line?.narration || !('line' in item) || goodCaption(line.display, item.text ?? line.display)) {
+          kept.push(item);
+          continue;
+        }
+        changed = true;
+        const text = (await options.writer.generate({ system: TRIM_CAPTION_INSTRUCTION, prompt: `The line:\n${line.display}`, signal: options.signal })).trim().replace(/^["“]|["”]$/g, '');
+        if (goodCaption(line.display, text)) kept.push({ ...item, text });
+      }
+      panel.items = kept;
+    }
+  }
+  return changed ? { ...draft, problems: adaptationProblems(draft.adaptation, draft.lines, script.cast) } : draft;
 }
 
 /** Reads a reply: its JSON, the off-panel marks code adds, and the problems code finds. */

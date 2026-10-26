@@ -67,3 +67,5 @@ Scene:
 Return only the JSON.`;
 
 export const ADAPT_REPAIR_INSTRUCTION = `You fix a comic adaptation of one scene. You get the same scene, your previous JSON, and the problems found in it. Return the whole corrected JSON, in the same shape, and only the JSON. Change only what the problems need.`;
+
+export const TRIM_CAPTION_INSTRUCTION = `You choose a comic caption from a line of narration. Reply with only the caption: whole sentences copied word for word from the line, in their order, at most ${MAX_CAPTION_WORDS} words, keeping the narrator's voice (jokes, feelings, what the picture can't show) and leaving out what the panel already shows. Never reword.`;

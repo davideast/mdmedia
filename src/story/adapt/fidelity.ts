@@ -3,18 +3,18 @@ import { placed, type SceneAdaptation, type SceneLines } from './assemble.js';
 import { MAX_CAPTION_WORDS, MAX_ITEMS_PER_PANEL, PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
 
 /** Quotes and spaces as a comparison sees them. */
-const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
+export const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
 const words = (text: string) => norm(text).toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean);
 
 /** Sentences, ending at . ! ? (with any closing quote). */
-const sentences = (text: string) => text.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g)?.map((s) => s.trim()).filter(Boolean) ?? [];
+export const sentences = (text: string) => text.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g)?.map((s) => s.trim()).filter(Boolean) ?? [];
 
 /**
  * Where `text` starts in `full`, when it is an exact part of it, or whole
  * sentences of it kept in order (a caption trimmed to its best sentences);
  * -1 otherwise.
  */
-function sentencesIn(full: string, text: string): number {
+export function sentencesIn(full: string, text: string): number {
   const exact = full.indexOf(text);
   if (exact >= 0) return exact;
   let from = 0;
@@ -26,6 +26,12 @@ function sentencesIn(full: string, text: string): number {
     from = at + sentence.length;
   }
   return start;
+}
+
+/** A caption that uses its line's exact sentences and isn't a paragraph. */
+export function goodCaption(full: string, text: string): boolean {
+  const t = norm(text);
+  return Boolean(t) && sentencesIn(norm(full), t) >= 0 && (t.split(' ').length <= MAX_CAPTION_WORDS || sentences(t).length === 1);
 }
 
 /**

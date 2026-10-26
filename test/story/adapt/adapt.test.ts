@@ -191,6 +191,17 @@ describe('adaptStory', () => {
     expect(markdown).toContain('Left: WREN.');
   });
 
+  it('chooses an over-long or reworded caption again from its line, and drops it if that fails too', async () => {
+    const reworded: SceneAdaptation = { ...SHOP, pages: [{ ...SHOP.pages[0]!, panels: [{ ...SHOP.pages[0]!.panels[0]!, items: [{ line: 'L1', text: 'The shop sold many old mirrors.' }, { line: 'L2' }] }, { ...SHOP.pages[0]!.panels[1]!, items: [{ line: 'L3', text: 'Her reflection winked.' }] }, SHOP.pages[0]!.panels[2]!] }] };
+    const w = writer((prompt, system) => (system.startsWith('You choose a comic caption') ? (prompt.includes('mirrors') ? 'Most of them were old.' : 'Her reflection waved.') as unknown as SceneAdaptation : reworded));
+    const { markdown, report } = await adaptStory(STORY, { writer: w, story: 'mirror.md', scene: 'Shop' });
+    expect(report!.remaining).toEqual([]);
+    expect(report!.repairRounds).toBe(0);
+    expect(markdown).toContain('*(dry)* Most of them were old.');
+    // The second caption came back reworded again, so it was dropped.
+    expect(markdown).not.toContain('reflection');
+  });
+
   it('adapts one scene with --scene, titled after it', async () => {
     const w = writer(() => SHOP);
     const { markdown, report } = await adaptStory(STORY, { writer: w, story: 'mirror.md', scene: 'shop', style: 'watercolor' });
