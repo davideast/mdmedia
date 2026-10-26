@@ -85,3 +85,21 @@ Rebuild the three comic readers (locked art, new voices, new lettering) and each
 - Art swaps on the side-by-side pages, if any.
 - The disputed voices, a few minutes of listening, if any.
 - Whether the new cast, voices and lettering replace the published readers.
+
+## Progress (2026-10-26)
+
+On `feat/story-recover` (f4386a1..90c3269), local only. 204 story tests pass; verify 13/13.
+
+| Step | State |
+| --- | --- |
+| 1. Guardrails | Done: locks (`story lock`, `--unlock`), `story compare`, regression tests |
+| 2. Art baseline | Done: first-version art locked for all three comics (in `test/story/fixtures/*.lock*`, not committed) |
+| 3. Voice facts | Stopped by its STOP condition: 13 of 30 voices measured inconsistently (limit 8). The listening page is up for David |
+| 4. Casting | Code done: casting auditions only voices David marked with the brief's gender, and refuses to cast before any are marked. Waiting on the marks |
+| 5. Comic voices | Waiting on 4 |
+| 6. Lettering | Done: no tall slivers, faces rather than heads, tails to visible speakers. Review readers published (art and lettering, no audio). The placement check (boxes drawn onto the art) is not built |
+| 7. Full rebuild | Waiting on 4 and 5 |
+
+**Found on the way:**
+- **The real cause of the art regression.** `RENDER_VERSION` was shared by voices, images and music. Bumping it for the voice changes redrew every panel in all three comics and would have regenerated all music. Each kind now has its own version, and images are back on version 1.
+- **The blind voice judge is unreliable on gender.** Three neutral takes flipped on 13 voices. It called Algenib, the voice David heard as a man for Harper, a woman twice, and its child and elderly verdicts just echo the direction given. Gacrux was "woman" three times out of three, yet sounded like a man as Odile under a gruff brief: a strong brief can shift a voice's perceived gender.
