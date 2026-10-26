@@ -6,6 +6,28 @@ import { MAX_CAPTION_WORDS, MAX_ITEMS_PER_PANEL, PANELS_PER_PAGE, PANELS_PER_ROW
 const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
 const words = (text: string) => norm(text).toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean);
 
+/** Sentences, ending at . ! ? (with any closing quote). */
+const sentences = (text: string) => text.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g)?.map((s) => s.trim()).filter(Boolean) ?? [];
+
+/**
+ * Where `text` starts in `full`, when it is an exact part of it, or whole
+ * sentences of it kept in order (a caption trimmed to its best sentences);
+ * -1 otherwise.
+ */
+function sentencesIn(full: string, text: string): number {
+  const exact = full.indexOf(text);
+  if (exact >= 0) return exact;
+  let from = 0;
+  let start = -1;
+  for (const sentence of sentences(text)) {
+    const at = full.indexOf(sentence, from);
+    if (at < 0) return -1;
+    if (start < 0) start = at;
+    from = at + sentence.length;
+  }
+  return start;
+}
+
 /**
  * What code can hold an adaptation to: captions and balloons use the story's
  * words exactly and in order, every line of dialogue keeps all its words, and
@@ -50,7 +72,7 @@ export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLine
         }
         const text = norm(item.text ?? line.display);
         const full = norm(line.display);
-        const index = full.indexOf(text);
+        const index = sentencesIn(full, text);
         if (!text || index < 0) {
           problems.push(`${at}: the text for ${item.line} is not an exact part of the line. Copy whole sentences from: "${line.display}"`);
           continue;

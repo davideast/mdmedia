@@ -133,6 +133,15 @@ describe('adaptationProblems', () => {
     expect(problems).toContain('missing: "i\'m going mad"');
   });
 
+  it('accepts a caption trimmed to whole sentences in order, and refuses reordered or reworded ones', async () => {
+    const lines = await linesOf('Shop');
+    const withText = (text: string): SceneAdaptation => ({ ...SHOP, pages: [{ ...SHOP.pages[0]!, panels: [{ ...SHOP.pages[0]!.panels[0]!, items: [{ line: 'L1', text }, { line: 'L2' }] }, ...SHOP.pages[0]!.panels.slice(1)] }] });
+    const cast = (await script()).cast;
+    expect(adaptationProblems(withText('Most of them were old.'), lines, cast)).toEqual([]);
+    expect(adaptationProblems(withText('Most of them were old. The shop sold mirrors.'), lines, cast).join()).toContain('not an exact part');
+    expect(adaptationProblems(withText('Most were old.'), lines, cast).join()).toContain('not an exact part');
+  });
+
   it('sends back a caption that is a paragraph', async () => {
     const long = STORY.replace('The shop sold mirrors. Most of them were old.', 'The shop sold mirrors. ' + 'Round ones and tall ones and ones in gold frames carved like seaweed. '.repeat(3));
     const lines = sceneLineIds((await parseStory(long, { path: 'm.md' })).script!.chapters[0]!.scenes[0]!.segments.filter((s): s is Line => s.kind === 'line'));
