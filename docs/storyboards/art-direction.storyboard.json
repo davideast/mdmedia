@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "premise": "Move beyond the familiar SaaS template by deciding what a product should communicate, following those qualities into visual associations, and exploring art styles that express them.",
+  "beats": [
+    {
+      "id": "familiar-result",
+      "title": "You keep arriving at the same SaaS template",
+      "summary": "You sit down to design something new and end up with the familiar combination: a dark page, a gradient, monospace type, and a floating globe.",
+      "script": "You sit down to build a design and no matter what you do, you always get something that looks like this. Gradients. Dark theme. Monospace fonts. Maybe a 3D globe. The typical SaaS template.",
+      "visual": "One recognizable dark SaaS hero with a gradient, monospace labels and a globe.",
+      "purpose": "",
+      "notes": "Keep the opening rooted in recognition. This is the user’s draft voice, not polished narration. Do not turn it into a joke or a critique of people who use these tools.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/saas.png"
+    },
+    {
+      "id": "communication",
+      "title": "It looks fine. What is it communicating?",
+      "summary": "The page is competent, but its appearance says little about this particular product. The discomfort comes from the gap between looking designed and communicating something.",
+      "script": "You stare at it and just feel that something is wrong. I mean, it looks fine, but a design communicates, and when every design is the same, is anything really being communicated?",
+      "visual": "Hold the same design. Compare a few different product promises using the same visual treatment.",
+      "purpose": "",
+      "notes": "Avoid claiming every SaaS design is identical. The point is the familiar experience of using a treatment before choosing what it should express.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/promises.png"
+    },
+    {
+      "id": "expectation",
+      "title": "A doorhandle tells you what to do",
+      "summary": "A handle suggests pulling. A plate suggests pushing. When the physical design and the instruction disagree, you feel it immediately. A website also sets expectations before you read its explanation.",
+      "script": "Design is more than layouts, fonts, and shades of blue. You design a website the same way you design a doorhandle. And if you think that’s simple, think about all the times where you’ve pulled on a push or pushed on a pull.",
+      "visual": "A door with a pull handle and PUSH sign, followed by a push plate. Let the mismatch establish the point.",
+      "purpose": "",
+      "notes": "Find or stage a clear real door example later. Keep this analogy brief; it connects design to communication without becoming a separate usability lesson.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/door.png"
+    },
+    {
+      "id": "product-promise",
+      "title": "Decide what this product should communicate",
+      "summary": "Before choosing the look, name the quality that matters for the product. The fastest, the most intelligent, and the cheapest each suggest a different direction.",
+      "script": "When you first stop to think about what you’re trying to communicate, what to design will become more clear. Is your product the fastest? The most intelligent?",
+      "visual": "Put three possible product qualities side by side: fast, intelligent, affordable.",
+      "purpose": "",
+      "notes": "The three words are examples from the spitball. Decide whether cheapest or affordable is the intended quality. Do not treat them as final positioning for the virtual-card example.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/qualities.png"
+    },
+    {
+      "id": "associations",
+      "title": "Follow those qualities into visual associations",
+      "summary": "Ask what each quality brings to mind. Those associations give you subjects, shapes, rhythm, and color to explore instead of reaching for the usual effects.",
+      "script": "What do those adjectives bring to mind? Fast makes you think of _____. Intelligent is _____. Cheapest is _____.",
+      "visual": "Develop a small reference grouping beneath each product quality. The specific associations are still open.",
+      "purpose": "",
+      "notes": "Fill these examples together. Do not silently decide that fast means a sports car, intelligent means a brain, or affordable means a bargain sticker.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/associations.png"
+    },
+    {
+      "id": "art-language",
+      "title": "Art offers more ways to express the same idea",
+      "summary": "Explore how different art styles can express the qualities you chose. The contemporary engraved reference shows one possibility: detailed linework, open space, and a restrained color accent.",
+      "script": "All of these can be traced back to art. So in this video I’m going to show you a few different art styles to move away from the standard SaaS template.",
+      "visual": "Use the supplied contemporary architecture-and-train engraving as a reference. Add other styles after selecting the examples.",
+      "purpose": "",
+      "notes": "Intaglio-inspired illustration is a candidate, not the entire premise. The supplied image is a style reference, not the final subject or a finished website. Avoid money, banknote borders and antique styling.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/contemporary-engraving-reference.png"
+    },
+    {
+      "id": "directions",
+      "title": "Try different directions on the same product",
+      "summary": "Keep one product and its content steady while trying a small number of art directions. Compare what each version communicates, then explain the decisions that produced that effect.",
+      "script": "",
+      "visual": "Matched concept sections for the same product. Show each selected style at the same scale; full websites are unnecessary.",
+      "purpose": "",
+      "notes": "Open: which styles, how many, and which product? The virtual-card premise remains available. Prepare concepts only after selecting useful contrasts; avoid making whole sites.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/comparison.png"
+    },
+    {
+      "id": "choose",
+      "title": "Choose a direction for what it communicates",
+      "summary": "Return to the product quality you started with. Choose the treatment that expresses it, and give the viewer a process they can repeat on their own design.",
+      "script": "",
+      "visual": "Place the original product quality beside the chosen concept and briefly revisit the reference that informed it.",
+      "purpose": "",
+      "notes": "Develop this ending after the worked examples. The takeaway should come from what those examples demonstrate, not a generic motivational closing.",
+      "status": "draft",
+      "estimatedSeconds": null,
+      "image": "/assets/storyboard/choose.png"
+    }
+  ]
+}

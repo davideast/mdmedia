@@ -8,7 +8,7 @@ compatibility: Requires the mdmedia CLI on PATH. Studio commands need a studio c
 
 | The user wants | Branch | Read |
 | --- | --- | --- |
-| A narration, image, video, music, or sound effect saved in their studio, or playlist changes | **studio** | [STUDIO.md](references/STUDIO.md) |
+| A narration, image, video, music, or sound effect saved in their studio, playlist changes, or independent storyboards | **studio** | [STUDIO.md](references/STUDIO.md) |
 | A media file on disk: `.wav`, `.mp4`, `.png`, `.mp3`, a narration script | **files** | [FILES.md](references/FILES.md) |
 
 "Narrate this" with no file named means **studio**: the user listens there.

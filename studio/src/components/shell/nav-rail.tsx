@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Clapperboard,
+  LayoutGrid,
   FileText,
   FolderTree,
   Download,
@@ -43,6 +44,7 @@ const NAV: readonly NavItem[] = [
   { href: "/drafts", label: "Drafts", icon: FileText, prefix: "/studio" },
   { href: "/queue", label: "Activity", icon: ListOrdered },
   { href: "/library", label: "Library", icon: Library, prefix: "/narration" },
+  { href: "/storyboards", label: "Storyboards", icon: LayoutGrid },
   { href: "/productions", label: "Productions", icon: Clapperboard },
   { href: "/playlists", label: "Playlists", icon: ListMusic },
   { href: "/trees", label: "Trees", icon: FolderTree },

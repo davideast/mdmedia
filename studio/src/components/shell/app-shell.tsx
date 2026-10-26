@@ -10,6 +10,8 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { AudioPlayerBar } from "@/components/reader/audio-player-bar";
+import { InspectorProvider } from "@/components/shell/inspector-slot";
+import { storyboardRoute } from "@/lib/storyboard";
 import { ContextPanel } from "@/components/shell/context-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { NavRail } from "@/components/shell/nav-rail";
@@ -106,7 +108,7 @@ export function AppShell({
     next: !offline && queue && queue.index + 1 < queue.tracks.length ? nextTrack : undefined,
   });
   const breakpoints = useResponsiveBreakpoints();
-  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/");
+  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/") || storyboardRoute(pathname) !== null;
   const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
@@ -211,7 +213,13 @@ export function AppShell({
     }
   }, [breakpoints.isMobile, toggleDock]);
 
-  const openContext = useCallback(() => setContextSheetOpen(true), []);
+  const openContext = useCallback(() => {
+    if (breakpoints.isMobile || breakpoints.isTablet) setContextSheetOpen(true);
+    else {
+      setRightDocked(false);
+      if (breakpoints.isMedium) setLeftDocked(true);
+    }
+  }, [breakpoints.isMobile, breakpoints.isTablet, breakpoints.isMedium, setRightDocked, setLeftDocked]);
   const closeContext = useCallback(() => setContextSheetOpen(false), []);
   const toggleContext = useCallback(() => {
     if (breakpoints.isMobile || breakpoints.isTablet) {
@@ -335,7 +343,7 @@ export function AppShell({
     hasContext && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
 
   return (
-    <ShellContext.Provider value={shellContextValue}>
+    <InspectorProvider><ShellContext.Provider value={shellContextValue}>
       <div className="flex h-dvh min-h-0 w-full overflow-hidden">
         {docked && !breakpoints.isMobile ? (
           <div
@@ -477,6 +485,6 @@ export function AppShell({
           </Sheet>
         ) : null}
       </div>
-    </ShellContext.Provider>
+    </ShellContext.Provider></InspectorProvider>
   );
 }

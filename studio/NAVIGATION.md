@@ -5,7 +5,7 @@ The prototype and its measurements are preserved on branch
 `prototype/studio-navigation` (stress-test commit `3f3df3f`). Production uses the
 existing Studio components and authorization, with one active route and no tab strip.
 
-- Drafts, Library, Activity, Productions, Playlists, Downloads, and Settings are stable destinations.
+- Drafts, Library, Activity, Storyboards, Productions, Playlists, Downloads, and Settings are stable destinations.
   Productions and their cuts are work items (Find work, pins, Recent); see `docs/studio-productions-api.md`.
 - Create narration starts an independent draft. Drafts are saved per account on
   this browser, including narration settings; they do not sync between devices.
@@ -34,3 +34,16 @@ pagination with 10,000 documents; search with duplicate and Unicode titles;
 server pagination across tied timestamps and past the old newest-100 limit;
 bounded sparse searches. Browser acceptance checks independent drafts, pins,
 refresh, Find work, Library authorization, and mobile navigation.
+
+## Working storyboards
+
+Storyboards is an independent destination at `/storyboards`. Each storyboard has
+its own record and title. `/storyboards/{id}?view=board|script&beat={beatId}` uses
+query state for presentation and selection. Both views are one work item in Recent
+and Find work. Breadcrumbs return to Storyboards; the standard editor shell and
+inspector remain in place. New storyboard lives in the list's page content.
+
+Old `/productions/{id}/storyboard` URLs redirect with query state preserved.
+Workspace recovery canonicalizes those routes without dropping unsaved fields or
+pins. Productions remain separate; handoff from storyboards is a later feature.
+See `docs/storyboards/README.md` for persistence, authorization, and migration.

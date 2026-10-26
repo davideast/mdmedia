@@ -281,3 +281,9 @@ bun run verify
 
 MIT — see [LICENSE](./LICENSE) for details.
 
+
+### Independent Studio storyboards
+
+`mdmedia studio storyboard` creates, edits, reorders, and narrates the same story
+plans shown in Studio. It uses revision checks to protect concurrent UI edits.
+See [the storyboard CLI guide](docs/storyboards/cli.md) for commands and examples.

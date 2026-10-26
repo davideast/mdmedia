@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "premise": "Redesign a modern virtual-card landing page using intaglio-inspired art direction. Gradients are the hook; the transformation is the story.",
+  "beats": [
+    {
+      "id": "hook",
+      "title": "The hook",
+      "purpose": "Introduce the question of art direction.",
+      "script": "Your UI doesn’t need another gradient. It needs art direction.",
+      "visual": "A modern finance landing page. The actual design is still to be explored.",
+      "notes": "Working title and hook; delivery is not locked.",
+      "status": "draft",
+      "estimatedSeconds": null
+    },
+    {
+      "id": "starting-point",
+      "title": "The starting point",
+      "purpose": "Give viewers a clear before state.",
+      "script": "Introduce a virtual-card service inspired by the premise of Privacy.com.",
+      "visual": "A placeholder for the existing modern landing page.",
+      "notes": "Choose a coherent starting design without building the complete site.",
+      "status": "draft",
+      "estimatedSeconds": null
+    },
+    {
+      "id": "possibility",
+      "title": "A different visual language",
+      "purpose": "Connect the proposed art direction to this product.",
+      "script": "Introduce intaglio as a possible direction for money, privacy, and control.",
+      "visual": "A placeholder for an intaglio reference.",
+      "notes": "Explore the direction before making claims about the outcome.",
+      "status": "draft",
+      "estimatedSeconds": null
+    },
+    {
+      "id": "transformation",
+      "title": "The transformation",
+      "purpose": "Carry the viewer from the original design to a different direction.",
+      "script": "",
+      "visual": "Redesign exploration — one placeholder beat for now.",
+      "notes": "Which decisions matter to the story? Leave the detailed walkthrough open.",
+      "status": "draft",
+      "estimatedSeconds": null
+    },
+    {
+      "id": "payoff",
+      "title": "The comparison",
+      "purpose": "Let the viewer judge the change.",
+      "script": "",
+      "visual": "Before and after, using the same product premise.",
+      "notes": "Does the redesign have a more distinctive, coherent identity? The result is not decided.",
+      "status": "draft",
+      "estimatedSeconds": null
+    },
+    {
+      "id": "takeaway",
+      "title": "The takeaway",
+      "purpose": "Bring the demonstration back to the opening idea.",
+      "script": "A deliberate visual language can change how a product feels.",
+      "visual": "Return to the redesigned page.",
+      "notes": "Revisit this conclusion after exploring the design.",
+      "status": "draft",
+      "estimatedSeconds": null
+    }
+  ]
+}

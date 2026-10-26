@@ -128,3 +128,58 @@ mdmedia studio playlist delete <playlist>        # keeps the narrations
 - On `playlist_ambiguous`, use the id from the error.
 - Before a sweeping change, like deleting a playlist or removing or reordering
   many items, list what you'll change and wait for the user to agree.
+
+## Independent storyboards
+
+Use `mdmedia studio storyboard`, not `mdmedia cut storyboard`, to create and edit
+Studio's independent story plans. Creating or editing a plan does not generate
+media or create a production.
+
+- `list --json`, `show <id> --json`
+- `create --title "…" [--input document.json] --json`
+- `update <id> --revision <n> [--title "…"] [--input document.json] --json`
+- `beat add <id> --revision <n> --input beat.json [--before <beat-id>] --json`
+- `beat update <id> <beat-id> --revision <n> --input patch.json --json`
+- `beat move <id> <beat-id> --revision <n> --before <other-id> --json`
+  (or `--after`, never both)
+- `beat remove <id> <beat-id> --revision <n> --yes --json`
+- `delete <id> --yes --json`
+
+Read with show first. Use its `storyboard.revision` and preserve stable beat IDs.
+On `storyboard_conflict`, reconcile against the latest content; never blindly retry
+using the new revision. `--input -` accepts stdin. Whole-document input is the
+`storyboard.document` shape, not the response envelope. Beat patches cannot change
+IDs; omitted fields remain unchanged. Use command help and the repository's
+`docs/storyboards/cli.md` for document/beat examples.
+
+`narrate <id> [--beat <beat-id>] [--view script|board] --dry-run --json` previews
+exact text and reader settings without generation. Without `--dry-run` it can cost
+money: require the user's authorization. Script reads authored narration; Board
+reads walkthrough summaries with narration as fallback. Use the returned
+`links.web`, and `mdmedia studio status <narration-id>` after an interrupted wait.
+An identical request reuses its recording. Do not automatically retry generation.
+
+
+Minimal whole-document input (supply authored content rather than these examples):
+
+```json
+{
+  "version": 1,
+  "premise": "The story this video develops",
+  "beats": [{
+    "id": "opening",
+    "title": "A concrete opening moment",
+    "purpose": "What this moment establishes",
+    "summary": "A short walkthrough of the moment",
+    "script": "The words to read aloud.",
+    "visual": "What the viewer sees",
+    "notes": "",
+    "status": "draft",
+    "estimatedSeconds": null
+  }]
+}
+```
+
+A beat-add input is one object from `beats`. A beat-update input contains only
+changed fields, for example `{"script":"Revised narration."}`. `image` is an
+optional local `/assets/storyboard/<name>.png` (or `.webp`/`.jpg`) path on a beat; status is `draft` or `decided`.
