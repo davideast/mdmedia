@@ -50,13 +50,13 @@ describe('mdmedia story check', () => {
 
 describe('mdmedia story build', async () => {
   const { runStoryBuild, EXIT } = await import('../../src/cli/story-command.js');
-  const { fakeJudge, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { fakeJudge, testFacts, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
   const { mkdtempSync, readFileSync, existsSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join: joinPath } = await import('node:path');
 
   const deps = (mishear?: (text: string) => string | undefined) => ({
-    judge: fakeJudge(),
+    judge: fakeJudge(), facts: testFacts,
     speaker: toneSpeaker(),
     transcriber: scriptedTranscriber(mishear),
     runtime: passThroughRuntime,
@@ -203,11 +203,11 @@ describe('mdmedia story draw', async () => {
 
 describe('mdmedia story comic', async () => {
   const { runStoryComic, EXIT } = await import('../../src/cli/story-command.js');
-  const { fakeImageModel, fakeJudge, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { fakeImageModel, fakeJudge, testFacts, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
   const { mkdtempSync, existsSync, readFileSync, writeFileSync, copyFileSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join: joinPath } = await import('node:path');
-  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge() });
+  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge(), facts: testFacts });
 
   it('writes the reader and comic-build.json, and exits 0', async () => {
     const out = mkdtempSync(joinPath(tmpdir(), 'story-comic-'));
@@ -264,11 +264,11 @@ describe('mdmedia story adapt', async () => {
 
 describe('mdmedia story compare', async () => {
   const { runStoryComic, runStoryCompare, EXIT } = await import('../../src/cli/story-command.js');
-  const { fakeImageModel, fakeJudge, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { fakeImageModel, fakeJudge, testFacts, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
   const { cpSync, mkdtempSync, readFileSync, writeFileSync, existsSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join: joinPath } = await import('node:path');
-  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge() });
+  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge(), facts: testFacts });
 
   it('lists the panels and lines that changed between two builds, with both versions beside each other', async () => {
     const root = mkdtempSync(joinPath(tmpdir(), 'story-compare-'));

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildStory, linePath, slugify } from '../../src/story/index.js';
 import type { StoryBuild, StoryTimeline } from '../../src/story/index.js';
-import { castingSpeaker, fakeComposer, fakeJudge, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
+import { castingSpeaker, fakeComposer, fakeJudge, testFacts, memoryCache, memorySink, passThroughRuntime, scriptedTranscriber, toneSpeaker } from './fakes.js';
 
 const markdown = readFileSync(join(import.meta.dir, 'fixtures', 'lighthouse.md'), 'utf8');
 
@@ -46,7 +46,7 @@ describe('buildStory', () => {
       out,
       speaker: castingSpeaker(),
       transcriber: { model: 'any', transcribe: async () => '' },
-      judge: fakeJudge({ Gacrux: 9 }),
+      judge: fakeJudge({ Gacrux: 9 }), facts: testFacts,
       runtime: passThroughRuntime,
       cache: memoryCache(),
     });
@@ -85,7 +85,7 @@ describe('buildStory', () => {
       source: { path: 'day.md', markdown },
       out,
       speaker: toneSpeaker(),
-      judge: fakeJudge(),
+      judge: fakeJudge(), facts: testFacts,
       transcriber: scriptedTranscriber(),
       runtime: passThroughRuntime,
       cache: memoryCache(),
@@ -109,10 +109,10 @@ describe('buildStory', () => {
     const composer = fakeComposer();
     const { build } = await buildStory({
       source: { path: 'day.md', markdown: readFileSync(join(import.meta.dir, 'fixtures', 'embarrassing-day.md'), 'utf8').split('\n### First period')[0]! },
-      judge: fakeJudge(),
+      judge: fakeJudge(), facts: testFacts,
       out: memorySink(),
       speaker: toneSpeaker(),
-      judge: fakeJudge(),
+      judge: fakeJudge(), facts: testFacts,
       transcriber: scriptedTranscriber(),
       runtime: passThroughRuntime,
       cache: memoryCache(),

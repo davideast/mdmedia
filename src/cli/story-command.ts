@@ -89,6 +89,7 @@ export interface BuildDeps {
   cache: RenderCache;
   composer?: Composer;
   judge?: VoiceJudge;
+  facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>>;
 }
 
 export interface BuildArgs {
@@ -393,7 +394,7 @@ export const storyDrawCommand = defineCommand({
 /** Builds the graphic novel for a comic script; resolves to the exit code. `deps` replaces providers in tests. */
 export async function runStoryComic(
   args: { file: string; out?: string; json?: boolean; redraw?: boolean; unlock?: string[]; signal?: AbortSignal },
-  deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber; judge?: VoiceJudge },
+  deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber; judge?: VoiceJudge; facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>> },
   write: (text: string) => void
 ): Promise<number> {
   let markdown: string;

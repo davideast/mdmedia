@@ -19,6 +19,8 @@ export interface BuildOptions {
   cache: RenderCache;
   /** Casts voices for cast members who have a brief and no voice. */
   judge?: VoiceJudge;
+  /** Each voice's gender, from a person listening; VOICE_FACTS by default. */
+  facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>>;
   /** Scene music; without one, or with `music: false`, the build has voices only. */
   composer?: Composer;
   music?: boolean;
@@ -153,13 +155,13 @@ export async function buildStory(options: BuildOptions): Promise<BuildResult> {
 /** Casts the cast members who need a voice, or explains what is missing. */
 export async function castCast(
   script: StoryScript,
-  options: { speaker: Speaker; judge?: VoiceJudge; cache: RenderCache; signal?: AbortSignal },
+  options: { speaker: Speaker; judge?: VoiceJudge; cache: RenderCache; facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>>; signal?: AbortSignal },
   emit: (event: CastEvent) => void
 ): Promise<{ script: StoryScript; casting: CastingResult[] }> {
   const uncast = Object.values(script.cast).filter((m) => !m.voice);
   if (!uncast.length) return { script, casting: [] };
   if (!options.judge) throw new StoryError('uncast', `${uncast.map((m) => m.id).join(', ')} need a voice: give them a voice:, or build with a judge to cast from their briefs.`);
-  return castVoices(script, { speaker: options.speaker, judge: options.judge, cache: options.cache, signal: options.signal, onEvent: emit });
+  return castVoices(script, { speaker: options.speaker, judge: options.judge, cache: options.cache, facts: options.facts, signal: options.signal, onEvent: emit });
 }
 
 /** `00/03/0007-june` → `audio/lines/00-03/0007-june.wav` */

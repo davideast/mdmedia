@@ -32,6 +32,8 @@ export interface ComicBuildOptions {
   transcriber?: Transcriber;
   /** Casts voices for cast members who have a brief and no voice. */
   judge?: VoiceJudge;
+  /** Each voice's gender, from a person listening; VOICE_FACTS by default. */
+  facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>>;
   signal?: AbortSignal;
   onEvent?: (event: DrawEvent | LineEvent | CastEvent) => void;
   /** Draw again panels that failed their checks in an earlier build. */

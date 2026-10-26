@@ -1,4 +1,5 @@
 import { PCM_RATE, SpeechRefused, type AudioRuntime, type CachedImage, type CachedLine, type CachedMusic, type Composer, type FileSink, type ImageModel, type MixPlan, type Vision, type RenderCache, type SpeakRequest, type Speaker, type Transcriber, type VoiceJudge } from '../../src/story/index.js';
+import { VOICES } from '../../src/story/direct/voices.js';
 
 /**
  * A tone, 50 ms per character. The first samples carry the spoken text (its
@@ -147,3 +148,6 @@ export function fakeJudge(fits: Record<string, number> = {}): VoiceJudge & { cal
     },
   };
 }
+
+/** Test marks for every voice: alternately a man's and a woman's, so any brief can be cast. */
+export const testFacts: Record<string, { gender: 'man' | 'woman' }> = Object.fromEntries(VOICES.map((v, i) => [v.name, { gender: i % 2 ? 'man' : 'woman' }]));

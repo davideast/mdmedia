@@ -6,6 +6,7 @@ import { wavFromPcm } from './pcm.js';
 import type { RenderCache, Speaker, VoiceJudge, VoiceScore } from './ports.js';
 import { spokenText } from './pronounce.js';
 import type { CastId, Line, StoryScript } from './types.js';
+import { briefGender, VOICE_FACTS } from './voice-facts.js';
 
 export interface Audition extends VoiceScore {
   voice: string;
@@ -29,6 +30,8 @@ export interface CastOptions {
   cache: RenderCache;
   /** The voices to audition; Gemini's prebuilt voices by default. */
   voices?: readonly string[];
+  /** Each voice's gender, from a person listening; VOICE_FACTS by default. */
+  facts?: Readonly<Record<string, { gender: 'man' | 'woman' }>>;
   concurrency?: number;
   signal?: AbortSignal;
   onEvent?: (event: CastEvent) => void;
@@ -54,16 +57,23 @@ export async function castVoices(script: StoryScript, options: CastOptions): Pro
     if (member.voice || !member.brief) return undefined;
     const line = lines.find((l) => l.speaker === member.id);
     if (!line) return undefined;
+    // Only voices a person has marked with the brief's gender; never a model's guess.
+    const facts = options.facts ?? VOICE_FACTS;
+    const wanted = briefGender(member.brief);
+    const pool = wanted ? voices.filter((v) => facts[v]?.gender === wanted) : voices;
+    if (!pool.length) {
+      throw new Error(`No voice is marked as a ${wanted} for ${member.id}: mark the voices first (plan 009, voice marks), or give ${member.id} a voice:.`);
+    }
     const sample = spokenText(line.text, script.meta.pronounce);
     const note = `${member.brief.replace(/\.$/, '')}. ${line.cue}`.replace(/\. $/, '');
-    const key = `casting:${await sha256(JSON.stringify([RENDER_VERSION, options.speaker.provider, options.judge.model, member.brief, sample, line.cue, voices]))}`;
+    const key = `casting:${await sha256(JSON.stringify([RENDER_VERSION, options.speaker.provider, options.judge.model, member.brief, sample, line.cue, pool]))}`;
     const hit = await options.cache.getImage(key);
     let result: CastingResult;
     if (hit) {
       result = { id: member.id, cached: true, ...(hit.meta as { voice: string; sample: string; ranked: Audition[] }) };
     } else {
       const auditions = await Promise.all(
-        voices.map((voice) =>
+        pool.map((voice) =>
           limit(async (): Promise<Audition | undefined> => {
             try {
               const pcm = await options.speaker.speak({ text: sample, voice, note, signal: options.signal });

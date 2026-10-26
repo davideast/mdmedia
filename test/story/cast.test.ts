@@ -29,6 +29,9 @@ pronounce:
 **ODILE** *(curt)*: Upstairs.
 `;
 
+/** Every voice marked as a woman's: the briefs here are all women and girls. */
+const women = Object.fromEntries(['Aoede', 'Gacrux', 'Schedar', 'Leda', 'Kore', 'Sulafat'].map((v) => [v, { gender: 'woman' as const }]));
+
 const parse = async () => (await parseStory(STORY, { path: 'm.md' })).script!;
 
 describe('the story format for casting', () => {
@@ -49,7 +52,7 @@ describe('the story format for casting', () => {
 describe('castVoices', () => {
   it('auditions every voice for each uncast character and casts the best fit', async () => {
     const judge = fakeJudge({ Aoede: 9, Gacrux: 2, Schedar: 8 });
-    const { script, casting } = await castVoices(await parse(), { speaker: castingSpeaker(), judge, cache: memoryCache(), voices: ['Aoede', 'Gacrux', 'Schedar'] });
+    const { script, casting } = await castVoices(await parse(), { speaker: castingSpeaker(), judge, facts: women, cache: memoryCache(), voices: ['Aoede', 'Gacrux', 'Schedar'] });
     // WREN and the narrator have briefs and no voice; NERW shares WREN's; ODILE has one.
     expect(casting.map((c) => c.id).sort()).toEqual(['NARRATOR', 'WREN']);
     expect(script.cast.WREN!.voice).toBe('Aoede');
@@ -65,36 +68,50 @@ describe('castVoices', () => {
     const two = STORY.replace('  ODILE:\n    voice: Sulafat\n', '  ODILE:\n');
     const script = (await parseStory(two, { path: 'm.md' })).script!;
     // Everyone's favourite is Aoede; only one can have it.
-    const { casting } = await castVoices(script, { speaker: castingSpeaker(), judge: fakeJudge({ Aoede: 9, Leda: 7, Kore: 6 }), cache: memoryCache(), voices: ['Aoede', 'Leda', 'Kore'] });
+    const { casting } = await castVoices(script, { speaker: castingSpeaker(), judge: fakeJudge({ Aoede: 9, Leda: 7, Kore: 6 }), facts: women, cache: memoryCache(), voices: ['Aoede', 'Leda', 'Kore'] });
     const voices = casting.map((c) => c.voice);
     expect(new Set(voices).size).toBe(voices.length);
     expect(voices.sort()).toEqual(['Aoede', 'Kore', 'Leda']);
   });
 
   it('keeps voices the author wrote for themselves', async () => {
-    const { casting } = await castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge({ Sulafat: 9, Aoede: 5 }), cache: memoryCache(), voices: ['Sulafat', 'Aoede', 'Leda'] });
+    const { casting } = await castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge({ Sulafat: 9, Aoede: 5 }), facts: women, cache: memoryCache(), voices: ['Sulafat', 'Aoede', 'Leda'] });
     expect(casting.map((c) => c.voice)).not.toContain('Sulafat');
   });
 
   it('auditions with the brief as the delivery note and casts again only when the brief changes', async () => {
     const cache = memoryCache();
     const speaker = castingSpeaker();
-    await castVoices(await parse(), { speaker, judge: fakeJudge(), cache, voices: ['Aoede', 'Leda'] });
+    await castVoices(await parse(), { speaker, judge: fakeJudge(), facts: women, cache, voices: ['Aoede', 'Leda'] });
     expect(speaker.calls.find((c) => c.text.endsWith("That's my name backwards."))!.note).toContain('Peckham');
     const again = castingSpeaker();
-    const second = await castVoices(await parse(), { speaker: again, judge: fakeJudge(), cache, voices: ['Aoede', 'Leda'] });
+    const second = await castVoices(await parse(), { speaker: again, judge: fakeJudge(), facts: women, cache, voices: ['Aoede', 'Leda'] });
     expect(again.calls).toHaveLength(0);
     expect(second.casting.every((c) => c.cached)).toBe(true);
     const changed = (await parseStory(STORY.replace('from Peckham', 'from Croydon'), { path: 'm.md' })).script!;
     const third = castingSpeaker();
-    await castVoices(changed, { speaker: third, judge: fakeJudge(), cache, voices: ['Aoede', 'Leda'] });
+    await castVoices(changed, { speaker: third, judge: fakeJudge(), facts: women, cache, voices: ['Aoede', 'Leda'] });
     expect(third.calls.length).toBe(2);
+  });
+});
+
+describe('casting from voice marks', () => {
+  it('only auditions voices marked with the gender the brief names', async () => {
+    const speaker = castingSpeaker();
+    const facts = { Aoede: { gender: 'woman' as const }, Puck: { gender: 'man' as const } };
+    const { casting } = await castVoices(await parse(), { speaker, judge: fakeJudge({ Puck: 10 }), cache: memoryCache(), voices: ['Aoede', 'Puck'], facts });
+    expect(casting.find((c) => c.id === 'WREN')!.voice).toBe('Aoede');
+    expect(speaker.calls.some((c) => String(c.voice) === 'Puck')).toBe(false);
+  });
+
+  it('refuses to cast a gendered brief before any voice is marked', async () => {
+    await expect(castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge(), cache: memoryCache(), voices: ['Aoede'], facts: {} })).rejects.toThrow('mark the voices first');
   });
 });
 
 describe('voicing with briefs and respellings', () => {
   it("speaks the respelling, sends the brief as the note, and checks against the story's spelling", async () => {
-    const { script } = await castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge(), cache: memoryCache(), voices: ['Aoede'] });
+    const { script } = await castVoices(await parse(), { speaker: castingSpeaker(), judge: fakeJudge(), facts: women, cache: memoryCache(), voices: ['Aoede'] });
     const speaker = toneSpeaker();
     // The transcriber writes the respelling it heard; the check maps it back.
     const transcriber = scriptedTranscriber((text) => (text.includes('Nur-oo') ? "Hello, Wren. I'm Nuroo." : undefined));
