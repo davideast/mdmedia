@@ -167,6 +167,14 @@ describe('adaptStory', () => {
     expect(night).toContain("The scene before ends:\nODILE: Wren Pickett. Upstairs.\nnarration: Her reflection blinked a beat late.\nWREN: I'm going mad. That's fine.");
   });
 
+  it('takes a single cast member written as a string instead of a list', async () => {
+    const loose = JSON.parse(JSON.stringify(SHOP)) as { pages: Array<{ panels: Array<Record<string, unknown>> }> };
+    loose.pages[0]!.panels[0]!.left = 'WREN';
+    const { markdown, report } = await adaptStory(STORY, { writer: writer(() => loose as unknown as SceneAdaptation), story: 'mirror.md', scene: 'Shop' });
+    expect(report!.remaining).toEqual([]);
+    expect(markdown).toContain('Left: WREN.');
+  });
+
   it('adapts one scene with --scene, titled after it', async () => {
     const w = writer(() => SHOP);
     const { markdown, report } = await adaptStory(STORY, { writer: w, story: 'mirror.md', scene: 'shop', style: 'watercolor' });

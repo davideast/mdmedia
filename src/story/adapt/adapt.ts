@@ -147,7 +147,15 @@ function review(draft: Draft, script: StoryScript): Draft {
   } catch (error) {
     return { ...draft, adaptation: undefined, problems: [`The reply was not valid JSON: ${error instanceof Error ? error.message : String(error)}`] };
   }
-  adaptation.pages = (adaptation.pages ?? []).map((p) => ({ ...p, panels: (p.panels ?? []).map((panel) => markOffPanel({ ...panel, items: panel.items ?? [] }, draft.lines)) }));
+  // Models write a single cast member as a string now and then: take either.
+  const side = (value: unknown): string[] | undefined => (value == null ? undefined : Array.isArray(value) ? value.map(String) : [String(value)]);
+  adaptation.pages = (adaptation.pages ?? []).map((p) => ({
+    ...p,
+    rows: Array.isArray(p.rows) ? p.rows.map(Number) : [],
+    panels: (p.panels ?? []).map((panel) =>
+      markOffPanel({ ...panel, left: side(panel.left), center: side(panel.center), right: side(panel.right), items: Array.isArray(panel.items) ? panel.items : [] }, draft.lines)
+    ),
+  }));
   return { ...draft, adaptation, problems: adaptationProblems(adaptation, draft.lines, script.cast) };
 }
 
