@@ -242,3 +242,22 @@ describe('mdmedia story comic', async () => {
     expect(JSON.parse(readFileSync(joinPath(dir, 'out', 'comic', 'comic-build.json'), 'utf8')).summary.crowded).toBeGreaterThan(0);
   });
 });
+
+describe('mdmedia story adapt', async () => {
+  const { runStoryAdapt, EXIT } = await import('../../src/cli/story-command.js');
+  const { mkdtempSync, readFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+
+  it('writes the comic script with its story path relative to it, and exits 1 while problems remain', async () => {
+    const out = joinPath(mkdtempSync(joinPath(tmpdir(), 'story-adapt-')), 'comics', 'wren.md');
+    let text = '';
+    const writer = { model: 'fake', generate: async () => 'not json' };
+    const code = await runStoryAdapt({ file: fixture('wren-backwards'), out, scene: 'Antique' }, writer, (t) => { text += t + '\n'; });
+    expect(code).toBe(EXIT.storyErrors);
+    const written = readFileSync(out, 'utf8');
+    expect(written).toContain('title: Wren Backwards — The Antique Shop');
+    expect(written).toMatch(/story: .*test\/story\/fixtures\/wren-backwards\.md/);
+    expect(text).toContain('not valid JSON');
+  });
+});

@@ -1,10 +1,10 @@
 import { defineCommand } from 'citty';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, dirname, extname, join } from 'node:path';
+import { basename, dirname, extname, join, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { buildComic, buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
-import type { AudioRuntime, BuildEvent, CastEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision, VoiceJudge } from '../story/index.js';
+import { adaptStory, buildComic, buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
+import type { AdaptEvent, AudioRuntime, BuildEvent, CastEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision, VoiceJudge } from '../story/index.js';
 import {
   createFileRenderCache,
   createFileSink,
@@ -231,7 +231,7 @@ export async function runStoryDirect(
   const onEvent = args.json ? undefined : (event: DirectEvent) => {
     if (event.type === 'cast-done') {
       const c = event.cast;
-      write(`cast: ${Object.entries(c.cast).map(([id, m]) => `${id} (${m.voice})`).join(', ')}; narrator ${'character' in c.narrator ? c.narrator.character : c.narrator.voice}; ${c.scenes.length} scenes`);
+      write(`cast: ${Object.keys(c.cast).join(', ')}; narrator ${'character' in c.narrator ? c.narrator.character : 'NARRATOR'}; ${c.scenes.length} scenes`);
     }
     if (event.type === 'scene-done') write(`✓ ${event.title}`);
     if (event.type === 'repair') write(`↻ repair round ${event.round}: ${event.scenes.join(', ')}`);
@@ -507,6 +507,81 @@ export const storyComicCommand = defineCommand({
   },
 });
 
+/**
+ * Adapts a story file into a comic script; resolves to the exit code. The file
+ * is written even when problems remain, so a person can finish it.
+ */
+export async function runStoryAdapt(
+  args: { file: string; out: string; style?: string; scene?: string; json?: boolean; signal?: AbortSignal },
+  writer: TextModel,
+  write: (text: string) => void
+): Promise<number> {
+  let markdown: string;
+  try {
+    markdown = await readFile(args.file, 'utf8');
+  } catch {
+    write(`${args.file}: cannot read file`);
+    return EXIT.storyErrors;
+  }
+  const onEvent = args.json ? undefined : (event: AdaptEvent) => {
+    if (event.type === 'scene-done') write(`✓ ${event.title}`);
+    if (event.type === 'repair') write(`↻ repair round ${event.round}: ${event.scenes.join(', ')}`);
+  };
+  try {
+    const story = relative(dirname(args.out), args.file).split('\\').join('/');
+    const result = await adaptStory(markdown, { writer, story, style: args.style, scene: args.scene, signal: args.signal, onEvent });
+    if (!result.markdown || !result.report) {
+      write(args.json ? JSON.stringify({ diagnostics: result.diagnostics }, null, 2) : formatDiagnostics(args.file, result.diagnostics));
+      return EXIT.storyErrors;
+    }
+    await mkdir(dirname(args.out), { recursive: true });
+    await writeFile(args.out, result.markdown);
+    const r = result.report;
+    if (args.json) write(JSON.stringify({ out: args.out, ...r }, null, 2));
+    else {
+      write(`${r.pages} pages, ${r.panels} panels, ${r.balloons} balloons, ${r.captions} captions (${r.narration.captioned} of ${r.narration.lines} narration lines kept as captions) -> ${args.out}`);
+      for (const p of r.remaining) write(`✗ ${p.scene}: ${p.problem}`);
+      if (!r.remaining.length) write('no problems');
+    }
+    return r.remaining.length ? EXIT.storyErrors : EXIT.ok;
+  } catch (error) {
+    if (args.signal?.aborted) return EXIT.cancelled;
+    write(`Adapt failed: ${error instanceof Error ? error.message : String(error)}`);
+    return EXIT.provider;
+  }
+}
+
+export const storyAdaptCommand = defineCommand({
+  meta: {
+    name: 'adapt',
+    description: 'Turn a story file into a comic script: pages, panels, shots, acting notes and which lines go where',
+  },
+  args: {
+    file: { type: 'positional', description: 'Story file', required: true },
+    out: { type: 'string', alias: 'o', description: 'Comic script to write', required: true },
+    style: { type: 'string', description: 'Art style: flat, watercolor, manga, or your own description (default flat)' },
+    scene: { type: 'string', description: 'Adapt only the scenes whose title contains this' },
+    model: { type: 'string', description: 'Text model (default gemini-3.5-flash)' },
+    json: { type: 'boolean', description: 'Print the report as JSON', default: false },
+  },
+  async run({ args }) {
+    const fileConfig = await loadConfigFile(process.cwd());
+    const apiKey = resolveConfig({}, fileConfig, process.env).apiKey;
+    if (!apiKey) {
+      console.error('A Gemini API key is required: set GEMINI_API_KEY or apiKey in .mdmedia.json.');
+      process.exitCode = EXIT.provider;
+      return;
+    }
+    const controller = new AbortController();
+    process.once('SIGINT', () => controller.abort());
+    process.exitCode = await runStoryAdapt(
+      { file: args.file, out: args.out, style: args.style, scene: args.scene, json: args.json, signal: controller.signal },
+      createGeminiTextModel({ apiKey, model: args.model }),
+      (text) => console.log(text)
+    );
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -518,5 +593,6 @@ export const storyCommand = defineCommand({
     direct: storyDirectCommand,
     draw: storyDrawCommand,
     comic: storyComicCommand,
+    adapt: storyAdaptCommand,
   },
 });

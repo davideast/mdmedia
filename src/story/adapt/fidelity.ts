@@ -1,0 +1,78 @@
+import type { CastMember } from '../types.js';
+import { placed, type SceneAdaptation, type SceneLines } from './assemble.js';
+import { PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
+
+/** Quotes and spaces as a comparison sees them. */
+const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
+const words = (text: string) => norm(text).toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean);
+
+/**
+ * What code can hold an adaptation to: captions and balloons use the story's
+ * words exactly and in order, every line of dialogue keeps all its words, and
+ * pages have a drawable shape. Returns one sentence per problem, written to
+ * the adapter.
+ */
+export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLines, cast: Record<string, CastMember>): string[] {
+  const problems: string[] = [];
+  if (!adaptation.setting?.trim()) problems.push('The scene needs a "setting".');
+  if (!adaptation.pages?.length) return [...problems, 'The scene has no pages.'];
+
+  const drawable = new Set(Object.keys(cast).filter((id) => cast[id]!.look));
+  const order = [...lines.keys()];
+  const used = new Map<string, string[]>();
+  let last = { line: -1, at: -1 };
+
+  adaptation.pages.forEach((page, p) => {
+    const where = `Page ${p + 1} of the scene`;
+    const count = page.panels?.length ?? 0;
+    const rows = page.rows ?? [];
+    if (count < PANELS_PER_PAGE.min || count > PANELS_PER_PAGE.max) problems.push(`${where} has ${count} panels; a page holds ${PANELS_PER_PAGE.min} to ${PANELS_PER_PAGE.max}.`);
+    if (rows.reduce((a, b) => a + b, 0) !== count) problems.push(`${where}: rows ${JSON.stringify(rows)} add up to ${rows.reduce((a, b) => a + b, 0)}, but the page has ${count} panels.`);
+    if (rows.some((n) => n < PANELS_PER_ROW.min || n > PANELS_PER_ROW.max)) problems.push(`${where}: each row holds ${PANELS_PER_ROW.min} to ${PANELS_PER_ROW.max} panels.`);
+
+    (page.panels ?? []).forEach((panel, i) => {
+      const at = `${where}, panel ${i + 1}`;
+      if (!panel.shot?.trim()) problems.push(`${at} needs a "shot".`);
+      if (!panel.acting?.trim()) problems.push(`${at} needs an "acting" note.`);
+      if (panel.continues && i === 0) problems.push(`${at} "continues", but it is the first panel on its page; a continuing panel follows one on the same page.`);
+      for (const id of placed(panel)) if (!drawable.has(id)) problems.push(`${at} places ${id}, who is not a cast member with a look.`);
+      const seen = placed(panel);
+      if (new Set(seen).size !== seen.length) problems.push(`${at} places someone on two sides.`);
+
+      for (const item of panel.items ?? []) {
+        if ('sfx' in item) continue;
+        const line = lines.get(item.line);
+        if (!line) {
+          problems.push(`${at} uses ${item.line}, which is not one of this scene's lines.`);
+          continue;
+        }
+        const text = norm(item.text ?? line.display);
+        const full = norm(line.display);
+        const index = full.indexOf(text);
+        if (!text || index < 0) {
+          problems.push(`${at}: the text for ${item.line} is not an exact part of the line. Copy whole sentences from: "${line.display}"`);
+          continue;
+        }
+        const lineIndex = order.indexOf(item.line);
+        if (lineIndex < last.line || (lineIndex === last.line && index < last.at)) problems.push(`${at}: ${item.line} comes out of story order.`);
+        last = { line: lineIndex, at: index };
+        used.set(item.line, [...(used.get(item.line) ?? []), text]);
+      }
+    });
+  });
+
+  // Every word of every line of dialogue, in order.
+  for (const [id, line] of lines) {
+    if (line.narration) continue;
+    const want = words(line.display);
+    const got = words((used.get(id) ?? []).join(' '));
+    let k = 0;
+    const missing: string[] = [];
+    for (const w of want) {
+      if (got[k] === w) k++;
+      else missing.push(w);
+    }
+    if (missing.length) problems.push(`${line.speaker}'s line ${id} must appear in balloons with all its words; missing: "${missing.join(' ')}". The line: "${line.display}"`);
+  }
+  return problems;
+}
