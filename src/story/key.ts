@@ -2,8 +2,18 @@ import { sha256 } from './parse.js';
 import { spokenText, voiceOf } from './pronounce.js';
 import type { Line, StoryScript } from './types.js';
 
-/** Bump when a change to rendering should invalidate every cached line. */
+/**
+ * One version per kind of render, so a change to one can't replace another.
+ * Bump only the kind whose output must change. A single shared version once
+ * redrew every approved panel and regenerated every music clip when only the
+ * voices changed (plan 009).
+ */
+/** Voice lines and casting. */
 export const RENDER_VERSION = 2;
+/** Panels, character sheets, staging images and head boxes. */
+export const IMAGE_RENDER_VERSION = 1;
+/** Scene music. */
+export const MUSIC_RENDER_VERSION = 1;
 
 /** How many earlier lines in the scene go into a line's delivery note. */
 export const CONTEXT_LINES = 2;

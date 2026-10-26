@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'bun:test';
 import { lineRenderKey, parseStory } from '../../src/story/index.js';
 import type { Line, StoryScript } from '../../src/story/index.js';
@@ -77,4 +79,12 @@ describe('lineRenderKey', () => {
     const after = await keys(story(BODY.join('\n\n'), 'slow and careful'));
     expect(changed(before, after)).toEqual(['Wait!', 'I saw.', 'Finally.']);
   });
+
+  it('keeps a separate version for each kind of render, so a voice change cannot redraw art or music', async () => {
+    const src = readFileSync(join(import.meta.dir, '../../src/story/comic/draw.ts'), 'utf8') + readFileSync(join(import.meta.dir, '../../src/story/music.ts'), 'utf8');
+    expect(src).not.toMatch(/\bRENDER_VERSION\b/);
+    expect(src).toContain('IMAGE_RENDER_VERSION');
+    expect(src).toContain('MUSIC_RENDER_VERSION');
+  });
 });
+

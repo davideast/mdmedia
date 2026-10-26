@@ -1,4 +1,4 @@
-import { RENDER_VERSION } from '../key.js';
+import { IMAGE_RENDER_VERSION } from '../key.js';
 import { limiter } from '../limit.js';
 import { sha256 } from '../parse.js';
 import type { ImageBytes, ImageModel, RenderCache, Vision } from '../ports.js';
@@ -259,7 +259,7 @@ async function headBoxes(
   const characters = Object.keys(panel.positions).filter((id) => cast[id]?.look).map((id) => ({ id, look: visualLook(cast[id]!.look!) }));
   if (!characters.length) return [];
   // Keyed by the image itself: a panel redrawn under the same key gets its own heads.
-  const key = `heads:${await sha256(JSON.stringify([RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;
+  const key = `heads:${await sha256(JSON.stringify([IMAGE_RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;
   const hit = await cache.getImage(key);
   // An empty result from before empty answers were retried is asked again.
   if (hit && (hit.meta.heads as PanelResult['heads']).length) return hit.meta.heads as PanelResult['heads'];
@@ -307,5 +307,5 @@ async function bytesHash(bytes: Uint8Array): Promise<string> {
 }
 
 export async function imageKey(model: string, prompt: string, references: string[], aspect: string): Promise<string> {
-  return `image:${await sha256(JSON.stringify([RENDER_VERSION, model, prompt, references, aspect]))}`;
+  return `image:${await sha256(JSON.stringify([IMAGE_RENDER_VERSION, model, prompt, references, aspect]))}`;
 }

@@ -1,0 +1,67 @@
+{
+  "schema": "mdmedia.story.lock/1",
+  "panels": {
+    "1.1": {
+      "file": "panel-1-1.webp",
+      "sha256": "f389303e8c98a7dbb1335d52906ccdd02af7f33bbf3bdc1216d06b253d9bf436"
+    },
+    "1.2": {
+      "file": "panel-1-2.webp",
+      "sha256": "cd479c0baef51d5089db405de61a89bf524207f2eb55671dc0020503e99c64fe"
+    },
+    "1.3": {
+      "file": "panel-1-3.webp",
+      "sha256": "dd4142f28ee9d621b5115eb81d5b9af16dc770e3b45688ae4da487e6a3d7b99e"
+    },
+    "1.4": {
+      "file": "panel-1-4.webp",
+      "sha256": "90d3433d889f2c552336d23807e5e543f427e5a59e470604464cb2b79f454f14"
+    },
+    "1.5": {
+      "file": "panel-1-5.webp",
+      "sha256": "3ef7bc2707587fb6a87803aabbc6bb9d8e1ea376ba29667371b3e4177aae233b"
+    },
+    "2.1": {
+      "file": "panel-2-1.webp",
+      "sha256": "587d8c8489c6086342ba3169bed5d5467d431c72b85653622d6aa3b1a9d8163a"
+    },
+    "2.2": {
+      "file": "panel-2-2.webp",
+      "sha256": "55e3369a335f6124b5c414e6ed275e188c772ea0672b56659e700bdd203cd83d"
+    },
+    "2.3": {
+      "file": "panel-2-3.webp",
+      "sha256": "4219a51a1de293d15ac1c28051464cedec3c5ea5c24138205b72c91d055c8196"
+    },
+    "2.4": {
+      "file": "panel-2-4.webp",
+      "sha256": "632675df07a2642bdfe9903dc35f500ca4f659298160537750c189c793ff1bb1"
+    },
+    "2.5": {
+      "file": "panel-2-5.webp",
+      "sha256": "61891ba8df8ef1cbad19c2cf16e52c3c6ec465e6a8f9524757622c1ff389497f"
+    },
+    "3.1": {
+      "file": "panel-3-1.webp",
+      "sha256": "73231d995688caf1fe308280ff912d27401388893cf4463e8bf1b289bd785dc2"
+    },
+    "3.2": {
+      "file": "panel-3-2.webp",
+      "sha256": "2997cc38b2be5b7e407a99dc8c0e8287109237e60330cb91df04ed28be1dd44d"
+    },
+    "3.3": {
+      "file": "panel-3-3.webp",
+      "sha256": "ab558bb13f4dc6a811c19c36d0bf61af051e6f1e119eebe0d8c32a1e30e65b68"
+    },
+    "3.4": {
+      "file": "panel-3-4.webp",
+      "sha256": "1b6b0d32143d9dac0dc6431ad950fee769bd6c97084a45d915290300e5cf192b"
+    },
+    "3.5": {
+      "file": "panel-3-5.webp",
+      "sha256": "34a54894351937d57ee7ca87c65c911b56255a1e49f4d9b28ac9dbbf74ead27c"
+    }
+  },
+  "cast": {},
+  "lines": {}
+}

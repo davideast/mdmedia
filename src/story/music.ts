@@ -1,4 +1,4 @@
-import { RENDER_VERSION } from './key.js';
+import { MUSIC_RENDER_VERSION } from './key.js';
 import { limiter } from './limit.js';
 import { sha256 } from './parse.js';
 import type { CachedMusic, Composer, MixBed, MixPlan, RenderCache } from './ports.js';
@@ -25,7 +25,7 @@ export interface MusicResult {
 export type MusicEvent = { type: 'music-done'; result: MusicResult };
 
 export async function musicRenderKey(cue: string, model: string): Promise<string> {
-  return `music:${await sha256(JSON.stringify([RENDER_VERSION, model, MUSIC_PREFIX + cue]))}`;
+  return `music:${await sha256(JSON.stringify([MUSIC_RENDER_VERSION, model, MUSIC_PREFIX + cue]))}`;
 }
 
 /**
