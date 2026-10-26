@@ -1,5 +1,6 @@
 import { mock } from 'bun:test';
 import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
 const records = new Map<string, any>();
 let starts = 0;
 let queue = Promise.resolve();
@@ -13,7 +14,10 @@ const db = {
     queue = result.then(() => undefined, () => undefined); return result;
   },
 };
-mock.module('../../../studio/node_modules/next/server.js', () => ({ after: (fn: any) => void fn() }));
+// Resolve from the route so both root-only CI installs and Studio installs mock
+// the same Next.js module that the handler actually imports.
+const routeRequire = createRequire(new URL('../../../studio/src/app/api/v1/storyboards/[id]/narration/route.ts', import.meta.url));
+mock.module(routeRequire.resolve('next/server'), () => ({ after: (fn: any) => void fn() }));
 mock.module('../../../studio/src/lib/firebase-admin', () => ({ adminDb: () => db }));
 mock.module('../../../studio/src/lib/api-auth', () => ({
   authorize: async (request: Request) => request.headers.get('authorization') ? { uid: 'owner', scopes: ['storyboards:read'] } : new Response(null, {status: 401}),
