@@ -29,6 +29,8 @@ export interface Checked {
   questions: string[];
   answers: boolean[];
   ok: boolean;
+  /** Approved and locked: used as it is, never re-checked or redrawn. */
+  locked?: boolean;
 }
 
 export interface PanelResult extends Checked {
@@ -65,6 +67,11 @@ export interface DrawOptions {
   onEvent?: (event: DrawEvent) => void;
   /** Draw again images that failed their checks in an earlier build, instead of reusing their best take. */
   redraw?: boolean;
+  /**
+   * Approved panel images by panel id. A locked panel is used as it is: it is
+   * never re-checked or redrawn, whatever the checks, prompts or cache say.
+   */
+  locked?: Map<string, ImageBytes>;
 }
 
 /**
@@ -81,25 +88,31 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
   const keys = new Map<string, string>();
   const style = comic.meta.style;
 
-  // 1. The character sheet.
+  const locked = options.locked ?? new Map<string, ImageBytes>();
+  const toDraw = comic.pages.flatMap((p) => p.panels).filter((p) => !locked.has(p.id));
+
+  // 1. The character sheet (only when a panel will be drawn).
   const sheetText = sheetPrompt(style, cast);
   const sheetKey = await imageKey(image.model, sheetText, [], '16:9');
   let sheet = await cache.getImage(sheetKey);
-  const sheetCached = Boolean(sheet);
-  if (!sheet) {
+  const sheetCached = Boolean(sheet) || !toDraw.length;
+  if (!sheet && toDraw.length) {
     const drawn = await image.draw({ prompt: sheetText, references: [], aspectRatio: '16:9', signal });
     sheet = { ...drawn, meta: { kind: 'sheet' } };
     await cache.putImage(sheetKey, sheet);
   }
-  images.set('sheet', sheet);
+  if (sheet) images.set('sheet', sheet);
   keys.set('sheet', sheetKey);
   emit({ type: 'sheet-done', cached: sheetCached });
 
   // 2. Staging images, one per distinct staging text, checked on model.
   const panels = comic.pages.flatMap((p) => p.panels);
   const stagingTexts = [...new Set(panels.map((p) => p.staging).filter((s): s is string => Boolean(s)))];
+  // A staging nothing unlocked is drawn from is not drawn.
+  const neededStagings = new Set(toDraw.map((p) => p.staging).filter(Boolean));
   const stagings: StagingResult[] = [];
   for (const [i, text] of stagingTexts.entries()) {
+    if (!neededStagings.has(text)) continue;
     const ids = namedIn(text, cast);
     const using = panels.filter((p) => p.staging === text);
     const placement = stagingPlacement(using, ids);
@@ -153,7 +166,13 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
           const questions = panelQuestions(panel, cast);
           const references = refs.map((r) => images.get(r.name)!);
           const source = panel.continues ? images.get(panel.continues) : undefined;
-          const checked = await drawChecked({
+          const lockedImage = locked.get(panel.id);
+          const checked = lockedImage
+            ? {
+                image: lockedImage,
+                result: { key: `locked:${await bytesHash(lockedImage.bytes)}`, cached: true, attempts: 0, questions, answers: questions.map(() => true), ok: true, locked: true },
+              }
+            : await drawChecked({
             key: await imageKey(image.model, prompt, refs.map((r) => keys.get(r.name)!), panel.aspect),
             tries: 1 + MAX_REDRAWS,
             draw: () => image.draw({ prompt, references, aspectRatio: panel.aspect, signal }),
@@ -163,10 +182,11 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
                 questions,
                 signal,
               }),
-            questions,
-            cache,
-            redraw: options.redraw,
-          });
+                questions,
+                cache,
+                redraw: options.redraw,
+              });
+          if (lockedImage) refs.length = 0;
           images.set(panel.id, checked.image);
           keys.set(panel.id, checked.result.key);
           const heads = await headBoxes(panel, checked.image, checked.result.key, cast, vision, cache, signal);

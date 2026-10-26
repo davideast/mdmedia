@@ -1,7 +1,8 @@
 import { castCast, LOUDNESS } from '../build.js';
+import { wavFromPcm } from '../pcm.js';
 import type { CastEvent, CastingResult } from '../cast.js';
 import { limiter } from '../limit.js';
-import type { AudioRuntime, FileSink, ImageModel, RenderCache, Speaker, Transcriber, Vision, VoiceJudge } from '../ports.js';
+import type { AudioRuntime, FileSink, ImageBytes, ImageModel, RenderCache, Speaker, Transcriber, Vision, VoiceJudge } from '../ports.js';
 import type { LineEvent, RenderedLine } from '../render-lines.js';
 import type { StoryScript } from '../types.js';
 import { drawComic, type DrawEvent, type DrawResult } from './draw.js';
@@ -35,6 +36,8 @@ export interface ComicBuildOptions {
   onEvent?: (event: DrawEvent | LineEvent | CastEvent) => void;
   /** Draw again panels that failed their checks in an earlier build. */
   redraw?: boolean;
+  /** What David approved: used as it is (plan 009). */
+  lock?: { images?: Map<string, ImageBytes>; cast?: Record<string, string>; lines?: Map<string, Uint8Array> };
 }
 
 export interface ComicBuildResult {
@@ -58,22 +61,33 @@ export const readerAudio = (id: string) => `audio/${id.replace('.', '-')}.mp3`;
  * lettering laid out live, the art as WebP and an MP3 per item.
  */
 export async function buildComic(options: ComicBuildOptions): Promise<ComicBuildResult> {
-  const { comic, story, runtime, sink, signal } = options;
-  const draw = await drawComic(comic, story.cast, { image: options.image, vision: options.vision, cache: options.cache, redraw: options.redraw, signal, onEvent: options.onEvent });
+  const { comic, runtime, sink, signal } = options;
+  // Locked cast voices are written into the story, so casting leaves them alone.
+  const lockedCast = options.lock?.cast ?? {};
+  const story = { ...options.story, cast: Object.fromEntries(Object.entries(options.story.cast).map(([id, m]) => [id, lockedCast[id] ? { ...m, voice: lockedCast[id] } : m])) };
+  const draw = await drawComic(comic, story.cast, { image: options.image, vision: options.vision, cache: options.cache, redraw: options.redraw, locked: options.lock?.images, signal, onEvent: options.onEvent });
   // Cast from the story file, so the comic and the audio drama audition the same line.
   const { script: cast, casting } =
     options.speaker && options.transcriber ? await castCast(story, { ...options, speaker: options.speaker }, options.onEvent ?? (() => {})) : { script: story, casting: [] };
   const lines =
     options.speaker && options.transcriber
-      ? await voiceComic(comic, cast, { speaker: options.speaker, transcriber: options.transcriber, cache: options.cache, signal, onEvent: options.onEvent })
+      ? await voiceComic(comic, cast, { speaker: options.speaker, transcriber: options.transcriber, cache: options.cache, locked: options.lock?.lines, signal, onEvent: options.onEvent })
       : new Map<string, RenderedLine>();
 
   const encode = limiter(4);
   const panels = comic.pages.flatMap((p) => p.panels);
   await Promise.all([
-    ...panels.map((p) => encode(async () => sink.write(`reader/${readerImage(p.id)}`, await runtime.webp(draw.images.get(p.id)!.bytes, READER_WEBP_QUALITY)))),
+    ...panels.map((p) =>
+      encode(async () => {
+        const art = draw.images.get(p.id)!;
+        // Locked WebP art is written as it is: re-encoding would change approved pixels.
+        await sink.write(`reader/${readerImage(p.id)}`, art.mimeType.includes('webp') ? art.bytes : await runtime.webp(art.bytes, READER_WEBP_QUALITY));
+      })
+    ),
     ...[...lines].map(([id, line]) =>
       encode(async () => {
+        // The raw take, so it can be locked once approved.
+        await sink.write(`comic/lines/${id.replace(/\./g, '-')}.wav`, wavFromPcm(line.pcm));
         const wav = await runtime.mix({ voice: line.pcm, beds: [], durationMs: line.result.durationMs }, LOUDNESS);
         await sink.write(`reader/${readerAudio(id)}`, await runtime.mp3(wav, READER_MP3_KBPS));
       })

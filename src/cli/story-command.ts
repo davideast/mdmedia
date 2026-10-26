@@ -1,5 +1,5 @@
 import { defineCommand } from 'citty';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
@@ -16,6 +16,8 @@ import {
   createGeminiVoiceJudge,
   createLyriaComposer,
   createNodeAudioRuntime,
+  addToComicLock,
+  readComicLock,
 } from '../story/node/index.js';
 
 /** One diagnostic per line: `file:line:col severity code message`. */
@@ -390,7 +392,7 @@ export const storyDrawCommand = defineCommand({
 
 /** Builds the graphic novel for a comic script; resolves to the exit code. `deps` replaces providers in tests. */
 export async function runStoryComic(
-  args: { file: string; out?: string; json?: boolean; redraw?: boolean; signal?: AbortSignal },
+  args: { file: string; out?: string; json?: boolean; redraw?: boolean; unlock?: string[]; signal?: AbortSignal },
   deps: { image: ImageModel; vision: Vision; cache: RenderCache; runtime: AudioRuntime; speaker?: Speaker; transcriber?: Transcriber; judge?: VoiceJudge },
   write: (text: string) => void
 ): Promise<number> {
@@ -420,7 +422,11 @@ export async function runStoryComic(
       };
   try {
     const started = Date.now();
-    const result = await buildComic({ comic, story, ...deps, sink: createFileSink(outDir), redraw: args.redraw, signal: args.signal, onEvent });
+    const lock = await readComicLock(args.file, args.unlock ?? []);
+    if (!args.json && (lock.images.size || lock.lines.size || Object.keys(lock.cast).length)) {
+      write(`locked: ${lock.images.size} panels, ${Object.keys(lock.cast).length} cast voices, ${lock.lines.size} lines`);
+    }
+    const result = await buildComic({ comic, story, ...deps, sink: createFileSink(outDir), redraw: args.redraw, lock, signal: args.signal, onEvent });
     const lines = [...result.lines.values()].map((l) => l.result);
     const summary = {
       panels: result.draw.panels.length,
@@ -463,6 +469,7 @@ export const storyComicCommand = defineCommand({
     cache: { type: 'string', description: 'Render cache folder (default .mdmedia/cache next to the script)' },
     voices: { type: 'boolean', description: 'Voice captions and balloons (use --no-voices for a lettering pass)', default: true },
     redraw: { type: 'boolean', description: 'Draw again panels that failed their checks in an earlier build', default: false },
+    unlock: { type: 'string', description: 'Comma-separated panel, cast or line ids to release from the lock for this build' },
     imageModel: { type: 'string', description: 'Image model (default gemini-3-pro-image)' },
     visionModel: { type: 'string', description: 'Model for checks and head boxes (default gemini-3.5-flash)' },
     voiceModel: { type: 'string', description: 'Speech model (default gemini-3.8-flash-tts)' },
@@ -488,7 +495,7 @@ export const storyComicCommand = defineCommand({
     const controller = new AbortController();
     process.once('SIGINT', () => controller.abort());
     process.exitCode = await runStoryComic(
-      { file: args.file, out: args.out, json: args.json, redraw: args.redraw, signal: controller.signal },
+      { file: args.file, out: args.out, json: args.json, redraw: args.redraw, unlock: args.unlock ? String(args.unlock).split(',').map((s) => s.trim()).filter(Boolean) : [], signal: controller.signal },
       {
         image: createGeminiImageModel({ apiKey, model: args.imageModel }),
         vision: createGeminiVision({ apiKey, model: args.visionModel }),
@@ -582,6 +589,64 @@ export const storyAdaptCommand = defineCommand({
   },
 });
 
+/**
+ * Locks approved work for a comic: panel images from a folder of
+ * `panel-P-N` images, cast voices from a build's comic-build.json, line takes
+ * from a build's comic/lines folder. Resolves to the exit code.
+ */
+export async function runStoryLock(
+  args: { file: string; art?: string; castFrom?: string; linesFrom?: string; only?: string[] },
+  write: (text: string) => void
+): Promise<number> {
+  const keep = (id: string) => !args.only?.length || args.only.includes(id);
+  const images = new Map<string, { bytes: Uint8Array; mimeType: string }>();
+  if (args.art) {
+    for (const name of await readdir(args.art)) {
+      const m = /^panel-(\d+)-(\d+)\.(webp|png|jpg)$/.exec(name);
+      if (!m || !keep(`${m[1]}.${m[2]}`)) continue;
+      images.set(`${m[1]}.${m[2]}`, { bytes: new Uint8Array(await readFile(join(args.art, name))), mimeType: m[3] === 'webp' ? 'image/webp' : m[3] === 'jpg' ? 'image/jpeg' : 'image/png' });
+    }
+  }
+  const cast: Record<string, string> = {};
+  if (args.castFrom) {
+    const report = JSON.parse(await readFile(args.castFrom, 'utf8')) as { casting?: Array<{ id: string; voice: string }> };
+    for (const c of report.casting ?? []) if (keep(c.id)) cast[c.id] = c.voice;
+  }
+  const lines = new Map<string, Uint8Array>();
+  if (args.linesFrom) {
+    const { pcmFromWav } = await import('../story/index.js');
+    for (const name of await readdir(args.linesFrom)) {
+      const m = /^(\d+)-(\d+)-(\d+)\.wav$/.exec(name);
+      if (!m || !keep(`${m[1]}.${m[2]}-${m[3]}`)) continue;
+      lines.set(`${m[1]}.${m[2]}-${m[3]}`, pcmFromWav(new Uint8Array(await readFile(join(args.linesFrom, name)))));
+    }
+  }
+  if (!images.size && !Object.keys(cast).length && !lines.size) {
+    write('Nothing to lock: give --art, --cast-from or --lines-from.');
+    return EXIT.storyErrors;
+  }
+  const m = await addToComicLock(args.file, { images, cast, lines });
+  write(`locked ${images.size} panels, ${Object.keys(cast).length} cast voices, ${lines.size} lines; the lock now holds ${Object.keys(m.panels).length} panels, ${Object.keys(m.cast).length} voices, ${Object.keys(m.lines).length} lines`);
+  return EXIT.ok;
+}
+
+export const storyLockCommand = defineCommand({
+  meta: { name: 'lock', description: 'Lock approved panels, cast voices or lines for a comic, so builds use them as they are' },
+  args: {
+    file: { type: 'positional', description: 'Comic script', required: true },
+    art: { type: 'string', description: 'Folder of panel-P-N images to lock' },
+    castFrom: { type: 'string', description: "A build's comic/comic-build.json, to lock its cast voices" },
+    linesFrom: { type: 'string', description: "A build's comic/lines folder, to lock its line takes" },
+    only: { type: 'string', description: 'Comma-separated ids to lock (default: everything given)' },
+  },
+  async run({ args }) {
+    process.exitCode = await runStoryLock(
+      { file: args.file, art: args.art, castFrom: args.castFrom, linesFrom: args.linesFrom, only: args.only ? String(args.only).split(',').map((s) => s.trim()) : undefined },
+      (text) => console.log(text)
+    );
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -594,5 +659,6 @@ export const storyCommand = defineCommand({
     draw: storyDrawCommand,
     comic: storyComicCommand,
     adapt: storyAdaptCommand,
+    lock: storyLockCommand,
   },
 });

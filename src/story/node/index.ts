@@ -17,3 +17,4 @@ export {
 } from './gemini.js';
 export { createLyriaComposer, DEFAULT_STORY_MUSIC_MODEL } from './lyria.js';
 export { mixGraph, envelopeExpression } from './ffmpeg.js';
+export { readComicLock, readLockManifest, addToComicLock, lockFiles, type ComicLock, type ComicLockManifest } from './lock.js';

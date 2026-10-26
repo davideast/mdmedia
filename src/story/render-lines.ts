@@ -26,6 +26,8 @@ export interface LineResult {
   ok: boolean;
   /** Set when no take was possible at any note level. */
   refused?: boolean;
+  /** Approved and locked: used as it is, never re-voiced or re-checked. */
+  locked?: boolean;
   durationMs: number;
 }
 
@@ -42,6 +44,8 @@ export interface RenderLinesOptions {
   concurrency?: { speak?: number; transcribe?: number };
   signal?: AbortSignal;
   onEvent?: (event: LineEvent) => void;
+  /** Approved takes (24 kHz PCM) by line id, used as they are whatever the cast, notes or cache say. */
+  locked?: Map<string, Uint8Array>;
 }
 
 export interface RenderedLine {
@@ -82,6 +86,11 @@ async function renderLine(
   emit: (event: LineEvent) => void
 ): Promise<RenderedLine> {
   const { speaker, transcriber, cache, signal } = options;
+  const approved = options.locked?.get(line.id);
+  if (approved) {
+    const result = { id: line.id, speaker: line.speaker, text: line.text, key: 'locked', cached: true, level: 0 as NoteLevel, attempts: 0, heard: line.text, missing: [], extra: [], ok: true, locked: true, durationMs: pcmDurationMs(approved) };
+    return { pcm: approved, result };
+  }
   const key = await lineRenderKey(line, script, speaker.provider);
   const base = { id: line.id, speaker: line.speaker, text: line.text, key };
 
