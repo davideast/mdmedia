@@ -104,6 +104,20 @@ describe('drawComic', async () => {
     expect(result.panels.every((p) => p.heads.length === 0)).toBe(true);
   });
 
+  it('checks the staging image against the sides its panels use', async () => {
+    const vision = fakeVision();
+    await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });
+    const staging = vision.asks.find((a) => a.labels.length === 1 && a.labels[0] === 'Image to check')!;
+    expect(staging.questions).toContain('Is June on the left of the frame and Milo on the right?');
+  });
+
+  it('gives the first panel of a page the last panel of the page before when the staging carries over', async () => {
+    const twoPages = { ...comic, pages: comic.pages.map((p) => ({ ...p, panels: p.panels.map((x) => ({ ...x, staging: 'One room.' })) })) };
+    const result = await drawComic(twoPages, cast, { image: fakeImageModel(), vision: fakeVision(), cache: memoryCache() });
+    expect(result.panels.find((p) => p.id === '2.1')!.references).toContain('1.5');
+    expect(result.panels.find((p) => p.id === '1.1')!.references).not.toContain('1.5');
+  });
+
   it('asks a continue panel its questions with the source panel shown first', async () => {
     const vision = fakeVision();
     await drawComic(comic, cast, { image: fakeImageModel(), vision, cache: memoryCache() });

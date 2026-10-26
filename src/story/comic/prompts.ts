@@ -45,8 +45,47 @@ export function sheetPrompt(style: string, cast: Record<string, CastMember>): st
   );
 }
 
-export function stagingPrompt(style: string, staging: string, cast: Record<string, CastMember>, ids: string[]): string {
-  return `${styleText(style)}. ${BLEED} ${staging} Characters, drawn exactly as in the reference sheet: ${looks(ids, cast)}. They sit calmly.`;
+/**
+ * The staging image's prompt. It carries who stands on which side, because
+ * the panels drawn from it are placed that way: a staging image that put Milo
+ * on the left while every panel said June was on the left gave each panel a
+ * reference that contradicted its own text, and the art flipped from panel to
+ * panel (adapted lunch scene).
+ */
+export function stagingPrompt(style: string, staging: string, cast: Record<string, CastMember>, ids: string[], placement: Record<string, 'left' | 'right'> = {}, rules?: string): string {
+  const sides = placementText(placement);
+  return [
+    `${styleText(style)}. ${BLEED} ${staging}`,
+    sides ? `Placement: ${sides}.` : '',
+    rules ?? '',
+    `Characters, drawn exactly as in the reference sheet: ${looks(ids, cast)}. They sit calmly.`,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+/** `{ JUNE: 'left', MILO: 'right' }` → `June on the left of the frame, Milo on the right of the frame` */
+export function placementText(placement: Record<string, 'left' | 'right'>): string {
+  return Object.entries(placement).map(([id, side]) => `${displayName(id)} on the ${side} of the frame`).join(', ');
+}
+
+/** The left/right question for a set of placements, or undefined when there aren't both sides. */
+export function sidesQuestion(placement: Record<string, string>): string | undefined {
+  const left = Object.entries(placement).filter(([, side]) => side === 'left').map(([id]) => displayName(id));
+  const right = Object.entries(placement).filter(([, side]) => side === 'right').map(([id]) => displayName(id));
+  return left.length && right.length ? `Is ${left.join(' and ')} on the left of the frame and ${right.join(' and ')} on the right?` : undefined;
+}
+
+/**
+ * The hair from a look ("messy curly brown hair"), the detail that drifts
+ * most between panels and that a broad on-model question let through (Milo
+ * drawn with straight hair, adapted lunch scene).
+ */
+export function hairOf(look: string): string | undefined {
+  const part = look.split(/[;,]/).find((p) => /\bhair\b|\bbob\b|\bbuzz cut\b|\bbald\b|\bbun\b/i.test(p));
+  if (!part) return undefined;
+  const after = /\bwith\s+(.*)$/i.exec(part);
+  return (after ? after[1]! : part).split(/\s+and\s+(?:a|an)\s+/i)[0]!.replace(/^\s*(?:a|an)\s+/i, '').trim() || undefined;
 }
 
 /** Whose look a staging text mentions, by name. */
@@ -130,6 +169,11 @@ export function onModelQuestions(ids: string[], cast: Record<string, CastMember>
       (id) =>
         `Is ${displayName(id)} recognizably this character, judging only hair, face and main outfit as far as they are visible ` +
         `(ignore small details such as shoes, accessories or marks): ${visualLook(cast[id]!.look!)}?`
+    )
+    .concat(
+      ids
+        .filter((id) => cast[id]?.look && hairOf(cast[id]!.look!))
+        .map((id) => `Does ${displayName(id)} have ${hairOf(cast[id]!.look!)}, as far as it is visible?`)
     );
 }
 
@@ -145,9 +189,8 @@ export const ONE_IMAGE_QUESTION = 'Is this one unbroken picture, with no panel b
  */
 export function panelQuestions(panel: ComicPanel, cast: Record<string, CastMember>): string[] {
   const questions = [...onModelQuestions(Object.keys(panel.positions), cast), NO_TEXT_QUESTION, ONE_IMAGE_QUESTION];
-  const left = Object.entries(panel.positions).filter(([, side]) => side === 'left').map(([id]) => displayName(id));
-  const right = Object.entries(panel.positions).filter(([, side]) => side === 'right').map(([id]) => displayName(id));
-  if (left.length && right.length) questions.push(`Is ${left.join(' and ')} on the left of the frame and ${right.join(' and ')} on the right?`);
+  const sides = sidesQuestion(panel.positions);
+  if (sides) questions.push(sides);
   if (isExtremeCloseUp(panel)) questions.push('Is this an extreme close-up where one face fills nearly the whole frame?');
   if (panel.continues) questions.push('Is this the same framing and the same face as the previous panel shown?');
   if (panel.acting) questions.push(`Does the panel show this moment, in pose and expression: ${panel.acting}`);

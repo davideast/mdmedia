@@ -49,6 +49,7 @@ Pages and panels:
 Each panel:
 - "shot" tells the artist what to draw in this moment, in the present tense: the framing (wide shot, medium shot, close-up), who does what, where. One moment only. Nothing written in the picture: no signs, labels or words.
 - "left", "center", "right" place the cast members who appear, by CAST_ID, as seen on the page. Only cast members with a look can be drawn. Keep someone on the same side while they stay in the same place.
+- Keep the camera on the staging's side of the action (the 180-degree rule): every shot in a staged scene is taken from the staging's view, nearer or farther; a close-up is the same view, cropped in. Never cut to the other side of the table.
 - An extreme close-up's shot says so in these words: "Extreme close-up: only NAME's face, filling the frame from hair to chin."
 - "zone" is where the balloons go: "top" (the artist leaves headroom: the top quarter shows only background) unless the top of the picture must show something, then "bottom". Never ask the artist to leave space for balloons.
 - "acting" says what the moment means and how it shows in pose and expression, written in context: "June has just understood he betrayed her trust. She pulls back from the table, stunned and hurt." Specific, never generic.
@@ -62,7 +63,7 @@ Items:
 
 Scene:
 - "setting" is the scene's place, for the artist, in one sentence.
-- When characters stay in fixed places for several panels (across a table, on a bench), give "staging": the camera's view and who sits where, and "rules": the screen sides to keep ("Whenever both are in a panel, June is on the left and Milo on the right").
+- When characters stay in fixed places for several panels (across a table, on a bench), give "staging": a description precise enough to draw the same room every time. Say where the camera is and how high, which way the furniture runs across the frame, and for each character: where they are, which side of the frame, and which way they face. Example: "Side view across one lunch table, camera at seated eye level, the table running left to right across the frame. June sits on the bench on the left, facing right; Milo sits on the right, facing left. Other students fill the tables behind them." Then "rules": the screen sides to keep ("Whenever both are in a panel, June is on the left and Milo on the right"). Every panel with both of them must agree with the staging's sides.
 
 Return only the JSON.`;
 

@@ -5,6 +5,7 @@ import type { ImageBytes, ImageModel, RenderCache, Vision } from '../ports.js';
 import type { CastMember } from '../types.js';
 import {
   NO_TEXT_QUESTION,
+  sidesQuestion,
   visualLook,
   namedIn,
   onModelQuestions,
@@ -100,8 +101,11 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
   const stagings: StagingResult[] = [];
   for (const [i, text] of stagingTexts.entries()) {
     const ids = namedIn(text, cast);
-    const prompt = stagingPrompt(style, text, cast, ids);
-    const questions = [...onModelQuestions(ids, cast), NO_TEXT_QUESTION];
+    const using = panels.filter((p) => p.staging === text);
+    const placement = stagingPlacement(using, ids);
+    const prompt = stagingPrompt(style, text, cast, ids, placement, using[0]?.rules);
+    const sides = sidesQuestion(placement);
+    const questions = [...onModelQuestions(ids, cast), NO_TEXT_QUESTION, ...(sides ? [sides] : [])];
     const checked = await drawChecked({
       key: await imageKey(image.model, prompt, [sheetKey], '16:9'),
       tries: STAGING_TRIES,
@@ -119,7 +123,9 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
   }
   const stagingName = (panel: ComicPanel) => (panel.staging ? `staging-${stagingTexts.indexOf(panel.staging) + 1}` : undefined);
 
-  // 3. Panels: pages in parallel, panels within a page in order.
+  // 3. Panels: pages in parallel, panels within a page in order. A page that
+  // keeps the staging of the page before waits for its last panel and takes it
+  // as a reference, so a scene doesn't lose its room at a page turn.
   const done = new Map<string, Promise<void>>();
   const finished = new Map<string, () => void>();
   for (const p of panels) done.set(p.id, new Promise((resolve) => finished.set(p.id, resolve)));
@@ -130,7 +136,9 @@ export async function drawComic(comic: ComicScript, cast: Record<string, CastMem
     comic.pages.map((page) =>
       limit(async () => {
         for (const [i, panel] of page.panels.entries()) {
-          const previous = i > 0 ? page.panels[i - 1] : undefined;
+          const lastOfPagePrior = comic.pages[comic.pages.indexOf(page) - 1]?.panels.at(-1);
+          const previous = i > 0 ? page.panels[i - 1] : lastOfPagePrior && panel.staging && lastOfPagePrior.staging === panel.staging ? lastOfPagePrior : undefined;
+          if (previous && i === 0) await done.get(previous.id);
           let refs: Array<{ name: string; label: Reference | 'source' }>;
           if (panel.continues) {
             await done.get(panel.continues);
@@ -251,6 +259,27 @@ async function headBoxes(
 }
 
 const yes = (answers: boolean[]) => answers.filter(Boolean).length;
+
+/**
+ * Where each staged character stands, from the panels drawn from this
+ * staging: the side they take most often in panels where they appear with
+ * someone else on the other side.
+ */
+export function stagingPlacement(panels: ComicPanel[], ids: string[]): Record<string, 'left' | 'right'> {
+  const counts = new Map<string, { left: number; right: number }>();
+  for (const panel of panels) {
+    const sides = Object.entries(panel.positions).filter(([id, side]) => ids.includes(id) && side !== 'center');
+    if (!sides.some(([, s]) => s === 'left') || !sides.some(([, s]) => s === 'right')) continue;
+    for (const [id, side] of sides) {
+      const c = counts.get(id) ?? { left: 0, right: 0 };
+      c[side as 'left' | 'right']++;
+      counts.set(id, c);
+    }
+  }
+  const out: Record<string, 'left' | 'right'> = {};
+  for (const [id, c] of counts) if (c.left !== c.right) out[id] = c.left > c.right ? 'left' : 'right';
+  return out;
+}
 
 async function bytesHash(bytes: Uint8Array): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>);

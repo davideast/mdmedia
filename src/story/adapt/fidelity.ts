@@ -93,6 +93,35 @@ export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLine
     });
   });
 
+  // Staging: names everyone it stages with their side, and no panel flips them.
+  const sides = new Map<string, { left: number; right: number }>();
+  for (const page of adaptation.pages) {
+    for (const panel of page.panels ?? []) {
+      if (!panel.left?.length || !panel.right?.length) continue;
+      for (const [side, ids] of [['left', panel.left], ['right', panel.right]] as const) {
+        for (const id of ids) {
+          const c = sides.get(id) ?? { left: 0, right: 0 };
+          c[side]++;
+          sides.set(id, c);
+        }
+      }
+    }
+  }
+  const regulars = [...sides].filter(([, c]) => c.left + c.right >= 2).map(([id]) => id);
+  if (adaptation.staging && regulars.length) {
+    const named = (id: string) => new RegExp(`\\b${id.charAt(0)}${id.slice(1).toLowerCase().replace(/_/g, ' ')}\\b`, 'i').test(adaptation.staging!) || adaptation.staging!.includes(id);
+    const missing = regulars.filter((id) => !named(id));
+    if (missing.length) problems.push(`The staging must say where ${missing.join(' and ')} ${missing.length > 1 ? 'are' : 'is'}: which side of the frame, and which way they face.`);
+    if (!/\b(left|right)\b/i.test(adaptation.staging)) problems.push('The staging must say who is on the left of the frame and who is on the right.');
+    if (!/\bcamera\b/i.test(adaptation.staging)) problems.push('The staging must say where the camera is.');
+  }
+  for (const [id, c] of sides) {
+    if (c.left && c.right) {
+      const usual = c.left >= c.right ? 'left' : 'right';
+      problems.push(`${id} switches sides: on the left in ${c.left} panels and the right in ${c.right}. Keep ${id} on the ${usual} whenever they share a panel with someone on the other side.`);
+    }
+  }
+
   // Every word of every line of dialogue, in order.
   for (const [id, line] of lines) {
     if (line.narration) continue;

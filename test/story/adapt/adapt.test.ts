@@ -142,6 +142,22 @@ describe('adaptationProblems', () => {
     expect(adaptationProblems(withText('Most were old.'), lines, cast).join()).toContain('not an exact part');
   });
 
+  it('sends back staging that leaves out sides, the camera or a regular, and a panel that flips sides', async () => {
+    const lines = await linesOf('Shop');
+    const twoShot = (left: string, right: string, items: SceneAdaptation['pages'][number]['panels'][number]['items']) => ({ shot: 'Medium shot', left: [left], right: [right], zone: 'top' as const, acting: 'x', items });
+    const flipped: SceneAdaptation = {
+      setting: 'shop',
+      staging: 'Wren and Odile at the counter.',
+      pages: [{ rows: [1, 1, 1], panels: [twoShot('WREN', 'ODILE', [{ line: 'L1' }, { line: 'L2' }]), twoShot('WREN', 'ODILE', [{ line: 'L3' }]), twoShot('ODILE', 'WREN', [{ line: 'L4' }])] }],
+    };
+    const problems = adaptationProblems(flipped, lines, (await script()).cast).join('\n');
+    expect(problems).toContain('The staging must say who is on the left of the frame and who is on the right.');
+    expect(problems).toContain('The staging must say where the camera is.');
+    expect(problems).toContain('WREN switches sides: on the left in 2 panels and the right in 1. Keep WREN on the left');
+    const vague: SceneAdaptation = { ...flipped, staging: 'Camera at eye level. Wren on the left, facing right.', pages: [{ ...flipped.pages[0]!, panels: flipped.pages[0]!.panels.slice(0, 2).concat([twoShot('WREN', 'ODILE', [{ line: 'L4' }])]) }] };
+    expect(adaptationProblems(vague, lines, (await script()).cast)).toEqual(['The staging must say where ODILE is: which side of the frame, and which way they face.']);
+  });
+
   it('sends back a caption that is a paragraph', async () => {
     const long = STORY.replace('The shop sold mirrors. Most of them were old.', 'The shop sold mirrors. ' + 'Round ones and tall ones and ones in gold frames carved like seaweed. '.repeat(3));
     const lines = sceneLineIds((await parseStory(long, { path: 'm.md' })).script!.chapters[0]!.scenes[0]!.segments.filter((s): s is Line => s.kind === 'line'));

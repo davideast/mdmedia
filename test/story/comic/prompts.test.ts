@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseStory } from '../../../src/story/index.js';
 import { parseComic } from '../../../src/story/comic/parse.js';
-import { NO_TEXT_QUESTION, ONE_IMAGE_QUESTION, visualLook, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
+import { NO_TEXT_QUESTION, ONE_IMAGE_QUESTION, hairOf, stagingPrompt, visualLook, panelPrompt, panelQuestions, sheetPrompt } from '../../../src/story/comic/prompts.js';
 
 const dir = join(import.meta.dir, '..', 'fixtures');
 
@@ -55,4 +55,18 @@ describe('comic prompts and checks', async () => {
     expect(visualLook('a small, skinny eleven-year-old English girl with a frizzy copper bob')).toBe('a English girl with a frizzy copper bob');
     for (const q of panelQuestions(panel('3.4'), cast)) expect(q).not.toMatch(/year-old/);
   });
+
+  it("asks about each character's hair, the detail that drifts", () => {
+    expect(hairOf('a 13-year-old boy with messy curly brown hair, freckles and big eyebrows')).toBe('messy curly brown hair');
+    expect(hairOf('a tall girl with long wavy strawberry-blonde hair and a white headband; varsity jacket')).toBe('long wavy strawberry-blonde hair');
+    expect(hairOf('a teacher in his forties with a mustache; sweater vest')).toBeUndefined();
+    expect(panelQuestions(panel('3.4'), cast)).toContain('Does Milo have messy curly brown hair, as far as it is visible?');
+  });
+
+  it('draws a staging image with the sides its panels use, and the rules', () => {
+    const prompt = stagingPrompt('flat', 'Side view across a lunch table.', cast, ['JUNE', 'MILO'], { JUNE: 'left', MILO: 'right' }, 'June stays on the left.');
+    expect(prompt).toContain('Placement: June on the left of the frame, Milo on the right of the frame.');
+    expect(prompt).toContain('June stays on the left.');
+  });
 });
+
