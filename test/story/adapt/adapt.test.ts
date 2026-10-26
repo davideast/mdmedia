@@ -132,6 +132,12 @@ describe('adaptationProblems', () => {
     expect(problems).toContain("ODILE's line L2 must appear in balloons");
     expect(problems).toContain('missing: "i\'m going mad"');
   });
+
+  it('sends back a panel with more lettering than fits', async () => {
+    const lines = await linesOf('Shop');
+    const crowded: SceneAdaptation = { ...SHOP, pages: [{ ...SHOP.pages[0]!, panels: [{ ...SHOP.pages[0]!.panels[0]!, items: [{ line: 'L1' }, { line: 'L2' }, { line: 'L3' }, { line: 'L4' }] }, ...SHOP.pages[0]!.panels.slice(1).map((p) => ({ ...p, items: [] }))] }] };
+    expect(adaptationProblems(crowded, lines, (await script()).cast).join('\n')).toContain('has 4 captions and balloons; at most 3 fit');
+  });
 });
 
 describe('adaptStory', () => {

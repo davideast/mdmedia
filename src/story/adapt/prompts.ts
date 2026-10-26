@@ -7,6 +7,8 @@
 /** Panels on a page, and panels in a row of a page. */
 export const PANELS_PER_PAGE = { min: 3, max: 7 } as const;
 export const PANELS_PER_ROW = { min: 1, max: 3 } as const;
+/** Lettered items in one panel; more crowd the art (the hand-lettered lunch scene used at most four, with lettering crowded at four). */
+export const MAX_ITEMS_PER_PANEL = 3;
 
 export const ADAPT_INSTRUCTION = `You adapt one scene of a story into a comic script, page by page and panel by panel, as a comics writer would for an artist.
 
@@ -30,7 +32,8 @@ You get the cast (who can be drawn, with how they look), the scene's lines, numb
 }
 
 Adapting:
-- Most narration becomes pictures. Show what the narration tells; keep a caption only for a voice the art can't carry: a joke in the narrator's voice, a jump in time, a thought. Captions are few and short.
+- Narration that only says what can be seen becomes the picture, and is cut: "She walked away." under a panel of her walking away, "I stared at my tray." over a close-up of him staring at it, "He sat down." These are stage directions for the artist, not captions.
+- The narrator's voice stays as captions: what the picture can't show. Jokes and asides ("It sounded like a lawn mower failing to start."), opinions and exaggeration ("An actual high five. From the most popular girl in school."), a jump in time, a beat of feeling ("Not angry. Worse. Hurt."), what the narrator didn't know yet. In a first-person story this voice is the story's personality; keep all of it. Take the best sentences of a long narration line with "text".
 - Every line of dialogue stays, in order, as balloons. A long speech may be split across panels; never drop or reword its words.
 - A caption or balloon uses the story's words exactly. With "text", copy an exact part of the line (whole sentences); without it, the whole line is used.
 - Items stay in story order, across panels and pages.
@@ -51,6 +54,7 @@ Each panel:
 
 Items:
 - A balloon's speaker should be drawn in the panel; if they are not, mark it "off".
+- At most ${MAX_ITEMS_PER_PANEL} captions and balloons in a panel. Split a fast exchange across panels, one or two lines each.
 - "small" for whispers and quiet asides, "loud" for shouting.
 - "sfx" only for a sound, in capitals: "KAFF!", "SHWIP!". Use them sparingly.
 

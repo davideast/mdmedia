@@ -1,6 +1,6 @@
 import type { CastMember } from '../types.js';
 import { placed, type SceneAdaptation, type SceneLines } from './assemble.js';
-import { PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
+import { MAX_ITEMS_PER_PANEL, PANELS_PER_PAGE, PANELS_PER_ROW } from './prompts.js';
 
 /** Quotes and spaces as a comparison sees them. */
 const norm = (text: string) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
@@ -36,6 +36,8 @@ export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLine
       if (!panel.acting?.trim()) problems.push(`${at} needs an "acting" note.`);
       if (panel.continues && i === 0) problems.push(`${at} "continues", but it is the first panel on its page; a continuing panel follows one on the same page.`);
       for (const id of placed(panel)) if (!drawable.has(id)) problems.push(`${at} places ${id}, who is not a cast member with a look.`);
+      const lettered = (panel.items ?? []).filter((item) => !('sfx' in item)).length;
+      if (lettered > MAX_ITEMS_PER_PANEL) problems.push(`${at} has ${lettered} captions and balloons; at most ${MAX_ITEMS_PER_PANEL} fit. Split them across panels.`);
       const seen = placed(panel);
       if (new Set(seen).size !== seen.length) problems.push(`${at} places someone on two sides.`);
 
