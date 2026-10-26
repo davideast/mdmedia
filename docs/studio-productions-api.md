@@ -426,3 +426,7 @@ with a cut file use it, the rest are rendered cuts.
   come back on reload like other work.
 - `/cut/{name}` stays a development-only view of a cut file straight from
   `docs/cuts` and the local media folder.
+
+## Assembly productions
+
+For mutable multitrack drafts, storyboard handoff, immutable rendered review versions, and realtime CLI feedback, see [Production assemblies](productions/assembly.md). These use `mdmedia.assembly@1` and the `mdmedia studio production` commands; legacy cut pushes remain a separate workflow.

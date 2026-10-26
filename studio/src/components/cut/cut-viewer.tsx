@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ref, type ReactNode } from 'react';
+import type { Assembly, AssemblyPlacement } from 'mdmedia/assembly';
 import { Film, Maximize, Minimize, MessageSquare, Minus, Pause, Play, Plus } from 'lucide-react';
 import { cn } from 'cn';
 import { gainAt, type CutError, type ResolvedAudio, type ResolvedLine, type ResolvedOverlay, type ResolvedSegment, type Timeline } from 'mdmedia/cut';
@@ -50,6 +51,8 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 export interface CutViewerProps {
   timeline: Timeline;
+  assembly?: Assembly;
+  assemblyDetails?: (selected: string | null) => ReactNode;
   /** The page's title, for its tab and header. */
   title: string;
   /** Drawn in the header instead of the title, such as a breadcrumb with a version switcher. */
@@ -76,7 +79,7 @@ export interface CutViewerProps {
   comments?: CutViewerComments;
 }
 
-export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRef: outerVideoRef, onVideoError, thumbnail, notes, source, startAt, readPlayhead, workspacePage = false, comments }: CutViewerProps) {
+export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRef: outerVideoRef, onVideoError, thumbnail, notes, source, startAt, readPlayhead, workspacePage = false, comments, assembly, assemblyDetails }: CutViewerProps) {
   // Lines are shown, measured and highlighted by when they're spoken, not by their whole audio.
   const timeline = useMemo(() => ({ ...cut, lines: spokenLines(cut.lines) }), [cut]);
   const { length, segments, lines, music, overlays, sfx, meta } = timeline;
@@ -95,7 +98,9 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   const rootRef = useRef<HTMLDivElement>(null);
 
   const [playing, setPlaying] = useState(false);
-  const [frame, setFrame] = useState<Frame>('tv');
+  const [frame, setFrame] = useState<Frame>(assembly ? 'full' : 'tv');
+  const [selectedPlacement, setSelectedPlacement] = useState<string | null>(null);
+  const assemblyRows = useMemo(() => assembly ? assemblyTrackRows(assembly) : undefined, [assembly]);
   const [width, setWidth] = useState(0);
   const [zoom, setZoom] = useState(0);
   /** Where the playhead sat on screen before a zoom, so it stays put after. */
@@ -280,7 +285,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     // A comment's pin is a button of its own: it selects the comment and seeks to it.
-    if (event.target instanceof HTMLElement && event.target.closest('[data-pin]')) return;
+    if (event.target instanceof HTMLElement && event.target.closest('[data-pin], [data-placement]')) return;
     const onRuler = event.target instanceof HTMLElement && event.target.closest('[data-ruler]');
     // A finger on the tracks may be scrolling them: seek on a tap, scrub only on the ruler.
     if (event.pointerType === 'touch' && !onRuler) {
@@ -365,7 +370,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   const times = 'flex h-8 items-center justify-end font-mono text-[12px] text-ink-faint tabular-nums';
   const range = (start: number, end: number) => `${tenths(start)}–${tenths(end)}`;
 
-  const nowSection = (
+  const nowSection = assemblyDetails ? assemblyDetails(selectedPlacement ?? activeShot?.id ?? null) : (
     <section aria-label="Now">
       <h3 className="flex h-8 items-center text-[13px] font-semibold text-foreground">Now</h3>
       <div className="grid grid-cols-[4.25rem_minmax(0,1fr)_auto] gap-x-3">
@@ -494,6 +499,7 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
       <div className="flex">
         <TrackNames
           speakers={speakers}
+          assemblyRows={assemblyRows}
           overlayTitle={sfx.length ? 'Overlays · SFX' : 'Overlays'}
           overlayLanes={overlayLaneCount(overlays, sfx)}
           pins={Boolean(comments)}
@@ -512,6 +518,9 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
           >
             <Tracks
               timeline={timeline}
+              assemblyRows={assemblyRows}
+              selectedPlacement={selectedPlacement}
+              onPlacement={id => { setSelectedPlacement(id); const p = assembly?.placements.find(p => p.id === id); if (p) seek(p.start); }}
               speakers={speakers}
               pxPerSecond={pxPerSecond}
               now={now}
@@ -651,6 +660,20 @@ function KeysButton() {
   );
 }
 
+interface AssemblyTrackRow {
+  id: string; name: string; type: 'video' | 'audio'; height: number; laneHeight: number;
+  placements: Array<{ placement: AssemblyPlacement; lane: number }>;
+}
+function assemblyTrackRows(assembly: Assembly): AssemblyTrackRow[] {
+  return assembly.tracks.map(track => {
+    const items = assembly.placements.filter(p => p.trackId === track.id).map(p => ({ ...p, end: p.start + p.out - p.in }));
+    const lanes = packLanes(items);
+    const laneHeight = track.type === 'video' ? ROW.shots : ROW.music;
+    const placements = items.map(placement => ({ placement, lane: lanes.get(placement) ?? 0 }));
+    return { id: track.id, name: track.name, type: track.type, laneHeight, height: Math.max(1, ...placements.map(p => p.lane + 1)) * laneHeight, placements };
+  });
+}
+
 function overlayLaneCount(overlays: readonly ResolvedOverlay[], sfx: readonly ResolvedAudio[]): number {
   const items = [...overlays, ...sfx];
   if (items.length === 0) return 0;
@@ -658,6 +681,7 @@ function overlayLaneCount(overlays: readonly ResolvedOverlay[], sfx: readonly Re
 }
 
 function TrackNames({
+  assemblyRows,
   speakers,
   overlayTitle,
   overlayLanes,
@@ -665,6 +689,7 @@ function TrackNames({
   zoom,
   onZoom,
 }: {
+  assemblyRows?: AssemblyTrackRow[];
   speakers: string[];
   overlayTitle: string;
   overlayLanes: number;
@@ -696,6 +721,7 @@ function TrackNames({
           <MessageSquare size={12} strokeWidth={2} aria-label="Comments" />
         </div>
       ) : null}
+      {assemblyRows ? assemblyRows.map(row => <div key={row.id} title={row.name} style={{ height: row.height }} className={cn(name, 'border-t border-border')}><span className="break-words leading-4">{row.name}</span></div>) : <>
       {speakers.map((speaker, i) => (
         <div key={speaker}>
           <div style={{ height: ROW.lane }} className={cn(name, 'items-start pt-[7px] text-foreground')}>{speaker}</div>
@@ -707,6 +733,7 @@ function TrackNames({
       {overlayLanes > 0 ? (
         <div style={{ height: overlayLanes * ROW.overlayLane + 12 }} className={cn(name, 'border-t border-border')}>{overlayTitle}</div>
       ) : null}
+      </>}
     </div>
   );
 }
@@ -731,6 +758,7 @@ function TipBody({ title, body, times }: { title: ReactNode; body?: ReactNode; t
 }
 
 const Tracks = memo(function Tracks({
+  assemblyRows, selectedPlacement, onPlacement,
   timeline,
   speakers,
   pxPerSecond,
@@ -742,6 +770,9 @@ const Tracks = memo(function Tracks({
   draftPin,
   onPin,
 }: {
+  assemblyRows?: AssemblyTrackRow[];
+  selectedPlacement?: string | null;
+  onPlacement?: (id: string) => void;
   timeline: Timeline;
   speakers: string[];
   pxPerSecond: number;
@@ -865,6 +896,28 @@ const Tracks = memo(function Tracks({
         </div>
       ) : null}
 
+      {assemblyRows ? assemblyRows.map(row => (
+        <div key={row.id} className="relative border-t border-border" style={{ height: row.height }}>
+          {row.placements.map(({ placement: p, lane }) => {
+            const segment = row.type === 'video' ? segments.find(segment => segment.id === p.id) : undefined;
+            if (segment) return <div key={p.id} className="absolute inset-x-0" style={{ top: lane * row.laneHeight, height: row.laneHeight }}>
+              <Shot segment={segment} thumbnail={thumbnail(segment)} active={selectedPlacement === p.id}
+                left={pct(p.start)} width={pct(p.out - p.in)} pixels={(p.out - p.in) * pxPerSecond}
+                onSelect={() => onPlacement?.(p.id)}
+                ariaLabel={`${row.name}: ${p.id}, ${p.start} to ${p.start + p.out - p.in} seconds`} />
+            </div>;
+            return <Tip key={p.id} label={<TipBody title={row.name} body={p.id} times={span(p.start, p.start + p.out - p.in)} />}>
+              <button type="button" data-placement aria-label={`${row.name}: ${p.id}, ${p.start} to ${p.start + p.out - p.in} seconds`}
+                aria-pressed={selectedPlacement === p.id} onClick={() => onPlacement?.(p.id)}
+                className={cn('absolute overflow-hidden border-l-2 bg-foreground/[0.075] px-2 py-1 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring', selectedPlacement === p.id ? 'border-[var(--cut-now)] text-foreground' : 'border-foreground/50 text-ink-muted')}
+                style={{ top: lane * row.laneHeight + 5, left: pct(p.start), width: `max(3px, calc(${pct(p.out - p.in)} - 2px))`, height: row.laneHeight - 10 }}>
+                <span className="block truncate font-mono text-[10.5px] tabular-nums">{tenths(p.start)}</span>
+                <span className="block truncate text-[12.5px]">{p.id}</span>
+              </button>
+            </Tip>;
+          })}
+        </div>
+      )) : <>
       {/* lines: one lane per speaker, the gaps between the first two */}
       {speakers.map((speaker, laneIndex) => (
         <div key={speaker}>
@@ -1045,6 +1098,7 @@ const Tracks = memo(function Tracks({
           })}
         </div>
       ) : null}
+      </>}
     </div>
   );
 });
@@ -1057,7 +1111,11 @@ function Shot({
   width,
   pixels,
   onKeyDown,
+  onSelect,
+  ariaLabel,
 }: {
+  onSelect?: () => void;
+  ariaLabel?: string;
   segment: ResolvedSegment;
   thumbnail: string | null;
   active: boolean;
@@ -1065,7 +1123,7 @@ function Shot({
   width: string;
   /** The block's width, so a narrow shot drops its length instead of cutting it off. */
   pixels: number;
-  onKeyDown: (event: React.KeyboardEvent) => void;
+  onKeyDown?: (event: React.KeyboardEvent) => void;
 }) {
   const [loaded, setLoaded] = useState<string | null>(null);
   const picture = Boolean(thumbnail) && segment.src.kind !== 'color';
@@ -1083,7 +1141,10 @@ function Shot({
       <button
         type="button"
         onKeyDown={onKeyDown}
-        aria-label={`Shot ${segment.id}, ${segment.label}. ${tenths(segment.start)} to ${tenths(segment.end)} seconds.`}
+        onClick={onSelect}
+        data-placement={onSelect ? '' : undefined}
+        aria-pressed={onSelect ? active : undefined}
+        aria-label={ariaLabel ?? `Shot ${segment.id}, ${segment.label}. ${tenths(segment.start)} to ${tenths(segment.end)} seconds.`}
         className="absolute top-0 flex h-full flex-col overflow-hidden pt-[6px] text-left outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-inset"
         style={{ left, width }}
       >

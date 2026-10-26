@@ -10,7 +10,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { AudioPlayerBar } from "@/components/reader/audio-player-bar";
-import { InspectorProvider } from "@/components/shell/inspector-slot";
+import { InspectorProvider, useHasInspector } from "@/components/shell/inspector-slot";
 import { storyboardRoute } from "@/lib/storyboard";
 import { ContextPanel } from "@/components/shell/context-panel";
 import { useNarration } from "@/components/shell/narration-provider";
@@ -70,7 +70,11 @@ function useResponsiveBreakpoints() {
  * Both the left and right panels can be resized when undocked and automatically
  * snap into their 56px docked rail once resized down past their threshold.
  */
-export function AppShell({
+export function AppShell(props: { children: ReactNode; context?: ReactNode }) {
+  return <InspectorProvider><AppShellContent {...props} /></InspectorProvider>;
+}
+
+function AppShellContent({
   children,
 }: {
   children: ReactNode;
@@ -108,7 +112,8 @@ export function AppShell({
     next: !offline && queue && queue.index + 1 < queue.tracks.length ? nextTrack : undefined,
   });
   const breakpoints = useResponsiveBreakpoints();
-  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/") || storyboardRoute(pathname) !== null;
+  const hasInspector = useHasInspector();
+  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/") || storyboardRoute(pathname) !== null || hasInspector;
   const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
@@ -343,7 +348,7 @@ export function AppShell({
     hasContext && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
 
   return (
-    <InspectorProvider><ShellContext.Provider value={shellContextValue}>
+    <ShellContext.Provider value={shellContextValue}>
       <div className="flex h-dvh min-h-0 w-full overflow-hidden">
         {docked && !breakpoints.isMobile ? (
           <div
@@ -485,6 +490,6 @@ export function AppShell({
           </Sheet>
         ) : null}
       </div>
-    </ShellContext.Provider></InspectorProvider>
+    </ShellContext.Provider>
   );
 }

@@ -103,6 +103,10 @@
     "./threads": {
       "types": "./dist/threads/index.d.ts",
       "import": "./dist/threads/index.js"
+    },
+    "./assembly": {
+      "types": "./dist/assembly/index.d.ts",
+      "import": "./dist/assembly/index.js"
     }
   },
   "bin": {

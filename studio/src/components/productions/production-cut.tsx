@@ -1,5 +1,6 @@
 'use client';
 
+import { AssemblyDetails } from './assembly-view';
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,7 @@ import { useCutComments } from '@/components/cut/comments-panel';
 import { CutProblems, CutViewer } from '@/components/cut/cut-viewer';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useAssemblyThumbnails } from '@/lib/use-assembly-thumbnails';
 import { useMediaLinks, useSteadySource } from '@/lib/use-media-links';
 import { useStudioResource } from '@/lib/use-studio-resource';
 import {
@@ -55,14 +57,15 @@ export function ProductionCutPage({ productionId, cutId }: { productionId: strin
   const router = useRouter();
 
   const summary = production?.cuts.find((item) => item.id === cutId) ?? null;
-  const ids = useMemo(() => (cut ? [cut.renderedAssetId, ...Object.values(cut.thumbs)] : []), [cut]);
+  const ids = useMemo(() => (cut ? [cut.renderedAssetId, ...Object.values(cut.thumbs), ...(cut.kind === 'assembly' ? (cut.timeline?.segments ?? []).flatMap(s => s.src.kind === 'asset' ? [s.src.id] : []) : [])] : []), [cut]);
   const { links, refresh } = useMediaLinks(ids);
   const src = cut?.renderedAssetId ? links[cut.renderedAssetId]?.content : undefined;
   const { recover } = useSteadySource(videoRef, src, refresh);
+  const assemblyThumbnails = useAssemblyThumbnails(cut ?? null, links);
   const thumbnail = useCallback((segment: ResolvedSegment) => {
     const asset = cut?.thumbs[segment.id];
-    return asset ? links[asset]?.content ?? null : null;
-  }, [cut, links]);
+    return asset ? links[asset]?.content ?? null : assemblyThumbnails[segment.id] ?? null;
+  }, [cut, links, assemblyThumbnails]);
 
   const label = summary?.label ?? cut?.label ?? cutId;
   const cutLabel = useCallback((id: string) => shortLabel(production?.cuts.find((item) => item.id === id)?.label ?? id), [production]);
@@ -88,6 +91,12 @@ export function ProductionCutPage({ productionId, cutId }: { productionId: strin
         <p role={error ? 'alert' : 'status'} className={cn('text-sm', error ? 'text-destructive' : 'text-ink-muted')}>{error || 'Loading version…'}</p>
       </WorkbenchPanel>
     );
+  }
+  if (cut.kind === 'assembly' && cut.assembly && cut.timeline) {
+    return <CutViewer workspacePage timeline={cut.timeline} assembly={cut.assembly.document}
+      assemblyDetails={selected => <AssemblyDetails document={cut.assembly!.document} assets={cut.assets} selected={selected} />}
+      title={title} titleNode={titleNode} video={src} videoRef={videoRef} onVideoError={recover}
+      thumbnail={thumbnail} notes={cut.notes || undefined} comments={comments} readPlayhead={playheadRef} />;
   }
   if (cut.kind === 'cut' && !cut.timeline) {
     return <CutProblems title={title} titleNode={titleNode} message="This cut no longer resolves." errors={cut.errors} />;

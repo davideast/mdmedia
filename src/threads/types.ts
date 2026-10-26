@@ -315,6 +315,7 @@ export interface BundleClip {
 
 /** Everything an agent needs to act on one thread. */
 export interface ContextBundle {
+  assembly?: import('../assembly/index.js').AssemblyDraft;
   format: 'mdmedia.thread-context@2';
   thread: Thread;
   /** All of them, in order, including folded rounds. */
@@ -356,7 +357,7 @@ export interface ContextBundle {
   history: {
     status: string;
     note: string;
-    versions: Array<{ id: string; label: string; status: string; kind: 'cut' | 'rendered'; renderAssetId: string | null; current: boolean }>;
+    versions: Array<{ id: string; label: string; status: string; kind: 'cut' | 'rendered' | 'assembly'; renderAssetId: string | null; current: boolean }>;
   };
   /** Asset ids, and API links to their bytes (`productions:read`). */
   media: {
