@@ -31,5 +31,6 @@ export { buildComic, readerImage, readerAudio, GUIDED, READER_MP3_KBPS, READER_W
 export { letterPanel, panelHeads, lettering, LETTERING, type Lettered, type Placed, type Measure, type HeadBox, type LetterPanel, type LetterItem } from './comic/letter.js';
 export { comicScript, voiceComic, itemId } from './comic/voices.js';
 export { readerHtml } from './comic/reader.js';
+export { compareHtml, type CompareInput, type CompareSide } from './comic/compare.js';
 export type { ReaderData } from './comic/reader-client.js';
 export { STYLES, BLEED, panelPrompt, panelQuestions, sheetPrompt, stagingPrompt, onModelQuestions, displayName } from './comic/prompts.js';

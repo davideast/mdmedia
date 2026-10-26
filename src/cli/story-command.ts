@@ -1,9 +1,9 @@
 import { defineCommand } from 'citty';
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { createRequire } from 'node:module';
 import { loadConfigFile, resolveConfig } from '../config/index.js';
-import { adaptStory, buildComic, buildStory, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
+import { adaptStory, buildComic, buildStory, compareHtml, directStory, drawComic, panelFile, parseComic, parseStory, previewHtml, slugify, StoryError } from '../story/index.js';
 import type { AdaptEvent, AudioRuntime, BuildEvent, CastEvent, ComicScript, Composer, DirectEvent, Diagnostic, DrawEvent, ImageModel, LineEvent, RenderCache, Speaker, StoryScript, TextModel, Transcriber, Vision, VoiceJudge } from '../story/index.js';
 import {
   createFileRenderCache,
@@ -647,6 +647,83 @@ export const storyLockCommand = defineCommand({
   },
 });
 
+/** The reader data inlined in a reader's index.html. */
+async function readerData(readerDir: string) {
+  const html = await readFile(join(readerDir, 'index.html'), 'utf8');
+  const json = /const COMIC = (.*);\n/.exec(html)?.[1];
+  if (!json) throw new Error(`${readerDir} is not a story reader.`);
+  return JSON.parse(json.replace(/\\u003c/g, '<')) as import('../story/index.js').ReaderData;
+}
+
+/**
+ * Writes a before/after review page for two reader builds of one comic, with
+ * both builds' art and audio copied beside it. Resolves to the exit code.
+ */
+export async function runStoryCompare(
+  args: { before: string; after: string; out: string; labels?: [string, string]; title?: string; onlyChanged?: boolean },
+  write: (text: string) => void
+): Promise<number> {
+  const before = await readerData(args.before);
+  const after = await readerData(args.after);
+  const same = async (a: string, b: string) => {
+    try {
+      return Buffer.compare(await readFile(a), await readFile(b)) === 0;
+    } catch {
+      return false;
+    }
+  };
+  const changedArt = new Set<string>();
+  const changedAudio = new Set<string>();
+  const beforePanels = new Map(before.pages.flatMap((p) => p.panels).map((p) => [p.id, p]));
+  for (const panel of after.pages.flatMap((p) => p.panels)) {
+    const old = beforePanels.get(panel.id);
+    if (!old || !(await same(join(args.before, old.image), join(args.after, panel.image)))) changedArt.add(panel.id);
+    for (const [i, item] of panel.items.entries()) {
+      const oldItem = old?.items[i];
+      if (!('audio' in item) || !item.audio) continue;
+      if (!oldItem || !('audio' in oldItem) || !oldItem.audio || !(await same(join(args.before, oldItem.audio), join(args.after, item.audio)))) changedAudio.add(`${panel.id}-${i}`);
+    }
+  }
+  for (const [side, from] of [['before', args.before], ['after', args.after]] as const) {
+    for (const sub of ['img', 'audio']) {
+      const src = join(from, sub);
+      const dst = join(args.out, side, sub);
+      await mkdir(dst, { recursive: true });
+      for (const name of await readdir(src).catch(() => [] as string[])) await copyFile(join(src, name), join(dst, name));
+    }
+  }
+  const [beforeLabel, afterLabel] = args.labels ?? ['Before', 'After'];
+  await writeFile(
+    join(args.out, 'index.html'),
+    compareHtml({
+      title: args.title ?? `${after.title}: before and after`,
+      before: { label: beforeLabel, data: before, root: 'before/' },
+      after: { label: afterLabel, data: after, root: 'after/' },
+      changedArt,
+      changedAudio,
+      onlyChanged: args.onlyChanged,
+    })
+  );
+  write(`${changedArt.size} panels with changed art, ${changedAudio.size} lines with new takes -> ${join(args.out, 'index.html')}`);
+  return EXIT.ok;
+}
+
+export const storyCompareCommand = defineCommand({
+  meta: { name: 'compare', description: 'Write a before/after review page for two reader builds of a comic' },
+  args: {
+    before: { type: 'positional', description: 'The earlier reader folder', required: true },
+    after: { type: 'positional', description: 'The later reader folder', required: true },
+    out: { type: 'string', alias: 'o', description: 'Folder to write the review page into', required: true },
+    labels: { type: 'string', description: 'Two labels, comma-separated (default Before,After)' },
+    title: { type: 'string', description: 'Page title' },
+    onlyChanged: { type: 'boolean', description: 'Show only panels whose art or voices changed', default: false },
+  },
+  async run({ args }) {
+    const labels = args.labels ? (String(args.labels).split(',').map((s) => s.trim()) as [string, string]) : undefined;
+    process.exitCode = await runStoryCompare({ before: args.before, after: args.after, out: args.out, labels, title: args.title, onlyChanged: args.onlyChanged }, (text) => console.log(text));
+  },
+});
+
 export const storyCommand = defineCommand({
   meta: {
     name: 'story',
@@ -660,5 +737,6 @@ export const storyCommand = defineCommand({
     comic: storyComicCommand,
     adapt: storyAdaptCommand,
     lock: storyLockCommand,
+    compare: storyCompareCommand,
   },
 });

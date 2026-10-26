@@ -261,3 +261,29 @@ describe('mdmedia story adapt', async () => {
     expect(text).toContain('not valid JSON');
   });
 });
+
+describe('mdmedia story compare', async () => {
+  const { runStoryComic, runStoryCompare, EXIT } = await import('../../src/cli/story-command.js');
+  const { fakeImageModel, fakeJudge, fakeVision, memoryCache, passThroughRuntime, scriptedTranscriber, toneSpeaker } = await import('./fakes.js');
+  const { cpSync, mkdtempSync, readFileSync, writeFileSync, existsSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join: joinPath } = await import('node:path');
+  const deps = () => ({ image: fakeImageModel(), vision: fakeVision(), cache: memoryCache(), runtime: passThroughRuntime, speaker: toneSpeaker(), transcriber: scriptedTranscriber(), judge: fakeJudge() });
+
+  it('lists the panels and lines that changed between two builds, with both versions beside each other', async () => {
+    const root = mkdtempSync(joinPath(tmpdir(), 'story-compare-'));
+    await runStoryComic({ file: fixture('comic-lunch'), out: joinPath(root, 'a') }, deps(), () => {});
+    cpSync(joinPath(root, 'a'), joinPath(root, 'b'), { recursive: true });
+    writeFileSync(joinPath(root, 'b', 'reader', 'img', 'panel-2-3.webp'), 'redrawn');
+    writeFileSync(joinPath(root, 'b', 'reader', 'audio', '1-1-1.mp3'), 'new take');
+    let text = '';
+    const code = await runStoryCompare({ before: joinPath(root, 'a', 'reader'), after: joinPath(root, 'b', 'reader'), out: joinPath(root, 'cmp'), labels: ['First version', 'Recovered'], onlyChanged: true }, (t) => { text += t; });
+    expect(code).toBe(EXIT.ok);
+    expect(text).toContain('1 panels with changed art, 1 lines with new takes');
+    const page = readFileSync(joinPath(root, 'cmp', 'index.html'), 'utf8');
+    expect(page).toContain('Panel 2.3 <span class="tag">art changed</span>');
+    expect(page).toContain('data-src="after/audio/1-1-1.mp3"');
+    expect(page).not.toContain('id="p3.4"');
+    expect(existsSync(joinPath(root, 'cmp', 'before', 'img', 'panel-2-3.webp'))).toBe(true);
+  });
+});
