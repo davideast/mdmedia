@@ -77,7 +77,8 @@ export function adaptationProblems(adaptation: SceneAdaptation, lines: SceneLine
           problems.push(`${at}: the text for ${item.line} is not an exact part of the line. Copy whole sentences from: "${line.display}"`);
           continue;
         }
-        if (line.narration && text.split(' ').length > MAX_CAPTION_WORDS) problems.push(`${at}: the caption from ${item.line} is ${text.split(' ').length} words; keep its best sentences, at most ${MAX_CAPTION_WORDS} words, with "text", and let the picture show the rest.`);
+        // One long sentence can't be trimmed to whole sentences; it stands.
+        if (line.narration && text.split(' ').length > MAX_CAPTION_WORDS && sentences(text).length > 1) problems.push(`${at}: the caption from ${item.line} is ${text.split(' ').length} words; keep its best sentences, at most ${MAX_CAPTION_WORDS} words, with "text", and let the picture show the rest.`);
         const lineIndex = order.indexOf(item.line);
         if (lineIndex < last.line || (lineIndex === last.line && index < last.at)) problems.push(`${at}: ${item.line} comes out of story order.`);
         last = { line: lineIndex, at: index };
