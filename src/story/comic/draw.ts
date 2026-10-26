@@ -256,10 +256,13 @@ async function headBoxes(
   cache: RenderCache,
   signal?: AbortSignal
 ): Promise<PanelResult['heads']> {
-  const characters = Object.keys(panel.positions).filter((id) => cast[id]?.look).map((id) => ({ id, look: visualLook(cast[id]!.look!) }));
+  // Everyone placed in the panel, and every speaker, who may be drawn even when the script didn't place them.
+  const speakers = panel.items.flatMap((i) => (i.kind === 'balloon' ? [i.who] : []));
+  const ids = [...new Set([...Object.keys(panel.positions), ...speakers])];
+  const characters = ids.filter((id) => cast[id]?.look).map((id) => ({ id, look: visualLook(cast[id]!.look!) }));
   if (!characters.length) return [];
   // Keyed by the image itself: a panel redrawn under the same key gets its own heads.
-  const key = `heads:${await sha256(JSON.stringify([IMAGE_RENDER_VERSION, vision.model, panelKey, await bytesHash(img.bytes)]))}`;
+  const key = `heads:${await sha256(JSON.stringify([IMAGE_RENDER_VERSION, 'faces', vision.model, panelKey, ids, await bytesHash(img.bytes)]))}`;
   const hit = await cache.getImage(key);
   // An empty result from before empty answers were retried is asked again.
   if (hit && (hit.meta.heads as PanelResult['heads']).length) return hit.meta.heads as PanelResult['heads'];

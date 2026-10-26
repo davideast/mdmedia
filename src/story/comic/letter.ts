@@ -94,6 +94,8 @@ export function lettering() {
     balloonPad: { x: 1.15, y: 0.8 },
     smallScale: 0.8,
     sfxScale: 2.8,
+    /** An oval taller than this times its width is rewrapped wider. */
+    maxOvalTallness: 1.1,
     shrink: 0.9,
   } as const;
 
@@ -257,6 +259,9 @@ export function lettering() {
   function size(panel: LetterPanel, group: number[], w: number, h: number, measure: Measure, fontPx: number): Rect & { shapes: Shape[]; fontPx: number } {
     const first = panel.items[group[0]!]!;
     const wide = w > h * 1.3;
+    // A narrow panel wraps wider, or its balloons turn into tall slivers down
+    // the middle of the art (adapted lunch scene, panel 1.3).
+    const narrow = w < h * 0.75;
     if (first.kind === 'sfx') {
       const px = fontPx * LETTERING.sfxScale;
       const lines = wrap(first.text, w * 0.5, px, measure, 'display');
@@ -266,19 +271,25 @@ export function lettering() {
     }
     const px = first.kind === 'balloon' && first.mark === 'small' ? fontPx * LETTERING.smallScale : fontPx;
     const padE = first.kind === 'caption' ? LETTERING.captionPad : LETTERING.balloonPad;
-    const maxText = (wide ? 0.4 : 0.62) * w - 2 * padE.x * px;
+    const maxText = (wide ? 0.4 : narrow ? 0.86 : 0.62) * w - 2 * padE.x * px;
+    const widest = 0.9 * w - 2 * padE.x * px;
     const shapes: Shape[] = [];
     let y = 0;
     let x = 0;
     for (const i of group) {
       const item = panel.items[i]!;
-      const lines = balancedWrap(item.text, maxText, px, measure);
-      const widths = lines.map((l) => measure(l, px, 'letter'));
-      const textW = Math.max(...widths);
-      const { sw, sh } =
+      let lines = balancedWrap(item.text, maxText, px, measure);
+      let widths = lines.map((l) => measure(l, px, 'letter'));
+      let { sw, sh } =
         first.kind === 'caption'
-          ? { sw: textW + 2 * padE.x * px, sh: lines.length * px * LETTERING.lineHeight + 2 * padE.y * px }
+          ? { sw: Math.max(...widths) + 2 * padE.x * px, sh: lines.length * px * LETTERING.lineHeight + 2 * padE.y * px }
           : oval(widths, px);
+      // A balloon taller than it is wide wraps wider, up to nearly the panel's width.
+      if (first.kind === 'balloon' && sh > sw * LETTERING.maxOvalTallness && widest > maxText) {
+        lines = wrap(item.text, widest, px, measure);
+        widths = lines.map((l) => measure(l, px, 'letter'));
+        ({ sw, sh } = oval(widths, px));
+      }
       shapes.push({ x, y, w: sw, h: sh, lines });
       // A joined balloon steps down and a little right, overlapping slightly.
       y += sh * 0.88;
@@ -332,7 +343,9 @@ export function lettering() {
     let tip: { x: number; y: number };
     // Off panel: marked [off], or not drawn in this panel at all. The tail points
     // out of the frame, never at whoever happens to be in it.
-    if (item.mark === 'off' || (!head && !panel.positions[item.who])) tip = { x: cx < w / 2 ? 0 : w, y: cy };
+    // When the art shows the speaker (their face was found), the tail points at
+    // them, whatever the script marked.
+    if (!head && (item.mark === 'off' || !panel.positions[item.who])) tip = { x: cx < w / 2 ? 0 : w, y: cy };
     else if (head) {
       const short = Math.max(w, h) * 0.015;
       tip =

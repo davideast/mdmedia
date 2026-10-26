@@ -133,6 +133,27 @@ describe('letterPanel', () => {
     });
   });
 
+  it('does not stack a long balloon into a tall sliver in a narrow panel (adapted lunch, panel 1.3)', () => {
+    const text = "You're definitely one of my favorites. That clip? Hilarious. We're using it in the assembly.";
+    const l = letterPanel(panel([{ kind: 'balloon', who: 'HARPER', text }], { aspect: '9:16' }), [], 300, 640, measure, { fontPx: 16 });
+    const s = l.placed[0]!.shapes[0]!;
+    expect(s.h).toBeLessThanOrEqual(s.w * 1.15);
+  });
+
+  it("points at a speaker whose face the art shows, even when the script marked them off panel", () => {
+    const l = letterPanel(
+      panel([{ kind: 'balloon', who: 'MILO', mark: 'off', text: 'I know, but--' }], { positions: { JUNE: 'left' } }),
+      [{ id: 'MILO', box: [0.4, 0.62, 0.62, 0.8] }],
+      600,
+      600,
+      measure,
+      { fontPx: 20 }
+    );
+    const tip = l.placed[0]!.tail!.tip;
+    expect(tip.x).toBeGreaterThan(0.55 * 600);
+    expect(tip.x).toBeLessThan(600);
+  });
+
   it('joins two balloons in a row by one speaker', () => {
     const l = letterPanel(
       panel([

@@ -213,9 +213,9 @@ export function createGeminiVision(options: { apiKey: string; model?: string; ma
     },
     async heads({ image, characters, signal }) {
       const prompt =
-        `Find the head of each of these characters in this comic panel, if visible:\n${characters.map((c) => `- ${c.id}: ${c.look}`).join('\n')}\n` +
-        'Return JSON: [{"name": NAME, "box_2d": [ymin, xmin, ymax, xmax]}] with coordinates 0-1000, one entry per character whose head is visible, ' +
-        'the box tight around the head and hair. Ignore everyone else.';
+        `Find the face of each of these characters in this comic panel, if visible:\n${characters.map((c) => `- ${c.id}: ${c.look}`).join('\n')}\n` +
+        'Return JSON: [{"name": NAME, "box_2d": [ymin, xmin, ymax, xmax]}] with coordinates 0-1000, one entry per character whose face is visible, ' +
+        'the box tight around the face from the eyebrows to the chin, leaving out the hair. Ignore everyone else.';
       let found: Array<{ name?: string; box_2d?: number[] }> | null;
       try {
         found = (await json([inline(image), { text: prompt }], signal)) as typeof found;
@@ -223,8 +223,8 @@ export function createGeminiVision(options: { apiKey: string; model?: string; ma
         if (!(error instanceof SyntaxError) || !/^blocked:/.test(error.message)) throw error;
         // A blocked description: ask with names only.
         const plain =
-          `Find the head of each of these comic characters in this panel, if visible: ${characters.map((c) => c.id).join(', ')}.\n` +
-          'Return JSON: [{"name": NAME, "box_2d": [ymin, xmin, ymax, xmax]}] with coordinates 0-1000, one entry per character whose head is visible.';
+          `Find the face of each of these comic characters in this panel, if visible: ${characters.map((c) => c.id).join(', ')}.\n` +
+          'Return JSON: [{"name": NAME, "box_2d": [ymin, xmin, ymax, xmax]}] with coordinates 0-1000, one entry per character whose face is visible, eyebrows to chin.';
         found = (await json([inline(image), { text: plain }], signal)) as typeof found;
       }
       const ids = new Set(characters.map((c) => c.id));
