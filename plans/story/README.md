@@ -15,7 +15,8 @@ from six prototype runs on real text; the evidence is in
 | [005](005-milestone-4-comic-art.md) | Milestone 4: comic scripts and checked art (`story draw`) | DONE |
 | [006](006-milestone-5-graphic-novel.md) | Milestone 5: pages, lettering, comic voices and the reader (`story comic`) | DONE |
 | [007](007-voices-briefs-casting.md) | Performance briefs, voice casting and lettering fixes | DONE |
-| [008](008-milestone-6-comic-director.md) | Milestone 6: the comic director (`story adapt`) | IN PROGRESS |
+| [008](008-milestone-6-comic-director.md) | Milestone 6: the comic director (`story adapt`) | PARKED |
+| [009](009-recover-and-lock.md) | Recover the comics and lock what is approved | IN PROGRESS |
 | 006–007 | Milestones 5–6: pages, lettering and reader; director for comics | NOT WRITTEN |
 
 Plans are written one or two milestones ahead, so each starts from what the
