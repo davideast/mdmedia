@@ -11,6 +11,7 @@ import {
 } from 'mdmedia/image';
 import { createGeminiClient, NodeEnvProvider } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
+import { startAdaptivePolling } from './worker-polling';
 import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, saveImageAsset, type StoredAsset } from './assets-server';
 import { DEFAULT_IMAGE_MODEL, MediaError, collectReferenceAssetIds, readImageDefaults, validMediaId } from './image-request';
@@ -313,13 +314,12 @@ async function recoverJob(job: ImageGeneration, token: string) {
   );
 }
 
-type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
+type Worker = { timer: ReturnType<typeof setTimeout> | null; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaImageWorker?: Worker };
 const worker = globalWorker.__mdmediaImageWorker ??= { timer: null, ticking: false, running: new Set() };
 export function startImageWorker() {
   if (worker.timer) return;
-  worker.timer = setInterval(() => { void processImageJobs().catch(() => {}); }, 5000);
-  worker.timer.unref();
+  startAdaptivePolling(worker, processImageJobs);
 }
 export async function processImageJobs() {
   if (worker.ticking) return;

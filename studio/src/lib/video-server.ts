@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { GeminiOmniVideoProvider, readMp4Duration, type VideoGenerationResult } from 'mdmedia/video';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
+import { startAdaptivePolling } from './worker-polling';
 import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
@@ -289,12 +290,12 @@ async function run(job: VideoGeneration, token: string, recovery: boolean) {
     } else await finish(job, token, null, 'interrupted', { code: 'generation_interrupted', message: 'This attempt did not complete. Regenerating starts a new request; your previous video is preserved.' });
   } finally { clearInterval(heartbeat); }
 }
-type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
+type Worker = { timer: ReturnType<typeof setTimeout> | null; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaVideoWorker?: Worker };
 const worker = globalWorker.__mdmediaVideoWorker ??= { timer: null, ticking: false, running: new Set() };
 export function startVideoWorker() {
   if (worker.timer) return;
-  worker.timer = setInterval(() => { void processVideoJobs().catch(() => {}); }, 5000); worker.timer.unref();
+  startAdaptivePolling(worker, processVideoJobs);
 }
 export async function processVideoJobs() {
   if (worker.ticking || worker.running.size) return;
