@@ -24,7 +24,7 @@ export interface TranscriptSourceMap {
 }
 
 export interface TreeMediaRef {
-  type: MediaType | 'asset' | 'mermaid';
+  type: MediaType | 'asset' | 'mermaid' | 'text';
   id: string;
   generationId?: string;
 }
@@ -265,11 +265,17 @@ export type MediaRemixKind =
   | 'video_extend'
   | 'video_edit'
   | 'video_to_image'
-  | 'mermaid_to_image';
+  | 'mermaid_to_image'
+  | 'text_to_image'
+  | 'text_to_video'
+  | 'text_to_music';
 
 export interface MediaRemixRequest {
   kind: MediaRemixKind;
-  source: TreeMediaRef | { type: 'mermaid'; code: string };
+  source:
+    | TreeMediaRef
+    | { type: 'mermaid'; code: string }
+    | { type: 'text'; text: string; id?: string };
   prompt: string;
   placement: 'replace' | 'insert_below' | 'library_only';
 }

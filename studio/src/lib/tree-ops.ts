@@ -608,10 +608,38 @@ export function applyTreeOpsState(
           } else {
             doc.markdown = `${doc.markdown.trimEnd()}\n\n${replacement}\n`;
           }
+        } else if (op.from.type === 'text') {
+          const targetSnippet = op.from.id.trim();
+          if (targetSnippet && doc.markdown.includes(targetSnippet)) {
+            if (op.placement === 'replace') {
+              doc.markdown = doc.markdown.replace(targetSnippet, replacement);
+            } else {
+              const idx = doc.markdown.indexOf(targetSnippet);
+              const afterSnippet = idx + targetSnippet.length;
+              const nextDoubleNewline = doc.markdown.indexOf('\n\n', afterSnippet);
+              const blockEnd = nextDoubleNewline === -1 ? doc.markdown.length : nextDoubleNewline;
+              doc.markdown =
+                doc.markdown.slice(0, blockEnd).trimEnd() +
+                `\n\n${replacement}` +
+                doc.markdown.slice(blockEnd);
+            }
+          } else {
+            doc.markdown = `${doc.markdown.trimEnd()}\n\n${replacement}\n`;
+          }
         } else {
           const targetUri = `mdmedia://${op.from.type}/${op.from.id}`;
           const regex = new RegExp(`!?\\[[^\\]]*\\]\\(${targetUri.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^)]*\\)`);
-          const match = doc.markdown.match(regex);
+          let match = doc.markdown.match(regex);
+          if (!match) {
+            const boundEntry = Object.entries(detail.pathAssets).find(
+              ([, ref]) => ref.id === op.from.id,
+            );
+            if (boundEntry) {
+              const escapedVirtualPath = boundEntry[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const assetRegex = new RegExp(`!?\\[[^\\]]*\\]\\((?:\\.\\.\\/|\\.\\/|\\/)*${escapedVirtualPath}[^)]*\\)`);
+              match = doc.markdown.match(assetRegex);
+            }
+          }
           if (match && match[0]) {
             doc.markdown =
               op.placement === 'replace'

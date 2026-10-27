@@ -478,36 +478,62 @@ function TreeDocumentSurface() {
         ? [rootCandidate, relativeCandidate]
         : [relativeCandidate, rootCandidate];
 
+      for (const baseCand of [...candidates]) {
+        if (!baseCand) continue;
+        const parts = baseCand.split("/").filter(Boolean);
+        if (parts.length > 1) {
+          candidates.push(parts.slice(1).join("/"));
+        }
+      }
+
       for (const candidate of candidates) {
         if (!candidate) continue;
         const resolved = resolveTreeNode(tree, candidate);
-        if (resolved) {
+        if (resolved && resolved.node.kind === "doc") {
           return `${buildTreeNodeHref(tree.id, resolved.node)}${hash}`;
         }
       }
 
+      const allDocs = Object.values(tree.nodes).filter((n) => n.kind === "doc");
+      for (const candidate of candidates) {
+        if (!candidate) continue;
+        const cleanCand = candidate.replace(/^\/+|\/+$/g, "").toLowerCase();
+        const segs = cleanCand.split("/").filter(Boolean);
+        if (segs.length >= 2) {
+          const suffixWithMd = cleanCand.endsWith(".md")
+            ? `/${cleanCand}`
+            : `/${cleanCand}.md`;
+          const suffixMatch = allDocs.find((n) =>
+            `/${n.path.toLowerCase()}`.endsWith(suffixWithMd),
+          );
+          if (suffixMatch) {
+            return `${buildTreeNodeHref(tree.id, suffixMatch)}${hash}`;
+          }
+        }
+      }
+
+      const GENERIC_DOC_NAMES = new Set([
+        "index.md",
+        "readme.md",
+        "lesson.md",
+        "classification.md",
+        "breakdown.md",
+        "review.md",
+      ]);
       const basename = rootCandidate.split("/").pop()?.toLowerCase() ?? "";
-      if (basename) {
+      if (basename && !GENERIC_DOC_NAMES.has(basename)) {
         const stem = basename.replace(/\.md$/i, "");
-        const matchingNode = Object.values(tree.nodes).find(
+        const matchingNode = allDocs.find(
           (n) =>
-            n.kind === "doc" &&
-            (n.name.toLowerCase() === basename ||
-              n.name.replace(/\.md$/i, "").toLowerCase() === stem),
+            n.name.toLowerCase() === basename ||
+            n.name.replace(/\.md$/i, "").toLowerCase() === stem,
         );
         if (matchingNode) {
           return `${buildTreeNodeHref(tree.id, matchingNode)}${hash}`;
         }
       }
 
-      const fallbackPath = (relativeCandidate || rootCandidate)
-        .split("/")
-        .filter(Boolean)
-        .map((s) => encodeURIComponent(s))
-        .join("/");
-      return fallbackPath
-        ? `/trees/${encodeURIComponent(tree.id)}/${fallbackPath}${hash}`
-        : null;
+      return null;
     },
     [tree, activeDocument?.path, activeNode?.path],
   );

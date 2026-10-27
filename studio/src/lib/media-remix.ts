@@ -47,6 +47,11 @@ export const REMIX_ACTIONS_BY_SOURCE: Record<TreeMediaRef['type'], RemixActionSp
   narration: [
     { kind: 'image_to_image', label: 'Generate Chapter Illustration', targetType: 'image' },
   ],
+  text: [
+    { kind: 'text_to_image', label: 'Turn into Image', targetType: 'image' },
+    { kind: 'text_to_video', label: 'Turn into Video', targetType: 'video' },
+    { kind: 'text_to_music', label: 'Score Music from Text', targetType: 'music' },
+  ],
 };
 
 export interface MediaRemixApiPayload {
@@ -57,11 +62,20 @@ export interface MediaRemixApiPayload {
 }
 
 function getSourceId(source: MediaRemixRequest['source']): string {
-  return 'code' in source ? source.code : source.id;
+  if ('code' in source) return source.code;
+  if ('text' in source) return source.id ?? source.text;
+  return source.id;
+}
+
+function getSourceText(source: MediaRemixRequest['source']): string {
+  if ('text' in source) return source.text;
+  if ('code' in source) return source.code;
+  return source.id;
 }
 
 function getSourceGenerationId(source: MediaRemixRequest['source']): string | undefined {
-  return 'code' in source ? undefined : source.generationId;
+  if ('code' in source || 'text' in source) return undefined;
+  return source.generationId;
 }
 
 export function buildMediaRemixApiPayload(request: MediaRemixRequest): MediaRemixApiPayload {
@@ -211,6 +225,60 @@ export function buildMediaRemixApiPayload(request: MediaRemixRequest): MediaRemi
         },
       };
     }
+
+    case 'text_to_image': {
+      const passage = getSourceText(request.source).trim();
+      const instructions =
+        prompt || 'Create a clear, evocative editorial illustration that visualizes this passage.';
+      const combinedPrompt = prompt ? `${prompt}\n\nPassage:\n${passage}` : passage;
+      return {
+        endpoint: '/api/v1/images',
+        method: 'POST',
+        targetType: 'image',
+        body: {
+          prompt: combinedPrompt,
+          adaptation: { enabled: true, instructions },
+          output: { aspectRatio: '16:9', resolution: null },
+        },
+      };
+    }
+
+    case 'text_to_video': {
+      const passage = getSourceText(request.source).trim();
+      const instructions =
+        prompt || 'Create a cinematic short video clip that brings this passage to life.';
+      const combinedPrompt = prompt ? `${prompt}\n\nPassage:\n${passage}` : passage;
+      return {
+        endpoint: '/api/v1/videos',
+        method: 'POST',
+        targetType: 'video',
+        body: {
+          prompt: combinedPrompt,
+          adaptation: { enabled: true, instructions },
+          output: { aspectRatio: '16:9', resolution: '720p', durationSeconds: 8 },
+        },
+      };
+    }
+
+    case 'text_to_music': {
+      const passage = getSourceText(request.source).trim();
+      const instructions =
+        prompt ||
+        'Compose an atmospheric instrumental score matching the mood and themes of this passage.';
+      const combinedPrompt = prompt ? `${prompt}\n\nPassage:\n${passage}` : passage;
+      return {
+        endpoint: '/api/v1/music',
+        method: 'POST',
+        targetType: 'music',
+        body: {
+          prompt: combinedPrompt,
+          adaptation: { enabled: true, instructions },
+          output: { mode: 'clip', format: 'mp3' },
+          vocals: 'instrumental',
+          lyrics: '',
+        },
+      };
+    }
   }
 }
 
@@ -242,6 +310,25 @@ export function applyMediaRemixToMarkdown(
               `${fullMatch}\n\n${replacement}` +
               markdown.slice(match.index + fullMatch.length);
       }
+    }
+    return `${markdown.trimEnd()}\n\n${replacement}\n`;
+  }
+
+  if (from.type === 'text') {
+    const targetSnippet = from.id.trim();
+    if (targetSnippet && markdown.includes(targetSnippet)) {
+      if (placement === 'replace') {
+        return markdown.replace(targetSnippet, replacement);
+      }
+      const idx = markdown.indexOf(targetSnippet);
+      const afterSnippet = idx + targetSnippet.length;
+      const nextDoubleNewline = markdown.indexOf('\n\n', afterSnippet);
+      const blockEnd = nextDoubleNewline === -1 ? markdown.length : nextDoubleNewline;
+      return (
+        markdown.slice(0, blockEnd).trimEnd() +
+        `\n\n${replacement}` +
+        markdown.slice(blockEnd)
+      );
     }
     return `${markdown.trimEnd()}\n\n${replacement}\n`;
   }
@@ -344,7 +431,9 @@ export async function executeMediaRemix(
   const fromRef: TreeMediaRef =
     'code' in request.source
       ? { type: 'mermaid', id: request.source.code }
-      : request.source;
+      : 'text' in request.source
+        ? { type: 'text', id: request.source.id ?? request.source.text }
+        : request.source;
 
   const generate = deps.generateMedia ?? defaultGenerateMedia;
   const createdRef = await generate(request, payload);

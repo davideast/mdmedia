@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "cn";
 import { toast } from "sonner";
@@ -11,13 +11,21 @@ export interface CodeBlockProps {
   code: string;
   lang?: string;
   className?: string;
+  headerActions?: ReactNode;
+  footer?: ReactNode;
 }
 
 /**
  * Renders a code snippet with minimal syntax highlighting and a small
  * canonical copy button in the top-right corner.
  */
-export function CodeBlock({ code, lang, className }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  lang,
+  className,
+  headerActions,
+  footer,
+}: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const highlightedHtml = useMemo(() => {
@@ -40,7 +48,7 @@ export function CodeBlock({ code, lang, className }: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "group relative my-4 w-full min-w-0 max-w-full rounded-lg border border-border bg-surface-card shadow-2xs",
+        "group relative grid w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-border bg-surface-card shadow-2xs",
         className,
       )}
     >
@@ -50,31 +58,34 @@ export function CodeBlock({ code, lang, className }: CodeBlockProps) {
           {displayLang && displayLang.length > 0 ? displayLang : "code"}
         </span>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label={copied ? "Copied" : "Copy code"}
-              onClick={handleCopy}
-              className={cn(
-                "inline-flex size-6 items-center justify-center rounded-md border transition-all",
-                copied
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border/60 bg-surface-inset/80 text-ink-muted hover:border-border-strong hover:bg-muted hover:text-foreground",
-                "focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
-              )}
-            >
-              {copied ? (
-                <Check size={12} strokeWidth={2.5} className="text-primary" />
-              ) : (
-                <Copy size={12} strokeWidth={2} />
-              )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            {copied ? "Copied!" : "Copy code"}
-          </TooltipContent>
-        </Tooltip>
+        <div className="flex items-center gap-1.5">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={copied ? "Copied" : "Copy code"}
+                onClick={handleCopy}
+                className={cn(
+                  "inline-flex size-6 items-center justify-center rounded-md border transition-all",
+                  copied
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/60 bg-surface-inset/80 text-ink-muted hover:border-border-strong hover:bg-muted hover:text-foreground",
+                  "focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
+                )}
+              >
+                {copied ? (
+                  <Check size={12} strokeWidth={2.5} className="text-primary" />
+                ) : (
+                  <Copy size={12} strokeWidth={2} />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              {copied ? "Copied!" : "Copy code"}
+            </TooltipContent>
+          </Tooltip>
+          {headerActions}
+        </div>
       </div>
 
       {/* Code body */}
@@ -84,6 +95,8 @@ export function CodeBlock({ code, lang, className }: CodeBlockProps) {
           dangerouslySetInnerHTML={{ __html: highlightedHtml }}
         />
       </pre>
+
+      {footer}
     </div>
   );
 }

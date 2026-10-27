@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "cn";
 import {
   Check,
+  Download,
   ExternalLink,
+  FileText,
   Info,
+  Loader2,
   PanelRightClose,
   PanelRightOpen,
   Plus,
@@ -16,6 +19,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  deriveExportSlug,
+  downloadDocumentDocx,
+  downloadHermeticDocumentZip,
+} from "@/lib/hermetic-export-client";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +44,6 @@ import { storyboardRoute } from "@/lib/storyboard";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import type { HeaderActions } from "@/components/shell/header-action";
 import { KeepSection } from "@/components/shell/keep-section";
-import { createBrowserTreeClient } from "@/lib/tree-client";
 import { useTreeContext } from "@/components/tree/tree-provider";
 import type { MediaType } from "@/lib/media-types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -90,7 +97,6 @@ function WorkPanel({ pathname, actions }: { pathname: string; actions?: HeaderAc
 
 function TreeContextPanel({ actions }: { actions?: HeaderActions }) {
   const router = useRouter();
-  const browserClient = useMemo(() => createBrowserTreeClient(), []);
   const {
     tree,
     activeNode,
@@ -106,11 +112,68 @@ function TreeContextPanel({ actions }: { actions?: HeaderActions }) {
   const deliveryPresets = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const [presetTitle, setPresetTitle] = useState("");
   const [deleteDocDialogOpen, setDeleteDocDialogOpen] = useState(false);
-  const [deleteTreeDialogOpen, setDeleteTreeDialogOpen] = useState(false);
+  const [exportingZip, setExportingZip] = useState(false);
+  const [exportingDocx, setExportingDocx] = useState(false);
 
   const presets = tree ? Object.values(tree.selectionSets) : [];
   const narrationId =
     activeDocument?.narrationId ?? activeNode?.narrationId ?? null;
+  const exportSlug = activeDocument
+    ? deriveExportSlug({
+        docPath: activeDocument.path || activeNode?.path,
+        title: activeDocument.title || activeNode?.name,
+      })
+    : null;
+
+  const handleExportHermeticZip = async () => {
+    if (!activeDocument || exportingZip) return;
+    setExportingZip(true);
+    try {
+      const pkg = await downloadHermeticDocumentZip({
+        title: activeDocument.title || activeNode?.name || "document",
+        markdown: activeDocument.markdown,
+        docPath: activeDocument.path || activeNode?.path,
+        pathAssets: tree?.pathAssets,
+      });
+      const count = pkg.mediaAssets.length;
+      toast.success(
+        count > 0
+          ? `Downloaded "${pkg.zipFilename}" (${count} ${count === 1 ? "image/media file" : "image/media files"})`
+          : `Downloaded "${pkg.zipFilename}"`,
+      );
+    } catch (error) {
+      toast.error(
+        (error as Error).message || "Could not export .zip archive.",
+      );
+    } finally {
+      setExportingZip(false);
+    }
+  };
+
+  const handleExportDocx = async () => {
+    if (!activeDocument || exportingDocx) return;
+    setExportingDocx(true);
+    try {
+      const pkg = await downloadDocumentDocx({
+        title: activeDocument.title || activeNode?.name || "document",
+        markdown: activeDocument.markdown,
+        docPath: activeDocument.path || activeNode?.path,
+        pathAssets: tree?.pathAssets,
+      });
+      const count = pkg.mediaAssets.length;
+      toast.success(
+        count > 0
+          ? `Downloaded "${pkg.docxFilename}" (${count} embedded ${count === 1 ? "image" : "images"})`
+          : `Downloaded "${pkg.docxFilename}"`,
+      );
+    } catch (error) {
+      toast.error(
+        (error as Error).message || "Could not export .docx document.",
+      );
+    } finally {
+      setExportingDocx(false);
+    }
+  };
 
   const handleSavePreset = async () => {
     const title = presetTitle.trim();
@@ -137,20 +200,6 @@ function TreeContextPanel({ actions }: { actions?: HeaderActions }) {
       router.push(`/trees/${encodeURIComponent(tree.id)}`);
     } catch (error) {
       toast.error((error as Error).message || "Could not delete document.");
-    }
-  };
-
-  const handleDeleteCurrentTree = async () => {
-    if (!tree) return;
-    const title = tree.title;
-    const id = tree.id;
-    setDeleteTreeDialogOpen(false);
-    try {
-      await browserClient.deleteTree(id);
-      toast.success(`Deleted "${title}"`);
-      router.push("/trees");
-    } catch (error) {
-      toast.error((error as Error).message || "Could not delete tree.");
     }
   };
 
@@ -371,29 +420,71 @@ function TreeContextPanel({ actions }: { actions?: HeaderActions }) {
         </div>
       ) : null}
 
-      {tree ? (
-        <div className="grid gap-2 border-t border-border py-2">
-          {activeNode ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setDeleteDocDialogOpen(true)}
-              className="w-full justify-center text-destructive hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
-            >
-              <Trash2 size={13} strokeWidth={2} />
-              <span>Delete document</span>
-            </Button>
-          ) : null}
+      {activeDocument && exportSlug ? (
+        <div className="grid gap-2">
+          <Label className="t-label">Export</Label>
+          <p className="text-[0.78rem] leading-normal text-ink-muted">
+            Export with embedded images as a{" "}
+            <code className="font-mono text-[11px]">.docx</code> for Google Docs
+            or a <code className="font-mono text-[11px]">.zip</code> of Markdown
+            and image files.
+          </p>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setDeleteTreeDialogOpen(true)}
+            disabled={exportingDocx}
+            onClick={() => void handleExportDocx()}
+            title={`Download ${exportSlug}.docx`}
+            className="h-8 w-full min-w-0 justify-center gap-2 text-[0.8rem]"
+          >
+            {exportingDocx ? (
+              <>
+                <Loader2 size={13} className="flex-none animate-spin text-primary" />
+                <span className="truncate">Packaging {exportSlug}.docx…</span>
+              </>
+            ) : (
+              <>
+                <FileText size={13} strokeWidth={2} className="flex-none" />
+                <span className="truncate">Download {exportSlug}.docx</span>
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={exportingZip}
+            onClick={() => void handleExportHermeticZip()}
+            title={`Download ${exportSlug}.zip`}
+            className="h-8 w-full min-w-0 justify-center gap-2 text-[0.8rem]"
+          >
+            {exportingZip ? (
+              <>
+                <Loader2 size={13} className="flex-none animate-spin text-primary" />
+                <span className="truncate">Packaging {exportSlug}.zip…</span>
+              </>
+            ) : (
+              <>
+                <Download size={13} strokeWidth={2} className="flex-none" />
+                <span className="truncate">Download {exportSlug}.zip</span>
+              </>
+            )}
+          </Button>
+        </div>
+      ) : null}
+
+      {tree && activeNode ? (
+        <div className="grid gap-2 border-t border-border py-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteDocDialogOpen(true)}
             className="w-full justify-center text-destructive hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2 size={13} strokeWidth={2} />
-            <span>Delete tree</span>
+            <span>Delete document</span>
           </Button>
         </div>
       ) : null}
@@ -422,37 +513,6 @@ function TreeContextPanel({ actions }: { actions?: HeaderActions }) {
             >
               <Trash2 size={13} strokeWidth={2} />
               <span>Delete document</span>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={deleteTreeDialogOpen}
-        onOpenChange={setDeleteTreeDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete tree?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete &ldquo;{tree?.title || "this tree"}
-              &rdquo; and all {tree?.docCount ?? 0} of its Markdown documents?
-              Detached narrations already in your Library will not be deleted.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2.5">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTreeDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => void handleDeleteCurrentTree()}
-            >
-              <Trash2 size={13} strokeWidth={2} />
-              <span>Delete tree</span>
             </Button>
           </DialogFooter>
         </DialogContent>

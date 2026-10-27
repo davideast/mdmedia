@@ -1,16 +1,29 @@
 "use client";
 
 import { cn } from "cn";
+import { ImageIcon, Music, Sparkles, Video, X } from "lucide-react";
 import { lexer, type Token, type Tokens } from "marked";
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { CodeBlock } from "./code-block";
-import { DocumentMediaCard } from "./document-media-card";
+import {
+  DocumentMediaCard,
+  resolvePrivateMediaContentPath,
+} from "./document-media-card";
 import {
   alignMarkdownWords,
   normalizeSpeakableToken,
   parseMediaUri,
 } from "../../lib/markdown-word-aligner";
+import { REMIX_ACTIONS_BY_SOURCE } from "../../lib/media-remix";
 import type {
+  MediaRemixKind,
   MediaRemixRequest,
   MediaRemixResult,
   TreeDocumentReaderProps,
@@ -132,7 +145,7 @@ function resolveRelativeDocPath(rawPath: string, currentDocPath: string): string
 function resolveInternalTreeHref(
   rawHref: string,
   ctx: WordRenderContext,
-): { href: string; isInternalDoc: boolean } {
+): { href: string | null; isInternalDoc: boolean } {
   const trimmed = rawHref.trim();
   if (
     !trimmed ||
@@ -147,6 +160,14 @@ function resolveInternalTreeHref(
     if (resolved) {
       return { href: resolved, isInternalDoc: true };
     }
+    const boundAsset = parseMediaUri(trimmed, ctx.pathAssets, ctx.docPath);
+    if (boundAsset) {
+      return {
+        href: resolvePrivateMediaContentPath(boundAsset),
+        isInternalDoc: false,
+      };
+    }
+    return { href: null, isInternalDoc: false };
   }
 
   if (trimmed.startsWith("/trees/")) {
@@ -488,12 +509,28 @@ function renderInlineTokens(
           ? { href: linkToken.href, isInternalDoc: false }
           : resolveInternalTreeHref(linkToken.href, ctx);
 
+        if (!resolvedHref) {
+          nodes.push(
+            <span
+              key={key}
+              data-unresolved-link={linkToken.href}
+              title={linkToken.href}
+              className="text-ink-muted decoration-dotted underline underline-offset-4"
+            >
+              {children}
+            </span>,
+          );
+          break;
+        }
+
         nodes.push(
           <a
             key={key}
             href={resolvedHref}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noopener noreferrer" : undefined}
+            target={isExternal || !isInternalDoc ? "_blank" : undefined}
+            rel={
+              isExternal || !isInternalDoc ? "noopener noreferrer" : undefined
+            }
             onClick={
               isInternalDoc && ctx.onNavigateDocHref
                 ? (event) => {
@@ -813,6 +850,229 @@ function computePositionedTopTokens(markdown: string) {
   return out;
 }
 
+const TEXT_PLACEMENT_OPTIONS: ReadonlyArray<{
+  value: MediaRemixRequest["placement"];
+  label: string;
+}> = [
+  { value: "insert_below", label: "Insert below" },
+  { value: "replace", label: "Replace in document" },
+  { value: "library_only", label: "Save to library only" },
+];
+
+function InlineTextMediaComposer({
+  sourceText,
+  anchorMarkdown,
+  initialKind = "text_to_image",
+  showQuote = true,
+  onRemixMedia,
+  onClose,
+}: {
+  sourceText: string;
+  anchorMarkdown: string;
+  initialKind?: MediaRemixKind;
+  showQuote?: boolean;
+  onRemixMedia: (request: MediaRemixRequest) => Promise<MediaRemixResult>;
+  onClose: () => void;
+}) {
+  const actions = REMIX_ACTIONS_BY_SOURCE.text;
+  const [selectedKind, setSelectedKind] = useState<MediaRemixKind>(initialKind);
+  const [prompt, setPrompt] = useState("");
+  const [placement, setPlacement] =
+    useState<MediaRemixRequest["placement"]>("insert_below");
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setErrorMessage(null);
+    try {
+      await onRemixMedia({
+        kind: selectedKind,
+        source: {
+          type: "text",
+          text: sourceText,
+          id: anchorMarkdown || sourceText,
+        },
+        prompt: prompt.trim(),
+        placement,
+      });
+      setPrompt("");
+      onClose();
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : "Could not generate media from text.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      aria-label="Create media from text"
+      className="grid w-full min-w-0 gap-3 border-t border-border/50 bg-surface-inset/40 p-3.5"
+    >
+      {showQuote ? (
+        <div className="flex items-start justify-between gap-2">
+          <div className="grid min-w-0 gap-1">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-ink-faint">
+              Selected passage
+            </span>
+            <p className="line-clamp-2 border-l-2 border-primary/60 px-2.5 text-xs italic text-ink-muted">
+              &ldquo;{sourceText}&rdquo;
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="Close media composer"
+            onClick={onClose}
+            className="inline-flex size-6 flex-none items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+          >
+            <X size={13} />
+          </button>
+        </div>
+      ) : null}
+
+      <div
+        role="radiogroup"
+        aria-label="Media type to generate"
+        className="flex flex-wrap items-center gap-1.5"
+      >
+        {actions.map((action) => {
+          const active = selectedKind === action.kind;
+          return (
+            <button
+              key={action.kind}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              data-remix-kind={action.kind}
+              onClick={() => setSelectedKind(action.kind)}
+              className={cn(
+                "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-surface-card text-foreground hover:bg-muted",
+              )}
+            >
+              {action.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <input
+        type="text"
+        value={prompt}
+        onChange={(event) => setPrompt(event.target.value)}
+        placeholder="Optional style, framing, or mood instructions..."
+        aria-label="Media generation instructions"
+        className="w-full rounded-md border border-border bg-surface-card px-3 py-2 text-sm text-foreground outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+      />
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Placement in document"
+          className="inline-flex items-center rounded-md border border-border/60 bg-surface-inset/60 p-0.5"
+        >
+          {TEXT_PLACEMENT_OPTIONS.map((option) => {
+            const active = placement === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                data-placement={option.value}
+                onClick={() => setPlacement(option.value)}
+                className={cn(
+                  "rounded px-2 py-1 text-xs transition-colors cursor-pointer",
+                  active
+                    ? "bg-surface-card font-medium text-foreground shadow-2xs"
+                    : "text-ink-muted hover:text-foreground",
+                )}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
+        >
+          {submitting ? "Generating..." : "Generate"}
+        </button>
+      </div>
+
+      {errorMessage ? (
+        <p role="alert" className="text-xs text-destructive">
+          {errorMessage}
+        </p>
+      ) : null}
+    </form>
+  );
+}
+
+function RemixableCodeBlock({
+  code,
+  lang,
+  rawFence,
+  onRemixMedia,
+}: {
+  code: string;
+  lang?: string;
+  rawFence: string;
+  onRemixMedia?: (request: MediaRemixRequest) => Promise<MediaRemixResult>;
+}) {
+  const [composerOpen, setComposerOpen] = useState(false);
+
+  const remixTrigger = onRemixMedia ? (
+    <button
+      type="button"
+      aria-expanded={composerOpen}
+      aria-label="Remix code block into media"
+      onClick={() => setComposerOpen((prev) => !prev)}
+      className={cn(
+        "inline-flex h-6 items-center gap-1 rounded-md border px-2 font-mono text-[11px] font-medium transition-colors cursor-pointer",
+        composerOpen
+          ? "border-primary bg-primary/10 text-primary"
+          : "border-border/60 bg-surface-inset/80 text-ink-muted hover:border-border-strong hover:bg-muted hover:text-foreground",
+      )}
+    >
+      <Sparkles size={11} />
+      <span>Remix</span>
+    </button>
+  ) : null;
+
+  const footer =
+    composerOpen && onRemixMedia ? (
+      <InlineTextMediaComposer
+        sourceText={code}
+        anchorMarkdown={rawFence}
+        showQuote={false}
+        onRemixMedia={onRemixMedia}
+        onClose={() => setComposerOpen(false)}
+      />
+    ) : null;
+
+  return (
+    <CodeBlock
+      code={code}
+      lang={lang}
+      className="w-full"
+      headerActions={remixTrigger}
+      footer={footer}
+    />
+  );
+}
+
 export function TreeDocumentReader({
   document,
   pathAssets,
@@ -833,6 +1093,21 @@ export function TreeDocumentReader({
   className,
 }: TreeDocumentReaderProps) {
   const markdown = document.markdown ?? "";
+  const articleRef = useRef<HTMLElement | null>(null);
+  const [selectionPopover, setSelectionPopover] = useState<{
+    text: string;
+    blockKey: string;
+    blockRaw: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const [activeSelectionComposer, setActiveSelectionComposer] = useState<{
+    text: string;
+    blockKey: string;
+    blockRaw: string;
+    initialKind: MediaRemixKind;
+  } | null>(null);
+
   const alignment = useMemo(
     () => alignMarkdownWords(markdown, words, sourceMap, chunks),
     [markdown, words, sourceMap, chunks],
@@ -841,6 +1116,59 @@ export function TreeDocumentReader({
     () => computePositionedTopTokens(markdown),
     [markdown],
   );
+
+  const handleCheckSelection = () => {
+    if (!onRemixMedia || typeof window === "undefined") return;
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+      setSelectionPopover(null);
+      return;
+    }
+    const selectedText = sel.toString().trim();
+    if (selectedText.length < 3) {
+      setSelectionPopover(null);
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    const articleEl = articleRef.current;
+    if (!articleEl || !articleEl.contains(range.commonAncestorContainer)) {
+      setSelectionPopover(null);
+      return;
+    }
+
+    const startNode =
+      range.startContainer.nodeType === Node.ELEMENT_NODE
+        ? (range.startContainer as HTMLElement)
+        : range.startContainer.parentElement;
+    if (startNode?.closest("form, input, textarea")) {
+      return;
+    }
+
+    const blockEl = startNode?.closest("[data-block-key]") as HTMLElement | null;
+    const blockKey =
+      blockEl?.getAttribute("data-block-key") ??
+      positionedTopTokens[positionedTopTokens.length - 1]?.blockKey ??
+      "blk_0_0";
+    const matchedBlock = positionedTopTokens.find((b) => b.blockKey === blockKey);
+    const blockRaw = matchedBlock ? matchedBlock.token.raw.trim() : selectedText;
+
+    const rangeRect = range.getBoundingClientRect();
+    const articleRect = articleEl.getBoundingClientRect();
+    const top = Math.max(0, rangeRect.top - articleRect.top - 42);
+    const rawLeft = rangeRect.left + rangeRect.width / 2 - articleRect.left;
+    const left = Math.min(
+      Math.max(130, rawLeft),
+      Math.max(130, articleRect.width - 130),
+    );
+
+    setSelectionPopover({
+      text: selectedText,
+      blockKey,
+      blockRaw,
+      top,
+      left,
+    });
+  };
   const highlightPalette = useMemo(
     () => getHighlightPalette(highlightColor),
     [highlightColor],
@@ -900,275 +1228,391 @@ export function TreeDocumentReader({
 
   return (
     <article
+      ref={articleRef}
       style={highlightVars}
+      onMouseUp={handleCheckSelection}
+      onKeyUp={handleCheckSelection}
       data-tree-document-id={document.id}
       data-tree-node-id={document.nodeId}
       data-alignment-fallback={alignment.fallbackToPlain ? "plain" : "aligned"}
       className={cn(
-        "grid w-full min-w-0 max-w-[68ch] justify-self-center gap-5 text-[1.0625rem] leading-[1.68] text-foreground [overflow-wrap:anywhere]",
+        "relative grid w-full min-w-0 max-w-[68ch] justify-self-center gap-5 text-[1.0625rem] leading-[1.68] text-foreground [overflow-wrap:anywhere]",
         className,
       )}
     >
+      {selectionPopover && onRemixMedia ? (
+        <div
+          role="toolbar"
+          aria-label="Turn selected text into media"
+          data-selection-toolbar="true"
+          style={{
+            top: `${selectionPopover.top}px`,
+            left: `${selectionPopover.left}px`,
+          }}
+          onMouseDown={(event) => {
+            // Prevent clearing the browser text selection when clicking the toolbar
+            event.preventDefault();
+          }}
+          className="absolute z-30 -translate-x-1/2 flex items-center gap-1 rounded-md border border-border-strong bg-surface-card p-1 shadow-md"
+        >
+          <span className="inline-flex items-center gap-1 px-1.5 font-mono text-[10px] font-medium uppercase tracking-wider text-ink-muted select-none">
+            <Sparkles size={11} className="text-primary" />
+            <span>Turn into</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSelectionComposer({
+                text: selectionPopover.text,
+                blockKey: selectionPopover.blockKey,
+                blockRaw: selectionPopover.blockRaw,
+                initialKind: "text_to_image",
+              });
+              setSelectionPopover(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="inline-flex h-6 items-center gap-1 rounded px-2 font-mono text-[11px] font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+          >
+            <ImageIcon size={11} />
+            <span>Image</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSelectionComposer({
+                text: selectionPopover.text,
+                blockKey: selectionPopover.blockKey,
+                blockRaw: selectionPopover.blockRaw,
+                initialKind: "text_to_video",
+              });
+              setSelectionPopover(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="inline-flex h-6 items-center gap-1 rounded px-2 font-mono text-[11px] font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+          >
+            <Video size={11} />
+            <span>Video</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSelectionComposer({
+                text: selectionPopover.text,
+                blockKey: selectionPopover.blockKey,
+                blockRaw: selectionPopover.blockRaw,
+                initialKind: "text_to_music",
+              });
+              setSelectionPopover(null);
+              window.getSelection()?.removeAllRanges();
+            }}
+            className="inline-flex h-6 items-center gap-1 rounded px-2 font-mono text-[11px] font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+          >
+            <Music size={11} />
+            <span>Music</span>
+          </button>
+        </div>
+      ) : null}
+
       {positionedTopTokens.map(({ token, mdStart, mdEnd, blockKey }) => {
-        switch (token.type) {
-          case "space":
-            return null;
+        const renderBlockNode = (): ReactNode => {
+          switch (token.type) {
+            case "space":
+              return null;
 
-          case "heading": {
-            const hToken = token as Tokens.Heading;
-            const depth = Math.min(6, Math.max(1, hToken.depth)) as
-              | 1
-              | 2
-              | 3
-              | 4
-              | 5
-              | 6;
-            const HeadingTag = `h${depth}` as const;
-            const prefixMatch = hToken.raw.match(/^\s{0,3}#{1,6}[ \t]+/);
-            const contentStart =
-              mdStart + (prefixMatch ? prefixMatch[0].length : 0);
-            const cursorRef = { pos: contentStart };
+            case "heading": {
+              const hToken = token as Tokens.Heading;
+              const depth = Math.min(6, Math.max(1, hToken.depth)) as
+                | 1
+                | 2
+                | 3
+                | 4
+                | 5
+                | 6;
+              const HeadingTag = `h${depth}` as const;
+              const prefixMatch = hToken.raw.match(/^\s{0,3}#{1,6}[ \t]+/);
+              const contentStart =
+                mdStart + (prefixMatch ? prefixMatch[0].length : 0);
+              const cursorRef = { pos: contentStart };
 
-            const isHeadingSpoken =
-              mdSpokenThrough >= 0 && contentStart <= mdSpokenThrough;
+              const isHeadingSpoken =
+                mdSpokenThrough >= 0 && contentStart <= mdSpokenThrough;
 
-            return (
-              <HeadingTag
-                key={blockKey}
-                data-spoken={
-                  isNarrationMode
-                    ? isHeadingSpoken
-                      ? "true"
-                      : "false"
-                    : undefined
-                }
-                className={cn(
-                  "reader-block min-w-0",
-                  HEADING_CLASSES[depth],
-                  isNarrationMode && !isHeadingSpoken
-                    ? "text-ink-faint"
-                    : undefined,
-                )}
-              >
-                {renderInlineTokens(
-                  hToken.tokens,
-                  cursorRef,
-                  mdEnd,
-                  ctx,
-                  blockKey,
-                )}
-              </HeadingTag>
-            );
-          }
-
-          case "paragraph": {
-            const pToken = token as Tokens.Paragraph;
-            const standaloneMedia = extractStandaloneMediaEmbed(
-              pToken.tokens,
-              pathAssets,
-              document.path,
-            );
-            if (standaloneMedia) {
               return (
-                <DocumentMediaCard
+                <HeadingTag
                   key={blockKey}
-                  mediaRef={standaloneMedia.mediaRef}
-                  alt={standaloneMedia.alt}
-                  onRemixMedia={onRemixMedia}
-                />
-              );
-            }
-
-            const isParagraphSpoken =
-              mdSpokenThrough >= 0 && mdStart <= mdSpokenThrough;
-            const cursorRef = { pos: mdStart };
-            return (
-              <p
-                key={blockKey}
-                data-spoken={
-                  isNarrationMode
-                    ? isParagraphSpoken
-                      ? "true"
-                      : "false"
-                    : undefined
-                }
-                className={cn(
-                  "reader-block min-w-0",
-                  isNarrationMode && !isParagraphSpoken
-                    ? "text-ink-faint"
-                    : undefined,
-                )}
-              >
-                {renderInlineTokens(
-                  pToken.tokens,
-                  cursorRef,
-                  mdEnd,
-                  ctx,
-                  blockKey,
-                )}
-              </p>
-            );
-          }
-
-          case "list": {
-            return renderListToken(
-              token as Tokens.List,
-              mdStart,
-              ctx,
-              blockKey,
-            );
-          }
-
-          case "blockquote": {
-            const quoteToken = token as Tokens.Blockquote;
-            const prefixMatch = quoteToken.raw.match(/^[ \t]*>[ \t]?/);
-            const contentStart =
-              mdStart + (prefixMatch ? prefixMatch[0].length : 0);
-            const isQuoteSpoken =
-              mdSpokenThrough >= 0 && contentStart <= mdSpokenThrough;
-            const cursorRef = { pos: contentStart };
-
-            return (
-              <blockquote
-                key={blockKey}
-                data-spoken={
-                  isNarrationMode
-                    ? isQuoteSpoken
-                      ? "true"
-                      : "false"
-                    : undefined
-                }
-                className={cn(
-                  "reader-block grid grid-cols-[2px_minmax(0,1fr)] gap-3 italic",
-                  isNarrationMode && !isQuoteSpoken
-                    ? "text-ink-faint"
-                    : "text-ink-muted",
-                )}
-              >
-                <span aria-hidden="true" className="rounded-full bg-border" />
-                <div className="grid min-w-0 gap-3">
-                  {renderBlockquoteTokens(
-                    quoteToken.tokens,
+                  data-block-key={blockKey}
+                  data-spoken={
+                    isNarrationMode
+                      ? isHeadingSpoken
+                        ? "true"
+                        : "false"
+                      : undefined
+                  }
+                  className={cn(
+                    "reader-block min-w-0",
+                    HEADING_CLASSES[depth],
+                    isNarrationMode && !isHeadingSpoken
+                      ? "text-ink-faint"
+                      : undefined,
+                  )}
+                >
+                  {renderInlineTokens(
+                    hToken.tokens,
                     cursorRef,
                     mdEnd,
                     ctx,
                     blockKey,
                   )}
-                </div>
-              </blockquote>
-            );
-          }
-
-          case "code": {
-            const codeToken = token as Tokens.Code;
-            const lang = codeToken.lang?.trim().toLowerCase();
-            if (lang === "mermaid") {
-              return (
-                <DocumentMediaCard
-                  key={blockKey}
-                  mediaRef={{ type: "mermaid", id: codeToken.text.trim() }}
-                  alt="Mermaid diagram"
-                  onRemixMedia={onRemixMedia}
-                />
+                </HeadingTag>
               );
             }
-            return (
-              <CodeBlock
-                key={blockKey}
-                code={codeToken.text}
-                lang={codeToken.lang}
-                className="w-full"
-              />
-            );
-          }
 
-          case "table": {
-            const tableToken = token as Tokens.Table;
-            const isTableSpoken =
-              mdSpokenThrough >= 0 && mdStart <= mdSpokenThrough;
-            const cursorRef = { pos: mdStart };
-            return (
-              <div
-                key={blockKey}
-                data-spoken={
-                  isNarrationMode
-                    ? isTableSpoken
-                      ? "true"
-                      : "false"
-                    : undefined
-                }
-                className={cn(
-                  "reader-block grid w-full overflow-x-auto rounded-lg border border-border",
-                  isNarrationMode && !isTableSpoken
-                    ? "text-ink-faint"
-                    : undefined,
-                )}
-              >
-                <table className="w-full border-collapse text-left text-sm">
-                  <thead className="border-b border-border bg-surface-inset">
-                    <tr>
-                      {tableToken.header.map((cell, hIdx) => (
-                        <th
-                          key={`${blockKey}_th_${hIdx}`}
-                          className="p-2.5 font-semibold"
-                        >
-                          {renderInlineTokens(
-                            cell.tokens,
-                            cursorRef,
-                            mdEnd,
-                            ctx,
-                            `${blockKey}_th_${hIdx}`,
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableToken.rows.map((row, rIdx) => (
-                      <tr
-                        key={`${blockKey}_tr_${rIdx}`}
-                        className="border-b border-border last:border-b-0"
-                      >
-                        {row.map((cell, cIdx) => (
-                          <td
-                            key={`${blockKey}_td_${rIdx}_${cIdx}`}
-                            className="p-2.5"
+            case "paragraph": {
+              const pToken = token as Tokens.Paragraph;
+              const standaloneMedia = extractStandaloneMediaEmbed(
+                pToken.tokens,
+                pathAssets,
+                document.path,
+              );
+              if (standaloneMedia) {
+                return (
+                  <DocumentMediaCard
+                    key={blockKey}
+                    mediaRef={standaloneMedia.mediaRef}
+                    alt={standaloneMedia.alt}
+                    onRemixMedia={onRemixMedia}
+                  />
+                );
+              }
+
+              const isParagraphSpoken =
+                mdSpokenThrough >= 0 && mdStart <= mdSpokenThrough;
+              const cursorRef = { pos: mdStart };
+              return (
+                <p
+                  key={blockKey}
+                  data-block-key={blockKey}
+                  data-spoken={
+                    isNarrationMode
+                      ? isParagraphSpoken
+                        ? "true"
+                        : "false"
+                      : undefined
+                  }
+                  className={cn(
+                    "reader-block min-w-0",
+                    isNarrationMode && !isParagraphSpoken
+                      ? "text-ink-faint"
+                      : undefined,
+                  )}
+                >
+                  {renderInlineTokens(
+                    pToken.tokens,
+                    cursorRef,
+                    mdEnd,
+                    ctx,
+                    blockKey,
+                  )}
+                </p>
+              );
+            }
+
+            case "list": {
+              return (
+                <div key={blockKey} data-block-key={blockKey} className="grid min-w-0">
+                  {renderListToken(
+                    token as Tokens.List,
+                    mdStart,
+                    ctx,
+                    blockKey,
+                  )}
+                </div>
+              );
+            }
+
+            case "blockquote": {
+              const quoteToken = token as Tokens.Blockquote;
+              const prefixMatch = quoteToken.raw.match(/^[ \t]*>[ \t]?/);
+              const contentStart =
+                mdStart + (prefixMatch ? prefixMatch[0].length : 0);
+              const isQuoteSpoken =
+                mdSpokenThrough >= 0 && contentStart <= mdSpokenThrough;
+              const cursorRef = { pos: contentStart };
+
+              return (
+                <blockquote
+                  key={blockKey}
+                  data-block-key={blockKey}
+                  data-spoken={
+                    isNarrationMode
+                      ? isQuoteSpoken
+                        ? "true"
+                        : "false"
+                      : undefined
+                  }
+                  className={cn(
+                    "reader-block grid grid-cols-[2px_minmax(0,1fr)] gap-3 italic",
+                    isNarrationMode && !isQuoteSpoken
+                      ? "text-ink-faint"
+                      : "text-ink-muted",
+                  )}
+                >
+                  <span aria-hidden="true" className="rounded-full bg-border" />
+                  <div className="grid min-w-0 gap-3">
+                    {renderBlockquoteTokens(
+                      quoteToken.tokens,
+                      cursorRef,
+                      mdEnd,
+                      ctx,
+                      blockKey,
+                    )}
+                  </div>
+                </blockquote>
+              );
+            }
+
+            case "code": {
+              const codeToken = token as Tokens.Code;
+              const lang = codeToken.lang?.trim().toLowerCase();
+              if (lang === "mermaid") {
+                return (
+                  <DocumentMediaCard
+                    key={blockKey}
+                    mediaRef={{ type: "mermaid", id: codeToken.text.trim() }}
+                    alt="Mermaid diagram"
+                    onRemixMedia={onRemixMedia}
+                  />
+                );
+              }
+              return (
+                <div key={blockKey} data-block-key={blockKey} className="grid min-w-0">
+                  <RemixableCodeBlock
+                    code={codeToken.text}
+                    lang={codeToken.lang}
+                    rawFence={codeToken.raw.trim()}
+                    onRemixMedia={onRemixMedia}
+                  />
+                </div>
+              );
+            }
+
+            case "table": {
+              const tableToken = token as Tokens.Table;
+              const isTableSpoken =
+                mdSpokenThrough >= 0 && mdStart <= mdSpokenThrough;
+              const cursorRef = { pos: mdStart };
+              return (
+                <div
+                  key={blockKey}
+                  data-block-key={blockKey}
+                  data-spoken={
+                    isNarrationMode
+                      ? isTableSpoken
+                        ? "true"
+                        : "false"
+                      : undefined
+                  }
+                  className={cn(
+                    "reader-block grid w-full overflow-x-auto rounded-lg border border-border",
+                    isNarrationMode && !isTableSpoken
+                      ? "text-ink-faint"
+                      : undefined,
+                  )}
+                >
+                  <table className="w-full border-collapse text-left text-sm">
+                    <thead className="border-b border-border bg-surface-inset">
+                      <tr>
+                        {tableToken.header.map((cell, hIdx) => (
+                          <th
+                            key={`${blockKey}_th_${hIdx}`}
+                            className="p-2.5 font-semibold"
                           >
                             {renderInlineTokens(
                               cell.tokens,
                               cursorRef,
                               mdEnd,
                               ctx,
-                              `${blockKey}_td_${rIdx}_${cIdx}`,
+                              `${blockKey}_th_${hIdx}`,
                             )}
-                          </td>
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {tableToken.rows.map((row, rIdx) => (
+                        <tr
+                          key={`${blockKey}_tr_${rIdx}`}
+                          className="border-b border-border last:border-b-0"
+                        >
+                          {row.map((cell, cIdx) => (
+                            <td
+                              key={`${blockKey}_td_${rIdx}_${cIdx}`}
+                              className="p-2.5"
+                            >
+                              {renderInlineTokens(
+                                cell.tokens,
+                                cursorRef,
+                                mdEnd,
+                                ctx,
+                                `${blockKey}_td_${rIdx}_${cIdx}`,
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            }
+
+            case "hr":
+              return <hr key={blockKey} className="border-t border-border" />;
+
+            case "html": {
+              const htmlToken = token as Tokens.HTML;
+              return (
+                <pre
+                  key={blockKey}
+                  data-block-key={blockKey}
+                  className="grid w-full overflow-x-auto rounded-md border border-border bg-surface-inset p-3 font-mono text-xs text-ink-muted"
+                >
+                  {htmlToken.raw}
+                </pre>
+              );
+            }
+
+            default:
+              return null;
+          }
+        };
+
+        const blockElement = renderBlockNode();
+        if (!blockElement) return null;
+
+        if (
+          activeSelectionComposer &&
+          activeSelectionComposer.blockKey === blockKey &&
+          onRemixMedia
+        ) {
+          return (
+            <div key={blockKey} className="grid w-full min-w-0 gap-3">
+              {blockElement}
+              <div className="overflow-hidden rounded-lg border border-primary/40 bg-surface-card shadow-sm">
+                <InlineTextMediaComposer
+                  sourceText={activeSelectionComposer.text}
+                  anchorMarkdown={activeSelectionComposer.blockRaw}
+                  initialKind={activeSelectionComposer.initialKind}
+                  showQuote
+                  onRemixMedia={onRemixMedia}
+                  onClose={() => setActiveSelectionComposer(null)}
+                />
               </div>
-            );
-          }
-
-          case "hr":
-            return <hr key={blockKey} className="border-t border-border" />;
-
-          case "html": {
-            const htmlToken = token as Tokens.HTML;
-            return (
-              <pre
-                key={blockKey}
-                className="grid w-full overflow-x-auto rounded-md border border-border bg-surface-inset p-3 font-mono text-xs text-ink-muted"
-              >
-                {htmlToken.raw}
-              </pre>
-            );
-          }
-
-          default:
-            return null;
+            </div>
+          );
         }
+
+        return blockElement;
       })}
     </article>
   );
