@@ -32,6 +32,16 @@ const { renderToStaticMarkup } = (await import(
 };
 import { TooltipProvider } from '../../studio/src/components/ui/tooltip';
 import {
+  buildDocumentDocxPackage,
+  readImageDimensions,
+} from '../../studio/src/lib/docx-export';
+import {
+  buildHermeticDocumentPackage,
+  crc32,
+  createZipArchive,
+  deriveExportSlug,
+} from '../../studio/src/lib/hermetic-export';
+import {
   buildMediaRemixApiPayload,
   executeMediaRemix,
   REMIX_ACTIONS_BY_SOURCE,
@@ -62,6 +72,11 @@ describe('REMIX_ACTIONS_BY_SOURCE & buildMediaRemixApiPayload', () => {
     ]);
     expect(REMIX_ACTIONS_BY_SOURCE.mermaid.map((a) => a.kind)).toEqual([
       'mermaid_to_image',
+    ]);
+    expect(REMIX_ACTIONS_BY_SOURCE.text.map((a) => a.kind)).toEqual([
+      'text_to_image',
+      'text_to_video',
+      'text_to_music',
     ]);
     expect(REMIX_ACTIONS_BY_SOURCE.music.length).toBeGreaterThan(0);
     expect(REMIX_ACTIONS_BY_SOURCE.sfx.length).toBeGreaterThan(0);
@@ -132,10 +147,40 @@ describe('REMIX_ACTIONS_BY_SOURCE & buildMediaRemixApiPayload', () => {
       instructions: 'Isometric editorial illustration',
     });
     expect(String(mermaidImg.body.prompt)).toContain('flowchart LR');
+
+    const textImg = buildMediaRemixApiPayload({
+      kind: 'text_to_image',
+      source: { type: 'text', text: 'PREPARED MATRIX -> INK + WIPE -> PRESS -> LIFT' },
+      prompt: 'Step-by-step intaglio workshop diagram',
+      placement: 'insert_below',
+    });
+    expect(textImg.endpoint).toBe('/api/v1/images');
+    expect(textImg.targetType).toBe('image');
+    expect(String(textImg.body.prompt)).toContain('PREPARED MATRIX');
+
+    const textVid = buildMediaRemixApiPayload({
+      kind: 'text_to_video',
+      source: { type: 'text', text: 'Paper receives ink from etched recesses under pressure.' },
+      prompt: 'Macro slow-motion shot of printing press roller',
+      placement: 'insert_below',
+    });
+    expect(textVid.endpoint).toBe('/api/v1/videos');
+    expect(textVid.targetType).toBe('video');
+    expect(String(textVid.body.prompt)).toContain('Paper receives ink');
+
+    const textMus = buildMediaRemixApiPayload({
+      kind: 'text_to_music',
+      source: { type: 'text', text: 'Goya — The Sleep of Reason Produces Monsters' },
+      prompt: 'Dark classical chamber strings',
+      placement: 'insert_below',
+    });
+    expect(textMus.endpoint).toBe('/api/v1/music');
+    expect(textMus.targetType).toBe('music');
+    expect(String(textMus.body.prompt)).toContain('The Sleep of Reason');
   });
 });
 
-describe('executeMediaRemix across all 6 cross-modal workflows & placements', () => {
+describe('executeMediaRemix across all cross-modal workflows & placements', () => {
   const workflows: Array<{
     kind: MediaRemixKind;
     source: MediaRemixRequest['source'];
@@ -184,6 +229,22 @@ describe('executeMediaRemix across all 6 cross-modal workflows & placements', ()
       createdRef: { type: 'image', id: 'img_from_mermaid' },
       initialMarkdown: '# Arch\n\n```mermaid\ngraph TD;\nA-->B;\n```\n',
       expectedRefToken: 'mdmedia://image/img_from_mermaid',
+    },
+    {
+      kind: 'text_to_image',
+      source: { type: 'text', text: 'In the simplified printing model below, paper receives ink from recesses.' },
+      createdRef: { type: 'image', id: 'img_from_text' },
+      initialMarkdown:
+        '# Intaglio\n\nIn the simplified printing model below, paper receives ink from recesses.\n\nNext paragraph.\n',
+      expectedRefToken: 'mdmedia://image/img_from_text',
+    },
+    {
+      kind: 'text_to_video',
+      source: { type: 'text', text: 'PREPARED MATRIX -> INK + WIPE -> PRESS -> LIFT' },
+      createdRef: { type: 'video', id: 'vid_from_text' },
+      initialMarkdown:
+        '# Process\n\n```text\nPREPARED MATRIX -> INK + WIPE -> PRESS -> LIFT\n```\n',
+      expectedRefToken: 'mdmedia://video/vid_from_text',
     },
   ];
 
@@ -301,11 +362,17 @@ describe('<DocumentMediaCard /> rendering & unified header toolbar', () => {
       createElement(DocumentMediaCard, {
         mediaRef: { type: 'image', id: 'img_hero_42' },
         alt: 'Architecture Diagram',
+        initialObjectUrl: 'blob:http://localhost:3080/hero',
         defaultComposerOpen: true,
       }),
     );
 
     expect(html).toContain('Architecture Diagram');
+    expect(html).toContain('data-image-collapsible="true"');
+    expect(html).toContain('data-image-expanded="false"');
+    expect(html).toContain('max-h-[24rem]');
+    expect(html).toContain('Click to expand full image');
+    expect(html).toContain('Open Architecture Diagram in full screen');
     expect(html).toContain('Remix');
     expect(html).toContain('Refine Image');
     expect(html).toContain('Animate as Video (First Frame)');
@@ -329,6 +396,119 @@ describe('<DocumentMediaCard /> rendering & unified header toolbar', () => {
     expect(mermaidHtml).toContain('data-media-type="mermaid"');
     expect(mermaidHtml).toContain('Flowchart');
     expect(mermaidHtml).toContain('Remix');
+  });
+});
+
+describe('buildHermeticDocumentPackage & createZipArchive', () => {
+  it('rewrites mdmedia:// and pathAssets links to local ./images/ paths and packs a valid PKZIP archive', async () => {
+    const markdown = [
+      '# What the quota benchmark showed, in plain terms',
+      '',
+      '![Media](mdmedia://image/img_quota_1)',
+      '',
+      'Look at Goya:',
+      '',
+      '![Goya — The Sleep of Reason](../../../works/goya-sleep-of-reason/art/met-338473.jpg)',
+      '',
+      '```markdown',
+      '![Untouched example](mdmedia://image/img_quota_1)',
+      '```',
+      '',
+    ].join('\n');
+
+    const fakePng = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const fakeJpg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
+
+    const pkg = await buildHermeticDocumentPackage({
+      title: 'What the quota benchmark showed, in plain terms',
+      docPath: 'techniques/intaglio/index.md',
+      markdown,
+      pathAssets: {
+        'works/goya-sleep-of-reason/art/met-338473.jpg': {
+          type: 'asset',
+          id: 'ast_goya_99',
+        },
+      },
+      fetchMedia: async (contentPath) => {
+        if (contentPath.includes('img_quota_1')) {
+          return { bytes: fakePng, mimeType: 'image/png' };
+        }
+        return { bytes: fakeJpg, mimeType: 'image/jpeg' };
+      },
+    });
+
+    expect(
+      deriveExportSlug({
+        docPath: 'quota-benchmark-narrative-10-26-26.md',
+        title: 'What the quota benchmark showed, in plain terms',
+      }),
+    ).toBe('quota-benchmark-narrative-10-26-26');
+    expect(pkg.zipFilename).toBe('intaglio.zip');
+    expect(pkg.mediaAssets).toHaveLength(2);
+    expect(pkg.mediaAssets[0]?.archiveRelativePath).toBe('images/01-image-imgquota.png');
+    expect(pkg.mediaAssets[1]?.archiveRelativePath).toBe('images/met-338473.jpg');
+
+    expect(pkg.rewrittenMarkdown).toContain('![Media](./images/01-image-imgquota.png)');
+    expect(pkg.rewrittenMarkdown).toContain(
+      '![Goya — The Sleep of Reason](./images/met-338473.jpg)',
+    );
+    // Code fence example remains untouched
+    expect(pkg.rewrittenMarkdown).toContain('![Untouched example](mdmedia://image/img_quota_1)');
+
+    // Verify PKZIP signatures (Local File Header 0x04034b50 & End of Central Directory 0x06054b50)
+    const view = new DataView(pkg.zipBytes.buffer);
+    expect(view.getUint32(0, true)).toBe(0x04034b50);
+    expect(view.getUint32(pkg.zipBytes.length - 22, true)).toBe(0x06054b50);
+    // 3 entries total in End of Central Directory (1 markdown + 2 images)
+    expect(view.getUint16(pkg.zipBytes.length - 12, true)).toBe(3);
+    expect(crc32(fakePng)).toBeGreaterThan(0);
+    expect(createZipArchive([{ path: 'hello.txt', data: 'hello' }]).length).toBeGreaterThan(50);
+  });
+
+  it('builds a valid OpenXML .docx archive with embedded word/media/* images and Heading styles', async () => {
+    // 24-byte PNG header with IHDR width=1200, height=630
+    const pngWithDims = new Uint8Array(24);
+    pngWithDims.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
+    const dimView = new DataView(pngWithDims.buffer);
+    dimView.setUint32(16, 1200, false);
+    dimView.setUint32(20, 630, false);
+
+    expect(readImageDimensions(pngWithDims)).toEqual({ width: 1200, height: 630 });
+
+    const docxPkg = await buildDocumentDocxPackage({
+      title: 'What the quota benchmark showed, in plain terms',
+      docPath: 'quota-benchmark-narrative-10-26-26.md',
+      markdown: [
+        '# What the quota benchmark showed, in plain terms',
+        '',
+        '![Handling High-Contention Database Events](mdmedia://image/img_quota_1)',
+        '',
+        'The live run on **26 Oct 2026** passed.',
+        '',
+        '| Metric | p95 |',
+        '| --- | --- |',
+        '| Latency | 0.4s |',
+      ].join('\n'),
+      fetchMedia: async () => ({
+        bytes: pngWithDims,
+        mimeType: 'image/png',
+      }),
+    });
+
+    expect(docxPkg.docxFilename).toBe('quota-benchmark-narrative-10-26-26.docx');
+    expect(docxPkg.mediaAssets).toHaveLength(1);
+    expect(docxPkg.mediaAssets[0]?.archiveRelativePath).toBe('media/image1.png');
+
+    const zipView = new DataView(docxPkg.docxBytes.buffer);
+    expect(zipView.getUint32(0, true)).toBe(0x04034b50);
+    expect(zipView.getUint32(docxPkg.docxBytes.length - 22, true)).toBe(0x06054b50);
+    // 6 entries: [Content_Types].xml, _rels/.rels, word/document.xml, word/styles.xml, word/_rels/document.xml.rels, word/media/image1.png
+    expect(zipView.getUint16(docxPkg.docxBytes.length - 12, true)).toBe(6);
+
+    const rawText = new TextDecoder().decode(docxPkg.docxBytes);
+    expect(rawText).toContain('w:styleId="Heading1"');
+    expect(rawText).toContain('r:embed="rIdImg1"');
+    expect(rawText).toContain('Target="media/image1.png"');
   });
 });
 

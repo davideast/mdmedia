@@ -30,6 +30,11 @@ import type { HeaderActions } from "@/components/shell/header-action";
 import { KeepSection } from "@/components/shell/keep-section";
 import { useAuth } from "@/lib/auth-context";
 import { currentIdToken } from "@/lib/firebase";
+import {
+  deriveExportSlug,
+  downloadDocumentDocx,
+  downloadHermeticDocumentZip,
+} from "@/lib/hermetic-export-client";
 import { deleteNarration, updateVisibility } from "@/lib/narrations";
 import { useOfflineStatus, type OfflineNarrationMetadata } from "@/lib/offline-manager";
 import {
@@ -75,6 +80,8 @@ export function NarrationSettings({
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [newPlaylistTitle, setNewPlaylistTitle] = useWorkspaceField("newPlaylistTitle", "");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [exportingZip, setExportingZip] = useState(false);
+  const [exportingDocx, setExportingDocx] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -489,6 +496,96 @@ export function NarrationSettings({
               )}
             </Button>
           )}
+          {effectiveSourceMarkdown ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={exportingDocx}
+                title={`Download ${deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.docx`}
+                onClick={async () => {
+                  setExportingDocx(true);
+                  try {
+                    const pkg = await downloadDocumentDocx({
+                      title: effectiveTitle || "narration",
+                      markdown: effectiveSourceMarkdown,
+                    });
+                    const count = pkg.mediaAssets.length;
+                    toast.success(
+                      count > 0
+                        ? `Downloaded "${pkg.docxFilename}" (${count} embedded ${count === 1 ? "image" : "images"})`
+                        : `Downloaded "${pkg.docxFilename}"`,
+                    );
+                  } catch {
+                    toast.error("Could not export .docx document.");
+                  } finally {
+                    setExportingDocx(false);
+                  }
+                }}
+                className="h-8 w-full min-w-0 justify-center gap-2 text-[0.8rem]"
+              >
+                {exportingDocx ? (
+                  <>
+                    <Loader2 size={13} className="flex-none animate-spin text-primary" />
+                    <span className="truncate">
+                      Packaging {deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.docx…
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <FileText size={13} strokeWidth={2} className="flex-none" />
+                    <span className="truncate">
+                      Download {deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.docx
+                    </span>
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={exportingZip}
+                title={`Download ${deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.zip`}
+                onClick={async () => {
+                  setExportingZip(true);
+                  try {
+                    const pkg = await downloadHermeticDocumentZip({
+                      title: effectiveTitle || "narration",
+                      markdown: effectiveSourceMarkdown,
+                    });
+                    const count = pkg.mediaAssets.length;
+                    toast.success(
+                      count > 0
+                        ? `Downloaded "${pkg.zipFilename}" (${count} ${count === 1 ? "image/media file" : "image/media files"})`
+                        : `Downloaded "${pkg.zipFilename}"`,
+                    );
+                  } catch {
+                    toast.error("Could not export .zip archive.");
+                  } finally {
+                    setExportingZip(false);
+                  }
+                }}
+                className="h-8 w-full min-w-0 justify-center gap-2 text-[0.8rem]"
+              >
+                {exportingZip ? (
+                  <>
+                    <Loader2 size={13} className="flex-none animate-spin text-primary" />
+                    <span className="truncate">
+                      Packaging {deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.zip…
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={13} strokeWidth={2} className="flex-none" />
+                    <span className="truncate">
+                      Download {deriveExportSlug({ title: effectiveTitle, fallback: "narration" })}.zip
+                    </span>
+                  </>
+                )}
+              </Button>
+            </>
+          ) : null}
         </div>
       ) : null}
 

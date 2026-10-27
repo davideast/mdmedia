@@ -192,16 +192,34 @@ function useInternalTreeState(options: {
       let changed = false;
       if (initializedTreeRef.current !== tree.id) {
         initializedTreeRef.current = tree.id;
-        if (tree.nodeCount <= 100) {
+        const COLLAPSED_REFERENCE_ROOTS = new Set([
+          "works",
+          "taxonomy",
+          "comparisons",
+          "explorations",
+          "styles",
+          "queue",
+        ]);
+        if (tree.nodeCount <= 120) {
           for (const node of Object.values(tree.nodes)) {
-            if (node.kind === "folder" && !next.has(node.id)) {
+            const topSegment = node.path.split("/")[0]?.toLowerCase() ?? "";
+            if (
+              node.kind === "folder" &&
+              !COLLAPSED_REFERENCE_ROOTS.has(topSegment) &&
+              !next.has(node.id)
+            ) {
               next.add(node.id);
               changed = true;
             }
           }
         } else {
           for (const rootId of tree.rootIds) {
-            if (tree.nodes[rootId]?.kind === "folder" && !next.has(rootId)) {
+            const rootNode = tree.nodes[rootId];
+            if (
+              rootNode?.kind === "folder" &&
+              !COLLAPSED_REFERENCE_ROOTS.has(rootNode.name.toLowerCase()) &&
+              !next.has(rootId)
+            ) {
               next.add(rootId);
               changed = true;
             }

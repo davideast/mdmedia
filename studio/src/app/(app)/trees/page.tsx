@@ -13,6 +13,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useWorkspaceField } from "@/components/shell/workspace-provider";
@@ -39,6 +47,7 @@ export default function TreesPage() {
     "editTreeDescription",
     "",
   );
+  const [treeToDelete, setTreeToDelete] = useState<TreeSummary | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -301,7 +310,7 @@ export default function TreesPage() {
                         type="button"
                         variant="ghost"
                         size="icon-xs"
-                        onClick={() => void handleDeleteTree(tree)}
+                        onClick={() => setTreeToDelete(tree)}
                         aria-label={`Delete ${tree.title}`}
                         title="Delete tree"
                         className="size-9 sm:size-6"
@@ -316,6 +325,42 @@ export default function TreesPage() {
           })
         )}
       </div>
+
+      <Dialog
+        open={treeToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setTreeToDelete(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete tree?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete &ldquo;{treeToDelete?.title || "this tree"}
+              &rdquo; and all {treeToDelete?.docCount ?? 0} of its Markdown documents?
+              Detached narrations already in your Library will not be deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2.5">
+            <Button variant="outline" onClick={() => setTreeToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (treeToDelete) {
+                  const target = treeToDelete;
+                  setTreeToDelete(null);
+                  void handleDeleteTree(target);
+                }
+              }}
+            >
+              <Trash2 size={13} strokeWidth={2} />
+              <span>Delete tree</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </WorkbenchPanel>
   );
 }

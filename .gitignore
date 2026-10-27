@@ -26,6 +26,7 @@ examples/
 studio/vendor/
 functions/lib/
 studio/.firebase/
+prompts/
 
 
 test/music/e2e-output/

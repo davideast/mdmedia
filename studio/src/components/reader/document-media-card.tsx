@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "cn";
-import { Sparkles } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { ChevronDown, ChevronUp, Maximize2, Sparkles, X } from "lucide-react";
+import { useState, type FormEvent, type SyntheticEvent } from "react";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { usePrivateMedia } from "../media/private-media";
 import { MermaidBlock } from "./mermaid-block";
 import { REMIX_ACTIONS_BY_SOURCE } from "../../lib/media-remix";
@@ -16,6 +17,7 @@ import type {
 export interface DocumentMediaCardProps {
   mediaRef: TreeMediaRef;
   alt?: string;
+  initialObjectUrl?: string;
   defaultComposerOpen?: boolean;
   onRemixMedia?: (request: MediaRemixRequest) => Promise<MediaRemixResult>;
   className?: string;
@@ -42,6 +44,7 @@ export function resolvePrivateMediaContentPath(mediaRef: TreeMediaRef): string |
 export function DocumentMediaCard({
   mediaRef,
   alt,
+  initialObjectUrl,
   defaultComposerOpen = false,
   onRemixMedia,
   className,
@@ -56,10 +59,23 @@ export function DocumentMediaCard({
     useState<MediaRemixRequest["placement"]>("insert_below");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [imageExpanded, setImageExpanded] = useState(false);
+  const [isTallImage, setIsTallImage] = useState(true);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const contentPath = resolvePrivateMediaContentPath(mediaRef);
-  const { url, error: mediaError } = usePrivateMedia(contentPath);
+  const { url: fetchedUrl, error: mediaError } = usePrivateMedia(contentPath);
+  const url = fetchedUrl || initialObjectUrl || "";
   const accessibleLabel = alt?.trim() || `${mediaRef.type} ${mediaRef.id}`;
+  const isImageLike = mediaRef.type === "image" || mediaRef.type === "asset";
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      const aspectRatio = img.naturalHeight / img.naturalWidth;
+      setIsTallImage(aspectRatio > 0.65);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -236,7 +252,32 @@ export function DocumentMediaCard({
             <span className="truncate text-xs text-ink-muted">{alt.trim()}</span>
           ) : null}
         </div>
-        <div className="flex items-center gap-1.5">{remixTriggerButton}</div>
+        <div className="flex items-center gap-1.5">
+          {isImageLike && url && isTallImage ? (
+            <button
+              type="button"
+              aria-expanded={imageExpanded}
+              aria-label={imageExpanded ? `Collapse ${accessibleLabel}` : `Expand ${accessibleLabel}`}
+              onClick={() => setImageExpanded((prev) => !prev)}
+              className="inline-flex h-6 items-center gap-1 rounded-md border border-border/60 bg-surface-inset/80 px-2 font-mono text-[11px] font-medium text-ink-muted transition-colors hover:border-border-strong hover:bg-muted hover:text-foreground cursor-pointer"
+            >
+              {imageExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+              <span>{imageExpanded ? "Collapse" : "Expand"}</span>
+            </button>
+          ) : null}
+          {isImageLike && url ? (
+            <button
+              type="button"
+              aria-label={`Open ${accessibleLabel} in full screen`}
+              title="Full screen view"
+              onClick={() => setLightboxOpen(true)}
+              className="inline-flex size-6 items-center justify-center rounded-md border border-border/60 bg-surface-inset/80 text-ink-muted transition-colors hover:border-border-strong hover:bg-muted hover:text-foreground cursor-pointer"
+            >
+              <Maximize2 size={11} />
+            </button>
+          ) : null}
+          {remixTriggerButton}
+        </div>
       </div>
 
       <div className="grid w-full min-w-0 bg-surface-card">
@@ -263,13 +304,56 @@ export function DocumentMediaCard({
             />
           </div>
         ) : url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={url}
-            alt={accessibleLabel}
-            data-media-path={contentPath ?? undefined}
-            className="w-full object-cover"
-          />
+          <div
+            data-image-collapsible={isTallImage ? "true" : "false"}
+            data-image-expanded={imageExpanded ? "true" : "false"}
+            className={cn(
+              "relative grid w-full min-w-0 overflow-hidden bg-surface-inset/30 transition-[max-height] duration-200",
+              isTallImage && !imageExpanded ? "max-h-[24rem]" : "max-h-none",
+            )}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={url}
+              alt={accessibleLabel}
+              onLoad={handleImageLoad}
+              onClick={() => {
+                if (isTallImage && !imageExpanded) {
+                  setImageExpanded(true);
+                } else {
+                  setLightboxOpen(true);
+                }
+              }}
+              data-media-path={contentPath ?? undefined}
+              className={cn(
+                "w-full object-cover object-top",
+                isTallImage && !imageExpanded ? "cursor-pointer" : "cursor-zoom-in",
+              )}
+            />
+            {isTallImage && !imageExpanded ? (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end justify-center bg-gradient-to-t from-surface-card via-surface-card/80 to-transparent p-3">
+                <button
+                  type="button"
+                  onClick={() => setImageExpanded(true)}
+                  className="pointer-events-auto inline-flex h-7 items-center gap-1.5 rounded-md border border-border-strong bg-surface-card/95 px-3 font-mono text-xs font-medium text-foreground shadow-sm backdrop-blur-xs transition-colors hover:bg-muted cursor-pointer"
+                >
+                  <ChevronDown size={13} />
+                  <span>Click to expand full image</span>
+                </button>
+              </div>
+            ) : isTallImage && imageExpanded ? (
+              <div className="flex items-center justify-center border-t border-border/50 bg-surface-inset/40 py-2">
+                <button
+                  type="button"
+                  onClick={() => setImageExpanded(false)}
+                  className="inline-flex h-6 items-center gap-1.5 rounded-md border border-border/60 bg-surface-card px-2.5 font-mono text-[11px] font-medium text-ink-muted transition-colors hover:border-border-strong hover:text-foreground cursor-pointer"
+                >
+                  <ChevronUp size={12} />
+                  <span>Collapse image</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
         ) : (
           <div
             role="img"
@@ -283,6 +367,48 @@ export function DocumentMediaCard({
       </div>
 
       {composerDrawer}
+
+      {isImageLike && url ? (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent
+            showCloseButton={false}
+            overlayClassName="bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex h-dvh w-dvw max-h-none max-w-none top-0 left-0 translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-background/95 p-0 shadow-none sm:max-w-none"
+          >
+            <div className="flex h-12 shrink-0 items-center justify-between border-b border-border/70 bg-surface-card px-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-ink-faint">
+                  {mediaRef.type}
+                </span>
+                <span className="truncate text-xs text-foreground">
+                  {accessibleLabel}
+                </span>
+              </div>
+              <button
+                type="button"
+                aria-label="Close full screen view"
+                onClick={() => setLightboxOpen(false)}
+                className="inline-flex size-7 items-center justify-center rounded-md border border-border/70 bg-surface-inset text-ink-muted transition-colors hover:border-border-strong hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <DialogTitle className="sr-only">{accessibleLabel}</DialogTitle>
+            <div
+              onClick={() => setLightboxOpen(false)}
+              className="grid flex-1 min-h-0 w-full place-items-center overflow-auto p-6 cursor-zoom-out"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={url}
+                alt={accessibleLabel}
+                onClick={(event) => event.stopPropagation()}
+                className="max-h-[calc(100dvh-5rem)] max-w-[calc(100dvw-3rem)] rounded-md object-contain shadow-lg cursor-default"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </figure>
   );
 }
