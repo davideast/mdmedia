@@ -129,6 +129,7 @@ export function toNarration(snapshot: {
     updatedAt: asNumber(data.updatedAt),
     locked: data.locked === true,
     expiresAt: typeof data.expiresAt === 'number' ? data.expiresAt : null,
+    audioExpiredAt: typeof data.audioExpiredAt === 'number' ? data.audioExpiredAt : null,
   };
   if (typeof data.errorMessage === 'string' && data.errorMessage.length > 0) {
     narration.errorMessage = data.errorMessage;

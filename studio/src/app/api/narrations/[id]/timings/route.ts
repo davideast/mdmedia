@@ -26,6 +26,9 @@ export async function GET(
   if (!narration || (narration.status !== "ready" && narration.status !== "streaming")) {
     return Response.json({ message: "That narration isn't available." }, { status: 404 });
   }
+  if (narration.audioExpiredAt) {
+    return Response.json({ message: "This narration's audio was deleted by retention. The text is still available." }, { status: 410 });
+  }
 
   const objectPath = timingsObjectPath(narration.ownerUid, id);
   const urlObj = new URL(request.url);
