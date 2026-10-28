@@ -5,7 +5,6 @@ import { saveMusicAsset, type MusicAsset } from './music-assets-server';
 import { musicPrompt, readMusicDefaults, MAX_MUSIC_BYTES } from './music-request';
 import { createGeminiClient } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
-import { startAdaptivePolling } from './worker-polling';
 import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, type StoredAsset } from './assets-server';
 import { MediaError, validMediaId } from './image-request';
@@ -224,12 +223,13 @@ async function recoverJob(job: MusicGeneration, token: string) {
   await finishGeneration(job, token, asset, asset ? null : { code: 'generation_interrupted', message: 'This attempt did not complete. Generating again starts a new request; your previous music is preserved.' }, asset ? 'ready' : 'interrupted');
 }
 
-type Worker = { timer: ReturnType<typeof setTimeout> | null; ticking: boolean; running: Set<string> };
+type Worker = { started: boolean; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaMusicWorker?: Worker };
-const worker = globalWorker.__mdmediaMusicWorker ??= { timer: null, ticking: false, running: new Set() };
+const worker = globalWorker.__mdmediaMusicWorker ??= { started: false, ticking: false, running: new Set() };
 export function startMusicWorker() {
-  if (worker.timer) return;
-  startAdaptivePolling(worker, processMusicJobs);
+  if (worker.started) return;
+  worker.started = true;
+  setTimeout(() => { void processMusicJobs().catch(() => {}); }, 5000).unref();
 }
 export async function processMusicJobs() {
   if (worker.ticking) return;
@@ -253,7 +253,7 @@ export async function processMusicJobs() {
     for (const snapshot of queued.docs) {
       if (worker.running.has(snapshot.id)) continue;
       worker.running.add(snapshot.id);
-      void runJob(snapshot.id).catch(() => {}).finally(() => worker.running.delete(snapshot.id));
+      void runJob(snapshot.id).catch(() => {}).finally(() => { worker.running.delete(snapshot.id); void processMusicJobs().catch(() => {}); });
     }
   } finally { worker.ticking = false; }
 }

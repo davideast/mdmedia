@@ -11,7 +11,6 @@ import {
 } from 'mdmedia/image';
 import { createGeminiClient, NodeEnvProvider } from 'mdmedia/tts';
 import { adminBucket, adminDb } from './firebase-admin';
-import { startAdaptivePolling } from './worker-polling';
 import { carriedRetention } from './retention-server';
 import { assetResource, loadOwnedAsset, saveImageAsset, type StoredAsset } from './assets-server';
 import { DEFAULT_IMAGE_MODEL, MediaError, collectReferenceAssetIds, readImageDefaults, validMediaId } from './image-request';
@@ -314,12 +313,13 @@ async function recoverJob(job: ImageGeneration, token: string) {
   );
 }
 
-type Worker = { timer: ReturnType<typeof setTimeout> | null; ticking: boolean; running: Set<string> };
+type Worker = { started: boolean; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaImageWorker?: Worker };
-const worker = globalWorker.__mdmediaImageWorker ??= { timer: null, ticking: false, running: new Set() };
+const worker = globalWorker.__mdmediaImageWorker ??= { started: false, ticking: false, running: new Set() };
 export function startImageWorker() {
-  if (worker.timer) return;
-  startAdaptivePolling(worker, processImageJobs);
+  if (worker.started) return;
+  worker.started = true;
+  setTimeout(() => { void processImageJobs().catch(() => {}); }, 5000).unref();
 }
 export async function processImageJobs() {
   if (worker.ticking) return;
@@ -343,7 +343,7 @@ export async function processImageJobs() {
     for (const snapshot of queued.docs) {
       if (worker.running.has(snapshot.id)) continue;
       worker.running.add(snapshot.id);
-      void runJob(snapshot.id).catch(() => {}).finally(() => worker.running.delete(snapshot.id));
+      void runJob(snapshot.id).catch(() => {}).finally(() => { worker.running.delete(snapshot.id); void processImageJobs().catch(() => {}); });
     }
   } finally { worker.ticking = false; }
 }
