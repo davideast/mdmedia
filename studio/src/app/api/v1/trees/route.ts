@@ -8,14 +8,13 @@ import {
   type Caller,
 } from '../../../../lib/api-auth';
 import type { ApiKeyScope } from '../../../../lib/api-key-token';
-import { InMemoryTreeStore } from '../../../../lib/tree-fakes';
+import { getServerTreeStore } from '../../../../lib/trees-server';
 import { TreeOpError, type TreeOp, type TreeStorePort } from '../../../../lib/tree-types';
 
 export const runtime = 'nodejs';
 
 let testingStore: TreeStorePort | null = null;
 let testingUid: string | null = null;
-let fallbackStore: TreeStorePort | null = null;
 
 export function setTreeStoreForTesting(store: TreeStorePort | null, uid?: string): void {
   testingStore = store;
@@ -23,26 +22,7 @@ export function setTreeStoreForTesting(store: TreeStorePort | null, uid?: string
 }
 
 export async function getTreeStore(): Promise<TreeStorePort> {
-  if (testingStore) return testingStore;
-  try {
-    const modPath = '../../../../lib/trees-server';
-    const mod = (await import(modPath)) as {
-      getServerTreeStore?: () => TreeStorePort;
-      serverTreeStore?: TreeStorePort;
-    };
-    if (typeof mod.getServerTreeStore === 'function') {
-      return mod.getServerTreeStore();
-    }
-    if (mod.serverTreeStore) {
-      return mod.serverTreeStore;
-    }
-  } catch {
-    // Fallback to in-memory store when server module is not initialized
-  }
-  if (!fallbackStore) {
-    fallbackStore = new InMemoryTreeStore();
-  }
-  return fallbackStore;
+  return testingStore ?? getServerTreeStore();
 }
 
 export async function requireTreeAuth(
