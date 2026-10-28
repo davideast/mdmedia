@@ -205,13 +205,13 @@ async function recoverJob(job: SfxGeneration, token: string) {
   await finishGeneration(job, token, asset, asset ? null : failure ?? { code: 'generation_interrupted', message: 'This attempt did not complete. Generating again starts a new request; your previous sound effect is preserved.' }, asset ? 'ready' : failure ? 'error' : 'interrupted');
 }
 
-type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
+type Worker = { started: boolean; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaSfxWorker?: Worker };
-const worker = globalWorker.__mdmediaSfxWorker ??= { timer: null, ticking: false, running: new Set() };
+const worker = globalWorker.__mdmediaSfxWorker ??= { started: false, ticking: false, running: new Set() };
 export function startSfxWorker() {
-  if (worker.timer) return;
-  worker.timer = setInterval(() => { void processSfxJobs().catch(() => {}); }, 5000);
-  worker.timer.unref();
+  if (worker.started) return;
+  worker.started = true;
+  setTimeout(() => { void processSfxJobs().catch(() => {}); }, 5000).unref();
 }
 export async function processSfxJobs() {
   if (worker.ticking) return;
@@ -235,7 +235,7 @@ export async function processSfxJobs() {
     for (const snapshot of queued.docs) {
       if (worker.running.has(snapshot.id)) continue;
       worker.running.add(snapshot.id);
-      void runJob(snapshot.id).catch(() => {}).finally(() => worker.running.delete(snapshot.id));
+      void runJob(snapshot.id).catch(() => {}).finally(() => { worker.running.delete(snapshot.id); void processSfxJobs().catch(() => {}); });
     }
   } finally { worker.ticking = false; }
 }

@@ -223,13 +223,13 @@ async function recoverJob(job: MusicGeneration, token: string) {
   await finishGeneration(job, token, asset, asset ? null : { code: 'generation_interrupted', message: 'This attempt did not complete. Generating again starts a new request; your previous music is preserved.' }, asset ? 'ready' : 'interrupted');
 }
 
-type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
+type Worker = { started: boolean; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaMusicWorker?: Worker };
-const worker = globalWorker.__mdmediaMusicWorker ??= { timer: null, ticking: false, running: new Set() };
+const worker = globalWorker.__mdmediaMusicWorker ??= { started: false, ticking: false, running: new Set() };
 export function startMusicWorker() {
-  if (worker.timer) return;
-  worker.timer = setInterval(() => { void processMusicJobs().catch(() => {}); }, 5000);
-  worker.timer.unref();
+  if (worker.started) return;
+  worker.started = true;
+  setTimeout(() => { void processMusicJobs().catch(() => {}); }, 5000).unref();
 }
 export async function processMusicJobs() {
   if (worker.ticking) return;
@@ -253,7 +253,7 @@ export async function processMusicJobs() {
     for (const snapshot of queued.docs) {
       if (worker.running.has(snapshot.id)) continue;
       worker.running.add(snapshot.id);
-      void runJob(snapshot.id).catch(() => {}).finally(() => worker.running.delete(snapshot.id));
+      void runJob(snapshot.id).catch(() => {}).finally(() => { worker.running.delete(snapshot.id); void processMusicJobs().catch(() => {}); });
     }
   } finally { worker.ticking = false; }
 }

@@ -289,12 +289,13 @@ async function run(job: VideoGeneration, token: string, recovery: boolean) {
     } else await finish(job, token, null, 'interrupted', { code: 'generation_interrupted', message: 'This attempt did not complete. Regenerating starts a new request; your previous video is preserved.' });
   } finally { clearInterval(heartbeat); }
 }
-type Worker = { timer: ReturnType<typeof setInterval> | null; ticking: boolean; running: Set<string> };
+type Worker = { started: boolean; ticking: boolean; running: Set<string> };
 const globalWorker = globalThis as typeof globalThis & { __mdmediaVideoWorker?: Worker };
-const worker = globalWorker.__mdmediaVideoWorker ??= { timer: null, ticking: false, running: new Set() };
+const worker = globalWorker.__mdmediaVideoWorker ??= { started: false, ticking: false, running: new Set() };
 export function startVideoWorker() {
-  if (worker.timer) return;
-  worker.timer = setInterval(() => { void processVideoJobs().catch(() => {}); }, 5000); worker.timer.unref();
+  if (worker.started) return;
+  worker.started = true;
+  setTimeout(() => { void processVideoJobs().catch(() => {}); }, 5000).unref();
 }
 export async function processVideoJobs() {
   if (worker.ticking || worker.running.size) return;
@@ -314,6 +315,6 @@ export async function processVideoJobs() {
     });
     if (!job) return;
     worker.running.add(job.id);
-    void run(job, token, job.status === 'generating').catch(() => {}).finally(() => worker.running.delete(job.id));
+    void run(job, token, job.status === 'generating').catch(() => {}).finally(() => { worker.running.delete(job.id); void processVideoJobs().catch(() => {}); });
   } finally { worker.ticking = false; }
 }
