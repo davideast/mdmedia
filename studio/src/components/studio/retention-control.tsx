@@ -23,13 +23,15 @@ import { TTL_PRESETS, describeTimeLeft, parseTtl, type RetentionView } from "@/l
 const USE_DEFAULT = "default";
 const CUSTOM = "custom";
 
-function when(view: RetentionView, now: number): string {
+function when(view: RetentionView, now: number, type: MediaType): string {
   if (view.locked) return "Locked. It stays until you unlock it.";
   if (view.effectiveExpiresAt === null) return "Kept. Nothing will delete it.";
   const date = new Date(view.effectiveExpiresAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   const left = describeTimeLeft(view.effectiveExpiresAt, now);
   const rule = view.source === "item" ? "Set on this item." : "From your default for this kind of media.";
-  return `${left === "due" ? "Due for deletion" : `Deletes in ${left}`} (${date}). ${rule}`;
+  const audio = type === "narration";
+  const text = left === "due" ? (audio ? "Audio due for deletion" : "Due for deletion") : `${audio ? "Audio deletes" : "Deletes"} in ${left}`;
+  return `${text} (${date}). ${rule}${audio ? " The text is kept." : ""}`;
 }
 
 interface RetentionState {
@@ -99,7 +101,7 @@ function RetentionFields({ type, id, state }: { type: MediaType; id: string; sta
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
         <div className="grid gap-1">
           <Label htmlFor={`lock-${type}-${id}`} className="t-card-title font-normal">Lock</Label>
-          <p className="t-meta">Never deleted until you unlock it.</p>
+          <p className="t-meta">{type === "narration" ? "Audio is kept until you unlock it." : "Never deleted until you unlock it."}</p>
         </div>
         <Switch
           id={`lock-${type}-${id}`}
@@ -111,7 +113,7 @@ function RetentionFields({ type, id, state }: { type: MediaType; id: string; sta
 
       {view.locked ? null : (
         <div className="grid gap-2">
-          <Label htmlFor={`ttl-${type}-${id}`} className="t-card-title font-normal">Delete after</Label>
+          <Label htmlFor={`ttl-${type}-${id}`} className="t-card-title font-normal">{type === "narration" ? "Delete audio after" : "Delete after"}</Label>
           <Select
             disabled={busy}
             value=""
@@ -153,7 +155,7 @@ function RetentionFields({ type, id, state }: { type: MediaType; id: string; sta
         </div>
       )}
 
-      <p className="t-meta" role="status">{when(view, at)}</p>
+      <p className="t-meta" role="status">{when(view, at, type)}</p>
     </div>
   );
 }
@@ -180,7 +182,7 @@ export function RetentionControl({
   const [open, setOpen] = useState(false);
   if (!state) return null;
   const { view, at } = state;
-  const label = view.locked ? "Locked" : view.effectiveExpiresAt !== null ? `Deletes in ${describeTimeLeft(view.effectiveExpiresAt, at)}` : "Retention";
+  const label = view.locked ? "Locked" : view.effectiveExpiresAt !== null ? `${type === "narration" ? "Audio deletes" : "Deletes"} in ${describeTimeLeft(view.effectiveExpiresAt, at)}` : "Retention";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

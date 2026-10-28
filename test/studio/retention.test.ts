@@ -234,8 +234,14 @@ describe('retentionNote', () => {
 
   test('names a lock, a countdown, and an overdue item', () => {
     expect(retentionNote({ ...item, locked: true }, settings, NOW)).toBe('Locked');
-    expect(retentionNote(item, settings, NOW + DAY)).toBe('Deletes in 6d');
-    expect(retentionNote({ ...item, expiresAt: NOW - 1 }, settings, NOW)).toBe('Deleting soon');
+    expect(retentionNote(item, settings, NOW + DAY)).toBe('Audio deletes in 6d');
+    expect(retentionNote({ ...item, expiresAt: NOW - 1 }, settings, NOW)).toBe('Audio deleting soon');
+  });
+
+  test('says the whole item is deleted for every type but narration', () => {
+    const image = { ...item, type: 'image' as const, expiresAt: NOW + DAY };
+    expect(retentionNote(image, settings, NOW)).toBe('Deletes in 1d');
+    expect(retentionNote({ ...image, expiresAt: NOW - 1 }, settings, NOW)).toBe('Deleting soon');
   });
 });
 

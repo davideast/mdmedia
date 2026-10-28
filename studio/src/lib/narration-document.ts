@@ -13,6 +13,8 @@ export interface NarrationDocument {
   sourceMap?: TranscriptSourceMap;
   status: 'loading' | 'streaming' | 'ready' | 'error';
   errorMessage: string | null;
+  /** When retention deleted the recording; the text is still here. */
+  audioExpiredAt?: number | null;
 }
 
 export interface PlaybackSlice<TPlayer = unknown> {
@@ -150,10 +152,10 @@ export function observeNarrationDocument(id: string, source: DocumentSource, rec
     }
     document = { ...document, title: narration.title, voice: narration.voice, transcript: narration.transcript,
       sourceMarkdown: narration.sourceMarkdown, adapted: narration.adapted, status: narration.status,
-      errorMessage: narration.errorMessage ?? null };
+      errorMessage: narration.errorMessage ?? null, audioExpiredAt: narration.audioExpiredAt ?? null };
     publish();
     const nextCheckpoint = `${narration.status}:${narration.durationMs}`;
-    if (checkpoint === nextCheckpoint || narration.status === 'error' || !narration.durationMs) return;
+    if (checkpoint === nextCheckpoint || narration.status === 'error' || !narration.durationMs || narration.audioExpiredAt) return;
     checkpoint = nextCheckpoint;
     const request = ++revision;
     void source.timings(id, controller.signal).then((timings) => {
