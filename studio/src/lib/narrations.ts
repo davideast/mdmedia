@@ -30,6 +30,7 @@ import { auth, db } from '@/lib/firebase';
 import { getMediaStore } from '@/lib/media-store';
 import { removeOfflineNarration } from '@/lib/offline-manager';
 import { retryDeniedListener } from '@/lib/retry-denied-listener';
+import { retryUnavailable } from '@/lib/retry-unavailable';
 import { multicastSubscribe } from '@/lib/subscription-pool';
 import {
   DEFAULT_VOICE,
@@ -224,7 +225,7 @@ export function watchNarration(id: string, cb: (narration: Narration | null) => 
 }
 
 export async function getNarrationOnce(id: string): Promise<Narration | null> {
-  const snapshot = await getDoc(narrationRef(id));
+  const snapshot = await retryUnavailable(() => getDoc(narrationRef(id)));
   return snapshot.exists() ? toNarration(snapshot) : null;
 }
 

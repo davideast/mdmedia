@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase';
+import { retryUnavailable } from '@/lib/retry-unavailable';
 import { readSettings } from '@/lib/settings';
 import {
   DEFAULT_SETTINGS,
@@ -69,7 +70,7 @@ export async function checkEmailAllowlist(email: string): Promise<'allowed' | 'd
   const normalized = email.trim().toLowerCase();
   if (!normalized) return 'denied';
   try {
-    const snapshot = await getDocFromServer(allowlistRef(normalized));
+    const snapshot = await retryUnavailable(() => getDocFromServer(allowlistRef(normalized)));
     return snapshot.exists() ? 'allowed' : 'denied';
   } catch (error) {
     const code = (error as { code?: string }).code;
@@ -78,7 +79,7 @@ export async function checkEmailAllowlist(email: string): Promise<'allowed' | 'd
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
-  const snapshot = await getDoc(userRef(uid));
+  const snapshot = await retryUnavailable(() => getDoc(userRef(uid)));
   return snapshot.exists() ? toUserProfile(snapshot) : null;
 }
 
@@ -96,7 +97,7 @@ export interface UpsertProfileInput {
  */
 export async function upsertUserProfile(input: UpsertProfileInput): Promise<UserProfile> {
   const ref = userRef(input.uid);
-  const existing = await getDoc(ref);
+  const existing = await retryUnavailable(() => getDoc(ref));
   const now = Date.now();
 
   if (!existing.exists()) {
