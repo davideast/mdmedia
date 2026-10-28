@@ -174,7 +174,7 @@ export function RetentionSettings() {
       })}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="t-meta">Expired items are deleted automatically about every 10 minutes.</p>
+        <p className="t-meta">Expired items are deleted automatically about every 10 minutes. A narration loses only its audio; its text stays.</p>
         <Button type="button" variant="outline" disabled={busy} onClick={() => void deleteNow()}>Delete expired items now</Button>
       </div>
 

@@ -68,7 +68,8 @@ function LibraryNarrationCard({
   onPlay: (narration: Narration) => void;
   onDelete: (narration: Narration) => void;
 }) {
-  const isReady = narration.status === "ready";
+  const audioExpired = typeof narration.audioExpiredAt === "number";
+  const isReady = narration.status === "ready" && !audioExpired;
   const retention = useAuth().profile?.settings.retention ?? DEFAULT_RETENTION;
   const now = useNow();
   const note = retentionNote(
@@ -137,7 +138,7 @@ function LibraryNarrationCard({
           <span className="font-mono tabular-nums">{duration(narration.durationMs)}</span>
           <span>Ready {relativeTime(narration.createdAt || narration.updatedAt)}</span>
           <span>{READABLE_VISIBILITY[narration.visibility]}</span>
-          {note ? <span>{note}</span> : null}
+          {audioExpired ? <span>Audio deleted, text kept</span> : note ? <span>{note}</span> : null}
           {narration.adapted ? (
             <span className="inline-flex items-center gap-1 text-primary">
               <Sparkles size={11} /> Adapted for ear
@@ -198,7 +199,7 @@ function LibraryNarrationCard({
               <span className="sr-only">Download for offline</span>
             </Button>
           ) : null}
-          {isReady ? <RetentionControl type="narration" id={narration.id} className="size-11" /> : null}
+          {isReady || audioExpired ? <RetentionControl type="narration" id={narration.id} className="size-11" /> : null}
           <Button
             type="button"
             variant="ghost"

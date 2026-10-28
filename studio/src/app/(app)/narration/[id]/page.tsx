@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { BookOpen, Check, Copy, FileText, Loader2, Pause, Play } from "lucide-react";
+import { BookOpen, Check, Copy, FileText, Loader2, Mic, Pause, Play } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/reader/follow-button";
 import { Reader } from "@/components/reader/reader";
 import { SourceDocumentView } from "@/components/reader/source-document-view";
@@ -12,7 +13,7 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import type { HeaderAction } from "@/components/shell/header-action";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
 import { projectNarrationView } from "@/lib/narration-document";
-import { updateNarrationTitle } from "@/lib/narrations";
+import { narrateAgain, updateNarrationTitle } from "@/lib/narrations";
 import { useNarrationDocument } from "@/lib/use-narration-document";
 import { useWorkspaceField } from "@/components/shell/workspace-provider";
 
@@ -136,6 +137,22 @@ export default function NarrationPage() {
 
   const empty = stream.transcript.length === 0;
 
+  // Retention deletes a narration's recording and keeps its text.
+  const audioExpiredAt = document?.audioExpiredAt ?? null;
+  const audioExpired = audioExpiredAt !== null && !activeQueueJob && !empty;
+  const [narratingAgain, setNarratingAgain] = useState(false);
+  const handleNarrateAgain = async () => {
+    setNarratingAgain(true);
+    try {
+      await narrateAgain(id);
+      toast.success("Narrating again. The text stays while the audio is recorded.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not narrate this again.");
+    } finally {
+      setNarratingAgain(false);
+    }
+  };
+
   const [copiedView, setCopiedView] = useState<string | null>(null);
   const copied = copiedView === `${id}:${activeDocumentView}`;
 
@@ -196,7 +213,7 @@ export default function NarrationPage() {
       if (isLive && playback.player && playback.durationMs > 0) { if (playback.playing) playback.player.pause(); else void playback.player.play(); }
       else playNarration(id);
     },
-    disabled: empty || stream.status === "error",
+    disabled: empty || stream.status === "error" || audioExpired,
     emphasis: "primary",
     iconClassName: stream.playing ? "fill-current" : "translate-x-px fill-current",
   };
@@ -258,6 +275,18 @@ export default function NarrationPage() {
       }
       actions={empty ? [playAction] : [copyAction, playAction]}
     >
+      {audioExpired && audioExpiredAt !== null ? (
+        <div role="status" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3.5 py-3">
+          <p className="min-w-0 text-[0.85rem] text-ink-muted">
+            The audio was deleted by your retention setting on{" "}
+            {new Date(audioExpiredAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}. The text is still here.
+          </p>
+          <Button type="button" size="sm" disabled={narratingAgain} onClick={() => void handleNarrateAgain()}>
+            {narratingAgain ? <Loader2 size={14} className="animate-spin" /> : <Mic size={14} />}
+            Narrate again
+          </Button>
+        </div>
+      ) : null}
       {stream.status === "error" && !activeQueueJob || failedQueueJob ? (
         <p className="text-[0.95rem] text-ink-muted">
           {failedQueueJob?.errorMessage ??

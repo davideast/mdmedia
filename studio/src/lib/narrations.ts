@@ -359,4 +359,22 @@ export async function deleteNarration(id: string): Promise<void> {
   })();
 }
 
+/**
+ * Re-records a narration whose audio retention deleted, into the same id.
+ * Resolves once the server has started; progress arrives through the
+ * narration document. Throws with the server's message otherwise.
+ */
+export async function narrateAgain(id: string): Promise<void> {
+  const user = auth().currentUser;
+  const token = user ? await user.getIdToken().catch(() => null) : null;
+  if (!token) throw new Error('Please sign in to narrate again.');
+  const response = await fetch(`/api/narrations/${id}/renarrate`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (response.ok) return;
+  const body = (await response.json().catch(() => null)) as { message?: unknown } | null;
+  throw new Error(typeof body?.message === 'string' ? body.message : 'Could not narrate this again.');
+}
+
 export { generateNarrationId } from './narration-request';

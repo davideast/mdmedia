@@ -244,5 +244,8 @@ export function retentionNote(
 ): string | null {
   const { expiresAt, source } = explainRetention(item, settings);
   if (source === 'locked') return 'Locked';
-  return expiresAt === null ? null : expiresAt <= now ? 'Deleting soon' : `Deletes in ${describeTimeLeft(expiresAt, now)}`;
+  if (expiresAt === null) return null;
+  // Retention takes a narration's recording and keeps its text.
+  const what = item.type === 'narration' ? 'Audio' : '';
+  return expiresAt <= now ? `${what ? `${what} deleting` : 'Deleting'} soon` : `${what ? `${what} deletes` : 'Deletes'} in ${describeTimeLeft(expiresAt, now)}`;
 }

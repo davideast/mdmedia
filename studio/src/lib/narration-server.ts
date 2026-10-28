@@ -476,7 +476,17 @@ export function createNarrationStream({
           throw new NarrationOwnershipError();
         }
         // Regenerating an id keeps its lock and expiry unless the caller sets new ones.
-        Object.assign(initialNarration, carriedRetention(snap.exists ? snap.data() : undefined), retention);
+        // An expiry that already took the audio is spent, so the new recording starts fresh
+        // and your defaults apply again; keeping it would expire the audio within minutes.
+        const previous = snap.exists ? snap.data() : undefined;
+        const carried = carriedRetention(previous);
+        if (typeof previous?.audioExpiredAt === "number") carried.expiresAt = null;
+        // The same people keep access when only the recording is regenerated.
+        const sharing =
+          previous?.visibility === request.visibility && Array.isArray(previous.sharedWith)
+            ? { sharedWith: previous.sharedWith, ...(previous.sharedWithLabels ? { sharedWithLabels: previous.sharedWithLabels } : {}) }
+            : {};
+        Object.assign(initialNarration, carried, sharing, retention);
         tx.set(docRef, initialNarration);
       });
       docWritten = true;
