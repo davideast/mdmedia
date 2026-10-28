@@ -1,5 +1,7 @@
 'use client';
 import { auth } from './firebase';
+/** Fired after a Studio request that changes data, so views that show derived counts can refetch instead of polling. */
+export const STUDIO_MUTATION_EVENT = 'mdmedia:studio-mutation';
 export class MediaClientError extends Error {
   constructor(readonly status: number, readonly code: string, message: string) { super(message); }
 }
@@ -11,6 +13,7 @@ export async function studioFetch(path: string, init: RequestInit = {}): Promise
     const body = await response.json().catch(() => null);
     throw new MediaClientError(response.status, body?.error?.code ?? 'request_failed', body?.error?.message ?? 'Studio could not complete this request.');
   }
+  if (init.method && init.method !== 'GET' && typeof window !== 'undefined') window.dispatchEvent(new Event(STUDIO_MUTATION_EVENT));
   return response;
 }
 export async function studioJson<T>(path: string, init: RequestInit = {}): Promise<T> {
