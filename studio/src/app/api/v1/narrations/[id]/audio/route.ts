@@ -15,6 +15,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (narration.status !== "ready") {
     return apiError(409, "not_ready", `This narration is ${narration.status}. Audio is available once it is ready.`);
   }
+  if (narration.audioExpiredAt) {
+    return apiError(410, "audio_expired", "Retention deleted this narration's audio. Its text is still available.");
+  }
   const bytes = await readStorageObjectBytes(audioObjectPath(narration.ownerUid, id));
   if (!bytes) return apiError(404, "not_found", "The recording for this narration is missing.");
   return new Response(new Uint8Array(bytes), {

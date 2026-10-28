@@ -288,6 +288,40 @@ export async function purgeNarrationData(
   return { deleted: true };
 }
 
+/**
+ * Retention for a narration removes its recording, not its words. The audio and
+ * word timings are deleted and the document is stamped `audioExpiredAt`; the
+ * text, playlist entries and tree links stay. Safe to repeat: a narration whose
+ * audio is already gone is left alone.
+ */
+export async function expireNarrationAudio(
+  id: string,
+  uid: string,
+): Promise<{ expired: boolean }> {
+  const docRef = adminDb().collection("narrations").doc(id);
+  const current = (await docRef.get()).data();
+  if (!current || current.ownerUid !== uid) return { expired: false };
+  if (current.locked === true) throw new NarrationLockedError();
+  if (typeof current.audioExpiredAt === "number") return { expired: false };
+
+  const active = activeStreams.get(id);
+  if (active && active.uid === uid) {
+    active.abort();
+    activeStreams.delete(id);
+  }
+
+  const bucket = adminBucket();
+  await Promise.all([
+    bucket.file(audioObjectPath(uid, id)).delete({ ignoreNotFound: true }),
+    bucket.file(timingsObjectPath(uid, id)).delete({ ignoreNotFound: true }),
+  ]);
+  // The document goes last, so a run that fails partway is finished by the next.
+  const now = Date.now();
+  await docRef.update({ audioExpiredAt: now, updatedAt: now });
+  await syncNarrationCatalog(id);
+  return { expired: true };
+}
+
 interface StreamParams {
   uid: string;
   id: string;

@@ -81,14 +81,31 @@ assert.equal(limited.expired.length, 4);
 // A full run removes the rest, including everything the expired image owned.
 const full = await sweepExpired({ now });
 assert.equal(full.failed, 0);
-for (const gone of ['narrations/n-old', 'narrations/n-stuck', 'narrations/o-short', 'mediaItems/image_i-old', 'mediaAssets/a1', 'mediaGenerations/g1', 'mediaActivity/g1', 'mediaRequests/r1']) {
+for (const gone of ['mediaItems/image_i-old', 'mediaAssets/a1', 'mediaGenerations/g1', 'mediaActivity/g1', 'mediaRequests/r1']) {
   assert.equal(documents.has(gone), false, `${gone} should be gone`);
+}
+// An expired narration loses its recording and timings but keeps its words.
+for (const [path, owner, id] of [['narrations/n-old', 'owner', 'n-old'], ['narrations/n-stuck', 'owner', 'n-stuck'], ['narrations/o-short', 'other', 'o-short']]) {
+  const kept = documents.get(path);
+  assert.ok(kept, `${path} keeps its document`);
+  assert.equal(typeof kept.audioExpiredAt, 'number', `${path} is stamped audioExpiredAt`);
+  assert.equal(kept.title, 'N', `${path} keeps its text and metadata`);
+  assert.ok(deletedObjects.some((object) => object.includes(owner) && object.includes(id)), `${path} audio and timings are deleted`);
+}
+for (const untouched of ['n-new', 'n-locked', 'n-streaming', 'o-keep']) {
+  assert.equal(documents.get(`narrations/${untouched}`)!.audioExpiredAt, undefined, `${untouched} keeps its audio`);
 }
 for (const kept of ['narrations/n-new', 'narrations/n-locked', 'narrations/n-streaming', 'narrations/o-keep', 'mediaItems/image_i-future', 'mediaItems/image_i-locked', 'mediaItems/image_i-queued', 'mediaItems/video_v-old', 'mediaAssets/a-keep', 'mediaGenerations/g-keep']) {
   assert.ok(documents.has(kept), `${kept} should be kept`);
 }
 assert.ok(deletedObjects.includes('media/owner/a1/original') && deletedObjects.includes('media/owner/a1/thumbnail.webp'), 'stored files are deleted');
 assert.ok(!deletedObjects.some((path) => path.includes('a-keep')), 'other items keep their files');
+
+// The recording of an expired narration answers 410, so a client can tell it from a missing one.
+const audioRoute = await import('../../../studio/src/app/api/v1/narrations/[id]/audio/route');
+response = await call(audioRoute.GET as never, '/x', {}, { id: 'n-old' });
+assert.equal(response.status, 410);
+assert.equal((await response.json()).error.code, 'audio_expired');
 
 // Running again finds nothing, and a locked item refuses a direct purge.
 assert.deepEqual([(await sweepExpired({ now })).purged, (await sweepExpired({ now })).expired.length], [0, 0]);

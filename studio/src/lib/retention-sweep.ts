@@ -1,5 +1,6 @@
 /**
- * Deletes generations whose time is up.
+ * Deletes generations whose time is up. A narration loses its audio and word
+ * timings but keeps its text; every other type is deleted whole.
  *
  * `sweepExpired` is the one place that decides what goes: it reads only items
  * that could be due, applies `isExpired` to each, never touches a locked or
@@ -13,7 +14,7 @@ import type { DocumentData, Query } from 'firebase-admin/firestore';
 
 import { adminBucket, adminDb } from './firebase-admin';
 import type { MediaType } from './media-types';
-import { purgeNarrationData, STALE_STREAMING_MS } from './narration-server';
+import { expireNarrationAudio, STALE_STREAMING_MS } from './narration-server';
 import { DEFAULT_RETENTION, defaultTtlFor, isExpired, parseTtl, resolveExpiry, type RetainedItem, type RetentionSettings } from './retention';
 import { loadRetentionSettings } from './retention-server';
 
@@ -111,6 +112,7 @@ export async function sweepExpired(options: SweepOptions = {}): Promise<SweepRep
   const consider = async (type: MediaType, id: string, data: DocumentData, status: RetainedItem['status']) => {
     const owner = data.ownerUid;
     if (typeof owner !== 'string') return;
+    if (type === 'narration' && typeof data.audioExpiredAt === 'number') return;
     checked += 1;
     const item: RetainedItem = {
       type, status, createdAt: Number(data.createdAt ?? 0), locked: data.locked === true,
@@ -168,10 +170,10 @@ export async function sweepExpired(options: SweepOptions = {}): Promise<SweepRep
   let failed = 0;
   for (const item of expired.slice(0, limit)) {
     try {
-      if (item.type === 'narration') await purgeNarrationData(item.id, item.ownerUid);
+      if (item.type === 'narration') await expireNarrationAudio(item.id, item.ownerUid);
       else await purgeMediaItem(item.ownerUid, item.type, item.id);
       purged += 1;
-      console.info(`[retention] deleted expired ${item.type} ${item.id}`);
+      console.info(`[retention] ${item.type === 'narration' ? 'expired audio of narration' : `deleted expired ${item.type}`} ${item.id}`);
     } catch (error) {
       failed += 1;
       console.error(`[retention] could not delete ${item.type} ${item.id}:`, error instanceof Error ? error.message : 'unknown error');

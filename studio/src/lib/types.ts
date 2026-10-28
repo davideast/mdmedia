@@ -132,6 +132,8 @@ export interface Narration {
   locked?: boolean;
   /** When this narration expires, if set on it directly. */
   expiresAt?: number | null;
+  /** When retention deleted the recording. The text is kept; `null` or absent while the audio exists. Written server-side only. */
+  audioExpiredAt?: number | null;
   title: string;
   /** What the user pasted in. */
   sourceMarkdown: string;
