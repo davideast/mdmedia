@@ -389,7 +389,7 @@ export function videoBody(prompt: string, args: {
   const body: VideoRequestBody = { prompt: checkPrompt(prompt, 32_000) };
   const aspectRatio = oneOf('--aspect', args.aspect, ['16:9', '9:16'] as const);
   const resolution = oneOf('--resolution', args.resolution, ['360p', '720p', '1080p', '4k'] as const);
-  const durationSeconds = numberIn('--duration', args.duration, 3, 10, true);
+  const durationSeconds = numberIn('--duration', args.duration, 3, 15, true);
   if (aspectRatio || resolution || durationSeconds !== undefined) {
     body.output = { ...(aspectRatio ? { aspectRatio } : {}), ...(resolution ? { resolution } : {}), ...(durationSeconds === undefined ? {} : { durationSeconds }) };
   }
@@ -406,7 +406,7 @@ export const videoCommand = defineCommand({
     ...promptArgs,
     aspect: { type: 'string', description: '16:9 or 9:16 (default: your studio default, 16:9 unless changed)' },
     resolution: { type: 'string', description: '360p, 720p, 1080p, or 4k (default: your studio default, 720p unless changed)' },
-    duration: { type: 'string', description: 'Clip length, 3 to 10 whole seconds (default: your studio default, 10 unless changed)' },
+    duration: { type: 'string', description: 'Clip length, 3 to 15 whole seconds (default: your studio default, 10 unless changed)' },
     ...referenceArg,
     firstFrame: { type: 'boolean', description: 'Use --reference as the first frame instead of a style/subject reference' },
     ...adaptArgs,

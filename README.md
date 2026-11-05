@@ -7,7 +7,7 @@ Transform Markdown documents into audio, video, and music, and generate sound ef
 ## Features
 
 - **Audio Narration (`mdmedia audio`)**: Stream Markdown documents of any length into single `.wav` audio files with zero memory spikes and **real-time speaker playback (`-p, --play`)** while synthesis streams.
-- **Video Generation (`mdmedia video`)**: Convert Markdown storyboards, timecoded scenes, and reference images into `.mp4` video clips via **Gemini Omni Flash** (`gemini-omni-flash-preview`), supporting aspect ratio control (`16:9` / `9:16`), Files API URI polling, and stateful multi-turn editing.
+- **Video Generation (`mdmedia video`)**: Convert Markdown storyboards, timecoded scenes, and reference images into `.mp4` video clips via **Gemini Omni Flash** (`gemini-omni-1.2-flash`), supporting aspect ratio control (`16:9` / `9:16`), Files API URI polling, and stateful multi-turn editing.
 - **Sound Effects (`mdmedia sfx`)**: Generate `.mp3` or `.wav` sound effects from a text prompt via **ElevenLabs** (`eleven_text_to_sound_v2`), with duration, prompt influence, and seamless looping controls.
 - **Smart Extension Routing**: Run `mdmedia -i doc.md -o out.wav` or `mdmedia -i storyboard.md -o scene.mp4` and let `mdmedia` automatically detect the right multimodal pipeline.
 
@@ -126,7 +126,7 @@ The CLI loads a `.env` file from the working directory (Node 20.12+ or Bun); var
     "play": false
   },
   "video": {
-    "model": "gemini-omni-flash-preview",
+    "model": "gemini-omni-1.2-flash",
     "aspectRatio": "16:9",
     "task": "text_to_video",
     "delivery": "uri"
@@ -170,14 +170,14 @@ For sound effects, the `sfx` section accepts `model`, `outputFormat`, `durationS
 | `--input` | `-i` | *(required)* | Path to source `.md` storyboard file |
 | `--output` | `-o` | `output.mp4` | Destination path for `.mp4` video clip |
 | `--aspectRatio` | `-a` | `16:9` | Video aspect ratio (`16:9` or `9:16`) |
-| `--duration` | | *(model default)* | Clip length per scene, 3 to 10 whole seconds |
+| `--duration` | | *(model default)* | Clip length per scene, 3 to 15 whole seconds |
 | `--resolution` | | *(model default)* | `360p`, `720p`, `1080p`, or `4k` |
 | `--task` | `-t` | `text_to_video` | Generation task (`text_to_video`, `image_to_video`, `reference_to_video`, `edit`) |
 | `--delivery` | | `uri` | Delivery mode (`uri` for Files API polling or `inline`) |
 | `--ref` | `-r` | `undefined` | Comma-separated reference image paths |
 | `--firstFrame` | | `undefined` | Path to starting image frame |
 | `--interactionId` | | `undefined` | Previous interaction ID for stateful video editing |
-| `--model` | `-m` | `gemini-omni-flash-preview` | Gemini Omni Flash model endpoint |
+| `--model` | `-m` | `gemini-omni-1.2-flash` | Gemini Omni Flash model endpoint |
 
 ### `mdmedia sfx` Options
 

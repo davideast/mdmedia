@@ -30,7 +30,7 @@ async function transform(bytes: Uint8Array, args: string[], output: string): Pro
 }
 export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationId: string, itemId: string, kind: 'sequence' | 'clip' = 'sequence'): Promise<StoredAsset> {
   const durationSeconds = readMp4Duration(bytes);
-  if (!bytes.length || bytes.length > MAX_VIDEO_BYTES || !durationSeconds || (kind === 'clip' && (durationSeconds < 2.75 || durationSeconds > 10.25))) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid video.');
+  if (!bytes.length || bytes.length > MAX_VIDEO_BYTES || !durationSeconds || (kind === 'clip' && (durationSeconds < 2.75 || durationSeconds > 15.25))) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid video.');
   const frame = await transform(bytes, ['-frames:v', '1'], 'poster.png');
   const metadata = await sharp(frame).metadata();
   const thumbnail = await sharp(frame).resize({ width: 480, height: 480, fit: 'inside', withoutEnlargement: true }).webp().toBuffer();
@@ -46,7 +46,7 @@ export async function saveVideoAsset(uid: string, bytes: Uint8Array, generationI
 }
 /** Local processing only. The provider receives a short clip, never this assembled movie. */
 export async function extractVideoSegment(bytes: Uint8Array, start: number, duration: number): Promise<Buffer> {
-  if (!Number.isFinite(start) || start < 0 || !Number.isFinite(duration) || duration < 2.75 || duration > 10.25) throw new MediaError(502, 'invalid_video', 'The returned clip has an invalid duration.');
+  if (!Number.isFinite(start) || start < 0 || !Number.isFinite(duration) || duration < 2.75 || duration > 15.25) throw new MediaError(502, 'invalid_video', 'The returned clip has an invalid duration.');
   return transform(bytes, ['-ss', String(start), '-t', String(duration), '-map', '0:v:0', '-map', '0:a?', '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-c:a', 'aac', '-movflags', '+faststart'], 'clip.mp4');
 }
 export async function appendVideoClip(previous: Uint8Array, clip: Uint8Array): Promise<Buffer> {

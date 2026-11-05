@@ -57,7 +57,7 @@ Options, only when asked:
   `--search`, `--image-search`, `--thinking minimal|medium|high`, `--video <https-url>`,
   `--item <id>` with `--refine` / `--from-generation <genId>` for multi-turn editing.
 - `video`: `--aspect` (16:9, 9:16), `--resolution` (360p, 720p, 1080p, 4k),
-  `--duration` (3–10 whole seconds), `--reference <image>`, plus `--first-frame`
+  `--duration` (3–15 whole seconds), `--reference <image>`, plus `--first-frame`
   to start the clip from that image.
 - `music`: `--clip` for a 30-second clip instead of a full song,
   `--format mp3|wav`, `--vocals auto|vocals|instrumental`, `--lyrics <file>`,

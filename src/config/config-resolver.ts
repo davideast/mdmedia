@@ -153,7 +153,7 @@ export function resolveConfig(
   };
 
   const resolvedVideo: ResolvedVideoConfig = {
-    model: cliArgs.videoModel ?? videoConfig.model ?? 'gemini-omni-flash-preview',
+    model: cliArgs.videoModel ?? videoConfig.model ?? 'gemini-omni-1.2-flash',
     aspectRatio: cliArgs.aspectRatio ?? videoConfig.aspectRatio ?? '16:9',
     task: cliArgs.task ?? videoConfig.task ?? 'text_to_video',
     delivery: cliArgs.delivery ?? videoConfig.delivery ?? 'uri',

@@ -224,7 +224,7 @@ const videoOptionsResponse = await optionsRoute.GET(http('/api/v1/options?media=
 assert.equal(videoOptionsResponse.status, 200);
 const videoOptions = await videoOptionsResponse.json();
 assert.equal(videoOptions.limits.sequenceSeconds, null);
-assert.deepEqual(videoOptions.limits.clipSeconds, { min: 3, max: 10 });
+assert.deepEqual(videoOptions.limits.clipSeconds, { min: 3, max: 15 });
 // Regeneration beyond 40s replaces only the last clip, using its original parent.
 const replacedLongId = longJob.id;
 long = await server.submitVideo(uid, { ...longRequest, action: 'regenerate_latest', fromGenerationId: longJob.id }, 'long-regenerate-123', long.itemId);

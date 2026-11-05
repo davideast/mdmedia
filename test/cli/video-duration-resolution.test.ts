@@ -15,9 +15,9 @@ describe('mdmedia video --duration and --resolution', () => {
     expect(videoOutputOptions(args.duration as string, args.resolution as string)).toEqual({ durationSeconds: 6, resolution: '1080p' });
   });
 
-  it('accepts 3 to 10 whole seconds and every Omni resolution', () => {
+  it('accepts 3 to 15 whole seconds and every Omni resolution', () => {
     expect(videoOutputOptions('3', '360p')).toEqual({ durationSeconds: 3, resolution: '360p' });
-    expect(videoOutputOptions('10', '4k')).toEqual({ durationSeconds: 10, resolution: '4k' });
+    expect(videoOutputOptions('15', '4k')).toEqual({ durationSeconds: 15, resolution: '4k' });
     expect(videoOutputOptions('8', '720p')).toEqual({ durationSeconds: 8, resolution: '720p' });
   });
 
@@ -28,7 +28,7 @@ describe('mdmedia video --duration and --resolution', () => {
 
   it('refuses lengths and resolutions Omni cannot make before any paid call', () => {
     expect(() => videoOutputOptions('2', undefined)).toThrow('--duration');
-    expect(() => videoOutputOptions('11', undefined)).toThrow('--duration');
+    expect(() => videoOutputOptions('16', undefined)).toThrow('--duration');
     expect(() => videoOutputOptions('4.5', undefined)).toThrow('--duration');
     expect(() => videoOutputOptions(undefined, '2160p')).toThrow('--resolution');
   });

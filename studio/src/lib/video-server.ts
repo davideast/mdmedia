@@ -26,7 +26,7 @@ export interface VideoGeneration {
 }
 const itemRef = (id: string) => adminDb().collection('mediaItems').doc(`video_${id}`);
 const generationRef = (id: string) => adminDb().collection('mediaGenerations').doc(id);
-export const configuredVideoModel = () => process.env.MDMEDIA_VIDEO_MODEL?.trim() || 'gemini-omni-1.1-flash';
+export const configuredVideoModel = () => process.env.MDMEDIA_VIDEO_MODEL?.trim() || 'gemini-omni-1.2-flash';
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const canonical = (value: unknown): unknown => value && typeof value === 'object' && !Array.isArray(value)
   ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, canonical(child)]))
@@ -171,7 +171,7 @@ async function finish(job: VideoGeneration, token: string, asset: StoredAsset | 
 function validateOutput(job: VideoGeneration, output: VideoGenerationResult) {
   if (!output.durationSeconds || output.durationSeconds < 2.75 ||
       (job.parentGenerationId && (output.durationSeconds <= job.parentDurationSeconds + 0.25 || Math.abs(output.durationSeconds - job.parentDurationSeconds - job.request.output.durationSeconds) > 0.5))) throw new MediaError(502, 'invalid_video', 'Gemini did not return a complete longer video. Your previous result is preserved.');
-  if (!job.parentGenerationId && (output.durationSeconds > 10.25 || Math.abs(output.durationSeconds - job.request.output.durationSeconds) > 0.5)) throw new MediaError(502, 'invalid_video', 'Gemini returned a clip outside the supported duration.');
+  if (!job.parentGenerationId && (output.durationSeconds > 15.25 || Math.abs(output.durationSeconds - job.request.output.durationSeconds) > 0.5)) throw new MediaError(502, 'invalid_video', 'Gemini returned a clip outside the supported duration.');
 }
 /** Old cumulative generations remain readable; their final clip is extracted locally on first use. */
 async function latestClip(job: VideoGeneration): Promise<Uint8Array> {
@@ -204,7 +204,7 @@ async function persistOutput(job: VideoGeneration, token: string, output: VideoG
   if (contextDuration == null || !output.durationSeconds || Math.abs(output.durationSeconds - contextDuration - job.request.output.durationSeconds) > 0.5) throw new MediaError(502, 'invalid_video', 'Gemini did not return the requested continuation. Your previous video is preserved.');
   const bytes = job.parentGenerationId ? await extractVideoSegment(output.videoBytes, contextDuration, job.request.output.durationSeconds) : output.videoBytes;
   const clipDuration = readMp4Duration(bytes);
-  if (!clipDuration || clipDuration < 2.75 || clipDuration > 10.25 || Math.abs(clipDuration - job.request.output.durationSeconds) > 0.25) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid clip. Your previous video is preserved.');
+  if (!clipDuration || clipDuration < 2.75 || clipDuration > 15.25 || Math.abs(clipDuration - job.request.output.durationSeconds) > 0.25) throw new MediaError(502, 'invalid_video', 'Gemini returned an invalid clip. Your previous video is preserved.');
   const clip = await saveVideoAsset(job.ownerUid, bytes, job.id, job.itemId, job.parentGenerationId ? 'clip' : 'sequence');
   return assembleClip(job, token, clip);
 }

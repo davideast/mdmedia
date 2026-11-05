@@ -214,7 +214,7 @@ export const videoCommand = defineCommand({
     },
     duration: {
       type: 'string',
-      description: 'Clip length per scene, 3 to 10 whole seconds (default: the model\'s)',
+      description: 'Clip length per scene, 3 to 15 whole seconds (default: the model\'s)',
     },
     resolution: {
       type: 'string',
@@ -302,7 +302,7 @@ export function videoOutputOptions(
   duration?: string,
   resolution?: string,
 ): { durationSeconds?: number; resolution?: '360p' | '720p' | '1080p' | '4k' } {
-  const durationSeconds = numberIn('--duration', duration, 3, 10, true);
+  const durationSeconds = numberIn('--duration', duration, 3, 15, true);
   const size = oneOf('--resolution', resolution, ['360p', '720p', '1080p', '4k'] as const);
   return { ...(durationSeconds === undefined ? {} : { durationSeconds }), ...(size ? { resolution: size } : {}) };
 }
