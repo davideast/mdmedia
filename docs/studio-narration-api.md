@@ -33,7 +33,6 @@ API keys carry scopes `narrations:create`, `narrations:read`, `options:read`,
 - Narrations they create are always `private`; asking for `shared` or `public`
   is `403 visibility_not_allowed`.
 - They cannot delete or share narrations, list keys, or create keys.
-- 30 narration starts per hour per key.
 
 Errors are `{ "error": { "code", "message" } }`.
 
@@ -59,9 +58,8 @@ Errors are `{ "error": { "code", "message" } }`.
 | `POST` | `/api/v1/device/token` | anyone with the device code | Poll for the key. |
 | `GET`/`POST` | `/api/v1/device/approve` | session | Describe / approve or deny a user code (the `/connect` page). |
 
-At most 3 narrations generate at once per person; more is
-`429 too_many_in_progress` with `Retry-After`. Generation continues on the
-server after `POST` returns.
+Studio puts no cap of its own on how many narrations are started or generating.
+Generation continues on the server after `POST` returns.
 
 ## Narration body
 
@@ -180,7 +178,7 @@ picks another). For the studio, it tells agents to:
 - pass only options the user asked for (`mdmedia studio options --json` lists them);
 - never share or publish, never run `login` approval themselves, and never
   read the credentials file or `MDMEDIA_API_KEY`;
-- stop on `rate_limited` / `too_many_in_progress` instead of retrying.
+- stop on `rate_limited` instead of retrying.
 
 The agent runs the CLI; the CLI holds the key. Its worst case with a leaked key
 is private narrations within the rate limit, revocable from Settings.

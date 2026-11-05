@@ -151,9 +151,8 @@ options only on first acceptance; the stored attempt is the authoritative
 snapshot. Use a fresh key for an intentional new version.
 
 The acceptance transaction persists the item, attempt, catalog/activity entry,
-quota, and request key before paid work starts. At most three image attempts may
-be outstanding per owner, and a key may start 30 images per hour. Narration
-retains its existing limits. Retries do not consume another image quota slot.
+and request key before paid work starts. Studio puts no cap of its own on how
+many images are started or in progress; only the provider's own limits apply.
 Additional attempts on an image already queued/generating return `409`.
 
 A worker inside the always-on Studio process claims queued jobs transactionally,

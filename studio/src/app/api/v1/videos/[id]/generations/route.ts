@@ -11,7 +11,7 @@ export const POST = (request: Request, context: Context) => mediaApi(async () =>
   const caller = await authorize(request, 'videos:create'); if (caller instanceof Response) return caller;
   const id = (await context.params).id;
   const body = await readJsonObject(request); if (body instanceof Response) return body;
-  const accepted = await submitVideo(caller.uid, body, readIdempotencyKey(request), id, caller.kind === 'apiKey' ? caller.keyId : null);
+  const accepted = await submitVideo(caller.uid, body, readIdempotencyKey(request), id);
   const video = await videoResource(caller.uid, id, apiOrigin(request));
   return mediaJson({ id, type: 'video', generation: await videoGenerationResource(await loadVideoGeneration(caller.uid, accepted.generationId), apiOrigin(request)), links: video.links, replayed: accepted.replayed }, 202);
 });

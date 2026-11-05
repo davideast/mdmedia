@@ -44,8 +44,8 @@ omitted fields, including `prompt`, keep the item's current request. Unknown
 fields return `unknown_fields`; invalid values return `invalid_prompt`,
 `invalid_format`, `invalid_duration`, `invalid_loop`, or `invalid_influence`.
 
-A user may have three attempts in progress (`429 too_many_in_progress`) and an
-API key may start 30 per hour (`429 rate_limited`). Without an ElevenLabs key or
+Studio puts no cap of its own on how many sound effects are started or in
+progress. Without an ElevenLabs key or
 ffmpeg, create returns `503 provider_unavailable` and options report
 `available: false`; an accepted attempt that starts after the key is removed
 ends as `error` with `provider_unavailable`. `MDMEDIA_SFX_MODEL` overrides the

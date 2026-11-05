@@ -83,13 +83,6 @@ export async function submitMusic(uid: string, request: MusicRequest, key: strin
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};
     const active = Array.isArray(data.active) ? data.active as string[] : [];
-    if (active.length >= 3) throw new MediaError(429, 'too_many_in_progress', 'You have three music attempts in progress. Wait for one to finish.');
-    const hourly = data.hourly as Record<string, { since: number; count: number }> | undefined;
-    const bucket = apiKeyId ? hourly?.[apiKeyId] : null;
-    const current = bucket && now - bucket.since < 3_600_000 ? bucket : { since: now, count: 0 };
-    if (apiKeyId && current.count >= 30) throw new MediaError(429, 'rate_limited', 'This key has started too much music this hour.');
-    const nextHourly = Object.fromEntries(Object.entries(hourly ?? {}).filter(([, value]) => now - value.since < 3_600_000));
-    if (apiKeyId) nextHourly[apiKeyId] = { ...current, count: current.count + 1 };
     const title = previous?.title ?? titleFor(request.prompt);
     const item: MusicItem = { id: itemId, type: 'music', ownerUid: uid, title, status: 'queued', visibility: 'private',
       ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/music/${itemId}`, sourcePreview: request.prompt.slice(0, 4000),
@@ -102,7 +95,7 @@ export async function submitMusic(uid: string, request: MusicRequest, key: strin
     tx.set(generationRef(generationId), generation);
     tx.set(adminDb().collection('mediaActivity').doc(generationId), { id: generationId, itemId, ownerUid: uid, type: 'music', title, status: 'queued', phase: 'queued', createdAt: now, updatedAt: now, href: `/music/${itemId}` });
     tx.set(replayRef, { ownerUid: uid, requestHash, itemId, generationId, createdAt: now });
-    tx.set(quotaRef, { active: [...active, generationId], hourly: nextHourly });
+    tx.set(quotaRef, { active: [...active, generationId] });
     return { itemId, generationId, replayed: false };
   });
   startMusicWorker();

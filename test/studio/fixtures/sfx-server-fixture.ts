@@ -170,13 +170,7 @@ const stored = { ...abandoned, id: 'stored' };
 documents.set('mediaGenerations/stored', stored); documents.set('mediaActivity/stored', stored);
 documents.set('mediaAssets/sfx_stored', { ...documents.get(`mediaAssets/${initial.assetId}`), id: 'sfx_stored' });
 assert.equal((await settled('stored')).status, 'ready'); assert.equal(providerCalls, before);
-const quota = structuredClone(documents.get('mediaQuotas/sfx_owner')!);
-assert.deepEqual(quota.active, []);
-documents.set('mediaQuotas/sfx_owner', { ...quota, active: ['a', 'b', 'c'] });
-await assert.rejects(server.submitSfx(uid, request, 'quota-sfx-key-1234', null, 'key'), { code: 'too_many_in_progress' });
-documents.set('mediaQuotas/sfx_owner', { ...quota, hourly: { key: { since: Date.now(), count: 30 } } });
-await assert.rejects(server.submitSfx(uid, request, 'rate-sfx-key-12345', null, 'key'), { code: 'rate_limited' });
-documents.set('mediaQuotas/sfx_owner', quota);
+assert.deepEqual(documents.get('mediaQuotas/sfx_owner')!.active, []);
 delete process.env.ELEVENLABS_API_KEY;
 await assert.rejects(server.submitSfx(uid, request, 'unconfigured-sfx-key', null, 'key'), { code: 'provider_unavailable' });
 // A key removed after acceptance fails the queued attempt as unavailable, not as an unknown outcome.

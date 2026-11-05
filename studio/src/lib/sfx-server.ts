@@ -72,13 +72,6 @@ export async function submitSfx(uid: string, request: SfxRequest, key: string, e
     const quota = await tx.get(quotaRef);
     const data = quota.data() ?? {};
     const active = Array.isArray(data.active) ? data.active as string[] : [];
-    if (active.length >= 3) throw new MediaError(429, 'too_many_in_progress', 'You have three sound effect attempts in progress. Wait for one to finish.');
-    const hourly = data.hourly as Record<string, { since: number; count: number }> | undefined;
-    const bucket = apiKeyId ? hourly?.[apiKeyId] : null;
-    const current = bucket && now - bucket.since < 3_600_000 ? bucket : { since: now, count: 0 };
-    if (apiKeyId && current.count >= 30) throw new MediaError(429, 'rate_limited', 'This key has started too many sound effects this hour.');
-    const nextHourly = Object.fromEntries(Object.entries(hourly ?? {}).filter(([, value]) => now - value.since < 3_600_000));
-    if (apiKeyId) nextHourly[apiKeyId] = { ...current, count: current.count + 1 };
     const title = previous?.title ?? titleFor(request.prompt);
     // No sound effect page exists yet, so saved work opens the Library.
     const item: SfxItem = { id: itemId, type: 'sfx', ownerUid: uid, title, status: 'queued', visibility: 'private',
@@ -91,7 +84,7 @@ export async function submitSfx(uid: string, request: SfxRequest, key: string, e
     tx.set(generationRef(generationId), generation);
     tx.set(adminDb().collection('mediaActivity').doc(generationId), { id: generationId, itemId, ownerUid: uid, type: 'sfx', title, status: 'queued', phase: 'queued', createdAt: now, updatedAt: now, href: '/library' });
     tx.set(replayRef, { ownerUid: uid, requestHash, itemId, generationId, createdAt: now });
-    tx.set(quotaRef, { active: [...active, generationId], hourly: nextHourly });
+    tx.set(quotaRef, { active: [...active, generationId] });
     return { itemId, generationId, replayed: false };
   });
   startSfxWorker();
