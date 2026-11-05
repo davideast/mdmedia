@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Pause, Play, X } from 'lucide-react';
 import { cn } from 'cn';
@@ -19,6 +19,8 @@ import {
   type TimedRef,
 } from 'mdmedia/threads';
 import { conversation, type MessageView, type OptionView } from '@/lib/comments-view';
+import { clearDraft, readDraft, saveDraft, unsentComments, type DraftTarget, type UnsentComment } from '@/lib/comment-drafts';
+import { useConnectivity } from '@/lib/connectivity';
 import { useMediaLinks } from '@/lib/use-media-links';
 import { useNow } from '@/lib/use-now';
 import { createComment, grabFrame, uploadFrame, replyTo, setOptionState, useComments, type CommentsData } from '@/lib/use-comments';
@@ -48,6 +50,39 @@ const BUTTON = 'inline-flex h-7 flex-none items-center rounded-full px-3 text-[1
 const PRIMARY = `${BUTTON} bg-foreground text-background hover:opacity-90`;
 const QUIET = `${BUTTON} bg-foreground/[0.07] text-foreground hover:bg-foreground/[0.12]`;
 const TEXT_ACTION = 'inline-flex h-7 items-center rounded-[4px] text-[12px] text-ink-muted transition-colors hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden';
+/** Shown on a post button while Studio can't reach its server; the text stays in the box. */
+const OFFLINE_POST = 'Can\u2019t post until Studio is back';
+const notPosted = (e: unknown) => `Not posted: ${(e instanceof Error && e.message ? e.message : 'Studio didn\u2019t answer').replace(/\.+$/, '')}. Your text is kept here; try again.`;
+const useOffline = () => useConnectivity() === 'offline';
+
+const DRAFTS_CHANGED = 'mdmedia:comment-drafts-changed';
+const draftsChanged = () => window.dispatchEvent(new Event(DRAFTS_CHANGED));
+function subscribeDrafts(onChange: () => void) {
+  window.addEventListener(DRAFTS_CHANGED, onChange);
+  window.addEventListener('storage', onChange);
+  return () => {
+    window.removeEventListener(DRAFTS_CHANGED, onChange);
+    window.removeEventListener('storage', onChange);
+  };
+}
+
+/** The box's text, kept in this browser as it's typed so nothing typed is lost. */
+function useDraftText(target: DraftTarget) {
+  const key = JSON.stringify(target);
+  const [text, setText] = useState(() => readDraft(target));
+  const change = useCallback((next: string) => {
+    setText(next);
+    saveDraft(JSON.parse(key) as DraftTarget, next);
+    draftsChanged();
+  }, [key]);
+  const posted = useCallback(() => {
+    clearDraft(JSON.parse(key) as DraftTarget);
+    setText('');
+    draftsChanged();
+  }, [key]);
+  return { text, change, posted };
+}
+
 const FIELD = 'block w-full resize-none rounded-[8px] border border-border bg-background/50 px-3 py-2 text-[13px] leading-[19px] text-foreground placeholder:text-ink-faint focus-visible:border-foreground/30 focus-visible:outline-hidden';
 
 function Dot({ tone, className }: { tone: Tone; className?: string }) {
@@ -123,6 +158,26 @@ function CommentsPanel({ productionId, cutId, data, now, selected, onSelect, rev
 }) {
   const viewer = useCutViewer();
   const [showResolved, setShowResolved] = useState(false);
+  // Comments typed but not posted (closed, reloaded, or offline); the server render has none, so hydration matches.
+  const unsentJson = useSyncExternalStore(
+    subscribeDrafts,
+    () => JSON.stringify(unsentComments(productionId, cutId)),
+    () => '[]',
+  );
+  const unsent = useMemo(() => JSON.parse(unsentJson) as UnsentComment[], [unsentJson]);
+  const reopen = (saved: UnsentComment) => {
+    viewer.pause();
+    const video = viewer.video.current;
+    // The still is taken again once the video reaches the comment's time; without one, the comment posts without it.
+    const frame = video
+      ? new Promise<Blob | null>((resolve) => {
+        const timer = window.setTimeout(() => resolve(null), 2000);
+        video.addEventListener('seeked', () => { window.clearTimeout(timer); resolve(grabFrame(video, viewer.frame === 'tv' ? '4:3' : '16:9')); }, { once: true });
+      })
+      : Promise.resolve(null);
+    viewer.seek(saved.time);
+    onDraft({ time: saved.time, frame });
+  };
 
   const startComment = useCallback(() => {
     viewer.pause();
@@ -172,8 +227,14 @@ function CommentsPanel({ productionId, cutId, data, now, selected, onSelect, rev
             onDone={(created) => { onDraft(null); if (created) onSelect(created); }}
           />
         ) : null}
+        {unsent.filter((saved) => saved.time !== draft?.time).map((saved) => (
+          <button key={saved.time} type="button" onClick={() => reopen(saved)} className={cn(TEXT_ACTION, 'w-full min-w-0 justify-start gap-1.5')}>
+            <span className="flex-none text-foreground">Unposted comment · {seconds(saved.time)}</span>
+            <span className="truncate">{firstWords(saved.text, 48)}</span>
+          </button>
+        ))}
         {data.error ? <p role="alert" className="py-1 text-[12px] text-destructive">{data.error}</p> : null}
-        {data.ready && data.threads.length === 0 && !draft ? (
+        {data.ready && data.threads.length === 0 && !draft && !unsent.length ? (
           <p className="py-1 text-[13px] leading-[19px] text-ink-muted">No comments on this version. Press C at a moment to leave one.</p>
         ) : null}
         <ul className="grid gap-0.5 py-1">
@@ -228,26 +289,31 @@ function NewComment({ productionId, cutId, draft, cutLabel, onDone }: {
   onDone: (created: string | null) => void;
 }) {
   const viewer = useCutViewer();
-  const [text, setText] = useState('');
+  const offline = useOffline();
+  const { text, change, posted } = useDraftText({ kind: 'comment', productionId, cutId, time: draft.time });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const where = anchorPhrase(viewer.timeline, [], draft.time);
 
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
-    if (!text.trim() || sending) return;
+    if (!text.trim() || sending || offline) return;
     setSending(true);
     setError('');
     try {
       // The still was taken when C was pressed; it goes up now, and a comment waits for it a moment at most.
       const frameAssetId = await Promise.race([draft.frame.then(uploadFrame), new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000))]);
       const thread = await createComment(productionId, { cutId, time: draft.time, text: text.trim(), view: viewer.frame === 'tv' ? '4:3' : '16:9', frameAssetId });
+      posted();
       onDone(thread.id);
     } catch (e) {
-      setError((e as Error).message);
+      // The text stays in the box and in this browser; posting again is one click.
+      setError(notPosted(e));
       setSending(false);
     }
   };
+  // Cancel and Escape close the box and keep the text; Discard is the only way to drop it unposted.
+  const discard = () => { posted(); onDone(null); };
 
   return (
     <form onSubmit={submit} className="grid gap-2 py-2" aria-label="New comment">
@@ -259,7 +325,7 @@ function NewComment({ productionId, cutId, draft, cutLabel, onDone }: {
         autoFocus
         rows={3}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => change(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Escape') { e.preventDefault(); onDone(null); }
           if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) void submit();
@@ -269,9 +335,10 @@ function NewComment({ productionId, cutId, draft, cutLabel, onDone }: {
         className={FIELD}
       />
       {error ? <p role="alert" className="text-[12px] text-destructive">{error}</p> : null}
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {text.trim() ? <button type="button" onClick={discard} className={cn(TEXT_ACTION, 'mr-auto')}>Discard</button> : null}
         <button type="button" onClick={() => onDone(null)} className={QUIET}>Cancel</button>
-        <button type="submit" disabled={!text.trim() || sending} className={PRIMARY}>Comment</button>
+        <button type="submit" disabled={!text.trim() || sending || offline} className={PRIMARY}>{offline ? OFFLINE_POST : 'Comment'}</button>
       </div>
     </form>
   );
@@ -406,6 +473,7 @@ function MessageBody({ message, cutLabel, cutHref, timeLabel, nested = false }: 
 function OptionBlock({ option, ...context }: { option: OptionView } & ItemContext) {
   const { suggestion: s, replies } = option;
   const { productionId, thread, cutLabel, cutHref } = context;
+  const offline = useOffline();
   const [confirm, setConfirm] = useState<'accepted' | 'rejected' | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -474,14 +542,14 @@ function OptionBlock({ option, ...context }: { option: OptionView } & ItemContex
             </p>
             {error ? <p role="alert" className="text-[12px] text-destructive">{error}</p> : null}
             <div className="flex gap-2">
-              <button type="button" disabled={busy} onClick={() => void decide()} className={PRIMARY}>{confirm === 'accepted' ? 'Accept' : 'Reject'}</button>
+              <button type="button" disabled={busy || offline} onClick={() => void decide()} className={PRIMARY}>{offline ? 'Can\u2019t decide until Studio is back' : confirm === 'accepted' ? 'Accept' : 'Reject'}</button>
               <button type="button" disabled={busy} onClick={() => setConfirm(null)} className={QUIET}>Cancel</button>
             </div>
           </div>
         ) : (
           <div className="mt-2 flex gap-2">
-            <button type="button" onClick={() => setConfirm('accepted')} className={QUIET}>Accept</button>
-            <button type="button" onClick={() => setConfirm('rejected')} className={QUIET}>Reject</button>
+            <button type="button" disabled={offline} onClick={() => setConfirm('accepted')} className={QUIET}>Accept</button>
+            <button type="button" disabled={offline} onClick={() => setConfirm('rejected')} className={QUIET}>Reject</button>
           </div>
         )
       ) : (
@@ -635,20 +703,21 @@ function Reply({ productionId, threadId, at, onClearAt, inputRef }: {
   onClearAt: () => void;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
-  const [text, setText] = useState('');
+  const offline = useOffline();
+  const { text, change, posted } = useDraftText({ kind: 'reply', productionId, threadId });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const submit = async (event?: FormEvent) => {
     event?.preventDefault();
-    if (!text.trim() || sending) return;
+    if (!text.trim() || sending || offline) return;
     setSending(true);
     setError('');
     try {
       await replyTo(productionId, threadId, { text: text.trim(), ...(at ? { at: at.at } : {}) });
-      setText('');
+      posted();
       onClearAt();
     } catch (e) {
-      setError((e as Error).message);
+      setError(notPosted(e));
     } finally {
       setSending(false);
     }
@@ -667,7 +736,7 @@ function Reply({ productionId, threadId, at, onClearAt, inputRef }: {
         ref={inputRef}
         rows={2}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={(e) => change(e.target.value)}
         onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) void submit(); }}
         placeholder="Reply"
         aria-label="Reply"
@@ -675,7 +744,7 @@ function Reply({ productionId, threadId, at, onClearAt, inputRef }: {
       />
       {error ? <p role="alert" className="text-[12px] text-destructive">{error}</p> : null}
       <div className="flex justify-end">
-        <button type="submit" disabled={!text.trim() || sending} className={PRIMARY}>Reply</button>
+        <button type="submit" disabled={!text.trim() || sending || offline} className={PRIMARY}>{offline ? OFFLINE_POST : 'Reply'}</button>
       </div>
     </form>
   );

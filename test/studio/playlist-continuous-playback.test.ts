@@ -1,6 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { StreamingPcmPlayer, unlockPlaybackAudio } from '../../studio/src/lib/pcm-player';
 import { wrapPcmAsWav } from '../../studio/src/lib/wav';
+
+// The player keeps one shared audio element per module. Bun runs every test
+// file in one process, so a copy of its own keeps an element made by an
+// earlier file from being reused here.
+const { StreamingPcmPlayer, unlockPlaybackAudio } = await import('../../studio/src/lib/pcm-player?playlist-continuous-playback') as typeof import('../../studio/src/lib/pcm-player');
+type StreamingPcmPlayer = InstanceType<typeof StreamingPcmPlayer>;
 
 /** Just enough of HTMLAudioElement for the player's native path. */
 class FakeAudio extends EventTarget {

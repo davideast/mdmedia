@@ -82,7 +82,8 @@ function AppShellContent({
 }) {
   const pathname = usePathname();
   const offline = useConnectivity() === 'offline';
-  const onlineScreenDisabled = offline && pathname !== '/downloads';
+  // Offline, the page stays usable; only actions that need the server wait for it.
+  const showOfflineBanner = offline && pathname !== '/downloads';
   const { stream, queue, nextTrack, previousTrack } = useNarration();
   const offlinePlayback = useOfflinePlayback();
   // One active transport owns both the player bar and the system media controls.
@@ -297,13 +298,13 @@ function AppShellContent({
         } as React.CSSProperties
       }
     >
-      {onlineScreenDisabled ? (
+      {showOfflineBanner ? (
         <div role="status" className="flex flex-none items-center justify-between gap-3 border-b border-border bg-muted px-4 py-2 text-sm text-foreground">
-          <span>Studio is offline. Online controls are disabled; your work stays here.</span>
+          <span>Studio can&rsquo;t reach its server. You can keep working; anything that needs the server waits until it&rsquo;s back.</span>
           <a href="/downloads" className="flex-none font-medium text-primary underline underline-offset-2">Open Downloads</a>
         </div>
       ) : null}
-      <div id="workspace-page" aria-label="Workspace" className={onlineScreenDisabled ? 'min-h-0 flex-1 opacity-60' : 'min-h-0 flex-1'} inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+      <div id="workspace-page" aria-label="Workspace" className="min-h-0 flex-1">
         {children}
       </div>
       {showPlayerBar ? (
@@ -431,7 +432,7 @@ function AppShellContent({
                     }
                   }}
                 >
-                  <div className="h-full min-h-0" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+                  <div className="h-full min-h-0">
                     <ContextPanel docked={false} onToggleDock={toggleContextDock} />
                   </div>
                 </ResizablePanel>
@@ -448,7 +449,7 @@ function AppShellContent({
             className="h-full flex-none border-l border-sidebar-border transition-[width] duration-200 ease-linear"
             style={{ width: 56 }}
           >
-          <div className="h-full" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+          <div className="h-full">
             <ContextPanel docked={true} onToggleDock={toggleContextDock} />
           </div>
           </div>
@@ -483,7 +484,7 @@ function AppShellContent({
             >
               <SheetTitle className="sr-only">Details</SheetTitle>
               <SheetDescription className="sr-only">Narration and studio inspector panel</SheetDescription>
-              <div className="h-full" inert={onlineScreenDisabled} aria-disabled={onlineScreenDisabled}>
+              <div className="h-full">
                 <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
               </div>
             </SheetContent>
