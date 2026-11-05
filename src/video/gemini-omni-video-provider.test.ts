@@ -39,7 +39,7 @@ describe('GeminiOmniVideoProvider - TDD Unit Tests', () => {
 
     expect(result.interactionId).toBe('interaction_123');
     expect(new TextDecoder().decode(result.videoBytes)).toBe('mock-mp4-video-data');
-    expect(capturedParams.model).toBe('gemini-omni-flash-preview');
+    expect(capturedParams.model).toBe('gemini-omni-1.2-flash');
     expect(capturedParams.response_format.aspect_ratio).toBe('16:9');
   });
 

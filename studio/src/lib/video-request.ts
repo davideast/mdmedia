@@ -23,7 +23,7 @@ export function parseVideoRequest(value: unknown, defaults = DEFAULT_VIDEO_REQUE
   const aspectRatio = output.aspectRatio ?? defaults.output.aspectRatio; const resolution = output.resolution ?? defaults.output.resolution; const durationSeconds = output.durationSeconds ?? defaults.output.durationSeconds;
   if (aspectRatio !== '16:9' && aspectRatio !== '9:16') throw new MediaError(400, 'invalid_aspect_ratio', 'Choose landscape or portrait.');
   if (!VIDEO_RESOLUTIONS.includes(resolution as typeof VIDEO_RESOLUTIONS[number])) throw new MediaError(400, 'invalid_resolution', 'Choose a supported video resolution.');
-  if (typeof durationSeconds !== 'number' || !Number.isInteger(durationSeconds) || durationSeconds < 3 || durationSeconds > 10) throw new MediaError(400, 'invalid_duration', 'Clip length must be 3–10 whole seconds.');
+  if (typeof durationSeconds !== 'number' || !Number.isInteger(durationSeconds) || durationSeconds < 3 || durationSeconds > 15) throw new MediaError(400, 'invalid_duration', 'Clip length must be 3–15 whole seconds.');
   const referenceAssetId = raw.referenceAssetId === undefined ? defaults.referenceAssetId : raw.referenceAssetId;
   if (referenceAssetId !== null && (typeof referenceAssetId !== 'string' || !validMediaId(referenceAssetId))) throw new MediaError(400, 'invalid_reference', 'Choose an uploaded reference.');
   const referenceRole = raw.referenceRole ?? defaults.referenceRole;

@@ -153,8 +153,8 @@ describe('studio video arguments', () => {
   it('rejects bad values before any request is made', () => {
     expect(() => videoBody('x', { aspect: '1:1' })).toThrow('--aspect must be one of 16:9, 9:16 (got "1:1")');
     expect(() => videoBody('x', { resolution: '2K' })).toThrow('--resolution must be one of 360p, 720p, 1080p, 4k');
-    expect(() => videoBody('x', { duration: '11' })).toThrow('--duration must be a whole number 3 to 10 (got "11")');
-    expect(() => videoBody('x', { duration: '4.5' })).toThrow('--duration must be a whole number 3 to 10');
+    expect(() => videoBody('x', { duration: '16' })).toThrow('--duration must be a whole number 3 to 15 (got "16")');
+    expect(() => videoBody('x', { duration: '4.5' })).toThrow('--duration must be a whole number 3 to 15');
     expect(() => videoBody('x', { firstFrame: true })).toThrow('--first-frame needs --reference <image>.');
   });
 

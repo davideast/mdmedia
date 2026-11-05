@@ -14,7 +14,7 @@ next? with Continue video. Clips and History open from the overflow menu;
 historical versions are read-only. Options remain closed by default.
 
 Defaults: direct prompt, 16:9, 720p, 10 seconds, generated audio, no image. Options
-include 3–10 whole seconds, landscape/portrait, 360p/720p/1080p/4k, optional notes
+include 3–15 whole seconds, landscape/portrait, 360p/720p/1080p/4k, optional notes
 adaptation and instructions, and one reference image. Initial generation can use
 that image as its first frame; continuation accepts a reference only. Shape and
 resolution lock after the first successful clip. Options can be saved as account
@@ -81,7 +81,7 @@ submission, or changed shape/resolution returns `409`.
 
 For existing videos, omitted options resolve from the source generation;
 references default to none. Prompt is always explicit. The server resolves the
-latest clip context; each requested addition is 3–10 seconds. Clients never send
+latest clip context; each requested addition is 3–15 seconds. Clients never send
 provider interaction IDs, model overrides, storage paths, or uploaded videos.
 
 History has 50 attempts per page and uses the same stable cursor format as the
@@ -95,7 +95,7 @@ old versions can be downloaded independently from History.
 
 `mdmedia/video` exposes `GeminiOmniVideoProvider.continueVideoClip(prompt,
 { videoBytes, durationSeconds }, options)` and `retrieveVideoClip(id, options)`.
-Continuation requires only the latest generated 3–10-second clip. The provider
+Continuation requires only the latest generated 3–15-second clip. The provider
 sends that clip as explicit model conversation history, followed by the new
 prompt, without chaining older interactions. This avoids Omni selecting the
 original clip again when several generated videos exist in the history.
@@ -138,7 +138,7 @@ as the fallback for older versions. Both preserve audio.
 
 There is no total sequence duration or clip-count limit. Options report
 `limits.sequenceSeconds: null`; the UI shows elapsed duration and keeps Continue
-available after 40 seconds. Source clips are limited to 10.25 measured seconds; provider responses must match source
+available after 40 seconds. Source clips are limited to 15.25 measured seconds; provider responses must match source
 clip plus requested addition within 0.5 seconds. Two concurrent legacy extraction
 cache misses are allowed, and identical requests share work.
 
@@ -151,7 +151,7 @@ Node host; request-only hosting needs a separately managed worker.
 Server configuration:
 
 - `GEMINI_API_KEY`: required server credential.
-- `MDMEDIA_VIDEO_MODEL`: defaults to `gemini-omni-1.1-flash`.
+- `MDMEDIA_VIDEO_MODEL`: defaults to `gemini-omni-1.2-flash`.
 - `MDMEDIA_VIDEO_ADAPTATION_MODEL`: defaults to `gemini-3.5-flash-lite`.
 
 ## Validation and sources

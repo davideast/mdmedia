@@ -12,7 +12,7 @@ const MAX_BYTES = 200 * 1024 * 1024;
 
 /** Omni extends one short clip. The caller trims its context and assembles the sequence locally. */
 export class GeminiOmniVideoProvider implements IVideoProvider {
-  constructor(private readonly client: GoogleGenAI, private readonly maxRetries = 3, private readonly defaultModel = 'gemini-omni-flash-preview') {}
+  constructor(private readonly client: GoogleGenAI, private readonly maxRetries = 3, private readonly defaultModel = 'gemini-omni-1.2-flash') {}
 
   async generateVideoClip(prompt: string, options: GenerateVideoOptions = {}): Promise<VideoGenerationResult> {
     return this.generate(prompt, options);
@@ -20,7 +20,7 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
 
   private async generate(prompt: string, options: GenerateVideoOptions, sourceVideo?: Uint8Array): Promise<VideoGenerationResult> {
     return this.withDeadline(options, async signal => {
-      if (options.durationSeconds !== undefined && (!Number.isInteger(options.durationSeconds) || options.durationSeconds < 3 || options.durationSeconds > 10)) throw new Error('Video duration must be an integer from 3 to 10 seconds');
+      if (options.durationSeconds !== undefined && (!Number.isInteger(options.durationSeconds) || options.durationSeconds < 3 || options.durationSeconds > 15)) throw new Error('Video duration must be an integer from 3 to 15 seconds');
       const inputs: Array<{ type: 'image'; data: string; mime_type: string } | { type: 'text'; text: string }> = [];
       for (const imagePath of [options.firstFrame, ...(options.referenceImages ?? [])]) {
         if (!imagePath) continue;
@@ -55,7 +55,7 @@ export class GeminiOmniVideoProvider implements IVideoProvider {
 
   async continueVideoClip(prompt: string, source: VideoContinuationSource, options: ContinueVideoOptions = {}): Promise<VideoGenerationResult> {
     const measured = readMp4Duration(source.videoBytes);
-    if (!measured || measured < 2.75 || measured > 10.25 || !Number.isFinite(source.durationSeconds) || Math.abs(measured - source.durationSeconds) > 0.25) throw new Error('Continuation requires only the latest clip, measured at 3–10 seconds');
+    if (!measured || measured < 2.75 || measured > 15.25 || !Number.isFinite(source.durationSeconds) || Math.abs(measured - source.durationSeconds) > 0.25) throw new Error('Continuation requires only the latest clip, measured at 3–15 seconds');
     if (source.videoBytes.length > (options.maxBytes ?? MAX_BYTES)) throw new Error('Source clip exceeds the size limit');
     if (options.reference?.role === 'first_frame') throw new Error('A continuation accepts a reference image, not a new first frame');
     const durationSeconds = options.durationSeconds ?? 10;

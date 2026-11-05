@@ -31,7 +31,7 @@ describe('Configuration Loader & Resolver (.mdmedia.json)', () => {
         play: true,
       },
       video: {
-        model: 'gemini-omni-flash-preview',
+        model: 'gemini-omni-1.2-flash',
         aspectRatio: '9:16',
         task: 'image_to_video',
         delivery: 'uri',
@@ -102,7 +102,7 @@ describe('Configuration Loader & Resolver (.mdmedia.json)', () => {
 
     expect(resolved.video.aspectRatio).toBe('9:16'); // CLI override
     expect(resolved.video.task).toBe('reference_to_video'); // CLI override
-    expect(resolved.video.model).toBe('gemini-omni-flash-preview'); // Default
+    expect(resolved.video.model).toBe('gemini-omni-1.2-flash'); // Default
     expect(resolved.video.delivery).toBe('uri'); // Default
     expect(resolved.video.referenceImages).toEqual(['ref1.png']);
   });
