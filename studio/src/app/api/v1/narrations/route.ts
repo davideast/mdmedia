@@ -2,19 +2,13 @@ import { apiError, authenticate, authorize, forbiddenScope, hasScope, unauthoriz
 import { apiOrigin } from "@/lib/api-origin";
 import { resolveNarrationBody, toNarrationResource } from "@/lib/narration-api";
 import { RetentionInputError, extractRetention, type RetentionPatch } from "@/lib/retention";
-import { activeStreamCount, listOwnNarrations } from "@/lib/narration-server";
+import { listOwnNarrations } from "@/lib/narration-server";
 import { startNarration } from "@/lib/narration-start";
 import { PlaylistOpError } from "@/lib/playlist-ops";
 import { placeNarration, playlistErrorResponse, preparePlacement, type PreparedPlacement } from "@/lib/playlists-server";
-import { createRateLimiter } from "@/lib/rate-limit";
 import { loadUserSettings } from "@/lib/user-settings-server";
 
 export const runtime = "nodejs";
-
-/** Generations one person may have in progress at once. */
-const MAX_CONCURRENT = 3;
-/** Narrations one API key may start per hour. Browser sessions are not limited here. */
-const keyStarts = createRateLimiter({ limit: 30, windowMs: 60 * 60_000 });
 
 /**
  * Your narrations, newest first. `?q=` matches titles (ignoring case),
@@ -77,16 +71,6 @@ export async function POST(request: Request): Promise<Response> {
       placement = await preparePlacement(caller.uid, resolved.placement, resolved.request.id);
     } catch (error) {
       return playlistErrorResponse(error);
-    }
-  }
-
-  if (activeStreamCount(caller.uid) >= MAX_CONCURRENT) {
-    return apiError(429, "too_many_in_progress", `You have ${MAX_CONCURRENT} narrations generating. Wait for one to finish.`, { "Retry-After": "30" });
-  }
-  if (caller.kind === "apiKey") {
-    const waitMs = keyStarts.take(caller.keyId);
-    if (waitMs > 0) {
-      return apiError(429, "rate_limited", "This API key has started too many narrations this hour.", { "Retry-After": String(Math.ceil(waitMs / 1000)) });
     }
   }
 

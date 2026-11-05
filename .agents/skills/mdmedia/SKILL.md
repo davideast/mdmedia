@@ -28,7 +28,7 @@ If it's unclear which they want, ask.
   secrets or private material from the surrounding context.
 - Use `--json` whenever a command offers it, and report results from what
   the command actually printed: ids, links, paths, durations.
-- On `rate_limited` or `too_many_in_progress`, tell the user and stop. Don't retry in a loop.
+- On `rate_limited`, tell the user and stop. Don't retry in a loop.
 
 You're done when the user has the link or file path they asked for, taken
 from the command output, or a clear statement of what failed and why.

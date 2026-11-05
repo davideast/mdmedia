@@ -114,9 +114,9 @@ Automatic retries apply only to safe reads/downloads. A potentially accepted pai
 create is never retried by either wrapper or SDK, including when it times out.
 This intentionally changes the old video provider's blanket retry behavior.
 
-Studio has a single video execution slot per host and separate video admission
-quotas: three outstanding attempts per owner, 30 starts per hour per API key.
-Acceptance, ownership, active-job checks, exact source, quota and idempotency are
+Studio has a single video execution slot per host; accepted attempts queue for
+it, and Studio puts no cap of its own on how many are started or outstanding.
+Acceptance, ownership, active-job checks, exact source and idempotency are
 transactional. Replay is checked before stale-source validation and returns the
 original attempt even after the video advances. Image workers explicitly filter
 image jobs in the shared generation collection.

@@ -128,12 +128,7 @@ const stored = { ...abandoned, id: 'stored' };
 documents.set('mediaGenerations/stored', stored); documents.set('mediaActivity/stored', stored);
 documents.set('mediaAssets/music_stored', { ...documents.get(`mediaAssets/${initial.assetId}`), id: 'music_stored' });
 assert.equal((await settled('stored')).status, 'ready'); assert.equal(providerCalls, before); assert.equal(retrievalCalls, 1);
-const quota = structuredClone(documents.get('mediaQuotas/music_owner')!);
-documents.set('mediaQuotas/music_owner', { ...quota, active: ['a', 'b', 'c'] });
-await assert.rejects(server.submitMusic(uid, request, 'quota-music-key-123', null, 'key'), { code: 'too_many_in_progress' });
-documents.set('mediaQuotas/music_owner', { ...quota, hourly: { key: { since: Date.now(), count: 30 } } });
-await assert.rejects(server.submitMusic(uid, request, 'rate-music-key-1234', null, 'key'), { code: 'rate_limited' });
-documents.set('mediaQuotas/music_owner', quota); assert.equal(providerCalls, before);
+assert.equal(providerCalls, before);
 // Reference ownership, purpose and medium validation precede all paid work.
 for (const [id, asset] of [['foreign', { ownerUid: 'other', mediaType: 'music' }], ['video-ref', { ownerUid: uid, mediaType: 'video' }], ['output-ref', { ownerUid: uid, mediaType: 'music', purpose: 'output' }]] as const) {
  documents.set(`mediaAssets/${id}`, { purpose: 'reference', mimeType: 'image/png', ...asset });

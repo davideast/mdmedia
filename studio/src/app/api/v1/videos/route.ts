@@ -10,7 +10,7 @@ export const POST = (request: Request) => mediaApi(async () => {
   const caller = await authorize(request, 'videos:create'); if (caller instanceof Response) return caller;
   const body = await readJsonObject(request); if (body instanceof Response) return body;
   const { rest, patch } = splitCreateRetention(body);
-  const accepted = await submitVideo(caller.uid, rest, readIdempotencyKey(request), null, caller.kind === 'apiKey' ? caller.keyId : null);
+  const accepted = await submitVideo(caller.uid, rest, readIdempotencyKey(request), null);
   await applyCreateRetention(caller.uid, 'video', accepted.itemId, patch, accepted.replayed);
   const video = await videoResource(caller.uid, accepted.itemId, apiOrigin(request));
   return mediaJson({ id: video.id, type: 'video', generation: await videoGenerationResource(await loadVideoGeneration(caller.uid, accepted.generationId), apiOrigin(request)), links: video.links, replayed: accepted.replayed }, 202, { Location: video.links.self });

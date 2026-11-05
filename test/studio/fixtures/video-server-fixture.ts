@@ -99,11 +99,11 @@ async function waitFor(id: string, predicate: (job: any) => boolean) {
 async function settled(id: string) { return waitFor(id, job => !['queued', 'generating'].includes(job.status)); }
 // Concurrent duplicates reserve one attempt. Other scopes and owners cannot access it.
 hold = new Promise(resolve => { release = resolve; });
-const accepted = await Promise.all(Array.from({ length: 8 }, () => server.submitVideo(uid, request, 'initial-key-123', null, 'key')));
+const accepted = await Promise.all(Array.from({ length: 8 }, () => server.submitVideo(uid, request, 'initial-key-123', null)));
 assert.equal(new Set(accepted.map(value => value.generationId)).size, 1); const first = accepted[0];
 await waitFor(first.generationId, job => job.phase === 'generating');
 assert.equal(providerCalls, 1); assert.equal(documents.get('mediaQuotas/video_owner')!.active.length, 1);
-await assert.rejects(server.submitVideo(uid, { ...request, prompt: 'Different' }, 'initial-key-123', null, 'key'), { code: 'idempotency_conflict' });
+await assert.rejects(server.submitVideo(uid, { ...request, prompt: 'Different' }, 'initial-key-123', null), { code: 'idempotency_conflict' });
 await assert.rejects(server.loadVideoItem('other', first.itemId), { code: 'not_found' });
 await assert.rejects(server.loadVideoGeneration('other', first.generationId), { code: 'not_found' });
 // The image dispatcher leaves pending video jobs alone.
@@ -116,17 +116,17 @@ assert(!JSON.stringify(ready).includes('provider-')); assert(!JSON.stringify(rea
 // A new clip extends the current success. Stale clients and parallel distinct submissions conflict.
 const nextBody = { ...request, prompt: 'Pass the blue station', action: 'continue', fromGenerationId: first.generationId };
 hold = new Promise(resolve => { release = resolve; });
-const next = await server.submitVideo(uid, nextBody, 'continue-key-123', first.itemId, 'key');
+const next = await server.submitVideo(uid, nextBody, 'continue-key-123', first.itemId);
 await waitFor(next.generationId, job => job.phase === 'generating');
-await assert.rejects(server.submitVideo(uid, nextBody, 'another-key-123', first.itemId, 'key'), { code: 'generation_in_progress' });
+await assert.rejects(server.submitVideo(uid, nextBody, 'another-key-123', first.itemId), { code: 'generation_in_progress' });
 assert.equal((await server.videoResource(uid, first.itemId, '')).result!.id, first.generationId);
 release(); hold = null; const secondJob = await settled(next.generationId); assert.equal(secondJob.status, 'ready'); assert.equal(secondJob.parentGenerationId, first.generationId);
 assert.equal(payloads[1].input[0].type, 'model_output'); assert(payloads[1].input[1].content[0].text.includes('Extend this video by 3 seconds'));
-await assert.rejects(server.submitVideo(uid, nextBody, 'stale-key-12345', first.itemId, 'key'), { code: 'stale_generation' });
+await assert.rejects(server.submitVideo(uid, nextBody, 'stale-key-12345', first.itemId), { code: 'stale_generation' });
 const continued = await server.videoResource(uid, first.itemId, 'https://studio.test'); assert(Math.abs(continued.result!.durationSeconds! - 6) < 0.1); assert.equal(continued.clips.length, 2);
-const replay = await server.submitVideo(uid, nextBody, 'continue-key-123', first.itemId, 'key'); assert.equal(replay.generationId, next.generationId); assert.equal(providerCalls, 2);
+const replay = await server.submitVideo(uid, nextBody, 'continue-key-123', first.itemId); assert.equal(replay.generationId, next.generationId); assert.equal(providerCalls, 2);
 // Regenerate latest replaces the second clip, using its original parent receipt.
-const regenerate = await server.submitVideo(uid, { ...request, prompt: 'Pass a green station', action: 'regenerate_latest', fromGenerationId: next.generationId }, 'regenerate-key-123', first.itemId, 'key');
+const regenerate = await server.submitVideo(uid, { ...request, prompt: 'Pass a green station', action: 'regenerate_latest', fromGenerationId: next.generationId }, 'regenerate-key-123', first.itemId);
 const replacement = await settled(regenerate.generationId); assert.equal(replacement.status, 'ready'); assert(Math.abs(replacement.durationSeconds! - 6) < 0.1);
 assert.equal(replacement.parentGenerationId, first.generationId); assert.equal(replacement.replacesGenerationId, next.generationId); assert.equal(replacement.clipNumber, 2);
 assert.equal(payloads[2].input[0].content[0].data, payloads[1].input[0].content[0].data);
@@ -134,18 +134,18 @@ assert.equal(replacement.clipDurationSeconds, 3); assert.notEqual(replacement.cl
 assert.equal((await server.loadVideoGeneration(uid, next.generationId)).assetId, secondJob.assetId);
 // Bad outputs and a provider 404 preserve the result. Local clips do not expire with provider context.
 fail = 'tail';
-const invalid = await server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id }, 'tail-key-123456', first.itemId, 'key'); await settled(invalid.generationId);
+const invalid = await server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id }, 'tail-key-123456', first.itemId); await settled(invalid.generationId);
 assert.equal((await server.videoResource(uid, first.itemId, '')).result!.id, replacement.id);
 fail = 'expired';
-const expired = await server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id }, 'expired-key-123', first.itemId, 'key');
+const expired = await server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id }, 'expired-key-123', first.itemId);
 assert.equal((await settled(expired.generationId)).error!.code, 'provider_rejected');
 assert.equal((await server.videoResource(uid, first.itemId, '')).result!.id, replacement.id);
 assert.equal((await server.videoResource(uid, first.itemId, '')).canContinue, true);
 fail = 'none';
 // Shape/resolution and foreign references are validated before paid work.
-await assert.rejects(server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id, output: { ...request.output, aspectRatio: '9:16' } }, 'shape-key-12345', first.itemId, 'key'), { code: 'locked_output' });
+await assert.rejects(server.submitVideo(uid, { ...nextBody, fromGenerationId: replacement.id, output: { ...request.output, aspectRatio: '9:16' } }, 'shape-key-12345', first.itemId), { code: 'locked_output' });
 documents.set('mediaAssets/foreign', { ownerUid: 'other', mediaType: 'video', purpose: 'reference', mimeType: 'image/png' });
-await assert.rejects(server.submitVideo(uid, { ...request, referenceAssetId: 'foreign' }, 'foreign-key-123', null, 'key'), { code: 'reference_not_found' });
+await assert.rejects(server.submitVideo(uid, { ...request, referenceAssetId: 'foreign' }, 'foreign-key-123', null), { code: 'reference_not_found' });
 const original = documents.get(`mediaGenerations/${replacement.id}`)!;
 // A receipt survived a process crash: retrieval succeeds without another paid create.
 const callsBefore = providerCalls; const getsBefore = retrievalCalls;
@@ -193,10 +193,10 @@ assert.equal(upload.status, 201); assert.equal(documents.get(`mediaAssets/${(awa
 assert(!JSON.stringify(await server.videoResource(uid, first.itemId, '')).includes('SECRET'));
 // Cross the former sequence limit while every provider request still uses only a 10s source.
 const longRequest = { ...request, adaptation: { enabled: false, instructions: '' }, output: { ...request.output, durationSeconds: 10 } };
-let long = await server.submitVideo(uid, longRequest, 'long-initial-123', null, 'key');
+let long = await server.submitVideo(uid, longRequest, 'long-initial-123', null);
 let longJob = await settled(long.generationId);
 for (const target of [20, 30, 40, 50, 60]) {
-  long = await server.submitVideo(uid, { ...longRequest, action: 'continue', fromGenerationId: longJob.id }, `long-continue-${target}`, long.itemId, 'key');
+  long = await server.submitVideo(uid, { ...longRequest, action: 'continue', fromGenerationId: longJob.id }, `long-continue-${target}`, long.itemId);
   longJob = await settled(long.generationId);
   assert.equal(longJob.status, 'ready'); assert(Math.abs(longJob.durationSeconds! - target) < 0.2);
   assert.equal(longJob.clipDurationSeconds, 10); assert.equal(longJob.parentClipDurationSeconds, 10);
@@ -227,7 +227,7 @@ assert.equal(videoOptions.limits.sequenceSeconds, null);
 assert.deepEqual(videoOptions.limits.clipSeconds, { min: 3, max: 10 });
 // Regeneration beyond 40s replaces only the last clip, using its original parent.
 const replacedLongId = longJob.id;
-long = await server.submitVideo(uid, { ...longRequest, action: 'regenerate_latest', fromGenerationId: longJob.id }, 'long-regenerate-123', long.itemId, 'key');
+long = await server.submitVideo(uid, { ...longRequest, action: 'regenerate_latest', fromGenerationId: longJob.id }, 'long-regenerate-123', long.itemId);
 longJob = await settled(long.generationId);
 assert.equal(longJob.status, 'ready'); assert(Math.abs(longJob.durationSeconds! - 60) < 0.2);
 assert.equal(longJob.replacesGenerationId, replacedLongId);
@@ -251,7 +251,7 @@ for (const [id, value, parent] of [['legacy-first', old10, null], ['legacy-secon
   documents.set(`mediaGenerations/${id}`, { ...legacy, id, itemId: legacyId, parentGenerationId: parent, interactionId: null });
 }
 documents.set(`mediaItems/video_${legacyId}`, { ...documents.get(`mediaItems/video_${long.itemId}`), id: legacyId, status: 'ready', latestGenerationId: 'legacy-second', latestSuccessfulGenerationId: 'legacy-second' });
-const migrated = await server.submitVideo(uid, { ...longRequest, action: 'continue', fromGenerationId: 'legacy-second' }, 'legacy-continue-123', legacyId, 'key');
+const migrated = await server.submitVideo(uid, { ...longRequest, action: 'continue', fromGenerationId: 'legacy-second' }, 'legacy-continue-123', legacyId);
 const migratedJob = await settled(migrated.generationId);
 assert.equal(migratedJob.status, 'ready'); assert(Math.abs(migratedJob.durationSeconds! - 30) < 0.25);
 assert(migratedJob.parentClipDurationSeconds! <= 10.25);

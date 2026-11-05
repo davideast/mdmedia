@@ -46,7 +46,7 @@ export async function loadVideoGeneration(uid: string, id: string): Promise<Vide
 }
 
 /** Replay precedes tip validation. Acceptance, ownership, tip, quota and pending job change atomically. */
-export async function submitVideo(uid: string, body: Record<string, unknown>, key: string, existingItemId: string | null, apiKeyId: string | null) {
+export async function submitVideo(uid: string, body: Record<string, unknown>, key: string, existingItemId: string | null) {
   const hash = digest(JSON.stringify(canonical(body)));
   const replayRef = adminDb().collection('mediaRequests').doc(digest(`video:${uid}:${existingItemId ?? 'new'}:${key}`));
   const quotaRef = adminDb().collection('mediaQuotas').doc(`video_${uid}`);
@@ -95,12 +95,7 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
     }
     const quota = (await tx.get(quotaRef)).data() ?? {};
     const active = (quota.active ?? []) as string[];
-    if (active.length >= 3) throw new MediaError(429, 'too_many_in_progress', 'You have three videos in progress. Wait for one to finish.');
-    const now = Date.now(); const hourly = (quota.hourly ?? {}) as Record<string, { since: number; count: number }>;
-    const old = apiKeyId ? hourly[apiKeyId] : null; const bucket = old && now - old.since < 3_600_000 ? old : { since: now, count: 0 };
-    if (apiKeyId && bucket.count >= 30) throw new MediaError(429, 'rate_limited', 'This key has started too many videos this hour.');
-    const nextHourly = Object.fromEntries(Object.entries(hourly).filter(([, value]) => now - value.since < 3_600_000));
-    if (apiKeyId) nextHourly[apiKeyId] = { ...bucket, count: bucket.count + 1 };
+    const now = Date.now();
     const title = previous?.title ?? request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 100);
     const job: VideoGeneration = { id: generationId, ownerUid: uid, itemId, type: 'video', title, request, action,
       parentGenerationId: parent?.id ?? null, replacesGenerationId: action === 'regenerate_latest' ? source?.id ?? null : null,
@@ -115,7 +110,7 @@ export async function submitVideo(uid: string, body: Record<string, unknown>, ke
     tx.set(itemRef(itemId), item); tx.set(generationRef(generationId), job);
     tx.set(adminDb().collection('mediaActivity').doc(generationId), { id: generationId, itemId, ownerUid: uid, type: 'video', title, status: 'queued', phase: 'queued', createdAt: now, updatedAt: now, href: item.href });
     tx.set(replayRef, { ownerUid: uid, requestHash: hash, itemId, generationId, createdAt: now });
-    tx.set(quotaRef, { active: [...active, generationId], hourly: nextHourly });
+    tx.set(quotaRef, { active: [...active, generationId] });
     return { itemId, generationId, replayed: false };
   });
   startVideoWorker(); void processVideoJobs().catch(() => {});
