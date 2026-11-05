@@ -63,6 +63,8 @@ export interface RunVideoGenerationArgs {
   referenceImages?: string[];
   firstFrame?: string;
   previousInteractionId?: string;
+  durationSeconds?: number;
+  resolution?: '360p' | '720p' | '1080p' | '4k';
   apiKey?: string;
   maxRetries?: number;
   verbose?: boolean;
@@ -240,6 +242,8 @@ export async function runVideoGeneration(args: RunVideoGenerationArgs): Promise<
     referenceImages: args.referenceImages,
     firstFrame: args.firstFrame,
     previousInteractionId: args.previousInteractionId,
+    durationSeconds: args.durationSeconds,
+    resolution: args.resolution,
   });
 
   await writeVideoSceneOutputs(args.output, results);
