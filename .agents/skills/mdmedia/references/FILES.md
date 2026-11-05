@@ -12,7 +12,7 @@ for any flag not listed here.
 | --- | --- | --- |
 | `audio` | Narration `.wav` | `mdmedia audio -i doc.md -o doc.wav` |
 | `adapt` | Ear-friendly script `.md` | `mdmedia adapt -i doc.md -o doc.script.md` |
-| `video` | Clip `.mp4` from a storyboard | `mdmedia video -i storyboard.md -o scene.mp4` |
+| `video` | Clip `.mp4` from a storyboard | `mdmedia video -i storyboard.md -o scene.mp4 --duration 6 --resolution 1080p` |
 | `image` | `.png` / `.jpg` | `mdmedia image -p "…" -o out.png` |
 | `music` | Song or score `.mp3` / `.wav` | `mdmedia music -p "…" -o song.mp3` |
 | `sfx` | Sound effect `.mp3` / `.wav` | `mdmedia sfx -p "…" -o sound.mp3` |

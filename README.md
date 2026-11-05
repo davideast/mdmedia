@@ -54,7 +54,7 @@ Voice names are resolved through ElevenLabs' voice list and require an API key w
 Convert a Markdown storyboard into an `.mp4` video clip:
 
 ```bash
-mdmedia video -i storyboard.md -o scene.mp4 --aspect 16:9
+mdmedia video -i storyboard.md -o scene.mp4 --aspect 16:9 --duration 6 --resolution 1080p
 ```
 
 #### Timecoded & multi-scene storyboards (`storyboard.md` syntax)
@@ -170,6 +170,8 @@ For sound effects, the `sfx` section accepts `model`, `outputFormat`, `durationS
 | `--input` | `-i` | *(required)* | Path to source `.md` storyboard file |
 | `--output` | `-o` | `output.mp4` | Destination path for `.mp4` video clip |
 | `--aspectRatio` | `-a` | `16:9` | Video aspect ratio (`16:9` or `9:16`) |
+| `--duration` | | *(model default)* | Clip length per scene, 3 to 10 whole seconds |
+| `--resolution` | | *(model default)* | `360p`, `720p`, `1080p`, or `4k` |
 | `--task` | `-t` | `text_to_video` | Generation task (`text_to_video`, `image_to_video`, `reference_to_video`, `edit`) |
 | `--delivery` | | `uri` | Delivery mode (`uri` for Files API polling or `inline`) |
 | `--ref` | `-r` | `undefined` | Comma-separated reference image paths |

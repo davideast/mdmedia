@@ -1,5 +1,6 @@
 import { defineCommand } from 'citty';
 import { studioCommand } from './studio-command.js';
+import { numberIn, oneOf } from './studio-media-commands.js';
 import { cutCommand } from './cut-command.js';
 import { productionCommand } from './production-command.js';
 import { commentsCommand } from './comments-command.js';
@@ -211,6 +212,14 @@ export const videoCommand = defineCommand({
       alias: ['a', 'aspect'],
       description: 'Video aspect ratio ("16:9" or "9:16")',
     },
+    duration: {
+      type: 'string',
+      description: 'Clip length per scene, 3 to 10 whole seconds (default: the model\'s)',
+    },
+    resolution: {
+      type: 'string',
+      description: '360p, 720p, 1080p, or 4k (default: the model\'s)',
+    },
     task: {
       type: 'string',
       alias: 't',
@@ -280,12 +289,23 @@ export const videoCommand = defineCommand({
       referenceImages: resolved.video.referenceImages,
       firstFrame: resolved.video.firstFrame,
       previousInteractionId: resolved.video.previousInteractionId,
+      ...videoOutputOptions(args.duration, args.resolution),
       apiKey: resolved.apiKey,
       maxRetries: resolved.maxRetries,
       verbose: args.verbose,
     });
   },
 });
+
+/** A clip's length and resolution, checked before any paid call; omitted flags keep the model's defaults. */
+export function videoOutputOptions(
+  duration?: string,
+  resolution?: string,
+): { durationSeconds?: number; resolution?: '360p' | '720p' | '1080p' | '4k' } {
+  const durationSeconds = numberIn('--duration', duration, 3, 10, true);
+  const size = oneOf('--resolution', resolution, ['360p', '720p', '1080p', '4k'] as const);
+  return { ...(durationSeconds === undefined ? {} : { durationSeconds }), ...(size ? { resolution: size } : {}) };
+}
 
 export const adaptCommand = defineCommand({
   meta: {
