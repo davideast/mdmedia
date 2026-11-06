@@ -6,7 +6,7 @@ import type { AssetResource } from './media-types';
 export interface StoredAsset {
   /** `production`: media a production's cuts use, uploaded once per content hash. See production-media-server.ts. */
   id: string; ownerUid: string; purpose: 'reference' | 'output' | 'production';
-  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'voice' | 'music' | 'sfx'; durationMs?: number;
+  generationId: string | null; itemId: string | null; mediaType?: 'image' | 'video' | 'voice' | 'music' | 'sfx' | 'analysis'; durationMs?: number;
   /** An empty `thumbnailPath` means the asset has no thumbnail. */
   path: string; thumbnailPath: string; mimeType: string;
   width: number; height: number; byteLength: number; createdAt: number;
@@ -51,7 +51,7 @@ export async function loadOwnedAsset(uid: string, id: string): Promise<StoredAss
     return directAsset;
   }
 
-  for (const prefix of ['image_', 'video_', 'music_', 'sfx_']) {
+  for (const prefix of ['image_', 'video_', 'music_', 'sfx_', 'analysis_']) {
     if (!id.startsWith(prefix)) {
       const prefixed = await adminDb().collection('mediaAssets').doc(`${prefix}${id}`).get();
       const prefixedAsset = prefixed.data() as StoredAsset | undefined;
@@ -71,7 +71,7 @@ export async function loadOwnedAsset(uid: string, id: string): Promise<StoredAss
     }
   }
 
-  for (const prefix of ['image_', 'video_', 'music_', 'sfx_']) {
+  for (const prefix of ['image_', 'video_', 'music_', 'sfx_', 'analysis_']) {
     const itemId = id.startsWith(prefix) ? id : `${prefix}${id}`;
     const itemSnap = await adminDb().collection('mediaItems').doc(itemId).get();
     const itemData = itemSnap.data() as {
@@ -100,6 +100,18 @@ export async function loadOwnedAsset(uid: string, id: string): Promise<StoredAss
   }
 
   throw new MediaError(404, 'not_found', 'That asset is not available to you.');
+}
+/**
+ * Reads a raw upload, refusing more than `max` bytes from the declared length or the stream itself,
+ * so an oversized body is never buffered whole.
+ */
+export async function readUploadBytes(request: Request, max: number, tooLarge: () => MediaError, missing: () => MediaError): Promise<Uint8Array> {
+  if (Number(request.headers.get('content-length')) > max) throw tooLarge();
+  const reader = request.body?.getReader(); if (!reader) throw missing();
+  const chunks: Uint8Array[] = []; let size = 0;
+  while (true) { const next = await reader.read(); if (next.done) break; size += next.value.length; if (size > max) { await reader.cancel(); throw tooLarge(); } chunks.push(next.value); }
+  if (!size) throw missing();
+  return new Uint8Array(Buffer.concat(chunks));
 }
 export function assetResource(asset: StoredAsset, origin: string): AssetResource {
   return { id: asset.id, mimeType: asset.mimeType, width: asset.width, height: asset.height, byteLength: asset.byteLength, ...(asset.durationMs === undefined ? {} : { durationMs: asset.durationMs }),

@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 
 type Context = { params: Promise<{ id: string }> };
 
-const extension = (mimeType: string) => (mimeType === 'audio/mpeg' ? 'mp3' : mimeType === 'video/quicktime' ? 'mov' : mimeType.split('/')[1]);
+const extension = (mimeType: string) => (mimeType === 'audio/mpeg' ? 'mp3' : mimeType === 'video/quicktime' ? 'mov' : mimeType === 'text/markdown' ? 'md' : mimeType.split('/')[1]);
 
 const refused = (expired: boolean) => expired
   ? new MediaError(403, 'link_expired', 'This media link has expired. Ask for a new one.')
@@ -60,7 +60,8 @@ async function serve(request: Request, context: Context, head: boolean): Promise
   const thumbnail = query.get('thumbnail') === '1';
   if (thumbnail && !asset.thumbnailPath) throw new MediaError(404, 'no_thumbnail', 'That asset has no thumbnail.');
   const mimeType = thumbnail ? 'image/webp' : asset.mimeType;
-  const headers = new Headers({ 'Content-Type': mimeType, 'Cache-Control': cache, 'X-Content-Type-Options': 'nosniff' });
+  // Text assets (analysis answers) are UTF-8 Markdown, or JSON for an answer with a schema.
+  const headers = new Headers({ 'Content-Type': mimeType.startsWith('text/') || mimeType === 'application/json' ? `${mimeType}; charset=utf-8` : mimeType, 'Cache-Control': cache, 'X-Content-Type-Options': 'nosniff' });
   if (query.get('download') === '1') headers.set('Content-Disposition', `attachment; filename="${asset.id}.${extension(mimeType)}"`);
 
   if (thumbnail || mimeType.startsWith('image/')) {

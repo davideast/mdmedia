@@ -8,6 +8,7 @@ import {
 } from "./narration-server";
 import type { NarrationRequest } from "./narration-request";
 import type { RetentionPatch } from "./retention";
+import type { NarrationSource } from "./types";
 
 export type StartResult =
   | { ok: true; id: string; stream: ReadableStream<Uint8Array> }
@@ -20,11 +21,12 @@ const fail = (status: number, code: string, message: string): StartResult => ({ 
  * completion on the server whether or not anyone reads the returned stream;
  * progress and the final recording land in Firestore and Storage.
  */
-export async function startNarration({ uid, request, signal, retention }: {
+export async function startNarration({ uid, request, signal, retention, source }: {
   uid: string;
   request: NarrationRequest;
   signal: AbortSignal;
   retention?: RetentionPatch;
+  source?: NarrationSource;
 }): Promise<StartResult> {
   if (request.voiceProvider === "elevenlabs") {
     let accessible;
@@ -49,7 +51,7 @@ export async function startNarration({ uid, request, signal, retention }: {
   const conflict = fail(409, "id_in_use", "That narration id is already in use.");
   if (!(await claimNarrationId(id, uid))) return conflict;
   try {
-    return { ok: true, id, stream: createNarrationStream({ uid, id, request, signal, retention }) };
+    return { ok: true, id, stream: createNarrationStream({ uid, id, request, signal, retention, source }) };
   } catch (error) {
     // Another user holds a live stream on this id.
     if (error instanceof NarrationOwnershipError) return conflict;

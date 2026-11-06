@@ -28,7 +28,7 @@ import type { StoredAsset } from './assets-server';
 /** The scope an API key needs to read this asset, or to get a link to it. */
 export function assetReadScope(asset: Pick<StoredAsset, 'purpose' | 'mediaType'>): ApiKeyScope {
   if (asset.purpose === 'production') return 'productions:read';
-  return asset.mediaType === 'sfx' ? 'sfx:read' : asset.mediaType === 'music' ? 'music:read' : asset.mediaType === 'video' ? 'videos:read' : 'images:read';
+  return asset.mediaType === 'analysis' ? 'analyses:read' : asset.mediaType === 'sfx' ? 'sfx:read' : asset.mediaType === 'music' ? 'music:read' : asset.mediaType === 'video' ? 'videos:read' : 'images:read';
 }
 
 /** How long a new link lives, at least. */

@@ -44,6 +44,8 @@ export const REMIX_ACTIONS_BY_SOURCE: Record<TreeMediaRef['type'], RemixActionSp
   ],
   music: [{ kind: 'image_to_image', label: 'Generate Cover Art', targetType: 'image' }],
   sfx: [{ kind: 'image_to_image', label: 'Generate Sound Illustration', targetType: 'image' }],
+  // Analyses are API-only until the Studio UI lands; no remix yet.
+  analysis: [],
   narration: [
     { kind: 'image_to_image', label: 'Generate Chapter Illustration', targetType: 'image' },
   ],

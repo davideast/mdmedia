@@ -20,6 +20,11 @@ export const GET = (request: Request, context: { params: Promise<{ id: string }>
   const { validMediaId, MediaError } = await import('@/lib/image-request');
   const data = validMediaId(id) ? (await adminDb().collection('mediaGenerations').doc(id).get()).data() : null;
   if (!data || data.ownerUid !== caller.uid) throw new MediaError(404, 'not_found', 'That generation is not available to you.');
+  if (data.type === 'analysis') {
+    if (!hasScope(caller, 'analyses:read')) return forbiddenScope('analyses:read');
+    const { analysisGenerationResource, loadAnalysisGeneration, startAnalysisWorker } = await import('@/lib/analysis-server');
+    startAnalysisWorker(); return mediaJson(await analysisGenerationResource(await loadAnalysisGeneration(caller.uid, id), apiOrigin(request)));
+  }
   if (data.type === 'sfx') {
     if (!hasScope(caller, 'sfx:read')) return forbiddenScope('sfx:read');
     const { generationResource, loadSfxGeneration, startSfxWorker } = await import('@/lib/sfx-server');

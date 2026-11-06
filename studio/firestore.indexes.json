@@ -301,6 +301,16 @@
       "indexes": []
     },
     {
+      "collectionGroup": "mediaGenerations",
+      "fieldPath": "trace",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "mediaGenerations",
+      "fieldPath": "narration",
+      "indexes": []
+    },
+    {
       "collectionGroup": "mediaItems",
       "fieldPath": "request",
       "indexes": []

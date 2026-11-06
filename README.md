@@ -118,6 +118,12 @@ mdmedia analyze --follow-up <interactionId> -p "Expand on the second argument."
 
 Videos up to about 15 MB are sent inline. Larger files are uploaded through the Gemini Files API first. The request runs in the background and is polled, so long videos don't time out. `--processing agentic` lets the model navigate long videos. It needs `gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`, and it can't be combined with `--start`, `--end`, or `--fps`. `analyze` always needs the subcommand name. While it runs, each new step Gemini reports prints as one line on stderr (not with `--json`). `--schema shots.json` asks for JSON matching a JSON Schema instead of Markdown.
 
+To keep the answer in your Studio instead, use `mdmedia studio analyze`. It takes a local file (uploaded, up to 200 MiB), a YouTube link, or a Studio video (`--from-video <id>`, optionally `--clip <n>`), saves the Markdown answer as a Library item, and can narrate it with `--narrate`. With `--wait`, the answer prints on stdout. See [Studio video analysis](docs/studio-analysis-api.md).
+
+```bash
+mdmedia studio analyze --from-video <videoItemId> --clip 2 -p "Shot list with MM:SS" --wait
+```
+
 ---
 
 ## Configuration File (`.mdmedia.json`)

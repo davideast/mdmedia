@@ -170,7 +170,12 @@ export interface Narration {
   errorCategory?: NarrationErrorCategory;
   errorChunkIndex?: number;
   errorActionableHint?: string;
+  /** What this narration was made from, when Studio started it from other work. Written server-side only. */
+  source?: NarrationSource;
 }
+
+/** A narration started from a video analysis result. */
+export type NarrationSource = { kind: 'analysis'; analysisId: string; generationId: string };
 
 export type NarrationStatus = "streaming" | "ready" | "error";
 
