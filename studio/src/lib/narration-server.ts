@@ -27,6 +27,7 @@ import {
   type AlignedChunk,
   type AlignedWord,
   type Narration,
+  type NarrationSource,
   type StreamEvent,
   type Visibility,
   type VoiceName,
@@ -322,6 +323,8 @@ interface StreamParams {
   signal: AbortSignal;
   /** How long to keep this narration, if the caller asked. */
   retention?: RetentionPatch;
+  /** Provenance, when Studio starts the narration from other work. */
+  source?: NarrationSource;
 }
 
 /**
@@ -337,6 +340,7 @@ export function createNarrationStream({
   request,
   signal,
   retention,
+  source,
 }: StreamParams): ReadableStream<Uint8Array> {
   const queue = new EventQueue();
   const encoder = new TextEncoder();
@@ -461,6 +465,7 @@ export function createNarrationStream({
         authorPhoto: author.photo,
         createdAt: now,
         updatedAt: now,
+        ...(source ? { source } : {}),
       };
       await adminDb().runTransaction(async (tx) => {
         const snap = await tx.get(docRef);

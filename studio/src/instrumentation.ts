@@ -98,6 +98,8 @@ export async function register(): Promise<void> {
     startMusicWorker();
     const { startSfxWorker } = await import('./lib/sfx-server');
     startSfxWorker();
+    const { startAnalysisWorker } = await import('./lib/analysis-server');
+    startAnalysisWorker();
     const { startRetentionSweeper } = await import('./lib/retention-sweep');
     startRetentionSweeper();
   }

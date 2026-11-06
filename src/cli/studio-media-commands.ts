@@ -1,9 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
+import { videoMimeType } from '../analysis/index.js';
 import {
   isFinished,
   mediaStatus,
+  type AnalysisRequestBody,
   type CreatedMedia,
   type ImageRequestBody,
   type MusicRequestBody,
@@ -12,14 +14,17 @@ import {
   type StudioClient,
   type StudioMediaBodies,
   type StudioMediaResource,
+  type StudioMediaResources,
   type StudioMediaType,
   type VideoRequestBody,
 } from '../remote/client.js';
 import { StartedMediaError, connectedClient, guarded, readSource } from './studio-support.js';
 
-const LABELS: Record<StudioMediaType, string> = { image: 'Image', video: 'Video', music: 'Music', sfx: 'Sound effect' };
+const LABELS: Record<StudioMediaType, string> = { image: 'Image', video: 'Video', music: 'Music', sfx: 'Sound effect', analysis: 'Analysis' };
 const REFERENCE_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
 const MAX_REFERENCE_BYTES = 10 * 1024 * 1024;
+/** The studio's upload limit for a video an analysis watches. */
+export const MAX_VIDEO_REFERENCE_BYTES = 200 * 1024 * 1024;
 const MAX_INSTRUCTIONS = 4000;
 
 export const IMAGE_ASPECTS = ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9', '1:4', '4:1', '1:8', '8:1'] as const;
@@ -92,6 +97,17 @@ export async function readReference(file: string): Promise<{ bytes: Uint8Array; 
   return { bytes: await fs.promises.readFile(file), mimeType };
 }
 
+/** A local video for `studio analyze --video`: a type Gemini reads, at most 200 MiB. */
+export async function checkVideoReference(file: string): Promise<{ path: string; mimeType: string; size: number }> {
+  let mimeType: string;
+  try { mimeType = videoMimeType(file); } catch (error) { throw new Error(`--video: ${(error as Error).message}`); }
+  const info = await fs.promises.stat(file).catch(() => null);
+  if (!info?.isFile()) throw new Error(`--video: ${file} is not a file.`);
+  if (info.size === 0) throw new Error(`--video: ${file} is empty.`);
+  if (info.size > MAX_VIDEO_REFERENCE_BYTES) throw new Error('--video must be at most 200 MiB; use a YouTube link or a shorter clip.');
+  return { path: file, mimeType, size: info.size };
+}
+
 /** The `--output` path, checked before anything is generated: a file in a folder that exists and can be written. */
 export async function checkOutput(file: string): Promise<string> {
   const resolved = path.resolve(file);
@@ -145,6 +161,12 @@ export interface MediaRunOptions {
 async function withReference<T extends StudioMediaType>(client: StudioClient, type: T, body: StudioMediaBodies[T], file: string | undefined): Promise<StudioMediaBodies[T]> {
   if (file === undefined) return body;
   if (type === 'sfx') throw new Error('Sound effects do not take a reference image.');
+  if (type === 'analysis') {
+    // For an analysis the "reference" is the video it watches, uploaded once and named as the source.
+    const video = await checkVideoReference(file);
+    const asset = await client.uploadVideoReference(await fs.promises.readFile(video.path), video.mimeType);
+    return { ...(body as AnalysisRequestBody), source: { kind: 'asset', assetId: asset.id } } as StudioMediaBodies[T];
+  }
   if (type === 'image') {
     const files = file.split(',').map((entry) => entry.trim()).filter(Boolean);
     if (files.length === 0) throw new Error('--reference must name at least one image file.');
@@ -188,10 +210,10 @@ export async function runMediaCommand<T extends StudioMediaType>(client: StudioC
   const payload = await withReference(client, type, body, options.reference);
   const created = type === 'image' && options.item
     ? (await client.createImageGeneration(options.item, payload as ImageRequestBody) as CreatedMedia<T>)
-    : await client.createMedia(type, payload);
+    : options.item ? await client.createMediaGeneration(type, options.item, payload) : await client.createMedia(type, payload);
   if (!options.wait && !options.output) {
     if (options.json) console.log(JSON.stringify(created, null, 2));
-    else console.log(`${LABELS[type]} started: ${created.links.web}`);
+    else console.log(`${LABELS[type]} started: ${created.links.web}${type === 'analysis' ? ` (id ${created.id})` : ''}`);
     return;
   }
   if (!options.json) console.error(`Generating ${created.links.web} …`);
@@ -204,13 +226,17 @@ export async function runMediaCommand<T extends StudioMediaType>(client: StudioC
 
 /** Waits for a created item, saves its file with `--output`, and prints the outcome. */
 async function finishMedia<T extends StudioMediaType>(client: StudioClient, type: T, id: string, options: MediaRunOptions, timeoutMs: number): Promise<void> {
-  let phase = '';
+  let phase = '', step = '';
   const finished = await client.waitForMedia(type, id, {
     timeoutMs,
     onProgress: (resource) => {
       const next = resource.latestGeneration?.phase ?? '';
       if (!options.json && next && next !== phase && !isFinished(mediaStatus(resource))) console.error(`  ${next}`);
       phase = next;
+      // An analysis also reports what Gemini is working on, one line per new step.
+      const latest = (resource.latestGeneration as { progress?: string | null } | undefined)?.progress ?? '';
+      if (!options.json && latest && latest !== step && !isFinished(mediaStatus(resource))) console.error(`  ${latest}`);
+      step = latest;
     },
   });
   const status = mediaStatus(finished);
@@ -221,7 +247,19 @@ async function finishMedia<T extends StudioMediaType>(client: StudioClient, type
     await saveStream((await client.downloadAsset(asset.links.content)).body, options.output);
     saved = options.output;
   }
-  if (options.json) console.log(JSON.stringify({ ...finished, ...(saved ? { savedTo: saved } : {}) }, null, 2));
+  if (type === 'analysis' && !options.json) {
+    // The one deliberate difference: an awaited analysis prints its Markdown answer on stdout, so agents can pipe it.
+    if (status === 'ready' && !saved) {
+      const asset = finished.result?.assets[0];
+      if (!asset) throw new Error('The studio finished without an answer.');
+      console.log((await new Response((await client.downloadAsset(asset.links.content)).body).text()).trimEnd());
+    }
+    const line = `${finished.title || finished.id}: ${describeMedia(finished)} — ${finished.links.web} (id ${finished.id})${saved ? `\nSaved ${saved}` : ''}`;
+    if (saved) console.log(line); else console.error(line);
+    const result = finished.result as StudioMediaResources['analysis']['result'];
+    if (status === 'ready' && result?.narrationId) console.error(result.narrationError ? `Narration did not start: ${result.narrationError.message}` : `Narration: ${client.origin}/narration/${result.narrationId}`);
+    if (!isFinished(status)) console.error(`Still ${status}. Check later with \`mdmedia studio status ${finished.id} --type ${type}\`.`);
+  } else if (options.json) console.log(JSON.stringify({ ...finished, ...(saved ? { savedTo: saved } : {}) }, null, 2));
   else {
     console.log(`${finished.title || finished.id}: ${describeMedia(finished)} — ${finished.links.web}${saved ? `\nSaved ${saved}` : ''}`);
     if (!isFinished(status)) console.error(`Still ${status}. Check later with \`mdmedia studio status ${finished.id} --type ${type}\`.`);

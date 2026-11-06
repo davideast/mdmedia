@@ -273,7 +273,7 @@ describe('studio commands end to end', () => {
   it('studio status refuses an unknown --type', async () => {
     await runCommand(studioCommand, { rawArgs: ['status', 'item1', '--type', 'podcast', '--json'] });
     expect(calls).toHaveLength(0);
-    expect(JSON.parse(logs[0]!).error.message).toBe('--type must be one of narration, image, video, music, sfx (got "podcast").');
+    expect(JSON.parse(logs[0]!).error.message).toBe('--type must be one of narration, image, video, music, sfx, analysis (got "podcast").');
   });
 
   it('studio image maps model, search, thinking, video, item, and refine flags to the request', async () => {

@@ -100,7 +100,16 @@ export async function GET(request: Request): Promise<Response> {
       defaults: await sfxDefaults(caller.uid), capabilities: { formats: ['mp3', 'wav'], durationSeconds: SFX_DURATION, promptInfluence: { min: 0, max: 1 }, loop: true },
       limits: { promptChars: MAX_SFX_PROMPT }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
   }
-  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, music, and sfx.');
+  if (media === 'analysis') {
+    const { configuredAnalysisModel, ANALYSIS_UPLOAD_TYPES } = await import('@/lib/analysis-server');
+    const { AGENTIC_ANALYSIS_MODELS, MEDIA_RESOLUTIONS } = await import('mdmedia/analysis');
+    const { MAX_VIDEO_BYTES } = await import('@/lib/video-request');
+    const { MAX_ANALYSIS_PROMPT, MAX_SYSTEM_INSTRUCTION } = await import('@/lib/analysis-request');
+    return Response.json({ type: 'analysis', available: Boolean(process.env.GEMINI_API_KEY), provider: 'gemini', model: configuredAnalysisModel(),
+      capabilities: { sources: ['video', 'asset', 'youtube'], processing: ['static', 'agentic'], agenticModels: AGENTIC_ANALYSIS_MODELS, mediaResolutions: MEDIA_RESOLUTIONS, followUps: true, narrate: true, uploadMimeTypes: [...ANALYSIS_UPLOAD_TYPES] },
+      limits: { promptChars: MAX_ANALYSIS_PROMPT, systemInstructionChars: MAX_SYSTEM_INSTRUCTION, uploadBytes: MAX_VIDEO_BYTES, narrationChars: MAX_MARKDOWN_CHARS }, visibility: ['private'] }, { headers: { 'Cache-Control': 'no-store' } });
+  }
+  if (media && media !== 'narration') return apiError(400, 'invalid_type', 'Options are available for narration, image, video, music, sfx, and analysis.');
   const settings = await loadUserSettings(caller.uid);
   const delivery = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
   const instructions = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];

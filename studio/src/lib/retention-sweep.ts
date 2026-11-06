@@ -57,10 +57,10 @@ export class MediaLockedError extends Error {
 
 /** The most candidates one query returns; the next sweep picks up the rest. */
 const CANDIDATE_LIMIT = 500;
-const OTHER_TYPES: MediaType[] = ['image', 'video', 'music', 'sfx'];
+const OTHER_TYPES: MediaType[] = ['image', 'video', 'music', 'sfx', 'analysis'];
 
 /**
- * Deletes an image, video, music or sfx item with everything it owns: stored
+ * Deletes an image, video, music, sfx or analysis item with everything it owns: stored
  * files, generations, assets, activity and idempotency records. The item
  * document goes last, so a run that fails partway is simply finished by the next.
  */

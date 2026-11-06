@@ -75,8 +75,32 @@ minutes. Add `--wait` only if the user wants to know it finished, and
 out (`--timeout`, default 900 seconds) is not a failure; check later with:
 
 ```sh
-mdmedia studio status <id> --type image|video|music|sfx --json
+mdmedia studio status <id> --type image|video|music|sfx|analysis --json
 ```
+
+## Ask about a video
+
+`studio analyze` asks Gemini about a video and saves the Markdown answer in the
+studio. Give exactly one source: `--video <file or YouTube link>` (a file is
+uploaded, up to 200 MiB) or `--from-video <videoItemId>` for a studio video,
+with `--generation <id>` or `--clip <n>` only when asked.
+
+```sh
+mdmedia studio analyze --video lecture.mp4 -p "<question>" --wait
+mdmedia studio analyze --from-video <id> --clip 2 -p "<question>" --json
+```
+
+- With `--wait` (and no `-o` or `--json`) the Markdown answer prints on stdout;
+  `-o notes.md` saves it instead.
+- Options, only when asked: `--model`, `--processing static|agentic`,
+  `--start`/`--end`/`--fps` (static only), `--media-resolution
+  low|medium|high|ultra_high`, `--system "<text>"`, `--schema <file.json>`
+  (a JSON Schema; the answer is saved as JSON, and can't be narrated).
+- `--narrate` also narrates the answer with studio defaults; `--narrate-voice`
+  and `--narrate-playlist` are the only overrides. For anything else, pipe:
+  `mdmedia studio analyze … --wait | mdmedia studio narrate -i - …`.
+- Run again with `--item <analysisId>`; ask a follow-up with `--item <id>
+  --follow-up <interactionId>` (the `interactionId` is in `--json` output).
 
 If a command fails after the item was created (a lost connection, a download
 or save error), the error includes the item's `id`. Check on it with `status`

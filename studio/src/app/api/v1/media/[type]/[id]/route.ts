@@ -14,6 +14,7 @@ const SCOPES: Record<MediaType, { read: ApiKeyScope; write: ApiKeyScope }> = {
   video: { read: 'videos:read', write: 'videos:create' },
   music: { read: 'music:read', write: 'music:create' },
   sfx: { read: 'sfx:read', write: 'sfx:create' },
+  analysis: { read: 'analyses:read', write: 'analyses:create' },
 };
 
 function mediaType(value: string): MediaType {

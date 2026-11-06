@@ -2,8 +2,9 @@
 
 Studio supports Narration, Gemini Image, [Gemini Video sequences](studio-video-api.md),
 and Lyria Music. Create, Drafts, Library, Activity, Pinned, Recent, and Find work
-serve all four. [Sound effects](studio-sfx-api.md) are API-only: they appear in
-Library and Activity but have no composer yet.
+serve all four. [Sound effects](studio-sfx-api.md) and
+[video analysis](studio-analysis-api.md) are API-only: they appear in Library and
+Activity but have no composer yet.
 
 The existing [narration API](studio-narration-api.md) remains compatible. Its
 `streaming` status, WAV endpoint, playlists, visibility, and request options
@@ -189,8 +190,9 @@ A pending submission retains its key and body across refresh and provides Retry
 submission, so a lost HTTP response does not create a second paid request.
 Pinned, Recent, Find work, and Drafts recognize images independently of narration.
 
-Music and sound effects follow the same pattern under `/api/v1/music` and
-`/api/v1/sfx`, with `music:*` and `sfx:*` scopes. A new medium adds its own
+Music, sound effects, and video analyses follow the same pattern under
+`/api/v1/music`, `/api/v1/sfx`, and `/api/v1/analyses`, with `music:*`, `sfx:*`,
+and `analyses:*` scopes. A new medium adds its own
 endpoints and editor, then registers its type in shared navigation; one that is
 `available: false` stays out of Create but still appears in the catalog.
 

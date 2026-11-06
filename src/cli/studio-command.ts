@@ -21,6 +21,7 @@ import {
 } from '../remote/credentials.js';
 import { installSkill, skillSourceDir } from '../remote/skill.js';
 import { describeMedia, imageCommand, musicCommand, oneOf, sfxCommand, videoCommand } from './studio-media-commands.js';
+import { studioAnalyzeCommand } from './studio-analyze-command.js';
 import { connectedClient, guarded, readSource } from './studio-support.js';
 import { storyboardCommand } from './studio-storyboard-commands.js';
 import { treeCommand } from './studio-tree-commands.js';
@@ -223,12 +224,12 @@ const status = defineCommand({
   meta: { name: 'status', description: 'Show a narration\'s or other item\'s progress' },
   args: {
     id: { type: 'positional', required: true, description: 'Item id' },
-    type: { type: 'string', description: 'narration, image, video, music, or sfx (default narration)' },
+    type: { type: 'string', description: 'narration, image, video, music, sfx, or analysis (default narration)' },
     json: { type: 'boolean', description: 'Print JSON' },
   },
   async run({ args }) {
     await guarded(args.json, async () => {
-      const type = oneOf('--type', args.type, ['narration', 'image', 'video', 'music', 'sfx'] as const) ?? 'narration';
+      const type = oneOf('--type', args.type, ['narration', 'image', 'video', 'music', 'sfx', 'analysis'] as const) ?? 'narration';
       if (type !== 'narration') {
         const item = await connectedClient().media(type, args.id);
         if (args.json) console.log(JSON.stringify(item, null, 2));
@@ -412,5 +413,5 @@ const installSkillCommand = defineCommand({
 
 export const studioCommand = defineCommand({
   meta: { name: 'studio', description: 'Create narrations, images, video, music, and sound effects in your mdmedia studio from the terminal or a coding agent' },
-  subCommands: { production: studioProductionCommand, login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, sfx: sfxCommand, status, narrations, playlist, tree: treeCommand, storyboard: storyboardCommand, 'install-skill': installSkillCommand },
+  subCommands: { production: studioProductionCommand, login, logout, options, narrate, image: imageCommand, video: videoCommand, music: musicCommand, sfx: sfxCommand, analyze: studioAnalyzeCommand, status, narrations, playlist, tree: treeCommand, storyboard: storyboardCommand, 'install-skill': installSkillCommand },
 });

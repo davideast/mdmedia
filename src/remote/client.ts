@@ -447,9 +447,9 @@ export interface TreeCompileResult {
   narrationId?: string;
 }
 
-export type StudioMediaType = 'image' | 'video' | 'music' | 'sfx';
+export type StudioMediaType = 'image' | 'video' | 'music' | 'sfx' | 'analysis';
 /** Media that accept an uploaded reference image. */
-export type ReferenceMediaType = Exclude<StudioMediaType, 'sfx'>;
+export type ReferenceMediaType = Exclude<StudioMediaType, 'sfx' | 'analysis'>;
 export type GenerationStatus = 'queued' | 'generating' | 'ready' | 'error' | 'interrupted';
 
 export interface StudioAsset {
@@ -506,12 +506,55 @@ export interface SfxRequestBody {
   promptInfluence?: number;
 }
 
+export type AnalysisSourceBody =
+  | { kind: 'video'; videoItemId: string; generationId?: string; clip?: number }
+  | { kind: 'asset'; assetId: string }
+  | { kind: 'youtube'; url: string };
+
+/** Narration options for the result: any `POST /api/v1/narrations` field except `markdown` and `id`. */
+export interface AnalysisNarrateBody {
+  voice?: string | { provider: 'gemini' | 'elevenlabs'; id: string };
+  playlist?: string;
+  [field: string]: unknown;
+}
+
+/** A create needs `prompt` and `source`; a new generation on an existing analysis may send only what changes. */
+export interface AnalysisRequestBody {
+  prompt?: string;
+  source?: AnalysisSourceBody;
+  model?: string | null;
+  processing?: { mode?: 'static' | 'agentic'; startSeconds?: number; endSeconds?: number; fps?: number } | null;
+  mediaResolution?: 'low' | 'medium' | 'high' | 'ultra_high' | null;
+  systemInstruction?: string | null;
+  /** A JSON Schema the answer must match; the answer is then saved as JSON. */
+  responseSchema?: Record<string, unknown> | null;
+  /** Follow-ups only (`POST /api/v1/analyses/{id}/generations`): an `interactionId` from this analysis. */
+  previousInteractionId?: string;
+  narrate?: true | AnalysisNarrateBody;
+}
+
+/** An analysis request as the studio stored it. */
+export interface AnalysisRequest {
+  prompt: string;
+  source: { kind: 'video'; videoItemId: string; generationId: string | null; clip: number | null } | { kind: 'asset'; assetId: string } | { kind: 'youtube'; url: string };
+  model: string | null;
+  processing: { mode: 'static' | 'agentic'; startSeconds: number | null; endSeconds: number | null; fps: number | null } | null;
+  mediaResolution: 'low' | 'medium' | 'high' | 'ultra_high' | null;
+  systemInstruction: string | null;
+  responseSchema: Record<string, unknown> | null;
+  previousInteractionId: string | null;
+}
+
 export interface StudioMediaBodies {
   image: ImageRequestBody;
   video: VideoRequestBody;
   music: MusicRequestBody;
   sfx: SfxRequestBody;
+  analysis: AnalysisRequestBody;
 }
+
+/** The request as the studio resolved it, defaults filled in. */
+type ResolvedRequest<T extends StudioMediaType> = T extends 'analysis' ? AnalysisRequest : Required<StudioMediaBodies[T]>;
 
 interface GenerationBase<T extends StudioMediaType> {
   id: string;
@@ -523,7 +566,7 @@ interface GenerationBase<T extends StudioMediaType> {
   createdAt: number;
   updatedAt: number;
   /** The request as the studio resolved it, defaults filled in. */
-  request: Required<StudioMediaBodies[T]>;
+  request: ResolvedRequest<T>;
   preparedPrompt: string | null;
   provider: string;
   model: string;
@@ -552,12 +595,24 @@ export interface VideoGeneration extends GenerationBase<'video'> {
 }
 export interface MusicGeneration extends GenerationBase<'music'> { lyrics: string | null; waveform: number[]; durationSeconds: number | null }
 export interface SfxGeneration extends GenerationBase<'sfx'> { waveform: number[]; durationSeconds: number | null }
+/** `assets[0]` is the answer: a `text/markdown` file, or `application/json` when the request had a `responseSchema`. */
+export interface AnalysisGeneration extends GenerationBase<'analysis'> {
+  /** Send as `previousInteractionId` to ask a follow-up. */
+  interactionId: string | null;
+  /** While it runs: the latest step Gemini reported, one short line. */
+  progress: string | null;
+  usage: { inputTokens?: number; outputTokens?: number; thoughtTokens?: number; toolUseTokens?: number; totalTokens?: number } | null;
+  trace: string[];
+  narrationId: string | null;
+  narrationError: { code: string; message: string } | null;
+}
 
 export interface StudioGenerations {
   image: ImageGeneration;
   video: VideoGeneration;
   music: MusicGeneration;
   sfx: SfxGeneration;
+  analysis: AnalysisGeneration;
 }
 
 interface MediaResourceBase<T extends StudioMediaType> {
@@ -571,7 +626,7 @@ interface MediaResourceBase<T extends StudioMediaType> {
   href: string;
   thumbnailAssetId: string | null;
   durationMs?: number;
-  request: Required<StudioMediaBodies[T]>;
+  request: ResolvedRequest<T>;
   latestGenerationId: string;
   latestSuccessfulGenerationId: string | null;
   latestGeneration: StudioGenerations[T] | null;
@@ -588,12 +643,14 @@ export interface VideoResource extends MediaResourceBase<'video'> {
 }
 export type MusicResource = MediaResourceBase<'music'>;
 export type SfxResource = MediaResourceBase<'sfx'>;
+export type AnalysisResource = MediaResourceBase<'analysis'>;
 
 export interface StudioMediaResources {
   image: ImageResource;
   video: VideoResource;
   music: MusicResource;
   sfx: SfxResource;
+  analysis: AnalysisResource;
 }
 export type StudioMediaResource = StudioMediaResources[StudioMediaType];
 
@@ -606,7 +663,7 @@ export interface CreatedMedia<T extends StudioMediaType> {
   replayed: boolean;
 }
 
-const MEDIA_ROUTES: Record<StudioMediaType, string> = { image: 'images', video: 'videos', music: 'music', sfx: 'sfx' };
+const MEDIA_ROUTES: Record<StudioMediaType, string> = { image: 'images', video: 'videos', music: 'music', sfx: 'sfx', analysis: 'analyses' };
 
 /** The status of the attempt the item is working on, falling back to the item's own. */
 export function mediaStatus(resource: StudioMediaResource): GenerationStatus {
@@ -1116,6 +1173,23 @@ export class StudioClient {
     }
   }
 
+  /** A new attempt on an existing item (a re-run or a follow-up), retried on a lost answer with the same key like `createMedia`. */
+  async createMediaGeneration<T extends StudioMediaType>(type: T, itemId: string, body: StudioMediaBodies[T], idempotencyKey: string = randomUUID(), retryDelaysMs: readonly number[] = [1000, 4000]): Promise<CreatedMedia<T>> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.request<CreatedMedia<T>>('POST', `/api/v1/${MEDIA_ROUTES[type]}/${encodeURIComponent(itemId)}/generations`, body, true, { 'Idempotency-Key': idempotencyKey });
+      } catch (error) {
+        const delay = retryDelaysMs[attempt];
+        if (delay === undefined || !lostAnswer(error)) throw error;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  createAnalysis(body: AnalysisRequestBody, idempotencyKey?: string): Promise<CreatedMedia<'analysis'>> {
+    return this.createMedia('analysis', body, idempotencyKey);
+  }
+
   createVideo(body: VideoRequestBody, idempotencyKey?: string): Promise<CreatedMedia<'video'>> {
     return this.createMedia('video', body, idempotencyKey);
   }
@@ -1135,6 +1209,12 @@ export class StudioClient {
   /** Uploads a PNG, JPEG, or WebP reference as raw bytes, scoped to the medium that will use it. */
   async uploadReference(media: ReferenceMediaType, bytes: Uint8Array, mimeType: string): Promise<StudioAsset> {
     const response = await this.send('POST', `/api/v1/assets?media=${media}`, { body: new Uint8Array(bytes), headers: { 'Content-Type': mimeType } });
+    return await response.json() as StudioAsset;
+  }
+
+  /** Uploads a video for an analysis to watch, as raw bytes (up to 200 MiB in a type Gemini reads). */
+  async uploadVideoReference(bytes: Uint8Array, mimeType: string): Promise<StudioAsset> {
+    const response = await this.send('POST', '/api/v1/assets?media=analysis', { body: new Uint8Array(bytes), headers: { 'Content-Type': mimeType } });
     return await response.json() as StudioAsset;
   }
 
