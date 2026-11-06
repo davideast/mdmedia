@@ -166,6 +166,14 @@ lines, including each new step Gemini reports, go to stderr. `-o` saves the answ
 anything is uploaded or created. Check on an analysis later with
 `mdmedia studio status <id> --type analysis`.
 
+## In trees
+
+An analysis can sit in a tree document like other Studio media: write
+`[Shot list](mdmedia://analysis/<id>)` on its own line, or bind it with the
+`bind_asset` op (`{ "type": "analysis", "id": "<id>" }`). The reader shows a
+compact card with the title, a short excerpt, and a link to `/analysis/{id}`.
+The card reads the analysis through the API, so only its owner sees it.
+
 ## Validation
 
 `test/studio/analysis-server.test.ts` runs the routes and worker against a

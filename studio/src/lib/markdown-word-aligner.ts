@@ -116,6 +116,7 @@ const VALID_MDMEDIA_TYPES = new Set<TreeMediaRef['type']>([
   'music',
   'sfx',
   'narration',
+  'analysis',
   'asset',
   'mermaid',
 ]);

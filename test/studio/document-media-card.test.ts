@@ -512,3 +512,29 @@ describe('buildHermeticDocumentPackage & createZipArchive', () => {
   });
 });
 
+
+describe('analyses in trees', () => {
+  it('parses mdmedia://analysis refs, writes them as links, and binds them with the existing op', async () => {
+    const { parseMediaUri } = await import('../../studio/src/lib/markdown-word-aligner');
+    const { formatMediaMarkdownRef } = await import('../../studio/src/lib/tree-helpers');
+    expect(parseMediaUri('mdmedia://analysis/an_1')).toEqual({ type: 'analysis', id: 'an_1' });
+    expect(formatMediaMarkdownRef({ type: 'analysis', id: 'an_1' }, 'Shot list')).toBe('[Shot list](mdmedia://analysis/an_1)');
+    const store = new InMemoryTreeStore('user_analysis');
+    const tree = await store.createTree('user_analysis', { title: 'Notes', ops: [{ op: 'put_doc', path: 'doc.md', markdown: '[Shot list](mdmedia://analysis/an_1)' }] });
+    const bound = await store.applyOps('user_analysis', tree.id, [{ op: 'bind_asset', virtualPath: 'media/shots', ref: { type: 'analysis', id: 'an_1' } }]);
+    expect(bound.pathAssets['media/shots']).toEqual({ type: 'analysis', id: 'an_1' });
+  });
+
+  it('renders a compact card: title, excerpt, and a link to the analysis, with no remix or file fetch', () => {
+    expect(resolvePrivateMediaContentPath({ type: 'analysis', id: 'an_1' })).toBeNull();
+    const html = renderToStaticMarkup(createElement(DocumentMediaCard, { mediaRef: { type: 'analysis', id: 'an_1' }, alt: 'Shot list' }));
+    expect(html).toContain('data-media-type="analysis"');
+    expect(html).toContain('Shot list');
+    expect(html).toContain('href="/analysis/an_1"');
+    expect(html).toContain('>Open</a>');
+    expect(html).toContain('line-clamp-3');
+    expect(html).not.toContain('Remix');
+    expect(html).not.toContain('<video');
+    expect(html).not.toContain('<audio');
+  });
+});

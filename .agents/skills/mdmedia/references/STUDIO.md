@@ -101,6 +101,8 @@ mdmedia studio analyze --from-video <id> --clip 2 -p "<question>" --json
   `mdmedia studio analyze … --wait | mdmedia studio narrate -i - …`.
 - Run again with `--item <analysisId>`; ask a follow-up with `--item <id>
   --follow-up <interactionId>` (the `interactionId` is in `--json` output).
+- To show an analysis in a tree document, put `[Title](mdmedia://analysis/<id>)`
+  on its own line.
 
 If a command fails after the item was created (a lost connection, a download
 or save error), the error includes the item's `id`. Check on it with `status`

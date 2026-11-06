@@ -35,7 +35,7 @@ export function formatMediaMarkdownRef(ref: TreeMediaRef, label = 'Media'): stri
   if (ref.type === 'mermaid') return `\`\`\`mermaid\n${ref.id}\n\`\`\``;
   const suffix = ref.generationId ? `@${ref.generationId}` : '';
   const uri = `mdmedia://${ref.type}/${ref.id}${suffix}`;
-  if (ref.type === 'music' || ref.type === 'sfx') {
+  if (ref.type === 'music' || ref.type === 'sfx' || ref.type === 'analysis') {
     return `[${label}](${uri})`;
   }
   return `![${label}](${uri})`;
