@@ -1,12 +1,14 @@
 "use client";
 
 import { cn } from "cn";
+import Link from "next/link";
 import { ChevronDown, ChevronUp, Maximize2, Sparkles, X } from "lucide-react";
-import { useState, type FormEvent, type SyntheticEvent } from "react";
+import { useEffect, useState, type FormEvent, type SyntheticEvent } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { usePrivateMedia } from "../media/private-media";
 import { MermaidBlock } from "./mermaid-block";
 import { REMIX_ACTIONS_BY_SOURCE } from "../../lib/media-remix";
+import { studioJson } from "../../lib/media-client";
 import type {
   MediaRemixKind,
   MediaRemixRequest,
@@ -33,7 +35,8 @@ const PLACEMENT_OPTIONS: ReadonlyArray<{
 ];
 
 export function resolvePrivateMediaContentPath(mediaRef: TreeMediaRef): string | null {
-  if (mediaRef.type === "mermaid") return null;
+  // An analysis is a page, not a file: its card links to it instead.
+  if (mediaRef.type === "mermaid" || mediaRef.type === "analysis") return null;
   if (mediaRef.type === "narration") {
     return `/api/v1/narrations/${encodeURIComponent(mediaRef.id)}/audio`;
   }
@@ -216,6 +219,10 @@ export function DocumentMediaCard({
       ) : null}
     </form>
   ) : null;
+
+  if (mediaRef.type === "analysis") {
+    return <AnalysisMediaCard id={mediaRef.id} alt={alt} className={className} />;
+  }
 
   if (mediaRef.type === "mermaid") {
     return (
@@ -409,6 +416,48 @@ export function DocumentMediaCard({
           </DialogContent>
         </Dialog>
       ) : null}
+    </figure>
+  );
+}
+
+/**
+ * An analysis in a document: its title, a short excerpt of the answer, and a
+ * link to the analysis. The analyses API enforces ownership, so a reader who
+ * cannot open it sees only that it is unavailable.
+ */
+function AnalysisMediaCard({ id, alt, className }: { id: string; alt?: string; className?: string }) {
+  const [analysis, setAnalysis] = useState<{ id: string; title: string; excerpt: string } | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    void studioJson<{ title: string; sourcePreview?: string }>(`/api/v1/analyses/${encodeURIComponent(id)}`, { signal: controller.signal })
+      .then((item) => setAnalysis({ id, title: item.title, excerpt: item.sourcePreview ?? "" }))
+      .catch(() => { if (!controller.signal.aborted) setUnavailable(true); });
+    return () => controller.abort();
+  }, [id]);
+  const current = analysis?.id === id ? analysis : null;
+  const title = current?.title || alt?.trim() || "Analysis";
+  return (
+    <figure
+      data-media-type="analysis"
+      data-media-id={id}
+      className={cn("grid w-full min-w-0 overflow-hidden rounded-lg border border-border bg-surface-card shadow-2xs", className)}
+    >
+      <div className="flex h-9 items-center justify-between gap-2 border-b border-border/50 bg-surface-inset/40 px-3.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="font-mono text-[11px] font-medium uppercase tracking-wider text-ink-faint select-none">analysis</span>
+          <span className="truncate text-xs text-ink-muted">{title}</span>
+        </div>
+        <Link
+          href={`/analysis/${encodeURIComponent(id)}`}
+          className="inline-flex h-6 shrink-0 items-center rounded-md border border-border/60 bg-surface-inset/80 px-2 font-mono text-[11px] font-medium text-ink-muted transition-colors hover:border-border-strong hover:bg-muted hover:text-foreground"
+        >
+          Open
+        </Link>
+      </div>
+      <p className="line-clamp-3 p-4 text-sm text-ink-muted">
+        {unavailable ? "This analysis is not available." : current?.excerpt || "\u00a0"}
+      </p>
     </figure>
   );
 }
