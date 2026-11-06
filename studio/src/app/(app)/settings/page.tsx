@@ -21,7 +21,6 @@ import { PresetList } from "@/components/studio/preset-list";
 import { RetentionSettings } from "@/components/studio/retention-settings";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
-import { ONE_OFF, selectedPresetId } from "@/lib/presets";
 import {
   DEFAULT_SETTINGS,
   DELIVERY_PRESETS,
@@ -30,7 +29,6 @@ import {
   settingsDefaultVoice,
   TTS_MODELS,
   type HighlightColorId,
-  type TextPreset,
   type TTSModelName,
   type UserSettings,
   type Visibility,
@@ -52,15 +50,23 @@ function Row({
   label,
   hint,
   htmlFor,
+  stacked = false,
   children,
 }: {
   label: string;
   hint?: string;
   htmlFor: string;
+  stacked?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid min-w-0 grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-6">
+    <div
+      className={
+        stacked
+          ? "grid min-w-0 grid-cols-1 gap-3"
+          : "grid min-w-0 grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-6"
+      }
+    >
       <div className="grid min-w-0 gap-1">
         <Label htmlFor={htmlFor} className="t-card-title font-normal">
           {label}
@@ -72,48 +78,12 @@ function Row({
   );
 }
 
-/** Chooses which preset new narrations start with. */
-function DefaultPresetSelect({
-  id,
-  presets,
-  text,
-  onChange,
-}: {
-  id: string;
-  presets: readonly TextPreset[];
-  text: string;
-  onChange: (text: string) => void;
-}) {
-  const selected = selectedPresetId(presets, text, undefined);
-  return (
-    <Select
-      value={selected}
-      onValueChange={(value) => {
-        const preset = presets.find((item) => item.id === value);
-        if (preset) onChange(preset.text);
-      }}
-    >
-      <SelectTrigger id={id} className="w-full">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {presets.map((preset) => (
-          <SelectItem key={preset.id} value={preset.id}>{preset.name}</SelectItem>
-        ))}
-        {selected === ONE_OFF ? <SelectItem value={ONE_OFF} disabled>Current text (not a preset)</SelectItem> : null}
-      </SelectContent>
-    </Select>
-  );
-}
-
 export default function SettingsPage() {
   const { profile, defaultReader, updateSettings, signOutUser } = useAuth();
   const { highlightColor, setHighlightColor } = useNarration();
   const { theme, setTheme } = useTheme();
 
   const settings: UserSettings = profile?.settings ?? DEFAULT_SETTINGS;
-  const deliveryPresets = [...DELIVERY_PRESETS, ...settings.deliveryPresets];
-  const instructionPresets = [...INSTRUCTION_PRESETS, ...settings.instructionPresets];
 
   const save = (patch: Partial<UserSettings>) => {
     try {
@@ -231,12 +201,25 @@ export default function SettingsPage() {
           {defaultReader.provider !== "elevenlabs" ? (
             <>
               <Separator />
-              <Row label="Delivery" hint="How the reader should sound by default." htmlFor="default-style">
-                <DefaultPresetSelect
+              <Row
+                stacked
+                label="Delivery"
+                hint="Choose the default delivery and manage saved delivery presets. Narrations keep their own text if a preset is edited or deleted."
+                htmlFor="default-style"
+              >
+                <PresetList
                   id="default-style"
-                  presets={deliveryPresets}
-                  text={settings.defaultPromptStyle}
-                  onChange={(text) => save({ defaultPromptStyle: text })}
+                  label="Delivery"
+                  builtInPresets={DELIVERY_PRESETS}
+                  savedPresets={settings.deliveryPresets}
+                  defaultText={settings.defaultPromptStyle}
+                  placeholder="Describe tone, pacing, and character…"
+                  onSave={({ presets, defaultText }) =>
+                    save({
+                      deliveryPresets: presets,
+                      defaultPromptStyle: defaultText,
+                    })
+                  }
                 />
               </Row>
             </>
@@ -260,12 +243,25 @@ export default function SettingsPage() {
 
           <Separator />
 
-          <Row label="Custom instructions" hint="What the rewrite starts with." htmlFor="default-instructions">
-            <DefaultPresetSelect
+          <Row
+            stacked
+            label="Custom instructions"
+            hint="Choose the default rewrite instructions and manage saved instruction presets."
+            htmlFor="default-instructions"
+          >
+            <PresetList
               id="default-instructions"
-              presets={instructionPresets}
-              text={settings.defaultRewriteInstructions}
-              onChange={(text) => save({ defaultRewriteInstructions: text })}
+              label="Instruction"
+              builtInPresets={INSTRUCTION_PRESETS}
+              savedPresets={settings.instructionPresets}
+              defaultText={settings.defaultRewriteInstructions}
+              placeholder="Tell the rewrite how to handle headings, code, or tone…"
+              onSave={({ presets, defaultText }) =>
+                save({
+                  instructionPresets: presets,
+                  defaultRewriteInstructions: defaultText,
+                })
+              }
             />
           </Row>
 
@@ -298,24 +294,6 @@ export default function SettingsPage() {
                 checked={settings.verbalizeDiagrams}
                 onCheckedChange={(checked) => save({ verbalizeDiagrams: checked })}
               />
-            </div>
-          </Row>
-
-          <Separator />
-
-          <Row label="Delivery presets" hint="Saved from the composer. Narrations keep their text if a preset is deleted." htmlFor="delivery-presets">
-            <div id="delivery-presets" className="min-w-0">
-              <PresetList label="Delivery" presets={settings.deliveryPresets}
-                onDelete={(id) => save({ deliveryPresets: settings.deliveryPresets.filter((preset) => preset.id !== id) })} />
-            </div>
-          </Row>
-
-          <Separator />
-
-          <Row label="Instruction presets" hint="Saved from the composer." htmlFor="instruction-presets">
-            <div id="instruction-presets" className="min-w-0">
-              <PresetList label="Instruction" presets={settings.instructionPresets}
-                onDelete={(id) => save({ instructionPresets: settings.instructionPresets.filter((preset) => preset.id !== id) })} />
             </div>
           </Row>
 
