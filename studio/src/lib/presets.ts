@@ -58,3 +58,65 @@ export function addPreset(saved: readonly TextPreset[], preset: TextPreset): Tex
   const kept = saved.filter((item) => item.name.toLowerCase() !== name);
   return [...kept, preset].slice(-MAX_SAVED_PRESETS);
 }
+
+export function isBuiltInPreset(preset: { id: string }): boolean {
+  return preset.id.startsWith('builtin:');
+}
+
+/** Builds an editable draft copy of a built-in or saved preset with a non-colliding name. */
+export function duplicatePresetDraft(
+  preset: TextPreset,
+  existingPresets: readonly TextPreset[],
+): { name: string; text: string } {
+  const base = preset.name.trim();
+  const taken = new Set(existingPresets.map((item) => item.name.trim().toLowerCase()));
+  let index = 1;
+  while (true) {
+    const suffix = index === 1 ? ' (copy)' : ` (copy ${index})`;
+    const candidate = `${base.slice(0, Math.max(1, MAX_PRESET_NAME - suffix.length))}${suffix}`;
+    if (!taken.has(candidate.toLowerCase())) {
+      return { name: candidate, text: preset.text.slice(0, MAX_PRESET_TEXT) };
+    }
+    index += 1;
+  }
+}
+
+/**
+ * Updates a saved preset in place and keeps `defaultText` in sync when the
+ * edited preset was the active default.
+ */
+export function updatePreset(
+  saved: readonly TextPreset[],
+  id: string,
+  patch: { name: string; text: string },
+  currentDefaultText: string,
+): { presets: TextPreset[]; defaultText: string } {
+  const existing = saved.find((item) => item.id === id);
+  const nextName = patch.name.trim().slice(0, MAX_PRESET_NAME);
+  const nextText = patch.text.slice(0, MAX_PRESET_TEXT);
+  if (!existing || !nextName || !nextText.trim()) {
+    return { presets: [...saved], defaultText: currentDefaultText };
+  }
+  const lowerName = nextName.toLowerCase();
+  const presets = saved
+    .filter((item) => item.id === id || item.name.toLowerCase() !== lowerName)
+    .map((item) => (item.id === id ? { id, name: nextName, text: nextText } : item));
+  const defaultText = currentDefaultText === existing.text ? nextText : currentDefaultText;
+  return { presets, defaultText };
+}
+
+/**
+ * Removes a saved preset and falls back `defaultText` to `fallbackDefaultText`
+ * when the removed preset was the active default.
+ */
+export function deletePreset(
+  saved: readonly TextPreset[],
+  id: string,
+  currentDefaultText: string,
+  fallbackDefaultText: string,
+): { presets: TextPreset[]; defaultText: string } {
+  const removed = saved.find((item) => item.id === id);
+  const presets = saved.filter((item) => item.id !== id);
+  const defaultText = removed && currentDefaultText === removed.text ? fallbackDefaultText : currentDefaultText;
+  return { presets, defaultText };
+}
