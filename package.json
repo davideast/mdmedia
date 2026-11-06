@@ -48,6 +48,10 @@
       "types": "./dist/video/index.d.ts",
       "import": "./dist/video/index.js"
     },
+    "./analysis": {
+      "types": "./dist/analysis/index.d.ts",
+      "import": "./dist/analysis/index.js"
+    },
     "./music": {
       "types": "./dist/music/index.d.ts",
       "import": "./dist/music/index.js"

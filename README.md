@@ -105,6 +105,21 @@ The output format follows the file extension (`.wav` is generated as 44.1 kHz PC
 
 ---
 
+### 4. Video Understanding (`mdmedia analyze`)
+
+Ask Gemini about a local video or a public YouTube link. The answer is printed as Markdown on stdout, and progress goes to stderr, so agents can pipe it:
+
+```bash
+mdmedia analyze -v lecture.mp4 -p "What are the three main arguments? Cite MM:SS."
+mdmedia analyze -v https://youtu.be/9hE5-98ZeCg --processing agentic -o notes.md
+mdmedia analyze -v talk.mp4 --start 20m --end 25:00 --fps 0.5 -p "Summarize this section."
+mdmedia analyze --follow-up <interactionId> -p "Expand on the second argument."
+```
+
+Videos up to about 15 MB are sent inline. Larger files are uploaded through the Gemini Files API first. The request runs in the background and is polled, so long videos don't time out. `--processing agentic` lets the model navigate long videos. It needs `gemini-4-argon`, `gemini-3.8-flash`, `gemini-3.6-flash`, or `gemini-3.5-flash-lite`, and it can't be combined with `--start`, `--end`, or `--fps`. `analyze` always needs the subcommand name. While it runs, each new step Gemini reports prints as one line on stderr (not with `--json`). `--schema shots.json` asks for JSON matching a JSON Schema instead of Markdown.
+
+---
+
 ## Configuration File (`.mdmedia.json`)
 
 If `.mdmedia.json` exists in the working directory, options are loaded automatically. Precedence:
@@ -192,6 +207,25 @@ For sound effects, the `sfx` section accepts `model`, `outputFormat`, `durationS
 | `--format` | `-f` | From output extension | `mp3` or `wav` |
 | `--model` | `-m` | `eleven_text_to_sound_v2` | ElevenLabs sound effects model |
 | `--apiKey` | `-k` | `ELEVENLABS_API_KEY` | ElevenLabs API key |
+
+### `mdmedia analyze` Options
+
+| Flag | Short | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `--video` | `-v` | | Video file(s) or YouTube link(s), comma-separated, up to 10 |
+| `--prompt` | `-p` | | What to ask about the video |
+| `--input` | `-i` | | File containing the prompt (`-` for stdin) |
+| `--model` | `-m` | `gemini-3.8-flash` | Also set by `analysis.model` in `.mdmedia.json` or `MDMEDIA_ANALYSIS_MODEL` |
+| `--processing` | | `static` | `static` or `agentic` |
+| `--start` / `--end` | | | Static only: clip range (`90`, `20m`, `MM:SS`) |
+| `--fps` | | `1` | Static only: frames sampled per second |
+| `--media-resolution` | | Model default | `low`, `medium`, `high`, `ultra_high` |
+| `--system` | | | System instruction |
+| `--follow-up` | | | Interaction id of an earlier analysis |
+| `--schema` | | | JSON Schema file; the answer is JSON matching it |
+| `--output` | `-o` | | Also save the answer to a file |
+| `--json` | | `false` | Print `{ text, interactionId, model, usage, trace }` |
+| `--apiKey` | `-k` | `GEMINI_API_KEY` | Gemini API key |
 
 ---
 
