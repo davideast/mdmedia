@@ -52,11 +52,17 @@ export interface ImageConfig {
   readonly imageSearch?: boolean;
 }
 
+export interface AnalysisConfig {
+  /** Gemini model for `mdmedia analyze` (default gemini-3.8-flash). */
+  readonly model?: string;
+}
+
 export interface MdMediaConfig {
   readonly mode?: MediaType;
   readonly audio?: AudioConfig;
   readonly video?: VideoConfig;
   readonly image?: ImageConfig;
+  readonly analysis?: AnalysisConfig;
   readonly music?: MusicConfig;
   readonly sfx?: SoundEffectsConfig;
   readonly narration?: NarrationConfig;

@@ -5,6 +5,7 @@ import { cutCommand } from './cut-command.js';
 import { productionCommand } from './production-command.js';
 import { commentsCommand } from './comments-command.js';
 import { characterCommand } from './character-command.js';
+import { analyzeCommand } from './analyze-command.js';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -923,6 +924,7 @@ const SUBCOMMANDS = {
   audio: audioCommand,
   voices: voicesCommand,
   video: videoCommand,
+  analyze: analyzeCommand,
   image: imageCommand,
   music: musicCommand,
   sfx: sfxCommand,

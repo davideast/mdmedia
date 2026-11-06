@@ -154,6 +154,7 @@ async function verifyPackagingAndConsumerHarness() {
 import * as root from 'mdmedia';
 import * as audio from 'mdmedia/audio';
 import * as video from 'mdmedia/video';
+import * as analysis from 'mdmedia/analysis';
 import * as music from 'mdmedia/music';
 import * as sfx from 'mdmedia/sfx';
 import * as chunker from 'mdmedia/chunker';
@@ -170,6 +171,7 @@ if (!audio.WavFileStreamSink) throw new Error('Missing WavFileStreamSink in mdme
 if (!audio.extractWordTimingsFromPcm) throw new Error('Missing extractWordTimingsFromPcm in mdmedia/audio');
 if (!audio.getActiveWordAtPosition) throw new Error('Missing getActiveWordAtPosition in mdmedia/audio');
 if (!video.GeminiOmniVideoProvider) throw new Error('Missing GeminiOmniVideoProvider in mdmedia/video');
+if (!analysis.GeminiVideoAnalysisProvider) throw new Error('Missing GeminiVideoAnalysisProvider in mdmedia/analysis');
 if (!music.LyriaMusicProvider) throw new Error('Missing LyriaMusicProvider in mdmedia/music');
 if (!sfx.ElevenLabsSoundEffectsProvider) throw new Error('Missing ElevenLabsSoundEffectsProvider in mdmedia/sfx');
 if (!chunker.prepareDocumentChunks) throw new Error('Missing prepareDocumentChunks in mdmedia/chunker');
