@@ -165,7 +165,7 @@ assert.equal(firstJob.status, 'ready'); assert.equal(firstJob.interactionId, 'in
 assert.deepEqual(payloads[0].input[0], { type: 'video', uri: youtube.url }); assert.equal(payloads[0].input[1].text, firstBody.prompt); assert.equal(payloads[0].model, 'gemini-3.8-flash');
 assert.match(payloads[0].system_instruction, /well-structured Markdown document/);
 const ready = await (await analysisRoute.GET(get(`/api/v1/analyses/${first.id}`), params(first.id))).json();
-assert.equal(ready.result.id, first.generation.id); assert.equal(ready.result.assets[0].mimeType, 'text/markdown');
+assert.equal(ready.result.id, first.generation.id); assert.equal(ready.href, `/analysis/${first.id}`); assert.equal(ready.links.web, `${origin}/analysis/${first.id}`); assert.equal(ready.result.links.web, `${origin}/analysis/${first.id}`); assert.equal(ready.result.assets[0].mimeType, 'text/markdown');
 assert.deepEqual(ready.result.usage, { inputTokens: 100, outputTokens: 20, totalTokens: 120 }); assert.deepEqual(ready.result.trace, ['Looking at frames']);
 assert.equal(ready.result.interactionId, 'interaction-1'); assert.equal(ready.result.narrationId, null);
 assert.equal(ready.sourcePreview, 'Shot list 00:01 A red train arrives. 00:02 It leaves.');

@@ -165,7 +165,7 @@ export async function submitAnalysis(uid: string, prepared: PreparedAnalysis, bo
       narration: prepared.narration, narrationId: prepared.narration ? narrationIdFor(generationId) : null, narrationError: null,
       createdAt: now, updatedAt: now, leaseUntil: 0, leaseToken: null, error: null };
     const item: AnalysisItem = { id: itemId, type: 'analysis', ownerUid: uid, title, status: 'queued', visibility: 'private', request,
-      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: '/library',
+      ...carriedRetention(previous), createdAt: previous?.createdAt ?? now, updatedAt: now, href: `/analysis/${itemId}`,
       sourcePreview: previous?.sourcePreview ?? request.prompt.slice(0, 4000), thumbnailAssetId: null,
       latestGenerationId: generationId, latestSuccessfulGenerationId: previous?.latestSuccessfulGenerationId ?? null };
     tx.set(itemRef(itemId), item); tx.set(generationRef(generationId), job);
@@ -184,7 +184,7 @@ export async function analysisGenerationResource(job: AnalysisGeneration, origin
     request: { ...job.request, responseSchema: job.request.responseSchema ?? null }, preparedPrompt: null, provider: job.provider, model: job.model, interactionId: job.interactionId,
     progress: job.status === 'generating' ? job.progress ?? null : null, usage: job.usage ?? null, trace: job.trace ?? [],
     narrationId: job.narrationId ?? null, narrationError: job.narrationError ?? null,
-    assets: asset ? [assetResource(asset, origin)] : [], error: job.error, links: { self: `${origin}/api/v1/generations/${job.id}`, web: `${origin}/library` } };
+    assets: asset ? [assetResource(asset, origin)] : [], error: job.error, links: { self: `${origin}/api/v1/generations/${job.id}`, web: `${origin}/analysis/${job.itemId}` } };
 }
 export async function analysisResource(uid: string, id: string, origin: string): Promise<AnalysisResource> {
   const item = await loadAnalysisItem(uid, id); const latest = await loadAnalysisGeneration(uid, item.latestGenerationId);
@@ -193,7 +193,7 @@ export async function analysisResource(uid: string, id: string, origin: string):
     href: item.href, thumbnailAssetId: null, ...(item.sourcePreview === undefined ? {} : { sourcePreview: item.sourcePreview }), request: { ...item.request, responseSchema: item.request.responseSchema ?? null },
     latestGenerationId: latest.id, latestSuccessfulGenerationId: result?.id ?? null,
     latestGeneration: await analysisGenerationResource(latest, origin), result: result ? await analysisGenerationResource(result, origin) : null,
-    links: { self: `${origin}/api/v1/analyses/${id}`, web: `${origin}/library`, generations: `${origin}/api/v1/analyses/${id}/generations` } };
+    links: { self: `${origin}/api/v1/analyses/${id}`, web: `${origin}/analysis/${id}`, generations: `${origin}/api/v1/analyses/${id}/generations` } };
 }
 
 /** A raw video upload for `source: { kind: 'asset' }`. The bytes stay in Storage; Gemini gets them per attempt. */

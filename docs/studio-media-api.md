@@ -2,9 +2,9 @@
 
 Studio supports Narration, Gemini Image, [Gemini Video sequences](studio-video-api.md),
 and Lyria Music. Create, Drafts, Library, Activity, Pinned, Recent, and Find work
-serve all four. [Sound effects](studio-sfx-api.md) and
-[video analysis](studio-analysis-api.md) are API-only: they appear in Library and
-Activity but have no composer yet.
+serve all four, and [video analysis](studio-analysis-api.md). [Sound
+effects](studio-sfx-api.md) are API-only: they appear in Library and Activity but
+have no composer yet.
 
 The existing [narration API](studio-narration-api.md) remains compatible. Its
 `streaming` status, WAV endpoint, playlists, visibility, and request options

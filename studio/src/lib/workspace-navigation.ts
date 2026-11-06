@@ -29,8 +29,8 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
       continue;
     }
     const isTree = view.key.startsWith('/trees/');
-    const type = view.key.startsWith('/music/') || view.key.startsWith('/studio/music:') ? 'music' : view.key.startsWith('/video/') || view.key.startsWith('/studio/video:') ? 'video' : view.key.startsWith('/image/') || view.key.startsWith('/studio/image:') ? 'image' : view.key.startsWith('/narration/') || view.key.startsWith('/studio:') ? 'narration' : undefined;
-    const kind = route.draftId ? (type === 'music' ? 'Music draft' : type === 'video' ? 'Video draft' : type === 'image' ? 'Image draft' : 'Draft') : isTree ? 'Tree doc' : type === 'music' ? 'Music' : type === 'video' ? 'Video' : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
+    const type = view.key.startsWith('/analysis/') || view.key.startsWith('/studio/analysis:') ? 'analysis' : view.key.startsWith('/music/') || view.key.startsWith('/studio/music:') ? 'music' : view.key.startsWith('/video/') || view.key.startsWith('/studio/video:') ? 'video' : view.key.startsWith('/image/') || view.key.startsWith('/studio/image:') ? 'image' : view.key.startsWith('/narration/') || view.key.startsWith('/studio:') ? 'narration' : undefined;
+    const kind = route.draftId ? (type === 'analysis' ? 'Analysis draft' : type === 'music' ? 'Music draft' : type === 'video' ? 'Video draft' : type === 'image' ? 'Image draft' : 'Draft') : isTree ? 'Tree doc' : type === 'analysis' ? 'Analysis' : type === 'music' ? 'Music' : type === 'video' ? 'Video' : type === 'image' ? 'Image' : type === 'narration' ? 'Narration' : 'Playlist';
     items.set(view.key, { type, key: view.key, href: view.href, title: view.title, detail: `${kind} · ${id}`,
       search: `${view.title} ${id}`, pinned: view.pinned === true, visitedAt: view.visitedAt ?? 0, viewId: view.id, draftId: route.draftId });
   }
@@ -64,12 +64,19 @@ export function workspaceItems(state: WorkspaceSnapshot): WorkItem[] {
       type: 'music', detail: `Music draft · ${id}`, search: `${title} ${draft.prompt} ${id}`,
       pinned: previous?.pinned ?? false, visitedAt: previous?.visitedAt ?? 0, draftId: id });
   }
+  for (const [id, draft] of Object.entries(state.analysisDrafts ?? {})) {
+    const key = `/studio/analysis:${id}`; const previous = items.get(key);
+    const title = draft.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 200) || 'Untitled analysis';
+    items.set(key, { ...previous, key, href: previous?.href ?? `/studio/analysis?draft=${encodeURIComponent(id)}`, title,
+      type: 'analysis', detail: `Analysis draft · ${id}`, search: `${title} ${draft.prompt} ${id}`,
+      pinned: previous?.pinned ?? false, visitedAt: previous?.visitedAt ?? 0, draftId: id });
+  }
   return [...items.values()].sort((a, b) => b.visitedAt - a.visitedAt || a.key.localeCompare(b.key));
 }
 
 export function isWorkRoute(href: string): boolean {
   const route = workspaceRoute(href);
-  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/playlists:') || productionRoute(route.key) !== null || storyboardRoute(route.key) !== null || route.key.startsWith('/trees/'));
+  return !!route && (!!route.draftId || route.key.startsWith('/narration/') || route.key.startsWith('/image/') || route.key.startsWith('/video/') || route.key.startsWith('/music/') || route.key.startsWith('/analysis/') || route.key.startsWith('/playlists:') || productionRoute(route.key) !== null || storyboardRoute(route.key) !== null || route.key.startsWith('/trees/'));
 }
 
 export function matchesWork(text: string, query: string): boolean {

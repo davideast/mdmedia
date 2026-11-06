@@ -4,7 +4,8 @@ Studio asks Gemini about a video and saves the answer as Markdown (or JSON, with
 `responseSchema`). A saved Analysis is one Library item; each generation is an
 immutable attempt whose output is one `text/markdown` or `application/json` asset. The source can be a video already in your
 Studio (the whole sequence, a version, or one clip), a video you upload, or a
-public YouTube link. Analyses have no dedicated Studio screen yet; saved items appear in the Library.
+public YouTube link. Create → Analysis opens the composer at `/studio/analysis`;
+each saved analysis opens at `/analysis/{id}`.
 
 The engine is `mdmedia/analysis` (`GeminiVideoAnalysisProvider`), the same one
 `mdmedia analyze` uses. Small requests send the video inline; larger ones go

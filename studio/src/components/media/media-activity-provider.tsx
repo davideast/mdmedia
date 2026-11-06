@@ -14,7 +14,7 @@ export function MediaActivityProvider({ children }: { children: ReactNode }) {
       clearTimeout(timer);
       let active = 0;
       try {
-        const pages = await Promise.all(['image', 'video', 'music', 'sfx'].flatMap(type => ['queued', 'generating'].map(status => studioJson<{ items: unknown[] }>(`/api/v1/generations?type=${type}&status=${status}`, { signal: controller.signal }))));
+        const pages = await Promise.all(['image', 'video', 'music', 'sfx', 'analysis'].flatMap(type => ['queued', 'generating'].map(status => studioJson<{ items: unknown[] }>(`/api/v1/generations?type=${type}&status=${status}`, { signal: controller.signal }))));
         active = pages.reduce((sum, page) => sum + page.items.length, 0);
         if (!controller.signal.aborted) setCount(active);
       } catch { /* Directory and editor show actionable errors; background counts do not interrupt work. */ }
