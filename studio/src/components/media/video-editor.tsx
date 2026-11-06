@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Video, Download, Expand, PanelRight, MoreHorizontal, Upload, Paperclip, X, Loader2, History, Copy, Pencil, RotateCcw, ListVideo } from 'lucide-react';
+import { Video, Download, Expand, PanelRight, MoreHorizontal, Upload, Paperclip, X, Loader2, History, Copy, Pencil, RotateCcw, ListVideo, ScanSearch } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ import { MediaClientError, studioJson } from '@/lib/media-client';
 import type { VideoRequest, VideoResource, VideoGenerationResource, VideoDraft } from '@/lib/media-types';
 import { DEFAULT_VIDEO_REQUEST, VIDEO_RESOLUTIONS } from '@/lib/video-request';
 import { MAX_REFERENCE_BYTES } from '@/lib/image-request';
+import { DEFAULT_ANALYSIS_DRAFT } from '@/lib/analysis-draft';
 import { MediaComposer, MediaIconAction } from './media-composer';
 import { AssetImage } from './asset-image';
 import { usePrivateMedia, PrivateThumbnail, downloadPrivateMedia } from './private-media';
@@ -121,6 +122,13 @@ export function VideoEditor({ id }: { id?: string }) {
     const draft = crypto.randomUUID(); const source = request.prompt.trim() ? request : video?.result?.request ?? request;
     store.setVideoDraft(draft, { ...source, kind: 'video' }); router.push(`/studio/video?draft=${draft}`);
   }
+  /** Opens the analysis composer with this video, a past version, or one clip as the source. */
+  function analyze(clip: number | null = null) {
+    if (!id || !video) return;
+    const draft = crypto.randomUUID(); const version = clip ? video.latestSuccessfulGenerationId : selected?.id ?? null;
+    store.setAnalysisDraft(draft, { ...DEFAULT_ANALYSIS_DRAFT, source: { kind: 'video', videoItemId: id, generationId: version, clip }, sourceLabel: video.title });
+    router.push(`/studio/analysis?draft=${draft}`);
+  }
   const title = id ? video?.title ?? 'Video' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New video';
   const report = (e: unknown) => setError((e as Error).message);
   const optionsAction: HeaderAction = { icon: PanelRight, label: 'Video options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' };
@@ -130,6 +138,7 @@ export function VideoEditor({ id }: { id?: string }) {
       <DropdownMenuItem disabled={busy || Boolean(pending) || !video} onSelect={regenerate}><RotateCcw size={16} />Regenerate latest</DropdownMenuItem>
       <DropdownMenuItem onSelect={() => { setRename(video?.title ?? ''); setRenameOpen(true); }}><Pencil size={16} />Rename</DropdownMenuItem>
       <DropdownMenuItem disabled={!video} onSelect={duplicate}><Copy size={16} />Duplicate</DropdownMenuItem>
+      <DropdownMenuItem disabled={!result} onSelect={() => analyze()}><ScanSearch size={16} />Analyze</DropdownMenuItem>
     </> }, optionsAction] : [optionsAction]}>
     {loadError && <p role="alert" className="p-4 text-sm text-destructive">{loadError}</p>}
     {asset && <div className="grid shrink-0 gap-2 p-4 pb-0 sm:p-6 sm:pb-0">
@@ -165,6 +174,7 @@ export function VideoEditor({ id }: { id?: string }) {
       <SheetTitle>{drawer === 'clips' ? 'Clips' : drawer === 'history' ? 'History' : 'Video options'}</SheetTitle><SheetDescription className="sr-only">{drawer === 'clips' ? 'Seek or download clips from the complete video.' : drawer === 'history' ? 'Preview previous results. Only the latest result can be continued.' : 'Optional video settings.'}</SheetDescription>
       {drawer === 'clips' ? <div className="grid gap-3">{video?.clips.map(clip => <div key={clip.index} className="flex items-center gap-2 rounded-md border border-border p-2">
         <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => { if (playerRef.current) { playerRef.current.currentTime = clip.startSeconds; void playerRef.current.play().catch(report); } setDrawer(''); }}><PrivateThumbnail path={clip.thumbnail} alt={`Clip ${clip.index}`} className="h-14 w-20 rounded object-cover" /><span className="text-sm">{clip.index}<span className="block text-xs text-ink-muted">{seconds(clip.endSeconds - clip.startSeconds)}</span></span></button>
+        <MediaIconAction label={`Analyze clip ${clip.index}`} onClick={() => analyze(clip.index)}><ScanSearch size={16} /></MediaIconAction>
         <MediaIconAction label={`Download clip ${clip.index}`} onClick={() => void downloadPrivateMedia(clip.content, `clip-${clip.index}.mp4`).catch(report)}><Download size={16} /></MediaIconAction>
       </div>)}</div> : drawer === 'history' ? <div className="grid gap-2">{versions.map(version => <button key={version.id} disabled={version.status !== 'ready'} className="flex items-center gap-3 rounded-md border border-border p-3 text-left text-sm disabled:opacity-50" onClick={() => { setSelected(version); setDrawer(''); }}>
         {version.assets[0] && <AssetImage id={version.assets[0].id} thumbnail alt="Previous video" className="h-14 w-20 rounded" />}<span>{new Date(version.createdAt).toLocaleString()}<span className="block text-xs text-ink-muted">{version.status === 'ready' ? seconds(version.durationSeconds ?? 0) : version.status}</span></span>

@@ -6,7 +6,7 @@ export const MEDIA_TYPES: Array<{ type: MediaType; label: string; composer: stri
   { type: 'video', label: 'Video', composer: '/studio/video', available: true },
   { type: 'music', label: 'Music', composer: '/studio/music', available: true },
   { type: 'sfx', label: 'Sound effect', composer: '/studio/sfx', available: false },
-  { type: 'analysis', label: 'Analysis', composer: '/studio/analysis', available: false },
+  { type: 'analysis', label: 'Analysis', composer: '/studio/analysis', available: true },
 ];
 export type GenerationStatus = 'queued' | 'generating' | 'ready' | 'error' | 'interrupted';
 export interface MediaSummary {

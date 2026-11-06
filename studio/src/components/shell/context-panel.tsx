@@ -82,7 +82,7 @@ function NarrationContextPanel({
   );
 }
 
-const MEDIA_ROUTE = /^\/(image|video|music)\/([^/?#]+)/;
+const MEDIA_ROUTE = /^\/(image|video|music|analysis)\/([^/?#]+)/;
 
 /** Pages without their own inspector still get Keep: pinning, and retention for media. */
 function WorkPanel({ pathname, actions }: { pathname: string; actions?: HeaderActions }) {
