@@ -5,6 +5,7 @@ import { AudioLines, ImageIcon, Video, Music2, Loader2, Library, ListOrdered, X,
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { CreateMenu } from '@/components/shell/create-menu';
 import { useRouteQuery, useWorkspaceField } from '@/components/shell/workspace-provider';
@@ -24,6 +25,7 @@ import { LocalNarrationActivity } from './local-narration-activity';
 type Cursor = { createdAt: number; id: string };
 type Row = MediaSummary & { itemId?: string; phase?: string };
 type Page = { items: Row[]; nextCursor: Cursor | null; indexing: boolean };
+const ALL_MEDIA = 'all';
 const labels: Record<string, string> = { queued: 'Queued', starting: 'Starting', preparing: 'Preparing prompt', generating: 'Generating', saving: 'Saving result', ready: 'Ready', error: 'Failed', interrupted: 'Interrupted' };
 export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
   const [query] = useRouteQuery('q');
@@ -69,9 +71,15 @@ export function MediaDirectory({ kind }: { kind: 'library' | 'activity' }) {
     catch { toast.error('Could not cancel generation.'); }
   };
   return <WorkbenchPanel workspacePage title={title} icon={kind === 'library' ? <Library size={15} /> : <ListOrdered size={15} />} viewGrid gridVariant="wide" scrollRef={scrollRef}>
-    <div className="flex flex-wrap gap-2">
-      <Input aria-label={`Search ${title}`} placeholder="Search titles or IDs…" className="min-w-0 flex-1" value={query} onChange={event => navigate(event.target.value.slice(0, 200), type, '', [])} />
-      <select aria-label="Media type" className="rounded-md border border-input bg-background px-3 text-sm" value={type} onChange={event => navigate(query, event.target.value, '', [])}><option value="">All media</option>{MEDIA_TYPES.filter(item => item.available).map(item => <option key={item.type} value={item.type}>{item.label}</option>)}</select>
+    <div className="flex flex-wrap items-center gap-2">
+      <Input aria-label={`Search ${title}`} placeholder="Search titles or IDs…" className="h-9 min-w-0 flex-1" value={query} onChange={event => navigate(event.target.value.slice(0, 200), type, '', [])} />
+      <Select value={type || ALL_MEDIA} onValueChange={value => navigate(query, value === ALL_MEDIA ? '' : value, '', [])}>
+        <SelectTrigger aria-label="Media type" className="h-9 min-w-[8.5rem] shrink-0"><SelectValue /></SelectTrigger>
+        <SelectContent position="popper" align="end">
+          <SelectItem value={ALL_MEDIA}>All media</SelectItem>
+          {MEDIA_TYPES.filter(item => item.available).map(item => <SelectItem key={item.type} value={item.type}>{item.label}</SelectItem>)}
+        </SelectContent>
+      </Select>
       <CreateMenu />
     </div>
     {kind === 'activity' && <LocalNarrationActivity type={type} />}
