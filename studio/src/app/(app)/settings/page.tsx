@@ -22,12 +22,16 @@ import { RetentionSettings } from "@/components/studio/retention-settings";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { useAuth } from "@/lib/auth-context";
 import {
+  CHAT_EFFORT_OPTIONS,
+  CHAT_MODELS,
   DEFAULT_SETTINGS,
   DELIVERY_PRESETS,
   INSTRUCTION_PRESETS,
   HIGHLIGHT_COLORS,
   settingsDefaultVoice,
   TTS_MODELS,
+  type ChatEffortLevel,
+  type ChatModelName,
   type HighlightColorId,
   type TTSModelName,
   type UserSettings,
@@ -321,6 +325,59 @@ export default function SettingsPage() {
               </SelectTrigger>
               <SelectContent>
                 {VISIBILITY.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+        </div>
+
+        <Separator />
+
+        <div className="grid gap-5">
+          <div className="grid gap-1">
+            <h2 className="t-card-title">Chat</h2>
+            <p className="t-meta">Default Gemini model and reasoning effort for Studio Chat. You can also switch models inline from the chat composer.</p>
+          </div>
+
+          <Row
+            label="Chat model"
+            hint="Model used across chat turns and tool calls."
+            htmlFor="chat-model"
+          >
+            <Select
+              value={settings.chatModel}
+              onValueChange={(value) => save({ chatModel: value as ChatModelName })}
+            >
+              <SelectTrigger id="chat-model" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHAT_MODELS.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+
+          <Row
+            label="Reasoning effort"
+            hint="Controls how much thinking budget Gemini spends before answering or calling tools."
+            htmlFor="chat-effort"
+          >
+            <Select
+              value={settings.chatEffort}
+              onValueChange={(value) => save({ chatEffort: value as ChatEffortLevel })}
+            >
+              <SelectTrigger id="chat-effort" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CHAT_EFFORT_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

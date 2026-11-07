@@ -69,6 +69,20 @@ service cloud.firestore {
     match /mediaQuotas/{id} { allow read, write: if false; }
     match /mediaCatalogMigrations/{id} { allow read, write: if false; }
 
+    // Studio Contextual Chat threads, nested messages, and staged actions.
+    // Managed strictly through /api/v1/chat/* with the Admin SDK.
+    match /chatThreads/{threadId} {
+      allow read, write: if false;
+
+      match /messages/{messageId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /chatStagedActions/{callId} {
+      allow read, write: if false;
+    }
+
     match /trees/{treeId} {
       allow get, list: if isAllowlisted() && isOwner(resource.data.ownerUid);
       allow write: if false;
