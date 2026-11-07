@@ -12,6 +12,8 @@ import {
   DEFAULT_SETTINGS,
   DELIVERY_PRESETS,
   HIGHLIGHT_COLORS,
+  isChatEffortLevel,
+  isChatModelName,
   isVoiceRef,
   readDefaultVoiceRef,
   TTS_MODELS,
@@ -48,6 +50,12 @@ export function readSettings(value: unknown): UserSettings {
     defaultGeminiModel: preferredGeminiModel && TTS_MODELS.includes(preferredGeminiModel)
       ? preferredGeminiModel
       : DEFAULT_SETTINGS.defaultGeminiModel,
+    chatModel: isChatModelName(raw.chatModel)
+      ? raw.chatModel
+      : DEFAULT_SETTINGS.chatModel,
+    chatEffort: isChatEffortLevel(raw.chatEffort)
+      ? raw.chatEffort
+      : DEFAULT_SETTINGS.chatEffort,
     defaultPromptStyle: asString(raw.defaultPromptStyle, DEFAULT_SETTINGS.defaultPromptStyle),
     rewriteForNarration:
       typeof raw.rewriteForNarration === 'boolean'

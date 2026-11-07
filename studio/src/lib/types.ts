@@ -82,6 +82,25 @@ export type TTSModelName = (typeof TTS_MODELS)[number];
 
 export const DEFAULT_TTS_MODEL: TTSModelName = "gemini-3.8-flash-tts";
 
+export {
+  CHAT_MODELS,
+  CHAT_MODEL_OPTIONS,
+  DEFAULT_CHAT_MODEL,
+  CHAT_EFFORT_LEVELS,
+  CHAT_EFFORT_OPTIONS,
+  DEFAULT_CHAT_EFFORT,
+  isChatModelName,
+  isChatEffortLevel,
+  type ChatModelName,
+  type ChatEffortLevel,
+} from "./chat/types";
+import {
+  DEFAULT_CHAT_EFFORT,
+  DEFAULT_CHAT_MODEL,
+  type ChatEffortLevel,
+  type ChatModelName,
+} from "./chat/types";
+
 /** Who can read a narration. */
 export type Visibility = "private" | "shared" | "public";
 
@@ -297,6 +316,10 @@ export interface UserSettings {
   pinnedVoiceRefs?: VoiceRef[];
   /** Gemini TTS model used for new narrations with a Gemini reader. */
   defaultGeminiModel: TTSModelName;
+  /** Default Gemini model for Studio Contextual Chat. */
+  chatModel: ChatModelName;
+  /** Default reasoning effort (`thinking_level`) for Studio Contextual Chat. */
+  chatEffort: ChatEffortLevel;
   defaultPromptStyle: string;
   /** Rewrite markdown for the ear before synthesis. */
   rewriteForNarration: boolean;
@@ -323,6 +346,8 @@ export const DEFAULT_SETTINGS: UserSettings = {
   defaultVoiceRef: { provider: "gemini", id: DEFAULT_VOICE },
   pinnedVoiceRefs: [],
   defaultGeminiModel: DEFAULT_TTS_MODEL,
+  chatModel: DEFAULT_CHAT_MODEL,
+  chatEffort: DEFAULT_CHAT_EFFORT,
   defaultPromptStyle: "Warm, unhurried narration.",
   rewriteForNarration: true,
   autoPlay: true,
