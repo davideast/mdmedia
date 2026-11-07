@@ -12,6 +12,7 @@ import { useReaderFollow } from "@/components/reader/use-reader-follow";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import type { HeaderAction } from "@/components/shell/header-action";
 import { parseDocumentView, useNarration } from "@/components/shell/narration-provider";
+import { usePublishChatViewContext } from "@/lib/chat-context-bridge";
 import { projectNarrationView } from "@/lib/narration-document";
 import { narrateAgain, updateNarrationTitle } from "@/lib/narrations";
 import { useNarrationDocument } from "@/lib/use-narration-document";
@@ -99,6 +100,42 @@ export default function NarrationPage() {
     stream.title.length > 0
       ? stream.title
       : activeQueueJob?.title || "Narration";
+
+  const narrationChatSnapshot = useMemo(
+    () =>
+      id
+        ? {
+            surface: "narration" as const,
+            route: `/narration/${id}`,
+            itemId: id,
+            title: displayTitle,
+            voiceName: stream.voice || null,
+            durationSeconds: loadedDurationMs > 0 ? loadedDurationMs / 1000 : null,
+          }
+        : null,
+    [id, displayTitle, stream.voice, loadedDurationMs],
+  );
+
+  usePublishChatViewContext(narrationChatSnapshot, {
+    getPlayheadSeconds: () => (isLive ? playback.positionMs / 1000 : 0),
+    seek: (seconds, play) => {
+      const startMs = Math.max(0, Math.round(seconds * 1000));
+      if (isLive && playback.player && playback.durationMs > 0) {
+        playback.player.seek(startMs);
+        if (play !== false && !playback.playing) void playback.player.play();
+      } else {
+        playNarration(id, startMs);
+      }
+    },
+    togglePlay: () => {
+      if (isLive && playback.player && playback.durationMs > 0) {
+        if (playback.playing) playback.player.pause();
+        else void playback.player.play();
+      } else {
+        playNarration(id);
+      }
+    },
+  });
 
   const startEditingTitle = () => {
     isSubmittingRef.current = false;

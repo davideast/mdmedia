@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ScanSearch, PanelRight, MoreHorizontal, History, Headphones, AudioLines, Upload, Library, Link2, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import type { HeaderAction } from '@/components/shell/header-action';
 import { useWorkspace, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { VoicePicker } from '@/components/studio/voice-picker';
 import { useAuth } from '@/lib/auth-context';
+import { usePublishChatViewContext } from '@/lib/chat-context-bridge';
 import { MediaClientError, studioFetch, studioJson } from '@/lib/media-client';
 import { ANALYSIS_RESOLUTIONS, ANALYSIS_UPLOAD_ACCEPT, DEFAULT_ANALYSIS_DRAFT, MAX_ANALYSIS_UPLOAD_BYTES, analysisBody, type AnalysisDraft } from '@/lib/analysis-draft';
 import type { AnalysisGenerationResource, AnalysisResource, AnalysisSource, MediaSummary, VideoResource } from '@/lib/media-types';
@@ -91,6 +92,33 @@ function AnalysisComposer() {
   const title = titleOf(draft.prompt) || 'New analysis';
   const models = options ? [...new Set([options.model, ...options.capabilities.agenticModels])] : [];
   const source = draft.source;
+  const selectedSourceId = source?.kind === 'video' ? source.videoItemId : source?.kind === 'asset' ? source.assetId : source?.kind === 'youtube' ? source.url || null : null;
+  const composerSnapshot = useMemo(() => ({
+    surface: 'composer' as const,
+    route: '/studio/analysis',
+    draftKind: 'analysis' as const,
+    draftTitle: title,
+    promptExcerpt: draft.prompt.trim().slice(0, 240) || undefined,
+    selectedSourceId,
+  }), [title, draft.prompt, selectedSourceId]);
+  usePublishChatViewContext(composerSnapshot, {
+    patchComposerDraft: (draftKind, patch) => {
+      if (draftKind !== 'analysis') return;
+      const nextPatch: Partial<AnalysisDraft> = {};
+      if (typeof patch.prompt === 'string') nextPatch.prompt = patch.prompt;
+      if (typeof patch.youtubeUrl === 'string' && patch.youtubeUrl.trim()) {
+        nextPatch.source = { kind: 'youtube', url: patch.youtubeUrl.trim() };
+        nextPatch.sourceLabel = patch.youtubeUrl.trim();
+      } else if (typeof patch.videoItemId === 'string' && patch.videoItemId.trim()) {
+        nextPatch.source = { kind: 'video', videoItemId: patch.videoItemId.trim(), generationId: null, clip: null };
+      }
+      if (typeof patch.narrate === 'boolean') nextPatch.narrate = patch.narrate;
+      if (typeof patch.model === 'string') nextPatch.model = patch.model;
+      if (typeof patch.longVideo === 'boolean') nextPatch.longVideo = patch.longVideo;
+      if (typeof patch.systemInstruction === 'string') nextPatch.systemInstruction = patch.systemInstruction;
+      if (Object.keys(nextPatch).length > 0) update(nextPatch);
+    },
+  });
   return <WorkbenchPanel workspacePage title={title} icon={<ScanSearch size={13} />} bodyClassName="gap-0 p-0"
     actions={[{ icon: PanelRight, label: 'Analysis options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' }]}>
     <MediaComposer heading="Ask about a video" label="Analysis prompt" placeholder="What do you want to know?" value={draft.prompt} maxLength={32000}
@@ -236,6 +264,33 @@ function AnalysisView({ id }: { id: string }) {
     store.setDraft(draft, { markdown: answer }); router.push(`/studio?draft=${draft}`);
   }
   const seek = media.url ? (seconds: number) => { const player = playerRef.current; if (!player) return; player.currentTime = seconds; void player.play().catch(() => {}); } : undefined;
+  const sourceVideoId = source?.kind === 'video' ? source.videoItemId : source?.kind === 'asset' ? source.assetId : null;
+  const sourceYoutubeUrl = source?.kind === 'youtube' ? source.url : null;
+  const viewTitle = analysis?.title || result?.request.prompt.trim().split('\n')[0] || 'Video analysis';
+  const viewSnapshot = useMemo(() => ({
+    surface: 'analysis' as const,
+    route: `/analysis/${id}`,
+    itemId: id,
+    title: viewTitle,
+    status: analysis?.status,
+    sourceVideoId,
+    sourceYoutubeUrl,
+  }), [id, viewTitle, analysis?.status, sourceVideoId, sourceYoutubeUrl]);
+  usePublishChatViewContext(viewSnapshot, {
+    getPlayheadSeconds: () => (playerRef.current ? playerRef.current.currentTime : null),
+    seek: (seconds, play) => {
+      const player = playerRef.current;
+      if (!player) return;
+      player.currentTime = seconds;
+      if (play !== false) void player.play().catch(() => {});
+    },
+    togglePlay: () => {
+      const player = playerRef.current;
+      if (!player) return;
+      if (player.paused || player.ended) void player.play().catch(() => {});
+      else player.pause();
+    },
+  });
   const menu: HeaderAction = { icon: MoreHorizontal, label: 'Analysis actions', menu: <>
     <DropdownMenuItem onSelect={() => void history()}><History size={15} />History</DropdownMenuItem>
     {!narration && !json && <DropdownMenuItem disabled={!answer} onSelect={narrate}><AudioLines size={15} />Narrate</DropdownMenuItem>}

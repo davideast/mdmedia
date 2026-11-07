@@ -8,6 +8,7 @@ import { gainAt, type CutError, type ResolvedAudio, type ResolvedLine, type Reso
 import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { usePublishChatViewContext } from '@/lib/chat-context-bridge';
 import {
   activeIndex,
   fitLabels,
@@ -328,6 +329,31 @@ export function CutViewer({ timeline: cut, title, titleNode, video: src, videoRe
   const controls = useMemo<CutViewerControls>(() => ({ timeline: cut, currentTime, seek, pause, video: videoRef, frame }), [cut, currentTime, seek, pause, frame]);
   const activeShot = now.shot >= 0 ? segments[now.shot] : null;
   const activeLine = now.line >= 0 ? lines[now.line] : null;
+  const activeSceneId = selectedPlacement ?? activeShot?.id ?? null;
+  const cutSnapshot = useMemo(() => {
+    const route = typeof window !== 'undefined' ? window.location.pathname : '/cut';
+    const match = /^\/productions\/([^/?#]+)\/cuts\/([^/?#]+)/.exec(route);
+    const productionId = match ? decodeURIComponent(match[1]!) : 'preview';
+    const cutId = match ? decodeURIComponent(match[2]!) : (source || title || 'cut');
+    return {
+      surface: 'cut' as const,
+      route,
+      productionId,
+      cutId,
+      title,
+      activeSceneId,
+    };
+  }, [source, title, activeSceneId]);
+  usePublishChatViewContext(cutSnapshot, {
+    getPlayheadSeconds: () => currentTime(),
+    seek: (seconds, play) => {
+      seek(seconds);
+      if (play && videoRef.current?.paused) {
+        void videoRef.current.play().catch(() => setPlaying(false));
+      }
+    },
+    togglePlay: toggle,
+  });
 
   // The side panel keeps to one grid: a label column, a value column that truncates, and a
   // right-aligned column of times. Every row is a fixed 32px, and the line's words, which vary,
