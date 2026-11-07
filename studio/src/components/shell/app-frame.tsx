@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { MediaActivityProvider } from "@/components/media/media-activity-provider";
+import { ChatProvider } from "@/components/chat/chat-provider";
 import { AppShell } from "@/components/shell/app-shell";
 import { ContextPanel } from "@/components/shell/context-panel";
 import { NarrationProvider } from "@/components/shell/narration-provider";
@@ -35,7 +36,11 @@ export function AppFrame({ children }: { children: ReactNode }) {
     <WorkspaceProvider key={user.uid}>
     <NarrationProvider>
       <OfflinePlaybackProvider>
-        <MediaActivityProvider><AppShell context={<ContextPanel />}>{children}</AppShell></MediaActivityProvider>
+        <MediaActivityProvider>
+          <ChatProvider>
+            <AppShell context={<ContextPanel />}>{children}</AppShell>
+          </ChatProvider>
+        </MediaActivityProvider>
       </OfflinePlaybackProvider>
     </NarrationProvider>
     </WorkspaceProvider>

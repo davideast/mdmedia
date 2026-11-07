@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Video, Download, Expand, PanelRight, MoreHorizontal, Upload, Paperclip, X, Loader2, History, Copy, Pencil, RotateCcw, ListVideo, ScanSearch } from 'lucide-react';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ import { WorkbenchPanel } from '@/components/shell/workbench-panel';
 import type { HeaderAction } from '@/components/shell/header-action';
 import { useWorkspace, useWorkspaceField } from '@/components/shell/workspace-provider';
 import { useAuth } from '@/lib/auth-context';
+import { usePublishChatViewContext } from '@/lib/chat-context-bridge';
 import { MediaClientError, studioJson } from '@/lib/media-client';
 import type { VideoRequest, VideoResource, VideoGenerationResource, VideoDraft } from '@/lib/media-types';
 import { DEFAULT_VIDEO_REQUEST, VIDEO_RESOLUTIONS } from '@/lib/video-request';
@@ -130,6 +131,72 @@ export function VideoEditor({ id }: { id?: string }) {
     router.push(`/studio/analysis?draft=${draft}`);
   }
   const title = id ? video?.title ?? 'Video' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New video';
+  const generationId = result?.id ?? video?.latestGenerationId ?? null;
+  const chatSnapshot = useMemo(
+    () =>
+      id
+        ? {
+            surface: 'video' as const,
+            route: `/video/${id}`,
+            itemId: id,
+            title,
+            status: video?.status,
+            generationId,
+          }
+        : {
+            surface: 'composer' as const,
+            route: '/studio/video',
+            draftKind: 'video' as const,
+            draftTitle: title,
+            promptExcerpt: request.prompt.trim().slice(0, 240) || undefined,
+            selectedSourceId: request.referenceAssetId,
+          },
+    [id, title, video?.status, generationId, request.prompt, request.referenceAssetId],
+  );
+  usePublishChatViewContext(
+    chatSnapshot,
+    id
+      ? {
+          getPlayheadSeconds: () => (playerRef.current ? playerRef.current.currentTime : null),
+          seek: (secs, play) => {
+            const player = playerRef.current;
+            if (!player) return;
+            player.currentTime = secs;
+            if (play !== false) void player.play().catch(() => {});
+          },
+          togglePlay: () => {
+            const player = playerRef.current;
+            if (!player) return;
+            if (player.paused || player.ended) void player.play().catch(() => {});
+            else player.pause();
+          },
+        }
+      : {
+          patchComposerDraft: (draftKind, patch) => {
+            if (draftKind !== 'video') return;
+            const nextPatch: Partial<VideoRequest> = {};
+            if (typeof patch.prompt === 'string') nextPatch.prompt = patch.prompt;
+            if (typeof patch.referenceAssetId === 'string' || patch.referenceAssetId === null) {
+              nextPatch.referenceAssetId = patch.referenceAssetId;
+            }
+            if (
+              (patch.aspectRatio === '16:9' || patch.aspectRatio === '9:16') ||
+              typeof patch.durationSeconds === 'number'
+            ) {
+              nextPatch.output = {
+                ...requestRef.current.output,
+                ...(patch.aspectRatio === '16:9' || patch.aspectRatio === '9:16'
+                  ? { aspectRatio: patch.aspectRatio }
+                  : {}),
+                ...(typeof patch.durationSeconds === 'number'
+                  ? { durationSeconds: patch.durationSeconds }
+                  : {}),
+              };
+            }
+            if (Object.keys(nextPatch).length > 0) update(nextPatch);
+          },
+        },
+  );
   const report = (e: unknown) => setError((e as Error).message);
   const optionsAction: HeaderAction = { icon: PanelRight, label: 'Video options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' };
   return <WorkbenchPanel workspacePage title={title} icon={<Video size={13} strokeWidth={2} />} bodyClassName="gap-0 p-0" actions={id ? [{ icon: MoreHorizontal, label: 'Video actions', menu: <>

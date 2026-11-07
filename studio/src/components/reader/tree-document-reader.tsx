@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { ImageIcon, Music, Sparkles, Video, X } from "lucide-react";
 import { lexer, type Token, type Tokens } from "marked";
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,16 +17,19 @@ import {
   DocumentMediaCard,
   resolvePrivateMediaContentPath,
 } from "./document-media-card";
+import { usePublishChatViewContext } from "../../lib/chat-context-bridge";
 import {
   alignMarkdownWords,
   normalizeSpeakableToken,
   parseMediaUri,
 } from "../../lib/markdown-word-aligner";
+import { STUDIO_MUTATION_EVENT, studioJson } from "../../lib/media-client";
 import { REMIX_ACTIONS_BY_SOURCE } from "../../lib/media-remix";
 import type {
   MediaRemixKind,
   MediaRemixRequest,
   MediaRemixResult,
+  TreeDocument,
   TreeDocumentReaderProps,
   TreeMediaRef,
 } from "../../lib/tree-types";
@@ -1073,9 +1077,27 @@ function RemixableCodeBlock({
   );
 }
 
+function buildReaderTreeRoute(
+  treeId: string,
+  nodeId: string,
+  docPath: string,
+): string {
+  const encodedTreeId = encodeURIComponent(treeId);
+  const encodedPath = docPath
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .filter(Boolean)
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const pathSuffix = encodedPath ? `/${encodedPath}` : "";
+  return nodeId
+    ? `/trees/${encodedTreeId}${pathSuffix}?node=${encodeURIComponent(nodeId)}`
+    : `/trees/${encodedTreeId}${pathSuffix}`;
+}
+
 export function TreeDocumentReader({
   document,
-  pathAssets,
+  pathAssets: propPathAssets,
   words = [],
   chunks,
   sourceMap,
@@ -1092,8 +1114,118 @@ export function TreeDocumentReader({
   onNavigateDocHref,
   className,
 }: TreeDocumentReaderProps) {
-  const markdown = document.markdown ?? "";
+  const docKey = `${document.treeId}:${document.nodeId}:${document.updatedAt}`;
+  const [liveOverride, setLiveOverride] = useState<{
+    docKey: string;
+    markdown?: string;
+    title?: string;
+    pathAssets?: Record<string, TreeMediaRef>;
+  } | null>(null);
+
+  const markdown =
+    liveOverride &&
+    liveOverride.docKey === docKey &&
+    liveOverride.markdown !== undefined
+      ? liveOverride.markdown
+      : (document.markdown ?? "");
+  const pathAssets =
+    liveOverride &&
+    liveOverride.docKey === docKey &&
+    liveOverride.pathAssets !== undefined
+      ? liveOverride.pathAssets
+      : propPathAssets;
+  const effectiveTitle =
+    liveOverride &&
+    liveOverride.docKey === docKey &&
+    liveOverride.title !== undefined
+      ? liveOverride.title
+      : document.title;
+
   const articleRef = useRef<HTMLElement | null>(null);
+  const [chatSelectionExcerpt, setChatSelectionExcerpt] = useState<
+    string | null
+  >(null);
+  const [activeHeading, setActiveHeading] = useState<string | null>(null);
+
+  useEffect(() => {
+    setChatSelectionExcerpt(null);
+    setActiveHeading(null);
+  }, [document.treeId, document.nodeId, document.path]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !document.treeId || !document.nodeId) {
+      return;
+    }
+    let cancelled = false;
+    const handleMutation = () => {
+      void Promise.all([
+        studioJson<TreeDocument | { document?: TreeDocument }>(
+          `/api/v1/trees/${encodeURIComponent(document.treeId)}/nodes/${encodeURIComponent(document.nodeId)}`,
+        ).catch(() => null),
+        studioJson<{
+          pathAssets?: Record<string, TreeMediaRef>;
+          tree?: { pathAssets?: Record<string, TreeMediaRef> };
+        }>(`/api/v1/trees/${encodeURIComponent(document.treeId)}`).catch(
+          () => null,
+        ),
+      ]).then(([docData, treeData]) => {
+        if (cancelled || !docData) return;
+        const nextDoc =
+          typeof docData === "object" &&
+          "document" in docData &&
+          docData.document
+            ? docData.document
+            : (docData as TreeDocument);
+        const nextPathAssets =
+          treeData?.tree?.pathAssets ?? treeData?.pathAssets;
+        if (typeof nextDoc?.markdown === "string") {
+          setLiveOverride({
+            docKey,
+            markdown: nextDoc.markdown,
+            title: nextDoc.title,
+            ...(nextPathAssets ? { pathAssets: nextPathAssets } : {}),
+          });
+        }
+      });
+    };
+    window.addEventListener(STUDIO_MUTATION_EVENT, handleMutation);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(STUDIO_MUTATION_EVENT, handleMutation);
+    };
+  }, [document.treeId, document.nodeId, docKey]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const updateSelection = () => {
+      const articleEl = articleRef.current;
+      const sel = window.getSelection();
+      if (!articleEl || !sel || sel.isCollapsed || sel.rangeCount === 0) {
+        setChatSelectionExcerpt(null);
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      if (!articleEl.contains(range.commonAncestorContainer)) {
+        setChatSelectionExcerpt(null);
+        return;
+      }
+      const normalized = sel.toString().replace(/\s+/g, " ").trim();
+      setChatSelectionExcerpt(
+        normalized.length > 0 ? normalized.slice(0, 240) : null,
+      );
+    };
+    const onSelectionChange = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(updateSelection, 120);
+    };
+    window.document.addEventListener("selectionchange", onSelectionChange);
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.document.removeEventListener("selectionchange", onSelectionChange);
+    };
+  }, []);
+
   const [selectionPopover, setSelectionPopover] = useState<{
     text: string;
     blockKey: string;
@@ -1116,6 +1248,102 @@ export function TreeDocumentReader({
     () => computePositionedTopTokens(markdown),
     [markdown],
   );
+
+  const firstHeadingText = useMemo(() => {
+    for (const entry of positionedTopTokens) {
+      if (entry.token.type === "heading") {
+        return (entry.token as Tokens.Heading).text?.trim() || null;
+      }
+    }
+    return null;
+  }, [positionedTopTokens]);
+
+  const readerRoute = useMemo(
+    () =>
+      buildReaderTreeRoute(document.treeId, document.nodeId, document.path),
+    [document.treeId, document.nodeId, document.path],
+  );
+
+  const treeDocSnapshot = useMemo(
+    () =>
+      document.treeId
+        ? {
+            surface: "tree-doc" as const,
+            route: readerRoute,
+            treeId: document.treeId,
+            docId: document.id || document.nodeId,
+            docPath: document.path,
+            docTitle: effectiveTitle || undefined,
+            activeHeading: activeHeading ?? firstHeadingText,
+            selectionExcerpt: chatSelectionExcerpt,
+          }
+        : null,
+    [
+      document.treeId,
+      document.id,
+      document.nodeId,
+      document.path,
+      readerRoute,
+      effectiveTitle,
+      activeHeading,
+      firstHeadingText,
+      chatSelectionExcerpt,
+    ],
+  );
+
+  usePublishChatViewContext(treeDocSnapshot, {
+    scrollToHeading: (heading) => {
+      const articleEl = articleRef.current;
+      if (!articleEl) return;
+      const target = heading.replace(/^#+\s*/, "").trim().toLowerCase();
+      if (!target) return;
+      const headings = Array.from(
+        articleEl.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+      );
+      const match =
+        headings.find(
+          (el) => el.textContent?.trim().toLowerCase() === target,
+        ) ??
+        headings.find((el) =>
+          el.textContent?.trim().toLowerCase().includes(target),
+        );
+      if (match) {
+        setActiveHeading(match.textContent?.trim() ?? heading);
+        match.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    },
+    insertMarkdown: (snippet) => {
+      const trimmed = snippet.trim();
+      if (!trimmed || !document.treeId || !document.path) return;
+      const nextMarkdown =
+        markdown.trim().length > 0
+          ? `${markdown.trimEnd()}\n\n${trimmed}\n`
+          : `${trimmed}\n`;
+      setLiveOverride((prev) => ({
+        docKey,
+        markdown: nextMarkdown,
+        title: effectiveTitle,
+        pathAssets: prev?.docKey === docKey ? prev.pathAssets : undefined,
+      }));
+      void studioJson(
+        `/api/v1/trees/${encodeURIComponent(document.treeId)}/ops`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ops: [
+              {
+                op: "put_doc",
+                path: document.path,
+                title: effectiveTitle,
+                markdown: nextMarkdown,
+              },
+            ],
+          }),
+        },
+      ).catch(() => {});
+    },
+  });
 
   const handleCheckSelection = () => {
     if (!onRemixMedia || typeof window === "undefined") return;

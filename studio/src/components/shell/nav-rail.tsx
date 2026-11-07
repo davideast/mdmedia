@@ -13,6 +13,7 @@ import {
   Library,
   ListMusic,
   ListOrdered,
+  MessageSquare,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
@@ -23,6 +24,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
+import { useOptionalChat } from "@/components/chat/chat-provider";
 import { useNarration } from "@/components/shell/narration-provider";
 import { BrandMark } from "@/components/brand-mark";
 import { useActiveImageCount } from "@/components/media/media-activity-provider";
@@ -84,6 +86,8 @@ export function NavRail({
   const offline = useConnectivity() === 'offline';
   const isDark = resolvedTheme === "dark";
   const activeCount = generationQueue.activeCount + useActiveImageCount();
+  const chat = useOptionalChat();
+  const chatActive = Boolean(chat?.chatOpen && chat?.rightMode === "chat");
 
   return (
     <nav
@@ -130,7 +134,54 @@ export function NavRail({
         <TreeExplorer docked={false} onNavigate={onNavigate} />
       ) : (
         <>
-          <div className="py-2"><FindWork compact={docked} onNavigate={onNavigate} /></div>
+          <div className="flex flex-col gap-1 py-2">
+            <FindWork compact={docked} onNavigate={onNavigate} />
+            {chat ? (
+              docked ? (
+                <Tooltip>
+                  <TooltipTrigger
+                    type="button"
+                    aria-label="Chat"
+                    aria-pressed={chatActive}
+                    onClick={() => {
+                      chat.toggleChat();
+                      onNavigate?.();
+                    }}
+                    className={cn(
+                      "flex h-[30px] w-full items-center justify-center rounded-md text-[13px] transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
+                      chatActive
+                        ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                        : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                    )}
+                  >
+                    <MessageSquare size={16} strokeWidth={2} className="flex-none" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Chat (⌘J)</TooltipContent>
+                </Tooltip>
+              ) : (
+                <button
+                  type="button"
+                  aria-label="Chat"
+                  aria-pressed={chatActive}
+                  title="Chat (⌘J)"
+                  onClick={() => {
+                    chat.toggleChat();
+                    onNavigate?.();
+                  }}
+                  className={cn(
+                    "flex h-8 w-full items-center gap-2 rounded-md px-2 text-[13px] transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
+                    chatActive
+                      ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                      : "text-ink-muted hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  )}
+                >
+                  <MessageSquare size={15} strokeWidth={2} className="flex-none" />
+                  <span className="truncate">Chat</span>
+                  <kbd className="t-mono ml-auto text-[10px]">⌘J</kbd>
+                </button>
+              )
+            ) : null}
+          </div>
           <div className="mb-2"><CreateMenu compact={docked} onNavigate={onNavigate} /></div>
           <ul className={cn("flex flex-col gap-1 py-2")}>
             {NAV.map((item) => {

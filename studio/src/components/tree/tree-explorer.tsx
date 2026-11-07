@@ -16,12 +16,14 @@ import {
   FolderPlus,
   FolderTree,
   ListChecks,
+  MessageSquare,
   Minus,
   Plus,
   Volume2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useOptionalChat } from "@/components/chat/chat-provider";
 import { buildTreeNodeHref, normalizeVirtualPath } from "@/lib/tree-client";
 import {
   type TreeDetail,
@@ -120,6 +122,8 @@ export function TreeExplorer({
   const [newFolderPath, setNewFolderPath] = useState("");
   const [submittingFolder, setSubmittingFolder] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const chat = useOptionalChat();
+  const chatActive = Boolean(chat?.chatOpen && chat?.rightMode === "chat");
 
   const activeFolderPath = useMemo(() => {
     if (!activeNode) return "";
@@ -241,14 +245,36 @@ export function TreeExplorer({
       aria-label={tree.title}
       className="grid content-start gap-2.5 py-2"
     >
-      <Link
-        href="/trees"
-        onClick={onNavigate}
-        className="grid grid-cols-[14px_minmax(0,1fr)] items-center gap-2 rounded-md px-2 py-1 text-[12px] font-medium text-ink-muted transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-      >
-        <ArrowLeft size={13} strokeWidth={2} />
-        <span className="truncate">All trees</span>
-      </Link>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1">
+        <Link
+          href="/trees"
+          onClick={onNavigate}
+          className="grid grid-cols-[14px_minmax(0,1fr)] items-center gap-2 rounded-md px-2 py-1 text-[12px] font-medium text-ink-muted transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+        >
+          <ArrowLeft size={13} strokeWidth={2} />
+          <span className="truncate">All trees</span>
+        </Link>
+        {chat ? (
+          <button
+            type="button"
+            onClick={() => {
+              chat.toggleChat();
+              onNavigate?.();
+            }}
+            aria-label="Chat"
+            aria-pressed={chatActive}
+            title="Chat (⌘J)"
+            className={cn(
+              "grid size-6 place-items-center rounded-xs transition-colors",
+              chatActive
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-ink-muted hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            )}
+          >
+            <MessageSquare size={13} strokeWidth={2} />
+          </button>
+        ) : null}
+      </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-1 border-b border-sidebar-border px-2 py-1.5">
         <Link

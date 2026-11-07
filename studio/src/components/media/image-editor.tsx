@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, ImageIcon, Loader2, PanelRight, Upload, Copy, History, Expand, Paperclip, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,8 @@ import {
   collectReferenceAssetIds,
 } from '@/lib/image-request';
 import type { ImageAction, ImageDraft, ImageGenerationResource, ImageRequest, ImageResource, ImageThinkingLevel } from '@/lib/media-types';
-import { MediaClientError, studioJson } from '@/lib/media-client';
+import { usePublishChatViewContext } from '@/lib/chat-context-bridge';
+import { MediaClientError, STUDIO_MUTATION_EVENT, studioJson } from '@/lib/media-client';
 import { AssetImage, downloadAsset } from './asset-image';
 import { MediaComposer, MediaIconAction } from './media-composer';
 import { toast } from 'sonner';
@@ -185,6 +186,7 @@ export function ImageEditor({ id }: { id?: string }) {
     if (!id) return;
     const controller = new AbortController(); let timer: ReturnType<typeof setTimeout>;
     const load = async () => {
+      clearTimeout(timer);
       try {
         const next = await studioJson<ImageResource>(`/api/v1/images/${id}`, { signal: controller.signal });
         if (controller.signal.aborted) return;
@@ -192,8 +194,14 @@ export function ImageEditor({ id }: { id?: string }) {
         timer = setTimeout(load, ['queued', 'generating'].includes(next.status) ? 2000 : 10_000);
       } catch (e) { if (!controller.signal.aborted) { setLoadError((e as Error).message); timer = setTimeout(load, 10_000); } }
     };
+    const handleMutate = () => { void load(); };
     void load();
-    return () => { controller.abort(); clearTimeout(timer); };
+    window.addEventListener(STUDIO_MUTATION_EVENT, handleMutate);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+      window.removeEventListener(STUDIO_MUTATION_EVENT, handleMutate);
+    };
   }, [id]);
   async function submit(action: ImageAction = id ? 'regenerate' : 'initial') {
     if (pendingRef.current) return;
@@ -268,6 +276,61 @@ export function ImageEditor({ id }: { id?: string }) {
     const nextId = crypto.randomUUID(); store.setImageDraft(nextId, toDraft(request)); router.push(`/studio/image?draft=${nextId}`);
   }
   const title = id ? item?.title ?? 'Image' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New image';
+  const generationId = current?.id ?? null;
+  const primaryRefId = refIds[0] ?? null;
+  const chatSnapshot = useMemo(
+    () =>
+      id
+        ? {
+            surface: 'image' as const,
+            route: `/image/${id}`,
+            itemId: id,
+            title,
+            status: item?.status,
+            generationId,
+          }
+        : {
+            surface: 'composer' as const,
+            route: '/studio/image',
+            draftKind: 'image' as const,
+            draftTitle: title,
+            promptExcerpt: request.prompt.trim().slice(0, 240) || undefined,
+            selectedSourceId: primaryRefId,
+          },
+    [id, title, item?.status, generationId, request.prompt, primaryRefId],
+  );
+  usePublishChatViewContext(
+    chatSnapshot,
+    id
+      ? {}
+      : {
+          patchComposerDraft: (draftKind, patch) => {
+            if (draftKind !== 'image') return;
+            const nextPatch: Partial<ImageRequest> = {};
+            if (typeof patch.prompt === 'string') nextPatch.prompt = patch.prompt;
+            if (typeof patch.model === 'string') nextPatch.model = patch.model;
+            if (typeof patch.referenceAssetId === 'string') {
+              nextPatch.referenceAssetIds = [patch.referenceAssetId];
+              nextPatch.referenceAssetId = patch.referenceAssetId;
+            }
+            if (typeof patch.aspectRatio === 'string' || typeof patch.resolution === 'string') {
+              nextPatch.output = {
+                ...requestRef.current.output,
+                ...(typeof patch.aspectRatio === 'string' ? { aspectRatio: patch.aspectRatio } : {}),
+                ...(typeof patch.resolution === 'string' ? { resolution: patch.resolution || null } : {}),
+              };
+            }
+            if (typeof patch.adapt === 'boolean' || typeof patch.instructions === 'string') {
+              nextPatch.adaptation = {
+                ...requestRef.current.adaptation,
+                ...(typeof patch.adapt === 'boolean' ? { enabled: patch.adapt } : {}),
+                ...(typeof patch.instructions === 'string' ? { instructions: patch.instructions } : {}),
+              };
+            }
+            if (Object.keys(nextPatch).length > 0) update(nextPatch);
+          },
+        },
+  );
   const canSubmit = !busy && (Boolean(pending) || Boolean(request.prompt.trim())) && options?.available !== false && !(id && !item);
   return <WorkbenchPanel workspacePage title={title} icon={<ImageIcon size={13} strokeWidth={2} />} bodyClassName="gap-0 p-0"
     actions={[{ icon: PanelRight, label: 'Image options', onClick: () => setOptionsOpen(!optionsOpen), expanded: optionsOpen }]}>

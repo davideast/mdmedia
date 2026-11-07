@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Music2, PanelRight, MoreHorizontal, History, Copy, Pencil, Upload, Paperclip, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,6 +17,7 @@ import { useAuth } from '@/lib/auth-context';
 import { DEFAULT_MUSIC_REQUEST, MAX_MUSIC_PROMPT } from '@/lib/music-request';
 import { MAX_REFERENCE_BYTES } from '@/lib/image-request';
 import type { MusicRequest, MusicResource, MusicGenerationResource } from '@/lib/media-types';
+import { usePublishChatViewContext } from '@/lib/chat-context-bridge';
 import { MediaClientError, studioJson } from '@/lib/media-client';
 import { MediaComposer, MediaIconAction } from './media-composer';
 import { AssetImage } from './asset-image';
@@ -36,6 +37,7 @@ export function MusicEditor({ id }: { id?: string }) {
   const [cursor, setCursor] = useState<{ createdAt: number; id: string } | null>(null);
   const [renameOpen, setRenameOpen] = useState(false), [rename, setRename] = useState('');
   const importRef = useRef<HTMLInputElement>(null), referenceRef = useRef<HTMLInputElement>(null), submittingRef = useRef(false);
+  const musicContainerRef = useRef<HTMLDivElement>(null);
   const base = id ? music?.request ?? DEFAULT_MUSIC_REQUEST : (state.musicDrafts?.[draftId] ? fromDraft(state.musicDrafts[draftId]) : null) ?? options?.defaults ?? DEFAULT_MUSIC_REQUEST;
   let request: MusicRequest = base;
   if (id && edit) { try { request = JSON.parse(edit) as MusicRequest; } catch { /* Preserve the saved source. */ } }
@@ -96,6 +98,63 @@ export function MusicEditor({ id }: { id?: string }) {
     } catch (e) { report(e); }
   }
   const title = id ? music?.title ?? 'Music' : request.prompt.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || 'New music';
+  const generationId = result?.id ?? music?.latestGeneration.id ?? null;
+  const chatSnapshot = useMemo(
+    () =>
+      id
+        ? {
+            surface: 'music' as const,
+            route: `/music/${id}`,
+            itemId: id,
+            title,
+            status: music?.status,
+            generationId,
+          }
+        : {
+            surface: 'composer' as const,
+            route: '/studio/music',
+            draftKind: 'music' as const,
+            draftTitle: title,
+            promptExcerpt: request.prompt.trim().slice(0, 240) || undefined,
+            selectedSourceId: request.referenceAssetId,
+          },
+    [id, title, music?.status, generationId, request.prompt, request.referenceAssetId],
+  );
+  usePublishChatViewContext(
+    chatSnapshot,
+    id
+      ? {
+          getPlayheadSeconds: () => {
+            const audio = musicContainerRef.current?.querySelector('audio');
+            return audio ? audio.currentTime : null;
+          },
+          seek: (secs, play) => {
+            const audio = musicContainerRef.current?.querySelector('audio');
+            if (!audio) return;
+            audio.currentTime = secs;
+            if (play !== false) void audio.play().catch(() => {});
+          },
+          togglePlay: () => {
+            const audio = musicContainerRef.current?.querySelector('audio');
+            if (!audio) return;
+            if (audio.paused || audio.ended) void audio.play().catch(() => {});
+            else audio.pause();
+          },
+        }
+      : {
+          patchComposerDraft: (draftKind, patch) => {
+            if (draftKind !== 'music') return;
+            const nextPatch: Partial<MusicRequest> = {};
+            if (typeof patch.prompt === 'string') nextPatch.prompt = patch.prompt;
+            if (typeof patch.lyrics === 'string') nextPatch.lyrics = patch.lyrics;
+            if (patch.instrumental === true) nextPatch.vocals = 'instrumental';
+            else if (patch.vocals === 'auto' || patch.vocals === 'vocals' || patch.vocals === 'instrumental') {
+              nextPatch.vocals = patch.vocals;
+            }
+            if (Object.keys(nextPatch).length > 0) update(nextPatch);
+          },
+        },
+  );
   const optionsAction: HeaderAction = { icon: PanelRight, label: 'Music options', onClick: () => setDrawer(drawer === 'options' ? '' : 'options'), expanded: drawer === 'options' };
   return <WorkbenchPanel workspacePage title={title} icon={<Music2 size={13} />} bodyClassName="gap-0 p-0" actions={music ? [{ icon: MoreHorizontal, label: 'Music actions', menu: <>
       <DropdownMenuItem onSelect={() => void history()}><History size={15} />History</DropdownMenuItem>
@@ -103,7 +162,7 @@ export function MusicEditor({ id }: { id?: string }) {
       <DropdownMenuItem onSelect={() => { setRename(music.title); setRenameOpen(true); }}><Pencil size={15} />Rename</DropdownMenuItem>
     </> }, optionsAction] : [optionsAction]}>
     {loadError && <p role="alert" className="p-4 text-sm text-destructive">{loadError}</p>}
-    {asset && result && <MusicPlayer key={asset.id} result={result} title={title} onStart={() => stream.player?.pause()} otherAudioPlaying={stream.playing} />}
+    {asset && result && <div ref={musicContainerRef} className="contents"><MusicPlayer key={asset.id} result={result} title={title} onStart={() => stream.player?.pause()} otherAudioPlaying={stream.playing} /></div>}
     {selected && <Button variant="ghost" className="mx-4 mt-3 self-start" onClick={() => setSelected(null)}>Back to latest</Button>}
     {id && !music && !loadError && <p role="status" className="p-4 text-sm text-ink-muted">Loading music…</p>}
     {!selected && <MediaComposer heading={asset ? 'Try another take' : 'Describe music'} label="Music prompt" placeholder="Describe or paste here. Markdown is fine."

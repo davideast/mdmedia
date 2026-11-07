@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AudioLines, Clock } from "lucide-react";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { WorkbenchPanel } from "@/components/shell/workbench-panel";
 import { useNarration } from "@/components/shell/narration-provider";
 import { useWorkspace } from "@/components/shell/workspace-provider";
 import { useAuth } from "@/lib/auth-context";
+import { usePublishChatViewContext } from "@/lib/chat-context-bridge";
 import { watchMyNarrations } from "@/lib/narrations";
 import { DEFAULT_TTS_MODEL, VOICE_PROVIDER_LABEL, type Narration } from "@/lib/types";
 
@@ -50,6 +51,34 @@ export default function StudioPage() {
   }, [user]);
 
   const tooShort = draft.markdown.trim().length < MIN_CHARS;
+  const draftTitle =
+    draft.markdown.trim().split("\n")[0].replace(/^#+\s*/, "").slice(0, 80) ||
+    "New narration";
+  const composerSnapshot = useMemo(
+    () => ({
+      surface: "composer" as const,
+      route: "/studio",
+      draftKind: "narration" as const,
+      draftTitle,
+      promptExcerpt: draft.markdown.trim().slice(0, 240) || undefined,
+    }),
+    [draftTitle, draft.markdown],
+  );
+  usePublishChatViewContext(composerSnapshot, {
+    patchComposerDraft: (draftKind, patch) => {
+      if (draftKind !== "narration") return;
+      const next: Record<string, unknown> = {};
+      if (typeof patch.markdown === "string") next.markdown = patch.markdown;
+      else if (typeof patch.input === "string") next.markdown = patch.input;
+      if (typeof patch.promptStyle === "string") next.promptStyle = patch.promptStyle;
+      if (typeof patch.rewriteInstructions === "string") {
+        next.rewriteInstructions = patch.rewriteInstructions;
+      }
+      if (Object.keys(next).length > 0) {
+        setDraft(next as Parameters<typeof setDraft>[0]);
+      }
+    },
+  });
 
   const create = async () => {
     const markdownToSynthesize = draft.markdown.trim();

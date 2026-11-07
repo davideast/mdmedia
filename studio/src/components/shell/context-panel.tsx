@@ -11,6 +11,7 @@ import {
   FileText,
   Info,
   Loader2,
+  MessageSquare,
   PanelRightClose,
   PanelRightOpen,
   Plus,
@@ -38,11 +39,13 @@ import { ComposerSettings } from "@/components/studio/composer-settings";
 import { PresetField } from "@/components/studio/preset-field";
 import { VoicePicker } from "@/components/studio/voice-picker";
 import { NarrationSettings } from "@/components/narration/narration-settings";
+import { ChatPanel } from "@/components/chat/chat-panel";
+import { useOptionalChat } from "@/components/chat/chat-provider";
 import { useNarration } from "@/components/shell/narration-provider";
-import { InspectorSlot } from "@/components/shell/inspector-slot";
+import { InspectorSlot, useHasInspector } from "@/components/shell/inspector-slot";
 import { storyboardRoute } from "@/lib/storyboard";
 import { WorkbenchPanel } from "@/components/shell/workbench-panel";
-import type { HeaderActions } from "@/components/shell/header-action";
+import type { HeaderAction, HeaderActions } from "@/components/shell/header-action";
 import { KeepSection } from "@/components/shell/keep-section";
 import { useTreeContext } from "@/components/tree/tree-provider";
 import type { MediaType } from "@/lib/media-types";
@@ -537,13 +540,36 @@ export function ContextPanel({
   onToggleDock?: () => void;
 }) {
   const pathname = usePathname();
-  const isStudio = pathname.startsWith("/studio");
+  const hasInspector = useHasInspector();
+  const chat = useOptionalChat();
+  const isStudio = pathname === "/studio";
+  const isStudioSubroute = pathname.startsWith("/studio/");
   const isNarration = pathname.startsWith("/narration/");
   const isTree = pathname.startsWith("/trees/");
+  const isMediaItem = MEDIA_ROUTE.test(pathname);
   const isProduction = /^\/productions\/[^/]+(?:\/cuts\/[^/]+)?$/.test(pathname);
   const isStoryboard = storyboardRoute(pathname) !== null;
-  const sectionLabel = isProduction ? "Production details" : isStoryboard ? "Story details" : isStudio ? "Voice" : isTree ? "Details" : "Sharing";
+  const hasInspectorForRoute =
+    isStudio ||
+    isStudioSubroute ||
+    isNarration ||
+    isTree ||
+    isMediaItem ||
+    isProduction ||
+    isStoryboard ||
+    hasInspector;
+  const sectionLabel = isProduction
+    ? "Production details"
+    : isStoryboard
+      ? "Story details"
+      : isStudio
+        ? "Voice"
+        : isTree || isMediaItem || isStudioSubroute
+          ? "Details"
+          : "Sharing";
   const SectionIcon = isStudio ? SlidersHorizontal : Info;
+  const effectiveMode =
+    !hasInspectorForRoute || chat?.rightMode === "chat" ? "chat" : "inspector";
 
   if (docked) {
     return (
@@ -562,47 +588,112 @@ export function ContextPanel({
             >
               <PanelRightOpen size={16} strokeWidth={2} />
             </TooltipTrigger>
-            <TooltipContent side="left">Expand {sectionLabel.toLowerCase()}</TooltipContent>
+            <TooltipContent side="left">
+              Expand {effectiveMode === "chat" ? "chat" : sectionLabel.toLowerCase()}
+            </TooltipContent>
           </Tooltip>
         </div>
 
         <div className="flex flex-col items-center gap-1 px-2 py-2">
+          {hasInspectorForRoute ? (
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => {
+                  chat?.setRightMode("inspector");
+                  onToggleDock?.();
+                }}
+                aria-label={sectionLabel}
+                aria-pressed={effectiveMode === "inspector"}
+                className={cn(
+                  "flex h-[30px] w-full items-center justify-center rounded-md transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
+                  effectiveMode === "inspector"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground hover:opacity-90"
+                    : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                )}
+              >
+                <SectionIcon size={16} strokeWidth={2} className="flex-none" />
+              </TooltipTrigger>
+              <TooltipContent side="left">{sectionLabel}</TooltipContent>
+            </Tooltip>
+          ) : null}
+
           <Tooltip>
             <TooltipTrigger
-              onClick={onToggleDock}
-              aria-label={sectionLabel}
-              className="flex h-[30px] w-full items-center justify-center rounded-md bg-sidebar-accent text-sidebar-accent-foreground transition-colors hover:opacity-90 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden"
+              onClick={() => {
+                if (chat) {
+                  chat.openChat({ focusComposer: true });
+                } else {
+                  onToggleDock?.();
+                }
+              }}
+              aria-label="Chat"
+              aria-pressed={effectiveMode === "chat"}
+              className={cn(
+                "flex h-[30px] w-full items-center justify-center rounded-md transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden",
+                effectiveMode === "chat"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground hover:opacity-90"
+                  : "text-ink-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+              )}
             >
-              <SectionIcon size={16} strokeWidth={2} className="flex-none" />
+              <MessageSquare size={16} strokeWidth={2} className="flex-none" />
             </TooltipTrigger>
-            <TooltipContent side="left">{sectionLabel}</TooltipContent>
+            <TooltipContent side="left">Chat (⌘J)</TooltipContent>
           </Tooltip>
         </div>
       </aside>
     );
   }
 
-  const collapseAction: HeaderActions | undefined =
+  if (effectiveMode === "chat") {
+    return (
+      <ChatPanel
+        onToggleDock={onToggleDock}
+        hasInspector={hasInspectorForRoute}
+      />
+    );
+  }
+
+  const chatHeaderAction: HeaderAction | undefined = chat
+    ? {
+        icon: MessageSquare,
+        label: "Open chat (⌘J)",
+        onClick: () => chat.openChat({ focusComposer: true }),
+      }
+    : undefined;
+  const collapseHeaderAction: HeaderAction | undefined =
     onToggleDock === undefined
       ? undefined
-      : [{ icon: PanelRightClose, label: `Collapse ${sectionLabel.toLowerCase()}`, onClick: onToggleDock, expanded: true }];
+      : {
+          icon: PanelRightClose,
+          label: `Collapse ${sectionLabel.toLowerCase()}`,
+          onClick: onToggleDock,
+          expanded: true,
+        };
+  const inspectorActions: HeaderActions | undefined =
+    chatHeaderAction && collapseHeaderAction
+      ? [chatHeaderAction, collapseHeaderAction]
+      : chatHeaderAction
+        ? [chatHeaderAction]
+        : collapseHeaderAction
+          ? [collapseHeaderAction]
+          : undefined;
 
-  if (isProduction) return <WorkbenchPanel title="Production details" icon={<Info size={13} />} actions={collapseAction} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
+  if (isProduction) return <WorkbenchPanel title="Production details" icon={<Info size={13} />} actions={inspectorActions} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
 
-  if (isStoryboard) return <WorkbenchPanel title="Story details" icon={<Info size={13} />} actions={collapseAction} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
+  if (isStoryboard) return <WorkbenchPanel title="Story details" icon={<Info size={13} />} actions={inspectorActions} bodyClassName="p-4"><InspectorSlot /></WorkbenchPanel>;
 
-  if (isStudio) return <ComposerSettings actions={collapseAction} />;
+  if (isStudio) return <ComposerSettings actions={inspectorActions} />;
 
   if (isNarration) {
     const id = pathname.split("/")[2];
     if (id !== undefined && id.length > 0) {
-      return <NarrationContextPanel key={id} id={id} actions={collapseAction} />;
+      return <NarrationContextPanel key={id} id={id} actions={inspectorActions} />;
     }
   }
 
   if (isTree) {
-    return <TreeContextPanel actions={collapseAction} />;
+    return <TreeContextPanel actions={inspectorActions} />;
   }
 
-  return <WorkPanel pathname={pathname} actions={collapseAction} />;
+  return <WorkPanel pathname={pathname} actions={inspectorActions} />;
 }

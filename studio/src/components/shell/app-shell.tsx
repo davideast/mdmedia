@@ -10,6 +10,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { AudioPlayerBar } from "@/components/reader/audio-player-bar";
+import { useOptionalChat, type ChatShellAdapter } from "@/components/chat/chat-provider";
 import { InspectorProvider, useHasInspector } from "@/components/shell/inspector-slot";
 import { storyboardRoute } from "@/lib/storyboard";
 import { ContextPanel } from "@/components/shell/context-panel";
@@ -114,7 +115,20 @@ function AppShellContent({
   });
   const breakpoints = useResponsiveBreakpoints();
   const hasInspector = useHasInspector();
-  const hasContext = pathname === "/studio" || pathname.startsWith("/narration/") || pathname.startsWith("/trees/") || storyboardRoute(pathname) !== null || hasInspector;
+  const hasContext =
+    pathname === "/studio" ||
+    pathname.startsWith("/studio/") ||
+    pathname.startsWith("/narration/") ||
+    pathname.startsWith("/trees/") ||
+    pathname.startsWith("/analysis/") ||
+    pathname.startsWith("/video/") ||
+    pathname.startsWith("/image/") ||
+    pathname.startsWith("/music/") ||
+    storyboardRoute(pathname) !== null ||
+    hasInspector;
+  const chat = useOptionalChat();
+  const chatOpen = chat?.chatOpen ?? false;
+  const showRightColumn = hasContext || chatOpen;
   const [docked, setDocked] = useState(false);
   const [contextDocked, setContextDocked] = useState(false);
   const [navSheetOpen, setNavSheetOpen] = useState(false);
@@ -150,8 +164,11 @@ function AppShellContent({
     if (breakpoints.isMedium && !docked && !contextDocked) {
       setContextDocked(true);
       window.localStorage.setItem(CONTEXT_DOCK_KEY, "1");
+      if (!hasContext) {
+        chat?.closeChat();
+      }
     }
-  }, [breakpoints.isMedium, docked, contextDocked]);
+  }, [breakpoints.isMedium, docked, contextDocked, hasContext, chat]);
 
   useEffect(() => {
     const stopResizing = () => {
@@ -177,6 +194,59 @@ function AppShellContent({
     window.localStorage.setItem(CONTEXT_DOCK_KEY, next ? "1" : "0");
   }, []);
 
+  const shellStateRef = useRef({
+    hasContext,
+    showRightColumn,
+    contextDocked,
+    contextSheetOpen,
+    isMobile: breakpoints.isMobile,
+    isTablet: breakpoints.isTablet,
+  });
+  shellStateRef.current = {
+    hasContext,
+    showRightColumn,
+    contextDocked,
+    contextSheetOpen,
+    isMobile: breakpoints.isMobile,
+    isTablet: breakpoints.isTablet,
+  };
+
+  const registerShellAdapter = chat?.registerShellAdapter;
+  useEffect(() => {
+    if (!registerShellAdapter) return;
+    const adapter: ChatShellAdapter = {
+      expandRightPanel: () => {
+        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+          setContextSheetOpen(true);
+          return;
+        }
+        setRightDocked(false);
+        if (typeof window !== "undefined" && window.innerWidth < 1280) {
+          setDocked(true);
+          window.localStorage.setItem(DOCK_KEY, "1");
+        }
+      },
+      collapseRightPanel: () => {
+        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+          setContextSheetOpen(false);
+          return;
+        }
+        if (shellStateRef.current.hasContext) {
+          setRightDocked(true);
+        } else {
+          setContextSheetOpen(false);
+        }
+      },
+      isRightPanelExpanded: () => {
+        const s = shellStateRef.current;
+        return s.isMobile || s.isTablet
+          ? s.contextSheetOpen
+          : s.showRightColumn && !s.contextDocked;
+      },
+    };
+    return registerShellAdapter(adapter);
+  }, [registerShellAdapter, setRightDocked]);
+
   const toggleDock = useCallback(() => {
     setDocked((previous) => {
       const next = !previous;
@@ -185,15 +255,29 @@ function AppShellContent({
       if (!next && typeof window !== "undefined" && window.innerWidth < 1280) {
         setContextDocked(true);
         window.localStorage.setItem(CONTEXT_DOCK_KEY, "1");
+        if (!hasContext) {
+          chat?.closeChat();
+        }
       }
       return next;
     });
-  }, []);
+  }, [hasContext, chat]);
 
   const toggleContextDock = useCallback(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       // On tablet and mobile, open ContextPanel in an overlay Sheet to preserve 100% reading width
-      setContextSheetOpen((prev) => !prev);
+      setContextSheetOpen((prev) => {
+        const nextOpen = !prev;
+        if (!nextOpen && !hasContext) {
+          chat?.closeChat();
+        }
+        return nextOpen;
+      });
+      return;
+    }
+
+    if (!hasContext) {
+      chat?.closeChat();
       return;
     }
 
@@ -207,7 +291,7 @@ function AppShellContent({
       }
       return next;
     });
-  }, []);
+  }, [hasContext, chat]);
 
   const openNav = useCallback(() => setNavSheetOpen(true), []);
   const closeNav = useCallback(() => setNavSheetOpen(false), []);
@@ -247,7 +331,7 @@ function AppShellContent({
       openContext,
       closeContext,
       toggleContext,
-      showContextToggle: hasContext && (breakpoints.isMobile || breakpoints.isTablet),
+      showContextToggle: (hasContext || chatOpen) && (breakpoints.isMobile || breakpoints.isTablet),
       hasPlayerBar: showPlayerBar,
       isMobile: breakpoints.isMobile,
       isTablet: breakpoints.isTablet,
@@ -261,6 +345,7 @@ function AppShellContent({
       toggleNav,
       breakpoints,
       hasContext,
+      chatOpen,
       contextSheetOpen,
       openContext,
       closeContext,
@@ -346,7 +431,7 @@ function AppShellContent({
 
   const showLeftResizable = !docked && !breakpoints.isMobile;
   const showRightResizable =
-    hasContext && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
+    showRightColumn && !contextDocked && !breakpoints.isTablet && !breakpoints.isMobile;
 
   return (
     <ShellContext.Provider value={shellContextValue}>
@@ -428,7 +513,11 @@ function AppShellContent({
                       panelSize.inPixels <= RIGHT_DOCK_THRESHOLD_PX
                     ) {
                       isResizingRef.current = false;
-                      setRightDocked(true);
+                      if (hasContext) {
+                        setRightDocked(true);
+                      } else {
+                        chat?.closeChat();
+                      }
                     }
                   }}
                 >
@@ -475,7 +564,7 @@ function AppShellContent({
         </Sheet>
 
         {/* Slide-over overlay sheet for ContextPanel on tablet and mobile */}
-        {hasContext ? (
+        {showRightColumn ? (
           <Sheet open={contextSheetOpen} onOpenChange={setContextSheetOpen}>
             <SheetContent
               side="right"
@@ -485,7 +574,15 @@ function AppShellContent({
               <SheetTitle className="sr-only">Details</SheetTitle>
               <SheetDescription className="sr-only">Narration and studio inspector panel</SheetDescription>
               <div className="h-full">
-                <ContextPanel docked={false} onToggleDock={() => setContextSheetOpen(false)} />
+                <ContextPanel
+                  docked={false}
+                  onToggleDock={() => {
+                    setContextSheetOpen(false);
+                    if (!hasContext) {
+                      chat?.closeChat();
+                    }
+                  }}
+                />
               </div>
             </SheetContent>
           </Sheet>
