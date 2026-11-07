@@ -99,6 +99,23 @@ export function resolveStudioTargetHref(rawTarget: string): {
 }
 
 /**
+ * Returns `true` when a real or emulated Firestore backend is configured in the
+ * current process. Avoids opening unconfigured `firebase-admin` gRPC channels
+ * (which enter multi-second retry backoff on non-GCP CI runners) during offline
+ * unit tests.
+ */
+export function hasConfiguredFirestoreEnv(): boolean {
+  return Boolean(
+    process.env.FIREBASE_PROJECT_ID?.trim() ||
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim() ||
+      process.env.FIRESTORE_EMULATOR_HOST?.trim() ||
+      process.env.PYRIC_SANDBOX?.trim() ||
+      process.env.GOOGLE_CLOUD_PROJECT?.trim() ||
+      process.env.GCLOUD_PROJECT?.trim(),
+  );
+}
+
+/**
  * Normalizes a raw Studio item reference (`abc123`, `mdmedia://image/abc123`, or `/image/abc123`)
  * into a bare item ID, validating media type when specified.
  */
@@ -641,11 +658,13 @@ export const analyzeVideoTool: ChatToolDefinition<AnalyzeVideoInput, Record<stri
       if (!hasScope(ctx.caller, 'analyses:read')) {
         return errorOutcome('insufficient_scope', 'This API key cannot analyses read.');
       }
-      try {
-        existingAnalysis = await loadAnalysisItem(ctx.caller.uid, cleanTargetId);
-      } catch (err) {
-        if (err instanceof MediaError) {
-          return errorOutcome(err.code, err.message);
+      if (hasConfiguredFirestoreEnv()) {
+        try {
+          existingAnalysis = await loadAnalysisItem(ctx.caller.uid, cleanTargetId);
+        } catch (err) {
+          if (err instanceof MediaError) {
+            return errorOutcome(err.code, err.message);
+          }
         }
       }
     }
@@ -833,7 +852,9 @@ export const createNarrationTool: ChatToolDefinition<CreateNarrationInput, Recor
     additionalProperties: false,
   },
   async execute(input, ctx) {
-    const settings = await loadUserSettings(ctx.caller.uid).catch(() => readSettings(undefined));
+    const settings = hasConfiguredFirestoreEnv()
+      ? await loadUserSettings(ctx.caller.uid).catch(() => readSettings(undefined))
+      : readSettings(undefined);
     const rawMarkdown = typeof input.input === 'string' ? input.input : '';
     const trimmedTitle = input.title?.trim();
     const markdownWithTitle =
@@ -1002,13 +1023,14 @@ export const generateImageTool: ChatToolDefinition<GenerateImageInput, Record<st
         if (!hasScope(ctx.caller, 'images:read')) {
           return errorOutcome('insufficient_scope', 'This API key cannot images read.');
         }
-        try {
-          existingItem = await loadImageItem(ctx.caller.uid, cleanTargetId);
-        } catch (err) {
-          if (err instanceof MediaError) {
-            return errorOutcome(err.code, err.message);
+        if (hasConfiguredFirestoreEnv()) {
+          try {
+            existingItem = await loadImageItem(ctx.caller.uid, cleanTargetId);
+          } catch (err) {
+            if (err instanceof MediaError) {
+              return errorOutcome(err.code, err.message);
+            }
           }
-          // In offline unit tests without Firestore, defer item lookup to confirm time.
         }
       }
 
@@ -1025,6 +1047,12 @@ export const generateImageTool: ChatToolDefinition<GenerateImageInput, Record<st
               'invalid_reference_image',
               '`referenceImageItemIds` must contain valid Studio image IDs.',
             );
+          }
+          if (!hasConfiguredFirestoreEnv()) {
+            if (!deferredRefImageItemIds.includes(refItemId)) {
+              deferredRefImageItemIds.push(refItemId);
+            }
+            continue;
           }
           try {
             const refImg = await loadImageItem(ctx.caller.uid, refItemId);
@@ -1048,7 +1076,9 @@ export const generateImageTool: ChatToolDefinition<GenerateImageInput, Record<st
         }
       }
 
-      const userDefaults = await imageDefaults(ctx.caller.uid).catch(() => readImageDefaults(undefined));
+      const userDefaults = hasConfiguredFirestoreEnv()
+        ? await imageDefaults(ctx.caller.uid).catch(() => readImageDefaults(undefined))
+        : readImageDefaults(undefined);
       const baseDefaults = existingItem?.request
         ? {
             ...existingItem.request,
@@ -1294,16 +1324,20 @@ export const generateVideoTool: ChatToolDefinition<GenerateVideoInput, Record<st
         if (!hasScope(ctx.caller, 'videos:read')) {
           return errorOutcome('insufficient_scope', 'This API key cannot videos read.');
         }
-        try {
-          existingVideo = await loadVideoItem(ctx.caller.uid, cleanTargetId);
-        } catch (err) {
-          if (err instanceof MediaError) {
-            return errorOutcome(err.code, err.message);
+        if (hasConfiguredFirestoreEnv()) {
+          try {
+            existingVideo = await loadVideoItem(ctx.caller.uid, cleanTargetId);
+          } catch (err) {
+            if (err instanceof MediaError) {
+              return errorOutcome(err.code, err.message);
+            }
           }
         }
       }
 
-      const userDefaults = await videoDefaults(ctx.caller.uid).catch(() => readVideoDefaults(undefined));
+      const userDefaults = hasConfiguredFirestoreEnv()
+        ? await videoDefaults(ctx.caller.uid).catch(() => readVideoDefaults(undefined))
+        : readVideoDefaults(undefined);
       const baseDefaults = existingVideo?.request
         ? {
             ...existingVideo.request,
@@ -1322,17 +1356,18 @@ export const generateVideoTool: ChatToolDefinition<GenerateVideoInput, Record<st
         if (!hasScope(ctx.caller, 'images:read')) {
           return errorOutcome('insufficient_scope', 'This API key cannot images read.');
         }
-        try {
-          const imgItem = await loadImageItem(ctx.caller.uid, startImageItemId);
-          if (!imgItem.thumbnailAssetId) {
-            return errorOutcome('image_not_ready', 'That image has no finished frame to animate yet.');
+        if (hasConfiguredFirestoreEnv()) {
+          try {
+            const imgItem = await loadImageItem(ctx.caller.uid, startImageItemId);
+            if (!imgItem.thumbnailAssetId) {
+              return errorOutcome('image_not_ready', 'That image has no finished frame to animate yet.');
+            }
+            referenceAssetId = imgItem.thumbnailAssetId;
+          } catch (err) {
+            if (err instanceof MediaError) {
+              return errorOutcome(err.code, err.message);
+            }
           }
-          referenceAssetId = imgItem.thumbnailAssetId;
-        } catch (err) {
-          if (err instanceof MediaError) {
-            return errorOutcome(err.code, err.message);
-          }
-          // In offline unit tests without Firestore, defer asset lookup to confirm time.
         }
       }
 
@@ -1561,16 +1596,20 @@ export const generateMusicTool: ChatToolDefinition<GenerateMusicInput, Record<st
         if (!hasScope(ctx.caller, 'music:read')) {
           return errorOutcome('insufficient_scope', 'This API key cannot music read.');
         }
-        try {
-          existingMusic = await loadMusicItem(ctx.caller.uid, cleanTargetId);
-        } catch (err) {
-          if (err instanceof MediaError) {
-            return errorOutcome(err.code, err.message);
+        if (hasConfiguredFirestoreEnv()) {
+          try {
+            existingMusic = await loadMusicItem(ctx.caller.uid, cleanTargetId);
+          } catch (err) {
+            if (err instanceof MediaError) {
+              return errorOutcome(err.code, err.message);
+            }
           }
         }
       }
 
-      const userDefaults = await musicDefaults(ctx.caller.uid).catch(() => readMusicDefaults(undefined));
+      const userDefaults = hasConfiguredFirestoreEnv()
+        ? await musicDefaults(ctx.caller.uid).catch(() => readMusicDefaults(undefined))
+        : readMusicDefaults(undefined);
       const baseDefaults = existingMusic?.request
         ? { ...existingMusic.request, referenceAssetId: null }
         : userDefaults;
