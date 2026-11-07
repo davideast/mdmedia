@@ -5,10 +5,14 @@ import Link from 'next/link';
 import { Pin, PinOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MEDIA_TYPES } from '@/lib/media-types';
 import { CreateMenu } from './create-menu';
 import { WorkbenchPanel } from './workbench-panel';
 import { useRouteQuery, useWorkspace } from './workspace-provider';
 import { workspaceItems, workPage } from '@/lib/workspace-navigation';
+
+const ALL_MEDIA = 'all';
 
 export function WorkDirectory({ kind }: { kind: 'drafts' | 'pinned' | 'recent' }) {
   const { state, store } = useWorkspace();
@@ -25,9 +29,15 @@ export function WorkDirectory({ kind }: { kind: 'drafts' | 'pinned' | 'recent' }
   };
   const title = kind === 'drafts' ? 'Drafts' : kind === 'pinned' ? 'Pinned' : 'Recent';
   return <WorkbenchPanel workspacePage title={title} viewGrid gridVariant="wide">
-    <div className="flex min-w-0 flex-wrap gap-2">
-      <Input aria-label={`Search ${title.toLowerCase()}`} className="min-w-0 flex-1" placeholder={`Search ${title.toLowerCase()}…`} value={query} onChange={(event) => update(event.target.value, 1)} />
-      <select aria-label="Media type" value={type} onChange={event => { setType(event.target.value); update(query, 1); }} className="rounded-md border border-input bg-background px-3 text-sm"><option value="">All media</option><option value="narration">Narration</option><option value="image">Image</option><option value="video">Video</option></select>
+    <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <Input aria-label={`Search ${title.toLowerCase()}`} className="h-9 min-w-0 flex-1" placeholder={`Search ${title.toLowerCase()}…`} value={query} onChange={(event) => update(event.target.value, 1)} />
+      <Select value={type || ALL_MEDIA} onValueChange={value => { setType(value === ALL_MEDIA ? '' : value); update(query, 1); }}>
+        <SelectTrigger aria-label="Media type" className="h-9 min-w-[8.5rem] shrink-0"><SelectValue /></SelectTrigger>
+        <SelectContent position="popper" align="end">
+          <SelectItem value={ALL_MEDIA}>All media</SelectItem>
+          {MEDIA_TYPES.filter(item => item.available).map(item => <SelectItem key={item.type} value={item.type}>{item.label}</SelectItem>)}
+        </SelectContent>
+      </Select>
       {kind === 'drafts' && <CreateMenu />}
     </div>
     <p className="text-sm text-ink-muted">{result.count} {title.toLowerCase()} · {kind === 'recent' ? 'Last 50 opened documents' : 'Saved on this device for your account'}</p>
