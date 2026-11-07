@@ -330,3 +330,7 @@ export function useNarration(): NarrationContextValue {
   }
   return value;
 }
+
+export function useOptionalNarration(): NarrationContextValue | null {
+  return useContext(NarrationContext);
+}
