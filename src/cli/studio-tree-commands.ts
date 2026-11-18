@@ -16,6 +16,7 @@ import type {
 } from '../remote/client.js';
 import { oneOf } from './studio-media-commands.js';
 import { connectedClient, guarded } from './studio-support.js';
+import { formatSyncReport, readTreeFolder, syncTreeFolder } from './studio-tree-sync.js';
 
 const SKIPPED_DIRS = new Set(['node_modules', '.git', '.next', '.hg', '.svn', 'dist', 'build']);
 
@@ -626,6 +627,35 @@ const treeCompile = defineCommand({
   },
 });
 
+const treeSync = defineCommand({
+  meta: {
+    name: 'sync',
+    description: 'Sync a local folder of Markdown and images into a tree: uploads new images by hash, writes changed docs, applies tree.json order',
+  },
+  args: {
+    tree: { ...treeArg, description: 'Tree id or exact title (created with this title when missing)' },
+    fromDir: { type: 'string', alias: 'dir', description: 'Local folder of .md documents, PNG/JPEG/WebP images and an optional tree.json' },
+    prune: { type: 'boolean', description: 'Remove documents the folder no longer has' },
+    dryRun: { type: 'boolean', description: 'Show what would change without changing anything' },
+    json: jsonArg,
+  },
+  async run({ args }) {
+    await guarded(args.json, async () => {
+      const rawArgs = args as Record<string, unknown>;
+      const fromDir = (args.fromDir ?? rawArgs['from-dir'] ?? rawArgs.dir) as string | undefined;
+      if (!fromDir) throw new Error('Pass --from-dir <folder>.');
+      const dryRun = Boolean(args.dryRun ?? rawArgs['dry-run']);
+      const folder = await readTreeFolder(fromDir);
+      const report = await syncTreeFolder(connectedClient(), args.tree, folder, {
+        prune: Boolean(args.prune),
+        dryRun,
+        log: args.json ? undefined : (line) => console.error(line),
+      });
+      console.log(args.json ? JSON.stringify({ sync: report }, null, 2) : formatSyncReport(report));
+    });
+  },
+});
+
 const treeDelete = defineCommand({
   meta: { name: 'delete', description: 'Delete a tree (its detached narrations are kept)' },
   args: {
@@ -661,6 +691,7 @@ export const treeCommand = defineCommand({
     organize: treeOrganize,
     select: treeSelect,
     compile: treeCompile,
+    sync: treeSync,
     delete: treeDelete,
   },
 });
