@@ -9,6 +9,7 @@ const TARGET_PATHS = [
   'studio/src/app/(app)/trees',
   'studio/src/components/reader/tree-document-reader.tsx',
   'studio/src/components/reader/document-media-card.tsx',
+  'studio/src/components/reader/gallery-block.tsx',
 ];
 
 function collectTsFiles(entryPath: string): string[] {
