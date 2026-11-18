@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { CodeBlock } from "./code-block";
+import { GalleryBlock, type GalleryResolvedHref } from "./gallery-block";
 import {
   DocumentMediaCard,
   resolvePrivateMediaContentPath,
@@ -195,6 +196,15 @@ function resolveInternalTreeHref(
   }
 
   return { href: rawHref, isInternalDoc: false };
+}
+
+/** Resolves a link written inside a `gallery` block exactly as a Markdown link in this document. */
+function resolveGalleryHref(rawHref: string, ctx: WordRenderContext): GalleryResolvedHref {
+  if (!isSafeHref(rawHref)) return { href: null, isInternalDoc: false };
+  if (/^https?:\/\//i.test(rawHref.trim())) {
+    return { href: rawHref.trim(), isInternalDoc: false };
+  }
+  return resolveInternalTreeHref(rawHref, ctx);
 }
 
 function renderTextRunWithWords(
@@ -1710,6 +1720,27 @@ export function TreeDocumentReader({
                     alt="Mermaid diagram"
                     onRemixMedia={onRemixMedia}
                   />
+                );
+              }
+              if (lang === "gallery") {
+                return (
+                  <div key={blockKey} data-block-key={blockKey} className="grid min-w-0">
+                    <GalleryBlock
+                      source={codeToken.text}
+                      pathAssets={pathAssets}
+                      docPath={document.path}
+                      resolveHref={(rawHref) => resolveGalleryHref(rawHref, ctx)}
+                      onNavigateDocHref={onNavigateDocHref}
+                      fallback={
+                        <RemixableCodeBlock
+                          code={codeToken.text}
+                          lang={codeToken.lang}
+                          rawFence={codeToken.raw.trim()}
+                          onRemixMedia={onRemixMedia}
+                        />
+                      }
+                    />
+                  </div>
                 );
               }
               return (
