@@ -76,6 +76,11 @@ export interface GalleryMade {
 
 export interface GalleryItem {
   id: string;
+  /**
+   * Unique within the block: the group id and the item id. The same work may
+   * appear in several groups, so navigation and React keys use this, not `id`.
+   */
+  key: string;
   title: string;
   image: string;
   href: string | null;
@@ -194,6 +199,7 @@ function parseItem(value: unknown): GalleryItem | null {
   if (!id || !title || !image) return null;
   return {
     id,
+    key: id,
     title,
     image,
     href: text(value.href),
@@ -225,7 +231,6 @@ export function parseGalleryBlock(source: string): GalleryParseResult {
   }
 
   const seenGroups = new Set<string>();
-  const seenItems = new Set<string>();
   const groups: GalleryGroup[] = [];
   for (const rawGroup of data.groups) {
     if (!isObject(rawGroup)) continue;
@@ -233,11 +238,16 @@ export function parseGalleryBlock(source: string): GalleryParseResult {
     const title = text(rawGroup.title);
     if (!id || !title || seenGroups.has(id)) continue;
     seenGroups.add(id);
-    const items = list(rawGroup.items, parseItem).filter((item) => {
-      if (seenItems.has(item.id)) return false;
-      seenItems.add(item.id);
-      return true;
-    });
+    // An item may repeat across groups (one work, several directions), but
+    // not within one group.
+    const seenItems = new Set<string>();
+    const items = list(rawGroup.items, parseItem)
+      .filter((item) => {
+        if (seenItems.has(item.id)) return false;
+        seenItems.add(item.id);
+        return true;
+      })
+      .map((item) => ({ ...item, key: `${id}/${item.id}` }));
     groups.push({ id, title, summary: text(rawGroup.summary), href: text(rawGroup.href), items });
   }
 
@@ -356,15 +366,15 @@ export function countItems(block: GalleryBlock): number {
 }
 
 /**
- * The item `delta` steps from `currentId` among the visible items, or null at
+ * The item `delta` steps from `currentKey` among the visible items, or null at
  * either end or when the current item is no longer visible.
  */
 export function stepItem(
   order: readonly GalleryItem[],
-  currentId: string,
+  currentKey: string,
   delta: number,
 ): GalleryItem | null {
-  const index = order.findIndex((item) => item.id === currentId);
+  const index = order.findIndex((item) => item.key === currentKey);
   if (index < 0) return null;
   return order[index + delta] ?? null;
 }

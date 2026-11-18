@@ -118,9 +118,9 @@ function GalleryView({
   const order = useMemo(() => visibleItemOrder(rows), [rows]);
   const shown = order.length;
 
-  const openItem = openId ? order.find((item) => item.id === openId) ?? null : null;
+  const openItem = openId ? order.find((item) => item.key === openId) ?? null : null;
   const openGroup = openItem
-    ? rows.find((row) => row.items.some((item) => item.id === openItem.id))?.group ?? null
+    ? rows.find((row) => row.items.some((item) => item.key === openItem.key))?.group ?? null
     : null;
 
   const toggleVerdict = (value: GalleryVerdictFilterValue) =>
@@ -307,11 +307,11 @@ function GalleryView({
                 className="flex min-w-0 snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain p-1 [scrollbar-width:thin]"
               >
                 {items.map((item) => (
-                  <li key={item.id} className="flex shrink-0 snap-start">
+                  <li key={item.key} className="flex shrink-0 snap-start">
                     <GalleryCard
                       item={item}
                       context={context}
-                      onOpen={() => setOpenId(item.id)}
+                      onOpen={() => setOpenId(item.key)}
                     />
                   </li>
                 ))}
@@ -331,10 +331,10 @@ function GalleryView({
           <GalleryLightbox
             item={openItem}
             groupTitle={openGroup?.title ?? null}
-            position={order.findIndex((item) => item.id === openItem.id) + 1}
+            position={order.findIndex((item) => item.key === openItem.key) + 1}
             count={order.length}
-            prev={stepItem(order, openItem.id, -1)}
-            next={stepItem(order, openItem.id, 1)}
+            prev={stepItem(order, openItem.key, -1)}
+            next={stepItem(order, openItem.key, 1)}
             onSelect={setOpenId}
             onClose={() => setOpenId(null)}
             context={context}
@@ -351,7 +351,7 @@ function FilterRow({ label, children }: { label: string; children: ReactNode }) 
       <span className="font-mono text-[10px] font-medium uppercase tracking-wider text-ink-faint">
         {label}
       </span>
-      <div className="flex min-w-0 flex-wrap gap-1.5">{children}</div>
+      <div className="flex min-w-0 gap-1.5 overflow-x-auto [scrollbar-width:none] [&>*]:shrink-0 [&>*]:whitespace-nowrap sm:flex-wrap sm:overflow-visible">{children}</div>
     </div>
   );
 }
@@ -482,6 +482,7 @@ function GalleryCard({
       ref={ref}
       type="button"
       data-gallery-item={item.id}
+      data-gallery-item-key={item.key}
       data-origin={item.origin}
       data-verdict={item.verdict ?? "none"}
       aria-label={`${item.title}: ${originLabel(item.origin)}, ${verdictLabel(item.verdict)}`}
@@ -600,10 +601,10 @@ function GalleryLightbox({
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === "ArrowLeft" && prev) {
       event.preventDefault();
-      onSelect(prev.id);
+      onSelect(prev.key);
     } else if (event.key === "ArrowRight" && next) {
       event.preventDefault();
-      onSelect(next.id);
+      onSelect(next.key);
     }
   };
 
@@ -617,6 +618,7 @@ function GalleryLightbox({
       onKeyDown={handleKeyDown}
       data-gallery-lightbox="true"
       data-gallery-item-id={item.id}
+      data-gallery-item-key={item.key}
       overlayClassName="bg-black/90 backdrop-blur-md"
       className="fixed inset-0 z-50 flex h-dvh w-dvw max-h-none max-w-none top-0 left-0 translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-background p-0 shadow-none sm:max-w-none"
     >
@@ -636,7 +638,7 @@ function GalleryLightbox({
             aria-label="Previous image"
             data-gallery-prev="true"
             disabled={!prev}
-            onClick={() => prev && onSelect(prev.id)}
+            onClick={() => prev && onSelect(prev.key)}
             className={navButton}
           >
             <ChevronLeft size={14} />
@@ -646,7 +648,7 @@ function GalleryLightbox({
             aria-label="Next image"
             data-gallery-next="true"
             disabled={!next}
-            onClick={() => next && onSelect(next.id)}
+            onClick={() => next && onSelect(next.key)}
             className={navButton}
           >
             <ChevronRight size={14} />
@@ -664,7 +666,7 @@ function GalleryLightbox({
       </div>
 
       <div
-        key={item.id}
+        key={item.key}
         data-gallery-lightbox-body="true"
         className="grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[minmax(0,1fr)_400px] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden"
       >
@@ -680,7 +682,7 @@ function LightboxImage({ item, context }: { item: GalleryItem; context: GalleryC
   const full = useGalleryImage(item.image, context, "full", true);
   const url = full.url || preview.url;
   return (
-    <div className="grid min-h-[50dvh] place-items-center bg-surface-inset p-4 lg:min-h-0">
+    <div className="grid min-h-[12rem] place-items-center bg-surface-inset p-4 lg:min-h-0">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img

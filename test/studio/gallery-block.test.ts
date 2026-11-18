@@ -30,6 +30,7 @@ import { TreeDocumentReader } from '../../studio/src/components/reader/tree-docu
 import { TooltipProvider } from '../../studio/src/components/ui/tooltip';
 import {
   DEFAULT_GALLERY_FILTERS,
+  countItems,
   filterGallery,
   isDefaultFilters,
   madeFacts,
@@ -197,6 +198,21 @@ describe('parseGalleryBlock', () => {
     expect(block.groups[1]!.items).toEqual([]);
   });
 
+  it('keeps a work that appears in several groups, with a key per group for navigation', () => {
+    const block = parsedBlock({
+      version: 1,
+      groups: [
+        { id: 'washes', title: 'Washes', items: [item('laundromat'), item('pigment')] },
+        { id: 'gouache', title: 'Gouache', items: [item('laundromat')] },
+      ],
+    });
+    expect(countItems(block)).toBe(3);
+    const order = visibleItemOrder(filterGallery(block, DEFAULT_GALLERY_FILTERS));
+    expect(order.map((entry) => entry.key)).toEqual(['washes/laundromat', 'washes/pigment', 'gouache/laundromat']);
+    expect(stepItem(order, 'washes/pigment', 1)?.key).toBe('gouache/laundromat');
+    expect(stepItem(order, 'gouache/laundromat', -1)?.key).toBe('washes/pigment');
+  });
+
   it('refuses bodies that are not JSON, not objects, have no groups, or use another version', () => {
     for (const source of ['{ not json', '[]', '"text"', '{"version":1}', '{"groups":{}}', '{"version":2,"groups":[]}']) {
       const result = parseGalleryBlock(source);
@@ -281,12 +297,13 @@ describe('gallery filters', () => {
 
   it('steps through the visible items in row order and stops at either end', () => {
     const order = visibleItemOrder(filterGallery(block, DEFAULT_GALLERY_FILTERS));
-    expect(stepItem(order, 'a1', 1)?.id).toBe('a3');
-    expect(stepItem(order, 'a3', 1)?.id).toBe('b1');
-    expect(stepItem(order, 'b1', -1)?.id).toBe('a3');
-    expect(stepItem(order, 'a1', -1)).toBeNull();
-    expect(stepItem(order, 'b2', 1)).toBeNull();
-    expect(stepItem(order, 'a2', 1)).toBeNull();
+    const keyOf = (id: string): string => order.find((entry) => entry.id === id)?.key ?? id;
+    expect(stepItem(order, keyOf('a1'), 1)?.id).toBe('a3');
+    expect(stepItem(order, keyOf('a3'), 1)?.id).toBe('b1');
+    expect(stepItem(order, keyOf('b1'), -1)?.id).toBe('a3');
+    expect(stepItem(order, keyOf('a1'), -1)).toBeNull();
+    expect(stepItem(order, keyOf('b2'), 1)).toBeNull();
+    expect(stepItem(order, keyOf('a2'), 1)).toBeNull();
   });
 });
 
